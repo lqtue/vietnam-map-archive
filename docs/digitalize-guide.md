@@ -1,6 +1,6 @@
 # Digitalize: reading a sheet
 
-An operator guide to `/contribute/digitalize` — the page where a scanned map becomes searchable text pinned to real ground.
+An operator guide to `/scan?mode=triage` — the page where a scanned map becomes searchable text pinned to real ground.
 
 Audience: whoever is working through the corpus, one sheet at a time. It assumes no knowledge of the codebase. For the architecture behind it see [`system-guidelines.md`](system-guidelines.md); for the command-line side see [`pipelines.md`](pipelines.md).
 
@@ -10,7 +10,7 @@ Audience: whoever is working through the corpus, one sheet at a time. It assumes
 
 A scanned historical map is a picture. Searching inside it — "find Khánh Hội" — needs every printed name as **text with a position on the ground**. That is what this page produces, and it takes a person and a model working together: the model reads fast and is wrong in ways only a human notices, and a human reads accurately but cannot do 39 sheets by hand.
 
-The output is rows in `ocr_extractions`: one per label, carrying the text, a box in sheet pixels, a category, a confidence, and — once warped through the sheet's georeference — a longitude and latitude. Those rows are what make `/catalog` and `/explore` able to search *inside* the maps and land you on the spot.
+The output is rows in `ocr_extractions`: one per label, carrying the text, a box in sheet pixels, a category, a confidence, and — once warped through the sheet's georeference — a longitude and latitude. Those rows are what make `/archive` and `/explore` able to search *inside* the maps and land you on the spot.
 
 ## Before you start
 
@@ -27,7 +27,7 @@ python work/worker/vma_worker.py --worker $(hostname)
 
 Leave that running in its own terminal for the whole session. Nothing in the browser does any reading. Pressing **Detect** or **Run OCR** writes a row to a queue and returns immediately; the worker claims the row and does the work.
 
-The reason is the Gemini API key. It lives on your machine and deliberately **never** in the web app, because the web app's code is public. So the website can only ever *ask* for work. If no worker is running, jobs sit queued forever — not a bug, and `/admin/status` shows the count under "The work queue".
+The reason is the Gemini API key. It lives on your machine and deliberately **never** in the web app, because the web app's code is public. So the website can only ever *ask* for work. If no worker is running, jobs sit queued forever — not a bug, and `/admin?tab=status` shows the count under "The work queue".
 
 **Checkpoint.** The worker prints a line per poll. `queue empty` means it asked and there was nothing — which is now trustworthy; before September 2026 it also printed that when the network was down.
 
@@ -110,7 +110,7 @@ Everything above autosaves to your browser as a draft. **Nothing on a server can
 
 **Save triage** writes it to the database (`maps.triage`), and that is what the batch script reads. It is a deliberate assertion: *this sheet is triaged*. The sidebar shows exactly one primary button at a time — Save while the triage is unsaved, Run once it is on the server.
 
-**Checkpoint.** `/admin/status` → "Sheets triaged by a person" should go up by one.
+**Checkpoint.** `/admin?tab=status` → "Sheets triaged by a person" should go up by one.
 
 ### 5. Run OCR — queue the work
 
@@ -146,7 +146,7 @@ Four of those are **derived** from the sheet's latest job — you cannot set the
 
 ### Nothing happens after Detect or Run OCR
 
-No worker is running, or it is running with `--kinds` that exclude what you queued. The default set is `ocr,join,layout`. Check `/admin/status` → "The work queue".
+No worker is running, or it is running with `--kinds` that exclude what you queued. The default set is `ocr,join,layout`. Check `/admin?tab=status` → "The work queue".
 
 ### A region comes back obviously wrong
 

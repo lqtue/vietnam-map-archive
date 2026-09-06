@@ -19,7 +19,7 @@ Read two creators' Threads exports end to end: Tomey (`@tomeyinhanoi`, hanoimaps
 ## Queued, with a reason
 
 - **Colonial ↔ current street names with namesake notes.** Tomey's single best product post, sourced from one book appendix, not a scrape. Feeds the place-time index directly.
-- **Per-place hub pages.** Craig's traffic engine, and he reports it ported cleanly to new countries. We already server-render `/map/[id]`; the increment is `/place/<name>` off the label index shipped in E1.
+- **Per-place hub pages.** Craig's traffic engine, and he reports it ported cleanly to new countries. We already server-render `/map/[id]`; the increment is `/archive/place/<name>` off the label index shipped in E1.
 - **Heritage-building point layer** from the HCMC conservation lists (~600 villas, District 3 heavy, published by decree). The cheapest possible seed for E5's OSM tags.
 - **A credits and attribution page.** We hold `holding_institution` already. Craig also received a commercial-use licensing request for one specific sheet, which says rights must be answerable per record, not per site.
 - **Classical-CV neatline / survey-grid detection to auto-seed GCPs.** He unblocked 200k maps with ~210 lines of pre-LLM algorithms after LLM approaches failed. Only worth it past ~101 maps, but it is the answer to E4's georef bottleneck at scale.

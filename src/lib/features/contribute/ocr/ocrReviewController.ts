@@ -1,5 +1,5 @@
 /**
- * ocrReviewController.ts — the OCR-review half of /contribute/digitalize.
+ * ocrReviewController.ts — the OCR-review half of /scan?mode=triage.
  *
  * Holds the canvas-side state (rows, selection, filter set, draw/isolation
  * toggles, last error) and every write that goes with it, so the route file is

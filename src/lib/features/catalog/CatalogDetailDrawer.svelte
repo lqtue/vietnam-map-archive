@@ -100,13 +100,13 @@
         <a class="act primary" href="/explore?map={item.id}">🌍 Map</a>
       {/if}
       {#if canImage}
-        <a class="act" href="/image?map={item.id}">🖼️ Image</a>
+        <a class="act" href="/scan?map={item.id}">🖼️ Image</a>
       {/if}
       {#if canAnnotate}
-        <a class="act" href="/studio?map={item.id}">✏️ Studio</a>
+        <a class="act" href="/explore?mode=annotate?map={item.id}">✏️ Studio</a>
       {/if}
       {#if !isScout && (item.status === 'public' || item.status === 'featured')}
-        <a class="act" href="/map/{item.id}">🔗 Share page</a>
+        <a class="act" href="/archive/{item.id}">🔗 Share page</a>
       {/if}
       {#if isScout && (item._scout?.source_url || item._scout?.manifest_url)}
         <a
@@ -134,15 +134,15 @@
     right: 0;
     bottom: 0;
     width: min(460px, 100vw);
-    background: var(--color-white);
-    border-left: 2.5px solid var(--color-border);
-    box-shadow: -6px 0 0 var(--color-border);
+    background: var(--ground-raised);
+    border-left: 2.5px solid var(--rule);
+    box-shadow: -6px 0 0 var(--rule);
     z-index: 51;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     animation: slidein 0.18s ease-out;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
   }
   .drawer-head {
     position: sticky;
@@ -152,14 +152,14 @@
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     background: var(--sb-head-bg);
-    border-bottom: var(--border-thin);
+    border-bottom: var(--rule-hair) solid var(--rule);
     z-index: 1;
   }
   .drawer-title {
     flex: 1;
     margin: 0;
-    font-family: var(--font-family-display);
-    font-weight: var(--font-extrabold);
+    font-family: var(--font-display);
+    font-weight: var(--w-semi);
     font-size: 1.1rem;
     line-height: 1.25;
   }
@@ -167,18 +167,18 @@
     flex-shrink: 0;
     width: 32px;
     height: 32px;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font-size: 1.3rem;
     line-height: 1;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     cursor: pointer;
     padding: 0;
   }
   .close-btn:hover {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
   }
 
   .thumb-wrap {
@@ -189,8 +189,8 @@
     max-height: 280px;
     object-fit: contain;
     background: var(--sb-thumb-bg);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--rule);
+    border-radius: var(--radius);
     display: block;
   }
   .status-pill {
@@ -198,10 +198,10 @@
     padding: 0.35rem 0.8rem;
     align-self: flex-start;
     background: var(--sb-accent-yellow);
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font-size: 0.8rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     display: inline-block;
     width: fit-content;
   }
@@ -227,7 +227,7 @@
     border-bottom: none;
   }
   .meta-row dt {
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     color: var(--sb-text-meta);
     text-transform: uppercase;
     font-size: 0.7rem;
@@ -236,7 +236,7 @@
   }
   .meta-row dd {
     margin: 0;
-    color: var(--color-text);
+    color: var(--ink);
     word-break: break-word;
   }
   .meta-row dd a {
@@ -252,22 +252,21 @@
     flex-wrap: wrap;
     padding: 1rem 1.25rem;
     background: var(--sb-head-bg);
-    border-top: var(--border-thin);
+    border-top: var(--rule-hair) solid var(--rule);
   }
   .act {
     flex: 1;
     min-width: 110px;
     padding: 0.65rem 0.9rem;
-    background: var(--color-white);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
     font: inherit;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     font-size: 0.9rem;
     text-decoration: none;
-    color: var(--color-text);
+    color: var(--ink);
     text-align: center;
-    box-shadow: var(--shadow-solid-xs);
     cursor: pointer;
     transition:
       transform 0.1s,
@@ -275,11 +274,11 @@
   }
   .act:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--color-border);
+    box-shadow: 3px 3px 0 var(--rule);
   }
   .act.primary {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
   }
   .act.primary:hover {
     background: var(--sb-text-meta);

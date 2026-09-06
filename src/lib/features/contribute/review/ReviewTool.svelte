@@ -49,6 +49,7 @@
 
   // Canvas colours, matching the legend below.
   const styleDefault = new Style({
+    // Literal: OpenLayers styles cannot read a CSS custom property.
     stroke: new Stroke({ color: '#f97316', width: 1.5 }),
     fill: new Fill({ color: 'rgba(249,115,22,0.12)' }),
   });
@@ -166,13 +167,13 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    background: color-mix(in srgb, var(--color-text) 88%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-white) 18%, transparent);
+    background: color-mix(in srgb, var(--ink) 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ground-raised) 18%, transparent);
     border-radius: 6px;
     padding: 0.3rem 0.75rem;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.75rem;
-    color: var(--color-gray-400);
+    color: var(--ink-soft);
     pointer-events: none;
     z-index: 10;
   }
@@ -187,12 +188,12 @@
 
   /* Literal, because these mirror the OpenLayers styles above exactly. */
   .legend-dot.orange {
-    background: #f97316;
+    background: #f97316; /* token-exempt: legend swatch, mirrors the OL canvas style above */
   }
   .legend-dot.yellow {
-    background: #eab308;
+    background: #eab308; /* token-exempt: legend swatch, mirrors the OL canvas style above */
   }
   .legend-dot.green {
-    background: #22c55e;
+    background: #22c55e; /* token-exempt: legend swatch, mirrors the OL canvas style above */
   }
 </style>

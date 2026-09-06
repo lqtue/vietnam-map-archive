@@ -2,7 +2,7 @@
  * exploreZoom.ts — overlay-stack + camera helpers for /explore.
  *
  * Deliberately NOT `$lib/features/stories/shared/mapPickHandlers.createMapPickHandlers`: that
- * factory clears the overlay stack on every pick (the /create and /studio
+ * factory clears the overlay stack on every pick (the /explore?mode=story and /explore?mode=annotate
  * single-overlay behaviour), whereas /explore is additive — tapping a row adds
  * to the stack and removal is explicit via the Layers panel ×.
  */

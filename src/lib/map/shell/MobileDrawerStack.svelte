@@ -175,11 +175,11 @@
   .drawer-body {
     max-height: 0;
     overflow: hidden;
-    background: var(--color-bg);
+    background: var(--ground);
     transition:
       max-height 0.25s ease,
       border-top-width 0.25s ease;
-    border-top: 0 solid var(--color-border);
+    border-top: 0 solid var(--rule);
     display: flex;
     flex-direction: column;
   }
@@ -212,8 +212,8 @@
     display: flex;
     flex-direction: row;
     height: var(--tab-h);
-    background: var(--color-white);
-    border-top: var(--border-thin);
+    background: var(--ground-raised);
+    border-top: var(--rule-hair) solid var(--rule);
   }
   .drawer-tab {
     flex: 1 1 0;
@@ -222,15 +222,15 @@
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    padding: 0 var(--space-2);
-    background: var(--color-white);
+    padding: 0 var(--s-2);
+    background: var(--ground-raised);
     border: none;
-    border-left: 1.5px solid var(--color-border);
+    border-left: 1.5px solid var(--rule);
     font: inherit;
-    font-family: var(--font-family-base);
-    font-weight: var(--font-bold);
+    font-family: var(--font-body);
+    font-weight: var(--w-semi);
     font-size: 0.82rem;
-    color: var(--color-text);
+    color: var(--ink);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -243,7 +243,7 @@
     background: var(--sb-bg);
   }
   .drawer-tab.on {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
   }
 </style>

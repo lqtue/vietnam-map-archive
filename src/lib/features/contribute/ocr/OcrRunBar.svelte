@@ -117,8 +117,8 @@
     align-items: center;
     gap: 0.4rem;
     padding: 0.4rem 0.75rem;
-    border-bottom: var(--border-thin);
-    background: var(--color-bg);
+    border-bottom: var(--rule-hair) solid var(--rule);
+    background: var(--ground);
     flex-shrink: 0;
   }
   .run-select-wrap {
@@ -139,29 +139,28 @@
     flex: 1;
   }
   .save-btn {
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.7rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.28rem 0.55rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 4px;
-    background: var(--color-yellow);
-    color: var(--color-text);
+    background: var(--accent);
+    color: var(--ink);
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    box-shadow: var(--shadow-solid-xs);
     transition: all 0.1s;
   }
   .validate-btn {
-    background: var(--color-success-600);
-    color: var(--color-white);
+    background: var(--status-ok);
+    color: var(--ground-raised);
   }
   .save-btn:hover:not(:disabled) {
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--color-border);
+    box-shadow: 3px 3px 0 var(--rule);
   }
   .save-btn:active:not(:disabled) {
     transform: none;
@@ -179,15 +178,15 @@
     justify-content: center;
     width: 26px;
     height: 26px;
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    background: var(--color-white);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--ground-raised);
     cursor: pointer;
     flex-shrink: 0;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .icon-btn:hover {
-    background: var(--color-gray-100);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
   .icon-btn.armed {
     background: var(--tone-red-pale);
@@ -195,6 +194,6 @@
     color: var(--tone-red-ink);
   }
   .text-danger {
-    color: var(--color-error-600);
+    color: var(--status-bad);
   }
 </style>

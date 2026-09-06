@@ -6,8 +6,7 @@
   import { annotationUrlForSource } from '$lib/map/shell/warpedOverlay';
   import { fetchFavorites, addFavorite, removeFavorite } from '$lib/data/supabase/favorites';
   import MapCard from '$lib/ui/MapCard.svelte';
-  import ChunkyTabs from '$lib/ui/ChunkyTabs.svelte';
-  import '$styles/layouts/home.css';
+  import HeroRegistration from '$lib/features/explore/HeroRegistration.svelte';
 
   const { supabase, session } = getSupabaseContext();
 
@@ -148,6 +147,13 @@
 
   $: displayedMaps = filterCollection === 'featured' ? displayedFeaturedMaps : favoriteMaps;
 
+  /* The hero registers one sheet onto the live city, so it needs one that is
+     actually georeferenced. First featured map with an Allmaps id wins. */
+  $: heroMap =
+    featuredMaps.find((m) => m.allmaps_id || m.annotation_url) ??
+    maps.find((m) => m.allmaps_id || m.annotation_url) ??
+    null;
+
   onMount(() => {
     mounted = true;
     loadMapCatalog();
@@ -162,213 +168,224 @@
   />
 </svelte:head>
 
-<div class="page home-page" class:mounted>
-  <header class="hero">
-    <div id="google_translate_element" style="display:none"></div>
-    <div class="hero-content">
-      <div class="label-chip">✨ Make old maps fun again.</div>
-      <h1 class="hero-title">
-        Vietnam<br /><span class="text-highlight">Map Archive</span>
-      </h1>
-      <p class="hero-subtitle">
-        A volunteer-built archive of Saigon's historical maps — georeferenced and laid over today's
-        city. We trace every building, name every street, and publish the result as open data. Open
-        data. Volunteer-built. Forkable.
-      </p>
-    </div>
-  </header>
-
-  <main class="main">
-    <!-- 
-      ============================================
-      SECTION 1: CATALOG
-      ============================================
-    -->
-    <section class="mode-section" id="view-mode">
-      <div class="feature-card mega-card">
-        <div class="feature-header-split">
-          <div class="icon-blob color-blue">📚</div>
-          <div class="feature-content-full">
-            <h2 class="feature-title">The Catalog</h2>
-            <p class="feature-description">
-              Every map in the archive. Browse the catalog, stack historical layers on today's city,
-              or inspect the high-resolution IIIF scans up close.
-            </p>
-          </div>
-        </div>
-
-        <div class="embedded-maps-area">
-          <div class="tab-bar">
-            <ChunkyTabs
-              tabs={[
-                { value: 'featured', label: '🌟 Featured' },
-                { value: 'favorites', label: '❤️ Favorites' },
-              ]}
-              active={filterCollection}
-              on:change={(e) => (filterCollection = e.detail as typeof filterCollection)}
-            />
-          </div>
-
-          {#if loading}
-            <div class="maps-loading">
-              <div class="globe-spin">🌎</div>
-              <span>Opening the archive…</span>
-            </div>
-          {:else if filterCollection === 'favorites' && !session}
-            <div class="empty-state">
-              <div class="empty-emoji">🙈</div>
-              <h3>No favorites yet — sign in to start a list.</h3>
-              <p>Heart any map and it lands here, on every device you sign in from.</p>
-              <p style="font-size:0.9rem;opacity:0.7">Sign in from the top nav.</p>
-            </div>
-          {:else if displayedMaps.length > 0}
-            <div class="maps-grid">
-              {#each displayedMaps as map (map.id)}
-                <MapCard
-                  {map}
-                  href="/explore?map={map.id}{map.location
-                    ? `&city=${encodeURIComponent(map.location)}`
-                    : ''}"
-                  thumbnail={thumbnails.get(map.id) ?? map.thumbnail ?? undefined}
-                  showFavorite={!!session}
-                  isFavorited={favoriteIds.includes(map.id)}
-                  on:toggleFavorite={(e) => toggleFavorite(e.detail)}
-                />
-              {/each}
-            </div>
-          {:else}
-            <div class="empty-state">
-              <div class="empty-emoji">🏜️</div>
-              <h3>Nothing here yet.</h3>
-              <p>No maps match this view — try another tab or the catalog.</p>
-            </div>
-          {/if}
-
-          <div class="action-footer">
-            <div class="footer-links-group">
-              <a href="/catalog" class="text-link">Browse the catalog →</a>
-              <a href="/image" class="text-link">Inspect a scan →</a>
-            </div>
-            <a href="/explore" class="action-btn primary-btn"> Open the map viewer 🚀 </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="split-sections">
-      <!--
-        ============================================
-        SECTION 2: CREATIVE TOOLS
-        ============================================
-      -->
-      <section class="mode-section" id="create-mode">
-        <div class="feature-card hover-lift">
-          <div class="icon-blob color-green">🛠️</div>
-          <h2 class="feature-title">
-            Tools <span class="fun-badge">Beta</span>
-          </h2>
-          <p class="feature-description">
-            Build something on top of the archive. Stitch a scrollytelling story across historical
-            layers, or annotate a map with your own points, lines, and shapes.
-          </p>
-          <div class="micro-links">
-            <a href="/create" class="micro-link-card">
-              <span class="mlc-icon">🎨</span>
-              <span class="mlc-body">
-                <span class="mlc-title">Story Builder</span>
-                <span class="mlc-desc"
-                  >Walk readers through a place, one historical layer at a time</span
-                >
-              </span>
-              <span class="mlc-arrow">→</span>
-            </a>
-            <a href="/studio" class="micro-link-card">
-              <span class="mlc-icon">✏️</span>
-              <span class="mlc-body">
-                <span class="mlc-title">Annotate</span>
-                <span class="mlc-desc"
-                  >Draw points, lines, and shapes on any map and save them as a set</span
-                >
-              </span>
-              <span class="mlc-arrow">→</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!--
-        ============================================
-        SECTION 3: COMMUNITY CONTRIBUTION
-        ============================================
-      -->
-      <section class="mode-section" id="contribute-mode">
-        <div class="feature-card hover-lift">
-          <div class="icon-blob color-orange">🤝</div>
-          <h2 class="feature-title">Contribute</h2>
-          <p class="feature-description">
-            The archive is built by volunteers. Trace a building, crop a map for OCR, or anchor a
-            scan to today's coordinates — every contribution is attributed and released as open
-            data.
-          </p>
-          <div class="micro-links">
-            <a href="/contribute/digitalize" class="micro-link-card">
-              <span class="mlc-icon">🏷️</span>
-              <span class="mlc-body">
-                <span class="mlc-title">OCR &amp; Triage</span>
-                <span class="mlc-desc"
-                  >Crop a map's neatline and validate the toponyms our pipeline pulls out</span
-                >
-              </span>
-              <span class="mlc-arrow">→</span>
-            </a>
-            <a href="/contribute/trace" class="micro-link-card">
-              <span class="mlc-icon">🖋️</span>
-              <span class="mlc-body">
-                <span class="mlc-title">Trace buildings</span>
-                <span class="mlc-desc"
-                  >Outline buildings, roads, and waterways on a georeferenced map</span
-                >
-              </span>
-              <span class="mlc-arrow">→</span>
-            </a>
-            <a href="/contribute/georef" class="micro-link-card">
-              <span class="mlc-icon">📍</span>
-              <span class="mlc-body">
-                <span class="mlc-title">Georeference</span>
-                <span class="mlc-desc"
-                  >Pin a historical map to real-world coordinates in the Allmaps Editor</span
-                >
-              </span>
-              <span class="mlc-arrow">→</span>
-            </a>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <div class="info-row">
-      <section class="info-card">
-        <div class="info-icon color-yellow">✦</div>
-        <h2 class="info-title">About the project</h2>
-        <p class="info-desc">
-          We're pulling every building out of colonial Saigon's historical maps — automatically, in
-          the open, with volunteer review. The 1882 and 1898 surveys are where it starts. Released
-          under CC-BY / ODbL.
-        </p>
-        <a href="/about" class="info-link">Project overview →</a>
-      </section>
-
-      <section class="info-card">
-        <div class="info-icon color-blue">📝</div>
-        <h2 class="info-title">Latest update</h2>
-        <p class="info-title-sm">April 2026 — SAM2 running on the 1882 survey</p>
-        <p class="info-desc">
-          Zero-shot SAM2 segmentation is live on the 1882 Saigon cadastral survey. City blocks are
-          out; building footprints are in progress. Volunteers are reviewing the polygons as they
-          land.
-        </p>
-        <a href="/blog" class="info-link">All updates →</a>
-      </section>
-    </div>
-  </main>
+<!-- The hero is the argument: a surveyed sheet laid onto the city it surveyed,
+     warped live from the same tiles every other page uses. -->
+<div class="is-wide hero-slot" class:mounted>
+  <HeroRegistration map={heroMap} />
 </div>
+
+<p class="standfirst">
+  Saigon was surveyed and resurveyed for a century, and almost none of it lines up with the city now
+  standing on it. We georeference each sheet, trace what is drawn on it, read the names printed
+  across it, and publish all of it as open data.
+</p>
+
+<!-- ── The archive ─────────────────────────────────────────────────────── -->
+<section class="is-wide block">
+  <div class="block__head">
+    <h2>The archive</h2>
+    <div class="row" role="group" aria-label="Which maps to show">
+      <button
+        type="button"
+        class="btn btn--sm"
+        aria-pressed={filterCollection === 'featured'}
+        on:click={() => (filterCollection = 'featured')}
+      >
+        Featured
+      </button>
+      <button
+        type="button"
+        class="btn btn--sm"
+        aria-pressed={filterCollection === 'favorites'}
+        on:click={() => (filterCollection = 'favorites')}
+      >
+        Saved
+      </button>
+    </div>
+  </div>
+
+  {#if loading}
+    <p class="state-msg">Opening the archive…</p>
+  {:else if filterCollection === 'favorites' && !session}
+    <p class="state-msg">
+      Sign in to keep a list. Anything you save shows up here on every device.
+    </p>
+  {:else if displayedMaps.length > 0}
+    <div class="grid">
+      {#each displayedMaps as map (map.id)}
+        <MapCard
+          {map}
+          href="/explore?map={map.id}{map.location
+            ? `&city=${encodeURIComponent(map.location)}`
+            : ''}"
+          thumbnail={thumbnails.get(map.id) ?? map.thumbnail ?? undefined}
+          showFavorite={!!session}
+          isFavorited={favoriteIds.includes(map.id)}
+          on:toggleFavorite={(e) => toggleFavorite(e.detail)}
+        />
+      {/each}
+    </div>
+  {:else if filterCollection === 'favorites'}
+    <p class="state-msg">Nothing saved yet. Open a map and save it to start a list.</p>
+  {:else}
+    <p class="state-msg">No maps match this view.</p>
+  {/if}
+
+  <p class="block__more">
+    <a href="/archive">Browse everything</a>
+    <a href="/explore">Open the viewer</a>
+    <a href="/scan">Inspect a scan</a>
+  </p>
+</section>
+
+<!-- ── Ways in ─────────────────────────────────────────────────────────
+     A ruled list, not numbered: these are three doors into the same
+     archive, and no one has to go through them in order. -->
+<section class="is-wide block">
+  <h2>Ways in</h2>
+
+  <dl class="ways">
+    <div>
+      <dt><a href="/archive">Archive</a></dt>
+      <dd>
+        Every sheet we hold, with its date, its surveyor and its scale. Filter by city, period or
+        what has already been georeferenced.
+      </dd>
+    </div>
+    <div>
+      <dt><a href="/explore">Explore</a></dt>
+      <dd>
+        Stack any number of sheets over the modern city and fade between them. Draw on what you
+        find, or build a story that walks a reader through it.
+      </dd>
+    </div>
+    <div>
+      <dt><a href="/contribute">Contribute</a></dt>
+      <dd>
+        Pin a scan to real coordinates, trace a building, or check the names our pipeline read off a
+        sheet. Every contribution is attributed and released under CC-BY.
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<!-- ── Notes ───────────────────────────────────────────────────────────── -->
+<section class="is-wide block block--split">
+  <div>
+    <h2>About the project</h2>
+    <p>
+      We are pulling every building out of colonial Saigon's historical maps — automatically, in the
+      open, with volunteer review. The 1882 and 1898 surveys are where it starts. Released under
+      CC-BY and ODbL.
+    </p>
+    <p class="block__more"><a href="/about">Project overview</a></p>
+  </div>
+
+  <div>
+    <h2>Latest update</h2>
+    <p class="label">April 2026 — SAM2 on the 1882 survey</p>
+    <p>
+      Zero-shot SAM2 segmentation is running on the 1882 Saigon cadastral survey. City blocks are
+      out; building footprints are in progress, and volunteers are reviewing the polygons as they
+      land.
+    </p>
+    <p class="block__more"><a href="/blog">All updates</a></p>
+  </div>
+</section>
+
+<style>
+  /* The hero breaks the measure and sits tight under the neatline. */
+  .hero-slot {
+    margin: calc(var(--s-5) * -1) calc(var(--s-6) * -1) var(--s-5);
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .hero-slot.mounted {
+    opacity: 1;
+  }
+
+  .standfirst {
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: var(--w-light);
+    line-height: 1.35;
+    max-width: 46ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .block {
+    margin-bottom: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: var(--rule-hair) solid var(--rule);
+  }
+
+  .block__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-4);
+  }
+
+  .block--split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: var(--s-5);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--s-3);
+  }
+
+  .block__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-4);
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--t-2xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .ways {
+    margin: var(--s-4) 0 0;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .ways > div {
+    display: grid;
+    grid-template-columns: minmax(6rem, 10rem) 1fr;
+    gap: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: var(--rule-hair) solid var(--rule);
+  }
+
+  .ways dt {
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: var(--w-light);
+  }
+
+  .ways dd {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 600px) {
+    .hero-slot {
+      margin-inline: calc(var(--s-4) * -1);
+    }
+
+    .ways > div {
+      grid-template-columns: 1fr;
+      gap: var(--s-2);
+    }
+  }
+</style>

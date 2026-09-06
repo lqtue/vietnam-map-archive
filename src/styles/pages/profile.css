@@ -3,10 +3,9 @@
 }
 
 .profile-page .profile-card {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-solid);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   overflow: hidden;
   max-width: 800px;
   margin: 0 auto;
@@ -17,25 +16,24 @@
   align-items: center;
   gap: 1.5rem;
   padding: 2rem;
-  border-bottom: var(--border-thin);
-  background: var(--color-bg);
+  border-bottom: var(--rule-hair) solid var(--rule);
+  background: var(--ground);
 }
 
 .profile-page .avatar-large {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  border: var(--border-thick);
-  box-shadow: var(--shadow-solid-sm);
+  border: var(--rule-thick) solid var(--rule);
   overflow: hidden;
-  background: var(--color-yellow);
+  background: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 2.5rem;
-  font-weight: var(--font-extrabold);
-  color: var(--color-text);
+  font-weight: var(--w-semi);
+  color: var(--ink);
   flex-shrink: 0;
 }
 
@@ -55,46 +53,45 @@
 
 .profile-page .profile-name {
   font-size: 1.5rem;
-  font-weight: var(--font-extrabold);
+  font-weight: var(--w-semi);
   margin: 0;
 }
 
 .profile-page .profile-email {
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
   margin: 0 0 0.5rem 0;
 }
 
 .profile-page .role-badge {
   font-size: 0.75rem;
-  font-weight: var(--font-bold);
+  font-weight: var(--w-semi);
   padding: 0.2rem 0.6rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-gray-300);
-  color: var(--color-gray-500);
-  border: 1.5px solid var(--color-gray-300);
+  border-radius: var(--radius);
+  background: var(--rule);
+  color: var(--ink-soft);
+  border: 1.5px solid var(--rule);
 }
 
 .profile-page .role-badge.mod {
-  background: var(--color-yellow);
-  color: var(--color-text);
-  border-color: var(--color-border);
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--rule);
 }
 
 .profile-page .role-badge.admin {
-  background: var(--color-orange);
-  color: var(--color-white);
-  border-color: var(--color-border);
+  background: var(--status-warn);
+  color: var(--ground-raised);
+  border-color: var(--rule);
 }
 
 .profile-page .sign-out-btn {
   padding: 0.6rem 1.25rem;
-  background: var(--color-white);
-  border: var(--border-thin);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-family-display);
-  font-weight: var(--font-bold);
-  color: var(--color-text);
-  box-shadow: var(--shadow-solid-sm);
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: var(--w-semi);
+  color: var(--ink);
   cursor: pointer;
   transition:
     transform 0.1s,
@@ -103,7 +100,7 @@
 
 .profile-page .sign-out-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--color-border);
+  box-shadow: 4px 4px 0 var(--rule);
 }
 
 .profile-page .stats-section {
@@ -111,15 +108,15 @@
 }
 
 .profile-page .section-title {
-  font-family: var(--font-family-display);
-  font-weight: var(--font-extrabold);
+  font-family: var(--font-display);
+  font-weight: var(--w-semi);
   font-size: 1.25rem;
   margin: 0 0 1.5rem 0;
 }
 
 .profile-page .loading-pulse {
   animation: pulse 2s infinite;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 
 @keyframes pulse {
@@ -143,29 +140,28 @@
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-solid-sm);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
 }
 
 .profile-page .stat-value {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 2.5rem;
-  font-weight: var(--font-extrabold);
-  color: var(--color-primary);
+  font-weight: var(--w-semi);
+  color: var(--accent);
 }
 
 .profile-page .stat-label {
   font-size: 0.875rem;
-  font-weight: var(--font-bold);
-  color: var(--color-gray-500);
+  font-weight: var(--w-semi);
+  color: var(--ink-soft);
   margin-top: 0.25rem;
 }
 
 .profile-page .settings-section {
   padding: 2rem;
-  border-top: var(--border-thin);
+  border-top: var(--rule-hair) solid var(--rule);
 }
 
 .profile-page .settings-grid {
@@ -179,9 +175,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
-  border-radius: var(--radius-md);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
 }
 
 .profile-page .setting-info {
@@ -191,17 +187,17 @@
 }
 
 .profile-page .setting-name {
-  font-weight: var(--font-bold);
-  color: var(--color-text);
+  font-weight: var(--w-semi);
+  color: var(--ink);
 }
 
 .profile-page .setting-desc {
   font-size: 0.85rem;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 
 .profile-page .lang-btn {
-  background: var(--color-blue);
+  background: var(--accent);
   color: white;
   border: none;
 }
@@ -209,8 +205,8 @@
 /* Staff-only shortcuts, shown on /profile when the role is admin or mod.
    The admin pages have no nav entry by design; this is how they are found. */
 .staff-blurb {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-sm);
+  margin: 0 0 var(--s-4);
+  font-size: var(--t-sm);
   opacity: 0.75;
   max-width: 60ch;
   line-height: 1.5;
@@ -219,7 +215,7 @@
 .staff-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--s-3);
 }
 
 .staff-links .pill-btn {

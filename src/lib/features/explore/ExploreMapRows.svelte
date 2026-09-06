@@ -89,13 +89,13 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--s-2);
   }
   .row {
     display: grid;
     grid-template-columns: 32px 3rem 1fr auto;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--s-2);
     width: 100%;
     min-height: 52px;
     text-align: left;
@@ -127,13 +127,13 @@
   }
   .tick.on {
     background: var(--sb-success);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-color: var(--sb-success-dark);
   }
 
   .year-cell {
     font-size: 0.82rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     color: var(--sb-accent);
     font-variant-numeric: tabular-nums;
     text-align: right;
@@ -155,12 +155,12 @@
     min-width: 0;
   }
   .type-chip {
-    padding: 0.15rem var(--space-2);
+    padding: 0.15rem var(--s-2);
     background: var(--sb-accent-yellow);
     border: var(--sb-border);
     border-radius: var(--sb-radius-pill);
     font-size: 0.7rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     text-transform: capitalize;
     white-space: nowrap;
   }

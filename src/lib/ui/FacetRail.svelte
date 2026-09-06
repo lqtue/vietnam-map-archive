@@ -97,24 +97,24 @@
     flex-direction: column;
     gap: 1.1rem;
     padding: 1rem;
-    background: var(--color-white);
-    border: var(--border-thin);
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 10px;
-    box-shadow: 3px 3px 0 var(--color-border);
-    font-family: var(--font-family-base);
+    box-shadow: 3px 3px 0 var(--rule);
+    font-family: var(--font-body);
     min-width: 240px;
     max-width: 280px;
   }
   .facet-group h4 {
     margin: 0 0 0.5rem;
-    font-family: var(--font-family-display);
-    font-weight: var(--font-extrabold);
+    font-family: var(--font-display);
+    font-weight: var(--w-semi);
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-text);
+    color: var(--ink);
     padding-bottom: 0.3rem;
-    border-bottom: 1.5px dashed var(--color-border);
+    border-bottom: 1.5px dashed var(--rule);
   }
   .chips {
     display: flex;
@@ -127,26 +127,26 @@
     gap: 0.35rem;
     padding: 0.25rem 0.55rem;
     background: var(--sb-bg);
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font-family: inherit;
     font-size: 0.78rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     cursor: pointer;
     max-width: 100%;
   }
   .chip:hover:not(:disabled) {
-    background: var(--color-white);
+    background: var(--ground-raised);
     transform: translate(-1px, -1px);
-    box-shadow: 1.5px 1.5px 0 var(--color-border);
+    box-shadow: 1.5px 1.5px 0 var(--rule);
   }
   .chip.on {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
   }
   .chip.on .n {
-    background: var(--color-white);
-    color: var(--color-text);
+    background: var(--ground-raised);
+    color: var(--ink);
   }
   .chip:disabled {
     opacity: 0.35;
@@ -159,12 +159,12 @@
     max-width: 170px;
   }
   .n {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     padding: 0.05rem 0.4rem;
     border-radius: var(--radius-pill);
     font-size: 0.68rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     min-width: 1.4rem;
     text-align: center;
   }

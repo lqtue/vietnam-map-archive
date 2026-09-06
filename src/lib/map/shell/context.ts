@@ -25,7 +25,7 @@ export interface ShellContextValue {
   layerStore: LayerStore;
 }
 
-// Annotation editing state is NOT here: /studio owns it and passes it through
+// Annotation editing state is NOT here: /explore?mode=annotate owns it and passes it through
 // `getAnnotationContext()` ($lib/map/annotations/annotationContext), which keeps the
 // generic shell free of a feature-specific dependency.
 

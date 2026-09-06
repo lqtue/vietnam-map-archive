@@ -55,7 +55,7 @@ src/lib/
 
 - `data/maps/types.ts` is the **only** home for `MapRecord` / `MapListItem` / `MapStatus`. `map/types.ts` no longer re-exports them and holds UI-only types (`ViewMode`, `DrawingMode`, `AnnotationSummary`, `SearchResult`, `AnnotationSet`).
 - `core/` must not import `@allmaps/openlayers` or `ol` — that is what keeps the OL bundle off `/explore`'s data path.
-- `ui/` must not import from `features/`. When a primitive needs domain behaviour, the **route page** wires it: `/catalog` renders `MapEditModal` itself, `CatalogUnifiedSearch` only dispatches `edit`.
+- `ui/` must not import from `features/`. When a primitive needs domain behaviour, the **route page** wires it: `/archive` renders `MapEditModal` itself, `CatalogUnifiedSearch` only dispatches `edit`.
 - Routes are thin — load, wire, render. Business logic belongs in a `features/` module so it stays importable and testable.
 - Features are isolated from each other. Cross-feature imports go through `features/shared/` (cross-cutting UI) or `features/<x>/shared/` (a feature's public API); anything else under another feature is private. Lint-enforced by the regex rule in `eslint.config.js` — `catalog/` had been a shared layer by accident, imported by four features, before the seam was declared.
 - One Svelte component per file. No barrel `index.ts` re-exports for components.
@@ -71,29 +71,29 @@ The group in parentheses is the SvelteKit layout group, not part of the URL. Bot
 | `/` | (editorial) | `+page.svelte` | none |
 | `/about` | (editorial) | `+page.svelte` + `content.ts` beside it | none |
 | `/blog`, `/blog/[slug]` | (editorial) | `+page.svelte` + `posts.ts` beside it | none |
-| `/catalog` | (editorial) | `+page.svelte` → `CatalogUnifiedSearch` (+ `MapEditModal` for admin/mod) | none |
+| `/archive` | (editorial) | `+page.svelte` → `CatalogUnifiedSearch` (+ `MapEditModal` for admin/mod) | none |
 | `/contribute` | (editorial) | `+page.svelte` | none (mod cards gated) |
-| `/contribute/georef` | (editorial) | `+page.svelte` → Allmaps Editor | none |
+| `/contribute#georef` | (editorial) | `+page.svelte` → Allmaps Editor | none |
 | `/login` | (editorial) | `+page.svelte` | none |
 | `/profile` | (editorial) | `+page.svelte` + `+page.server.ts` | auth (303 → `/login`) |
-| `/admin/bulk` | (editorial) | `+page.svelte` | admin |
-| `/admin/scout` | (editorial) | `+page.svelte` + `ScoutCard` | admin/mod |
+| `/admin?tab=bulk` | (editorial) | `+page.svelte` | admin |
+| `/admin?tab=scout` | (editorial) | `+page.svelte` + `ScoutCard` | admin/mod |
 | `/explore` | (app) | `+page.svelte` + `MapWorkspace` + `ExploreSidebar` | none |
-| `/studio` | (app) | `StudioMode.svelte` | auth |
-| `/create` | (app) | `CreateMode.svelte` | auth |
+| `/explore?mode=annotate` | (app) | `StudioMode.svelte` | auth |
+| `/explore?mode=story` | (app) | `CreateMode.svelte` | auth |
 | `/trip/[id]` | (app) | `+page.svelte` + `TripPlayback` | none |
-| `/image` | (app) | `+page.svelte` + `ImageShell` | none |
-| `/contribute/digitalize` | (app) | `+page.svelte` + `TriageTool` / `OcrBboxTool` / `SegSidebar` | auth |
-| `/contribute/trace` | (app) | `+page.svelte` + `TraceTool` | auth |
-| `/contribute/review` | (app) | `+page.svelte` + `ReviewMode` | mod/admin |
+| `/scan?mode=inspect` | (app) | `+page.svelte` + `ImageShell` | none |
+| `/scan?mode=triage` | (app) | `+page.svelte` + `TriageTool` / `OcrBboxTool` / `SegSidebar` | auth |
+| `/scan?mode=trace` | (app) | `+page.svelte` + `TraceTool` | auth |
+| `/scan?mode=review` | (app) | `+page.svelte` + `ReviewMode` | mod/admin |
 
-Every route is in one of the two groups — `/contribute/review` moved into `(app)` in Aug 2026.
+Every route is in one of the two groups — `/scan?mode=review` moved into `(app)` in Aug 2026.
 
 **Redirects** are a table, not stub pages. `LEGACY_REDIRECTS` in `src/hooks.server.ts` issues a 301 with the query string preserved:
 
 - `/view` → `/explore`
-- `/annotate` → `/studio`
-- `/contribute/label` → `/contribute/digitalize`
+- `/annotate` → `/explore?mode=annotate`
+- `/contribute/label` → `/scan?mode=triage`
 
 There is no `/admin`, `/signup`, `/contribute/catalog`, `/hunt` or `/georef` route.
 
@@ -105,7 +105,7 @@ Four registers. The register decides the shell and the CSS.
 
 ### Editorial
 
-`/`, `/about`, `/blog`, `/blog/[slug]`, `/catalog`, `/contribute`, `/contribute/georef`, `/login`, `/profile`, `/admin/bulk`, `/admin/scout`.
+`/`, `/about`, `/blog`, `/blog/[slug]`, `/archive`, `/contribute`, `/contribute#georef`, `/login`, `/profile`, `/admin?tab=bulk`, `/admin?tab=scout`.
 
 Nav and footer come from the group layout, so a page renders only its own body:
 
@@ -126,19 +126,19 @@ The shared classes (`.editorial-hero`, `.editorial-main`, `.section-card`, `.lab
 
 ### Geo-map tool
 
-`/explore`, `/studio`, `/create`, `/trip/[id]`.
+`/explore`, `/explore?mode=annotate`, `/explore?mode=story`, `/trip/[id]`.
 
 `src/lib/map/shell/MapWorkspace.svelte` is the shared base (§5). It composes `ToolLayout` + `MapShell` + `LayerRenderer` + `MapModeOverlays`. Never create a second OL map outside `MapShell`.
 
 ### IIIF-canvas tool
 
-`/image`, `/contribute/digitalize`, `/contribute/trace`, `/contribute/review`, plus `NeatlineEditor` inside the admin modal.
+`/scan?mode=inspect`, `/scan?mode=triage`, `/scan?mode=trace`, `/scan?mode=review`, plus `NeatlineEditor` inside the admin modal.
 
 These use `ImageShell` (static image extent, pixel coordinates) and the shared sidebar frame `ToolSidebarShell` + `ToolMapPicker`. They do **not** use MapShell or the global map stores. CSS: `src/styles/layouts/tool-page.css` + `src/styles/components/tool-sidebar.css`.
 
 ### Admin
 
-Admin work happens inside the editorial register. Map CRUD is a modal rendered by `/catalog`; bulk and scout are ordinary editorial pages using `src/styles/pages/admin-bulk.css` and `admin-scout.css`, with modal chrome in `src/styles/components/admin-modals.css`. The old `layouts/admin.css` dashboard sheet was deleted — there is no `.dashboard` / `.top-bar` register any more.
+Admin work happens inside the editorial register. Map CRUD is a modal rendered by `/archive`; bulk and scout are ordinary editorial pages using `src/styles/pages/admin-bulk.css` and `admin-scout.css`, with modal chrome in `src/styles/components/admin-modals.css`. The old `layouts/admin.css` dashboard sheet was deleted — there is no `.dashboard` / `.top-bar` register any more.
 
 ---
 
@@ -288,5 +288,5 @@ Role lives in `profiles.role`, read on the client via `fetchUserRole` (`data/sup
 | `CatalogUnifiedSearch` still queries Supabase directly | `features/catalog/CatalogUnifiedSearch.svelte` | move the read into `data/maps/service.ts` |
 | Mixed error conventions | throw vs `console` → `[]` vs `console` → `false` across `data/` | pick one |
 | Mobile gaps in contribute | `OcrSidebar` bind/`on:filter` and the Segmentation tab are desktop-only (carried from the Aug 2026 cleanup, not re-verified since) | decide whether these tools are desktop-only by design, then either say so or fix |
-| Fat route pages | `/explore` (336 script lines) and `/contribute/digitalize` (263, down from 322 — the layout job left in Sept 2026) are controllers, not wiring | pull into `features/<x>/<x>Controller.ts` when next touching them — the `ocrReviewController.ts` / `layoutJob.ts` pattern |
+| Fat route pages | `/explore` (336 script lines) and `/scan?mode=triage` (263, down from 322 — the layout job left in Sept 2026) are controllers, not wiring | pull into `features/<x>/<x>Controller.ts` when next touching them — the `ocrReviewController.ts` / `layoutJob.ts` pattern |
 | Four button systems | `.chip` and `.btn` (`components/buttons.css`), `.action-btn` / `.pill-btn` (`components/editorial.css`), and the tool-chrome set `.tool-btn` / `.ctrl-btn` / `.sb-btn` / `.tool-run-btn` / `.auth-gate-btn`, plus ~15 one-offs in component `<style>` blocks | decide which two survive, then fold the rest in; `/screens` shows `.chip` and `.btn` side by side |

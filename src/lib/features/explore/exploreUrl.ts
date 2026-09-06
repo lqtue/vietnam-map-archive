@@ -2,7 +2,7 @@
  * exploreUrl.ts — the `?map=` deeplink contract for /explore.
  *
  * `?map=<id>` (query, written here) is the inbound deep link: it is what
- * /catalog, /contribute/digitalize and every share link point at. The `&map=`
+ * /archive, /scan?mode=triage and every share link point at. The `&map=`
  * that urlStore used to append to the `#…` hash was a second, competing
  * mechanism for the same thing and was dropped — see `$lib/map/stores/urlStore.ts`.
  * The hash reader stays tolerant of `map=` so old links still land here.

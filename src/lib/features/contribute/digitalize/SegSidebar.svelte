@@ -1,5 +1,5 @@
 <!--
-  SegSidebar.svelte — the Segmentation phase panel of /contribute/digitalize.
+  SegSidebar.svelte — the Segmentation phase panel of /scan?mode=triage.
 
   Shows the pipeline stage, the gate to the next stage, the MapSAM2 command
   configuration, and the Colab command itself. Segmentation runs on a GPU
@@ -55,7 +55,7 @@
         <p class="seg-hint">Ready. Run the Colab command below, then come back here.</p>
       {/if}
     {:else if stage === 'seg_done' || stage === 'seg_reviewed'}
-      <a class="action-btn seg-review-link" href="/contribute/review?map={mapId}">
+      <a class="action-btn seg-review-link" href="/scan?mode=review?map={mapId}">
         Review footprints &rarr;
       </a>
     {:else if stage === 'idle'}
@@ -146,13 +146,13 @@
   }
   .seg-stage-badge {
     font-size: 0.72rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     padding: 2px 8px;
     border-radius: var(--radius-pill);
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    background: var(--color-gray-100);
-    color: var(--color-text);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
+    color: var(--ink);
   }
   .seg-stage-badge.stage-ocr_done,
   .seg-stage-badge.stage-reviewed {
@@ -184,8 +184,8 @@
     flex-direction: column;
     gap: 0.45rem;
     padding: 0.55rem 0.6rem;
-    background: var(--color-gray-100);
-    border: 1px solid var(--color-gray-300);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
+    border: 1px solid var(--rule);
     border-radius: 4px;
   }
   .seg-field {
@@ -195,17 +195,17 @@
   }
   .seg-field span {
     font-size: 0.68rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     opacity: 0.6;
   }
   .seg-field input,
   .seg-field select {
     font-family: ui-monospace, monospace;
     font-size: 0.68rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     border-radius: 3px;
     padding: 0.25rem 0.4rem;
-    background: var(--color-white);
+    background: var(--ground-raised);
     width: 100%;
   }
   .seg-field--inline {

@@ -305,12 +305,12 @@
     margin: -0.2rem -0.35rem 0;
   }
   .kf-label:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
   }
   .kf-label:focus {
     outline: none;
     border-color: var(--sb-accent);
-    background: var(--color-white);
+    background: var(--ground-raised);
   }
 
   .kf-desc {
@@ -344,7 +344,7 @@
     font-weight: 600;
     text-transform: none;
     letter-spacing: 0;
-    background: var(--color-white);
+    background: var(--ground-raised);
     border: var(--sb-border);
     border-radius: var(--sb-radius-sm);
   }

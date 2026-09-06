@@ -1,5 +1,5 @@
 <!--
-  StudioRightPane.svelte — right pane for /studio. A mode switch, nothing more.
+  StudioRightPane.svelte — right pane for /explore?mode=annotate. A mode switch, nothing more.
 
   Layout:
     • Top bar       — Back · Mode toggle (Annotate | Animate) · Collapse

@@ -95,7 +95,7 @@ So step 2 of §6 leads with `context.schema.json`, and `story.schema.json` follo
 | MR ≤ 15 files / ≤ 1500 lines / ≤ 1 contract change | `map-data-operations.md:547-551` | PR rule for the platform repo |
 | Non-goals recorded **with reopen conditions** | `map-data-operations.md:26-27,555-578` | §6 below |
 | Decision register + retraction table + kill conditions; measurement beats spec | `tasco/MATH-AND-DECISIONS.md:13-14,463-499,630-647` | `docs/decisions.md` (§5) |
-| Reuse the one approval surface; never a second review UI | `mapops-indexing-tasking-prd.md:33,76` | `/contribute/review` is the only moderation queue, tab per kind |
+| Reuse the one approval surface; never a second review UI | `mapops-indexing-tasking-prd.md:33,76` | `/scan?mode=review` is the only moderation queue, tab per kind |
 | Protected **random audit core** so targeted review cannot self-confirm | `collection-system-plan.md:370`, `MATH-AND-DECISIONS.md:334-345` | 5 % of validated OCR/footprints re-queued blind (E2 HITL) |
 | QA at edit time is the cheapest cell and the one most skipped | `collection-system-plan.md:280-291` | Category enums + required fields enforced in the API, before sampled QC |
 | Log predictions **before** collecting; score with a proper rule | `collection-system-plan.md:448-479` | C5 eval: freeze the 20-tile set and the metric before the next seg run |
@@ -137,8 +137,8 @@ Two apps, two packages. No `packages/ui`, no `packages/map`, no `packages/tokens
 | Contract / package | Producer | Consumers | Status |
 |---|---|---|---|
 | `context.schema.json` — `context_at(lng, lat, radius, years)` → maps · labels · footprints · legend points · stories, each with `year`, `distance_m`, `geom_rmse` | archive RPC (§0) | archive `/explore` + E3, event map, thesis notebook, any planner AOI, an LLM tool later | **The engine's contract.** Leads step 2 |
-| `story.schema.json` — tour with stops `{id, title, lng, lat, mapId?, year?, body, media[]}` | archive `/create` | archive `/trip`, event `/tours` + check-in | **The unification with teeth.** Author once in the archive, ship frozen JSON in the event PWA. Replaces HACW's hand-edited `tours.json`. |
-| `label-hit.schema.json` — `/api/search?include=labels` row | archive API | archive `/catalog` + `/explore`, event map (historical labels as pins), thesis notebook | Shipped in E1; freeze shape |
+| `story.schema.json` — tour with stops `{id, title, lng, lat, mapId?, year?, body, media[]}` | archive `/explore?mode=story` | archive `/trip`, event `/tours` + check-in | **The unification with teeth.** Author once in the archive, ship frozen JSON in the event PWA. Replaces HACW's hand-edited `tours.json`. |
+| `label-hit.schema.json` — `/api/search?include=labels` row | archive API | archive `/archive` + `/explore`, event map (historical labels as pins), thesis notebook | Shipped in E1; freeze shape |
 | `legend-point.schema.json` | archive API | archive `LegendPointsLayer`, event map | Freeze |
 | `footprint-feature.schema.json` — GeoJSON properties of `/api/export/footprints` | archive API | thesis `work/analysis`, Tasco QGIS, event map (E2) | E2 export upgrade defines it |
 | `packages/basemap` — extract script + style overrides | — | archive (Saigon 37 MB in R2), event (Hội An 1.3 MB shipped), Hanoi/Huế extracts (E4) | Both repos carry the command today, differently |
@@ -184,11 +184,11 @@ Reopen any row when a second consumer appears (e.g. an archive "field mode" that
 | 1 | `packages/basemap`: one `pmtiles_extract.sh`, flavor overrides; archive `basemapStyle.ts` and HACW `map-style.js` both point at it | archive + event | now |
 | 1.5 | **The engine** (§0): PostGIS, `geom`/`geom_src`/`geom_rmse` on labels and footprints, warp-on-write in the three server writers, one `warp` job kind, `context_at` + `map_context` RPCs. Re-scopes B8 | archive `/explore` + E3 + thesis | E2's seg runner (so footprints exist to index) |
 | 2 | `packages/contracts` leading with `context.schema.json`, then `label-hit`, `legend-point`, `footprint-feature`; archive API validates its own output against them in the write smoke | archive API + thesis notebook (E2) | step 1.5 |
-| 3 | `story.schema.json`; archive `/create` exports it; HACW `/tours` reads it | archive + event | step 2 |
+| 3 | `story.schema.json`; archive `/explore?mode=story` exports it; HACW `/tours` reads it | archive + event | step 2 |
 | 4 | `git subtree add` HACW → `apps/event`; pnpm workspace; root lanes; CF Pages root dir per app | — | step 3 (so the import carries a real shared dependency, not a hope) |
 | 5 | Archive moves root → `apps/archive`; CF Pages root dir change; repo rename | — | step 4, one PR, nothing else in it |
 | 6 | Docs three-layer split; `docs/AGENTS.md`; CLAUDE.md → adapter; `decisions.md` seeded | both apps' docs | step 4 |
-| 7 | Random audit core (5 % blind re-review) in `/contribute/review`; QA enums in API | E2 HITL volume | when a second reviewer exists |
+| 7 | Random audit core (5 % blind re-review) in `/scan?mode=review`; QA enums in API | E2 HITL volume | when a second reviewer exists |
 
 **Non-goals, with reopen conditions**
 - Shared UI package — reopen when a third app needs `LocationSearch`/`MapCard`-class components.

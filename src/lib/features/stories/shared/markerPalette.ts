@@ -15,7 +15,7 @@ export interface MarkerPalette {
 }
 
 // Last-resort literals, used only during SSR / before the stylesheet lands.
-// They mirror --sb-accent, --sb-accent-warm, --color-border and --color-white;
+// They mirror --sb-accent, --sb-accent-warm, --rule and --ground-raised;
 // `done` green has no token of its own (see --marker-done above).
 const FALLBACK: MarkerPalette = {
   pending: '#2563eb',
@@ -39,8 +39,8 @@ export function markerPalette(): MarkerPalette {
     pending: cssVar('--marker-pending', cssVar('--sb-accent', FALLBACK.pending)),
     current: cssVar('--marker-current', cssVar('--sb-accent-warm', FALLBACK.current)),
     done: cssVar('--marker-done', FALLBACK.done),
-    border: cssVar('--color-border', FALLBACK.border),
-    label: cssVar('--color-white', FALLBACK.label),
-    font: cssVar('--font-family-display', FALLBACK.font),
+    border: cssVar('--rule', FALLBACK.border),
+    label: cssVar('--ground-raised', FALLBACK.label),
+    font: cssVar('--font-display', FALLBACK.font),
   };
 }

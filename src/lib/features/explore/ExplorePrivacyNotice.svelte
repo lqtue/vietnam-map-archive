@@ -102,7 +102,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(20, 20, 20, 0.45);
+    background: var(--scrim);
     z-index: 200;
   }
   .modal {
@@ -113,11 +113,11 @@
     width: min(460px, 100vw);
     background: var(--sb-card-bg);
     color: var(--sb-text);
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-bottom: none;
-    border-top-left-radius: var(--radius-md);
-    border-top-right-radius: var(--radius-md);
-    box-shadow: 0 -6px 0 var(--color-border);
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    box-shadow: 0 -6px 0 var(--rule);
     padding: 1.05rem 1.1rem 1.25rem;
     z-index: 201;
     max-height: 90vh;
@@ -127,17 +127,16 @@
     .modal {
       bottom: 50%;
       transform: translate(-50%, 50%);
-      border: var(--border-thin);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-solid-sm);
+      border: var(--rule-hair) solid var(--rule);
+      border-radius: var(--radius);
     }
   }
 
   h2 {
     margin: 0 0 0.4rem;
     font-family: var(--sb-font-display);
-    font-size: var(--text-xl);
-    font-weight: var(--font-extrabold);
+    font-size: var(--t-lg);
+    font-weight: var(--w-semi);
   }
   .lede {
     margin: 0 0 0.85rem;
@@ -160,20 +159,18 @@
     text-align: left;
     padding: 0.8rem 0.85rem;
     background: var(--sb-card-bg);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-solid-sm);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
     font-family: inherit;
     cursor: pointer;
     color: var(--sb-text);
   }
   .choice.primary {
     background: var(--sb-accent-warm);
-    color: var(--color-white);
+    color: var(--ground-raised);
   }
   .choice:active {
     transform: translate(2px, 2px);
-    box-shadow: var(--shadow-solid-xs);
   }
   .choice-icon {
     font-size: 1.55rem;
@@ -188,7 +185,7 @@
   }
   .choice-body strong {
     font-size: 0.98rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
   }
   .choice-body span {
     font-size: 0.82rem;
@@ -198,11 +195,11 @@
 
   .privacy {
     margin-bottom: 0.75rem;
-    font-size: var(--text-sm);
+    font-size: var(--t-sm);
   }
   .privacy summary {
     cursor: pointer;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     color: var(--sb-accent);
     padding: 0.3rem 0;
   }

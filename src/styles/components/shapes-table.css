@@ -29,8 +29,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  border-bottom: var(--border-thin);
-  background: var(--color-white);
+  border-bottom: var(--rule-hair) solid var(--rule);
+  background: var(--ground-raised);
   flex-shrink: 0;
 }
 .shapes-search {
@@ -39,9 +39,9 @@
   gap: 0.35rem;
   flex: 1;
   min-width: 0;
-  background: var(--color-bg);
-  border: var(--border-thin);
-  border-radius: var(--radius-sm);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
   padding: 0.3rem 0.5rem;
 }
 .shapes-search svg {
@@ -52,27 +52,27 @@
   border: none;
   background: none;
   outline: none;
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   width: 100%;
-  color: var(--color-text);
+  color: var(--ink);
 }
 .filter-type-select {
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.3rem 0.4rem;
-  border: var(--border-thin);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  color: var(--color-text);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--ground);
+  color: var(--ink);
   cursor: pointer;
   flex-shrink: 0;
 }
 .shapes-count {
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.5;
   flex-shrink: 0;
   white-space: nowrap;
@@ -100,13 +100,13 @@
   border: none;
   background: none;
   outline: none;
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   font-size: 0.75rem;
-  color: var(--color-text);
+  color: var(--ink);
   padding: 0.2rem 0;
 }
 .cell-input:focus {
-  background: var(--color-yellow);
+  background: var(--accent);
   border-radius: 2px;
   padding: 0.2rem 0.25rem;
   margin: 0 -0.25rem;
@@ -118,19 +118,19 @@
 }
 .cell-select {
   width: 100%;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--rule);
   border-radius: 3px;
-  background: var(--color-bg);
-  font-family: var(--font-family-base);
+  background: var(--ground);
+  font-family: var(--font-body);
   font-size: 0.7rem;
-  color: var(--color-text);
+  color: var(--ink);
   cursor: pointer;
   padding: 0.2rem 1.2rem 0.2rem 0.3rem;
   -webkit-appearance: none;
   appearance: none;
 }
 .cell-select:focus {
-  outline: 2px solid var(--color-blue);
+  outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
 .dropdown-chevron {
@@ -148,15 +148,15 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.3;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   transition: all 0.1s;
   padding: 0;
 }
 .row-action:hover {
   opacity: 1;
-  background: var(--color-gray-100);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
 }
 
 /* ── Hint bar ────────────────────────────────────────────────────────────
@@ -164,10 +164,10 @@
 .sidebar-content .hint-bar {
   padding: 0.5rem 1rem;
   font-size: 0.7rem;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.5;
-  border-top: var(--border-thin);
-  background: var(--color-white);
+  border-top: var(--rule-hair) solid var(--rule);
+  background: var(--ground-raised);
   flex-shrink: 0;
   text-align: center;
 }
@@ -175,9 +175,9 @@
   display: inline-block;
   padding: 0.1rem 0.35rem;
   font-size: 0.65rem;
-  font-family: var(--font-family-base);
-  background: var(--color-bg);
-  border: var(--border-thin);
+  font-family: var(--font-body);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: 3px;
   font-weight: 700;
 }

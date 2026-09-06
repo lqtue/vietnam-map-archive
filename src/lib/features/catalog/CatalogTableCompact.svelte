@@ -65,10 +65,10 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: var(--sb-radius-sm);
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.85rem;
     overflow: hidden;
   }
@@ -78,7 +78,7 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.45rem 0.55rem;
-    border-bottom: 1px dashed var(--color-gray-300);
+    border-bottom: 1px dashed var(--rule);
     cursor: pointer;
   }
 
@@ -100,7 +100,7 @@
     min-width: 3rem;
     white-space: nowrap;
     font-size: 1rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     color: var(--sb-accent);
     font-variant-numeric: tabular-nums;
   }
@@ -125,7 +125,7 @@
 
   .title-link {
     font-size: 0.82rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     color: var(--sb-text-meta);
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -147,14 +147,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-white);
-    color: var(--color-text);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    color: var(--ink);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font: inherit;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.9rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     line-height: 1;
     cursor: pointer;
     padding: 0;
@@ -165,8 +165,8 @@
   }
 
   .cmp-btn.on {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     font-size: 0.75rem;
   }
 
@@ -176,7 +176,7 @@
 
   .active-row {
     background: var(--sb-accent-yellow);
-    box-shadow: inset 3px 0 0 var(--color-border);
+    box-shadow: inset 3px 0 0 var(--rule);
   }
 
   .active-row:hover {

@@ -60,6 +60,7 @@
 
   // ── Styles ─────────────────────────────────────────────────────────────────
   const neatlineStyle = new Style({
+    // Literal: OpenLayers styles cannot read a CSS custom property.
     stroke: new Stroke({ color: '#f59e0b', width: 2.5, lineDash: [8, 4] }),
     fill: new Fill({ color: 'rgba(245,158,11,0.05)' }),
   });

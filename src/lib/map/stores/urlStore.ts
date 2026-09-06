@@ -8,7 +8,7 @@
  *   #@10.7765,106.7010,14z,0r&base=g-satellite
  *
  * The hash carries the camera and the basemap only. The selected map lives in
- * the `?map=<id>` QUERY param, which is what /catalog, /contribute/digitalize
+ * the `?map=<id>` QUERY param, which is what /archive, /scan?mode=triage
  * and every share link point at — see `$lib/features/explore/exploreUrl.ts`. The hash
  * used to carry a second `&map=` copy of the same thing; that writer is gone.
  * Old links are still honoured: a `map=` found in the hash is migrated into

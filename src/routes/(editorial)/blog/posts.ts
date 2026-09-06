@@ -53,10 +53,10 @@ export const posts: BlogPost[] = [
     date: '2026-05-16',
     category: 'update',
     excerpt:
-      'We built a multi-source discovery pipeline that pulls Vietnam-related map records from BnF Gallica, Humazur, David Rumsey, and the Library of Congress into a single reviewable grid. 3,373 candidates surfaced — 758 high-confidence — now curatable from /admin/scout with thumbnails, scoring, and one-click bulk-ingest into the catalog.',
+      'We built a multi-source discovery pipeline that pulls Vietnam-related map records from BnF Gallica, Humazur, David Rumsey, and the Library of Congress into a single reviewable grid. 3,373 candidates surfaced — 758 high-confidence — now curatable from /admin?tab=scout with thumbnails, scoring, and one-click bulk-ingest into the catalog.',
     content: `
 <p>Until this week, adding maps to VMA was a one-by-one job: paste a IIIF manifest URL into the admin form, click "Fetch from Allmaps," fill in the gaps, save. That works fine for the maps we already know about. It doesn't work for the ones we don't — and the colonial Vietnam corpus is scattered across at least a dozen institutions worldwide, most of which have public catalogs but no obvious entry point.</p>
-<p>So we built a scout. <strong>3,373 candidate maps</strong> are now sitting in a reviewable queue at <code>/admin/scout</code>, pulled from four institutions in one pass, scored for relevance, and ready to bulk-ingest with thumbnails and full Dublin Core metadata.</p>
+<p>So we built a scout. <strong>3,373 candidate maps</strong> are now sitting in a reviewable queue at <code>/admin?tab=scout</code>, pulled from four institutions in one pass, scored for relevance, and ready to bulk-ingest with thumbnails and full Dublin Core metadata.</p>
 
 <h2>What "scout" means here</h2>
 <p>Each source has its own API quirks, but the shape of the work is the same: query for Vietnam-related material, normalize the metadata, dedup against what's already in the VMA catalog, derive a thumbnail, and score the result for relevance. We hit four sources:</p>
@@ -86,7 +86,7 @@ export const posts: BlogPost[] = [
 <p>One bug we caught in the process: our initial Humazur scout was building manifest URLs out of media IDs (<code>iiif/&lt;media_id&gt;/manifest</code>) when the correct pattern is <em>item</em> ID (<code>iiif/&lt;item_id&gt;/manifest</code>). Every Humazur manifest URL was returning 404. The loader silently fixes this at insert time so the stored URLs are correct.</p>
 
 <h2>The review UI</h2>
-<p>The page at <code>/admin/scout</code> is a thumbnail grid with filters along the top (status, source, category, minimum score, title search), facet counts that update as you filter, and per-card Approve / Reject / Revert buttons. Selecting multiple cards lets you bulk-approve, bulk-reject, or — for already-approved candidates — bulk-ingest as draft <code>maps</code> rows. Each ingested map carries an <code>extra_metadata.scout_candidate_id</code> reference so we can always trace a catalog row back to the source record that produced it.</p>
+<p>The page at <code>/admin?tab=scout</code> is a thumbnail grid with filters along the top (status, source, category, minimum score, title search), facet counts that update as you filter, and per-card Approve / Reject / Revert buttons. Selecting multiple cards lets you bulk-approve, bulk-reject, or — for already-approved candidates — bulk-ingest as draft <code>maps</code> rows. Each ingested map carries an <code>extra_metadata.scout_candidate_id</code> reference so we can always trace a catalog row back to the source record that produced it.</p>
 <p>The ingest itself reuses the same metadata model we just standardized in last week's <code>holding_institution</code> work: each ingested row gets <code>source_type</code> mapped from the holding institution (Bibliothèque nationale de France → <code>bnf</code>, David Rumsey → <code>rumsey</code>, others → <code>other</code>), a populated <code>holding_institution</code> field separate from <code>collection</code> (which is the sub-collection at the holder), and the IIIF manifest URL ready for further enrichment via the "Fetch metadata from IIIF manifest" button in MapEditModal.</p>
 
 <h2>Why this matters for the project</h2>
@@ -99,7 +99,7 @@ export const posts: BlogPost[] = [
 <li><strong>Curate and ingest the high-score bucket.</strong> 758 candidates is a real afternoon's work, but a quiet one — most are obvious approves. Once they're in the catalog as drafts, the existing pipeline (georeference → OCR → annotate) picks up from there.</li>
 <li><strong>Extend to Vietnamese-language and regional sources.</strong> The biggest gap right now is anything held inside Vietnam. EFEO's collection, the Institut d'Asie Orientale at Lyon, and any digitized holdings from Hanoi or Ho Chi Minh City archives would push the corpus toward 5,000+ unique candidates.</li>
 </ol>
-<p>If you've been waiting for a way to help VMA without doing pixel-level work, scout review is exactly that — fast, judgment-based, and visible in its impact. Drop us a note and we'll get you admin access to <code>/admin/scout</code>.</p>
+<p>If you've been waiting for a way to help VMA without doing pixel-level work, scout review is exactly that — fast, judgment-based, and visible in its impact. Drop us a note and we'll get you admin access to <code>/admin?tab=scout</code>.</p>
 		`,
   },
   {
@@ -122,7 +122,7 @@ export const posts: BlogPost[] = [
 
 <h2>What's next for these sheets</h2>
 <p>None of the new maps are georeferenced yet — they're in <code>draft</code> status until the corners are placed. The sheets are gridded enough that GCP propagation should work well: once we manually georeference one or two anchors per band, the rest can inherit corners arithmetically the same way the L7014 series did. After that, the OCR pipeline can scout the sheets for place names, and the toponym layer for northern Vietnam starts to materialize.</p>
-<p>If you can read the older romanization confidently and want to help validate place-name extractions, this is exactly the kind of contributor work we're set up to support. <a href="/catalog">Browse the catalog</a> to see the new sheets.</p>
+<p>If you can read the older romanization confidently and want to help validate place-name extractions, this is exactly the kind of contributor work we're set up to support. <a href="/archive">Browse the catalog</a> to see the new sheets.</p>
 		`,
   },
   {
@@ -379,8 +379,8 @@ export const CATEGORY_LABELS: Record<BlogPost['category'], string> = {
 };
 
 export const CATEGORY_COLORS: Record<BlogPost['category'], string> = {
-  update: 'var(--color-blue)',
-  research: 'var(--color-green)',
-  community: 'var(--color-orange)',
-  announcement: 'var(--color-purple)',
+  update: 'var(--accent)',
+  research: 'var(--status-ok)',
+  community: 'var(--status-warn)',
+  announcement: 'var(--accent)',
 };

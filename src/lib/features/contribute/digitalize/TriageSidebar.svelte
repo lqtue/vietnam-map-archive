@@ -1,5 +1,5 @@
 <!--
-  TriageSidebar.svelte — Left panel for the Triage phase of /contribute/digitalize.
+  TriageSidebar.svelte — Left panel for the Triage phase of /scan?mode=triage.
 
   Shows neatline config (x/y/w/h inputs), tile config (target calls, live stats),
   per-tile priority legend, run controls, and existing run history.
@@ -520,8 +520,8 @@
     height: 1.15rem;
     margin-right: 0.3rem;
     border-radius: 50%;
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     font-size: 0.68rem;
     font-weight: 700;
   }
@@ -536,8 +536,8 @@
   .ts-note {
     margin: 0 0 0.5rem;
     padding: 0.4rem 0.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--color-gray-100);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
     font-size: 0.72rem;
   }
   .ts-toggle {
@@ -559,10 +559,10 @@
   .ts-regions li {
     display: flex;
     align-items: center;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
   }
   .ts-regions li.selected {
-    background: var(--color-gray-100);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
   .ts-region-row {
     flex: 1;
@@ -588,7 +588,7 @@
     flex: 1;
     min-width: 0;
     border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     background: none;
     color: inherit;
     font: inherit;
@@ -596,7 +596,7 @@
     cursor: pointer;
   }
   .ts-region-cat:hover {
-    border-color: var(--color-border);
+    border-color: var(--rule);
   }
   .ts-region-size,
   .ts-region-conf {
@@ -619,7 +619,7 @@
   }
   .ts-region-del:hover {
     opacity: 1;
-    color: var(--color-error-600);
+    color: var(--status-bad);
   }
   .ts-region-actions {
     display: flex;
@@ -686,15 +686,15 @@
   }
   .ts-swatch--low-res {
     background: rgba(245, 158, 11, 0.18);
-    border-color: #f59e0b;
+    border-color: #f59e0b; /* token-exempt: legend swatch, mirrors the OL tile style in TriageTool */
   }
   .ts-swatch--skip {
     background: rgba(107, 114, 128, 0.28);
-    border-color: #6b7280;
+    border-color: #6b7280; /* token-exempt: legend swatch, mirrors the OL tile style in TriageTool */
   }
 
   .ts-priority-label {
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     min-width: 56px;
   }
   .ts-priority-count {

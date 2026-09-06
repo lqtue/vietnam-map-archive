@@ -33,6 +33,8 @@
   let modify: Modify | null = null;
   let translate: Translate | null = null;
 
+  // Literal colours on purpose: OL builds styles in JS and cannot read a CSS
+  // custom property, so the role tokens are unavailable here.
   const style = new Style({
     stroke: new Stroke({ color: '#2563eb', width: 2.5, lineDash: [6, 4] }),
     fill: new Fill({ color: 'rgba(37, 99, 235, 0.08)' }),

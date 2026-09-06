@@ -15,7 +15,7 @@
 /* ── Sections ────────────────────────────────────────────────────────────── */
 .tool-section {
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -29,15 +29,15 @@
 
 .tool-section-title {
   font-size: 0.7rem;
-  font-weight: var(--font-bold);
+  font-weight: var(--w-semi);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.55;
 }
 
 .tool-hint-inline {
-  font-weight: var(--font-normal);
+  font-weight: var(--w-regular);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -51,7 +51,7 @@
 
 .tool-label {
   font-size: 0.72rem;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.6;
   flex-shrink: 0;
 }
@@ -90,9 +90,9 @@
   padding: 0.25rem 0.4rem;
   font-size: 0.75rem;
   font-family: ui-monospace, monospace;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--rule);
   border-radius: 3px;
-  background: var(--color-white);
+  background: var(--ground-raised);
 }
 
 .tool-field {
@@ -109,29 +109,29 @@
   flex: 1;
   padding: 0.25rem 0.4rem;
   font-size: 0.75rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--rule);
   border-radius: 3px;
-  background: var(--color-white);
+  background: var(--ground-raised);
 }
 
 .tool-range {
   flex: 1;
-  accent-color: var(--color-text);
+  accent-color: var(--ink);
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
 .tool-ghost-btn {
   font-size: 0.7rem;
   padding: 0.2rem 0.5rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--rule);
   border-radius: 3px;
   background: transparent;
   cursor: pointer;
   white-space: nowrap;
-  color: var(--color-text);
+  color: var(--ink);
 }
 .tool-ghost-btn:hover:not(:disabled) {
-  background: var(--color-gray-100);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
 }
 .tool-ghost-btn:disabled {
   opacity: 0.4;
@@ -146,9 +146,9 @@
   width: 100%;
   padding: 0.55rem;
   font-size: 0.8rem;
-  font-weight: var(--font-semibold);
-  background: var(--color-text);
-  color: var(--color-bg);
+  font-weight: var(--w-semi);
+  background: var(--ink);
+  color: var(--ground);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -166,7 +166,7 @@
   font-size: 0.72rem;
   color: var(--tone-red-ink);
   background: var(--tone-red-pale);
-  border: 1px solid color-mix(in srgb, var(--color-error-600) 35%, var(--color-white));
+  border: 1px solid color-mix(in srgb, var(--status-bad) 35%, var(--ground-raised));
   border-radius: 3px;
   padding: 0.35rem 0.5rem;
 }

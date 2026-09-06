@@ -12,14 +12,14 @@
   inset: var(--nav-height) 0 0 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-bg);
-  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
   background-size: 32px 32px;
   overflow: hidden;
 }
 
 .create-mode .map-stage {
-  background: var(--color-white);
+  background: var(--ground-raised);
 }
 
 .create-mode.mobile .workspace {

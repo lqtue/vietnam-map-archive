@@ -3,7 +3,7 @@
 
   Headless: creates an OL vector layer of styled point features.
     • `revealUpTo`  — render only the first N points (reveal-as-you-go on /trip);
-                      null renders all of them (/create editor + /explore).
+                      null renders all of them (/explore?mode=story editor + /explore).
     • `showTrail`   — draw a dashed line through the revealed points.
 -->
 <script lang="ts">

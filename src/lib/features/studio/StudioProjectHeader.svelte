@@ -1,5 +1,5 @@
 <!--
-  StudioProjectHeader.svelte — the one-line project strip under /studio's top
+  StudioProjectHeader.svelte — the one-line project strip under /explore?mode=annotate's top
   bar: inline-renameable title · selected map · autosave dot · Save button.
   Shown in both editor modes.
 -->

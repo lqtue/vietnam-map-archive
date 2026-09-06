@@ -66,9 +66,9 @@
     justify-content: center;
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.18) 60%,
-      rgba(0, 0, 0, 0.32) 100%
+      transparent 0%,
+      color-mix(in srgb, var(--scrim) 45%, transparent) 60%,
+      var(--scrim) 100%
     );
     pointer-events: auto;
   }
@@ -76,9 +76,9 @@
     width: 100%;
     max-width: 560px;
     background: var(--sb-card-bg);
-    border-top: var(--border-thin);
+    border-top: var(--rule-hair) solid var(--rule);
     border-radius: 18px 18px 0 0;
-    box-shadow: 0 -6px 0 #11111118;
+    box-shadow: 0 -6px 0 color-mix(in srgb, var(--ink) 10%, transparent);
     padding: 0.5rem 1.1rem calc(env(safe-area-inset-bottom) + 1.25rem);
     color: var(--sb-text);
     font-family: var(--sb-font-base);
@@ -89,7 +89,7 @@
     width: 38px;
     height: 4px;
     margin: 0.4rem auto 0.6rem;
-    background: #11111133;
+    background: var(--rule);
     border-radius: 99px;
   }
   .intro-eyebrow {
@@ -118,7 +118,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.3rem 0.65rem;
-    background: var(--color-white);
+    background: var(--ground-raised);
     border: var(--sb-border);
     border-radius: 999px;
     font-size: 0.78rem;
@@ -128,13 +128,13 @@
     font-weight: 800;
   }
   .chip-walk {
-    background: #fde68a;
+    background: color-mix(in srgb, var(--accent) 18%, var(--ground-raised));
   }
   .desc {
     margin: 0 0 0.85rem;
     font-size: 0.95rem;
     line-height: 1.5;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .tips {
     margin: 0 0 1rem;
@@ -155,27 +155,26 @@
     width: 100%;
     padding: 0.95rem 1rem;
     border-radius: 14px;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     font-size: 1rem;
     font-weight: 800;
     font-family: inherit;
     cursor: pointer;
-    box-shadow: 3px 3px 0 var(--color-border);
+    box-shadow: 3px 3px 0 var(--rule);
     transition:
       transform 0.06s ease,
       box-shadow 0.06s ease;
   }
   .cta:active {
     transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 var(--color-border);
+    box-shadow: 1px 1px 0 var(--rule);
   }
   .cta.is-primary {
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
   }
   .cta.is-ghost {
-    background: var(--color-white);
-    color: var(--color-text);
-    box-shadow: var(--shadow-solid-xs);
+    background: var(--ground-raised);
+    color: var(--ink);
   }
 </style>

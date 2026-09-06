@@ -2,12 +2,12 @@
    The IIIF canvas is a deliberately dark, warm surface — none of the
    neo-brutalist tokens fit it, so its four colours are named here. */
 :root {
-  --is-canvas-bg: #1a1612;
+  --is-canvas-bg: var(--ink);
   --is-canvas-scrim: rgba(26, 22, 18, 0.75);
-  --is-canvas-text: #e8d5ba;
-  --is-canvas-text-dim: #8b7355;
-  --is-canvas-error: #f87171;
-  --is-canvas-gold: #d4af37;
+  --is-canvas-text: var(--rule);
+  --is-canvas-text-dim: var(--ink-soft);
+  --is-canvas-error: var(--status-bad);
+  --is-canvas-gold: var(--status-warn);
   --is-canvas-gold-dim: rgba(212, 175, 55, 0.3);
 }
 
@@ -15,9 +15,9 @@
 
 :global(body) {
   margin: 0;
-  font-family: var(--font-family-base);
-  background: var(--color-bg);
-  color: var(--color-text);
+  font-family: var(--font-body);
+  background: var(--ground);
+  color: var(--ink);
 }
 
 /* Workspace */
@@ -80,7 +80,7 @@
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  background: var(--color-gray-100);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   border: none;
   border-radius: 0;
   box-shadow: none;
@@ -133,12 +133,12 @@
   left: 0;
   width: 85%;
   max-width: 320px;
-  background: var(--color-bg);
-  border-right: var(--border-thick);
+  background: var(--ground);
+  border-right: var(--rule-thick) solid var(--rule);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-solid-hover);
+  box-shadow: var(--shadow-overlay);
 }
 
 /* Dual Map Layout */
@@ -181,7 +181,7 @@
 
 .dual-divider {
   width: 4px;
-  background: var(--color-border);
+  background: var(--rule);
   flex-shrink: 0;
 }
 
@@ -209,7 +209,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 3px solid var(--color-blue);
+  border: 3px solid var(--accent);
   border-radius: 50%;
   box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.5);
 }
@@ -222,8 +222,8 @@
   height: 24px;
   margin-top: -12px;
   margin-left: -12px;
-  background: var(--color-white);
-  border: 3px solid var(--color-blue);
+  background: var(--ground-raised);
+  border: 3px solid var(--accent);
   border-radius: 50%;
   cursor: ew-resize;
   pointer-events: auto;
@@ -238,8 +238,8 @@
   inset: var(--nav-height) 0 0 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-bg);
-  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-color: var(--ground);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
   background-size: 32px 32px;
   overflow: hidden;
 }
@@ -252,24 +252,23 @@
 .explore-mode .mobile-pane {
   height: 100%;
   overflow-y: auto;
-  padding: var(--space-2);
+  padding: var(--s-2);
 }
 
 .explore-mode .resolving {
   position: absolute;
-  top: var(--space-3);
+  top: var(--s-3);
   left: 50%;
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--s-2);
   padding: 0.45rem 0.85rem;
   background: var(--sb-card-bg);
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--sb-radius-pill);
-  box-shadow: var(--shadow-solid-xs);
   font-size: 0.82rem;
-  font-weight: var(--font-semibold);
+  font-weight: var(--w-semi);
   z-index: 95;
 }
 
@@ -281,14 +280,14 @@
 
 .explore-mode .gps-error {
   position: absolute;
-  top: var(--space-3);
+  top: var(--s-3);
   left: 50%;
   transform: translateX(-50%);
   max-width: 80%;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--s-2) var(--s-3);
   background: var(--sb-accent-yellow);
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--sb-radius-sm);
-  font-size: var(--text-sm);
+  font-size: var(--t-sm);
   z-index: 95;
 }

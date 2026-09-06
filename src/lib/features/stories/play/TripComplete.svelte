@@ -112,10 +112,9 @@
     align-items: center;
     gap: 0.1rem;
     padding: 0.75rem 0.25rem;
-    background: var(--color-white);
-    border: var(--border-thin);
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 12px;
-    box-shadow: var(--shadow-solid-xs);
   }
   .stat .value {
     font-family: var(--sb-font-display);
@@ -138,13 +137,12 @@
     text-align: left;
     padding: 0.7rem 0.85rem;
     margin-bottom: 0.85rem;
-    background: #fef3c7;
-    border: var(--border-thin);
+    background: color-mix(in srgb, var(--accent) 14%, var(--ground-raised));
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 12px;
-    box-shadow: var(--shadow-solid-xs);
     cursor: pointer;
     font-family: inherit;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .save-icon {
     font-size: 1.3rem;
@@ -155,7 +153,7 @@
   }
   .save-row:active {
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
 
   .actions {
@@ -166,23 +164,23 @@
     flex: 1;
     padding: 0.85rem 0.8rem;
     border-radius: 12px;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 3px 3px 0 var(--color-border);
+    box-shadow: 3px 3px 0 var(--rule);
   }
   .btn.is-primary {
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
   }
   .btn.is-ghost {
-    background: var(--color-white);
-    color: var(--color-text);
+    background: var(--ground-raised);
+    color: var(--ink);
   }
   .btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 var(--color-border);
+    box-shadow: 1px 1px 0 var(--rule);
   }
 </style>

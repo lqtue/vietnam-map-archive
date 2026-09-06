@@ -9,7 +9,7 @@
   import LocationSearch from '$lib/ui/LocationSearch.svelte';
 
   export let role: 'user' | 'mod' | 'admin' = 'user';
-  /** Show place-name suggestions (Nominatim). Disable on /image. */
+  /** Show place-name suggestions (Nominatim). Disable on /scan. */
   export let showLocation: boolean = true;
   /** Highlight this row in the table. */
   export let activeId: string | null = null;
@@ -97,6 +97,6 @@
     flex-direction: column;
     gap: 0.4rem;
     padding: 0.2rem 0 0.4rem;
-    background: var(--color-white);
+    background: var(--ground-raised);
   }
 </style>

@@ -1,5 +1,5 @@
 <!--
-  StudioAnnotationList.svelte — /studio's "Annotations" card: the Clear /
+  StudioAnnotationList.svelte — /explore?mode=annotate's "Annotations" card: the Clear /
   Export / Import / From-OSM actions, the Point · Line · Polygon draw toggles,
   the transient notice line, and the annotation rows themselves.
 -->
@@ -290,19 +290,21 @@
     border-radius: 50%;
     font-size: 0.6rem;
     font-weight: 800;
-    color: var(--color-white);
+    color: var(--ground-raised);
     border: var(--sb-border);
     flex-shrink: 0;
   }
-  /* Feature-type badges: gold / green / violet, matching the OSM import palette. */
+  /* Feature-type badges: gold / green / violet, matching the OSM import palette.
+     Literal on purpose — these encode which geometry a feature is, not a UI
+     role, and they have to stay in step with the colours the OL layers use. */
   .type-point {
-    background: #d4af37;
+    background: #d4af37; /* token-exempt: geometry-type badge, must match the OSM import layer */
   }
   .type-line {
-    background: #5b8a72;
+    background: #5b8a72; /* token-exempt: geometry-type badge, must match the OSM import layer */
   }
   .type-polygon {
-    background: #7b6b9e;
+    background: #7b6b9e; /* token-exempt: geometry-type badge, must match the OSM import layer */
   }
 
   .empty {

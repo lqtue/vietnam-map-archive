@@ -10,7 +10,7 @@
 
   Slots:
     sidebar           — desktop left panel
-    right-sidebar     — desktop right panel (e.g. /create story+point editor)
+    right-sidebar     — desktop right panel (e.g. /explore?mode=story story+point editor)
     default           — map content
     floating          — bottom-right controls
     mobile-layers     — mobile drawer 1 body  (label: "Layers")
@@ -31,9 +31,9 @@
   export let sidebarCollapsed = false;
   export let isMobile = false;
   export let isCompact = false;
-  /** Initial / current width of the desktop sidebar. Bindable so callers (e.g. /create) can set a wider default. */
+  /** Initial / current width of the desktop sidebar. Bindable so callers (e.g. /explore?mode=story) can set a wider default. */
   export let sidebarWidth = 320;
-  /** Max draggable width of the sidebar. /create bumps this so its 2-column sidebar fits. */
+  /** Max draggable width of the sidebar. /explore?mode=story bumps this so its 2-column sidebar fits. */
   export let sidebarMaxWidth = 600;
   /** Width of the optional right sidebar (only rendered when its slot has content). */
   export let rightSidebarWidth = 360;
@@ -96,7 +96,7 @@
   let responsiveCleanup: (() => void) | null = null;
   onMount(() => {
     const mobileQuery = window.matchMedia('(max-width: 900px)');
-    const compactQuery = window.matchMedia('(max-width: 1400px)');
+    const compactQuery = window.matchMedia('(max-width: 1280px)');
     const update = () => {
       isMobile = mobileQuery.matches;
       isCompact = compactQuery.matches;
@@ -276,10 +276,10 @@
     left: 50%;
     width: 3px;
     height: 28px;
-    background: var(--color-text);
+    background: var(--ink);
     border-radius: 2px;
     transition: all 0.15s ease;
-    box-shadow: 0 0 0 1px var(--color-white);
+    box-shadow: 0 0 0 1px var(--ground-raised);
   }
   .resize-handle::before {
     transform: translate(-5px, -50%);
@@ -302,8 +302,8 @@
   /* Floating "show editor" pill (mirror of .top-controls but right-anchored). */
   .right-controls {
     position: absolute;
-    top: var(--space-4);
-    right: var(--space-4);
+    top: var(--s-4);
+    right: var(--s-4);
     z-index: 50;
   }
 </style>

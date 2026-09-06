@@ -12,7 +12,7 @@ Vietnam Map Archive (VMA) — a SvelteKit 5 app for exploring georeferenced hist
 - `docs/ROADMAP.md` — **the one tracker**: ship/harden · architecture steps · OCR↔SAM2 product · burn-down
 - `docs/time-machine-plan.md` — label search · temporal fabric · period sources (Track E detail)
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared (contracts, basemap, deploy, docs) and what stays per-app, with sequencing
-- `docs/digitalize-guide.md` — **operator guide** for `/contribute/digitalize`: the five triage steps, what each layout category means, the ground-per-call target, and the failure modes that return plausible output while dropping data
+- `docs/digitalize-guide.md` — **operator guide** for `/scan?mode=triage`: the five triage steps, what each layout category means, the ground-per-call target, and the failure modes that return plausible output while dropping data
 - `docs/api.md` — every server route, its auth class and its contract
 - `docs/deploy.md` — Cloudflare Pages: env in the dashboard, no root `wrangler.toml`, the blank-page-after-deploy effect
 - `docs/pipelines.md` — OCR + MapSAM2 command reference and design rationale. `scripts/` holds the living operator scripts; `scripts/oneoff/` the backfills that have already run and stay only as a record.
@@ -30,7 +30,8 @@ Vietnam Map Archive (VMA) — a SvelteKit 5 app for exploring georeferenced hist
 npm run dev          # Dev server
 npm run build        # Production build (wipes .svelte-kit/output first — see note below)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
-npm run lint         # prettier --check . && eslint .
+npm run lint         # prettier --check . && eslint . && check-tokens
+npm run lint:tokens  # no hex literals in any <style> block
 npm run format       # prettier --write .
 npm run test         # Playwright smoke suite, read-only (tests/smoke.spec.ts)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
@@ -48,7 +49,7 @@ There is no root `wrangler.toml` on purpose — see Deployment. The R2 tile work
 
 Never import a Node builtin bare (`import('path')`); the CF Functions bundle errors with `Could not resolve "path"` and publishes nothing. Use the `node:` prefix.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **85** tests: the **seven** smokes in `tests/smoke.spec.ts`, which are **read-only** (they hit the real Supabase project but never write), plus 78 browser-less pure checks that ride the same runner — `tests/press.spec.ts` (the Gallica CQL builder and the NLV year window), `tests/explore-keys.spec.ts` (the /explore time scrubber), `tests/tween.spec.ts` (the studio easing that replaced animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker), `tests/triage-suggest.spec.ts` (level0 tile addressing and the triage proposal), `tests/map-grid.spec.ts` (the printed reference grid, cell to point), `tests/layout-regions.spec.ts` (the layout vocabulary and which rectangle steers the tile grid), `tests/georef-editor-url.spec.ts` (which IIIF source Allmaps Editor is handed when reopening a map's control points) `tests/bounds-probe.spec.ts` (which maps /explore asks Allmaps about — only georeferenced ones without a bbox) and `tests/palette.spec.ts` (which pages the command palette offers each role, and the gazetteer key a label resolves to — that key is computed twice, once in Postgres and once in the client, and a mismatch is a 404). Pure checks live here rather than in a second framework because Playwright is already installed.
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **87** tests: the smokes in `tests/smoke.spec.ts`, which are **read-only** (they hit the real Supabase project but never write), plus 78 browser-less pure checks that ride the same runner — `tests/press.spec.ts` (the Gallica CQL builder and the NLV year window), `tests/explore-keys.spec.ts` (the /explore time scrubber), `tests/tween.spec.ts` (the studio easing that replaced animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker), `tests/triage-suggest.spec.ts` (level0 tile addressing and the triage proposal), `tests/map-grid.spec.ts` (the printed reference grid, cell to point), `tests/layout-regions.spec.ts` (the layout vocabulary and which rectangle steers the tile grid), `tests/georef-editor-url.spec.ts` (which IIIF source Allmaps Editor is handed when reopening a map's control points) `tests/bounds-probe.spec.ts` (which maps /explore asks Allmaps about — only georeferenced ones without a bbox) and `tests/palette.spec.ts` (which pages the command palette offers each role, and the gazetteer key a label resolves to — that key is computed twice, once in Postgres and once in the client, and a mismatch is a 404). Pure checks live here rather than in a second framework because Playwright is already installed.
 
 **Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 23 tests) against a **local** stack, never production: `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via `scripts/seed-test-db.mjs`. The suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done by letting `@supabase/ssr` mint the session cookies, so chunking and encoding match the app exactly.
 
@@ -110,7 +111,21 @@ VMA_API_URL, VMA_WORKER_KEY     # worker machines only — never the web app
 - `src/lib/data/supabase/types.ts` is current against migration head 070, verified identical to the linked project. Prefer the real types over `as any`; ~25 casts remain, mostly in Svelte components.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is what forces most `as any` casts downstream.
 
-**Styling:** all CSS in `src/styles/`, imported via the `$styles` alias. Root entry is `src/styles/global.css`, which imports `tokens.css` plus the always-on component sheets; layout and page sheets are imported by the component or route that needs them. **One theme.** `tokens.css` has no `[data-theme]` block, and the `vma-theme` boot script that used to sit in `src/app.html` is gone — nothing wrote the key and no CSS consumed it. Component `<style>` blocks carry layout/positioning; every colour, border and shadow goes through a `var(--token)`. New pages use the template in `docs/design-system.md`; nav and footer come once from `src/routes/(editorial)/+layout.svelte`, so a new editorial page only needs the links added in `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
+**Styling — the Sheet system.** All CSS in `src/styles/`, via the `$styles` alias. Root entry is `global.css`, which imports five files in order: `fonts.css` · `tokens.css` · `base.css` · `sheet.css` · `primitives.css` (~1,100 lines total, replacing the 7,751 across 28 files that preceded it). Page sheets under `components/`, `layouts/` and `pages/` are imported by the component that needs them.
+
+**Two surfaces, not two themes.** `tokens.css` defines **six role tokens** — `--ground` `--ground-raised` `--ink` `--ink-soft` `--rule` `--accent` (plus `--on-accent`, `--status-ok|warn|bad`, `--scrim`) — redefined once under `.surface-paper` (editorial) and once under `.surface-darkroom` (tools). **The route layout picks the surface; the visitor never does.** Tools are dark because historical scans are light and a light UI around a light scan gives the eye nothing to separate them by. Paper roles are also on bare `:root`, so a page that forgets its surface class is still legible.
+
+A component reads roles and **never names a colour**. `npm run lint` runs `scripts/check-tokens.mjs`, which fails on a hex literal inside any `<style>` block. Two things stay literal and are marked `/* token-exempt: why */`: colours handed to OpenLayers (OL cannot read a custom property) and categorical data colours (footprint types, layout regions, tile priorities) whose value encodes *which thing*, not *what role*.
+
+**Faces are self-hosted** from `static/fonts` (`fonts.css`): **Spectral** display, **Be Vietnam Pro** body, **IBM Plex Mono** data. Latin, latin-ext and vietnamese subsets only — 191 KB total, ~54 KB on the usual path. No Google Fonts request anywhere; adding one is a regression.
+
+**Breakpoints are 600 / 900 / 1280.** Three. `ToolLayout`'s mobile split at 900 is the one other components pair with.
+
+**Layout is one primitive.** `src/lib/ui/Sheet.svelte` + `sheet.css`: a printed map sheet puts content inside a **neatline** and its title, scale and legend in the **margin** around it. Chrome goes in the margin, content in the field — an article is a field, a map is a field. Both `+layout.svelte` files own the Sheet, so a page contributes content only: no header scaffold, no max-width, no footer. A block that must break the measure marks itself `.is-wide`.
+
+**Primitives** (`primitives.css`): `.label` · `.btn` · `.field` · `.panel` · `.chip` · `.data-table`. There were four parallel button vocabularies; one survives, and `.sb-btn` / `.tool-btn` / `.pill-btn` / `.sb-card` / `.tool-section` / `.sb-input` are aliased onto the primitives with `:is()` rather than renamed across sixty files. Write the new names in new markup.
+
+New pages use the template in `docs/design-system.md`. Nav and footer come once from the layouts, so a new editorial page only needs its link added in `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
 
 ## Architecture
 
@@ -120,7 +135,7 @@ VMA_API_URL, VMA_WORKER_KEY     # worker machines only — never the web app
 
 `src/lib/map/shell/LayerRenderer.svelte` is the single component that renders **all** map layers — base (modern tile OR historical warped) and overlays — by subscribing to `layersStore`. In side-by-side mode it hides overlays past index 0 so the left pane shows only the topmost; `DualMapPane.svelte` independently renders overlays[1] in the right pane.
 
-**Exception — `ImageShell.svelte`** (same dir): IIIF-canvas counterpart to MapShell for pixel-coordinate work. Creates an OL map with a static image extent, exposes via `getImageShellStore()` (`imageContext.ts`), binds `imgWidth`/`imgHeight`. Used by `/contribute/digitalize`, `/contribute/trace`, `/contribute/review` and by `NeatlineEditor` — none of them use MapShell or the global stores.
+**Exception — `ImageShell.svelte`** (same dir): IIIF-canvas counterpart to MapShell for pixel-coordinate work. Creates an OL map with a static image extent, exposes via `getImageShellStore()` (`imageContext.ts`), binds `imgWidth`/`imgHeight`. Used by `/scan?mode=triage`, `/scan?mode=trace`, `/scan?mode=review` and by `NeatlineEditor` — none of them use MapShell or the global stores.
 
 **IIIF canvas coords:** OL uses `ol_y = -image_y` (y-flip). Tool components store bboxes image-space (y-down) and flip when creating OL geometries. `src/lib/core/geo/rectUtils.ts` owns the flip helpers (in `core` because `ImageShell` needs them too); `bboxHandles.ts` builds the shared handle features and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line tools (`TraceTool`, `ReviewTool`) flip inline.
 
@@ -129,7 +144,7 @@ VMA_API_URL, VMA_WORKER_KEY     # worker machines only — never the web app
 - **layersStore** — single source of truth for what the map renders. `{ base: LayerRef, overlays: OverlayLayer[] }` where `base` is either `{ kind: 'basemap', key }` (`'g-streets' | 'g-satellite' | 'none'`) or `{ kind: 'historical', mapId, allmapsId, name?, thumbnail? }`. `overlays` is top-of-stack-first; each item has its own `opacity`, `visible`, and stable local `id`. Max 10 (`MAX_OVERLAY_LAYERS`). Persists to `localStorage` as `vma-layers-v1`. API: `setBase`, `addOverlay`, `removeOverlay`, `removeOverlayByMapId`, `setOpacity`, `setVisible`, `reorderOverlay`, `clearOverlays`, `isOverlay`; plus the free functions `toHistoricalRef(map)`, `toggleOverlayFor(map)`, `clamp01(n)` and the derived `topOverlay`.
 - **mapStore** — `{ lng, lat, zoom, rotation, activeMapId, activeAllmapsId }`. Default: Saigon (106.70098, 10.77653) zoom 14. `activeMapId` is `maps.id` UUID and **is** mirrored from `layersStore.topOverlay` — the bridge is wired in `src/lib/map/shell/geoMapSetup.ts` (`topOverlay.subscribe → setActiveMap`). Kept for legacy callers: story playback, share links. `activeAllmapsId` holds the annotation source string — either a bare Allmaps image ID or a full annotation URL; `annotationUrlForSource()` (`src/lib/core/iiif/annotationUrl.ts`) accepts both.
 - **layerStore** — per-shell view settings: `{ basemap, viewMode, lensRadius, customBaseUrl }`. View modes: `'overlay' | 'spy' | 'dual'` (UI labels: Stacked / Lens / Side-by-side). The side-by-side split is fixed at 50/50; `sideRatio` was removed.
-- **urlStore** — bidirectional URL ↔ store sync. The hash carries **camera + basemap only**: `#@lat,lng,zoomz,rotationr&base=key`. The selected map lives in the **`?map=<id>` query param** — that is what /catalog, /contribute/digitalize and every share link point at (`src/lib/features/explore/exploreUrl.ts`). A `map=` found in the hash is a legacy link and is migrated into `?map=` on init.
+- **urlStore** — bidirectional URL ↔ store sync. The hash carries **camera + basemap only**: `#@lat,lng,zoomz,rotationr&base=key`. The selected map lives in the **`?map=<id>` query param** — that is what /archive, /scan?mode=triage and every share link point at (`src/lib/features/explore/exploreUrl.ts`). A `map=` found in the hash is a legacy link and is migrated into `?map=` on init.
 
 Other persisted keys (there is no `vma-viewer-state-v1`): `vma-layers-v1`, `vma-story-player-v1`, `vma-story-library-v1`, `vma-annotation-projects-v1`, `vma-bounds-cache-v2`, `vma-explore-sidebar-ratios-v1`, `vma-custom-base-url`, `vma-thumb-cache-v1`, `vma-explore-{tour,welcome}-ack-v1`, `vma-create-saigon-seeded-v2`. Debounced persistence lives in `src/lib/core/utils/persistence/createPersistedStore.ts`; raw read/write in the sibling `storage.ts`.
 
@@ -137,35 +152,48 @@ Other persisted keys (there is no `vma-viewer-state-v1`): `vma-layers-v1`, `vma-
 
 `src/lib/features/shared/CommandPalette.svelte` is mounted once by the **root** layout, so it is on every page in both route groups. ⌘K / Ctrl+K anywhere, `/` outside a form field, or the Search button in `NavBar`. It searches four things through `/api/search`: **pages** (`paletteDestinations.ts`, role-gated), **maps**, **places** (the gazetteer) and **labels** (which open `/explore` at the spot).
 
-Open state is `src/lib/core/utils/commandPalette.ts` — a bare boolean store in `core` rather than beside the component, because `NavBar` is in `ui` and the layering rule bars `ui` from importing `features`. `src/lib/core/utils/placeKey.ts` is the client-side twin of Postgres's `place_key()` (mig 067), so a label on screen links straight to `/place/<slug>`; `tests/palette.spec.ts` guards that the two agree.
+Open state is `src/lib/core/utils/commandPalette.ts` — a bare boolean store in `core` rather than beside the component, because `NavBar` is in `ui` and the layering rule bars `ui` from importing `features`. `src/lib/core/utils/placeKey.ts` is the client-side twin of Postgres's `place_key()` (mig 067), so a label on screen links straight to `/archive/place/<slug>`; `tests/palette.spec.ts` guards that the two agree.
 
 ### Route groups
 
-- `(editorial)` — public pages with nav/footer: `/`, `/catalog`, `/about`, `/blog`, `/blog/[slug]`, `/map/[id]`, `/place/[name]`, `/screens`, `/profile`, `/login`, `/contribute`, `/contribute/georef`, `/admin/bulk`, `/admin/scout`, `/admin/status`. There is no `/signup`.
+**Sept 2026 route merge: fifteen surfaces became six.** Modes are query params, not routes. The grouping is **by shell**, not by verb — `/explore` is the MapShell surface and `/scan` the ImageShell one — which is what lets the OL map, the PMTiles source and the warped tiles stay warm across a mode change instead of being torn down and rebuilt. `src/hooks.server.ts` 301s every retired path (`LEGACY_REDIRECTS` for the fixed ones, `LEGACY_PREFIXES` for `/archive/<id>` and `/archive/place/<name>`); `withSearch()` joins with `&` because half the targets already carry a `?mode=`.
 
-`/place/[name]` is the **gazetteer page**: one server-rendered URL per attested place name (the mig 067 view groups spellings), published maps only. `/screens` renders every design-system component from fixtures — no database, use it to see what already exists before building a second one. `/admin/status` is the archive's own review queue: counts of maps, jobs and failures that used to need hand-run SQL, fed by `GET /api/admin/status` (admin or mod).
+- `(editorial)` — public pages with nav/footer: `/`, `/archive`, `/archive/[id]`, `/archive/place/[name]`, `/about`, `/blog`, `/blog/[slug]`, `/screens`, `/profile`, `/login`, `/contribute`, `/admin`. There is no `/signup`.
 
-`/map/[id]` is the **share page**: server-rendered from `+page.server.ts` so a crawler sees the title, description and OG image without running JavaScript. Only `public`/`featured` maps resolve — a draft id is a 404. Everything interactive is one click away at `/explore?map=<id>`. The OG image is the map's `thumbnail` column, falling back to a derived `…/full/800,/0/default.jpg`; there is no rendered preview, because the R2 worker is level0 behind a proxy and a IIIF size we know exists beats one we hope for.
-- `(app)` — full-screen tools with their own layout: `/explore`, `/studio`, `/create`, `/trip/[id]`, `/image`, `/contribute/digitalize`, `/contribute/trace`, `/contribute/review`.
+`/admin` is one console, tab chosen by `?tab=bulk|scout|status` (bulk is the default); the pages live in `src/lib/features/admin/{BulkUploadPage,ScoutPage,StatusPage}.svelte` and each keeps its own role gate. `/contribute` is the on-ramp **and** the georeference worklist — georeferencing is the one contribution task with no canvas of its own, since it hands off to the Allmaps Editor, so `GeorefQueue.svelte` sits in a `#georef` section on that page rather than in `/scan`.
+
+`/archive/place/[name]` is the **gazetteer page**: one server-rendered URL per attested place name (the mig 067 view groups spellings), published maps only. `/screens` renders every design-system component from fixtures — no database, use it to see what already exists before building a second one. `/admin?tab=status` is the archive's own review queue: counts of maps, jobs and failures that used to need hand-run SQL, fed by `GET /api/admin/status` (admin or mod).
+
+`/archive/[id]` is the **share page**: server-rendered from `+page.server.ts` so a crawler sees the title, description and OG image without running JavaScript. Only `public`/`featured` maps resolve — a draft id is a 404. Everything interactive is one click away at `/explore?map=<id>`. The OG image is the map's `thumbnail` column, falling back to a derived `…/full/800,/0/default.jpg`; there is no rendered preview, because the R2 worker is level0 behind a proxy and a IIIF size we know exists beats one we hope for.
+- `(app)` — full-screen tools on the darkroom surface: `/explore`, `/scan`, `/trip/[id]`.
+
+`/explore?mode=browse|annotate|story` and `/scan?mode=inspect|triage|trace|review` are **dispatchers**: a title and an `{#if}` chain, ~60 lines each, mounting one feature component. The **mode strip is rendered by `(app)/+layout.svelte`, in the sheet's margin** — the first version floated it over the map at top-centre and it swallowed clicks meant for the panels underneath, which is the failure the margin exists to prevent. `?map=` is carried across a mode switch.
+
+`/trip/[id]` keeps its own URL on purpose: printed QR codes point at it.
 
 Only the home page and the `(app)` tools set `ssr = false`; the rest of `(editorial)` server-renders already.
 
-Every route lives in one of those two groups. Legacy paths are 301-redirected (query string preserved) by the `LEGACY_REDIRECTS` table in `src/hooks.server.ts` — `/view` → `/explore`, `/annotate` → `/studio`, `/contribute/label` → `/contribute/digitalize`. There are **no redirect stub pages**. There is no `/admin`, `/hunt` or `/georef` route.
+The home page's hero is `HeroRegistration.svelte`: one georeferenced sheet warped live over the modern city, breathing between 0.12 and 0.88 opacity on a 14s cosine, held at 0.6 under `prefers-reduced-motion`. It bypasses `layersStore` on purpose — that store is the visitor's saved layer stack and a hero has no business writing to it — and attaches its `WarpedMapLayer` straight to the OL map.
+
+Every route lives in one of those two groups. There are **no redirect stub pages**. There is no `/hunt` or `/georef` route.
 
 ### Modes
 
 | Route | Purpose | Source |
 |-------|---------|--------|
-| `/explore` | Browse maps, play stories | `src/lib/features/explore/`, `src/routes/(app)/explore/` |
-| `/studio` | Free-form annotation + timeline animation | `src/lib/features/studio/`, `src/routes/(app)/studio/` |
-| `/create` | Author stories | `src/lib/features/stories/editor/`, `src/routes/(app)/create/` |
-| `/trip/[id]` | Story playback | `src/lib/features/stories/play/`, `src/routes/(app)/trip/[id]/` |
-| `/image` | IIIF inspector | `src/routes/(app)/image/` |
-| `/catalog` | Faceted catalog + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
-| `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
-| `/contribute/trace` | Polygon/line tracing of footprints | `src/lib/features/contribute/trace/` |
-| `/contribute/digitalize` | Triage (neatline + tile grid) + OCR review | `src/lib/features/contribute/{digitalize,ocr}/` |
-| `/contribute/review` | HITL review of SAM2 footprints | `src/lib/features/contribute/review/` |
+| `/explore` | MapShell dispatcher | `src/routes/(app)/explore/` |
+| `/explore?mode=browse` | Browse maps, play stories | `src/lib/features/explore/ExplorePage.svelte` |
+| `/explore?mode=annotate` | Free-form annotation + timeline animation | `src/lib/features/studio/` |
+| `/explore?mode=story` | Author stories | `src/lib/features/stories/editor/` |
+| `/scan` | ImageShell dispatcher | `src/routes/(app)/scan/` |
+| `/scan?mode=inspect` | IIIF inspector, public read-only | `src/lib/features/contribute/inspect/` |
+| `/scan?mode=triage` | Triage (neatline + tile grid) + OCR review | `src/lib/features/contribute/{digitalize,ocr}/` |
+| `/scan?mode=trace` | Polygon/line tracing of footprints | `src/lib/features/contribute/trace/` |
+| `/scan?mode=review` | HITL review of SAM2 footprints | `src/lib/features/contribute/review/` |
+| `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
+| `/archive` | Faceted catalog + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/archive/` |
+| `/contribute` | On-ramp + the georeference worklist | `src/lib/features/contribute/georef/GeorefQueue.svelte` |
+| `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
 
 Code shared across the story lifecycle (markers, playback state, point ops) lives in `src/lib/features/stories/shared/`. All app modes except the IIIF-canvas contribute tools share MapShell + the map stores.
 
@@ -180,7 +208,7 @@ Same components drive both viewports. The reusable panels are in `src/lib/featur
 
 `/explore`'s own desktop sidebar is `src/lib/features/explore/ExploreSidebar.svelte`, which stacks **Browse → Layers → Controls** (default 40/40/20, draggable splitters, ratios persisted). Its Browse pane is `ExploreBrowsePanel.svelte` + `ExploreArchiveBrowser.svelte`, not `CatalogSidebarPanel`.
 
-Mobile (`< 900px`): `ToolLayout.svelte` shows a full-bleed map with a horizontal 3-tab bottom bar — Layers · Controls · Browse — backed by `MobileDrawerStack.svelte`, one shared drawer body sliding up. Slots: `mobile-layers`, `mobile-controls`, `mobile-browse`; `mobile-sidebar` is the legacy single-drawer fallback other tool pages still use. A tool that fills only `sidebar` gets **that same slot** in the mobile drawer, with `let:compact` true — one component instance, since the desktop rail and the drawer are never mounted together. `/contribute/digitalize` and `/contribute/trace` did carry two copies of their sidebar (39 and 20 lines of duplicated wiring) until Sept 2026. Desktop slots: `sidebar`, `right-sidebar`, `floating`, default.
+Mobile (`< 900px`): `ToolLayout.svelte` shows a full-bleed map with a horizontal 3-tab bottom bar — Layers · Controls · Browse — backed by `MobileDrawerStack.svelte`, one shared drawer body sliding up. Slots: `mobile-layers`, `mobile-controls`, `mobile-browse`; `mobile-sidebar` is the legacy single-drawer fallback other tool pages still use. A tool that fills only `sidebar` gets **that same slot** in the mobile drawer, with `let:compact` true — one component instance, since the desktop rail and the drawer are never mounted together. `/scan?mode=triage` and `/scan?mode=trace` did carry two copies of their sidebar (39 and 20 lines of duplicated wiring) until Sept 2026. Desktop slots: `sidebar`, `right-sidebar`, `floating`, default.
 
 In dual mode, OL attribution + scale live on the **secondary** pane (right on desktop, bottom on mobile) — hidden on the primary via CSS. Map-bounds resolution goes through `resolveBounds()` in `src/lib/core/geo/mapBounds.ts` (`bounds → bbox → annotation_url → allmaps_id`) so R2-mirrored maps and `?map=<id>` deep-links both zoom correctly.
 
@@ -188,7 +216,7 @@ In dual mode, OL attribution + scale live on the **secondary** pane (right on de
 
 **Shared (`src/lib/features/contribute/shared/`):** `ToolSidebarShell.svelte` + `ToolMapPicker.svelte` (the sidebar frame and map selector all three tools use), `ToolPanelHeader.svelte`, `EmptyPanel.svelte`, `SidebarToggleButton.svelte`, `CliCommandBlock.svelte` (copy-paste CLI block), `bboxHandles.ts` (flip helpers live in `$lib/core/geo/rectUtils.ts`), `tableSort.ts` (`createTableSort<T>`), `iiifSource.ts` (`resolveMapIiifInfoUrl`). Data clients: `src/lib/features/contribute/shared/ocrApi.ts` and `src/lib/features/contribute/pipelineApi.ts`. Category/colour/status constants have one home: `src/lib/features/contribute/shared/constants.ts` (with `types.ts` beside it — all three moved from `ocr/` because `MapEditPipelineTab` and `LabelHits` import them). Footprint geometry types live in `src/lib/data/maps/footprintTypes.ts`.
 
-**Digitalize (`/contribute/digitalize`)** — two-phase HITL on a single `ImageShell`, tabs via `PhaseTabs.svelte`:
+**Digitalize (`/scan?mode=triage`)** — two-phase HITL on a single `ImageShell`, tabs via `PhaseTabs.svelte`:
 
 - **Triage**: `TriageTool.svelte` (neatline rect + tile priority grid; click cycles normal → low-res amber → skip gray), `RegionsTool.svelte` (the layout regions — one labelled rect per part of the sheet, click to select, drag to correct; a dashed edge is the model's proposal and a solid one a person's) and `TriageSidebar.svelte`, whose five steps are **Layout · Neatline · Tiles · Save triage · Run OCR**. **Detect** on step 1 enqueues a `layout` job: one low-resolution look at the whole sheet asking the model where the main map, title block, legend, name list, inset and furniture are. It is a job and not a route because the Gemini key lives on the worker and deliberately not in the web app. The answer lands in `maps.triage.regions` and the page polls for it. **Save triage** writes the neatline, tile grid and per-tile priorities to `maps.triage` (mig 069) — localStorage stays the working draft, but only a saved triage is visible to `scripts/enqueue_ocr_all.mjs`, which by default queues **only** triaged sheets (`--untriaged` includes the rest in auto mode) and crops to the `main_map` region when the layout pass found one, falling back to the neatline. "Run OCR" **enqueues a `pipeline_jobs` row** and returns 202; nothing runs until a worker claims it. Same behaviour in dev and on Cloudflare — the old `child_process` spawn and its `{ cli_only, cli_command }` fallback are gone. `CliCommandBlock` now only serves the segmentation panel.
 - **OCR Review**: `OcrBboxTool.svelte` renders + edits `ocr_extractions` bboxes and supports `drawMode` for manual bboxes (POSTs with `model: 'manual'`). `OcrSidebar.svelte` is a filterable table with inline text/category edit and auto-save on blur, split into `OcrFilterBar.svelte` + `OcrRunBar.svelte`, with state in `ocrReviewController.ts`. `BboxPanel.svelte` is the floating selected-bbox editor.
@@ -198,9 +226,9 @@ The layout job — enqueue, poll, adopt the regions once it closes — lives in 
 
 Pipeline stage (idle → ocr_queued → ocr_done → reviewed → seg_queued → seg_done → seg_reviewed → exported) is polled via `GET /api/admin/maps/[id]/pipeline`. Four of those stages are **derived** from the map's latest `ocr`/`seg` job; PATCH accepts only `reviewed`, `seg_reviewed`, `exported` and `idle` — anything else is a 400.
 
-**Trace (`/contribute/trace`)** — `TraceTool.svelte` (OL Draw + Select + Modify) + `TraceSidebar.svelte`. Polygon for closed footprints, line for roads/waterways. Submits through `POST /api/contribute/footprints` (rate-limited, author stamped server-side).
+**Trace (`/scan?mode=trace`)** — `TraceTool.svelte` (OL Draw + Select + Modify) + `TraceSidebar.svelte`. Polygon for closed footprints, line for roads/waterways. Submits through `POST /api/contribute/footprints` (rate-limited, author stamped server-side).
 
-**Review (`/contribute/review`)** — a queue per kind of contribution, chosen by a tab (`?kind=stories` opens the second one). **Stories**: `StoryReviewPanel.svelte` lists submitted stories and approves / sends back / rejects through `/api/admin/stories`. **Footprints**: HITL for SAM2 `submitted` / `needs_review` polygons: `ReviewMode.svelte` mounts `ImageShell` + `ReviewTool.svelte` + `ReviewSidebar.svelte` (approve/reject, "Mark seg reviewed"). Map list from `fetchMapsWithSubmittedFootprints()`. API `GET/PATCH /api/admin/footprints`; "Mark seg reviewed" PATCHes `/api/admin/maps/[id]/pipeline` → `seg_reviewed`.
+**Review (`/scan?mode=review`)** — a queue per kind of contribution, chosen by a tab (`?kind=stories` opens the second one). **Stories**: `StoryReviewPanel.svelte` lists submitted stories and approves / sends back / rejects through `/api/admin/stories`. **Footprints**: HITL for SAM2 `submitted` / `needs_review` polygons: `ReviewMode.svelte` mounts `ImageShell` + `ReviewTool.svelte` + `ReviewSidebar.svelte` (approve/reject, "Mark seg reviewed"). Map list from `fetchMapsWithSubmittedFootprints()`. API `GET/PATCH /api/admin/footprints`; "Mark seg reviewed" PATCHes `/api/admin/maps/[id]/pipeline` → `seg_reviewed`.
 
 ### Maps domain
 
@@ -227,7 +255,7 @@ Admin client functions: `src/lib/data/admin/adminApi.ts` (map CRUD, image upload
 
 ### Data access (`src/lib/data/supabase/`)
 
-`client.ts` (browser client), `context.ts` (auth via Svelte context), `role.ts` (`fetchUserRole`), `annotations.ts`, `stories.ts`, `favorites.ts`, `mapOpens.ts`, `footprints.ts`, `types.ts` (generated). `footprints.ts` is both the footprint CRUD layer and the SAM2 review entry point: `fetchSubmittedFootprints()`, `fetchMapsWithSubmittedFootprints()`, plus `fetchLabelMaps()` — the map-selector source for `/contribute/digitalize` and `/contribute/trace`.
+`client.ts` (browser client), `context.ts` (auth via Svelte context), `role.ts` (`fetchUserRole`), `annotations.ts`, `stories.ts`, `favorites.ts`, `mapOpens.ts`, `footprints.ts`, `types.ts` (generated). `footprints.ts` is both the footprint CRUD layer and the SAM2 review entry point: `fetchSubmittedFootprints()`, `fetchMapsWithSubmittedFootprints()`, plus `fetchLabelMaps()` — the map-selector source for `/scan?mode=triage` and `/scan?mode=trace`.
 
 ### IIIF utilities (`src/lib/core/iiif/`)
 
@@ -245,7 +273,7 @@ Admin client functions: `src/lib/data/admin/adminApi.ts` (map CRUD, image upload
 Per-route reference: **`docs/api.md`**. The rules:
 
 - Every handler is `requireRole → adminClient → query → json`, using the `$lib/server` helpers `requireRole`/`getRole` (`auth.ts`), `adminClient` (`supabaseAdmin.ts`) and `assertUuid`/`dbError` (`http.ts` — 400 on a malformed id, and no raw Postgres message ever reaches the client).
-- Three auth classes: **admin/mod session** (`/api/admin/*`), **any signed-in user** (`/api/contribute/*`, `user_id` from the session, rate-limited by `assertUnderRateLimit`), and **worker token** (`/api/pipeline/*`, `Authorization: Bearer <worker_keys token>` via `$lib/server/workerAuth.ts`; mint with `scripts/mint-worker-key.mjs`). `/api/search`, `/api/context`, `/api/press`, `/api/maps/[id]/legend-points` are public and enforce `status IN ('public','featured')` server-side. `/api/search` takes `include=maps,scout,labels,places`; `places` searches the mig 067 gazetteer and is what the command palette turns into `/place/<slug>` rows.
+- Three auth classes: **admin/mod session** (`/api/admin/*`), **any signed-in user** (`/api/contribute/*`, `user_id` from the session, rate-limited by `assertUnderRateLimit`), and **worker token** (`/api/pipeline/*`, `Authorization: Bearer <worker_keys token>` via `$lib/server/workerAuth.ts`; mint with `scripts/mint-worker-key.mjs`). `/api/search`, `/api/context`, `/api/press`, `/api/maps/[id]/legend-points` are public and enforce `status IN ('public','featured')` server-side. `/api/search` takes `include=maps,scout,labels,places`; `places` searches the mig 067 gazetteer and is what the command palette turns into `/archive/place/<slug>` rows.
 - Enqueue, never execute: routes that start pipeline work insert a `pipeline_jobs` row and return 202 (409 if one is in flight). Nothing runs until a worker claims it. `/api/pipeline/execute` is the one exception, for kinds that need the service key.
 - Human pipeline stages (`reviewed`, `seg_reviewed`, `exported`, `idle`) are the only ones PATCHable; machine stages derive from jobs and are rejected with 400.
 
@@ -262,7 +290,7 @@ Schema: `supabase/migrations/` (head **070**). Table-by-table reference and the 
 
 ## Admin tooling
 
-Map CRUD is inline in `/catalog`, gated by `role === 'admin' | 'mod'`: `CatalogUnifiedSearch.svelte` dispatches `edit`, and the **route page** `src/routes/(editorial)/catalog/+page.svelte` renders `MapEditModal`. Plus the dedicated pages `/admin/bulk` and `/admin/scout`. There is no general `/admin` route. Full reference in `docs/admin-tooling.md`.
+Map CRUD is inline in `/archive`, gated by `role === 'admin' | 'mod'`: `CatalogUnifiedSearch.svelte` dispatches `edit`, and the **route page** `src/routes/(editorial)/archive/+page.svelte` renders `MapEditModal`. Bulk upload, Scout and Status are tabs of `/admin`. Full reference in `docs/admin-tooling.md`.
 
 ## Pipelines
 

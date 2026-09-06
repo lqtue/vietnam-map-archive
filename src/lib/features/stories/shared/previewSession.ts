@@ -1,7 +1,7 @@
 /**
  * previewSession.ts — the "play my draft inside the editor" lifecycle.
  *
- * `/create` runs the real `StoryPlayback` component against a throwaway
+ * `/explore?mode=story` runs the real `StoryPlayback` component against a throwaway
  * `StoryProgress` that never touches the player store. This module owns that
  * throwaway progress; framing the map is the caller's job (it already goes
  * through `applyStoryPoint`).

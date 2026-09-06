@@ -1,4 +1,4 @@
-// ---- /contribute/georef data + Allmaps Editor links ----
+// ---- /contribute#georef data + Allmaps Editor links ----
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';

@@ -1,96 +1,116 @@
+/* ============================================================================
+   Sheet — design tokens
+
+   Two SURFACES, not two themes. A surface is chosen by the route, never by the
+   visitor: editorial pages are paper, map tools are a darkroom. Both define the
+   same six role tokens, so every component below this file reads roles only and
+   never names a colour.
+
+     .surface-paper      set by (editorial)/+layout
+     .surface-darkroom   set by (app)/+layout
+
+   Breakpoints are 600 / 900 / 1280. Three. Nothing else.
+   ========================================================================= */
+
 :root {
-  /* ========================================
-     NEO-BRUTALIST PALETTE
-     ======================================== */
-  --color-bg: #faf6f0;
-  --color-text: #111111;
-  --color-border: #111111;
-  --color-white: #ffffff;
+  /* ---- type ------------------------------------------------------------ */
+  /* Spectral      display, engraved, full Vietnamese. Used with restraint.
+     Be Vietnam Pro body, by a Vietnamese foundry, for a Vietnamese archive.
+     IBM Plex Mono data: coordinates, years, tile ids, scales. Tabular. */
+  --font-display: 'Spectral', Georgia, serif;
+  --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
 
-  --color-primary: #ff4d4d;
-  --color-blue: #4d94ff;
-  --color-yellow: #ffd23f;
-  --color-green: #00cc99;
-  --color-orange: #ff8c42;
-  --color-purple: #9d4edd;
+  /* Tight at reading sizes, loose at display sizes — how a specimen sheet
+     actually steps, rather than one ratio applied past where it reads. */
+  --t-2xs: 0.6875rem; /* 11 — mono captions, tick labels */
+  --t-xs: 0.8125rem; /* 13 — data, meta */
+  --t-sm: 0.9375rem; /* 15 — UI labels */
+  --t-md: 1.0625rem; /* 17 — body */
+  --t-lg: 1.375rem; /* 22 — subhead */
+  --t-xl: 1.875rem; /* 30 — section head */
+  --t-2xl: 2.75rem; /* 44 — page title */
+  --t-3xl: 4rem; /* 64 — hero */
 
-  /* Legacy mappings for compatibility */
-  --color-primary-600: var(--color-blue);
-  --color-primary-700: #3b71ca;
-  --color-gray-900: var(--color-text);
-  --color-gray-50: var(--color-bg);
-  --color-gray-100: #f3f4f6;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-success-600: var(--color-green);
-  --color-warning-600: var(--color-orange);
-  --color-error-600: var(--color-primary);
+  --w-light: 300;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-semi: 600;
 
-  /* ========================================
-     TYPOGRAPHY
-     ======================================== */
-  --font-family-base: 'Outfit', 'Be Vietnam Pro', system-ui, sans-serif;
-  --font-family-display: 'Space Grotesk', system-ui, sans-serif;
+  --leading-tight: 1.15;
+  --leading-body: 1.55;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
+  /* ---- space ----------------------------------------------------------- */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1.25rem;
+  --s-5: 2rem;
+  --s-6: 3.5rem;
 
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-extrabold: 800;
-
-  /* ========================================
-     BORDERS & SHADOWS
-     ======================================== */
-  --border-thick: 3px solid var(--color-border);
-  --border-thin: 2px solid var(--color-border);
-
-  --shadow-solid: 6px 6px 0px var(--color-border);
-  --shadow-solid-sm: 4px 4px 0px var(--color-border);
-  --shadow-solid-xs: 2px 2px 0px var(--color-border);
-  --shadow-solid-hover: 10px 10px 0px var(--color-border);
-
-  /* Legacy shadow mappings */
-  --shadow-sm: var(--shadow-solid-sm);
-  --shadow-md: var(--shadow-solid);
-  --shadow-lg: var(--shadow-solid-hover);
-
-  /* ========================================
-     RADIUS
-     ======================================== */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  /* ---- line & form ----------------------------------------------------- */
+  /* Paper is square. Instruments are eased. So the neatline and every rule sit
+     at 0, and only things you press or type into get the 2px. */
+  --rule-hair: 1px;
+  --rule-thick: 2px;
+  --radius: 2px;
   --radius-pill: 999px;
 
-  /* ========================================
-     SPACING
-     ======================================== */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
+  /* Elevation on paper comes from --ground-raised plus a rule. The one shadow
+     is for things that genuinely float above the sheet. */
+  --shadow-overlay: 0 8px 32px rgb(0 0 0 / 0.18);
 
-  /* ========================================
-     SEMANTIC CONSTANTS
-     Always dark regardless of mode — yellow is always a light surface
-     ======================================== */
-  --color-text-on-yellow: #111111;
-
-  /* ========================================
-     LAYOUT
-     ======================================== */
+  /* ---- layout ---------------------------------------------------------- */
+  --sheet-margin: clamp(0.75rem, 3vw, 3rem);
   --nav-height: 56px;
+  --measure: 68ch;
+
+  /* ---- motion ---------------------------------------------------------- */
+  /* One duration. Rules darken; nothing lifts, nothing bounces. */
+  --ease: 120ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* ============================================================================
+   Surface: paper — cool grey-green laid stock, not warm cream.
+
+   Also on :root, so a page that forgets its surface class is still legible
+   rather than unstyled. One selector list, so the values live in one place.
+   ========================================================================= */
+:root,
+.surface-paper {
+  --ground: #eae7df;
+  --ground-raised: #f6f4ef;
+  --ink: #191c1a;
+  --ink-soft: #5c625c;
+  --rule: #c6c2b6;
+  --accent: #0e7c86; /* survey cyan — printed hydrography at full strength */
+
+  --on-accent: #f6f4ef;
+  --status-ok: #2e7d57;
+  --status-warn: #9a6b1f;
+  --status-bad: #a33a2e;
+
+  --scrim: rgb(25 28 26 / 0.42);
+  color-scheme: light;
+}
+
+/* ============================================================================
+   Surface: darkroom — historical scans are light, so the tool around them is
+   not. --ink is paper white: text on this surface literally reads as paper.
+   ========================================================================= */
+.surface-darkroom {
+  --ground: #14181a;
+  --ground-raised: #1d2325;
+  --ink: #e6e4dc;
+  --ink-soft: #8b9490;
+  --rule: #2e3739;
+  --accent: #2aa5ae;
+
+  --on-accent: #0b1113;
+  --status-ok: #4caf87;
+  --status-warn: #d6a344;
+  --status-bad: #e0705e;
+
+  --scrim: rgb(8 11 12 / 0.62);
+  color-scheme: dark;
 }

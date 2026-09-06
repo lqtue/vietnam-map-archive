@@ -3,6 +3,7 @@
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole } from '$lib/data/supabase/role';
   import PageHero from '$lib/ui/PageHero.svelte';
+  import GeorefQueue from '$lib/features/contribute/georef/GeorefQueue.svelte';
 
   const { session, supabase } = getSupabaseContext();
 
@@ -36,7 +37,7 @@
 
   <main class="editorial-main">
     <section class="contribute-grid">
-      <a href="/contribute/digitalize" class="section-card card-link">
+      <a href="/scan?mode=triage" class="section-card card-link">
         <div class="section-card-header">
           <div class="icon-blob color-orange">✏️</div>
           <div>
@@ -50,7 +51,7 @@
         <span class="card-cta">Start triaging →</span>
       </a>
 
-      <a href="/contribute/trace" class="section-card card-link">
+      <a href="/scan?mode=trace" class="section-card card-link">
         <div class="section-card-header">
           <div class="icon-blob color-yellow">🖋️</div>
           <div>
@@ -64,7 +65,7 @@
         <span class="card-cta">Open the tracer →</span>
       </a>
 
-      <a href="/contribute/georef" class="section-card card-link">
+      <a href="/contribute#georef" class="section-card card-link">
         <div class="section-card-header">
           <div class="icon-blob color-blue">📍</div>
           <div>
@@ -75,11 +76,11 @@
             </p>
           </div>
         </div>
-        <span class="card-cta">See what needs georef →</span>
+        <span class="card-cta">Jump to the queue →</span>
       </a>
 
       {#if role === 'admin' || role === 'mod'}
-        <a href="/contribute/review" class="section-card card-link mod-card">
+        <a href="/scan?mode=review" class="section-card card-link mod-card">
           <div class="section-card-header">
             <div class="icon-blob color-green">✅</div>
             <div>
@@ -93,7 +94,7 @@
           <span class="card-cta">Open the review queue →</span>
         </a>
 
-        <a href="/catalog" class="section-card card-link catalog-card">
+        <a href="/archive" class="section-card card-link catalog-card">
           <div class="section-card-header">
             <div class="icon-blob color-purple">📚</div>
             <div>
@@ -108,15 +109,19 @@
         </a>
       {/if}
     </section>
+
+    <section id="georef" class="georef-section">
+      <GeorefQueue />
+    </section>
   </main>
 </div>
 
 <style>
   :global(body) {
     margin: 0;
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-family-base);
+    background-color: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
   }
 
   .page {
@@ -136,7 +141,7 @@
 
   .card-link {
     text-decoration: none;
-    color: var(--color-text);
+    color: var(--ink);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -147,20 +152,27 @@
 
   .card-link:hover {
     transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-solid-hover);
+    box-shadow: var(--shadow-overlay);
   }
 
   .mod-card:hover {
-    border-color: var(--color-green);
+    border-color: var(--status-ok);
   }
   .catalog-card:hover {
-    border-color: var(--color-purple);
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--status-bad));
+  }
+
+  .georef-section {
+    margin-top: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: var(--rule-hair) solid var(--rule);
+    scroll-margin-top: var(--s-5);
   }
 
   .card-cta {
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--color-primary);
+    color: var(--accent);
     margin-top: auto;
   }
 </style>

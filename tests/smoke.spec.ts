@@ -17,17 +17,19 @@ async function blockMapOpenTally(page: Page): Promise<() => number> {
 // saving an OCR bbox and submitting a footprint — need a logged-in user and
 // would insert into production tables; they want a seeded test project first.
 
-test('home renders and links into the catalog', async ({ page }) => {
+test('home renders and links into the archive', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/./);
-  await expect(page.locator('nav.top-nav a[href="/about"]')).toBeVisible();
-  // Dropdown contents are gated behind {#if open} — click to render them.
-  await page.locator('nav.top-nav button', { hasText: 'Catalog' }).click();
-  await expect(page.locator('nav a[href="/catalog"]').first()).toBeVisible();
+  // The Sept 2026 route merge left six destinations, so the nav is flat: no
+  // dropdown to open before the link exists.
+  await expect(page.locator('nav.nav a[href="/about"]')).toBeVisible();
+  await expect(page.locator('nav.nav a[href="/archive"]')).toBeVisible();
+  // The page is one Sheet: chrome in the margin, content inside the neatline.
+  await expect(page.locator('.sheet .sheet__field')).toBeVisible();
 });
 
 test('catalog search returns maps', async ({ page }) => {
-  await page.goto('/catalog');
+  await page.goto('/archive');
   await page.getByPlaceholder(/Search by title/i).fill('saigon');
 
   // Results come from /api/search over the tsvector column.
@@ -91,7 +93,7 @@ test('picking a map writes ?map= and tallies the open', async ({ page }) => {
 });
 
 test('the IIIF tool pages mount their ImageShell', async ({ page }) => {
-  for (const route of ['/image', '/contribute/trace', '/contribute/digitalize']) {
+  for (const route of ['/scan', '/scan?mode=trace', '/scan?mode=triage']) {
     await page.goto(route);
     await expect(page.locator('.tool-page')).toBeVisible();
 
@@ -114,10 +116,12 @@ test('auth-gated and legacy routes redirect', async ({ page }) => {
 
   for (const [from, to] of [
     ['/view', '/explore'],
-    ['/annotate', '/studio'],
-    ['/contribute/label', '/contribute/digitalize'],
+    ['/annotate', '/explore?mode=annotate'],
+    ['/contribute/label', '/scan?mode=triage'],
   ]) {
     await page.goto(from);
-    await expect(page).toHaveURL(new RegExp(`${to}$`));
+    // `to` carries a query string, so match the literal rather than a pattern:
+    // an unescaped `?` is a regex quantifier.
+    await expect(page).toHaveURL(new URL(to, page.url()).href);
   }
 });

@@ -1,0 +1,160 @@
+/* ============================================================================
+   Sheet — the one layout primitive.
+
+   A printed map sheet has a NEATLINE: a double rule, thin outside and thick
+   inside, with ticks breaking each corner where the plate was registered.
+   Inside the neatline is the FIELD. Outside it is the MARGIN, and the margin is
+   where the title cartouche, the scale bar and the legend have always lived.
+
+   So: chrome in the margin, content in the field. An article is a field. A map
+   is a field. Both are this component.
+
+   Replaces layouts/{home,catalog,mode-shared,tool-page,create-mode}.css.
+   ========================================================================= */
+
+.sheet {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 100dvh;
+  padding: var(--sheet-margin);
+  gap: var(--s-3);
+  background: var(--ground);
+}
+
+/* ---- the margin --------------------------------------------------------- */
+/* Small, mono, quiet. It annotates the field; it never competes with it. */
+.sheet__margin {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: var(--s-4);
+
+  font-family: var(--font-mono);
+  font-size: var(--t-2xs);
+  font-weight: var(--w-regular);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.sheet__cartouche {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  min-width: 0;
+  flex: 1 1 auto; /* the nav lives here and wants the whole strip */
+}
+
+.sheet__scale {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the field ---------------------------------------------------------- */
+.sheet__field {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  background: var(--ground-raised);
+
+  /* thick inner rule, a hairline of paper, thin outer rule */
+  border: var(--rule-thick) solid var(--ink);
+  box-shadow:
+    0 0 0 3px var(--ground),
+    0 0 0 4px var(--rule);
+}
+
+/* Registration ticks. Eight one-pixel strokes reaching out of the four
+   corners, the way a corner mark on a lithographic plate does. */
+.sheet__field::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--rule), var(--rule)) left top / 11px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) left top / 1px 11px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) right top / 11px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) right top / 1px 11px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) left bottom / 11px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) left bottom / 1px 11px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) right bottom / 11px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) right bottom / 1px 11px no-repeat;
+}
+
+/* Editorial content sits on a measure and gets its own padding. A field whose
+   content is a map takes neither. */
+.sheet__body {
+  padding: var(--s-5) clamp(var(--s-4), 5vw, var(--s-6));
+  overflow-y: auto;
+  height: 100%;
+}
+
+.sheet__body > * {
+  max-width: var(--measure);
+}
+
+.sheet__body > .is-wide {
+  max-width: none;
+}
+
+/* ---- tool variant ------------------------------------------------------- */
+/* A map fills its field edge to edge. The margin stays, because the scale and
+   the coordinates belong there, but it gets out of the way. */
+.sheet--tool {
+  --sheet-margin: var(--s-2);
+  gap: var(--s-2);
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sheet--tool .sheet__field {
+  overflow: hidden;
+  background: var(--ground);
+}
+
+/* Tool pages were written against the viewport. The field is now their
+   viewport, so hand it over whole. */
+.sheet--tool .sheet__field > * {
+  height: 100%;
+}
+
+/* ---- graticule ---------------------------------------------------------- */
+/* The home page admits its own coordinate system, which is the one thing a map
+   does that a web page never does. Margin only, and only where there is a
+   margin to draw it in. */
+@media (min-width: 900px) {
+  .sheet--graticule {
+    --graticule: color-mix(in srgb, var(--rule) 40%, transparent);
+    background-image:
+      repeating-linear-gradient(to right, var(--graticule) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(to bottom, var(--graticule) 0 1px, transparent 1px 64px);
+    background-position: var(--sheet-margin) var(--sheet-margin);
+  }
+
+  .sheet--graticule > .sheet__field,
+  .sheet--graticule > .sheet__margin {
+    position: relative;
+  }
+}
+
+/* ---- narrow ------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .sheet {
+    --sheet-margin: var(--s-2);
+  }
+
+  .sheet__margin {
+    letter-spacing: 0.04em;
+  }
+
+  /* No room for ticks to reach into. */
+  .sheet__field::before {
+    display: none;
+  }
+}

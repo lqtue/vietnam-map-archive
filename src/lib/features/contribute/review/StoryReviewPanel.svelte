@@ -104,60 +104,60 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--s-3);
   }
 
   .story-row {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--s-4);
     align-items: flex-start;
     justify-content: space-between;
-    padding: var(--space-4);
-    border: var(--border-thin);
-    border-radius: var(--radius-md);
-    background: var(--color-white);
+    padding: var(--s-4);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--ground-raised);
   }
 
   .story-meta {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--s-1);
     min-width: 0;
   }
 
   .story-title {
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--ink);
   }
 
   .story-sub {
-    font-size: var(--text-sm);
-    color: var(--color-gray-500);
+    font-size: var(--t-sm);
+    color: var(--ink-soft);
   }
 
   .story-desc {
-    margin: var(--space-1) 0 0;
-    font-size: var(--text-sm);
-    color: var(--color-text);
+    margin: var(--s-1) 0 0;
+    font-size: var(--t-sm);
+    color: var(--ink);
   }
 
   .story-actions {
     display: flex;
-    gap: var(--space-2);
+    gap: var(--s-2);
     flex-shrink: 0;
   }
 
   .story-actions button {
-    padding: var(--space-2) var(--space-3);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    background: var(--color-white);
+    padding: var(--s-2) var(--s-3);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--ground-raised);
     font: inherit;
     cursor: pointer;
   }
 
   .story-actions button.danger {
-    color: var(--color-primary);
+    color: var(--accent);
   }
 
   .story-actions button:disabled {

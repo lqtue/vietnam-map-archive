@@ -94,9 +94,9 @@
 
   .nav-dropdown-trigger.open,
   .nav-dropdown-trigger.active {
-    background: var(--color-yellow);
-    border-color: var(--color-border);
-    color: var(--color-text);
+    background: var(--accent);
+    border-color: var(--rule);
+    color: var(--ink);
   }
 
   .chevron {
@@ -111,10 +111,9 @@
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-solid);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
     padding: 0.5rem;
     min-width: 200px;
     z-index: 200;

@@ -77,7 +77,7 @@ export async function fetchPublicStories(supabase: SupabaseClient<Database>): Pr
 
 /**
  * Push the full local draft (story row + every point) to Supabase, then return.
- * Used by /create's Publish toggle: local drafts only live in localStorage, so
+ * Used by /explore?mode=story's Publish toggle: local drafts only live in localStorage, so
  * before submitting for review we have to make sure the row actually exists.
  *
  * Strategy: upsert the story row by id, then replace all child story_points

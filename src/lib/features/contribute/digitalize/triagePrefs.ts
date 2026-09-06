@@ -1,5 +1,5 @@
 /**
- * triagePrefs.ts — per-map localStorage for the /contribute/digitalize page.
+ * triagePrefs.ts — per-map localStorage for the /scan?mode=triage page.
  *
  * Two independent records, both keyed by map id:
  *   digitalize-triage-<mapId>  neatline + tile grid + per-tile overrides

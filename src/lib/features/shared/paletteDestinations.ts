@@ -2,7 +2,7 @@
  * paletteDestinations.ts — every page the command palette can send you to.
  *
  * The list is here rather than derived from the route tree because a route is
- * not a destination: `/map/[id]` needs an id, `/trip/[id]` needs a story, and
+ * not a destination: `/archive/[id]` needs an id, `/trip/[id]` needs a story, and
  * `/screens` is only interesting to whoever is building the UI. Keywords carry
  * the words people actually type — "viewer" for /explore, "ocr" for digitalize.
  *
@@ -23,7 +23,7 @@ export interface Destination {
 export const DESTINATIONS: Destination[] = [
   // Browse
   {
-    href: '/catalog',
+    href: '/archive',
     label: 'Catalog',
     hint: 'Every map, faceted',
     role: 'anyone',
@@ -37,7 +37,7 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'explore view overlay layers basemap story play',
   },
   {
-    href: '/image',
+    href: '/scan',
     label: 'Scan inspector',
     hint: 'Read one sheet at full resolution',
     role: 'anyone',
@@ -46,14 +46,14 @@ export const DESTINATIONS: Destination[] = [
 
   // Make
   {
-    href: '/create',
+    href: '/explore?mode=story',
     label: 'Story Builder',
     hint: 'Author a guided walk',
     role: 'member',
     keywords: 'story trip tour author write make',
   },
   {
-    href: '/studio',
+    href: '/explore?mode=annotate',
     label: 'Studio',
     hint: 'Annotate and animate',
     role: 'member',
@@ -69,28 +69,28 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'help volunteer join tasks',
   },
   {
-    href: '/contribute/georef',
+    href: '/contribute#georef',
     label: 'Georeference a map',
     hint: 'Pin a scan to the world',
     role: 'member',
     keywords: 'allmaps control points warp align',
   },
   {
-    href: '/contribute/digitalize',
+    href: '/scan?mode=triage',
     label: 'Digitalize a sheet',
     hint: 'Triage, then review the OCR',
     role: 'member',
     keywords: 'ocr triage neatline tiles labels text',
   },
   {
-    href: '/contribute/trace',
+    href: '/scan?mode=trace',
     label: 'Trace footprints',
     hint: 'Draw buildings and roads',
     role: 'member',
     keywords: 'polygon shape outline building road',
   },
   {
-    href: '/contribute/review',
+    href: '/scan?mode=review',
     label: 'Review queue',
     hint: 'Approve stories and footprints',
     role: 'mod',
@@ -122,21 +122,21 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'account me settings favourites',
   },
   {
-    href: '/admin/status',
+    href: '/admin?tab=status',
     label: 'System status',
     hint: 'What the archive holds, what is stuck',
     role: 'mod',
     keywords: 'admin health jobs failures counts queue',
   },
   {
-    href: '/admin/bulk',
+    href: '/admin?tab=bulk',
     label: 'Bulk upload',
     hint: 'Add sheets in a batch',
     role: 'admin',
     keywords: 'admin import upload csv new maps',
   },
   {
-    href: '/admin/scout',
+    href: '/admin?tab=scout',
     label: 'Scout',
     hint: 'Candidate maps from other collections',
     role: 'admin',

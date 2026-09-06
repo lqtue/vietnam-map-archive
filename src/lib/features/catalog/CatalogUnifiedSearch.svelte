@@ -192,14 +192,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: var(--sb-radius-sm);
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.85rem;
   }
   .v2-count strong {
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
   }
   .v2-loading {
     margin-left: 0.4rem;
@@ -209,14 +209,14 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     cursor: pointer;
   }
   .v2-selects {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
   }
   .v2-select {
     flex: 1 1 140px;
@@ -226,9 +226,9 @@
     gap: 0.2rem;
   }
   .v2-select-label {
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 0.62rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--sb-text-meta);
@@ -237,14 +237,14 @@
     width: 100%;
     min-height: 38px;
     padding: 0.35rem 0.55rem;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: var(--sb-radius-sm);
     font: inherit;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    font-weight: var(--font-bold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
     cursor: pointer;
   }
 
@@ -256,8 +256,8 @@
     font-size: 3rem;
   }
   .state-title {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-extrabold);
+    font-family: var(--font-display);
+    font-weight: var(--w-semi);
     margin: 0.5rem 0;
   }
   .state-desc {

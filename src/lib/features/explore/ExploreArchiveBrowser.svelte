@@ -3,7 +3,7 @@
   ExploreBrowsePanel.
 
   Driven by the shared catalog engine (`$lib/features/shared/catalogSearch`) — the same
-  full-text search + facet logic that powers /catalog — restricted to
+  full-text search + facet logic that powers /archive — restricted to
   georeferenced maps since only those can overlay. Draft visibility is enforced
   server-side by role, so this doesn't need its own status filter.
 -->
@@ -129,11 +129,11 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.35rem var(--space-2);
+    padding: 0.35rem var(--s-2);
     background: var(--sb-card-bg);
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: var(--sb-radius-sm);
-    box-shadow: 1px 1px 0 var(--color-border);
+    box-shadow: 1px 1px 0 var(--rule);
   }
   .search input {
     flex: 1;
@@ -157,9 +157,9 @@
     font-family: inherit;
     font-size: 0.82rem;
     background: var(--sb-card-bg);
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: var(--sb-radius-sm);
-    box-shadow: 1px 1px 0 var(--color-border);
+    box-shadow: 1px 1px 0 var(--rule);
     cursor: pointer;
   }
 
@@ -176,7 +176,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-2);
+    gap: var(--s-2);
   }
   .count {
     font-size: 0.74rem;
@@ -190,7 +190,7 @@
     padding: 0;
     font: inherit;
     font-size: 0.76rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     color: var(--sb-accent);
     text-decoration: underline;
     cursor: pointer;

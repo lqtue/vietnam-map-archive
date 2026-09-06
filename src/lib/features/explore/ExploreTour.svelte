@@ -166,7 +166,9 @@
     driverObj = driver({
       showProgress: true,
       progressText: 'Step {{current}} of {{total}}',
-      overlayColor: 'rgba(0,0,0,0.45)',
+      // driver.js builds this overlay in JS, so it cannot read --scrim. Kept in
+      // step with the darkroom surface by hand.
+      overlayColor: 'rgba(8, 11, 12, 0.62)',
       stagePadding: 6,
       stageRadius: 12,
       animate: true,
@@ -229,45 +231,47 @@
 
 <style>
   :global(.driver-popover) {
-    border: var(--border-thin) !important;
-    border-radius: var(--sb-radius) !important;
-    box-shadow: var(--shadow-solid-sm) !important;
-    font-family: var(--sb-font-base) !important;
-    background: var(--sb-card-bg) !important;
+    border: var(--rule-hair) solid var(--rule) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: none !important;
+    font-family: var(--font-body) !important;
+    background: var(--ground-raised) !important;
   }
   :global(.driver-popover-title) {
-    font-family: var(--sb-font-display) !important;
-    font-weight: var(--font-extrabold) !important;
+    font-family: var(--font-display) !important;
+    font-weight: var(--w-semi) !important;
     font-size: 1.05rem !important;
-    color: var(--sb-text) !important;
+    color: var(--ink) !important;
   }
   :global(.driver-popover-description) {
     font-size: 0.88rem !important;
     line-height: 1.45 !important;
-    color: var(--sb-text-meta) !important;
+    color: var(--ink-soft) !important;
   }
   :global(.driver-popover-progress-text) {
-    color: var(--sb-accent) !important;
-    font-weight: var(--font-bold) !important;
+    color: var(--accent) !important;
+    font-weight: var(--w-semi) !important;
   }
   :global(.driver-popover-navigation-btns button) {
-    border: var(--border-thin) !important;
-    border-radius: var(--sb-radius-sm) !important;
-    box-shadow: var(--shadow-solid-xs) !important;
-    background: var(--sb-card-bg) !important;
-    color: var(--sb-text) !important;
-    font-weight: var(--font-bold) !important;
+    border: var(--rule-hair) solid var(--rule) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: none !important;
+    background: var(--ground-raised) !important;
+    color: var(--ink) !important;
+    font-weight: var(--w-semi) !important;
     text-shadow: none !important;
     padding: 0.45rem 0.8rem !important;
   }
   :global(.driver-popover-next-btn) {
-    background: var(--sb-accent-warm) !important;
-    color: var(--color-white) !important;
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
   }
   :global(.driver-popover-close-btn) {
-    color: var(--sb-text) !important;
+    color: var(--ink) !important;
   }
+  /* The spotlight ring. driver.js is kept for this: a native popover gives the
+     bubble but not the cutout, the anchoring or the store-driven auto-advance. */
   :global(.driver-active-element) {
-    box-shadow: 0 0 0 4px var(--sb-accent-warm) !important;
+    box-shadow: 0 0 0 4px var(--accent) !important;
   }
 </style>

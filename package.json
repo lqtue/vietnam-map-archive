@@ -15,8 +15,9 @@
     "test:write": "playwright test -c playwright.write.config.ts",
     "db:test": "supabase start -x vector -x logflare && node --env-file=.env.test scripts/seed-test-db.mjs",
     "db:test:reset": "supabase db reset && node --env-file=.env.test scripts/seed-test-db.mjs",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "prettier --check . && eslint . && node scripts/check-tokens.mjs",
+    "format": "prettier --write .",
+    "lint:tokens": "node scripts/check-tokens.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

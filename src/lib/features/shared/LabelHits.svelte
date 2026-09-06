@@ -6,9 +6,9 @@
   mode="pick" dispatches `pick` instead, for a caller already on /explore.
 
   A label in one of the gazetteer's five categories also gets a link to its
-  /place/<slug> page. Those pages are server-rendered so search engines index
+  /archive/place/<slug> page. Those pages are server-rendered so search engines index
   them, and until Sept 2026 the only link to one anywhere in the app sat on
-  /map/<id> — which is itself one link deep inside a drawer.
+  /archive/<id> — which is itself one link deep inside a drawer.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
@@ -62,19 +62,19 @@
 
 <style>
   .label-hits {
-    margin: var(--space-1) 0 var(--space-3);
+    margin: var(--s-1) 0 var(--s-3);
   }
   .title {
-    font-size: var(--text-xs);
-    font-weight: var(--font-semibold);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semi);
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--color-gray-500);
-    margin: 0 0 var(--space-2);
+    color: var(--ink-soft);
+    margin: 0 0 var(--s-2);
   }
   .n {
-    font-weight: var(--font-normal);
-    margin-left: var(--space-1);
+    font-weight: var(--w-regular);
+    margin-left: var(--s-1);
   }
   ul {
     list-style: none;
@@ -98,21 +98,21 @@
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--s-2);
     width: 100%;
-    padding: var(--space-1) var(--space-2);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    background: var(--color-white);
-    color: var(--color-text);
+    padding: var(--s-1) var(--s-2);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--ground-raised);
+    color: var(--ink);
     text-decoration: none;
     text-align: left;
     font: inherit;
-    font-size: var(--text-sm);
+    font-size: var(--t-sm);
     cursor: pointer;
   }
   .hit:hover {
-    background: var(--color-gray-50);
+    background: var(--ground);
   }
   .dot {
     width: 8px;
@@ -121,34 +121,34 @@
     flex: none;
   }
   .text {
-    font-weight: var(--font-medium);
+    font-weight: var(--w-medium);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .map {
-    font-size: var(--text-xs);
-    color: var(--color-gray-500);
+    font-size: var(--t-xs);
+    color: var(--ink-soft);
     white-space: nowrap;
   }
   /* The gazetteer door: every map that names this place, on one page. */
   .place-link {
     display: inline-flex;
     align-items: center;
-    padding: 0 var(--space-2);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    background: var(--color-white);
-    color: var(--color-gray-500);
-    font-size: var(--text-xs);
-    font-weight: var(--font-semibold);
+    padding: 0 var(--s-2);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    background: var(--ground-raised);
+    color: var(--ink-soft);
+    font-size: var(--t-xs);
+    font-weight: var(--w-semi);
     text-decoration: none;
     white-space: nowrap;
     flex: none;
   }
   .place-link:hover {
-    background: var(--color-green);
-    color: var(--color-white);
+    background: var(--status-ok);
+    color: var(--ground-raised);
     text-decoration: none;
   }
 </style>

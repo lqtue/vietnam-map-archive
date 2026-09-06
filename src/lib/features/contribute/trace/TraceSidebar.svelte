@@ -358,14 +358,14 @@
   }
   .confirm-yes:hover {
     opacity: 1;
-    background: color-mix(in srgb, var(--color-error-600) 28%, var(--color-white));
-    color: color-mix(in srgb, var(--color-error-600) 70%, var(--color-text));
+    background: color-mix(in srgb, var(--status-bad) 28%, var(--ground-raised));
+    color: color-mix(in srgb, var(--status-bad) 70%, var(--ink));
   }
   .confirm-no {
     opacity: 0.6;
   }
   .confirm-no:hover {
     opacity: 1;
-    background: var(--color-gray-100);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
 </style>

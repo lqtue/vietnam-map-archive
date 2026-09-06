@@ -42,51 +42,51 @@
 */
 
 :root {
-  --sb-bg: #fafaf7;
-  --sb-card-bg: #fff;
-  --sb-border: 1.5px solid #111;
-  --sb-border-soft: 1px dashed #d9d4c0;
-  --sb-radius: 10px;
-  --sb-radius-sm: 6px;
-  --sb-radius-pill: 999px;
+  --sb-bg: var(--ground-raised);
+  --sb-card-bg: var(--ground-raised);
+  --sb-border: var(--rule-hair) solid var(--rule);
+  --sb-border-soft: 1px dashed var(--rule);
+  --sb-radius: var(--radius);
+  --sb-radius-sm: var(--radius);
+  --sb-radius-pill: var(--radius-pill);
 
   --sb-card-margin: 0.5rem 0.6rem;
   --sb-card-pad-x: 0.65rem;
   --sb-card-pad-y: 0.6rem;
 
-  --sb-head-bg: #fafaf7;
+  --sb-head-bg: var(--ground-raised);
   --sb-head-pad: 0.5rem 0.7rem;
 
-  --sb-accent: #2563eb;
-  --sb-accent-warm: #f59e0b;
-  --sb-accent-yellow: #fff7d1;
-  --sb-accent-yellow-strong: #fff3b8;
-  --sb-row-hover: #fdfbf3;
-  --sb-scout-bg: #fffbe9;
-  --sb-accent-dark: #1e3a8a;
-  --sb-accent-fill: rgba(37, 99, 235, 0.18);
-  --sb-accent-glow: rgba(37, 99, 235, 0.35);
-  --sb-scrim: rgba(17, 17, 17, 0.3);
+  --sb-accent: var(--accent);
+  --sb-accent-warm: var(--status-warn);
+  --sb-accent-yellow: color-mix(in srgb, var(--status-warn) 12%, var(--ground-raised));
+  --sb-accent-yellow-strong: color-mix(in srgb, var(--status-warn) 22%, var(--ground-raised));
+  --sb-row-hover: var(--ground-raised);
+  --sb-scout-bg: color-mix(in srgb, var(--status-warn) 7%, var(--ground-raised));
+  --sb-accent-dark: var(--accent);
+  --sb-accent-fill: color-mix(in srgb, var(--accent) 18%, transparent);
+  --sb-accent-glow: color-mix(in srgb, var(--accent) 35%, transparent);
+  --sb-scrim: var(--scrim);
 
   /* Warm archival greys used by the catalog table / detail drawer. */
-  --sb-head-hover: #f0efe7;
-  --sb-sort-idle: #c8c4b5;
-  --sb-thumb-bg: #f1ede0;
-  --sb-text-soft: #666;
-  --sb-badge-map: #d4f5e9;
-  --sb-group-bg: #f6f4ec;
-  --sb-group-bg-hover: #efece1;
-  --sb-error-bg: #ffe0e0;
-  --sb-row-active: #f3f1ea;
-  --sb-success-dark: #064e3b;
-  --sb-danger: #b91c1c;
-  --sb-danger-bg: #fee2e2;
-  --sb-success: #166534;
-  --sb-success-bg: #dcfce7;
+  --sb-head-hover: var(--ground);
+  --sb-sort-idle: var(--rule);
+  --sb-thumb-bg: var(--ground);
+  --sb-text-soft: var(--ink-soft);
+  --sb-badge-map: color-mix(in srgb, var(--status-ok) 12%, var(--ground-raised));
+  --sb-group-bg: var(--ground);
+  --sb-group-bg-hover: var(--ground);
+  --sb-error-bg: color-mix(in srgb, var(--status-bad) 12%, var(--ground-raised));
+  --sb-row-active: var(--ground);
+  --sb-success-dark: var(--status-ok);
+  --sb-danger: var(--status-bad);
+  --sb-danger-bg: color-mix(in srgb, var(--status-bad) 12%, var(--ground-raised));
+  --sb-success: var(--status-ok);
+  --sb-success-bg: color-mix(in srgb, var(--status-ok) 12%, var(--ground-raised));
 
-  --sb-text: #111;
-  --sb-text-meta: #555;
-  --sb-text-muted: #888;
+  --sb-text: var(--ink);
+  --sb-text-meta: var(--ink-soft);
+  --sb-text-muted: var(--ink-soft);
 
   --sb-font-base: 'Outfit', sans-serif;
   --sb-font-display: 'Space Grotesk', sans-serif;
@@ -279,12 +279,12 @@
   background: var(--sb-accent-yellow);
 }
 .sb-btn.is-primary:hover:not(:disabled) {
-  background: #ffe88a;
+  background: color-mix(in srgb, var(--status-warn) 30%, var(--ground-raised));
 }
 
 .sb-btn.is-on {
   background: var(--sb-accent);
-  color: #fff;
+  color: var(--ground-raised);
   border-color: var(--sb-accent);
 }
 .sb-btn.is-on:hover:not(:disabled) {
@@ -302,7 +302,7 @@
   border-color: var(--sb-danger);
 }
 .sb-btn.is-danger:hover:not(:disabled) {
-  background: #fecaca;
+  background: color-mix(in srgb, var(--status-bad) 22%, var(--ground-raised));
 }
 
 .sb-btn.is-ghost {
@@ -367,5 +367,5 @@
 }
 .sb-pill.is-on {
   background: var(--sb-text);
-  color: #fff;
+  color: var(--ground-raised);
 }

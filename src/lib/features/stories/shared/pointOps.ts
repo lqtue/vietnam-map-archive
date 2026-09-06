@@ -3,7 +3,7 @@
  *
  * Every operation returns a NEW story (never mutates) and re-stamps
  * `updatedAt`, so callers can assign the result straight back into a reactive
- * variable or a store. Both consumers use these: `/create`'s editor handlers
+ * variable or a store. Both consumers use these: `/explore?mode=story`'s editor handlers
  * and `storyStore`'s library methods.
  */
 import type { PointChallenge, Story, StoryPoint } from './types';

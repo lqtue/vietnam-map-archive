@@ -45,6 +45,8 @@
   let points: LegendPoint[] = [];
   let loadedFor = '';
 
+  // Literal hex on purpose: OpenLayers style objects are canvas fills, not CSS —
+  // they cannot read a custom property.
   const markerStyle = (n: number) =>
     new Style({
       image: new CircleStyle({
@@ -152,9 +154,9 @@
 
 <style>
   .legend-popup {
-    background: var(--color-white);
-    color: var(--color-text, #111);
-    border: 1.5px solid #111;
+    background: var(--ground-raised);
+    color: var(--ink);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 4px;
     padding: 3px 7px;
     font:

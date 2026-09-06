@@ -14,7 +14,7 @@
 
   export let matches: ResolvedMap[] = [];
   // Admins/mods may browse draft maps in the viewer; everyone else is
-  // capped to public/featured (mirrors /catalog's role gating).
+  // capped to public/featured (mirrors /archive's role gating).
   export let role: 'user' | 'mod' | 'admin' = 'user';
   // When the parent's welcome-mode is "Show all maps", force-expand so the
   // user lands on the full archive immediately. When the parent's mode is
@@ -29,7 +29,7 @@
   // when off, leave whatever the user chose manually.
   $: if (forceExpanded) expanded = true;
 
-  // Oldest → newest, matching /catalog's default sort. Undated maps sink
+  // Oldest → newest, matching /archive's default sort. Undated maps sink
   // to the bottom; ties break by name so the order is stable.
   function byYear(
     a: { year?: number | null; name?: string },
@@ -95,8 +95,8 @@
   }
   .title {
     font-family: var(--sb-font-display);
-    font-size: var(--text-base);
-    font-weight: var(--font-extrabold);
+    font-size: var(--t-md);
+    font-weight: var(--w-semi);
   }
   .hint {
     color: var(--sb-text-meta);
@@ -113,7 +113,7 @@
     text-decoration: none;
     font-family: inherit;
     font-size: 0.84rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     cursor: pointer;
     border-bottom: 1.5px dashed var(--sb-accent);
   }

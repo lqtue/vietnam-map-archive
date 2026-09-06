@@ -251,7 +251,7 @@
               Draw building outlines on historical maps — same skills as OSM tracing. Every shape
               goes into the open dataset.
             </p>
-            <a href="/contribute/trace" class="role-btn">Start tracing →</a>
+            <a href="/scan?mode=trace" class="role-btn">Start tracing →</a>
           </div>
           <div class="cta-role">
             <div class="role-icon">📖</div>

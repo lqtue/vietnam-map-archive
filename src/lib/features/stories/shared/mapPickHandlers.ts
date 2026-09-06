@@ -1,6 +1,6 @@
 /**
  * mapPickHandlers.ts — the catalog pick / zoom handlers shared by the
- * two-sidebar map editors (/create and /studio).
+ * two-sidebar map editors (/explore?mode=story and /explore?mode=annotate).
  *
  * `mapList` and `shellMap` are passed as getters because both are `bind:`-ed
  * from MapWorkspace and change after this factory runs.

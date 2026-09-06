@@ -1,5 +1,5 @@
 <!--
-  DigitalizeBottomBar.svelte — the toolbar under the /contribute/digitalize
+  DigitalizeBottomBar.svelte — the toolbar under the /scan?mode=triage
   canvas. Triage gets a hint only; the review phases add the draw and focus
   toggles. Purely presentational: every action is an event.
 -->
@@ -83,7 +83,7 @@
 <style>
   .bar-hint {
     font-size: 0.72rem;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.45;
     padding: 0 0.5rem;
     white-space: nowrap;

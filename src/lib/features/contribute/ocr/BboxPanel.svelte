@@ -1,7 +1,7 @@
 <!--
   BboxPanel.svelte — the floating editor for the selected OCR bbox.
 
-  Sits above the bottom bar of /contribute/digitalize while a bbox is selected:
+  Sits above the bottom bar of /scan?mode=triage while a bbox is selected:
   text, category, confidence, validate / reject / deselect. Owns the edit
   buffer; the parent only hears about it on `save`.
 -->
@@ -115,10 +115,9 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
-    background: var(--color-white);
-    border: var(--border-thick);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
     border-radius: 6px;
-    box-shadow: var(--shadow-solid-sm);
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
@@ -140,25 +139,25 @@
   .bbox-panel-text {
     flex: 1;
     min-width: 0;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.82rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     border-radius: 3px;
     padding: 0.3rem 0.5rem;
-    background: var(--color-bg);
+    background: var(--ground);
   }
   .bbox-panel-text:focus {
-    outline: 2px solid var(--color-blue);
+    outline: 2px solid var(--accent);
     outline-offset: -1px;
-    background: var(--color-white);
+    background: var(--ground-raised);
   }
   .bbox-panel-cat {
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.75rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     border-radius: 3px;
     padding: 0.3rem 0.35rem;
-    background: var(--color-bg);
+    background: var(--ground);
     cursor: pointer;
     flex-shrink: 0;
   }
@@ -169,7 +168,7 @@
   }
   .bbox-panel-conf {
     font-size: 0.68rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     font-variant-numeric: tabular-nums;
     opacity: 0.45;
     margin-right: 0.2rem;
@@ -178,14 +177,14 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.72rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     padding: 0.28rem 0.65rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 4px;
-    background: var(--color-bg);
-    color: var(--color-text);
+    background: var(--ground);
+    color: var(--ink);
     cursor: pointer;
     transition: all 0.1s;
   }
@@ -212,15 +211,15 @@
     width: 24px;
     height: 24px;
     margin-left: auto;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     border-radius: 3px;
     background: transparent;
     cursor: pointer;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.4;
   }
   .bbox-panel-close:hover {
     opacity: 1;
-    background: var(--color-gray-100);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
 </style>

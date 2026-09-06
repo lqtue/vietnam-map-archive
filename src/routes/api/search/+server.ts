@@ -1,12 +1,12 @@
 // Unified search across `maps` and (admin-only) `scout_candidates`.
-// Powers the upgraded /catalog search bar + facet rail.
+// Powers the upgraded /archive search bar + facet rail.
 //
 // GET /api/search?q=<text>&institution=<csv>&type=<csv>&period=<csv>&georef=<bool>&source=<csv>&include=maps,scout,labels,places&limit=60&offset=0
 //
 // `include=places` searches the gazetteer (mig 067's `place_names` view), so a
-// place name resolves to its own /place/<slug> page. Added Sept 2026 with the
+// place name resolves to its own /archive/place/<slug> page. Added Sept 2026 with the
 // command palette: the gazetteer is server-rendered for search engines, and
-// until then the only link to it in the whole app sat on /map/<id>.
+// until then the only link to it in the whole app sat on /archive/<id>.
 //
 // `include=labels` searches *inside* the maps: OCR'd labels via the
 // `search_labels` RPC (mig 065, trigram word-similarity), each warped to lng/lat

@@ -79,8 +79,8 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background-color: var(--color-bg);
-    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+    background-color: var(--ground);
+    background-image: radial-gradient(var(--rule) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
@@ -88,17 +88,16 @@
     width: 100%;
     max-width: 400px;
     padding: 2.5rem;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-solid);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
   }
 
   .auth-title {
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 2.25rem;
     font-weight: 800;
-    color: var(--color-text);
+    color: var(--ink);
     margin: 0 0 2rem;
     text-align: center;
     text-transform: uppercase;
@@ -106,17 +105,16 @@
   }
 
   /* #fee2e2 / #ef4444 / #b91c1c have no exact tokens — nearest is the
-     --color-error-600 family, tinted for the surface. */
+     --status-bad family, tinted for the surface. */
   .auth-error {
-    padding: var(--space-3) var(--space-4);
-    background: color-mix(in srgb, var(--color-error-600) 15%, var(--color-white));
-    border: 2px solid var(--color-error-600);
-    border-radius: var(--radius-md);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    font-weight: var(--font-semibold);
-    margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-solid-sm);
+    padding: var(--s-3) var(--s-4);
+    background: color-mix(in srgb, var(--status-bad) 15%, var(--ground-raised));
+    border: 2px solid var(--status-bad);
+    border-radius: var(--radius);
+    color: var(--ink);
+    font-size: var(--t-sm);
+    font-weight: var(--w-semi);
+    margin-bottom: var(--s-4);
   }
 
   .auth-options {
@@ -132,28 +130,26 @@
     gap: 0.75rem;
     width: 100%;
     padding: 0.875rem 1.25rem;
-    border: var(--border-thick);
+    border: var(--rule-thick) solid var(--rule);
     border-radius: var(--radius-pill);
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.1s;
-    box-shadow: var(--shadow-solid-sm);
     text-transform: uppercase;
-    background: var(--color-white);
-    color: var(--color-text);
+    background: var(--ground-raised);
+    color: var(--ink);
   }
 
   .auth-btn:hover:not(:disabled) {
     transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-solid);
-    background: var(--color-bg);
+    background: var(--ground);
   }
 
   .auth-btn:active:not(:disabled) {
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
 
   .auth-btn:disabled {
@@ -164,11 +160,11 @@
   .auth-notice {
     text-align: center;
     margin: 2rem 0 0;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.4;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.6;
   }
 </style>

@@ -121,17 +121,17 @@
   .review-sidebar {
     width: 280px;
     flex-shrink: 0;
-    background: var(--color-white);
-    border-left: var(--border-thin);
+    background: var(--ground-raised);
+    border-left: var(--rule-hair) solid var(--rule);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
   }
 
   .sidebar-header {
     padding: 1rem;
-    border-bottom: var(--border-thin);
+    border-bottom: var(--rule-hair) solid var(--rule);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -141,17 +141,17 @@
   h2 {
     margin: 0;
     font-size: 0.875rem;
-    font-weight: var(--font-bold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
   .progress-pill {
     font-size: 0.75rem;
-    font-weight: var(--font-semibold);
-    background: var(--color-gray-100);
-    color: var(--color-gray-500);
+    font-weight: var(--w-semi);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
+    color: var(--ink-soft);
     border-radius: var(--radius-pill);
     padding: 0.15rem 0.6rem;
     white-space: nowrap;
@@ -160,7 +160,7 @@
   .empty {
     padding: 2rem 1rem;
     text-align: center;
-    color: var(--color-gray-500);
+    color: var(--ink-soft);
     font-size: 0.875rem;
   }
 
@@ -173,12 +173,12 @@
   }
 
   .fp-item {
-    border-bottom: 1px solid var(--color-gray-300);
+    border-bottom: 1px solid var(--rule);
     transition: background 0.1s;
   }
 
   .fp-item:hover {
-    background: var(--color-gray-100);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
   .fp-item.selected {
     background: var(--tone-blue-wash);
@@ -204,14 +204,14 @@
     border-radius: 3px;
     flex-shrink: 0;
     margin-top: 3px;
-    border: 1px solid color-mix(in srgb, var(--color-border) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rule) 15%, transparent);
   }
 
   .fp-class {
     flex: 1;
     font-size: 0.8125rem;
-    font-weight: var(--font-semibold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
   }
 
   .fp-extra {
@@ -232,7 +232,7 @@
     flex: 1;
     padding: 0.35rem 0;
     font-size: 0.75rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -252,7 +252,7 @@
   }
 
   .btn-approve:hover:not(:disabled) {
-    background: var(--color-success-600);
+    background: var(--status-ok);
   }
 
   .btn-reject {
@@ -261,14 +261,14 @@
   }
 
   .btn-reject:hover:not(:disabled) {
-    background: var(--color-error-600);
+    background: var(--status-bad);
   }
 
   .type-select {
     width: 100%;
-    background: var(--color-white);
-    color: var(--color-text);
-    border: 1px solid var(--color-gray-300);
+    background: var(--ground-raised);
+    color: var(--ink);
+    border: 1px solid var(--rule);
     border-radius: 4px;
     font-size: 0.75rem;
     font-family: inherit;
@@ -278,7 +278,7 @@
   }
 
   .type-select:focus {
-    outline: 1px solid var(--color-orange);
+    outline: 1px solid var(--status-warn);
     outline-offset: -1px;
   }
 
@@ -292,10 +292,10 @@
     width: 100%;
     padding: 0.5rem;
     font-size: 0.8rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     font-family: inherit;
     background: var(--tone-green-ink);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -305,11 +305,11 @@
     cursor: not-allowed;
   }
   .btn-mark-reviewed:hover:not(:disabled) {
-    background: var(--color-success-600);
+    background: var(--status-ok);
   }
   .mark-reviewed-error {
     font-size: 0.72rem;
-    color: var(--color-error-600);
+    color: var(--status-bad);
     margin: 0;
   }
 </style>

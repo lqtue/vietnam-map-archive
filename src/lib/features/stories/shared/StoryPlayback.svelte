@@ -1,6 +1,6 @@
 <!--
   StoryPlayback.svelte — Floating preview/playback card anchored at the bottom
-  of the map. Used by /explore (real playback) and /create (preview mode).
+  of the map. Used by /explore (real playback) and /explore?mode=story (preview mode).
   Styled with sidebar.css tokens so it matches the right-pane editor.
 -->
 <script lang="ts">
@@ -168,7 +168,6 @@
     background: var(--sb-card-bg);
     border: var(--sb-border);
     border-radius: var(--sb-radius);
-    box-shadow: var(--shadow-solid-sm);
     z-index: 100;
     pointer-events: auto;
     color: var(--sb-text);
@@ -216,7 +215,7 @@
     width: 60px;
     height: 6px;
     background: var(--sb-bg);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     border-radius: var(--sb-radius-pill);
     overflow: hidden;
   }
@@ -250,7 +249,7 @@
     align-items: center;
     justify-content: center;
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border: var(--sb-border);
     border-radius: 50%;
     font-family: var(--sb-font-display);

@@ -1,7 +1,7 @@
 <!--
-  StudioMode.svelte — /studio plugin on MapWorkspace.
+  StudioMode.svelte — /explore?mode=annotate plugin on MapWorkspace.
 
-  Desktop two-sidebar layout (mirrors /create):
+  Desktop two-sidebar layout (mirrors /explore?mode=story):
     • Left sidebar  — Layers · Controls · Browse (MapViewerSidebar, shared)
     • Right sidebar — Project header · Annotations · Inspector (StudioRightPane)
 
@@ -241,7 +241,7 @@
   }
 
   onMount(() => {
-    // /studio doesn't support side-by-side — snap back if state is stale from /view.
+    // /explore?mode=annotate doesn't support side-by-side — snap back if state is stale from /view.
     if ($layerStore.viewMode === 'dual') layerStore.setViewMode('overlay');
 
     projectStore.loadFromSupabase().finally(() => {

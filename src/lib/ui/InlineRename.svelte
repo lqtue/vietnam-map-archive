@@ -1,7 +1,7 @@
 <!--
   InlineRename.svelte — double-click (or Enter / F2) a title to edit it in
-  place; Enter or blur commits, Escape cancels. Shared by the /create story
-  header and the /studio project header.
+  place; Enter or blur commits, Escape cancels. Shared by the /explore?mode=story story
+  header and the /explore?mode=annotate project header.
 
   The idle state is a real <button> so it is focusable and keyboard-operable
   without an ARIA role override.
@@ -14,7 +14,7 @@
   export let value = '';
   export let placeholder = 'Title';
   export let fallback = 'Untitled';
-  /** One-line variant used in the /studio header strip. */
+  /** One-line variant used in the /explore?mode=annotate header strip. */
   export let compact = false;
 
   let editing = false;
@@ -105,7 +105,7 @@
     white-space: nowrap;
   }
   .sh-title:hover {
-    background: var(--sb-accent-yellow, #fff3a3);
+    background: var(--sb-accent-yellow, color-mix(in srgb, var(--accent) 12%, transparent));
   }
   .sh-title:focus {
     outline: 2px solid var(--sb-accent);

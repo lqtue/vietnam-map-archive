@@ -19,7 +19,7 @@
 
   export let viewMode: ViewMode = 'overlay';
   export let gpsActive: boolean = false;
-  /** When false, "Side-by-side" is hidden — used by tool pages (/studio, /create). */
+  /** When false, "Side-by-side" is hidden — used by tool pages (/explore?mode=annotate, /explore?mode=story). */
   export let allowDual: boolean = true;
   /** Show the "Legend points" toggle (only when the active overlay has legend data). */
   export let legendPointsAvailable: boolean = false;
@@ -240,15 +240,6 @@
     font-family: var(--sb-font-display);
     font-weight: 800;
   }
-  .mcp-lbl {
-    /* Hide labels on narrow sidebars; icons remain readable. */
-    display: inline;
-  }
-  @media (max-width: 320px) {
-    .mcp-lbl {
-      display: none;
-    }
-  }
 
   .mcp-url-input {
     flex: 1;
@@ -257,9 +248,9 @@
     padding: 0.2rem 0.5rem;
     font-size: 0.74rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    border: 1px solid var(--sb-border, #ccc);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 4px;
-    background: var(--sb-bg-input, #fff);
-    color: var(--sb-text, #000);
+    background: var(--ground-raised);
+    color: var(--ink);
   }
 </style>

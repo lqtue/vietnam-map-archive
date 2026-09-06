@@ -5,8 +5,8 @@
  * `/api/search` does the heavy lifting (Postgres tsvector full-text search,
  * server-side role gating, the 2000-row safety ceiling). This module wraps it
  * in a Svelte store-factory so multiple UIs can share one implementation:
- *   - /catalog            → CatalogUnifiedSearch.svelte (full facet rail)
- *   - /create, /image     → CatalogSidebarPanel → CatalogUnifiedSearch (compact)
+ *   - /archive            → CatalogUnifiedSearch.svelte (full facet rail)
+ *   - /explore?mode=story, /scan     → CatalogSidebarPanel → CatalogUnifiedSearch (compact)
  *   - /explore map view   → ExploreBrowsePanel (compact, georef-only)
  *
  * Consumers bind `query`, read derived `results`/`facets`/`total`/`loading`,

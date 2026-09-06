@@ -61,6 +61,9 @@
   let loadSeq = 0;
 
   // ── Color palette ─────────────────────────────────────────────────────────
+  // Categorical, not a role: each entry encodes *which label* a footprint has,
+  // so it must stay a fixed literal. It is also handed to OpenLayers, which
+  // cannot read a CSS custom property.
   const labelColors: Record<string, string> = {};
   const palette = [
     '#d4af37',

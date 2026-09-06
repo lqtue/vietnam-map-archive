@@ -1,7 +1,7 @@
 <!--
   GeorefSyncPanel.svelte — "Sync georef status from Allmaps" maintenance action.
 
-  Nothing to do with bulk upload; it only lives on /admin/bulk because that was
+  Nothing to do with bulk upload; it only lives on /admin?tab=bulk because that was
   the nearest admin page when it was written. It belongs with the catalog admin
   bar (or a future /admin/maintenance). Styling still comes from the host page's
   stylesheet (`$styles/pages/admin-bulk.css`, scoped under .admin-bulk-page) —
@@ -32,7 +32,7 @@
   <p class="hint">
     Probe the Allmaps annotation server for every map with an <code>allmaps_id</code> but
     <code>georef_done = false</code>. Volunteers who finish georef in the Allmaps Editor become
-    visible to /contribute/digitalize after this runs. Idempotent.
+    visible to /scan?mode=triage after this runs. Idempotent.
   </p>
   <div class="script-actions">
     <button class="pill-btn" on:click={syncGeorefFromAllmaps} disabled={syncing}>

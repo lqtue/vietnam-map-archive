@@ -1,6 +1,6 @@
 <!--
   ToolMapPicker.svelte — the floating map picker shared by the contribute
-  IIIF-canvas tools (/contribute/digitalize, /contribute/trace).
+  IIIF-canvas tools (/scan?mode=triage, /scan?mode=trace).
 
   Owns the map list: loads it via fetchLabelMaps() and adapts LabelMapInfo to
   the MapListItem shape MapSearchBar expects, so callers need neither a

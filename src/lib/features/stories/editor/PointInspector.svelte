@@ -1,5 +1,5 @@
 <!--
-  PointInspector.svelte — Point view of /create's right pane.
+  PointInspector.svelte — Point view of /explore?mode=story's right pane.
 
   Lives inside a titled SidebarCard ("Point N · title") with a ← Back button
   in head-actions (owned by CreateRightPane). This panel renders the editor

@@ -5,11 +5,11 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 
 /**
- * GET /api/admin/status — the numbers behind `/admin/status`.
+ * GET /api/admin/status — the numbers behind `/admin?tab=status`.
  *
  * Every figure here used to be reachable only by running SQL by hand, which
  * meant the person who owns the project could not check the project's own
- * state. This is the same human-in-the-loop idea as `/contribute/review`,
+ * state. This is the same human-in-the-loop idea as `/scan?mode=review`,
  * pointed at the pipeline instead of at a map.
  *
  * Counts use `head: true`, so PostgREST returns the tally in a Content-Range

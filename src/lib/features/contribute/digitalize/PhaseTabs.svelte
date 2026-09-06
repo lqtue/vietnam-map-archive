@@ -1,6 +1,6 @@
 <!--
   PhaseTabs.svelte — the Triage / OCR / Segmentation switcher in the
-  /contribute/digitalize sidebar footer. The mobile drawer shortens the middle
+  /scan?mode=triage sidebar footer. The mobile drawer shortens the middle
   label, hence `ocrLabel`.
 -->
 <script lang="ts">
@@ -37,7 +37,7 @@
   .phase-tabs {
     display: flex;
     gap: 2px;
-    background: var(--color-border);
+    background: var(--rule);
     border-radius: 6px;
     padding: 2px;
     width: 100%;
@@ -47,11 +47,11 @@
     flex: 1;
     padding: 0.35rem 0.6rem;
     font-size: 0.72rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: var(--color-white);
+    color: var(--ground-raised);
     cursor: pointer;
     opacity: 0.5;
     transition: all 0.15s;
@@ -60,9 +60,9 @@
   }
 
   .phase-tab.active {
-    background: var(--color-white);
-    color: var(--color-text);
+    background: var(--ground-raised);
+    color: var(--ink);
     opacity: 1;
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-border) 8%, transparent);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--rule) 8%, transparent);
   }
 </style>

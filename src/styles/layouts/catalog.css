@@ -1,7 +1,7 @@
 /*
   Neutral text greys are expressed as token mixes rather than raw hex:
-  `color-mix(in srgb, var(--color-text) N%, var(--color-white))` reproduces
-  #222…#888 exactly (--color-text is #111, a neutral), so tokenising here is
+  `color-mix(in srgb, var(--ink) N%, var(--ground-raised))` reproduces
+  var(--ink)…var(--ink-soft) exactly (--ink is var(--ink), a neutral), so tokenising here is
   pixel-identical. White overlays use the same form against `transparent`.
 */
 /*
@@ -19,7 +19,7 @@
    ======================================== */
 .catalog-page {
   min-height: 100vh;
-  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: 0 0;
   opacity: 0;
@@ -40,22 +40,22 @@
   width: 100%;
   min-width: 320px;
   padding: 0.75rem 1rem 0.75rem 3rem;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
-  border: var(--border-thick);
+  border: var(--rule-thick) solid var(--rule);
   border-radius: var(--radius-pill);
-  background: var(--color-white);
-  color: var(--color-text);
+  background: var(--ground-raised);
+  color: var(--ink);
   outline: none;
-  box-shadow: 2px 2px 0px var(--color-border);
+  box-shadow: 2px 2px 0px var(--rule);
   transition: all 0.2s ease;
 }
 
 .catalog-page .chunky-input:focus {
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px var(--color-border);
-  background: var(--color-bg);
+  box-shadow: 4px 4px 0px var(--rule);
+  background: var(--ground);
 }
 
 /* ========================================
@@ -68,46 +68,45 @@
 }
 
 .catalog-page .filter-label {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 
 .catalog-page .status-pill {
   padding: 0.5rem 0.875rem;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 0.8rem;
   font-weight: 700;
-  background: var(--color-white);
-  border: var(--border-thin);
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  box-shadow: 1.5px 1.5px 0px var(--color-border);
+  box-shadow: 1.5px 1.5px 0px var(--rule);
   transition: all 0.1s;
   white-space: nowrap;
 }
 
 .catalog-page .status-pill:hover {
-  background: var(--color-yellow);
+  background: var(--accent);
 }
 .catalog-page .status-pill.active {
-  background: var(--color-text);
-  color: var(--color-white);
+  background: var(--ink);
+  color: var(--ground-raised);
 }
 
 /* ========================================
    STATES
    ======================================== */
 .catalog-page .state-panel {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   padding: 5rem 2rem;
   text-align: center;
-  box-shadow: var(--shadow-solid);
   margin-top: 2rem;
 }
 
@@ -117,7 +116,7 @@
 }
 
 .catalog-page .state-title {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
   margin: 0 0 0.5rem 0;
@@ -126,7 +125,7 @@
 .catalog-page .state-desc {
   font-size: 1.125rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--color-text) 79%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 79%, var(--ground-raised));
   margin: 0;
 }
 
@@ -138,14 +137,13 @@
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 1.125rem;
   font-weight: 800;
-  border: var(--border-thick);
+  border: var(--rule-thick) solid var(--rule);
   border-radius: var(--radius-pill);
   text-decoration: none;
   cursor: pointer;
-  box-shadow: var(--shadow-solid-sm);
   transition:
     transform 0.1s,
     box-shadow 0.1s;
@@ -153,15 +151,14 @@
 
 .catalog-page .action-btn:hover {
   transform: translate(-4px, -4px);
-  box-shadow: var(--shadow-solid);
 }
 .catalog-page .action-btn:active {
   transform: translate(0, 0);
-  box-shadow: 0px 0px 0px var(--color-border);
+  box-shadow: 0px 0px 0px var(--rule);
 }
 .catalog-page .primary-btn {
-  background: var(--color-blue);
-  color: var(--color-white);
+  background: var(--accent);
+  color: var(--ground-raised);
 }
 
 /* ========================================
@@ -176,24 +173,24 @@
 
 /* Badges used by the list view (grid view uses MapCard's scoped styles) */
 .catalog-page .badge {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 800;
   padding: 0.25rem 0.6rem;
-  background: var(--color-white);
-  border: var(--border-thin);
-  border-radius: var(--radius-sm);
-  box-shadow: 2px 2px 0px var(--color-border);
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 2px 2px 0px var(--rule);
 }
 
 .catalog-page .year-badge {
-  background: var(--color-green);
-  color: var(--color-text);
+  background: var(--status-ok);
+  color: var(--ink);
 }
 
 .catalog-page .source-badge {
-  background: var(--color-orange);
-  color: var(--color-white);
+  background: var(--status-warn);
+  color: var(--ground-raised);
 }
 
 /* ========================================
@@ -221,10 +218,10 @@
 
 /* Admin edit error (catalog page, MapEditModal load failure) */
 .edit-error {
-  margin: var(--space-2) 0;
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-thin);
-  background: var(--color-white);
-  color: var(--color-error-600);
-  font-size: var(--text-sm);
+  margin: var(--s-2) 0;
+  padding: var(--s-2) var(--s-3);
+  border: var(--rule-hair) solid var(--rule);
+  background: var(--ground-raised);
+  color: var(--status-bad);
+  font-size: var(--t-sm);
 }

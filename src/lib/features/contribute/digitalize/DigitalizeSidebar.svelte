@@ -1,5 +1,5 @@
 <!--
-  DigitalizeSidebar.svelte — the whole /contribute/digitalize left panel:
+  DigitalizeSidebar.svelte — the whole /scan?mode=triage left panel:
   the phase-appropriate body plus the phase tabs in the footer.
 
   One component and one instance for both viewports: the page fills ToolLayout's

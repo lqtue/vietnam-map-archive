@@ -49,6 +49,8 @@
 
     // Queue a preview feature. Prefer the real Nominatim geometry (polygon /
     // multipolygon / line); fall back to a bbox rectangle or a point.
+    // Literal on purpose: `color` is annotation *data* the user can then edit,
+    // and it ends up in an OL style, which cannot read a CSS custom property.
     const props = { label, color: '#d97706', hidden: false, source: 'nominatim' };
     let geometry: import('geojson').Geometry;
     if (geojson) {
@@ -223,7 +225,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--scrim);
     z-index: 200;
   }
   .dialog {
@@ -238,7 +240,6 @@
     background: var(--sb-bg);
     border: var(--sb-border);
     border-radius: var(--sb-radius-lg, 12px);
-    box-shadow: var(--shadow-solid);
     z-index: 201;
     overflow: hidden;
   }

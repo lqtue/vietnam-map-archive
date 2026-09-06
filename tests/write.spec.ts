@@ -581,7 +581,7 @@ test('the share page is server-rendered and hides drafts', async () => {
   const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
 
   // No JavaScript runs here: this is what a link-preview crawler sees.
-  const res = await anon.get(`/map/${mapId}`);
+  const res = await anon.get(`/archive/${mapId}`);
   expect(res.status()).toBe(200);
   const html = await res.text();
   expect(html).toContain('og:title');
@@ -599,7 +599,7 @@ test('the share page is server-rendered and hides drafts', async () => {
     .single();
 
   // A draft is not published, so its link must not resolve for anyone.
-  expect((await anon.get(`/map/${draft!.id}`)).status()).toBe(404);
+  expect((await anon.get(`/archive/${draft!.id}`)).status()).toBe(404);
 
   await admin.from('maps').delete().eq('id', draft!.id);
   await anon.dispose();
@@ -693,7 +693,7 @@ test('a draft map is invisible to an anonymous reader, visible once signed in', 
   const { data: unauthed } = await anon.from('maps').select('id').eq('id', draft!.id);
   expect(unauthed).toEqual([]);
 
-  // A signed-in volunteer still needs drafts: /contribute/georef selects them
+  // A signed-in volunteer still needs drafts: /contribute#georef selects them
   // by status, and the digitalize and trace pickers are mostly unpublished maps.
   const signedIn = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   await signedIn.auth.signInWithPassword({ email: TEST_EMAIL, password: TEST_PASSWORD });
@@ -1094,7 +1094,7 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
   expect(insErr, insErr?.message).toBeNull();
 
   const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
-  const res = await anon.get('/place/rue-de-cay-mai');
+  const res = await anon.get('/archive/place/rue-de-cay-mai');
   expect(res.ok(), `${res.status()} ${await res.text()}`).toBe(true);
   const html = await res.text();
 
@@ -1107,12 +1107,12 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
   expect(html).toContain('8 m'); // the rounded warp error, stated rather than hidden
 
   // The share page links to it, which is the only crawl path there is.
-  const share = await anon.get(`/map/${mapId}`);
+  const share = await anon.get(`/archive/${mapId}`);
   expect(share.ok()).toBe(true);
-  expect(await share.text()).toContain('/place/rue-de-cay-mai');
+  expect(await share.text()).toContain('/archive/place/rue-de-cay-mai');
 
   // An unknown name is a 404, not an empty page.
-  expect((await anon.get('/place/rue-qui-nexiste-pas')).status()).toBe(404);
+  expect((await anon.get('/archive/place/rue-qui-nexiste-pas')).status()).toBe(404);
 
   // A name attested only on a draft map has no public page.
   const { data: draft } = await admin
@@ -1122,7 +1122,7 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
     .single();
   created.mapIds.push(draft!.id);
   await admin.from('ocr_extractions').insert({ ...row('Rue Introuvable', 54), map_id: draft!.id });
-  expect((await anon.get('/place/rue-introuvable')).status()).toBe(404);
+  expect((await anon.get('/archive/place/rue-introuvable')).status()).toBe(404);
 
   // And a name on BOTH a published and a draft sheet must not leak the draft
   // through the aggregate. The page loader reads the gazetteer on the service
@@ -1135,7 +1135,7 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
     .single();
   expect(agg!.map_ids).not.toContain(draft!.id);
   expect(agg!.years).not.toContain(1902);
-  expect(await (await anon.get('/place/rue-de-cay-mai')).text()).not.toContain(draft!.id);
+  expect(await (await anon.get('/archive/place/rue-de-cay-mai')).text()).not.toContain(draft!.id);
 
   await anon.dispose();
 });

@@ -1,6 +1,6 @@
 <!--
   StudioOverpassController.svelte — the whole "import from OpenStreetMap" flow
-  for /studio, lifted out of StudioMode.
+  for /explore?mode=annotate, lifted out of StudioMode.
 
   Owns: the dialog, the bbox the query runs against (viewport / search result /
   draw-on-map), the Overpass fetch, and the preview → Add | Discard step.
@@ -192,10 +192,9 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.55rem 0.75rem;
-    background: var(--color-white);
-    border: var(--border-thick);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
     border-radius: 10px;
-    box-shadow: var(--shadow-solid-sm);
     z-index: 150;
     font-size: 0.85rem;
     max-width: calc(100vw - 2rem);
@@ -207,7 +206,7 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.78rem;
     padding: 0.2rem 0.4rem;
-    background: var(--color-bg);
+    background: var(--ground);
     border-radius: 4px;
   }
 </style>

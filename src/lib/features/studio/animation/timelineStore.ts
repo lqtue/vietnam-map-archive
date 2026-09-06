@@ -1,5 +1,5 @@
 /**
- * timelineStore — in-memory keyframe list for /studio playback.
+ * timelineStore — in-memory keyframe list for /explore?mode=annotate playback.
  *
  * Each keyframe snapshots the current camera (mapStore) and layer stack
  * (layersStore). Not persisted — survives only the editor session.

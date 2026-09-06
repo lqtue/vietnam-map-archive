@@ -62,6 +62,7 @@
       points: 4,
       radius: 7,
       angle: Math.PI / 4,
+      // Literal: OpenLayers styles cannot read a CSS custom property.
       fill: new Fill({ color: '#ffffff' }),
       stroke: new Stroke({ color: '#111827', width: 1.5 }),
     }),

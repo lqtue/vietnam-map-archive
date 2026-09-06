@@ -12,18 +12,18 @@
    substitution stays lazy, so a theme that re-points the base token re-points
    these too. */
 :root {
-  --tone-green-pale: color-mix(in srgb, var(--color-green) 18%, var(--color-white));
-  --tone-green-ink: color-mix(in srgb, var(--color-green) 55%, var(--color-text));
-  --tone-red-pale: color-mix(in srgb, var(--color-error-600) 15%, var(--color-white));
-  --tone-red-ink: color-mix(in srgb, var(--color-error-600) 55%, var(--color-text));
-  --tone-amber-pale: color-mix(in srgb, var(--color-yellow) 35%, var(--color-white));
-  --tone-amber-ink: color-mix(in srgb, var(--color-orange) 55%, var(--color-text));
-  --tone-blue-pale: color-mix(in srgb, var(--color-blue) 15%, var(--color-white));
-  --tone-blue-ink: color-mix(in srgb, var(--color-blue) 55%, var(--color-text));
+  --tone-green-pale: color-mix(in srgb, var(--status-ok) 18%, var(--ground-raised));
+  --tone-green-ink: color-mix(in srgb, var(--status-ok) 55%, var(--ink));
+  --tone-red-pale: color-mix(in srgb, var(--status-bad) 15%, var(--ground-raised));
+  --tone-red-ink: color-mix(in srgb, var(--status-bad) 55%, var(--ink));
+  --tone-amber-pale: color-mix(in srgb, var(--accent) 35%, var(--ground-raised));
+  --tone-amber-ink: color-mix(in srgb, var(--status-warn) 55%, var(--ink));
+  --tone-blue-pale: color-mix(in srgb, var(--accent) 15%, var(--ground-raised));
+  --tone-blue-ink: color-mix(in srgb, var(--accent) 55%, var(--ink));
   /* Washes tint a whole table row, so they sit a step below `pale`. */
-  --tone-green-wash: color-mix(in srgb, var(--color-green) 8%, var(--color-white));
-  --tone-red-wash: color-mix(in srgb, var(--color-error-600) 7%, var(--color-white));
-  --tone-blue-wash: color-mix(in srgb, var(--color-blue) 9%, var(--color-white));
+  --tone-green-wash: color-mix(in srgb, var(--status-ok) 8%, var(--ground-raised));
+  --tone-red-wash: color-mix(in srgb, var(--status-bad) 7%, var(--ground-raised));
+  --tone-blue-wash: color-mix(in srgb, var(--accent) 9%, var(--ground-raised));
 }
 
 /* ── Page shell ──────────────────────────────────────────────────────────── */
@@ -32,9 +32,9 @@
   inset: var(--nav-height) 0 0 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg, #f5f0ea);
+  background: var(--ground, var(--ground));
   overflow: hidden;
-  font-family: var(--font-family-base, 'Be Vietnam Pro', sans-serif);
+  font-family: var(--font-body, 'Be Vietnam Pro', sans-serif);
 }
 
 /* ── Home link (inside sidebar panel-header) ─────────────────────────────── */
@@ -43,13 +43,13 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.3rem 0.5rem 0.3rem 0.3rem;
-  border-radius: var(--radius-sm, 4px);
-  color: var(--color-text, #2b2520);
+  border-radius: var(--radius, 4px);
+  color: var(--ink, var(--ink));
   text-decoration: none;
   opacity: 0.7;
   transition: all 0.1s;
   flex-shrink: 0;
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -60,7 +60,7 @@
 }
 .home-link:hover {
   opacity: 1;
-  background: var(--color-gray-100, #f1ece6);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   transform: translateX(-1px);
 }
 
@@ -78,8 +78,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--color-bg, #f5f0ea);
-  border-right: var(--border-thick, 2px solid #2b2520);
+  background: var(--ground, var(--ground));
+  border-right: var(--rule-thick) solid var(--rule);
   overflow: hidden;
   min-width: 0;
 }
@@ -88,8 +88,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 0.75rem;
-  background: var(--color-white, #fff);
-  border-bottom: var(--border-thick, 2px solid #2b2520);
+  background: var(--ground-raised, var(--ground-raised));
+  border-bottom: var(--rule-thick) solid var(--rule);
   flex-shrink: 0;
 }
 .panel-mode-label {
@@ -109,11 +109,11 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: var(--border-thin, 1px solid #2b2520);
-  border-radius: var(--radius-sm, 4px);
-  background: var(--color-white, #fff);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius, 4px);
+  background: var(--ground-raised, var(--ground-raised));
   cursor: pointer;
-  color: var(--color-text, #2b2520);
+  color: var(--ink, var(--ink));
   opacity: 0.55;
   transition:
     opacity 0.1s,
@@ -121,7 +121,7 @@
 }
 .collapse-btn:hover {
   opacity: 1;
-  background: var(--color-gray-100, #f1ece6);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
 }
 @media (max-width: 900px) {
   .collapse-btn {
@@ -154,12 +154,12 @@
   gap: 1rem;
   height: 100%;
   font-size: 0.875rem;
-  color: var(--color-text, #2b2520);
+  color: var(--ink, var(--ink));
   opacity: 0.7;
 }
 .catalog-link {
   font-weight: 700;
-  color: var(--color-text, #2b2520);
+  color: var(--ink, var(--ink));
   text-decoration: none;
   opacity: 0.8;
 }
@@ -176,7 +176,7 @@
   gap: 0.75rem;
   height: 100%;
   font-size: 0.875rem;
-  color: var(--color-text, #2b2520);
+  color: var(--ink, var(--ink));
   opacity: 0.6;
 }
 /* ── Bottom toolbar (contribute/trace) ───────────────────────────────────── */
@@ -186,8 +186,8 @@
   gap: 0.25rem;
   height: 46px;
   padding: 0 0.75rem;
-  background: var(--color-white, #fff);
-  border-top: var(--border-thick, 2px solid #2b2520);
+  background: var(--ground-raised, var(--ground-raised));
+  border-top: var(--rule-thick) solid var(--rule);
   flex-shrink: 0;
   z-index: 20;
 }
@@ -201,7 +201,7 @@
 /* ── Sidebar helpers (moved from the retired components/label.css) ───────── */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-gray-300) transparent;
+  scrollbar-color: var(--rule) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -209,18 +209,18 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--color-gray-300);
+  background: var(--rule);
   border-radius: 999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gray-400);
+  background: var(--ink-soft);
 }
 
 .empty-state {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.6;
   font-style: italic;
 }
@@ -228,17 +228,17 @@
 .hint-bar {
   padding: 0.5rem 1rem;
   font-size: 0.72rem;
-  color: var(--color-text);
+  color: var(--ink);
   opacity: 0.6;
-  border-top: var(--border-thin);
+  border-top: var(--rule-hair) solid var(--rule);
   line-height: 1.6;
   flex-shrink: 0;
 }
 .hint-bar kbd {
   font-family: monospace;
   font-size: 0.68rem;
-  background: var(--color-gray-100);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   padding: 0.05rem 0.3rem;
   border-radius: 2px;
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
 }

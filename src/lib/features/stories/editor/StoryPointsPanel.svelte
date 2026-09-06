@@ -159,7 +159,7 @@
   }
   .pt-row.selected {
     background: var(--sb-accent-yellow);
-    box-shadow: 0 0 0 2px #2563eb33;
+    box-shadow: 0 0 0 var(--rule-thick) color-mix(in srgb, var(--accent) 35%, transparent);
   }
   .pt-reorder {
     flex-shrink: 0;
@@ -195,7 +195,7 @@
     align-items: center;
     justify-content: center;
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-radius: 50%;
     font-size: 0.72rem;
     font-weight: 800;

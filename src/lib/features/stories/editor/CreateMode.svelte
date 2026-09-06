@@ -1,5 +1,5 @@
 <!--
-  CreateMode.svelte — /create plugin on MapWorkspace.
+  CreateMode.svelte — /explore?mode=story plugin on MapWorkspace.
 
   Desktop authoring:
     • Left sidebar  — Layers · Controls · Browse (MapViewerSidebar, shared)
@@ -91,7 +91,7 @@
   let activeView: 'library' | 'editor' = 'library';
   let storiesLoading = true;
 
-  // /create always lands on the library (welcome screen); the user picks
+  // /explore?mode=story always lands on the library (welcome screen); the user picks
   // which story to edit. Drafts auto-persist regardless via persistDraft.
 
   let preview: PreviewSession = CLOSED_PREVIEW;
@@ -321,7 +321,7 @@
   }
 
   onMount(() => {
-    // /create doesn't support side-by-side — snap back if state is stale from /view.
+    // /explore?mode=story doesn't support side-by-side — snap back if state is stale from /view.
     if ($layerStore.viewMode === 'dual') layerStore.setViewMode('overlay');
 
     storyLibrary.loadFromSupabase().finally(() => {
@@ -561,9 +561,9 @@
     background: var(--sb-accent-yellow);
     border: var(--sb-border);
     border-radius: 10px;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.86rem;
-    color: var(--color-text);
+    color: var(--ink);
     line-height: 1.4;
   }
   .mobile-banner strong {

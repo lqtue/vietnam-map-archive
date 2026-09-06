@@ -1,14 +1,14 @@
 /*
   Neutral text greys are expressed as token mixes rather than raw hex:
-  `color-mix(in srgb, var(--color-text) N%, var(--color-white))` reproduces
-  #222…#888 exactly (--color-text is #111, a neutral), so tokenising here is
+  `color-mix(in srgb, var(--ink) N%, var(--ground-raised))` reproduces
+  var(--ink)…var(--ink-soft) exactly (--ink is var(--ink), a neutral), so tokenising here is
   pixel-identical. White overlays use the same form against `transparent`.
 */
 body {
   margin: 0;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-family-base);
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
 }
 
 .blog-post-page.page {
@@ -32,16 +32,15 @@ body {
 }
 /* ARTICLE */
 .blog-post-page .article {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-solid);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
 .blog-post-page .article-header {
   padding: 2.5rem 3rem 2rem;
-  border-bottom: var(--border-thick);
+  border-bottom: var(--rule-thick) solid var(--rule);
 }
 
 .blog-post-page .back-link {
@@ -50,17 +49,17 @@ body {
   font-weight: 700;
   font-size: 0.875rem;
   text-decoration: none;
-  color: var(--color-text);
+  color: var(--ink);
   margin-bottom: 1.5rem;
   padding: 0.4rem 0.875rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--radius-pill);
   transition: all 0.15s;
 }
 
 .blog-post-page .back-link:hover {
-  background: var(--color-yellow);
+  background: var(--accent);
 }
 
 .blog-post-page .article-meta {
@@ -78,14 +77,14 @@ body {
   letter-spacing: 0.04em;
   padding: 0.25rem 0.6rem;
   border-radius: var(--radius-pill);
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
   color: white;
 }
 
 .blog-post-page .post-date {
   font-size: 0.875rem;
   font-weight: 600;
-  color: color-mix(in srgb, var(--color-text) 57%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 57%, var(--ground-raised));
 }
 
 .blog-post-page .article-title {
@@ -102,7 +101,7 @@ body {
   font-size: 1.1rem;
   font-weight: 500;
   line-height: 1.6;
-  color: color-mix(in srgb, var(--color-text) 71%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 71%, var(--ground-raised));
   margin: 0;
 }
 
@@ -116,7 +115,7 @@ body {
   font-size: 1.05rem;
   font-weight: 500;
   line-height: 1.75;
-  color: color-mix(in srgb, var(--color-text) 93%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 93%, var(--ground-raised));
 }
 
 .blog-post-page .article-body h2 {
@@ -125,7 +124,7 @@ body {
   font-weight: 800;
   margin: 2.5rem 0 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: var(--border-thick);
+  border-bottom: var(--rule-thick) solid var(--rule);
 }
 
 .blog-post-page .article-body p {
@@ -134,7 +133,7 @@ body {
 
 .blog-post-page .article-body strong {
   font-weight: 800;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 .blog-post-page .article-body em {
@@ -142,7 +141,7 @@ body {
 }
 
 .blog-post-page .article-body a {
-  color: var(--color-primary);
+  color: var(--accent);
   font-weight: 700;
   text-decoration: underline;
   text-decoration-thickness: 2px;
@@ -150,8 +149,8 @@ body {
 
 .blog-post-page .article-body code {
   font-family: monospace;
-  background: var(--color-bg);
-  border: var(--border-thin);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: 4px;
   padding: 0.1em 0.4em;
   font-size: 0.9em;
@@ -159,8 +158,8 @@ body {
 /* ARTICLE FOOTER */
 .blog-post-page .article-footer {
   padding: 2.5rem 3rem;
-  border-top: var(--border-thick);
-  background: var(--color-bg);
+  border-top: var(--rule-thick) solid var(--rule);
+  background: var(--ground);
 }
 
 .blog-post-page .footer-cta h3 {
@@ -173,7 +172,7 @@ body {
 .blog-post-page .footer-cta p {
   font-size: 0.95rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--color-text) 71%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 71%, var(--ground-raised));
   margin: 0 0 1.25rem 0;
 }
 
@@ -189,10 +188,9 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 0.9rem;
-  border: var(--border-thick);
+  border: var(--rule-thick) solid var(--rule);
   border-radius: var(--radius-pill);
   text-decoration: none;
-  box-shadow: var(--shadow-solid-sm);
   transition:
     transform 0.1s,
     box-shadow 0.1s;
@@ -200,17 +198,16 @@ body {
 
 .blog-post-page .cta-btn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-solid);
 }
 
 .blog-post-page .cta-btn.primary {
-  background: var(--color-primary);
+  background: var(--accent);
   color: white;
 }
 
 .blog-post-page .cta-btn.secondary {
-  background: var(--color-white);
-  color: var(--color-text);
+  background: var(--ground-raised);
+  color: var(--ink);
 }
 /* SIDEBAR */
 .blog-post-page .sidebar {
@@ -222,11 +219,10 @@ body {
 }
 
 .blog-post-page .sidebar-card {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-md);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   padding: 1.5rem;
-  box-shadow: var(--shadow-solid-sm);
 }
 
 .blog-post-page .sidebar-title {
@@ -240,7 +236,7 @@ body {
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.5;
-  color: color-mix(in srgb, var(--color-text) 71%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 71%, var(--ground-raised));
   margin: 0 0 0.75rem 0;
 }
 
@@ -248,7 +244,7 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 0.875rem;
-  color: var(--color-primary);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -269,13 +265,13 @@ body {
   text-decoration: none;
   color: inherit;
   padding: 0.625rem;
-  border-radius: var(--radius-sm);
-  border: var(--border-thin);
+  border-radius: var(--radius);
+  border: var(--rule-hair) solid var(--rule);
   transition: background 0.15s;
 }
 
 .blog-post-page .other-post:hover {
-  background: var(--color-bg);
+  background: var(--ground);
 }
 
 .blog-post-page .other-cat {
@@ -300,53 +296,36 @@ body {
 
 .blog-post-page .other-post-date {
   font-size: 0.75rem;
-  color: color-mix(in srgb, var(--color-text) 50%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 50%, var(--ground-raised));
   font-weight: 500;
 }
 
 .blog-post-page .sidebar-contact {
-  background: var(--color-text);
-  color: var(--color-white);
+  background: var(--ink);
+  color: var(--ground-raised);
 }
 
 .blog-post-page .sidebar-contact .sidebar-title {
-  color: var(--color-white);
+  color: var(--ground-raised);
 }
 
 .blog-post-page .sidebar-contact .sidebar-text {
-  color: color-mix(in srgb, var(--color-white) 75%, transparent);
+  color: color-mix(in srgb, var(--ground-raised) 75%, transparent);
 }
 
 .blog-post-page .sidebar-contact .sidebar-link {
-  color: var(--color-yellow);
+  color: var(--accent);
 }
 /* FOOTER */
 .blog-post-page .footer {
-  background: var(--color-text);
-  color: var(--color-white);
+  background: var(--ink);
+  color: var(--ground-raised);
   padding: 3rem 2rem;
   margin-top: 2rem;
 }
 
-.blog-post-page .footer-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.blog-post-page .footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.blog-post-page .footer-links a,
 .blog-post-page .footer a {
-  color: var(--color-yellow);
+  color: var(--accent);
   text-decoration: none;
   font-weight: 700;
   font-family: 'Space Grotesk', sans-serif;
@@ -373,9 +352,5 @@ body {
   .blog-post-page .article-body,
   .blog-post-page .article-footer {
     padding: 1.5rem;
-  }
-
-  .blog-post-page .nav-links {
-    display: none;
   }
 }

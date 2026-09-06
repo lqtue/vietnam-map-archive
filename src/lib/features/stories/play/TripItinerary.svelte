@@ -56,14 +56,14 @@
     align-items: center;
     gap: 0.55rem;
     padding: 0.5rem 0.65rem;
-    background: var(--color-white);
-    border: 1.5px solid #11111133;
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: 10px;
     font-size: 0.9rem;
   }
+  /* The live stop is the one selected row in the list. */
   .itinerary li.current {
-    border-color: var(--color-border);
-    box-shadow: var(--shadow-solid-xs);
+    border-color: var(--accent);
   }
   .itinerary li.done {
     opacity: 0.75;
@@ -76,14 +76,20 @@
     align-items: center;
     justify-content: center;
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border: var(--sb-border);
     border-radius: 50%;
     font-weight: 800;
     font-size: 0.72rem;
   }
+  /* Literal fallback on purpose: this green is the story-marker `done`
+     state, and it has to match the OL marker drawn on the map by
+     markerPalette.ts, which cannot read a CSS custom property. */
   .li-num.done {
-    background: var(--marker-done, #16a34a);
+    background: var(
+      --marker-done,
+      #16a34a
+    ); /* token-exempt: matches the done marker drawn on the map by markerPalette */
   }
   .li-num.current {
     background: var(--sb-accent);
@@ -99,7 +105,7 @@
     flex-shrink: 0;
     padding: 0.1rem 0.5rem;
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-radius: 99px;
     font-size: 0.65rem;
     font-weight: 800;

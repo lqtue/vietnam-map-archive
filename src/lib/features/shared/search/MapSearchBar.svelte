@@ -117,32 +117,31 @@
     padding: 0.75rem 1rem;
     width: 100%;
     min-width: 320px;
-    border: var(--border-thick);
+    border: var(--rule-thick) solid var(--rule);
     border-radius: var(--radius-pill);
-    background: var(--color-white);
-    color: var(--color-text);
-    font-family: var(--font-family-base);
+    background: var(--ground-raised);
+    color: var(--ink);
+    font-family: var(--font-body);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: var(--shadow-solid);
     transition: all 0.1s;
   }
 
   .search-trigger:hover {
-    background: var(--color-yellow);
+    background: var(--accent);
     transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-solid-hover);
+    box-shadow: var(--shadow-overlay);
   }
 
   .search-trigger:active {
     transform: translate(0, 0);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
 
   .search-trigger svg {
     flex-shrink: 0;
-    color: var(--color-text);
+    color: var(--ink);
   }
 
   .search-trigger-text {
@@ -177,9 +176,8 @@
     pointer-events: auto;
     width: var(--toolbar-width);
     min-width: 320px;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-solid);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
   }
 </style>

@@ -65,7 +65,7 @@ per distinct map, ≤ 20 maps per query; mirror URLs live on Storage so this is 
 `lng/lat` null when the map has no annotation.
 
 **UI.**
-- `/catalog` search → a third result block "On the map": *text · map name · year* →
+- `/archive` search → a third result block "On the map": *text · map name · year* →
   `/explore?map=<id>&at=<lng>,<lat>`.
 - `/explore` Browse pane search box → same call, same links, in place.
 - `applyExploreUrlParams` reads `at=` → after `zoomToMap`, `view.animate({center, zoom:17})`
@@ -93,7 +93,7 @@ query anon → draft label absent, typo'd query still hits.
 
 **What exists.** `footprint_submissions.pixel_polygon` + `feature_type`; SAM2 writer fixed
 (C0); `join` job; `/api/export/footprints?format=geojson` **already warps** px→geo via the
-same transformer. `/contribute/review` is the HITL.
+same transformer. `/scan?mode=review` is the HITL.
 
 **What is missing, in build order.**
 
@@ -155,7 +155,7 @@ compact "In the press, ±10 y" list in the sidebar. /explore only; the SSR share
 not call Gallica per request.
 
 **Later, when someone asks.** Pinning a clipping to a map/point = a `sources` table with
-`status/submitted_by/reviewed_by`, moderated in `/contribute/review` like stories.
+`status/submitted_by/reviewed_by`, moderated in `/scan?mode=review` like stories.
 *Annuaire* ingestion (merchants by street → L5 POI) is its own project; note only.
 
 **Check.** Unit-level: the query builder emits the expected CQL for a two-word
@@ -166,7 +166,7 @@ Vietnamese label with diacritics.
 ## E4 — Corpus growth
 
 **Bottleneck is georef, not ingest.** Scout already covers gallica / rumsey / loc /
-humazur; 62 drafts wait for a human in `/contribute/georef`.
+humazur; 62 drafts wait for a human in `/contribute#georef`.
 
 - **Sprint list, by value:** `select year, name from maps where not georef_done order by year` filtered to sheets covering the District 4 peninsula; target ≥ 3 georeferenced city plans per decade 1860–1975.
 - **Series propagation** (proven on L7014) for any uniform series in the drafts.
@@ -192,7 +192,7 @@ Start only after E2 shows stable, reviewed fabric on ≥ 3 maps.
 ## Cross-cutting
 
 - **HITL surfaces already exist** for everything E1–E3 write: OCR → `OcrSidebar`;
-  footprints → `/contribute/review`. No new review screens.
+  footprints → `/scan?mode=review`. No new review screens.
 - **Every write is a job or an RPC** (Track B rule). New job kinds: none. New RPC:
   `search_labels`. New migration: 065.
 - **Visibility.** Labels and footprints inherit the map's gate: anon sees `public/featured`

@@ -140,7 +140,7 @@
             {@const isOverlay = overlayMapIds.has(item.id)}
             {@const shareHref =
               !isScout && ((item as any).status === 'public' || (item as any).status === 'featured')
-                ? `/map/${item.id}`
+                ? `/archive/${item.id}`
                 : null}
             <tr
               class:scout-row={isScout}
@@ -161,7 +161,7 @@
                       A real link, not a span: the row's on:click still opens the
                       drawer (a plain click is swallowed here and bubbles), but a
                       crawler, a middle-click and ⌘-click now all reach the share
-                      page. /map/<id> and /place/<slug> only linked to each other,
+                      page. /archive/<id> and /archive/place/<slug> only linked to each other,
                       so the whole server-rendered half of the site had no entry.
                     -->
                     <a
@@ -238,23 +238,23 @@
   .ct-toolbar {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-1) 0 var(--space-2);
-    font-family: var(--font-family-base);
+    gap: var(--s-3);
+    padding: var(--s-1) 0 var(--s-2);
+    font-family: var(--font-body);
     font-size: 0.85rem;
   }
   .group-pick {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
   }
   .group-pick select {
     font: inherit;
     padding: 0.2rem 0.4rem;
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     border-radius: var(--sb-radius-sm);
-    background: var(--color-white);
+    background: var(--ground-raised);
   }
   /* Shape, header, row rules and the sort indicator come from
      `.data-table.is-card` in components/table.css. */
@@ -262,8 +262,8 @@
     cursor: pointer;
   }
   .ct .title-link {
-    font-weight: var(--font-bold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
     font-size: 1rem;
     /* An anchor now; keep the row-hover underline as the only one. */
     text-decoration: none;
@@ -274,17 +274,17 @@
   .tag-chip {
     background: transparent;
     border: 1.5px solid transparent;
-    padding: 0.15rem var(--space-2);
+    padding: 0.15rem var(--s-2);
     border-radius: var(--radius-pill);
     font: inherit;
     font-size: 0.85rem;
     cursor: pointer;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .tag-chip:hover {
-    background: var(--color-white);
-    border-color: var(--color-border);
-    box-shadow: 1.5px 1.5px 0 var(--color-border);
+    background: var(--ground-raised);
+    border-color: var(--rule);
+    box-shadow: 1.5px 1.5px 0 var(--rule);
   }
   .collection-col {
     color: var(--sb-text-meta);
@@ -292,14 +292,14 @@
   }
   .ct .thumb-col {
     width: 96px;
-    padding: var(--space-2) 0.6rem;
+    padding: var(--s-2) 0.6rem;
   }
   .ct .thumb-col img,
   .ct .thumb-col .thumb-empty {
     width: 84px;
     height: 64px;
     object-fit: cover;
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     border-radius: var(--sb-radius-sm);
     background: var(--sb-thumb-bg);
     display: block;
@@ -318,9 +318,9 @@
     display: inline-block;
     padding: 0.05rem 0.4rem;
     font-size: 0.7rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     border-radius: var(--radius-pill);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--rule);
     margin-left: 0.2rem;
   }
   .badge.scout {
@@ -337,9 +337,9 @@
     background: var(--sb-group-bg);
   }
   .group-row td {
-    padding: var(--space-2) var(--space-3);
-    border-top: 1.5px solid var(--color-border);
-    border-bottom: 1.5px solid var(--color-border);
+    padding: var(--s-2) var(--s-3);
+    border-top: 1.5px solid var(--rule);
+    border-bottom: 1.5px solid var(--rule);
   }
   .group-row:hover {
     background: var(--sb-group-bg-hover);
@@ -349,13 +349,13 @@
     width: 1em;
   }
   .group-count {
-    margin-left: var(--space-2);
+    margin-left: var(--s-2);
     padding: 0.05rem 0.45rem;
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     border-radius: var(--radius-pill);
     font-size: 0.72rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
   }
   .title-row {
     display: flex;
@@ -369,14 +369,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-white);
-    color: var(--color-text);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    color: var(--ink);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font: inherit;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.9rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     line-height: 1;
     cursor: pointer;
     padding: 0;
@@ -385,8 +385,8 @@
     background: var(--sb-accent-yellow);
   }
   .cmp-btn.on {
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     font-size: 0.75rem;
   }
 
@@ -395,7 +395,7 @@
   }
   .active-row td {
     background: var(--sb-accent-yellow);
-    box-shadow: inset 3px 0 0 var(--color-border);
+    box-shadow: inset 3px 0 0 var(--rule);
   }
   .active-row:hover td {
     background: var(--sb-accent-yellow-strong);
@@ -403,7 +403,7 @@
   .active-row .title-link {
     text-decoration: underline;
   }
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     .ct th:nth-child(5),
     .ct td:nth-child(5) {
       display: none;

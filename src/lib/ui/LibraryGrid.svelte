@@ -1,6 +1,6 @@
 <!--
-  LibraryGrid.svelte — the "my projects" landing screen shared by /create and
-  /studio: hero + loading state + empty state + card grid + rename/delete
+  LibraryGrid.svelte — the "my projects" landing screen shared by /explore?mode=story and
+  /explore?mode=annotate: hero + loading state + empty state + card grid + rename/delete
   actions + the name dialog used for both create and rename.
 
   Per-item chrome (meta chips, description line, extra actions) comes in via

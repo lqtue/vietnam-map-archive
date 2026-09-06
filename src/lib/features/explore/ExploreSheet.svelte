@@ -15,8 +15,8 @@
   const dispatch = createEventDispatcher<{ jumpToSaigon: void }>();
 
   $: scoutHref = userLocation
-    ? `/contribute/scout?near=${userLocation[1].toFixed(5)},${userLocation[0].toFixed(5)}`
-    : '/contribute/scout';
+    ? `/admin?tab=scout?near=${userLocation[1].toFixed(5)},${userLocation[0].toFixed(5)}`
+    : '/admin?tab=scout';
 </script>
 
 <div class="card">
@@ -42,9 +42,8 @@
     width: min(440px, calc(100vw - 1.5rem));
     background: var(--sb-card-bg);
     color: var(--sb-text);
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: var(--sb-radius);
-    box-shadow: var(--shadow-solid-sm);
     padding: 0.65rem 0.85rem 0.8rem;
     z-index: 90;
   }
@@ -61,8 +60,8 @@
     display: block;
     margin-bottom: 0.35rem;
     font-family: var(--sb-font-display);
-    font-size: var(--text-base);
-    font-weight: var(--font-extrabold);
+    font-size: var(--t-md);
+    font-weight: var(--w-semi);
     line-height: 1.25;
   }
   .hint {
@@ -80,20 +79,19 @@
   .btn {
     flex: 1;
     padding: 0.55rem 0.7rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: var(--sb-radius);
     font-family: inherit;
     font-size: 0.86rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     cursor: pointer;
     text-decoration: none;
     text-align: center;
-    box-shadow: var(--shadow-solid-xs);
     color: var(--sb-text);
   }
   .btn.primary {
     background: var(--sb-accent-warm);
-    color: var(--color-white);
+    color: var(--ground-raised);
   }
   .btn.ghost {
     background: var(--sb-card-bg);

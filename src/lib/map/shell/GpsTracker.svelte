@@ -47,6 +47,8 @@
   let watchId: number | null = null;
   let trackingState: TrackingState = 'inactive';
 
+  // Literal hex on purpose: OpenLayers style objects are canvas fills, not CSS —
+  // they cannot read a custom property.
   function createTrackStyle(): Style {
     return new Style({
       stroke: new Stroke({ color: '#ea580c', width: 4, lineCap: 'round', lineJoin: 'round' }),

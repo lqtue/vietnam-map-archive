@@ -79,13 +79,12 @@
   .map-card {
     display: flex;
     flex-direction: column;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-md);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: var(--shadow-solid-sm);
     transition:
       transform 0.2s,
       box-shadow 0.2s;
@@ -94,7 +93,7 @@
 
   .map-card:hover {
     transform: translate(-4px, -4px) rotate(-1deg);
-    box-shadow: var(--shadow-solid-hover);
+    box-shadow: var(--shadow-overlay);
   }
 
   .map-card-wrapper:nth-child(even) .map-card:hover {
@@ -104,8 +103,8 @@
   .map-thumbnail {
     position: relative;
     aspect-ratio: 4 / 3;
-    background: var(--color-bg);
-    border-bottom: var(--border-thick);
+    background: var(--ground);
+    border-bottom: var(--rule-thick) solid var(--rule);
     overflow: hidden;
   }
 
@@ -120,10 +119,10 @@
     height: 100%;
     background-image: repeating-linear-gradient(
       45deg,
-      var(--color-yellow) 0,
-      var(--color-yellow) 10px,
-      var(--color-white) 10px,
-      var(--color-white) 20px
+      var(--accent) 0,
+      var(--accent) 10px,
+      var(--ground-raised) 10px,
+      var(--ground-raised) 20px
     );
   }
 
@@ -136,23 +135,23 @@
   }
 
   .badge {
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 0.75rem;
     font-weight: 800;
     padding: 0.25rem 0.6rem;
-    background: var(--color-white);
-    border: var(--border-thin);
-    border-radius: var(--radius-sm);
-    box-shadow: 2px 2px 0px var(--color-border);
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: 2px 2px 0px var(--rule);
   }
 
   .year-badge {
-    background: var(--color-green);
-    color: var(--color-text);
+    background: var(--status-ok);
+    color: var(--ink);
   }
   .source-badge {
-    background: var(--color-orange);
-    color: var(--color-white);
+    background: var(--status-warn);
+    color: var(--ground-raised);
   }
 
   .map-info {
@@ -163,7 +162,7 @@
   }
 
   .map-name {
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 800;
     margin: 0 0 0.5rem 0;
@@ -178,7 +177,7 @@
   .map-city {
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--color-gray-500);
+    color: var(--ink-soft);
     margin-top: auto;
   }
 
@@ -189,11 +188,10 @@
     width: 44px;
     height: 44px;
     font-size: 1.5rem;
-    background: var(--color-white);
-    border: var(--border-thick);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: var(--shadow-solid-sm);
     z-index: 2;
     display: flex;
     align-items: center;

@@ -5,42 +5,42 @@
   enough that they must not become global.
 
   Palette substitutions (nearest token, no exact match in tokens.css):
-    #2e7d32 → --color-success-600   #b71c1c → --color-error-600
-    #ed8c00 → --color-warning-600   #3367d6 → --color-blue
-    #666/#555 → --color-gray-500    #999/#888 → --color-gray-400
-    #ddd/#ccc → --color-gray-300    #eee → --color-gray-100
-    #fafafa → --color-gray-50       #1a1a1a/#333 → --color-text
+    var(--status-ok) → --status-ok   var(--status-bad) → --status-bad
+    var(--status-warn) → --status-warn   var(--accent) → --accent
+    var(--ink-soft)/var(--ink-soft) → --ink-soft    var(--ink-soft)/var(--ink-soft) → --ink-soft
+    var(--rule)/var(--rule) → --rule    var(--rule) → --color-gray-100
+    var(--ground-raised) → --ground       var(--ink)/var(--ink) → --ink
 */
 
 .scout-page {
   max-width: 1400px;
   margin: 0 auto;
-  padding: var(--space-8) var(--space-6) 5rem;
+  padding: var(--s-5) var(--s-4) 5rem;
 }
 .scout-page .page-header h1 {
-  margin: 0 0 var(--space-1);
-  font-size: var(--text-3xl);
+  margin: 0 0 var(--s-1);
+  font-size: var(--t-xl);
 }
 .scout-page .page-header p {
-  margin: 0 0 var(--space-6);
-  color: var(--color-gray-500);
+  margin: 0 0 var(--s-4);
+  color: var(--ink-soft);
   font-size: 0.9rem;
 }
 
 .scout-page .filters,
 .scout-page .bulk-bar {
-  background: var(--color-gray-50);
-  border: 1px solid var(--color-gray-300);
-  padding: var(--space-3) var(--space-4);
-  margin-bottom: var(--space-4);
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  padding: var(--s-3) var(--s-4);
+  margin-bottom: var(--s-4);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--s-3);
   align-items: center;
 }
 .scout-page .filter-row {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--s-4);
   flex-wrap: wrap;
   width: 100%;
   align-items: end;
@@ -49,21 +49,21 @@
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 .scout-page .filter-row select,
 .scout-page .filter-row input {
   padding: 0.35rem 0.5rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--rule);
   font-size: 0.9rem;
 }
 .scout-page .result-line {
   width: 100%;
   display: flex;
-  gap: var(--space-2);
+  gap: var(--s-2);
   align-items: center;
   font-size: 0.85rem;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 .scout-page .result-line button {
   margin-left: auto;
@@ -73,24 +73,24 @@
 }
 .scout-page .action-msg {
   font-size: 0.85rem;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 
 .scout-page .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-4);
+  gap: var(--s-4);
 }
 .scout-page .card {
-  border: 1px solid var(--color-gray-300);
-  background: var(--color-white);
+  border: 1px solid var(--rule);
+  background: var(--ground-raised);
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 .scout-page .card.focused {
-  outline: 3px solid var(--color-border);
+  outline: 3px solid var(--rule);
   outline-offset: 2px;
 }
 .scout-page .kbd-hint {
@@ -99,25 +99,25 @@
 }
 .scout-page .kbd-hint kbd {
   font-family: ui-monospace, monospace;
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: 3px;
   padding: 0 0.3em;
 }
 .scout-page .card.selected {
-  outline: 3px solid var(--color-blue);
+  outline: 3px solid var(--accent);
 }
 .scout-page .card-select {
   position: absolute;
   top: 6px;
   left: 6px;
   z-index: 2;
-  background: color-mix(in srgb, var(--color-white) 90%, transparent);
+  background: color-mix(in srgb, var(--ground-raised) 90%, transparent);
   padding: 0.15rem 0.3rem;
   border-radius: 2px;
 }
 .scout-page .thumb-link {
   display: block;
-  background: var(--color-text);
+  background: var(--ink);
 }
 .scout-page .thumb-link img {
   display: block;
@@ -126,14 +126,14 @@
   object-fit: cover;
 }
 .scout-page .card-body {
-  padding: 0.6rem var(--space-3);
+  padding: 0.6rem var(--s-3);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 .scout-page .title {
   font-size: 0.85rem;
-  font-weight: var(--font-semibold);
+  font-weight: var(--w-semi);
   margin: 0;
   line-height: 1.25;
   display: -webkit-box;
@@ -145,38 +145,38 @@
 .scout-page .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--s-1);
 }
 .scout-page .chip {
   font-size: 0.7rem;
   padding: 0.1rem 0.4rem;
   border-radius: 2px;
-  background: var(--color-gray-100);
-  color: var(--color-text);
+  background: color-mix(in srgb, var(--ink) 6%, var(--ground));
+  color: var(--ink);
 }
 .scout-page .chip.score[data-score='high'] {
-  background: var(--color-success-600);
-  color: var(--color-white);
+  background: var(--status-ok);
+  color: var(--ground-raised);
 }
 .scout-page .chip.score[data-score='mid'] {
-  background: var(--color-warning-600);
-  color: var(--color-white);
+  background: var(--status-warn);
+  color: var(--ground-raised);
 }
 .scout-page .chip.score[data-score='low'] {
-  background: var(--color-gray-400);
-  color: var(--color-white);
+  background: var(--ink-soft);
+  color: var(--ground-raised);
 }
 .scout-page .chip.score[data-score='neg'] {
-  background: var(--color-error-600);
-  color: var(--color-white);
+  background: var(--status-bad);
+  color: var(--ground-raised);
 }
 .scout-page .holder {
   font-size: 0.75rem;
-  color: var(--color-gray-500);
+  color: var(--ink-soft);
 }
 .scout-page .creator {
   font-size: 0.75rem;
-  color: var(--color-gray-400);
+  color: var(--ink-soft);
   font-style: italic;
 }
 .scout-page .actions {
@@ -188,32 +188,32 @@
   flex: 1;
   padding: 0.35rem;
   font-size: 0.8rem;
-  border: 1px solid var(--color-gray-300);
-  background: var(--color-white);
+  border: 1px solid var(--rule);
+  background: var(--ground-raised);
   cursor: pointer;
 }
 /* `button.btn-*` matches the specificity of `.actions button` above and wins on
    source order — which is what the original !important flags were compensating
    for inside a scoped stylesheet. Also applies to the buttons in .bulk-bar. */
 .scout-page button.btn-good {
-  background: var(--color-success-600);
-  color: var(--color-white);
-  border-color: var(--color-success-600);
+  background: var(--status-ok);
+  color: var(--ground-raised);
+  border-color: var(--status-ok);
 }
 .scout-page button.btn-bad {
-  background: var(--color-error-600);
-  color: var(--color-white);
-  border-color: var(--color-error-600);
+  background: var(--status-bad);
+  color: var(--ground-raised);
+  border-color: var(--status-bad);
 }
 .scout-page button.btn-primary {
-  background: var(--color-blue);
-  color: var(--color-white);
-  border-color: var(--color-blue);
+  background: var(--accent);
+  color: var(--ground-raised);
+  border-color: var(--accent);
 }
 .scout-page button.btn-link {
   background: transparent;
   border: none;
-  color: var(--color-blue);
+  color: var(--accent);
   font-size: 0.75rem;
 }
 .scout-page .status-badge {
@@ -221,14 +221,14 @@
   font-size: 0.75rem;
 }
 .scout-page .status-badge.approved {
-  background: var(--color-success-600);
-  color: var(--color-white);
+  background: var(--status-ok);
+  color: var(--ground-raised);
 }
 .scout-page .status-badge.rejected {
-  background: var(--color-error-600);
-  color: var(--color-white);
+  background: var(--status-bad);
+  color: var(--ground-raised);
 }
 .scout-page .status-badge.ingested {
-  background: var(--color-blue);
-  color: var(--color-white);
+  background: var(--accent);
+  color: var(--ground-raised);
 }

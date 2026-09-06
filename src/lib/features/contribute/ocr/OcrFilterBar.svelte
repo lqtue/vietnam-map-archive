@@ -54,8 +54,8 @@
 <style>
   .ocr-filters {
     padding: 0.6rem 0.75rem;
-    background: var(--color-white);
-    border-bottom: var(--border-thin);
+    background: var(--ground-raised);
+    border-bottom: var(--rule-hair) solid var(--rule);
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
@@ -67,15 +67,15 @@
   }
   .filter-label {
     font-size: 0.68rem;
-    font-weight: var(--font-bold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
     width: 64px;
     flex-shrink: 0;
   }
   .conf-slider {
     flex: 1;
     height: 4px;
-    accent-color: var(--color-primary);
+    accent-color: var(--accent);
   }
   .cat-toggles {
     display: flex;
@@ -89,7 +89,7 @@
     gap: 0.25rem;
     margin-right: 0.4rem;
     padding-right: 0.4rem;
-    border-right: 1px solid var(--color-gray-300);
+    border-right: 1px solid var(--rule);
     line-height: 1;
   }
   .bulk-link {
@@ -97,8 +97,8 @@
     border: none;
     padding: 0;
     font-size: 0.65rem;
-    font-weight: var(--font-bold);
-    color: var(--color-primary);
+    font-weight: var(--w-semi);
+    color: var(--accent);
     cursor: pointer;
     opacity: 0.6;
   }
@@ -113,9 +113,9 @@
   .cat-chip {
     border: 1.5px solid var(--cat-color);
     background: transparent;
-    color: var(--color-text);
+    color: var(--ink);
     font-size: 0.64rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     padding: 0.15rem 0.45rem;
     border-radius: 1rem;
     cursor: pointer;
@@ -129,6 +129,6 @@
   .cat-chip.active {
     opacity: 1;
     background: var(--cat-color);
-    color: var(--color-white);
+    color: var(--ground-raised);
   }
 </style>

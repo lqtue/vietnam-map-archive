@@ -1,300 +1,206 @@
-# VMA Design System
+# The Sheet system
 
-The visual language for Vietnam Map Archive. Applies to every public page and to the chrome of the map tools.
+The design language of the Vietnam Map Archive. Written September 2026, replacing
+the neo-brutalist tokens (cream `#faf6f0`, 3px black borders, `6px 6px 0` offset
+shadows) that preceded it.
 
----
+## The idea
 
-## Philosophy
+A printed map sheet puts its content inside a **neatline** — a double rule, thin
+outside and thick inside, with ticks breaking each corner where the plate was
+registered. Inside the neatline is the **field**. Outside it is the **margin**,
+and the margin is where the title cartouche, the scale bar and the legend have
+always lived.
 
-**Neo-brutalist editorial.** Bold borders, offset shadows, flat fills — applied with editorial restraint. Not a playful toy, not a generic SaaS dashboard. A serious archive made legible and memorable.
+So: **chrome in the margin, content in the field.** An article is a field. A map
+is a field. Both are one component.
 
-Two registers coexist:
+The archive's own database already speaks this vocabulary — `LAYOUT_CATEGORIES`
+in `src/lib/data/maps/triageTypes.ts` is `sheet · main_map · title · legend ·
+name_list · inset · scale_bar · north_arrow · stamp`. The design is taken from
+the subject rather than applied to it.
 
-- **Editorial** (`/`, `/about`, `/blog`, `/contribute`, `/login`, `/profile`, `/admin/*`) — clean, left-aligned, information-dense.
-- **Tool** (`/explore`, `/studio`, `/create`, `/trip/[id]`, `/image`, `/contribute/*`) — full-bleed map under the nav, sidebar chrome, compact controls.
+## Files
 
-New public pages default to the **editorial** register.
+`src/styles/global.css` imports five files, in this order. Nothing else is
+always-on.
 
-**There is one theme.** `tokens.css` has no `[data-theme]` block; no component reads `data-theme`; there is no `ThemeToggle` component. The `vma-theme` boot script in `src/app.html` is vestigial — nothing writes the key. Do not write CSS that assumes a second theme.
-
----
-
-## Tokens
-
-Defined in `src/styles/tokens.css`, imported first by `src/styles/global.css`. **Never hardcode a colour, border, shadow or radius in a component `<style>` block.**
-
-### Colours
-
-| Variable | Value | Role |
+| File | Lines | What |
 |---|---|---|
-| `--color-bg` | `#faf6f0` | Page background (warm off-white) |
-| `--color-white` | `#ffffff` | Card and element backgrounds |
-| `--color-text` | `#111111` | Primary text; also the footer background |
-| `--color-border` | `#111111` | All borders and shadows |
-| `--color-primary` | `#ff4d4d` | CTAs, links, active states, errors |
-| `--color-yellow` | `#ffd23f` | Hero backgrounds, highlights, hover fills |
-| `--color-blue` | `#4d94ff` | Info, in-progress, research |
-| `--color-green` | `#00cc99` | Done / complete |
-| `--color-orange` | `#ff8c42` | Community / building now |
-| `--color-purple` | `#9d4edd` | Future / announcement |
-| `--color-text-on-yellow` | `#111111` | Text on a yellow surface |
+| `fonts.css` | 249 | `@font-face` for three self-hosted families |
+| `tokens.css` | 116 | six roles × two surfaces, type, space, line |
+| `base.css` | 167 | reset and element defaults |
+| `sheet.css` | 160 | the neatline / margin / field primitive |
+| `primitives.css` | 394 | label · button · field · panel · chip · table |
 
-Legacy aliases also exist and are still referenced: `--color-primary-600/700`, `--color-gray-50/100/300/400/500/900`, `--color-success-600`, `--color-warning-600`, `--color-error-600`.
+Page-scoped sheets under `components/`, `layouts/` and `pages/` are imported by
+the component that owns them, never globally.
 
-### Typography
+## Colour: two surfaces, not two themes
 
-| Variable | Value | Use |
+Six role tokens, redefined once per surface. **The route layout picks the
+surface; the visitor never does** — there is no theme toggle and no
+`[data-theme]` attribute.
+
+| Token | Paper | Darkroom | Role |
+|---|---|---|---|
+| `--ground` | `#eae7df` | `#14181a` | the sheet itself |
+| `--ground-raised` | `#f6f4ef` | `#1d2325` | panels, cards, table heads |
+| `--ink` | `#191c1a` | `#e6e4dc` | body text; the neatline |
+| `--ink-soft` | `#5c625c` | `#8b9490` | captions, labels, secondary text |
+| `--rule` | `#c6c2b6` | `#2e3739` | every hairline and border |
+| `--accent` | `#0e7c86` | `#2aa5ae` | live, selected, primary |
+
+Plus `--on-accent`, `--status-ok`, `--status-warn`, `--status-bad`, `--scrim`.
+
+- `.surface-paper` — editorial pages. Cool grey-green laid stock, not warm cream.
+- `.surface-darkroom` — the tools. Historical scans are light; a light interface
+  around a light scan gives the eye nothing to separate them by, which is why
+  every serious map tool puts a dark ground around imagery. `--ink` is paper
+  white here, so text on this surface literally reads as paper.
+
+Paper is also on bare `:root`, so a page that forgets its surface class is
+legible rather than unstyled.
+
+`--accent` is **survey cyan** — printed hydrography at full strength. It reads as
+an instrument rather than a brand, and it sits far from the categorical hues the
+footprint and layout palettes already use, so a "this is live" cue can never be
+mistaken for data.
+
+### The rule
+
+**A component reads roles and never names a colour.** `npm run lint` runs
+`scripts/check-tokens.mjs`, which fails the build on a hex literal inside any
+`<style>` block. Two things stay literal, each marked
+`/* token-exempt: why */`:
+
+1. Colours handed to **OpenLayers** — OL builds styles in JS and cannot resolve a
+   CSS custom property.
+2. **Categorical data** colours, where the value encodes *which thing* rather
+   than *what role*: footprint feature types, layout regions, tile priorities,
+   story markers. A legend swatch that mirrors an OL canvas style counts too —
+   tokenising it would make the legend stop matching the canvas.
+
+## Type
+
+Three families, self-hosted from `static/fonts`. Only latin, latin-ext and
+vietnamese ship: the corpus is French, Vietnamese and English, and cyrillic plus
+greek were 40% of the bytes and 0% of the corpus. 191 KB total, ~54 KB on the
+usual path.
+
+| Token | Family | Use |
 |---|---|---|
-| `--font-family-display` | `'Space Grotesk', system-ui, sans-serif` | Headings, nav, badges, labels, buttons |
-| `--font-family-base` | `'Outfit', 'Be Vietnam Pro', system-ui, sans-serif` | Body text, descriptions, captions |
+| `--font-display` | Spectral 300 / 600 + italic | Engraved, high contrast. Used with restraint; italic for place names, the way hydronyms are set on a real sheet. |
+| `--font-body` | Be Vietnam Pro 400 / 600 | Body. A Vietnamese face, by a Vietnamese foundry, for a Vietnamese archive. |
+| `--font-mono` | IBM Plex Mono 400 / 500 | Coordinates, years, scales, tile ids. Tabular figures. |
 
-Sizes: `--text-xs` `.75rem` · `--text-sm` `.875rem` · `--text-base` `1rem` · `--text-lg` `1.125rem` · `--text-xl` `1.25rem` · `--text-2xl` `1.5rem` · `--text-3xl` `2rem`.
-Weights: `--font-normal` 400 · `--font-medium` 500 · `--font-semibold` 600 · `--font-bold` 700 · `--font-extrabold` 800.
+Vietnamese coverage was a hard constraint, not a taste call — it is what ruled
+out Instrument Serif, Fraunces and Martian Mono.
 
-Use `800` for page and section titles, `700` for nav and sub-headings, `500` for body copy, `400` for long-form blog reading. Hero titles use `clamp(2.5rem, 6vw, 4rem)` — always fluid.
+Scale: `--t-2xs` `--t-xs` `--t-sm` `--t-md` `--t-lg` `--t-xl` `--t-2xl` `--t-3xl`
+(0.6875 → 4rem). Tight at reading sizes, loose at display sizes — how a specimen
+sheet steps, rather than one ratio applied past where it reads.
 
-**The Google Fonts link lives once in `src/app.html`.** Do not add a `<link>` to a page or component; the per-page copies were removed in Aug 2026.
+Weights: `--w-light` 300 · `--w-regular` 400 · `--w-medium` 500 · `--w-semi` 600.
+There is no bold. The old design shouted.
 
-### Borders, shadows, radii, spacing
+## Line, radius, elevation
 
-| Variable | Value | Use |
-|---|---|---|
-| `--border-thick` | `3px solid var(--color-border)` | Cards, nav, hero, structural elements |
-| `--border-thin` | `2px solid var(--color-border)` | Inline labels, progress tracks, dividers |
-| `--shadow-solid` | `6px 6px 0 var(--color-border)` | Feature cards, primary CTAs |
-| `--shadow-solid-sm` | `4px 4px 0` | Smaller cards, badges, secondary buttons |
-| `--shadow-solid-xs` | `2px 2px 0` | Chips, dense controls |
-| `--shadow-solid-hover` | `10px 10px 0` | Hover lift only — never on a static element |
-| `--radius-sm / md / lg / pill` | `8px / 16px / 24px / 999px` | Tags · cards, inputs · feature cards · buttons, chips |
+**Paper is square; instruments are eased.** The neatline and every rule sit at 0
+radius, and only what you press or type into gets the 2px.
 
-Aliases `--shadow-sm/md/lg` map onto the solid set. Spacing scale: `--space-1…16` (`0.25rem` → `4rem`). Layout: `--nav-height: 56px` — tool pages inset from the top by this. Breakpoints: `--bp-tablet 768px`, `--bp-desktop 1024px` (the tool shells use a hard `900px` mobile cut-off).
+- `--rule-hair` 1px · `--rule-thick` 2px
+- `--radius` 2px · `--radius-pill` 999px
+- `--shadow-overlay` — the *only* shadow, for modals and popovers. Elevation on
+  paper is `--ground-raised` plus a rule. Nothing lifts on hover; rules darken.
+- `--ease` — one duration, 120ms. Zeroed under `prefers-reduced-motion`.
 
----
+## Space and breakpoints
 
-## CSS files
+`--s-1` 0.25 · `--s-2` 0.5 · `--s-3` 0.75 · `--s-4` 1.25 · `--s-5` 2 ·
+`--s-6` 3.5rem.
 
-All stylesheets live in `src/styles/` and are reached via the `$styles` alias. `global.css` imports `tokens.css` plus the six always-on component sheets; everything else is imported by the component or route that needs it, so a page only pays for what it uses.
+**Breakpoints are 600 / 900 / 1280.** Three. There were nineteen.
+`ToolLayout`'s mobile split at 900 is the one other components pair with.
 
-| File | Loaded by | Scope |
-|---|---|---|
-| `tokens.css` | `global.css` | every custom property |
-| `global.css` | root layout | entry point |
-| **components/** | | shared widgets |
-| `buttons.css` | `global.css` | **every button**: the `.chip` / `.action-btn` / `.pill-btn` / `.btn` pill family, `.tool-btn`, `.ctrl-btn` |
-| `feedback.css` | `global.css` | `.spinner` (the only one) and `.state-msg` |
-| `table.css` | `global.css` | `.data-table` and its two densities |
-| `nav-buttons.css` | `global.css` | nav-bar button chrome |
-| `editorial.css` | `global.css` | hero, section-card, chips, footer, nav |
-| `modal.css` | `global.css` | generic modal scaffolding |
-| `sidebar.css` | `global.css` + `SidebarCard` | sidebar card frame |
-| `admin-modals.css` | `MapEditModal`, `NeatlineEditor` | admin modal chrome only — the `.btn` family moved to `buttons.css` in Sept 2026, because six components outside the modals used it without importing it |
-| `catalog.css` | `CatalogGrid`, `CatalogCard`, `/catalog` | map card grid |
-| `search-panel.css` | `features/shared/search/SearchPanel` + its two tabs | unified search overlay |
-| `shapes-table.css` | `OcrSidebar`, `OcrRunBar`, `TraceSidebar` | the toolbar and cell editors around that table |
-| `tool-sidebar.css` | `TriageSidebar`, `SegSidebar` | tool sidebar form controls |
-| `auth-gate.css` | `AuthGate`, `StudioMode`, `CreateMode` | signed-out gate |
-| `library.css` | `LibraryGrid`, `StudioMode`, `CreateMode` | project/story library grid |
-| **layouts/** | | page shells |
-| `tool-page.css` | every IIIF-canvas tool + `/image` | tool page frame, panels, toolbars |
-| `mode-shared.css` | `ToolLayout`, `ImageShell`, `MapModeOverlays`, `/explore` | map-mode chrome + the z-index scale |
-| `catalog.css` | `/catalog` | catalog page layout |
-| `home.css` | `/` | home page layout |
-| `create-mode.css` | `CreateMode`, `StudioMode` | story/annotation editor layout |
-| **pages/** | | one per editorial page |
-| `about.css`, `blog.css`, `blog-post.css`, `profile.css`, `admin-scout.css`, `admin-bulk.css`, `admin-status.css`, `screens.css` | their route (`admin-bulk.css` also by `GeorefSyncPanel`) | page-specific |
+## Layout
 
-**Breakpoints.** Four, and no others — a fifth value invented for one page is how the set got to seventeen before Sept 2026:
+`src/lib/ui/Sheet.svelte` is the only layout primitive. Both `+layout.svelte`
+files own it, so a page contributes content and nothing else — no header
+scaffold, no max-width, no footer.
 
-| Width | Meaning |
-|---|---|
-| `600px` | small phone — editorial pages drop to one column |
-| `640px` | dense chrome (nav, modals, admin tables) gets its compact form |
-| `768px` | tablet — `global.css` shrinks body type and pins inputs to 16px so iOS stops zooming |
-| `900px` | the tool split: `ToolLayout` swaps the desktop rail for the mobile drawer stack, matched by `mode-shared.css` and `tool-page.css` |
-
-`ToolLayout` also reads `1400px` in JS for `isCompact`. CSS custom properties do not work inside `@media`, so these are literals on purpose — `--bp-*` tokens existed until Sept 2026, matched nothing and were deleted.
-
-**One button.** Four names — `.action-btn` (large CTA), `.chip` (default), `.pill-btn` (lighter chrome), `.btn` (admin and dialogs) — share one base rule in `buttons.css` and differ only in the `--btn-*` properties each sets. They are kept as separate names because ~60 files use them and a rename would be a diff nobody could review; prefer `.chip` in new markup. `.tool-btn` is the dense square toolbar variant and `.ctrl-btn` the 48px round map control. `.sb-btn` stays in `sidebar.css` because it runs on the `--sb-*` token scope. Before Sept 2026 the `.btn` family lived in `admin-modals.css`, which six of its eleven users never imported.
-
-**One table.** Every `<table>` wears `.data-table` and picks a density: `.is-dense` (sidebar) or `.is-card` (a table that is its own card, on /catalog). Nine custom properties define a density, so a new one is a short block and never a second copy of the base. Before Sept 2026 there were four unrelated implementations across three stylesheets.
-
-**One spinner.** `.spinner` in `feedback.css` is the whole system: size and colour tune through `--spinner-size`, `--spinner-thickness`, `--spinner-track` and `--spinner-ink`, and `.spinner.on-ink` covers a spinner on a solid coloured button. There is exactly one `@keyframes spin` in the tree — it replaced nine near-identical definitions in Sept 2026. Never write a second one. `.home-page .globe-spin` is a different thing: the rotating 🌎 emoji on the home page.
-
-`layouts/admin.css` and `components/label.css` were deleted in Aug 2026 — the three surviving `label.css` classes moved into `tool-page.css`. Do not reintroduce either name.
-
-**Import form:**
-
-```svelte
-<script lang="ts">
-  import '$styles/layouts/tool-page.css';
-</script>
+```
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐   margin: nav, mode strip
+   ╔══════════════════════════════════╗
+│  ║                                  ║   │
+   ║              FIELD               ║       map, article, table
+│  ║                                  ║   │
+   ╚══════════════════════════════════╝
+└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   margin: scale, meta
 ```
 
----
+- `variant="page"` — the field pads and scrolls, content sits on `--measure`.
+- `variant="tool"` — the field goes edge to edge and belongs to the map.
+- Slots: `cartouche` (top-left, the nav), `margin-top-right` (the mode strip),
+  default (the field), `margin-bottom-left`, `scale`.
+- `graticule` — a faint coordinate grid behind the margin, home page only, off
+  below 900px where there is no margin to draw it in.
 
-## Components
+A block that must break the measure marks itself `.is-wide`.
 
-**Reach for one of these before writing markup.** Every one already exists in `src/lib/ui/`;
-re-implementing what they do is how the codebase grew twenty different card patterns.
-See them all rendered together at **`/screens`**.
+**Chrome never floats over the field.** The first mode switcher was fixed at
+top-centre over the map and swallowed clicks meant for the panels underneath —
+caught by `tests/smoke.spec.ts`. That is the failure the margin exists to
+prevent.
 
-| Component | Use it for |
-|---|---|
-| `PageHero` | **The hero on every editorial page.** Props `eyebrow` · `title` · `sub` · `badges`; slots `title` (wins over the prop, for `.text-highlight` markup), `sub`, `actions`, `eyebrow`. Do not hand-roll `.editorial-hero`. |
-| `NavBar` · `EditorialFooter` | Mounted once by `(editorial)/+layout.svelte`. A page never renders either. |
-| `AuthGate` | The signed-out "sign in to continue" card. |
-| `CatalogGrid` · `CatalogCard` · `MapCard` | Map listings. |
-| `LibraryGrid` | Project / story library grids. |
-| `ChunkyTabs` | The tab strip. Use it instead of a row of buttons that toggle a variable. |
-| `FacetRail` | Faceted filter column. |
-| `LocationSearch` | Nominatim place lookup with results dropdown. |
-| `SnapSheet` | Mobile bottom sheet. |
-| `NameDialog` · `InlineRename` | Naming and renaming flows. |
-| `NavDropdown` | Nav menu disclosure. |
+## Primitives
 
-`ui/` is leaf-level by the layering rule: these import nothing from `features/`, `map/` or `data/`,
-so any page or feature may use them.
+`.label` · `.btn` · `.field` · `.panel` · `.chip` · `.data-table`, plus `.row`,
+`.stack`, `.divider`, `.state-msg`, `.spinner`, `.visually-hidden`.
 
-The shared editorial **classes** live in `src/styles/components/editorial.css` and are global. Use them without redefining the CSS.
+There were four parallel button vocabularies before this: `.btn`, `.sb-btn`,
+`.tool-btn`, `.pill-btn`, plus `.action-btn` / `.ctrl-btn` / `.primary-btn` /
+`.secondary-btn`. One survives. The rest are aliased onto the primitives with
+`:is()` at the bottom of `primitives.css` rather than renamed across sixty files
+for no visual change — **write the new names in new markup**, and rename an old
+one when you are already editing the file for another reason.
 
-`.top-nav` `.nav-logo` `.nav-links` `.nav-link` `.nav-auth` · `.editorial-hero` `.hero-inner` `.label-chip` `.text-highlight` · `.editorial-main` `.section-card` `.section-card-header` `.section-title` `.section-title-sm` `.section-desc` `.icon-blob` · `.badge-chip` with `.chip-blue` / `.chip-green` / `.chip-yellow` · `.action-btn` `.pill-btn` · `.editorial-footer`.
-
-### Hero
-
-Use the component. The classes below are what it renders — you should not be typing them.
-
-```svelte
-<script lang="ts">
-  import PageHero from '$lib/ui/PageHero.svelte';
-</script>
-
-<PageHero
-  eyebrow="Page context"
-  sub="Supporting paragraph. Max ~500px wide."
-  badges={[{ label: 'Fact one' }, { label: 'Fact two' }]}
->
-  <svelte:fragment slot="title">
-    Bold headline<br /><span class="text-highlight">highlighted word.</span>
-  </svelte:fragment>
-</PageHero>
-```
-
-Plain-text title and no highlight? Then the prop is enough: `<PageHero title="Bold headline" />`.
-
-`.text-highlight` (white fill, black stroke, offset shadow) belongs on one or two words of a hero title — never in body text. Only `.chip-blue`, `.chip-green` and `.chip-yellow` exist; the orange/purple/red chip classes were removed.
-
-### Section card
-
-```html
-<div class="section-card">
-  <div class="section-card-header">
-    <div class="icon-blob color-blue">📊</div>
-    <div>
-      <h2 class="section-title-sm">Section heading</h2>
-      <p class="section-desc">One or two sentences.</p>
-    </div>
-  </div>
-  <!-- content -->
-</div>
-```
-
-`.icon-blob` modifiers: `.color-green`, `.color-blue`, `.color-orange`, `.color-yellow`, `.color-purple`.
-
-### Buttons
-
-`.action-btn.primary-btn` (red, white text) and `.action-btn.secondary-btn` (white, dark text) for CTAs — both lift on hover with `translate(-3px,-3px)` plus the larger shadow. `.pill-btn` for small utility actions (sign out, toggles).
-
----
+Modifiers: `.btn--primary` `.btn--ghost` `.btn--danger` `.btn--sm` `.btn--xs`
+`.btn--icon` `.btn--block`, and `aria-pressed="true"` / `.is-on` for a selected
+tool.
 
 ## Page template
 
-Nav and footer come once from `src/routes/(editorial)/+layout.svelte`. A new editorial page renders only its own body:
-
 ```svelte
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import PageHero from '$lib/ui/PageHero.svelte';
-  import '$styles/pages/my-page.css';
-
-  let mounted = false;
-  onMount(() => {
-    mounted = true;
-  });
+  // The layout owns the Sheet, the nav and the footer. Contribute content.
 </script>
 
 <svelte:head>
-  <title>Page Title — Vietnam Map Archive</title>
-  <meta name="description" content="…" />
+  <title>Thing — Vietnam Map Archive</title>
+  <meta name="description" content="One sentence." />
 </svelte:head>
 
-<div class="page my-page" class:mounted>
-  <PageHero eyebrow="Section label" sub="Supporting sentence.">
-    <svelte:fragment slot="title">
-      Page headline<br /><span class="text-highlight">key phrase.</span>
-    </svelte:fragment>
-  </PageHero>
+<h1>Thing</h1>
+<p>A standfirst, on the measure.</p>
 
-  <main class="editorial-main">
-    <!-- .section-card blocks -->
-  </main>
-</div>
+<section class="is-wide">
+  <span class="label">Section</span>
+  <table class="data-table">…</table>
+</section>
 
 <style>
-  .page {
-    min-height: 100vh;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  .page.mounted {
-    opacity: 1;
+  /* Layout and position only. Every colour is a role token. */
+  section {
+    margin-bottom: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: var(--rule-hair) solid var(--rule);
   }
 </style>
 ```
 
-`.editorial-main` constrains to `1100px` with `4rem 1.5rem` padding and a `3.5rem` gap between sections.
+## See it
 
----
-
-## Rules
-
-**Always**
-
-- Use `var(--color-*)`, `var(--border-*)`, `var(--shadow-*)`, `var(--radius-*)` — a hex literal in a component `<style>` block is a bug. (The two legitimate exceptions are OpenLayers JS style objects, which cannot read CSS variables, and brand SVG fills.)
-- `border: var(--border-thick)` on every card and structural container.
-- `--font-family-display` for headings and labels; `--font-family-base` for body.
-- Left-align editorial hero content.
-- Add `class:mounted` with the `opacity: 0 → 1` fade-in on the root `.page`.
-- `aria-expanded` on any toggle or disclosure; collapsible regions use `{#if}`, not `display: none`.
-- **Check `/screens` before writing a component or a card style.** If something close already exists, extend it. Twenty distinct card patterns exist — four reusable, sixteen locked to a single page — because this step kept getting skipped.
-- **Keep controls few.** A surface needing more than ~6 buttons, selects and inputs is a design question, not a layout one — decide what matters most and put the rest behind a disclosure. `MapEditPipelineTab` (23 controls) is the example not to follow.
-
-**Never**
-
-- `transform: rotate()` on an editorial page.
-- Emoji in `<h1>`/`<h2>` — they go inside `.icon-blob` or inline in body copy.
-- Hardcoded font sizes — `clamp()` for headlines, tokens for everything else.
-- A per-page Google Fonts `<link>` — it is in `app.html`.
-- `--shadow-solid-hover` on a static element; it is a hover state.
-- A new page without nav + footer links.
-
-**Adding a new public page**
-
-1. Copy the template above into `src/routes/(editorial)/<page>/+page.svelte` — including its `PageHero`, which is not optional.
-2. Add its stylesheet at `src/styles/pages/<page>.css` and import it in the page.
-3. Add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
-4. Add a row to the route map in `docs/system-guidelines.md` §2.
-5. Build content from `.editorial-main` + `.section-card`; don't invent new layout patterns.
-
----
-
-## Colour × state reference
-
-| State | Token | Example |
-|---|---|---|
-| Complete / done | `--color-green` | finished pipeline stage, milestone check |
-| Active / in progress | `--color-blue` | current phase, research chips |
-| Community / people | `--color-orange` | contributor cards, low-res tile priority |
-| Future | `--color-purple` | roadmap items |
-| Hero / highlight | `--color-yellow` | hero background, hover fill |
-| CTA / danger | `--color-primary` | primary buttons, error messages |
-| Neutral | `--color-text` / `--color-bg` | body, cards, footer |
+`/screens` renders the whole system from fixtures — tokens, type, space, line,
+and every component in `src/lib/ui/`. No database, so it cannot break on data.
+Look there before building a second version of something that already exists.

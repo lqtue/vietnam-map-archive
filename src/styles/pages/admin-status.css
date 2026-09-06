@@ -8,30 +8,28 @@
 .status-bar {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--s-4);
   flex-wrap: wrap;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--s-5);
 }
 
 .status-refresh {
-  padding: var(--space-2) var(--space-6);
-  background: var(--color-white);
-  border: var(--border-thick);
+  padding: var(--s-2) var(--s-4);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
   border-radius: var(--radius-pill);
-  font-family: var(--font-family-base);
-  font-weight: var(--font-bold);
-  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  font-weight: var(--w-semi);
+  font-size: var(--t-sm);
   cursor: pointer;
-  box-shadow: var(--shadow-solid-xs);
   transition:
     transform 0.1s,
     box-shadow 0.1s,
     background 0.1s;
 }
 .status-refresh:hover:not(:disabled) {
-  background: var(--color-yellow);
+  background: var(--accent);
   transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-solid-sm);
 }
 .status-refresh:disabled {
   opacity: 0.5;
@@ -39,69 +37,68 @@
 }
 
 .status-checked {
-  font-size: var(--text-sm);
+  font-size: var(--t-sm);
   opacity: 0.65;
 }
 
 .status-note {
-  font-size: var(--text-lg);
-  padding: var(--space-8) 0;
+  font-size: var(--t-md);
+  padding: var(--s-5) 0;
 }
 .status-note-bad {
-  color: var(--color-primary);
-  font-weight: var(--font-semibold);
+  color: var(--accent);
+  font-weight: var(--w-semi);
 }
 
 /* ── the one thing to look at first ──────────────────────────────────────── */
 
 .status-headline {
-  border: var(--border-thick);
-  border-radius: var(--radius-md);
-  background: var(--color-yellow);
-  color: var(--color-text-on-yellow);
-  box-shadow: var(--shadow-solid);
-  padding: var(--space-6);
-  margin-bottom: var(--space-12);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: var(--s-4);
+  margin-bottom: var(--s-6);
 }
 
 .status-headline-label {
-  font-family: var(--font-family-display);
-  font-size: var(--text-xs);
-  font-weight: var(--font-extrabold);
+  font-family: var(--font-display);
+  font-size: var(--t-xs);
+  font-weight: var(--w-semi);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--s-2);
 }
 
 .status-headline-text {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  margin: 0 0 var(--space-3);
+  font-size: var(--t-md);
+  font-weight: var(--w-semi);
+  margin: 0 0 var(--s-3);
   line-height: 1.45;
 }
 
 .status-headline-next {
   margin: 0;
-  font-size: var(--text-base);
+  font-size: var(--t-md);
   line-height: 1.5;
 }
 
 /* ── sections ────────────────────────────────────────────────────────────── */
 
 .status-section {
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--s-6);
 }
 
 .status-section-title {
-  font-family: var(--font-family-display);
-  font-size: var(--text-2xl);
-  font-weight: var(--font-extrabold);
-  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: var(--w-semi);
+  margin: 0 0 var(--s-2);
 }
 
 .status-section-blurb {
-  margin: 0 0 var(--space-6);
-  font-size: var(--text-base);
+  margin: 0 0 var(--s-4);
+  font-size: var(--t-md);
   opacity: 0.75;
   max-width: 60ch;
   line-height: 1.5;
@@ -110,87 +107,86 @@
 .status-rows {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-4);
+  gap: var(--s-4);
 }
 
 /* ── one measurement ─────────────────────────────────────────────────────── */
 
 .status-row {
-  background: var(--color-white);
-  border: var(--border-thin);
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
   border-left-width: 10px;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-solid-xs);
-  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius);
+  padding: var(--s-4) var(--s-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--s-2);
 }
 
 .status-row-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--s-4);
 }
 
 .status-row-label {
-  font-family: var(--font-family-display);
-  font-size: var(--text-base);
-  font-weight: var(--font-bold);
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  font-weight: var(--w-semi);
   margin: 0;
 }
 
 .status-row-value {
-  font-family: var(--font-family-display);
-  font-size: var(--text-xl);
-  font-weight: var(--font-extrabold);
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: var(--w-semi);
   white-space: nowrap;
 }
 .status-row-value-sm {
-  font-size: var(--text-base);
+  font-size: var(--t-md);
   opacity: 0.7;
 }
 
 .status-row-detail {
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: var(--t-sm);
   line-height: 1.55;
   opacity: 0.85;
 }
 
 .status-row-next {
-  margin: var(--space-1) 0 0;
-  font-size: var(--text-sm);
+  margin: var(--s-1) 0 0;
+  font-size: var(--t-sm);
   line-height: 1.5;
-  font-weight: var(--font-medium);
+  font-weight: var(--w-medium);
 }
 .status-row-next span {
   display: inline-block;
-  font-family: var(--font-family-display);
-  font-size: var(--text-xs);
-  font-weight: var(--font-extrabold);
+  font-family: var(--font-display);
+  font-size: var(--t-xs);
+  font-weight: var(--w-semi);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--radius-pill);
-  padding: 0 var(--space-2);
-  margin-right: var(--space-2);
+  padding: 0 var(--s-2);
+  margin-right: var(--s-2);
 }
 
 /* ── tones ───────────────────────────────────────────────────────────────── */
 
 .status-row.tone-good {
-  border-left-color: var(--color-green);
+  border-left-color: var(--status-ok);
 }
 .status-row.tone-warn {
-  border-left-color: var(--color-orange);
+  border-left-color: var(--status-warn);
 }
 .status-row.tone-bad {
-  border-left-color: var(--color-primary);
+  border-left-color: var(--accent);
 }
 .status-row.tone-idle {
-  border-left-color: var(--color-gray-300);
+  border-left-color: var(--rule);
 }
 
 @media (max-width: 640px) {

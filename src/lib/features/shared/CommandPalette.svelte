@@ -8,7 +8,7 @@
     Pages    the destination list — this is what finally makes the gazetteer,
              the review queue and the design system reachable by name
     Maps     the archive, by title, creator, year or description
-    Places   the gazetteer (mig 067), each row its own /place/<slug>
+    Places   the gazetteer (mig 067), each row its own /archive/place/<slug>
     On maps  OCR'd labels, which open /explore at the spot
 
   Arrow keys move, Enter opens, Escape closes. Results are one flat list so
@@ -318,7 +318,7 @@
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: rgba(17, 17, 17, 0.35);
+    background: var(--scrim);
     border: none;
     padding: 0;
     cursor: default;
@@ -334,10 +334,9 @@
     max-height: 70vh;
     display: flex;
     flex-direction: column;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-solid);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
     overflow: hidden;
   }
 
@@ -346,7 +345,7 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.75rem 0.9rem;
-    border-bottom: var(--border-thick);
+    border-bottom: var(--rule-thick) solid var(--rule);
     flex-shrink: 0;
   }
   .cp-icon {
@@ -359,9 +358,9 @@
     border: none;
     outline: none;
     background: none;
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 1rem;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .cp-esc {
     flex-shrink: 0;
@@ -389,9 +388,9 @@
   }
 
   .cp-heading {
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 0.62rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     opacity: 0.5;
@@ -403,14 +402,14 @@
     align-items: center;
     gap: 0.65rem;
     padding: 0.45rem 0.55rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     color: inherit;
     text-decoration: none;
     min-width: 0;
   }
   .cp-row.is-active {
-    background: var(--color-yellow);
-    color: var(--color-text-on-yellow);
+    background: var(--accent);
+    color: var(--on-accent);
   }
   .cp-row:hover {
     text-decoration: none;
@@ -425,16 +424,16 @@
     flex-shrink: 0;
   }
   .cp-kind-page {
-    background: var(--color-text);
+    background: var(--ink);
   }
   .cp-kind-map {
-    background: var(--color-blue);
+    background: var(--accent);
   }
   .cp-kind-place {
-    background: var(--color-green);
+    background: var(--status-ok);
   }
   .cp-kind-label {
-    background: var(--color-purple);
+    background: color-mix(in srgb, var(--accent) 55%, var(--status-bad));
   }
 
   .cp-text {
@@ -444,9 +443,9 @@
     line-height: 1.25;
   }
   .cp-title {
-    font-family: var(--font-family-base);
+    font-family: var(--font-body);
     font-size: 0.92rem;
-    font-weight: var(--font-semibold);
+    font-weight: var(--w-semi);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -469,7 +468,7 @@
   }
   .cp-error {
     padding: 0.5rem 0.75rem;
-    color: var(--color-error-600);
+    color: var(--status-bad);
     opacity: 1;
   }
 
@@ -477,8 +476,8 @@
     display: flex;
     gap: 1rem;
     padding: 0.5rem 0.9rem;
-    border-top: var(--border-thin);
-    background: var(--color-bg);
+    border-top: var(--rule-hair) solid var(--rule);
+    background: var(--ground);
     font-size: 0.7rem;
     opacity: 0.7;
     flex-shrink: 0;
@@ -490,13 +489,13 @@
   }
 
   kbd {
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 0.65rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     padding: 0.1rem 0.3rem;
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     border-radius: 4px;
-    background: var(--color-white);
+    background: var(--ground-raised);
     line-height: 1.4;
   }
 

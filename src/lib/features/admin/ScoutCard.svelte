@@ -1,5 +1,5 @@
 <!--
-  ScoutCard.svelte — one candidate tile in the /admin/scout review grid.
+  ScoutCard.svelte — one candidate tile in the /admin?tab=scout review grid.
   Presentational: selection and status changes are dispatched to the page.
 -->
 <script lang="ts" context="module">

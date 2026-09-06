@@ -1,7 +1,7 @@
 /**
  * applyPoint.ts — the "show this story point on the map" primitive.
  *
- * Three call sites used to hand-roll this: /create (editor + preview),
+ * Three call sites used to hand-roll this: /explore?mode=story (editor + preview),
  * /trip/[id] (playback) and /explore (story playback). Each one resolved the
  * point's `overlayMapId` against the catalogue, swapped the overlay stack and
  * framed the camera at zoom 17.

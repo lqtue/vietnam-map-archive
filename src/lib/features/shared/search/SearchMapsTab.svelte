@@ -135,19 +135,19 @@
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.55;
   }
 
   /* Progress over a long pass reads better as one strong mark than two weak
      ones, so OCR'd wins and Triaged only shows on sheets not yet read. */
   .done-badge {
-    background: var(--color-green);
-    color: var(--color-text);
+    background: var(--status-ok);
+    color: var(--ink);
   }
 
   .triaged-badge {
-    background: var(--color-yellow);
-    color: var(--color-text);
+    background: var(--accent);
+    color: var(--ink);
   }
 </style>

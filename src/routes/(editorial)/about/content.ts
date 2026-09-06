@@ -23,9 +23,9 @@ export const layers: Layer[] = [
     name: 'Historical maps',
     desc: 'The foundation — old maps placed on real coordinates so every building on them has an address',
     pct: 40,
-    color: 'var(--color-green)',
+    color: 'var(--status-ok)',
     phase: 'Foundation',
-    phaseColor: 'var(--color-green)',
+    phaseColor: 'var(--status-ok)',
     built: [
       '45 historical maps in the archive spanning 1791 to today — Saigon, Hanoi, Huế, and broader Vietnam, sourced from archives in Paris, Hanoi, and private collections',
       'Every map works in a regular browser — no specialist software, just a link',
@@ -42,9 +42,9 @@ export const layers: Layer[] = [
     name: 'Building heights',
     desc: 'How tall was the city? We read it from two rare paintings — no laser scanning needed',
     pct: 5,
-    color: 'var(--color-blue)',
+    color: 'var(--ink-soft)',
     phase: 'Phase 3',
-    phaseColor: 'var(--color-purple)',
+    phaseColor: 'var(--ink-soft)',
     built: [
       'Two painting-and-map pairs found from the same years as our maps — most reconstruction projects only have the map',
       "An 1881 bird's-eye engraving shows the whole city from above: you can count the floors, see the rooflines, compare block heights across the grid",
@@ -61,9 +61,9 @@ export const layers: Layer[] = [
     name: 'Roof types',
     desc: 'Flat, pitched, or hipped — giving every building its correct roofline',
     pct: 5,
-    color: 'var(--color-blue)',
+    color: 'var(--ink-soft)',
     phase: 'Phase 3',
-    phaseColor: 'var(--color-purple)',
+    phaseColor: 'var(--ink-soft)',
     built: [
       'The 1901 painting is the key: look at it and the whole city is covered in red-tiled roofs — the same terracotta tiles still common in Vietnamese cities today',
       'This is more than a visual observation — it confirms that the color-coded map symbols really do map onto real, distinct building types. The AI classification is semantically correct.',
@@ -77,9 +77,9 @@ export const layers: Layer[] = [
     name: 'Detailed 3D models',
     desc: 'Photo-realistic facades for ~30 landmark buildings, built from archival photos',
     pct: 5,
-    color: 'var(--color-blue)',
+    color: 'var(--ink-soft)',
     phase: 'Phase 3',
-    phaseColor: 'var(--color-purple)',
+    phaseColor: 'var(--ink-soft)',
     built: [
       '3D-from-photos technique chosen — open-source, proven on architectural heritage projects worldwide',
       'Best photo sources mapped: French colonial survey albums, Paris national library postcards (1900–1930), the Manhhai community archive, family collections',
@@ -95,9 +95,9 @@ export const layers: Layer[] = [
     name: 'Stories behind the buildings',
     desc: 'Names, owners, dates, and histories — linked to every building on the map',
     pct: 10,
-    color: 'var(--color-orange)',
+    color: 'var(--accent)',
     phase: 'Phase 2',
-    phaseColor: 'var(--color-blue)',
+    phaseColor: 'var(--accent)',
     built: [
       'Data structure complete: buildings, streets, people, institutions — each connected by named relationships (built by, owned by, known as, replaced by...)',
       'Dates handle uncertainty honestly — “around 1905” or “before 1910” are valid entries, not workarounds',
@@ -114,9 +114,9 @@ export const layers: Layer[] = [
     name: 'Living memory',
     desc: 'A Wikipedia page for every building — anyone can add what they know, from a family photo to an archival document',
     pct: 20,
-    color: 'var(--color-purple)',
+    color: 'var(--accent)',
     phase: 'Phase 1',
-    phaseColor: 'var(--color-green)',
+    phaseColor: 'var(--status-ok)',
     built: [
       'GPS walking stories: stand near a historic site and the app reveals what was there',
       'Drawing tool for marking and annotating historical maps',
@@ -135,7 +135,7 @@ export const phases = [
     title: 'Maps to Geometry',
     subtitle: '"Turn every building on colonial maps into a shape with an address"',
     timeline: '6–9 months from funding',
-    color: 'var(--color-green)',
+    color: 'var(--status-ok)',
     milestones: [
       {
         id: 'M1.1',
@@ -165,7 +165,7 @@ export const phases = [
     title: 'Geometry to Knowledge',
     subtitle: '"Give every building a story, every street a history"',
     timeline: '9–18 months from funding',
-    color: 'var(--color-blue)',
+    color: 'var(--accent)',
     milestones: [
       {
         id: 'M2.1',
@@ -199,7 +199,7 @@ export const phases = [
     title: 'Knowledge to Dimension',
     subtitle: '"Lift the city off the page"',
     timeline: '18–30 months from funding',
-    color: 'var(--color-purple)',
+    color: 'var(--ink-soft)',
     milestones: [
       {
         id: 'M3.1',

@@ -1,14 +1,14 @@
 /*
   Neutral text greys are expressed as token mixes rather than raw hex:
-  `color-mix(in srgb, var(--color-text) N%, var(--color-white))` reproduces
-  #222…#888 exactly (--color-text is #111, a neutral), so tokenising here is
+  `color-mix(in srgb, var(--ink) N%, var(--ground-raised))` reproduces
+  var(--ink)…var(--ink-soft) exactly (--ink is var(--ink), a neutral), so tokenising here is
   pixel-identical. White overlays use the same form against `transparent`.
 */
 body {
   margin: 0;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-family-base);
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
 }
 
 .about-page.page {
@@ -23,8 +23,8 @@ body {
 
 /* HERO */
 .about-page .hero {
-  background: var(--color-yellow);
-  border-bottom: var(--border-thick);
+  background: var(--accent);
+  border-bottom: var(--rule-thick) solid var(--rule);
   padding: 5rem 2rem;
 }
 
@@ -43,9 +43,9 @@ body {
 }
 
 .about-page .highlight {
-  color: var(--color-white);
-  -webkit-text-stroke: 2px var(--color-text);
-  text-shadow: 4px 4px 0 var(--color-text);
+  color: var(--ground-raised);
+  -webkit-text-stroke: 2px var(--ink);
+  text-shadow: 4px 4px 0 var(--ink);
 }
 
 .about-page .hero-sub {
@@ -54,11 +54,10 @@ body {
   font-weight: 500;
   line-height: 1.6;
   max-width: 640px;
-  background: color-mix(in srgb, var(--color-white) 85%, transparent);
+  background: color-mix(in srgb, var(--ground-raised) 85%, transparent);
   padding: 1.25rem 1.5rem;
-  border: var(--border-thin);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-solid-sm);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
   margin: 0 0 2rem 0;
 }
 
@@ -87,9 +86,9 @@ body {
 
 .about-page .user-card {
   padding: 1.5rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
-  border-radius: var(--radius-md);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -111,7 +110,7 @@ body {
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.55;
-  color: color-mix(in srgb, var(--color-text) 79%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 79%, var(--ground-raised));
   margin: 0;
   flex: 1;
 }
@@ -121,9 +120,9 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
-  color: color-mix(in srgb, var(--color-text) 50%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 50%, var(--ground-raised));
   padding-top: 0.625rem;
-  border-top: var(--border-thin);
+  border-top: var(--rule-hair) solid var(--rule);
   line-height: 1.5;
 }
 
@@ -136,9 +135,9 @@ body {
 
 /* Layer cards */
 .about-page .layer-card {
-  border: var(--border-thick);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--ground-raised);
   overflow: hidden;
 }
 
@@ -147,24 +146,24 @@ body {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.25rem;
-  background: var(--color-bg);
-  border-bottom: var(--border-thin);
+  background: var(--ground);
+  border-bottom: var(--rule-hair) solid var(--rule);
   width: 100%;
   text-align: left;
   font: inherit;
   cursor: pointer;
   border: none;
-  border-bottom: var(--border-thin);
+  border-bottom: var(--rule-hair) solid var(--rule);
   transition: background 0.15s;
 }
 
 .about-page .layer-header:hover {
-  background: var(--color-yellow);
+  background: var(--accent);
 }
 
 .about-page .chevron {
   flex-shrink: 0;
-  color: color-mix(in srgb, var(--color-text) 50%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 50%, var(--ground-raised));
   transition: transform 0.2s ease;
 }
 
@@ -176,9 +175,9 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 0.85rem;
-  color: var(--color-white);
+  color: var(--ground-raised);
   padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   flex-shrink: 0;
   width: 2.5rem;
   text-align: center;
@@ -199,7 +198,7 @@ body {
 
 .about-page .layer-desc {
   font-size: 0.8rem;
-  color: color-mix(in srgb, var(--color-text) 64%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 64%, var(--ground-raised));
   font-weight: 500;
 }
 
@@ -223,8 +222,8 @@ body {
 
 .about-page .progress-track {
   height: 6px;
-  background: var(--color-bg);
-  border-bottom: var(--border-thin);
+  background: var(--ground);
+  border-bottom: var(--rule-hair) solid var(--rule);
 }
 
 .about-page .progress-fill {
@@ -239,7 +238,7 @@ body {
 
 .about-page .detail-col {
   padding: 1.25rem;
-  border-right: var(--border-thin);
+  border-right: var(--rule-hair) solid var(--rule);
 }
 
 .about-page .detail-col:last-child {
@@ -257,15 +256,15 @@ body {
 }
 
 .about-page .built-label {
-  color: var(--color-green);
+  color: var(--status-ok);
 }
 
 .about-page .building-label {
-  color: var(--color-blue);
+  color: var(--accent);
 }
 
 .about-page .next-label {
-  color: color-mix(in srgb, var(--color-text) 50%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 50%, var(--ground-raised));
 }
 
 .about-page .detail-list {
@@ -283,7 +282,7 @@ body {
   line-height: 1.45;
   padding-left: 1.1rem;
   position: relative;
-  color: color-mix(in srgb, var(--color-text) 86%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 86%, var(--ground-raised));
 }
 
 .about-page .detail-item::before {
@@ -296,17 +295,17 @@ body {
 
 .about-page .detail-list .built-item::before {
   content: '✓';
-  color: var(--color-green);
+  color: var(--status-ok);
 }
 
 .about-page .detail-list .building-item::before {
   content: '→';
-  color: var(--color-blue);
+  color: var(--accent);
 }
 
 .about-page .next-row {
   padding-top: 0.625rem;
-  border-top: var(--border-thin);
+  border-top: var(--rule-hair) solid var(--rule);
   margin-top: auto;
 }
 
@@ -315,7 +314,7 @@ body {
   font-size: 0.83rem;
   font-weight: 500;
   line-height: 1.45;
-  color: color-mix(in srgb, var(--color-text) 79%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 79%, var(--ground-raised));
   margin-top: 0.3rem;
 }
 
@@ -338,11 +337,10 @@ body {
 }
 
 .about-page .phase-card {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: var(--shadow-solid-sm);
   border-top: 6px solid var(--phase-color);
 }
 
@@ -356,7 +354,7 @@ body {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: color-mix(in srgb, var(--color-text) 50%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 50%, var(--ground-raised));
 }
 
 .about-page .phase-title {
@@ -369,7 +367,7 @@ body {
 .about-page .phase-subtitle {
   font-size: 0.875rem;
   font-style: italic;
-  color: color-mix(in srgb, var(--color-text) 71%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 71%, var(--ground-raised));
   margin: 0 0 0.75rem 0;
 }
 
@@ -377,8 +375,8 @@ body {
   display: inline-block;
   font-size: 0.8rem;
   font-weight: 700;
-  background: var(--color-bg);
-  border: var(--border-thin);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: var(--radius-pill);
   padding: 0.25rem 0.75rem;
 }
@@ -416,8 +414,8 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 0.75rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
   border-radius: 4px;
   padding: 0.1rem 0.35rem;
   flex-shrink: 0;
@@ -433,9 +431,9 @@ body {
 
 .about-page .model-item {
   padding: 1.25rem;
-  background: var(--color-bg);
-  border: var(--border-thin);
-  border-radius: var(--radius-md);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
 }
 
 .about-page .model-item h4 {
@@ -449,18 +447,17 @@ body {
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.5;
-  color: color-mix(in srgb, var(--color-text) 79%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 79%, var(--ground-raised));
   margin: 0;
 }
 
 /* CTA */
 .about-page .cta-card {
-  background: var(--color-text);
-  color: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
+  background: var(--ink);
+  color: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   padding: 3rem;
-  box-shadow: var(--shadow-solid);
 }
 
 .about-page .cta-title {
@@ -486,9 +483,9 @@ body {
 }
 
 .about-page .cta-role {
-  background: color-mix(in srgb, var(--color-white) 7.000000000000001%, transparent);
-  border: 2px solid color-mix(in srgb, var(--color-white) 15%, transparent);
-  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--ground-raised) 7.000000000000001%, transparent);
+  border: 2px solid color-mix(in srgb, var(--ground-raised) 15%, transparent);
+  border-radius: var(--radius);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -520,7 +517,7 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 0.875rem;
-  color: var(--color-yellow);
+  color: var(--accent);
   text-decoration: none;
   margin-top: 0.5rem;
   transition: opacity 0.15s;
@@ -532,11 +529,10 @@ body {
 
 /* LATEST UPDATE */
 .about-page .latest-card {
-  background: var(--color-white);
-  border: var(--border-thick);
-  border-radius: var(--radius-lg);
+  background: var(--ground-raised);
+  border: var(--rule-thick) solid var(--rule);
+  border-radius: var(--radius);
   padding: 2.5rem;
-  box-shadow: var(--shadow-solid-sm);
 }
 
 .about-page .latest-header {
@@ -552,18 +548,18 @@ body {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: var(--color-blue);
+  background: var(--accent);
   color: white;
   padding: 0.3rem 0.75rem;
   border-radius: var(--radius-pill);
-  border: var(--border-thin);
+  border: var(--rule-hair) solid var(--rule);
 }
 
 .about-page .all-updates-link {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   text-decoration: none;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 .about-page .latest-title {
@@ -577,7 +573,7 @@ body {
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.6;
-  color: color-mix(in srgb, var(--color-text) 79%, var(--color-white));
+  color: color-mix(in srgb, var(--ink) 79%, var(--ground-raised));
   margin: 0 0 1.75rem 0;
 }
 
@@ -589,11 +585,10 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1rem;
   font-weight: 800;
-  border: var(--border-thick);
+  border: var(--rule-thick) solid var(--rule);
   border-radius: var(--radius-pill);
   text-decoration: none;
   cursor: pointer;
-  box-shadow: var(--shadow-solid-sm);
   transition:
     transform 0.1s,
     box-shadow 0.1s;
@@ -601,41 +596,23 @@ body {
 
 .about-page .action-btn:hover {
   transform: translate(-3px, -3px);
-  box-shadow: var(--shadow-solid);
 }
 
 .about-page .primary-btn {
-  background: var(--color-primary);
+  background: var(--accent);
   color: white;
 }
 
 /* FOOTER */
 .about-page .footer {
-  background: var(--color-text);
-  color: var(--color-white);
+  background: var(--ink);
+  color: var(--ground-raised);
   padding: 3rem 2rem;
   margin-top: 2rem;
 }
 
-.about-page .footer-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.about-page .footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.about-page .footer-links a,
 .about-page .footer a {
-  color: var(--color-yellow);
+  color: var(--accent);
   text-decoration: none;
   font-weight: 700;
   font-family: 'Space Grotesk', sans-serif;
@@ -683,9 +660,5 @@ body {
   .about-page .main {
     padding: 2.5rem 1rem;
     gap: 2.5rem;
-  }
-
-  .about-page .nav-links {
-    display: none;
   }
 }

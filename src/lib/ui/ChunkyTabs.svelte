@@ -5,8 +5,8 @@
   export let tabs: { value: string; label: string }[];
   /** The currently active value. Two-way bindable via on:change. */
   export let active: string;
-  /** Active tab background color. Defaults to blue; pass var(--color-purple) for catalog. */
-  export let activeColor: string = 'var(--color-blue)';
+  /** Active tab background color. Defaults to blue; pass color-mix(in srgb, var(--accent) 55%, var(--status-bad)) for catalog. */
+  export let activeColor: string = 'var(--accent)';
 
   const dispatch = createEventDispatcher<{ change: string }>();
 </script>
@@ -32,26 +32,25 @@
 
   .chunky-tab {
     padding: 0.75rem 1.5rem;
-    font-family: var(--font-family-display);
+    font-family: var(--font-display);
     font-size: 1rem;
     font-weight: 700;
-    background: var(--color-white);
-    border: var(--border-thick);
-    border-radius: var(--radius-md);
+    background: var(--ground-raised);
+    border: var(--rule-thick) solid var(--rule);
+    border-radius: var(--radius);
     cursor: pointer;
-    box-shadow: var(--shadow-solid-sm);
     transition: all 0.1s;
   }
 
   .chunky-tab:hover {
     transform: translateY(-2px);
-    box-shadow: 4px 4px 0px var(--color-border);
+    box-shadow: 4px 4px 0px var(--rule);
   }
 
   .chunky-tab.active {
-    background: var(--tab-active-bg, var(--color-blue));
-    color: white;
+    background: var(--tab-active-bg, var(--accent));
+    color: var(--on-accent);
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
 </style>

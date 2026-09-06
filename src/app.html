@@ -6,36 +6,45 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#faf6f0" />
+    <meta name="theme-color" content="#eae7df" />
+
     <!-- Every map view fetches its rows from Supabase and then dozens of tiles
          from the IIIF worker. Both handshakes measured 70-180ms and neither
          starts until the bundle asks, so they sit at the head of the critical
          path. Warming them costs one connection each. -->
     <link rel="preconnect" href="https://iiif.maparchive.vn" crossorigin />
     <link rel="preconnect" href="https://trioykjhhwrruwjsklfo.supabase.co" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- The three faces are self-hosted from /fonts, so there is no third
+         origin to preconnect and no render-blocking stylesheet. Only the latin
+         subset of the body face is on the critical path. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Outfit:wght@400;600;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/be-vietnam-pro-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     %sveltekit.head%
-    <script type="text/javascript">
-      function googleTranslateElementInit() {
-        new google.translate.TranslateElement(
-          {
-            pageLanguage: 'en',
-            includedLanguages: 'en,vi',
-            autoDisplay: false,
-          },
-          'google_translate_element'
-        );
+
+    <!-- Google's website translator, loaded ONLY for a visitor who has actually
+         asked for Vietnamese. /profile's language toggle sets this cookie and
+         reloads. It used to load unconditionally on every page, render nothing
+         (there was no mount element anywhere in the app) and block the head. -->
+    <script>
+      if (document.cookie.indexOf('googtrans=/en/vi') !== -1) {
+        window.googleTranslateElementInit = function () {
+          new google.translate.TranslateElement(
+            { pageLanguage: 'en', includedLanguages: 'en,vi', autoDisplay: false },
+            'google_translate_element'
+          );
+        };
+        var s = document.createElement('script');
+        s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        s.async = true;
+        document.head.appendChild(s);
       }
     </script>
-    <script
-      type="text/javascript"
-      src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-    ></script>
     <style>
       body > .skiptranslate {
         display: none !important;
@@ -46,6 +55,7 @@
     </style>
   </head>
   <body data-sveltekit-preload-data="hover">
+    <div id="google_translate_element" hidden></div>
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

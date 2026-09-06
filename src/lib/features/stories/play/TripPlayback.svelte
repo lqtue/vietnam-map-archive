@@ -246,15 +246,21 @@
     align-items: center;
     justify-content: center;
     background: var(--sb-accent);
-    color: var(--color-white);
-    border: var(--border-thin);
+    color: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 50%;
     font-family: var(--sb-font-display);
     font-weight: 800;
     font-size: 0.85rem;
   }
+  /* Literal fallback on purpose: this green is the story-marker `done`
+     state, and it has to match the OL marker drawn on the map by
+     markerPalette.ts, which cannot read a CSS custom property. */
   .num.done {
-    background: var(--marker-done, #16a34a);
+    background: var(
+      --marker-done,
+      #16a34a
+    ); /* token-exempt: matches the done marker drawn on the map by markerPalette */
   }
   .head-text {
     min-width: 0;
@@ -281,7 +287,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.15rem 0.5rem;
-    background: var(--color-white);
+    background: var(--ground-raised);
     border: var(--sb-border);
     border-radius: 999px;
     font-weight: 700;
@@ -308,8 +314,8 @@
   .bar {
     margin-top: 0.55rem;
     height: 5px;
-    background: #1111110d;
-    border: 1px solid #11111122;
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 99px;
     overflow: hidden;
   }
@@ -323,13 +329,13 @@
     margin: 0;
     font-size: 0.92rem;
     line-height: 1.5;
-    color: var(--color-text);
+    color: var(--ink);
   }
   .hint {
     margin: 0;
     padding: 0.55rem 0.7rem;
     font-size: 0.85rem;
-    background: #fde68a;
+    background: color-mix(in srgb, var(--status-warn) 18%, var(--ground-raised));
     border: var(--sb-border);
     border-radius: 8px;
   }
@@ -339,8 +345,8 @@
     flex-direction: column;
     gap: 0.45rem;
     padding: 0.65rem 0.75rem;
-    background: var(--color-white);
-    border: var(--border-thin);
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 10px;
   }
   .challenge-label {
@@ -367,22 +373,21 @@
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.9rem;
-    background: var(--color-white);
+    background: var(--ground-raised);
   }
   .answer-btn {
     padding: 0.55rem 0.9rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-radius: 8px;
     font-family: inherit;
     font-weight: 700;
-    box-shadow: var(--shadow-solid-xs);
     cursor: pointer;
   }
   .answer-btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
   .answer-wrong {
     margin: 0;
@@ -396,16 +401,15 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0.7rem 0.85rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 10px;
-    box-shadow: var(--shadow-solid-xs);
     font-size: 0.9rem;
   }
   .status-banner.is-correct {
-    background: #bbf7d0;
+    background: color-mix(in srgb, var(--status-ok) 20%, var(--ground-raised));
   }
   .status-banner.is-visited {
-    background: #dbeafe;
+    background: color-mix(in srgb, var(--accent) 16%, var(--ground-raised));
   }
   .status-banner strong {
     display: block;
@@ -423,8 +427,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-text);
-    color: var(--color-white);
+    background: var(--ink);
+    color: var(--ground-raised);
     border-radius: 50%;
     font-weight: 800;
   }
@@ -437,18 +441,17 @@
   .action-btn {
     flex: 1;
     padding: 0.7rem 0.6rem;
-    border: var(--border-thin);
+    border: var(--rule-hair) solid var(--rule);
     border-radius: 10px;
-    background: var(--color-white);
+    background: var(--ground-raised);
     font-family: inherit;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
-    box-shadow: var(--shadow-solid-xs);
   }
   .action-btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 0 0 0 var(--color-border);
+    box-shadow: 0 0 0 var(--rule);
   }
   .action-btn:disabled {
     opacity: 0.45;
@@ -456,7 +459,7 @@
   }
   .action-btn.is-primary {
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     flex: 1.4;
   }
 </style>

@@ -202,8 +202,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--color-bg, #f5f0ea);
-    border-right: var(--border-thick, 2px solid #2b2520);
+    background: var(--ground);
+    border-right: var(--rule-thick) solid var(--rule);
     overflow: hidden;
     min-width: 0;
   }
@@ -231,7 +231,7 @@
     width: 36px;
     height: 3px;
     border-radius: 999px;
-    background: #1112;
+    background: var(--rule);
     transition: background 0.15s;
   }
   .splitter:hover::before,

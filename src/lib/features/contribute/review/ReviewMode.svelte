@@ -184,7 +184,7 @@
   }
 
   .fullscreen-state.error {
-    color: var(--color-error-600);
+    color: var(--status-bad);
     opacity: 1;
   }
 
@@ -193,8 +193,8 @@
     align-items: center;
     gap: 1rem;
     padding: 0.5rem 1rem;
-    background: var(--color-white);
-    border-bottom: var(--border-thin);
+    background: var(--ground-raised);
+    border-bottom: var(--rule-hair) solid var(--rule);
     height: 44px;
     flex-shrink: 0;
   }
@@ -202,7 +202,7 @@
   .back-btn {
     background: none;
     border: none;
-    color: var(--color-gray-500);
+    color: var(--ink-soft);
     font-size: 0.8125rem;
     cursor: pointer;
     font-family: inherit;
@@ -214,15 +214,15 @@
   }
 
   .back-btn:hover {
-    color: var(--color-text);
-    background: var(--color-gray-100);
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
   }
 
   .header-title {
     flex: 1;
     font-size: 0.875rem;
-    font-weight: var(--font-semibold);
-    color: var(--color-text);
+    font-weight: var(--w-semi);
+    color: var(--ink);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -230,9 +230,9 @@
 
   .map-chip {
     font-size: 0.75rem;
-    font-weight: var(--font-normal);
-    color: var(--color-gray-500);
-    background: var(--color-gray-100);
+    font-weight: var(--w-regular);
+    color: var(--ink-soft);
+    background: color-mix(in srgb, var(--ink) 6%, var(--ground));
     border-radius: 4px;
     padding: 0.1rem 0.4rem;
     font-family: ui-monospace, monospace;
@@ -240,12 +240,12 @@
 
   .progress-text {
     font-size: 0.8125rem;
-    color: var(--color-gray-500);
+    color: var(--ink-soft);
   }
 
   .update-error {
     font-size: 0.8125rem;
-    color: var(--color-error-600);
+    color: var(--status-bad);
   }
 
   .review-body {

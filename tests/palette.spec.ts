@@ -20,24 +20,24 @@ import { isPaletteShortcut, isTypingTarget } from '../src/lib/core/utils/command
 
 test('a signed-out visitor is offered only public pages', () => {
   const hrefs = destinationsFor(null, false).map((d) => d.href);
-  expect(hrefs).toContain('/catalog');
+  expect(hrefs).toContain('/archive');
   expect(hrefs).toContain('/explore');
   expect(hrefs).toContain('/contribute');
   expect(hrefs).not.toContain('/profile');
-  expect(hrefs).not.toContain('/contribute/review');
-  expect(hrefs).not.toContain('/admin/status');
+  expect(hrefs).not.toContain('/scan?mode=review');
+  expect(hrefs).not.toContain('/admin?tab=status');
 });
 
 test('each role adds the tier below it and nothing above', () => {
   const member = destinationsFor('user', true).map((d) => d.href);
-  expect(member).toContain('/create');
-  expect(member).toContain('/contribute/trace');
-  expect(member).not.toContain('/contribute/review');
+  expect(member).toContain('/explore?mode=story');
+  expect(member).toContain('/scan?mode=trace');
+  expect(member).not.toContain('/scan?mode=review');
 
   const mod = destinationsFor('mod', true).map((d) => d.href);
-  expect(mod).toContain('/contribute/review');
-  expect(mod).toContain('/admin/status');
-  expect(mod).not.toContain('/admin/bulk');
+  expect(mod).toContain('/scan?mode=review');
+  expect(mod).toContain('/admin?tab=status');
+  expect(mod).not.toContain('/admin?tab=bulk');
 
   const admin = destinationsFor('admin', true).map((d) => d.href);
   expect(admin).toHaveLength(DESTINATIONS.length);
@@ -62,10 +62,10 @@ test('a label prefix beats a keyword match', () => {
 test('the words people actually type reach the right tool', () => {
   const all = destinationsFor('admin', true);
   const first = (q: string) => matchDestinations(all, q)[0]?.href;
-  expect(first('ocr')).toBe('/contribute/digitalize');
-  expect(first('annotate')).toBe('/studio');
-  expect(first('story')).toBe('/create');
-  expect(first('allmaps')).toBe('/contribute/georef');
+  expect(first('ocr')).toBe('/scan?mode=triage');
+  expect(first('annotate')).toBe('/explore?mode=annotate');
+  expect(first('story')).toBe('/explore?mode=story');
+  expect(first('allmaps')).toBe('/contribute#georef');
   expect(first('tokens')).toBe('/screens');
 });
 
@@ -90,16 +90,16 @@ test('placeKey folds accents and collapses punctuation, like place_key() does', 
 });
 
 test('a key round-trips through the slug the route parses', () => {
-  // /place/[name] turns the slug back into the key by the same rules.
+  // /archive/place/[name] turns the slug back into the key by the same rules.
   const key = placeKey('Chợ Lớn');
   expect(keyToSlug(key)).toBe('cho-lon');
   expect(placeKey(keyToSlug(key).replace(/-/g, ' '))).toBe(key);
 });
 
 test('only the five gazetteer categories get a place link', () => {
-  expect(placeHrefFor('Rue Catinat', 'street')).toBe('/place/rue-catinat');
-  expect(placeHrefFor('Chợ Lớn', 'place')).toBe('/place/cho-lon');
-  expect(placeHrefFor('Arroyo Chinois', 'hydrology')).toBe('/place/arroyo-chinois');
+  expect(placeHrefFor('Rue Catinat', 'street')).toBe('/archive/place/rue-catinat');
+  expect(placeHrefFor('Chợ Lớn', 'place')).toBe('/archive/place/cho-lon');
+  expect(placeHrefFor('Arroyo Chinois', 'hydrology')).toBe('/archive/place/arroyo-chinois');
   // The loader 404s on a key under two characters, so don't offer the link.
   expect(placeHrefFor('A', 'place')).toBeNull();
   expect(placeHrefFor('...', 'place')).toBeNull();

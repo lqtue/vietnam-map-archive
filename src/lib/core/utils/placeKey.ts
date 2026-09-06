@@ -2,7 +2,7 @@
  * placeKey.ts — the gazetteer key, computed the same way on both sides.
  *
  * Postgres builds it in `place_key()` (migration 067): unaccent, lowercase,
- * then every run of non-alphanumerics collapsed to one space. `/place/[name]`
+ * then every run of non-alphanumerics collapsed to one space. `/archive/place/[name]`
  * inverts the slug with the same rules. This is the client-side twin, so a
  * label on screen can link straight to its place page without a round trip.
  *
@@ -22,18 +22,18 @@ export function placeKey(text: string): string {
     .trim();
 }
 
-/** Gazetteer `name_key` → the slug `/place/[name]` expects. */
+/** Gazetteer `name_key` → the slug `/archive/place/[name]` expects. */
 export const keyToSlug = (key: string) => key.replace(/\s+/g, '-');
 
 /**
- * `/place/<slug>` for a gazetteer key. The one-liner had four copies — here,
+ * `/archive/place/<slug>` for a gazetteer key. The one-liner had four copies — here,
  * `paletteDestinations`, the share page and the place loader — which is three
  * places for the URL shape to drift away from the route that parses it.
  */
-export const placeHref = (key: string) => `/place/${keyToSlug(key)}`;
+export const placeHref = (key: string) => `/archive/place/${keyToSlug(key)}`;
 
 /**
- * `/place/<slug>` for a label, or null when it cannot have a page — the
+ * `/archive/place/<slug>` for a label, or null when it cannot have a page — the
  * category is not one the gazetteer groups, or the key is too short for the
  * loader, which 404s under two characters.
  */

@@ -77,6 +77,7 @@
 
   // Style used while drawing (dashed amber preview)
   const DRAW_STYLE = new Style({
+    // Literal: OpenLayers styles cannot read a CSS custom property.
     stroke: new Stroke({ color: '#f59e0b', width: 2, lineDash: [6, 4] }),
     fill: new Fill({ color: 'rgba(245, 158, 11, 0.15)' }),
     image: new CircleStyle({ radius: 5, fill: new Fill({ color: '#f59e0b' }) }),
@@ -306,12 +307,14 @@
     z-index: 50;
     pointer-events: none;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--shadow-overlay);
   }
 
+  /* Three states, one ramp: accent solid while live, an accent tint while a
+     feature is selected, plain raised ground at rest. */
   .trace-status.drawing {
-    background: rgba(245, 158, 11, 0.93);
-    color: #451a03;
+    background: var(--accent);
+    color: var(--on-accent);
     top: auto;
     bottom: 0;
     left: 0;
@@ -322,25 +325,21 @@
   }
 
   .trace-status.idle {
-    background: linear-gradient(
-      160deg,
-      rgba(244, 232, 216, 0.95) 0%,
-      rgba(232, 213, 186, 0.95) 100%
-    );
-    border: 1px solid #d4af37;
-    color: #4a3f35;
+    background: var(--ground-raised);
+    border: var(--rule-hair) solid var(--rule);
+    color: var(--ink);
   }
 
   .trace-status.select-mode {
-    background: linear-gradient(160deg, rgba(255, 107, 53, 0.12) 0%, rgba(255, 107, 53, 0.08) 100%);
-    border: 1px solid #ff6b35;
-    color: #7c2d12;
+    background: color-mix(in srgb, var(--accent) 12%, var(--ground-raised));
+    border: var(--rule-hair) solid var(--accent);
+    color: var(--ink);
   }
 
   .pts-badge {
     font-weight: 800;
     font-size: 0.8rem;
-    background: rgba(0, 0, 0, 0.12);
+    background: color-mix(in srgb, currentColor 12%, transparent);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
     flex-shrink: 0;
@@ -354,9 +353,9 @@
   kbd {
     font-family: monospace;
     font-size: 0.7rem;
-    background: rgba(0, 0, 0, 0.15);
+    background: color-mix(in srgb, currentColor 15%, transparent);
     padding: 0.05rem 0.3rem;
     border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: var(--rule-hair) solid color-mix(in srgb, currentColor 25%, transparent);
   }
 </style>

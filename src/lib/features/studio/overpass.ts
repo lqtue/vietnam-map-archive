@@ -1,5 +1,5 @@
 /**
- * Overpass API helpers — fetch OSM features for /studio import.
+ * Overpass API helpers — fetch OSM features for /explore?mode=annotate import.
  *
  * Query is built from a preset (or raw QL) + a (south, west, north, east) bbox
  * and posted to overpass-api.de. The result is converted to GeoJSON in-memory

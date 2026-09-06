@@ -1,5 +1,5 @@
 <!--
-  CreateRightPane.svelte — right pane for /create.
+  CreateRightPane.svelte — right pane for /explore?mode=story.
 
   Split into three cards:
     • Story info  — title (dblclick to rename) + auto-save badge + Public toggle

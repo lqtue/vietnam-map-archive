@@ -19,6 +19,8 @@
   export let features: FeatureCollection | null = null;
 
   const fmt = new GeoJSON();
+  // Literal colours on purpose: OL builds styles in JS and cannot read a CSS
+  // custom property, so the role tokens are unavailable here.
   const style = new Style({
     stroke: new Stroke({ color: '#d97706', width: 2, lineDash: [4, 4] }),
     fill: new Fill({ color: 'rgba(217, 119, 6, 0.12)' }),

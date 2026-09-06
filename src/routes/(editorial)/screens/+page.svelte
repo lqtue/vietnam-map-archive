@@ -53,41 +53,63 @@
   let locQuery = '';
 
   // ── the system, as data ───────────────────────────────────────────────────
-  const COLORS = [
-    ['--color-bg', '#faf6f0', 'Page background'],
-    ['--color-white', '#ffffff', 'Card and element backgrounds'],
-    ['--color-text', '#111111', 'Primary text; also the footer background'],
-    ['--color-border', '#111111', 'Every border and shadow'],
-    ['--color-primary', '#ff4d4d', 'CTAs, links, active states, errors'],
-    ['--color-yellow', '#ffd23f', 'Hero backgrounds, highlights, hover fills'],
-    ['--color-blue', '#4d94ff', 'Info, in progress, research'],
-    ['--color-green', '#00cc99', 'Done / complete'],
-    ['--color-orange', '#ff8c42', 'Community / building now'],
-    ['--color-purple', '#9d4edd', 'Future / announcement'],
+  /*
+    The system, as data. Six role tokens, redefined once per surface — that is
+    the whole colour system. A component reads roles and never names a colour,
+    which is what lets the same button be correct on paper and in the darkroom.
+  */
+  const SURFACES = [
+    ['--ground', '#eae7df', '#14181a', 'The sheet itself'],
+    ['--ground-raised', '#f6f4ef', '#1d2325', 'Panels, cards, table heads'],
+    ['--ink', '#191c1a', '#e6e4dc', 'Body text; the neatline'],
+    ['--ink-soft', '#5c625c', '#8b9490', 'Captions, labels, secondary text'],
+    ['--rule', '#c6c2b6', '#2e3739', 'Every hairline and border'],
+    ['--accent', '#0e7c86', '#2aa5ae', 'Live, selected, primary — survey cyan'],
+    ['--on-accent', '#f6f4ef', '#0b1113', 'Text on an accent fill'],
+    ['--status-ok', '#2e7d57', '#4caf87', 'Done, approved, passing'],
+    ['--status-warn', '#9a6b1f', '#d6a344', 'Queued, needs attention'],
+    ['--status-bad', '#a33a2e', '#e0705e', 'Failed, rejected, destructive'],
   ];
 
+  /* Tight at reading sizes, loose at display sizes. */
   const TYPE = [
-    ['--text-3xl', '2rem'],
-    ['--text-2xl', '1.5rem'],
-    ['--text-xl', '1.25rem'],
-    ['--text-lg', '1.125rem'],
-    ['--text-base', '1rem'],
-    ['--text-sm', '0.875rem'],
-    ['--text-xs', '0.75rem'],
+    ['--t-3xl', '4rem', 'Hero'],
+    ['--t-2xl', '2.75rem', 'Page title'],
+    ['--t-xl', '1.875rem', 'Section head'],
+    ['--t-lg', '1.375rem', 'Subhead, standfirst'],
+    ['--t-md', '1.0625rem', 'Body'],
+    ['--t-sm', '0.9375rem', 'UI labels, buttons'],
+    ['--t-xs', '0.8125rem', 'Data, table cells'],
+    ['--t-2xs', '0.6875rem', 'Mono captions, tick labels'],
   ];
 
-  const SHADOWS = [
-    ['--shadow-solid-xs', '2px 2px 0', 'Chips, dense controls'],
-    ['--shadow-solid-sm', '4px 4px 0', 'Smaller cards, badges, secondary buttons'],
-    ['--shadow-solid', '6px 6px 0', 'Feature cards, primary CTAs'],
-    ['--shadow-solid-hover', '10px 10px 0', 'Hover lift only — never static'],
+  const FACES = [
+    ['--font-display', 'Spectral', 'Engraved, high contrast. Used with restraint.'],
+    ['--font-body', 'Be Vietnam Pro', 'Body. A Vietnamese face for a Vietnamese archive.'],
+    ['--font-mono', 'IBM Plex Mono', 'Coordinates, years, scales, tile ids. Tabular.'],
   ];
 
-  const RADII = [
-    ['--radius-sm', '8px', 'Tags'],
-    ['--radius-md', '16px', 'Cards, inputs'],
-    ['--radius-lg', '24px', 'Feature cards'],
-    ['--radius-pill', '999px', 'Buttons, chips'],
+  const SPACE = [
+    ['--s-1', '0.25rem'],
+    ['--s-2', '0.5rem'],
+    ['--s-3', '0.75rem'],
+    ['--s-4', '1.25rem'],
+    ['--s-5', '2rem'],
+    ['--s-6', '3.5rem'],
+  ];
+
+  /*
+    Paper is square, instruments are eased. So the neatline and every rule sit
+    at 0 radius, and only what you press or type into gets the 2px. Elevation
+    on paper is tone plus a rule — there is one shadow, for things that
+    genuinely float above the sheet.
+  */
+  const LINE = [
+    ['--rule-hair', '1px', 'Borders, dividers, table rows'],
+    ['--rule-thick', '2px', 'The neatline; table head underline'],
+    ['--radius', '2px', 'Buttons, fields — nothing else'],
+    ['--radius-pill', '999px', 'Chips and badges'],
+    ['--shadow-overlay', '0 8px 32px rgb(0 0 0 / .18)', 'Modals and popovers only'],
   ];
 
   /*
@@ -97,16 +119,17 @@
   */
   const CARDS_GLOBAL = [
     ['.section-card', 'components/editorial.css', 'Every editorial page'],
-    ['.catalog-card', 'components/catalog.css', 'CatalogCard, /catalog'],
+    ['.catalog-card', 'components/catalog.css', 'CatalogCard, /archive'],
+    ['.panel', 'primitives.css', 'Anywhere — the one panel'],
     ['.sb-card', 'components/sidebar.css', 'Tool sidebars (needs --sb-* from a parent)'],
-    ['.auth-gate-card', 'components/auth-gate.css', 'AuthGate, /studio, /create'],
+    [
+      '.auth-gate-card',
+      'components/auth-gate.css',
+      'AuthGate, /explore?mode=annotate, /explore?mode=story',
+    ],
   ];
 
   const CARDS_SCOPED = [
-    ['.feature-card', 'layouts/home.css', '.home-page'],
-    ['.mega-card', 'layouts/home.css', '.home-page'],
-    ['.micro-link-card', 'layouts/home.css', '.home-page'],
-    ['.info-card', 'layouts/home.css', '.home-page'],
     ['.layer-card', 'pages/about.css', '.about-page'],
     ['.phase-card', 'pages/about.css', '.about-page'],
     ['.cta-card', 'pages/about.css', '.about-page'],
@@ -118,7 +141,7 @@
     ['.subscribe-card', 'pages/blog.css', '.blog-page'],
     ['.profile-card', 'pages/profile.css', '.profile-page'],
     ['.stat-card', 'pages/profile.css', '.profile-page'],
-    ['.status-row', 'pages/admin-status.css', 'global — /admin/status'],
+    ['.status-row', 'pages/admin-status.css', 'global — /admin?tab=status'],
   ];
 
   const TABS = [
@@ -155,74 +178,102 @@
       <section class="sc-section">
         <h2 class="sc-h2">Colour</h2>
         <p class="sc-blurb">
-          Never hardcode one. A hex literal in a component <code>&lt;style&gt;</code> block is a bug.
+          Six roles, redefined once per surface. A component reads a role and never names a colour —
+          that is what lets one button be correct on paper and in the darkroom. A hex literal in a
+          component <code>&lt;style&gt;</code> block is a bug, and the lint script fails the build on
+          one.
         </p>
-        <div class="sc-swatches">
-          {#each COLORS as [name, hex, role] (name)}
-            <div class="sc-swatch">
-              <div class="sc-swatch-chip" style="background: var({name})"></div>
-              <code class="sc-code">{name}</code>
-              <span class="sc-hex">{hex}</span>
-              <span class="sc-role">{role}</span>
-            </div>
-          {/each}
-        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Paper</th>
+              <th>Darkroom</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each SURFACES as [name, paper, dark, role] (name)}
+              <tr>
+                <td><code class="sc-code">{name}</code></td>
+                <td>
+                  <span class="sc-dot" style="background: {paper}"></span>
+                  <span class="num">{paper}</span>
+                </td>
+                <td>
+                  <span class="sc-dot" style="background: {dark}"></span>
+                  <span class="num">{dark}</span>
+                </td>
+                <td>{role}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
       </section>
 
       <section class="sc-section">
         <h2 class="sc-h2">Type</h2>
         <p class="sc-blurb">
-          <strong>Space Grotesk</strong> for headings, nav, badges, labels and buttons.
-          <strong>Outfit</strong> for body text. Hero titles use
-          <code>clamp(2.5rem, 6vw, 4rem)</code> — always fluid.
+          Three faces, self-hosted from <code>/fonts</code>, each shipped only in latin, latin-ext
+          and vietnamese. The corpus is French, Vietnamese and English.
         </p>
+        <table class="data-table">
+          <tbody>
+            {#each FACES as [name, family, role] (name)}
+              <tr>
+                <td><code class="sc-code">{name}</code></td>
+                <td><span style="font-family: var({name})">{family}</span></td>
+                <td>{role}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
         <div class="sc-typelist">
-          {#each TYPE as [name, size] (name)}
+          {#each TYPE as [name, size, role] (name)}
             <div class="sc-typerow">
               <code class="sc-code">{name}</code>
               <span class="sc-hex">{size}</span>
               <span class="sc-sample" style="font-size: var({name})">
                 Saigon · Chợ Lớn · 1882
               </span>
+              <span class="sc-role">{role}</span>
             </div>
           {/each}
         </div>
       </section>
 
       <section class="sc-section">
-        <h2 class="sc-h2">Surface</h2>
+        <h2 class="sc-h2">Line, radius, elevation</h2>
         <p class="sc-blurb">
-          Borders, shadows and radii. The shadow is always solid, never blurred.
+          Paper is square and instruments are eased, so the neatline and every rule sit at 0 and
+          only what you press or type into gets the 2px. Elevation is tone plus a rule; there is one
+          shadow, for what genuinely floats above the sheet.
         </p>
-        <div class="sc-grid3">
-          {#each SHADOWS as [name, value, role] (name)}
-            <div class="sc-demo">
-              <div class="sc-box" style="box-shadow: var({name})"></div>
+        <table class="data-table">
+          <tbody>
+            {#each LINE as [name, value, role] (name)}
+              <tr>
+                <td><code class="sc-code">{name}</code></td>
+                <td class="num">{value}</td>
+                <td>{role}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="sc-section">
+        <h2 class="sc-h2">Space</h2>
+        <p class="sc-blurb">Six steps. Breakpoints are 600 / 900 / 1280. Three.</p>
+        <div class="sc-spacelist">
+          {#each SPACE as [name, value] (name)}
+            <div class="sc-typerow">
               <code class="sc-code">{name}</code>
               <span class="sc-hex">{value}</span>
-              <span class="sc-role">{role}</span>
+              <span class="sc-bar" style="width: var({name})"></span>
             </div>
           {/each}
-          {#each RADII as [name, value, role] (name)}
-            <div class="sc-demo">
-              <div class="sc-box" style="border-radius: var({name})"></div>
-              <code class="sc-code">{name}</code>
-              <span class="sc-hex">{value}</span>
-              <span class="sc-role">{role}</span>
-            </div>
-          {/each}
-          <div class="sc-demo">
-            <div class="sc-box" style="border: var(--border-thin)"></div>
-            <code class="sc-code">--border-thin</code>
-            <span class="sc-hex">2px</span>
-            <span class="sc-role">Inline labels, dividers</span>
-          </div>
-          <div class="sc-demo">
-            <div class="sc-box" style="border: var(--border-thick)"></div>
-            <code class="sc-code">--border-thick</code>
-            <span class="sc-hex">3px</span>
-            <span class="sc-role">Cards, nav, structural</span>
-          </div>
         </div>
       </section>
     {/if}
@@ -232,14 +283,25 @@
       <section class="sc-section">
         <h2 class="sc-h2">Buttons</h2>
         <p class="sc-blurb">
-          Global classes from <code>components/buttons.css</code> and
-          <code>components/editorial.css</code>. Both action buttons lift on hover.
+          One class, from <code>primitives.css</code>. There used to be four parallel button
+          vocabularies — <code>.btn</code>, <code>.sb-btn</code>, <code>.tool-btn</code>,
+          <code>.pill-btn</code>, plus <code>.action-btn</code> / <code>.ctrl-btn</code> /
+          <code>.primary-btn</code> / <code>.secondary-btn</code>. The old names are aliased onto
+          this one, so they still render; write <code>.btn</code> in new markup. Rules darken on hover
+          — nothing lifts, nothing casts a shadow.
         </p>
         <div class="sc-row">
-          <button class="action-btn primary-btn">Primary action</button>
-          <button class="action-btn secondary-btn">Secondary action</button>
-          <button class="pill-btn">Pill button</button>
-          <button class="action-btn primary-btn" disabled>Disabled</button>
+          <button class="btn btn--primary">Primary action</button>
+          <button class="btn">Default</button>
+          <button class="btn btn--ghost">Ghost</button>
+          <button class="btn btn--danger">Danger</button>
+          <button class="btn" aria-pressed="true">Selected</button>
+          <button class="btn btn--primary" disabled>Disabled</button>
+        </div>
+        <div class="sc-row">
+          <button class="btn btn--sm">Small</button>
+          <button class="btn btn--xs">Extra small</button>
+          <button class="btn btn--sm btn--icon" aria-label="Close">×</button>
         </div>
         <h3 class="sc-h3">.chip — the pill button</h3>
         <div class="sc-row">
@@ -275,8 +337,7 @@
         <div class="sc-row">
           <span class="spinner"></span>
           <span class="spinner" style="--spinner-size: 14px; --spinner-thickness: 2.5px"></span>
-          <span class="spinner" style="--spinner-size: 40px; --spinner-ink: var(--color-primary)"
-          ></span>
+          <span class="spinner" style="--spinner-size: 40px; --spinner-ink: var(--accent)"></span>
           <button class="btn btn-primary"><span class="spinner on-ink"></span>&nbsp;Running…</button
           >
         </div>
@@ -458,8 +519,8 @@
           <div class="sc-item-head">
             <code class="sc-code">AuthGate</code>
             <span class="sc-role">
-              Signed-out gate for /studio and /create. Not rendered here — its button starts a real
-              Google sign-in.
+              Signed-out gate for /explore?mode=annotate and /explore?mode=story. Not rendered here
+              — its button starts a real Google sign-in.
             </span>
           </div>
         </div>
@@ -532,7 +593,7 @@
       <section class="sc-section">
         <h2 class="sc-h2">Status tones</h2>
         <p class="sc-blurb">
-          The <code>.status-row</code> variants from <code>/admin/status</code>. Colour never
+          The <code>.status-row</code> variants from <code>/admin?tab=status</code>. Colour never
           carries meaning alone — the sentence on the card says the same thing.
         </p>
         <div class="sc-grid3">

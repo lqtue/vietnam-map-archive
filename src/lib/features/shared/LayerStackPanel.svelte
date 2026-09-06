@@ -38,7 +38,7 @@
   $: topMapId = state.overlays[0]?.ref.mapId ?? null;
   $: topMap = topMapId ? (mapList.find((m) => m.id === topMapId) ?? null) : null;
   $: topName = state.overlays[0]?.ref.name ?? topMap?.name ?? 'this map';
-  /** A draft has no share page — /map/[id] 404s on anything unpublished. */
+  /** A draft has no share page — /archive/[id] 404s on anything unpublished. */
   $: topIsPublished = topMap?.status === 'public' || topMap?.status === 'featured';
 
   $: yearByMapId = (() => {
@@ -178,10 +178,10 @@
     {#if topMapId}
       <div class="lsp-links">
         <span class="lsp-links-label" title={topName}>{topName}</span>
-        <a class="lsp-link" href="/image?map={topMapId}">Scan</a>
-        <a class="lsp-link" href="/studio?map={topMapId}">Annotate</a>
+        <a class="lsp-link" href="/scan?map={topMapId}">Scan</a>
+        <a class="lsp-link" href="/explore?mode=annotate?map={topMapId}">Annotate</a>
         {#if topIsPublished}
-          <a class="lsp-link" href="/map/{topMapId}">Share</a>
+          <a class="lsp-link" href="/archive/{topMapId}">Share</a>
         {/if}
       </div>
     {/if}
@@ -197,7 +197,7 @@
   }
   .lsp-sub {
     font-size: 0.66rem;
-    font-weight: var(--font-medium);
+    font-weight: var(--w-medium);
     color: var(--sb-text-muted);
     margin: 0 0 0.4rem;
   }
@@ -268,8 +268,8 @@
       var(--sb-bg) var(--fill),
       var(--sb-bg) 100%
     );
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--rule);
+    border-radius: var(--radius);
     touch-action: pan-y;
     user-select: none;
     cursor: ew-resize;
@@ -290,8 +290,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: 4px;
     font: inherit;
     font-size: 0.7rem;
@@ -317,7 +317,7 @@
   }
   .lsp-name {
     font-size: 0.88rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     color: var(--sb-text);
     display: flex;
     align-items: center;
@@ -334,7 +334,7 @@
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
     font-size: 0.82rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     color: var(--sb-accent);
   }
   .lsp-pane {
@@ -344,23 +344,23 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-pill);
-    border: 1.5px solid var(--color-border);
+    border: 1.5px solid var(--rule);
     font-size: 0.66rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     line-height: 1.2;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    background: var(--color-white);
+    background: var(--ground-raised);
     color: var(--sb-text);
   }
   .lsp-pane.left {
     background: var(--sb-accent);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-color: var(--sb-accent);
   }
   .lsp-pane.right {
     background: var(--sb-accent-warm);
-    color: var(--color-white);
+    color: var(--ground-raised);
     border-color: var(--sb-accent-warm);
   }
 
@@ -368,7 +368,7 @@
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
     font-size: 0.78rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     color: var(--sb-text);
     min-width: 38px;
     text-align: right;
@@ -380,19 +380,19 @@
   }
   .lsp-vec.is-on {
     opacity: 1;
-    color: var(--sb-success, #16a34a);
+    color: var(--sb-success, var(--status-ok));
   }
 
   .lsp-x {
     flex-shrink: 0;
     width: 32px;
     height: 32px;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
+    background: var(--ground-raised);
+    border: 1.5px solid var(--rule);
     border-radius: var(--radius-pill);
     font: inherit;
     font-size: 1.1rem;
-    font-weight: var(--font-extrabold);
+    font-weight: var(--w-semi);
     line-height: 1;
     cursor: pointer;
     padding: 0;

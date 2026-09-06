@@ -1,0 +1,394 @@
+/* ============================================================================
+   Sheet — primitives. Five things: label, button, field, panel, table.
+
+   There were four parallel button vocabularies before this file (.btn, .sb-btn,
+   .tool-btn, .pill-btn, plus .action-btn / .ctrl-btn / .primary-btn /
+   .secondary-btn). One survives; the rest are aliased onto it at the bottom of
+   this file, so old markup still renders and new markup has one name to use.
+
+   Nothing here names a colour. Every value is a role token, so a primitive
+   dropped on .surface-darkroom is correct without a second rule.
+   ========================================================================= */
+
+/* ---- label -------------------------------------------------------------- */
+/* The mono eyebrow used for section heads, coordinate captions and any other
+   text that annotates rather than reads. Replaces .sb-section-label,
+   .tool-section-title, .tool-coord-label, .tool-label. */
+:is(.label, .sb-section-label, .tool-section-title, .tool-coord-label, .tool-label) {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--t-2xs);
+  font-weight: var(--w-regular);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 var(--s-2);
+}
+
+.label--inline {
+  display: inline;
+  margin: 0;
+}
+
+/* ---- button ------------------------------------------------------------- */
+:is(
+  .btn,
+  .sb-btn,
+  .tool-btn,
+  .pill-btn,
+  .primary-btn,
+  .secondary-btn,
+  .action-btn,
+  .ctrl-btn,
+  .back-link
+) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+
+  min-height: 34px;
+  padding: 0 var(--s-3);
+
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  font-weight: var(--w-semi);
+  line-height: 1;
+  white-space: nowrap;
+
+  color: var(--ink);
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  /* Rules darken. Nothing lifts, nothing bounces, nothing casts a shadow. */
+  transition:
+    border-color var(--ease),
+    color var(--ease),
+    background-color var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+:is(.btn--primary, .btn-primary, .primary-btn) {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+:is(.btn--primary, .btn-primary, .primary-btn):hover:not(:disabled) {
+  color: var(--on-accent);
+  background: color-mix(in srgb, var(--accent) 82%, var(--ink));
+  border-color: color-mix(in srgb, var(--accent) 82%, var(--ink));
+}
+
+:is(.btn--ghost, .btn-ghost, .tool-ghost-btn) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-soft);
+}
+
+:is(.btn--ghost, .btn-ghost, .tool-ghost-btn):hover:not(:disabled) {
+  border-color: transparent;
+  color: var(--accent);
+}
+
+:is(.btn--danger, .btn-danger) {
+  color: var(--status-bad);
+  border-color: color-mix(in srgb, var(--status-bad) 45%, transparent);
+}
+
+:is(.btn--danger, .btn-danger):hover:not(:disabled) {
+  color: var(--on-accent);
+  background: var(--status-bad);
+  border-color: var(--status-bad);
+}
+
+/* A button that is currently the selected tool or the open panel. */
+.btn.is-on,
+.btn[aria-pressed='true'] {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+:is(.btn--sm, .btn-sm) {
+  min-height: 28px;
+  padding: 0 var(--s-2);
+  font-size: var(--t-xs);
+}
+
+:is(.btn--xs, .btn-xs) {
+  min-height: 22px;
+  padding: 0 var(--s-2);
+  font-size: var(--t-2xs);
+}
+
+.btn--icon {
+  width: 34px;
+  padding: 0;
+}
+
+.btn--sm.btn--icon {
+  width: 28px;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ---- field -------------------------------------------------------------- */
+:is(.field, .sb-input, .tool-num-input) {
+  display: block;
+  width: 100%;
+  min-height: 34px;
+  padding: var(--s-2) var(--s-3);
+
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  color: var(--ink);
+  background: var(--ground);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius);
+
+  transition: border-color var(--ease);
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.field::placeholder {
+  color: var(--ink-soft);
+}
+
+.field:disabled {
+  opacity: 0.5;
+}
+
+/* Coordinates, years, extents. Tabular, so a column of them lines up. */
+.field--numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+textarea.field {
+  min-height: 5lh;
+  resize: vertical;
+}
+
+/* ---- panel -------------------------------------------------------------- */
+/* A sheet within the sheet: square, ruled, raised by tone rather than shadow.
+   Replaces .sb-card and .tool-section. */
+:is(.panel, .sb-card, .tool-section) {
+  background: var(--ground-raised);
+  border: var(--rule-hair) solid var(--rule);
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border-bottom: var(--rule-hair) solid var(--rule);
+}
+
+.panel__body {
+  padding: var(--s-3);
+}
+
+/* ---- chip --------------------------------------------------------------- */
+/* Chips carry a year, a category or a count — data, so they are mono. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: 2px var(--s-2);
+
+  font-family: var(--font-mono);
+  font-size: var(--t-2xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+
+  color: var(--ink-soft);
+  background: transparent;
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-pill);
+}
+
+.chip--accent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.chip--ok {
+  color: var(--status-ok);
+  border-color: color-mix(in srgb, var(--status-ok) 50%, transparent);
+}
+
+.chip--warn {
+  color: var(--status-warn);
+  border-color: color-mix(in srgb, var(--status-warn) 50%, transparent);
+}
+
+.chip--bad {
+  color: var(--status-bad);
+  border-color: color-mix(in srgb, var(--status-bad) 50%, transparent);
+}
+
+/* ---- table -------------------------------------------------------------- */
+:is(.data-table, .gcp-table, .shapes-table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-xs);
+}
+
+:is(.data-table, .gcp-table, .shapes-table) th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  padding: var(--s-2) var(--s-3);
+  text-align: left;
+  white-space: nowrap;
+
+  font-family: var(--font-mono);
+  font-size: var(--t-2xs);
+  font-weight: var(--w-regular);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+
+  background: var(--ground-raised);
+  border-bottom: var(--rule-thick) solid var(--rule);
+}
+
+:is(.data-table, .gcp-table, .shapes-table) td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: var(--rule-hair) solid var(--rule);
+  vertical-align: top;
+}
+
+:is(.data-table, .gcp-table, .shapes-table) tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.data-table tbody tr[aria-selected='true'] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+:is(.data-table, .gcp-table, .shapes-table) .num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+:is(.data-table, .gcp-table, .shapes-table) th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+:is(.data-table, .gcp-table, .shapes-table) th.sortable:hover {
+  color: var(--accent);
+}
+
+.table-wrap {
+  overflow: auto;
+  min-height: 0;
+}
+
+/* ---- feedback ----------------------------------------------------------- */
+.state-msg {
+  padding: var(--s-4);
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.state-msg.error {
+  color: var(--status-bad);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: var(--rule-thick) solid var(--rule);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- helpers ------------------------------------------------------------ */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.divider {
+  border-top: var(--rule-hair) solid var(--rule);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- old vocabularies, aliased ------------------------------------------ */
+/* ponytail: `.sb-btn`, `.tool-btn`, `.pill-btn`, `.sb-card`, `.tool-section`,
+   `.sb-input` and friends are aliased onto the primitives above (see the
+   `:is()` lists) rather than renamed across sixty files for no visual change.
+   Write the new names in new markup; rename the old ones when you are already
+   editing the file for another reason. */
+.back-link {
+  width: 34px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.table-empty {
+  padding: var(--s-5);
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: var(--t-sm);
+}
+
+.on-ink {
+  color: var(--on-accent);
+}

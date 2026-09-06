@@ -496,7 +496,7 @@
     background: var(--tone-red-pale);
     color: var(--tone-red-ink);
     font-size: 0.72rem;
-    border-bottom: var(--border-thin);
+    border-bottom: var(--rule-hair) solid var(--rule);
     flex-shrink: 0;
   }
   .ocr-notice {
@@ -504,7 +504,7 @@
     background: var(--tone-amber-pale);
     color: var(--tone-amber-ink);
     font-size: 0.72rem;
-    border-bottom: var(--border-thin);
+    border-bottom: var(--rule-hair) solid var(--rule);
     flex-shrink: 0;
   }
   .shape-tr.status-validated td {
@@ -515,18 +515,18 @@
     opacity: 0.65;
   }
   .shape-tr.row-selected td {
-    outline: 2px solid var(--color-blue);
+    outline: 2px solid var(--accent);
     outline-offset: -1px;
     background: var(--tone-blue-wash) !important;
   }
   .dot--dirty {
-    background: var(--color-orange) !important;
+    background: var(--status-warn) !important;
     border-style: dashed;
     border-color: var(--tone-amber-ink);
   }
   .dot--saving {
     background: transparent !important;
-    border: 1.5px dashed var(--color-gray-400);
+    border: 1.5px dashed var(--ink-soft);
     animation: pulse 0.8s ease-in-out infinite;
   }
   @keyframes pulse {
@@ -556,12 +556,12 @@
   }
   .conf-badge {
     font-size: 0.68rem;
-    font-weight: var(--font-bold);
+    font-weight: var(--w-semi);
     font-variant-numeric: tabular-nums;
   }
   .saving-dot {
     font-size: 0.75rem;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.4;
     padding-right: 0.4rem;
   }
@@ -585,12 +585,12 @@
     display: block;
     margin-top: 0.5rem;
     font-size: 0.72rem;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.6;
   }
   .empty-state {
     font-size: 0.8rem;
-    color: var(--color-text);
+    color: var(--ink);
     opacity: 0.6;
   }
 </style>
