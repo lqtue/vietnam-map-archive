@@ -13,6 +13,8 @@
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
+  import { layersStore, toggleRasterOverlay } from '$lib/map/stores/layersStore';
+  import { L7014_OVERLAY } from '$lib/map/constants';
 
   export let matches: ResolvedMap[] = [];
   // Admins/mods may browse draft maps in the viewer; everyone else is
@@ -53,6 +55,17 @@
   $: visibleMatches = [...matches]
     .filter((m) => canSeeDrafts || m.status === 'public' || m.status === 'featured')
     .sort(byYear);
+
+  // Sheet series — whole pre-warped archives. They sit above the sheet rows
+  // rather than among them because they are not catalogue entries: no record
+  // page, no year to sort by, no single scan behind them. Same gesture though
+  // — tap to put it on the map, tap again to take it off.
+  const SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1965–72 · 1:50,000' }];
+  $: seriesOn = new Set(
+    $layersStore.overlays
+      .filter((o) => o.ref.kind === 'raster')
+      .map((o) => (o.ref as { key: string }).key)
+  );
 </script>
 
 <div class="ebp" class:is-expanded={expanded}>
@@ -68,6 +81,26 @@
       <span class="hint">{$t('Tap a row to add it as a layer · tap again to remove.')}</span>
     {/if}
   </div>
+
+  <ul class="series">
+    {#each SERIES as s (s.ref.key)}
+      <li>
+        <button
+          type="button"
+          class="series-row"
+          class:is-on={seriesOn.has(s.ref.key)}
+          aria-pressed={seriesOn.has(s.ref.key)}
+          on:click={() => toggleRasterOverlay(s.ref)}
+        >
+          <span class="series-mark" aria-hidden="true">{seriesOn.has(s.ref.key) ? '✓' : '+'}</span>
+          <span class="series-text">
+            <span class="series-name">{s.ref.name}</span>
+            <span class="series-note">{s.sheets} sheets · {s.note}</span>
+          </span>
+        </button>
+      </li>
+    {/each}
+  </ul>
 
   {#if expanded}
     <ArchiveBrowser
@@ -90,6 +123,64 @@
 </div>
 
 <style>
+  .series {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .series-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    background: var(--sb-card-bg);
+    border: 1px solid var(--sb-border);
+    border-radius: var(--sb-radius);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--sb-text);
+  }
+  .series-row:hover {
+    background: var(--sb-row-hover);
+  }
+  .series-row.is-on {
+    border-color: var(--sb-accent);
+  }
+  .series-mark {
+    flex: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--sb-border);
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+  .series-row.is-on .series-mark {
+    background: var(--sb-accent);
+    border-color: var(--sb-accent);
+    color: var(--color-on-accent);
+  }
+  .series-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .series-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .series-note {
+    font-size: 0.7rem;
+    color: var(--sb-text-muted);
+  }
+
   .ebp {
     display: flex;
     flex-direction: column;

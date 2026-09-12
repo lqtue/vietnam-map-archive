@@ -39,3 +39,4 @@ work/cleanup/
 # Scout runs are local discovery artifacts — load them into scout_candidates, do not commit
 scripts/scout_all_*.json
 scripts/scout_review.csv
+work/l7014/

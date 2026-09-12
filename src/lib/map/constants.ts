@@ -13,6 +13,7 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import type BaseLayer from 'ol/layer/Base';
 import { buildPmtilesBasemapLayer } from './basemapStyle';
+import type { RasterRef } from '$lib/map/stores/layersStore';
 
 export const DEFAULT_ANNOTATION_COLOR = INK.blue;
 
@@ -21,6 +22,23 @@ export const DRAW_TYPE_MAP = {
   line: 'LineString',
   polygon: 'Polygon',
 } as const;
+
+/**
+ * The AMS L7014 mosaic as a stackable layer.
+ *
+ * An overlay, not a basemap: it is one sheet series among the archive's others,
+ * so it belongs over whatever basemap the reader picked, at an opacity they
+ * choose — and where the series has no sheet (Saigon, Huế, Hanoi and ~95 more)
+ * the gap shows their basemap instead of punching a hole in the page. The
+ * bounds are the archive's own, from its PMTiles header.
+ */
+export const L7014_OVERLAY: RasterRef = {
+  kind: 'raster',
+  mapId: 'raster:l7014',
+  key: 'l7014',
+  name: 'AMS 1:50,000 (1965–72)',
+  bounds: [102.2499, 8.4999, 109.5001, 23.25],
+};
 
 export interface BasemapDefinition {
   key: string;

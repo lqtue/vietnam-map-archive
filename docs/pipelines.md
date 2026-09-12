@@ -2,6 +2,116 @@
 
 Pipelines that live outside the SvelteKit app. Each section is the canonical reference — CLAUDE.md only links here.
 
+## AMS Series L7014 mosaic (`scripts/l7014_mosaic.py`)
+
+The US Army Map Service's 1:50,000 coverage of Vietnam, as **one raster PMTiles
+archive** rather than 509 catalogue rows. It is served exactly the way the
+street basemap is — an object in `vma-tiles` behind `tiles.maparchive.vn`, read
+by byte range — but it is a **layer, not a basemap**: it joins the overlay stack
+as a `RasterRef`, with its own opacity, eye and position, and is switched on
+from the **Series** row of the map controls. A basemap was the first attempt and
+was wrong in two ways — a sheet series is one thing among the archive's others
+and wants an opacity slider, and underneath it the ~99 missing sheets showed the
+*basemap*, which in dark mode is near-black, so every gap read as a hole punched
+in the page.
+
+```bash
+python3 scripts/l7014_mosaic.py index           # scrape the PCL index
+python3 scripts/l7014_mosaic.py fetch --jobs 4  # download the GeoPDFs (~4 GB)
+python3 scripts/l7014_mosaic.py warp            # clip to neatline, reproject
+python3 scripts/l7014_mosaic.py tile            # mosaic -> MBTiles -> PMTiles
+python3 scripts/l7014_mosaic.py upload          # rclone to r2:vma-tiles/overlay/
+python3 scripts/l7014_mosaic.py check           # prove the datum check can fail
+```
+
+Every phase is resumable — it skips what it already produced — so a failed run
+is re-run, not restarted. Needs GDAL with the PDF driver, the `pmtiles` CLI,
+and rclone's `r2:` remote. Wall clock for the full series is roughly two hours,
+most of it the download.
+
+**Why there is nothing to georeference by hand.** Each PCL GeoPDF carries eight
+NGA control points in pixel space, its printed neatline as a polygon, and an XMP
+block with the sheet's title, edition, date and graticule corners. The pipeline
+clips each sheet to its own neatline (which is what removes the collar, so
+sheets butt together instead of overlapping their margins), warps it to Web
+Mercator, and tiles the lot. Measured on four adjacent sheets, neighbouring
+sheet edges agree to **2.5–14 m** — inside the series' own ±25 m drafting
+accuracy, and grid lines and streams run unbroken across a join. What *is*
+visible at a seam is tone: the scans differ in brightness sheet to sheet.
+
+**Five things that will silently produce a plausible wrong result.** All five
+are handled; all five are worth knowing before editing this script. Every one of
+them was found by looking at the output, not by reading the code.
+
+1. **GDAL cannot map every NGA LGIDict datum code.** On `IND-I` and `INF-A` it
+   emits a warning, falls back to WGS84, and *the warp still succeeds* — putting
+   the sheet ~450 m off with no error anywhere. So the CRS is rebuilt from the
+   projection GDAL did parse (its central meridian names the UTM zone exactly)
+   or, failing that, the sheet's XMP; and every sheet's registration is then
+   checked against the graticule corners the XMP prints. A sheet that fails is
+   left out of the mosaic rather than placed wrongly. `check` runs a real sheet
+   through WGS84 on purpose and asserts the check rejects it — 147 m out on the
+   sheet it was measured on. A check that cannot fail is not one.
+2. **The UTM zone must come from the sheet's centre, never an edge.** Many
+   sheets end at longitude 108.000, exactly the zone 48/49 boundary; taking the
+   east edge puts them a zone over. That is a clean 6.00001° error, and it looks
+   like a datum fault rather than the off-by-one it is.
+3. **The COG driver cannot carry a fourth band through JPEG compression.** Ask
+   for `-dstalpha` with `-of COG -co COMPRESS=JPEG` and GDAL quietly demotes the
+   alpha to an internal mask; `gdalbuildvrt` then drops the mask, and the mosaic
+   loses its transparency without a word — every hole becomes an opaque
+   rectangle sitting on the basemap. Plain GTiff + DEFLATE for the
+   intermediates, which cost ~41 MB a sheet (~21 GB for the series, deletable
+   once tiled).
+4. **The pixels nothing ever shows still get averaged.** `-dstalpha` leaves the
+   area outside the neatline black at alpha 0. Invisible — until every
+   resampling step blends it into the visible edge and draws a dark outline
+   around each hole. `-wo INIT_DEST=255,255,255,0` puts white there instead.
+5. **`TILE_FORMAT=JPEG` has no alpha**, so the holes would paint black over the
+   basemap; and **`ZOOM_LEVEL_STRATEGY=UPPER` invents a zoom level** past the
+   scans' own resolution, quadrupling the archive for detail that is not in the
+   paper. WEBP and `LOWER`.
+
+Also: `gdalbuildvrt` defaults to **average** resolution, which would quietly
+downsample the 300 dpi sheets to match the 150 dpi ones. `-resolution highest`.
+
+**The one flaw left, and its price.** WEBP discards the RGB under fully
+transparent pixels, so the white from trap 4 is gone by the time `gdaladdo`
+averages a half-covered edge, and a thin dark line survives around each hole.
+`--tile-format PNG` removes it completely and costs **nine times the bytes** —
+35 GB against 3 GB, measured on the same four sheets — on every tile a reader
+pans across. Hence a flag rather than a different default.
+
+**On the browser side**, `PMTilesRasterSource` returns an empty `Uint8Array` for
+a tile the archive does not hold, and a sparse archive is mostly misses. The
+canvas renderer throws on array data outright; the WebGL one paints it black,
+hiding the street basemap underneath. `SparsePMTilesSource` in `basemapStyle.ts`
+wraps the loader and substitutes a transparent canvas — **at the archive's own
+tile size**, because a `DataTileSource` assumes every tile is the size its grid
+declares, and a 512 px blank where the grid says 256 renders the neighbouring
+tiles as black bands.
+
+**The hole over Saigon.** 25 of the 534 sheets are published as plain JPGs with
+no georeference at all, and they are the ones that matter most here — Thành phố
+Hồ Chí Minh (6330-4), Biên Hòa, Nhơn Trạch, Cần Giuộc, Cần Giờ, Gò Công, Huế,
+Đà Nẵng, Hải Phòng. They are recorded in `work/l7014/sheets.json` with
+`kind: "jpg"` so what the mosaic is missing stays legible. Their geographic
+corners are *not* unknown — the series is a regular 15′ lattice, so any sheet
+number's cell is computable exactly from its neighbours' XMP. What is missing is
+the four neatline corners in each JPG's pixel space, which is four clicks a
+sheet, twenty-five times.
+
+PCL sits behind a bot check that challenges anything claiming to be a browser
+and waves curl's own user agent through, which is why both fetches shell out to
+curl instead of dressing `urllib` up as Chrome.
+
+The predecessor of this script was `scripts/l7014_pipeline.py` (deleted in
+`27f8e79f`, with `pipeline_sheets` dropped in migration 036). It scraped corner
+coordinates from Texas Tech's Virtual Vietnam Archive, guessed every sheet's
+neatline from one hand-calibrated set of fractions, and uploaded each sheet to
+the Internet Archive for a IIIF service. None of that is needed once the PDF
+carries its own control points.
+
 ## The worker (`work/worker/vma_worker.py`)
 
 Since migration 053 the app does not run a pipeline itself: "Run OCR" writes a `pipeline_jobs` row, and a worker claims it. Everything below still runs by hand — the worker only assembles the same command lines from a job payload.
@@ -160,7 +270,7 @@ work/ocr/.venv/bin/python work/ocr/scripts/ocr.py numerals \
 
 - `detect-layout` finds **bordered** boxes only; borderless legends fall back to a manual region or the whole-image legend pass. The regions feed the (Gemini) structured `legend` pass.
 - `numerals` writes `category='legend_ref'` rows — a later join `legend_ref.text == legend_entry.number` links each map numeral to its legend entry (pure SQL, no model).
-- `legend` (Gemini) reads a numbered legend region into `{n, name, grid}` rows: `--region x,y,w,h` required; `--bilingual`, `--consensus N` (cross-check across N models and flag disagreements), `--db` → `category='legend_entry'`.
+- `legend` (Gemini) reads a sheet's numbered legend into `{n, name, grid}` rows: `--regions x,y,w,h;…` (a sheet may print more than one block — see *Two printed indexes on one sheet* below; `--region` still works as a spelling of it), or omit it with `--map-id` to take every `legend` region the layout pass found. Also `--bilingual`, `--consensus N` (cross-check across N models and flag disagreements), `--db` → `category='legend_entry'`.
 - All three accept `--local-image <path>` to skip IIIF entirely. Self-check: `work/ocr/.venv/bin/python work/ocr/scripts/local_vision.py`.
 - **Known limit:** Tesseract single-digit recall is mediocre (rotated glyphs missed). Upgrade path if recall is too low — swap `spot_numerals()` for a PaddleOCR detector in a Python 3.11 venv, keeping the same `[{text, bbox, confidence}]` shape.
 
@@ -233,6 +343,29 @@ layout pass found, so a triaged sheet gets it for free. Nothing is lost — the
 cell each line names. `scripts/oneoff/reject_printed_index_reads.mjs` rejects
 the rows already written (dry run by default).
 
+**Two printed indexes on one sheet.** The 1942 Saigon–Cho Lon sheet prints
+**two** `legend` blocks, and until Sept 2026 `ocr legend` read one of them:
+`--region` was singular and typed by hand, while `--exclude` was given both. So
+the tile pass dropped the numerals inside block two and no structured pass ever
+picked them up — erased twice. `--regions` now takes the list, and with
+`--map-id` and no flag it reads every `legend` region the layout pass found;
+`street-index` does the same over `name_list`, falling back to `legend`.
+
+Reading both raises the question the numbers alone cannot answer. Either the
+blocks **continue one sequence** — 1…99, then 100…236 — and joining a map
+numeral to its entry by number is exactly right; or they are **two independent
+tables both numbering from 1**, and that join hands one table's name to the
+other table's numerals wherever they overlap. Merging keeps the first writer, so
+nothing downstream can see it happen. The run answers it from the sheet's own
+ink and says which case it is: `legend_block_collisions` flags a number two
+blocks name **differently** (the name, not the number — the same line read twice
+agrees with itself). Rows then carry `block=<i>` in `notes`, and only on a
+multi-block sheet, so every single-block sheet reads exactly as before.
+`ambiguousNumbers` in `src/lib/features/contribute/ocr/legendIndex.ts` is the
+same check over the stored rows, and adds an `ambiguous-entry` flag to every
+numeral of a contested number in the review table. Checks:
+`work/ocr/scripts/test_legend_blocks.py` and `tests/ocr-suspects.spec.ts`.
+
 **The printed index is an answer key.** It names every number that exists
 (1–156 here) and gives each a grid cell, so numeral recall has a real
 denominator and each miss has a place to look. The tile pass placed 104/156;
@@ -302,11 +435,25 @@ work/ocr/.venv/bin/python work/ocr/scripts/ocr.py street-index \
   --regions "350,2143,798,7853;12852,775,798,9221" [--db]
 ```
 
+Omit `--regions` with `--map-id` and it reads every `name_list` region the
+layout pass found, falling back to `legend` — on the 1942 sheet the layout pass
+called both printed directories `legend`.
+
 **15 calls, 384 entries, ~$0.03** — against the sheet's own claim of 384 named
 streets. Every row carries a position, because the table states one: `--db`
 writes each street's box as the union of its two cells, `notes` recording
-`grid=C9→C10`. A run of cells is not a point and the box says so; it is also
-not the *neatline*-wide guess a name with no reference gets.
+`grid=C9→C10; cells=2/2`. A run of cells is not a point and the box says so; it
+is also not the *neatline*-wide guess a name with no reference gets.
+
+Two details that each lost streets silently. An end may itself name a run —
+`J 5,6`, the form `ocr grid`'s own docstring uses — and taken literally it
+resolved to nothing and the street was dropped from the run with no mark;
+`_expand_ref` splits it, and `cells=<got>/<want>` in the notes says when the
+grid could place only part of what the entry states. And entries merge on
+`(generic, name)`, first writer wins, which is right for one directory read in
+overlapping bands and wrong for two directories indexing two areas: a repeat
+stating **different** cells is now reported at the end of the run instead of
+being dropped as a duplicate.
 
 **~$0.03 was a guess, not a measurement, and it was low either way (2026-09-10
 correction).** `work/ocr/outputs/34d4edb2…/runs/streetindex-20260910/calls.jsonl`

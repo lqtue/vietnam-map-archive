@@ -19,7 +19,7 @@
   import { resolveMapRef } from '$lib/features/stories/shared/applyPoint';
   import { createGeoMapStores } from '$lib/map/shell/geoMapSetup';
   import type { Bbox } from '$lib/core/geo/mapBounds';
-  import { layersStore, toHistoricalRef } from '$lib/map/stores/layersStore';
+  import { layersStore, toHistoricalRef, isSheetLayer } from '$lib/map/stores/layersStore';
   import { fetchPublicStories } from '$lib/data/supabase/stories';
   import { fetchUserRole } from '$lib/data/supabase/role';
   import { createStoryPlayerStore } from '$lib/features/stories/shared/storyStore';
@@ -125,10 +125,13 @@
   $: viewMode = $layerStore.viewMode;
   $: basemapSelection = $layerStore.basemap;
   $: dualPaneActive = viewMode === 'dual';
-  $: sideAlt = $layersStore.overlays[1] ?? null;
+  // The stack can hold a raster archive as well as sheets. Everything below
+  // means "the sheet on top", so it reads past one.
+  $: sheetOverlays = $layersStore.overlays.filter(isSheetLayer);
+  $: sideAlt = sheetOverlays[1] ?? null;
   $: stackCount = $layersStore.overlays.length;
   // Numbered-legend point overlay — gated to the active (top) overlay map.
-  $: activeOverlayMapId = $layersStore.overlays[0]?.ref.mapId ?? null;
+  $: activeOverlayMapId = sheetOverlays[0]?.ref.mapId ?? null;
   $: activeOverlayMap = activeOverlayMapId
     ? (mapList.find((m) => m.id === activeOverlayMapId) ?? null)
     : null;
@@ -316,7 +319,7 @@
       return;
     }
 
-    const top = $layersStore.overlays[0];
+    const top = sheetOverlays[0];
     if (!top) return;
 
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -354,7 +357,13 @@
     layersStore.removeOverlayByMapId(e.detail.mapId);
     syncMapParam($layersStore.overlays[0]?.ref.mapId ?? null);
   }
-  function handleZoomToOverlay(e: CustomEvent<{ mapId: string }>) {
+  function handleZoomToOverlay(
+    e: CustomEvent<{ mapId: string; bounds?: [number, number, number, number] }>
+  ) {
+    if (e.detail.bounds) {
+      setViewFromBounds(e.detail.bounds);
+      return;
+    }
     const m = mapList.find((x) => x.id === e.detail.mapId);
     if (m) void zoomToMap(m, { force: true });
   }

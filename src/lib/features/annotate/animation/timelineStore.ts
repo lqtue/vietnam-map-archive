@@ -53,14 +53,18 @@ function snapshot(mapStore: MapStore): Pick<Keyframe, 'camera' | 'layers'> {
     camera: { lng: m.lng, lat: m.lat, zoom: m.zoom, rotation: m.rotation },
     layers: {
       base: structuredClone(l.base),
-      overlays: l.overlays.map((o) => ({
-        mapId: o.ref.mapId,
-        allmapsId: o.ref.allmapsId,
-        name: o.ref.name,
-        thumbnail: o.ref.thumbnail,
-        opacity: o.opacity,
-        visible: o.visible,
-      })),
+      // Sheets only. A raster archive is a basemap-like backdrop with no
+      // annotation to warp, so a keyframe neither captures nor restores it.
+      overlays: l.overlays
+        .filter((o) => o.ref.kind === 'historical')
+        .map((o) => ({
+          mapId: o.ref.mapId,
+          allmapsId: (o.ref as { allmapsId: string }).allmapsId,
+          name: o.ref.name,
+          thumbnail: (o.ref as { thumbnail?: string }).thumbnail,
+          opacity: o.opacity,
+          visible: o.visible,
+        })),
     },
   };
 }

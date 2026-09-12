@@ -26,6 +26,8 @@
     applyClipMask,
   } from './warpedOverlay';
   import { layersStore, type OverlayLayer, type LayerRef } from '$lib/map/stores/layersStore';
+  import { buildRasterOverlayLayer } from '$lib/map/basemapStyle';
+  import type TileLayer from 'ol/layer/Tile';
 
   const { map: mapWritable, layerStore } = getShellContext();
 
@@ -42,6 +44,17 @@
     string,
     { layer: WarpedMapLayer; loadedAllmapsId: string | null }
   >();
+
+  // Raster overlays (the pre-warped tile archives) keyed by layer.id. They are
+  // ordinary OL tile layers, so they are kept apart from the Allmaps ones —
+  // nothing about loading, clipping or teardown is shared.
+  const rasterInstances = new Map<string, TileLayer>();
+
+  function dropRaster(id: string) {
+    const layer = rasterInstances.get(id);
+    if (layer && olMap) olMap.removeLayer(layer);
+    rasterInstances.delete(id);
+  }
 
   function hideAllBasemaps(map: OlMap) {
     map.getLayers().forEach((layer) => {
@@ -96,12 +109,29 @@
         overlayInstances.delete(id);
       }
     }
+    for (const id of [...rasterInstances.keys()]) {
+      if (!wantedIds.has(id)) dropRaster(id);
+    }
 
     // Create or update
     const N = overlays.length;
     for (let i = 0; i < N; i++) {
       const o = overlays[i];
       const z = 10 + (N - 1 - i); // topmost (i=0) → highest z
+
+      if (o.ref.kind === 'raster') {
+        let raster = rasterInstances.get(o.id);
+        if (!raster) {
+          raster = buildRasterOverlayLayer(o.ref.key);
+          rasterInstances.set(o.id, raster);
+          olMap.addLayer(raster);
+        }
+        raster.setZIndex(z);
+        raster.setOpacity(o.opacity);
+        raster.setVisible(o.visible && !(sideBySide && i > 0));
+        continue;
+      }
+
       let inst = overlayInstances.get(o.id);
       if (!inst) {
         const layer = await createWarpedLayer(olMap, {
@@ -182,5 +212,6 @@
     }
     for (const inst of overlayInstances.values()) destroyWarpedLayer(inst.layer);
     overlayInstances.clear();
+    for (const id of [...rasterInstances.keys()]) dropRaster(id);
   });
 </script>

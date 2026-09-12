@@ -33,15 +33,101 @@
  */
 
 import VectorTileLayer from 'ol/layer/VectorTile';
-import { PMTilesVectorSource } from 'ol-pmtiles';
+import TileLayer from 'ol/layer/Tile';
+import { PMTilesVectorSource, PMTilesRasterSource } from 'ol-pmtiles';
 import Style from 'ol/style/Style';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import type { FeatureLike } from 'ol/Feature';
+import type { Loader, LoaderOptions } from 'ol/source/DataTile';
 import { isDarkTheme } from '$lib/core/utils/theme';
 
 export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260906.pmtiles';
+
+/**
+ * The AMS Series L7014 mosaic: 509 GeoPDF sheets from the Perry-Castañeda
+ * Library, each clipped to its own printed neatline and warped off the eight
+ * control points the sheet carries, tiled into one raster archive by
+ * `scripts/l7014_mosaic.py`.
+ *
+ * Like the basemap above, the key carries its build date because the R2 domain
+ * sits behind a long edge TTL — a rebuild written over the same key would
+ * strand readers on stale bytes. A new build is a new name and a new constant.
+ */
+export const L7014_PMTILES_URL = 'https://tiles.maparchive.vn/overlay/l7014-20260912.pmtiles';
+
+/**
+ * A tile the archive does not hold, as something drawable.
+ *
+ * `PMTilesRasterSource` returns an empty `Uint8Array` for a miss, and a sparse
+ * archive is nothing but misses — every tile outside a sheet, inside a hole, or
+ * past the last zoom level. The canvas renderer throws outright on array data
+ * ("Rendering array data is not yet supported"), and the WebGL one paints it
+ * black, which is worse: it hides the street basemap underneath instead of
+ * letting it through. An untouched canvas is transparent, so a miss simply
+ * shows what is below it.
+ *
+ * It has to match the archive's own tile size. A `DataTileSource` assumes every
+ * tile is the size its grid declares, and handing back a 512 px blank where the
+ * grid says 256 does not read as "nothing here" — it reads as four tiles' worth
+ * of data, and the neighbouring tiles render as black bands.
+ */
+const blankTiles = new Map<number, HTMLCanvasElement>();
+function blank(size: number): HTMLCanvasElement {
+  let tile = blankTiles.get(size);
+  if (!tile) {
+    tile = document.createElement('canvas');
+    tile.width = tile.height = size;
+    blankTiles.set(size, tile);
+  }
+  return tile;
+}
+
+/**
+ * The mosaic's tile source. The loader the parent installs is wrapped rather
+ * than replaced — the constructor calls `setLoader` itself once the PMTiles
+ * header has arrived, so overriding the method is what gets in front of it.
+ */
+class SparsePMTilesSource extends PMTilesRasterSource {
+  protected override setLoader(loader: Loader): void {
+    super.setLoader(async (z: number, x: number, y: number, options: LoaderOptions) => {
+      const data = await loader(z, x, y, options);
+      if (!(data instanceof Uint8Array)) return data;
+      const size = this.getTileGrid()?.getTileSize(z);
+      return blank(typeof size === 'number' ? size : (size?.[0] ?? 256));
+    });
+  }
+}
+
+/** The pre-warped raster archives, by the key a `RasterRef` carries. */
+const RASTER_ARCHIVES: Record<string, { url: string; attribution: string }> = {
+  l7014: {
+    url: L7014_PMTILES_URL,
+    attribution:
+      'U.S. Army Map Service, Series L7014 &mdash; <a href="https://maps.lib.utexas.edu/maps/topo/vietnam/" target="_blank">Perry-Castañeda Library Map Collection</a>, University of Texas at Austin',
+  },
+};
+
+/**
+ * One raster archive as a stackable overlay layer. `LayerRenderer` owns its
+ * z-index, opacity and visibility, the same as it does for a warped sheet.
+ *
+ * It stops at the sheets' own native resolution (~4.2 m/px, so zoom 15); past
+ * that the tiles run out and whatever is beneath shows through, which is the
+ * reader's basemap rather than a black screen.
+ */
+export function buildRasterOverlayLayer(key: string): TileLayer {
+  const archive = RASTER_ARCHIVES[key];
+  if (!archive) throw new Error(`unknown raster archive: ${key}`);
+  return new TileLayer({
+    source: new SparsePMTilesSource({
+      url: archive.url,
+      attributions: [archive.attribution],
+    }),
+    properties: { name: `raster-${key}` },
+  });
+}
 
 /**
  * Two palettes, because a canvas cannot read a CSS token: OL paints these as

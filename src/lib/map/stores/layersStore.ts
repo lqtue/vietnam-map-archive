@@ -12,6 +12,9 @@ import { writable, derived, get, type Readable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { randomId } from '$lib/core/utils/id';
 import { readJson, writeJson } from '$lib/core/utils/persistence/storage';
+import { isSheetLayer } from './overlayKind';
+
+export { isSheetLayer };
 
 export type BasemapRef = { kind: 'basemap'; key: string };
 export type HistoricalRef = {
@@ -21,7 +24,31 @@ export type HistoricalRef = {
   name?: string;
   thumbnail?: string;
 };
+/**
+ * A pre-warped raster archive on our own tile domain — the AMS L7014 mosaic.
+ *
+ * It is an overlay rather than a basemap because it is one sheet series among
+ * others, not a backdrop: the reader wants it *over* whichever basemap they
+ * chose, at an opacity they pick, and where the series has no sheet the gap
+ * should show their basemap rather than punch a hole in the page.
+ *
+ * `mapId` is synthetic and stable (`raster:<key>`). It is not a `maps.id`, and
+ * nothing will resolve it in the catalogue — it exists so that the overlay
+ * stack's identity, dedupe and removal keep working on one field for every
+ * kind of overlay.
+ */
+export type RasterRef = {
+  kind: 'raster';
+  mapId: string;
+  key: string;
+  name: string;
+  /** [minLon, minLat, maxLon, maxLat] — what "zoom to this layer" means. */
+  bounds: [number, number, number, number];
+};
+
 export type LayerRef = BasemapRef | HistoricalRef;
+/** Anything that can sit in the overlay stack. */
+export type OverlayRef = HistoricalRef | RasterRef;
 
 /** Build a HistoricalRef from a catalogue row. `annotation_url` (R2 mirror) wins over the bare Allmaps id. */
 export function toHistoricalRef(map: {
@@ -43,7 +70,7 @@ export function toHistoricalRef(map: {
 export interface OverlayLayer {
   /** Stable local id (for keyed iteration; survives reorder). */
   id: string;
-  ref: HistoricalRef; // overlays can only be historical for now
+  ref: OverlayRef;
   opacity: number; // 0..1
   visible: boolean;
 }
@@ -67,7 +94,11 @@ function load(): LayersState {
       : DEFAULT_BASE;
   const overlays: OverlayLayer[] = Array.isArray(parsed.overlays)
     ? parsed.overlays
-        .filter((o: any) => o?.ref?.kind === 'historical' && o.ref.mapId && o.ref.allmapsId)
+        .filter((o: any) =>
+          o?.ref?.kind === 'raster'
+            ? o.ref.key && o.ref.mapId
+            : o?.ref?.kind === 'historical' && o.ref.mapId && o.ref.allmapsId
+        )
         .slice(0, MAX_OVERLAYS)
         .map((o: any) => ({
           id: String(o.id ?? makeId()),
@@ -104,7 +135,7 @@ function create() {
     },
 
     /** Add as topmost overlay. Returns the new layer id; no-op if already present. */
-    addOverlay(ref: HistoricalRef, opts: { opacity?: number } = {}): string {
+    addOverlay(ref: OverlayRef, opts: { opacity?: number } = {}): string {
       let id = '';
       update((s) => {
         if (s.overlays.some((o) => o.ref.mapId === ref.mapId)) return s;
@@ -189,6 +220,21 @@ function create() {
 }
 
 export const layersStore = create();
+
+/** True when this raster archive is already in the stack. */
+export function hasRasterOverlay(key: string): boolean {
+  return get(layersStore).overlays.some((o) => o.ref.kind === 'raster' && o.ref.key === key);
+}
+
+/** Put the raster archive on the stack, or take it off. Returns its new membership. */
+export function toggleRasterOverlay(ref: RasterRef): boolean {
+  if (hasRasterOverlay(ref.key)) {
+    layersStore.removeOverlayByMapId(ref.mapId);
+    return false;
+  }
+  layersStore.addOverlay(ref);
+  return true;
+}
 export const MAX_OVERLAY_LAYERS = MAX_OVERLAYS;
 
 // ── Derived: top overlay ──
@@ -211,7 +257,13 @@ export function toggleOverlayFor(map: Parameters<typeof toHistoricalRef>[0]): bo
   return true;
 }
 
+/**
+ * The topmost *sheet* on the stack — what `?map=`, the Info rail and story
+ * playback all mean by "this sheet". A raster archive is skipped: it is a whole
+ * series, has no catalogue row, and putting it here would write a `?map=` that
+ * resolves to nothing.
+ */
 export const topOverlay: Readable<HistoricalRef | null> = derived(
   layersStore,
-  ($l) => $l.overlays[0]?.ref ?? null
+  ($l) => $l.overlays.find(isSheetLayer)?.ref ?? null
 );

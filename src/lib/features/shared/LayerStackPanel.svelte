@@ -28,7 +28,11 @@
    *  is the whole stack. Same name and meaning as `ArchiveBrowser.filterIds`. */
   export let filterIds: string[] | null = null;
 
-  const dispatch = createEventDispatcher<{ zoomToOverlay: { mapId: string } }>();
+  // A raster archive has no catalogue row to look its extent up in, so it
+  // carries its own bounds and hands them over with the request.
+  const dispatch = createEventDispatcher<{
+    zoomToOverlay: { mapId: string; bounds?: [number, number, number, number] };
+  }>();
 
   $: state = $layersStore;
   $: isSideBySide = viewMode === 'dual';
@@ -103,7 +107,11 @@
               <button
                 type="button"
                 class="lsp-name"
-                on:click={() => dispatch('zoomToOverlay', { mapId: o.ref.mapId })}
+                on:click={() =>
+                  dispatch('zoomToOverlay', {
+                    mapId: o.ref.mapId,
+                    bounds: o.ref.kind === 'raster' ? o.ref.bounds : undefined,
+                  })}
                 title="Zoom to {o.ref.name ?? 'this layer'}"
                 >{o.ref.name ?? o.ref.mapId.slice(0, 8)}</button
               >
