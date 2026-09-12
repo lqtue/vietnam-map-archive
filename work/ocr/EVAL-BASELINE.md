@@ -1316,3 +1316,121 @@ than letting the later branch win silently. Pass `--out` to keep two.
 SAM2 has not been re-run on these blocks. The 0.249 land_plot figure for
 LoRA-on-blocks is against the 4 m set, so the whole prompted arm wants
 re-measuring on this prior before any of it is compared to the Gemini runs.
+
+---
+
+## Thinking, and one call for names + numbers (2026-09-12)
+
+Three findings, all measured on two sheets with a **printed numbered legend as
+the ground truth** — the 1923 Saigon-Cholon sheet (`1bce28f0`, index 1..182) and
+the 1942 Plan de Saigon - Cho Lon (`eca788e5`, index 1..236, 235 entries read).
+No hand labelling: the sheet states every number that exists, so numeral recall
+is measurable for the price of reading the legend box.
+
+The scripts are scratchpad one-offs, not pipeline code. Nothing here is wired in.
+
+### 1. `thinking=False` is cheaper AND better on numerals
+
+1923 sheet, 42 tiles of the `main_map` crop, one call per tile:
+
+| metric | thinking on | **thinking off** |
+|---|---|---|
+| found | 116/182 | **126/182** |
+| orphans (number not in the index) | 0 | 0 |
+| cost | $0.435 | **$0.129** |
+| wall clock | 8.5 min | **3.8 min** |
+
+Thinking was **93% of billed output** on the thinking-on run: 7,009 logged output
+tokens against 104,904 billed. (Billed output is `total_tokens - input_tokens`;
+see the DEFAULT_MODEL comment in `gemini_client.py`.)
+
+Confirmed on the 1942 sheet: 218/235, 0 orphans, $0.123.
+
+This contradicts the comment at `gemini_client.py:284` — "every text path measured
+so far is better with it." Numerals were never one of those paths; they were
+Tesseract-local until this date.
+
+Two traps for anyone re-running it:
+
+- `extract_labels_sequence` **does not take the flag**. Only `extract_labels`
+  does, so the production row-sequence body path cannot be A/B'd without a code
+  change. That test is still open and is where the money is — the 1923 body
+  passes spent 44% and 56% of billed output on thinking.
+- The tile cache key does not include the flag (the module says so). An A/B in
+  one `cache_dir` silently returns the first run's answers.
+
+### 2. Gemini beats Tesseract at numerals, which inverts the local/Gemini split
+
+1923 sheet, same crop. `local_vision.spot_numerals` is psm 11 + a digit whitelist:
+
+| | local (tesseract) | gemini |
+|---|---|---|
+| rows returned | 259 | 139 |
+| found | 96/182 | **116/182** |
+| orphans | 30 (`700`..`787`, `1477`, `2005`) | **0** |
+| numbers claimed >1x | 34, worst `4x36`, `2x17`, `7x16` | 21, worst `x3` |
+
+Local returned 87% more rows for 21% fewer real hits. The rationale in
+`local_vision.py` — "geometry and digits are the parts classical tools do as
+well as a frontier VLM" — does not hold for small, faded, half-rotated numerals
+printed on ink.
+
+They are complementary, not ordered: union was 153/182, with 57 gemini-only and
+37 local-only. Local costs nothing, so a vote of the two is the obvious shape.
+
+### 3. Asking for names and numbers in ONE call reads MORE names
+
+The production row-sequence path (`seq-v1` + `sequence_frame_rules`), with
+`legend_ref` appended to the category enum and a rule overriding the prompt's
+"do NOT extract bare integers". One pass against one pass, same tiles, same
+prompt but for the numeral rule, legend boxes excluded from both counts:
+
+| sheet | names only | **combined** | delta |
+|---|---|---|---|
+| 1923 | 252 distinct | **299** | +47 |
+| 1942 | 241 distinct | **326** | +85 |
+
+Reproduced, and larger on the second sheet. No explanation offered — asking for
+small isolated marks may make the model sweep more carefully, but that is a
+story, not a measurement.
+
+The cost is numerals, also reproduced and also in one direction:
+
+| sheet | dedicated numerals | combined | delta |
+|---|---|---|---|
+| 1923 | 126/182 | 106/182 | −20 |
+| 1942 | 218/235 | 187/235 | −31 |
+
+So it is a trade, not a free win. Per sheet, at 6 row-calls + 42 tile-calls:
+
+| recipe | calls | cost | names | numbers |
+|---|---|---|---|---|
+| names alone + numerals alone | 48 | $0.35 | 241 | 218 |
+| combined alone | 6 | $0.53 | **326** | 187 |
+| **combined + dedicated numerals** | 48 | $0.65 | **326** | **218** |
+
+The third row is the recommendation: +85 names for ~$0.30, both weaknesses
+cancelling.
+
+### What is NOT established
+
+- **Against the two-pass production baseline.** Every row above is one pass.
+  Production runs the grid twice and votes (41/43 vs 39/43, above). Whether
+  combining still wins against that is untested.
+- **The 1942 sheet already held 230/235 numerals** in `ocr_extractions` from the
+  September `2026-09-11-idx` / `idx2x-20260912` runs — better than anything
+  measured here. Read what those did before changing the pipeline.
+- **Names have no ground truth on either sheet.** "Distinct folded cores" is a
+  denominator-free count, exactly the metric §2 of *Getting more out of OCR*
+  warns about. `eval.py index-agreement` against a printed street directory is
+  the honest version and was not run.
+
+### Incidental: the level0 fetcher had no tile cache
+
+Not a model finding, but it is why these runs took as long as they did. On the
+1942 combined pass the split was **12.2 min fetching tiles against 5.1 min of
+model time**, repeated in full for each of three runs over the same crop.
+`fetch_crop` (level2) has cached since the start; `fetch_crop_level0` — the path
+every mirrored sheet in the archive uses — never did. Now does, per tile, in the
+same `.tile_cache/ocr`. Measured on one 2400px crop: 29.0 s cold, 0.1 s warm.
+Covered by `iiif_tiles.py --self-check`.

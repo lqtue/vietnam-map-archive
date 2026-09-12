@@ -241,6 +241,27 @@ def fetch_crop_level0(
                 wanted += 1
                 tw, th = min(step, full_w - tx), min(step, full_h - ty)
                 url = level0_tile_url(iiif_base, tx, ty, tw, th, sf, quality)
+                at = ((tx - x0) // sf, (ty - y0) // sf)
+
+                # Per-tile disk cache. `fetch_crop` (the level2 path) has had one
+                # since the start; this path never did, so every pass over a sheet
+                # re-downloaded the same few thousand 256px tiles. Measured
+                # 2026-09-12 on the 1942 sheet: 12.2 min of tile fetching against
+                # 5.1 min of actual model time, repeated in full for each of three
+                # runs over the same crop.
+                #
+                # Only whole tiles are cached, never the assembled crop — a partial
+                # assembly is white paper to everything downstream (see the coverage
+                # check below), and one written to disk would poison every later run.
+                cpath = CACHE_DIR / f"l0_{hashlib.md5(url.encode()).hexdigest()}.jpg"
+                if cpath.exists():
+                    try:
+                        canvas.paste(Image.open(cpath).convert("RGB"), at)
+                        got += 1
+                        continue
+                    except Exception:
+                        cpath.unlink(missing_ok=True)  # truncated write, refetch
+
                 # Retry: measured 2026-09-04, some tiles of a mirrored map hang
                 # rather than 404 — 3 of 8 timed out on an idle host for map
                 # 3a446d85 while 8 of 8 succeeded for 0e02b9d9. A short timeout
@@ -251,8 +272,12 @@ def fetch_crop_level0(
                         resp = requests.get(url, timeout=10)
                         if not resp.ok:
                             break  # a real 404 will not become a 200 on retry
-                        canvas.paste(Image.open(BytesIO(resp.content)).convert("RGB"),
-                                     ((tx - x0) // sf, (ty - y0) // sf))
+                        tile_img = Image.open(BytesIO(resp.content)).convert("RGB")
+                        canvas.paste(tile_img, at)
+                        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+                        tmp = cpath.with_suffix(".part")
+                        tile_img.save(tmp, format="JPEG", quality=90)
+                        tmp.replace(cpath)  # atomic: a killed run leaves no half tile
                         got += 1
                         break
                     except Exception:
@@ -1081,6 +1106,50 @@ def _self_check() -> None:
     assert choose_scale_levels({"width": 800, "height": 628}, targets=(1024, 2048)) == []
     real = {"width": 7561, "height": 5601, "sizes": [{"width": 7561, "height": 5601}, {"width": 1890, "height": 1400}]}
     assert [l["width"] for l in choose_scale_levels(real, targets=(1024, 2048, 4096))] == [1890], "every target rounds to the 1890 level; dedup keeps one"
+
+    # ── level0 per-tile disk cache ──────────────────────────────────────────
+    # The property: a second assembly of the same region fetches nothing and
+    # returns the same pixels. Without it every pass over a sheet re-downloads
+    # the whole pyramid, which on the 1942 sheet was 12 min of the 17 min run.
+    import tempfile as _tf, shutil as _sh
+
+    _real_get, _real_cache = requests.get, CACHE_DIR
+    _calls = {"n": 0}
+
+    class _Resp:
+        ok = True
+        def __init__(self, b): self.content = b
+
+    def _fake_get(url, timeout=None):
+        _calls["n"] += 1
+        buf = BytesIO()
+        _Image.new("RGB", (256, 256), (200, 30, 30)).save(buf, format="JPEG")
+        return _Resp(buf.getvalue())
+
+    _tmp = Path(_tf.mkdtemp())
+    try:
+        globals()["CACHE_DIR"] = _tmp
+        requests.get = _fake_get
+        _INFO_CACHE["http://x/iiif/fake"] = {
+            "width": 512, "height": 512, "tile_size": 256, "scale_factors": [1],
+        }
+        a = fetch_crop_level0("http://x/iiif/fake", 0, 0, 512, 512, size=128)
+        first = _calls["n"]
+        assert first == 4, f"cold assembly should fetch 4 tiles, fetched {first}"
+        b = fetch_crop_level0("http://x/iiif/fake", 0, 0, 512, 512, size=128)
+        assert _calls["n"] == first, "warm assembly must fetch nothing"
+        assert a.tobytes() == b.tobytes(), "cached assembly must be pixel-identical"
+
+        # A truncated cache file is refetched, not pasted as garbage.
+        next(_tmp.glob("l0_*.jpg")).write_bytes(b"not a jpeg")
+        c = fetch_crop_level0("http://x/iiif/fake", 0, 0, 512, 512, size=128)
+        assert _calls["n"] == first + 1, "a corrupt tile must be refetched once"
+        assert c.tobytes() == a.tobytes()
+    finally:
+        requests.get = _real_get
+        globals()["CACHE_DIR"] = _real_cache
+        _INFO_CACHE.pop("http://x/iiif/fake", None)
+        _sh.rmtree(_tmp, ignore_errors=True)
 
     print("[ok] iiif_tiles self-check passed")
 
