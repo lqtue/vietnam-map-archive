@@ -1380,6 +1380,17 @@ They are complementary, not ordered: union was 153/182, with 57 gemini-only and
 
 ### 3. Asking for names and numbers in ONE call reads MORE names
 
+> **Correction, same day.** This is not a new finding. `seq-v1-idx` (commit
+> e8a5c2d8, 2026-09-10) already does exactly this, and does it better — the
+> September 1942 run scored **226/235 numerals and 819 distinct names** against
+> the 187/326 below. The lever it has and the experiment below does not is
+> **ground per call**: `--tile-metres 1400` sizes the grid from the sheet's own
+> m/px (97 tiles, 65 demoted to low-res and 13 skipped by `--auto-priority`)
+> instead of a flat 2400px. That is §3 of *Getting more out of OCR*, and it is
+> ranked there for a reason. The rows below are one bad recipe measured against
+> another; they are kept because the direction of both effects is real, and
+> because the 2400px arm is what a sheet gets if nobody passes `--tile-metres`.
+
 The production row-sequence path (`seq-v1` + `sequence_frame_rules`), with
 `legend_ref` appended to the category enum and a rule overriding the prompt's
 "do NOT extract bare integers". One pass against one pass, same tiles, same
@@ -1434,3 +1445,74 @@ model time**, repeated in full for each of three runs over the same crop.
 every mirrored sheet in the archive uses — never did. Now does, per tile, in the
 same `.tile_cache/ocr`. Measured on one 2400px crop: 29.0 s cold, 0.1 s warm.
 Covered by `iiif_tiles.py --self-check`.
+
+
+---
+
+## The index_key bug: `seq-v1-idx` could not return its own category (2026-09-12)
+
+`seq-v1-idx` instructs the model to return `category="index_key"`. That value was
+never added to `EXTRACTION_SCHEMA`'s category enum. Structured output is
+constrained to the enum, so the model could not answer with it: **every index
+numeral silently landed in `other`.**
+
+It had been hit before and treated as a one-off — `scripts/oneoff/rescan_1942_to_2x.mjs`
+reclassifies `other` + numeric text to `legend_ref` after the fact, with the note
+"the prompt's own `index_key` never made it into a response." The cause was never
+fixed, so it repeated on the next new sheet.
+
+Measured on the 1878 Plan de la Ville de Saigon (`dc2eda7d`), whose layout pass
+found a `name_list` region described as "Numbered reference list … (1 to 29)":
+
+| | numerals in DB as `legend_ref` | scored against the 29-entry index |
+|---|---|---|
+| before the fix | 0 | **0/29** (28 present, all `other`) |
+| after the fix | 28 | **22/29**, 1 orphan |
+
+The fix is two parts, both in this commit:
+
+- `prompt.schema_for(prompt_key)` returns `EXTRACTION_SCHEMA_IDX` — a copy with
+  `index_key` appended — for `seq-v1-idx` only. Kept separate from the shared
+  schema **on purpose**: the Gemini result cache keys on `schema_version`, and
+  `ocr.py` pins it with `assert … == SCHEMA_VERSION, "cache went cold"`.
+  Widening the shared enum would cold-cache every run of every other prompt.
+- `ocr._db_category` maps `index_key` → `legend_ref` on both write paths (batch
+  and merge). One name at the model boundary, one in the database — `legend_ref`
+  is what the column, the review UI's Numbers tab and the `legend_entry` join
+  already speak.
+
+Two things this sheet also showed, worth carrying:
+
+- **`ocr legend` only reads regions categorised `legend`.** This sheet's numbered
+  list is categorised `name_list`, so the command returned **0 entries and exited
+  0**. A sheet with an index looks identical to a sheet without one. Pointing
+  `--regions` at the box by hand returned 29.
+- A silent miscategorisation is paid for twice: the numerals were extracted and
+  billed on the first run, then extracted and billed again on the second.
+
+## `--low-thinking` on the body pass (2026-09-12)
+
+`thinking` was plumbed into `extract_labels` but **not** `extract_labels_sequence`,
+which is the production row-sequence path — so the finding above could not be
+tested where the money is. It is now a parameter there and a `--low-thinking`
+flag on `ocr batch`, default off.
+
+**The sequence path's cache key carries the flag** (`schema_version + "+lowthink"`).
+`extract_labels`' key does not, which the module's own ponytail note calls out;
+an A/B in one `cache_dir` there replays the first run's answers.
+
+1878 sheet, same crop, same recipe, one flag apart:
+
+| | thinking on | **low** |
+|---|---|---|
+| cost | $0.325 | **$0.143** |
+| wall clock | 3.7 min | **1.7 min** |
+| numerals | 22/29 | 21/29 |
+| distinct names | 121 | **124** |
+| orphans | 1 | 1 |
+| thinking share of billed output | 60% | 0% |
+
+Less than half the cost and half the time, for one numeral. Three sheets now say
+low thinking is free or better (1923 and 1942 numerals, 1878 body); none says it
+costs recall. It stays opt-in until a fourth agrees — score any run against the
+sheet's printed index before trusting it.

@@ -419,6 +419,7 @@ def extract_labels_sequence(
     schema: dict,
     user_prompt: str,
     model: str = DEFAULT_MODEL,
+    thinking: bool = True,
     log_path: Path | None = None,
     cache_dir: Path | None = None,
 ) -> dict:
@@ -459,7 +460,10 @@ def extract_labels_sequence(
 
     # Cache key covers all image bytes + the sequence prompt + model
     cache_key_bytes = b"".join(all_image_bytes)
-    sv = schema_version(schema)
+    # The thinking level changes the answer, so it has to change the key. Its
+    # absence from `extract_labels`' key is a known trap (see the ponytail note
+    # there): an A/B in one cache_dir silently replays the first run's answers.
+    sv = schema_version(schema) + ("" if thinking else "+lowthink")
     cached = cache_get(cache_key_bytes, sequence_prompt, model, cache_dir=cache_dir,
                        schema_version=sv)
     if cached is not None:
@@ -498,6 +502,15 @@ def extract_labels_sequence(
         # truncate again on the retry too.
         "max_output_tokens": 65536,
     }
+
+    # Measured 2026-09-12 on the numeral pass: thinking was 93% of billed output
+    # and turning it down was both 3.4x cheaper AND more accurate (126/182 vs
+    # 116). On the 1878 body pass it is 54% of the bill. See EVAL-BASELINE.
+    # "low", not "minimal" — this model rejects MINIMAL outright.
+    if not thinking:
+        config_kwargs["thinking_config"] = genai_types.ThinkingConfig(
+            thinking_level="low"
+        )
 
     t_start = time.monotonic()
     backoff = 2.0

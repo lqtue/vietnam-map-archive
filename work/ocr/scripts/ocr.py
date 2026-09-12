@@ -58,7 +58,7 @@ from iiif_tiles import (
     tile_grid,
 )
 from gemini_client import DEFAULT_MODEL, extract_labels, extract_labels_sequence, extract_legend, list_models
-from prompt import (DEFAULT_PROMPT, EXTRACTION_SCHEMA, PROMPTS, SYSTEM_PROMPT,
+from prompt import (DEFAULT_PROMPT, EXTRACTION_SCHEMA, PROMPTS, SYSTEM_PROMPT, schema_for,
                     sequence_frame_rules)
 from labels import LABEL_PREFIXES, fold, label_core
 from local_vision import detect_legend_boxes, spot_numerals
@@ -328,7 +328,8 @@ def cmd_run(args: argparse.Namespace) -> None:
             image=image,
             system_prompt=SYSTEM_PROMPT,
             user_prompt=prompt_text,
-            schema=EXTRACTION_SCHEMA,
+            schema=schema_for(args.prompt),
+            thinking=not getattr(args, 'low_thinking', False),
             model=model,
             log_path=log_path,
             cache_dir=OUTPUTS_CACHE_DIR,
@@ -501,6 +502,22 @@ def cmd_self_check(args: argparse.Namespace) -> None:
     assert not _has_status("4290", "429")
 
     print("[ok] ocr self-check passed")
+
+
+# `seq-v1-idx` asks the model for category="index_key" because that is what the
+# thing is called on the sheet. `legend_ref` is what the column, the review UI's
+# Numbers tab and the join to `legend_entry` all speak, and what `ocr numerals`
+# writes. One name at the model boundary, one in the database.
+#
+# Before 2026-09-12 neither end worked: `index_key` was missing from the response
+# schema, so the model could not return it, and nothing translated it if it had.
+# The 1942 rescan one-off did this by hand afterwards; the 1878 sheet lost all 28
+# of its numerals to `other` before anyone looked.
+_CATEGORY_TO_DB = {"index_key": "legend_ref"}
+
+
+def _db_category(category: str | None) -> str:
+    return _CATEGORY_TO_DB.get(category or "other", category or "other")
 
 
 def cmd_batch(args: argparse.Namespace) -> None:
@@ -940,7 +957,8 @@ def cmd_batch(args: argparse.Namespace) -> None:
                         image=row_images[0],
                         system_prompt=SYSTEM_PROMPT,
                         user_prompt=prompt_text,
-                        schema=EXTRACTION_SCHEMA,
+                        schema=schema_for(args.prompt),
+                        thinking=not getattr(args, 'low_thinking', False),
                         model=model,
                         log_path=log_path,
                         cache_dir=OUTPUTS_CACHE_DIR,
@@ -961,7 +979,8 @@ def cmd_batch(args: argparse.Namespace) -> None:
                     seq_result = _sanitize_extractions(extract_labels_sequence(
                         images=row_images,
                         system_prompt=SYSTEM_PROMPT,
-                        schema=EXTRACTION_SCHEMA,
+                        schema=schema_for(args.prompt),
+                        thinking=not getattr(args, 'low_thinking', False),
                         user_prompt=prompt_text + sequence_frame_rules(len(row_images)),
                         model=model,
                         log_path=log_path,
@@ -1017,7 +1036,8 @@ def cmd_batch(args: argparse.Namespace) -> None:
                     image=image,
                     system_prompt=SYSTEM_PROMPT,
                     user_prompt=prompt_text,
-                    schema=EXTRACTION_SCHEMA,
+                    schema=schema_for(args.prompt),
+                    thinking=not getattr(args, 'low_thinking', False),
                     model=model,
                     log_path=log_path,
                     cache_dir=OUTPUTS_CACHE_DIR,
@@ -1128,7 +1148,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
             db_rows.append({
                 "tile_x": tx, "tile_y": ty, "tile_w": tw, "tile_h": th,
                 "global_x": gx, "global_y": gy, "global_w": gw, "global_h": gh,
-                "category": e.get("category", "other"),
+                "category": _db_category(e.get("category", "other")),
                 "text": e.get("text", ""),
                 "confidence": e.get("confidence", 0),
                 "rotation_deg": e.get("rotation_deg"),
@@ -2116,7 +2136,8 @@ def cmd_stitch(args: argparse.Namespace) -> None:
                     result = extract_labels_sequence(
                         images=imgs,
                         system_prompt=SYSTEM_PROMPT,
-                        schema=EXTRACTION_SCHEMA,
+                        schema=schema_for(args.prompt),
+                        thinking=not getattr(args, 'low_thinking', False),
                         user_prompt=prompt_text + sequence_frame_rules(len(imgs)),
                         model=args.model,
                         log_path=log_path,
@@ -2159,7 +2180,8 @@ def cmd_stitch(args: argparse.Namespace) -> None:
                     image=tile_img,
                     system_prompt=SYSTEM_PROMPT,
                     user_prompt=prompt_text,
-                    schema=EXTRACTION_SCHEMA,
+                    schema=schema_for(args.prompt),
+                    thinking=not getattr(args, 'low_thinking', False),
                     model=args.model,
                     log_path=log_path,
                 )
@@ -2337,7 +2359,9 @@ def cmd_merge(args: argparse.Namespace) -> None:
             db_rows.append({
                 "tile_x": tx, "tile_y": ty, "tile_w": args.tile_size, "tile_h": args.tile_size,
                 "global_x": gx, "global_y": gy, "global_w": gw, "global_h": gh,
-                "category": e.get("category", "other"),
+                # Same translation as the batch path: merge reads the raw run
+                # files, which now carry the model's own `index_key`.
+                "category": _db_category(e.get("category", "other")),
                 "text": e.get("text", ""),
                 "confidence": e.get("confidence", 0),
                 "rotation_deg": e.get("rotation_deg"),
@@ -3880,6 +3904,11 @@ def build_parser() -> argparse.ArgumentParser:
                               'Example: \'{"390_295_2000_2000":"skip","2390_0_2000_2000":"low_res"}\'')
     p_batch.add_argument("--low-res-render", type=int, default=512,
                          help="Render size (px) for low_res tiles (default 512)")
+    p_batch.add_argument("--low-thinking", action="store_true",
+                         help="Ask for thinking_level=low. Measured 2026-09-12: 54%% of a body "
+                              "pass's bill and 93%% of a numeral pass's is thinking, and on "
+                              "numerals turning it down was cheaper AND more accurate. Score a "
+                              "run against the sheet's printed index before trusting it here.")
     p_batch.add_argument("--auto-priority", action="store_true",
                          help="Auto-fill the priority grid from a density pre-pass "
                               "(blank→skip, sparse→low_res). Ignored if --tile-overrides is given.")

@@ -16,6 +16,8 @@ raw source-image pixels — a separate, legitimate space for the local tools; th
 0–1000 path. Don't feed local_vision boxes through _to_global.
 """
 
+import copy
+
 # ── JSON schema ───────────────────────────────────────────────────────────────
 
 EXTRACTION_SCHEMA = {
@@ -761,6 +763,38 @@ scale bar.""",
     """2. category: street | hydrology | place | building | institution | legend | title | index_key | other""",
 )
 assert "index_key" in PROMPT_SEQ_V1_IDX and "bare integers inside plot" not in PROMPT_SEQ_V1_IDX
+
+
+# The schema that prompt needs. `index_key` has to be in the response schema's
+# category enum or the model cannot answer with it: structured output is
+# constrained to the enum, so every index number silently lands in `other`.
+# That is exactly what happened — the 1942 rescan one-off carries the note "the
+# prompt's own `index_key` never made it into a response" and reclassifies by
+# hand afterwards, and the 1878 sheet repeated it on 2026-09-12 (28 numerals,
+# all filed as `other`, scoring 0/29 against the sheet's own printed list).
+#
+# Kept SEPARATE from EXTRACTION_SCHEMA rather than adding the value there: the
+# Gemini result cache keys on the schema (`schema_version`), and `ocr.py` pins
+# it with `assert ... == SCHEMA_VERSION, "cache went cold"`. Widening the shared
+# enum would cold-cache every run of every other prompt to fix one of them.
+EXTRACTION_SCHEMA_IDX = copy.deepcopy(EXTRACTION_SCHEMA)
+EXTRACTION_SCHEMA_IDX["properties"]["extractions"]["items"]["properties"]["category"]["enum"].append(
+    "index_key"
+)
+
+
+def schema_for(prompt_key: str) -> dict:
+    """The response schema a prompt version needs.
+
+    Only `seq-v1-idx` asks for a category the default schema does not list.
+    Every other version gets EXTRACTION_SCHEMA unchanged, so their cached tile
+    results stay warm.
+    """
+    return EXTRACTION_SCHEMA_IDX if prompt_key == "seq-v1-idx" else EXTRACTION_SCHEMA
+
+
+assert "index_key" in schema_for("seq-v1-idx")["properties"]["extractions"]["items"]["properties"]["category"]["enum"]
+assert "index_key" not in schema_for("seq-v1")["properties"]["extractions"]["items"]["properties"]["category"]["enum"]
 
 
 # ── Prompt registry (used by ocr.py --prompt flag) ───────────────────────────
