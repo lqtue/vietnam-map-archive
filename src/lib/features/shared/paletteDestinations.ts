@@ -56,6 +56,14 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'explore view overlay layers basemap story play',
   },
   {
+    href: '/catalog/series',
+    label: 'Map series',
+    hint: 'Systematic surveys, sheet by sheet',
+    group: 'Browse',
+    role: 'anyone',
+    keywords: 'series survey sheets l7014 indochine coverage index gap',
+  },
+  {
     href: '/scan',
     label: 'Scan inspector',
     hint: 'Read one sheet at full resolution',
@@ -245,6 +253,12 @@ export function matchDestinations(list: Destination[], q: string, limit = 6): De
     else if (d.hint.toLowerCase().includes(needle)) score = 4;
     if (score >= 0) scored.push({ d, score });
   }
-  scored.sort((a, b) => a.score - b.score || a.d.label.localeCompare(b.d.label));
+  // Ties break by position in `DESTINATIONS`, which is hand-ordered from most
+  // central outwards — `sort` is stable, so this is what dropping a second
+  // comparator means. It was alphabetical, which is a rule about spelling
+  // rather than about what someone typing two letters wants: "Map series"
+  // arrived in Sept 2026 and took "map" off "Map viewer" on the strength of
+  // an s preceding a v.
+  scored.sort((a, b) => a.score - b.score);
   return scored.slice(0, limit).map((s) => s.d);
 }

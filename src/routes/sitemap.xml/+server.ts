@@ -38,7 +38,7 @@ const esc = (s: string) =>
 export const GET: RequestHandler = async ({ setHeaders }) => {
   const supabase = adminClient();
 
-  const [{ data: maps }, { data: places }] = await Promise.all([
+  const [{ data: maps }, { data: places }, { data: series }] = await Promise.all([
     supabase.from('maps').select('id, updated_at').in('status', ['public', 'featured']).limit(5000),
     // The gazetteer is a view over an aggregate, so cap it rather than let a
     // crawler's request grow with the corpus.
@@ -47,6 +47,21 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
       .select('name_key')
       .order('mentions', { ascending: false })
       .limit(5000),
+    /* `map_series` runs its own visibility gate in SQL (mig 082), which is why
+       reading it on the service client still returns only surveys a signed-out
+       reader may see. The per-sheet pages underneath are NOT listed: the series
+       page links to all 706 of them, and the ~200 for sheets nobody holds carry
+       `noindex` — a sitemap entry for those would be asking for a page we have
+       told the crawler to skip. */
+    /* `survey_sheets` is null for a survey whose index was never imported (mig
+       084's left join), and that page 404s deliberately — AMS L909 has three
+       sheets and nobody has decided what the survey contains. A sitemap entry
+       for it would be a crawl invitation to a 404. */
+    supabase
+      .from('map_series')
+      .select('key')
+      .gt('published_sheets', 0)
+      .not('survey_sheets', 'is', null),
   ]);
 
   /* The pinned origin, not the request's: a preview deploy would otherwise
@@ -64,6 +79,11 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
     ...STATIC_PATHS.map((p) => entry(withLocale(p))),
     ...posts.map((p) => entry(`/blog/${p.slug}`, p.date)),
     ...(maps ?? []).map((m) => entry(`/catalog/${m.id}`, m.updated_at as string | null)),
+    /* Listed here rather than in `LOCALIZED_PATHS`: the index is a page, but
+       its prose is not translated, and a `/vi` twin with an hreflang pair
+       would be the same document claiming to be two. */
+    entry('/catalog/series'),
+    ...(series ?? []).map((s) => entry(`/catalog/series/${encodeURIComponent(s.key as string)}`)),
     ...(places ?? [])
       .filter((p) => p.name_key)
       .map((p) => entry(`/catalog/place/${keyToSlug(p.name_key as string)}`)),
