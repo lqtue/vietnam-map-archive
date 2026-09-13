@@ -124,13 +124,68 @@ export async function loadOverlayByUrl(
 }
 
 /**
- * Loads a whole series into one WarpedMapLayer.
+ * One sheet of a series: its annotation source and where on the ground it is.
+ *
+ * Named `…Source` because `data/maps/seriesSheets.ts` already exports a
+ * `SeriesSheet`, and that one is a row of the `series_sheets` table — the
+ * survey's own denominator, what it contains whether or not the archive holds
+ * it. This is the other end: a sheet the archive *has*, reduced to the two
+ * things drawing it needs. (The same two files also each export a
+ * `fetchSeriesSheets`, against different tables with different signatures.
+ * Nothing imports both, but read the import line before assuming which.)
+ *
+ * The bbox is what makes a 627-sheet survey affordable. A `WarpedMapLayer` only
+ * ever *draws* the maps in the viewport — `loadMissingImagesInViewport` is the
+ * renderer's own rule — but it cannot know a sheet exists, let alone where, until
+ * its annotation has been fetched and parsed. So handing it the whole series
+ * up front paid 56 round trips to learn that four of them were on screen.
+ * `maps.bbox` already says where each sheet is, in the row the picker read, so
+ * the same question is answered for nothing before any of it is fetched.
+ */
+export type SeriesSheetSource = {
+  id: string;
+  source: string;
+  bbox?: [number, number, number, number];
+};
+
+/** Incremental loader state for one series layer. */
+export type SeriesLoad = { sheets: SeriesSheetSource[]; loaded: Set<string> };
+
+function intersects(
+  a: [number, number, number, number],
+  b: [number, number, number, number]
+): boolean {
+  return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
+}
+
+/** Grow an extent by `ratio` about its own centre, so a short pan draws no blank. */
+function pad(e: [number, number, number, number], ratio: number): [number, number, number, number] {
+  const dx = ((e[2] - e[0]) * (ratio - 1)) / 2;
+  const dy = ((e[3] - e[1]) * (ratio - 1)) / 2;
+  return [e[0] - dx, e[1] - dy, e[2] + dx, e[3] + dy];
+}
+
+/** How much ground beyond the viewport counts as "about to be looked at". */
+const SERIES_VIEWPORT_PAD = 1.5;
+
+/**
+ * Loads the sheets of a series that the reader can currently see, into one layer.
  *
  * A `WarpedMapLayer` is a *set* of georeferenced maps, not one of them —
- * `addGeoreferenceAnnotationByUrl` is additive — so 56 sheets cost one OL
+ * `addGeoreferenceAnnotationByUrl` is additive — so a whole series costs one OL
  * layer, one z-index and one opacity rather than 56 of each. That is the whole
  * reason a live-warped series is affordable at all; the alternative is the
  * pre-tiled mosaic L7014 needs, which is 4 GB and a pipeline.
+ *
+ * Additive is also what makes this callable again on every `moveend`: `loaded`
+ * is the set of sources already in the layer, so panning fetches only what has
+ * newly come into view and nothing is ever fetched twice. Sheets are never
+ * removed — an annotation already parsed costs nothing to keep, and the
+ * renderer draws only what is on screen regardless.
+ *
+ * A sheet with no bbox is loaded unconditionally: not knowing where something is
+ * is not a reason to hide it, and it is the one case where the old behaviour was
+ * the right one.
  *
  * Annotations are fetched together and failures counted rather than thrown: one
  * sheet whose annotation 404s should cost the reader that sheet, not the
@@ -142,16 +197,27 @@ export async function loadOverlayByUrl(
  * promise rather than as a rejection. Only a fetch that throws rejects. Both
  * have to be counted, or a half-empty series reports itself complete.
  */
-export async function loadSeriesByUrls(
+export async function loadSeriesInView(
   layer: WarpedMapLayer,
   map: Map,
-  sources: string[],
+  state: SeriesLoad,
+  view: [number, number, number, number] | null,
   opacity = 0.8
 ): Promise<{ loaded: number; failed: number }> {
-  layer.clear();
+  const box = view ? pad(view, SERIES_VIEWPORT_PAD) : null;
+  const wanted = state.sheets.filter(
+    (s) => !state.loaded.has(s.source) && (!box || !s.bbox || intersects(s.bbox, box))
+  );
+
+  (layer as any).setOpacity(opacity);
+  if (!wanted.length) return { loaded: 0, failed: 0 };
+
+  // Claimed before the await, so a second moveend inside the round trip does
+  // not ask for the same sheets again.
+  for (const s of wanted) state.loaded.add(s.source);
 
   const results = await Promise.allSettled(
-    sources.map((s) => layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s)))
+    wanted.map((s) => layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s.source)))
   );
 
   let loaded = 0;
@@ -165,9 +231,7 @@ export async function loadSeriesByUrls(
       }
   }
 
-  (layer as any).setOpacity(opacity);
   map.render();
-
   return { loaded, failed };
 }
 

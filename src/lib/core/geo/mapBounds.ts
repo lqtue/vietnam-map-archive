@@ -249,3 +249,45 @@ export async function fetchMultipleBounds(
 
   return results;
 }
+
+/**
+ * The maps that still need their bounds fetched from an annotation.
+ *
+ * The ladder in `resolveBounds` is per map; this is the same ladder asked of a
+ * whole catalogue at once, so a caller can probe the gaps and nothing else. It
+ * lives here rather than beside its first caller because two of them are in
+ * `map/` and `features/`, and a feature may not be imported from the shell.
+ *
+ * Three rungs, each of which was once missing and cost a page load:
+ *   - a map with a `bbox` is already answered — today that is the entire
+ *     corpus (103 of 103), so skipping this rung fetched 102 annotations on
+ *     every cold /explore load to learn what the catalogue row already said;
+ *   - a map with no annotation at all can only 404;
+ *   - a draft is not probed unless the caller can see drafts.
+ */
+export function unresolvedBoundsSources(
+  mapList: Array<{
+    status?: string;
+    georef_done?: boolean | null;
+    bbox?: unknown;
+    bounds?: unknown;
+    allmaps_id?: string | null;
+    annotation_url?: string | null;
+  }>,
+  includeDrafts = false
+): string[] {
+  return mapList
+    .filter(
+      (m) =>
+        (includeDrafts || m.status === 'public' || m.status === 'featured') &&
+        // A map with no annotation cannot yield a bbox, so asking for one is
+        // 61 guaranteed 404s at annotations.allmaps.org on every page load.
+        // `annotation_url` overrides the flag: having a mirror means it is
+        // georeferenced whatever `georef_done` happens to say.
+        !(m.georef_done === false && !m.annotation_url) &&
+        !looksValidBbox(m.bbox) &&
+        !looksValidBbox(m.bounds)
+    )
+    .map(annotationSourceFor)
+    .filter((src): src is string => !!src);
+}

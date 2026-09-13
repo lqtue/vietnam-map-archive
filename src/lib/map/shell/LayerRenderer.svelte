@@ -14,6 +14,7 @@
   import { get } from 'svelte/store';
   import type { WarpedMapLayer } from '@allmaps/openlayers';
   import type OlMap from 'ol/Map';
+  import { transformExtent } from 'ol/proj';
   import type { Unsubscriber } from 'svelte/store';
 
   import { getShellContext } from './context';
@@ -22,9 +23,11 @@
     createWarpedLayer,
     destroyWarpedLayer,
     loadOverlayByUrl,
-    loadSeriesByUrls,
+    loadSeriesInView,
+    clearOverlay,
     setOverlayOpacity,
     applyClipMask,
+    type SeriesLoad,
   } from './warpedOverlay';
   import { layersStore, type OverlayLayer, type LayerRef } from '$lib/map/stores/layersStore';
   import { buildRasterOverlayLayer } from '$lib/map/basemapStyle';
@@ -45,10 +48,12 @@
   let baseWarped: WarpedMapLayer | null = null;
   let baseLoadedId: string | null = null;
 
-  // Overlay layers keyed by layer.id
+  // Overlay layers keyed by layer.id. `series` is set only for a `sheets` ref:
+  // it is the sheet list plus the sources already in the layer, so a pan can
+  // top the layer up with what has newly come into view.
   const overlayInstances = new Map<
     string,
-    { layer: WarpedMapLayer; loadedAllmapsId: string | null }
+    { layer: WarpedMapLayer; loadedAllmapsId: string | null; series?: SeriesLoad }
   >();
 
   // Raster overlays (the pre-warped tile archives) keyed by layer.id. They are
@@ -69,6 +74,50 @@
     });
   }
 
+  /** The current view as `[minLon, minLat, maxLon, maxLat]`, or null before first render. */
+  function lonLatViewport(): [number, number, number, number] | null {
+    if (!olMap) return null;
+    const size = olMap.getSize();
+    if (!size || !size[0] || !size[1]) return null;
+    const extent = olMap.getView().calculateExtent(size);
+    return transformExtent(extent, 'EPSG:3857', 'EPSG:4326') as [number, number, number, number];
+  }
+
+  /**
+   * Run one sync at a time, and coalesce everything that arrives while it runs.
+   *
+   * Both subscriptions below fire synchronously on subscribe, so two passes
+   * started in the same tick and both ran to the `await createWarpedLayer`
+   * inside — which is a dynamic import of 151 kB and therefore a very long
+   * window. Neither saw the other's instance in `overlayInstances`, so both
+   * created one, and the loser stayed attached to the OL map drawing forever.
+   * Measured on the 56-sheet Indochine series restored from localStorage:
+   * every annotation fetched **four** times, 276 requests and 712 kB where 56
+   * and 180 kB were wanted, plus three orphaned WebGL layers.
+   *
+   * Only the newest state is worth applying, so `pending` is overwritten rather
+   * than queued: a slider dragged through twenty values runs the first pass and
+   * then one more with the value it ended on.
+   */
+  let syncing = false;
+  let pending: { base: LayerRef; overlays: OverlayLayer[] } | null = null;
+
+  async function queueSync(base: LayerRef, overlays: OverlayLayer[]) {
+    pending = { base, overlays };
+    if (syncing) return;
+    syncing = true;
+    try {
+      while (pending) {
+        const next = pending;
+        pending = null;
+        await syncBase(next.base);
+        await syncOverlays(next.overlays);
+      }
+    } finally {
+      syncing = false;
+    }
+  }
+
   // ── Base sync ────────────────────────────────────────────────────
   async function syncBase(ref: LayerRef) {
     if (!olMap) return;
@@ -86,6 +135,7 @@
     if (!baseWarped) {
       baseWarped = await createWarpedLayer(olMap, { zIndex: 5, name: 'allmaps-base' });
     }
+    if (!olMap) return; // torn down inside the dynamic import
     if (ref.allmapsId !== baseLoadedId) {
       baseLoadedId = ref.allmapsId;
       try {
@@ -169,15 +219,20 @@
               // explains nothing, so say it once.
               console.warn('[LayerRenderer] series resolved to no sheets', o.ref.collection);
             }
-            const { loaded, failed } = await loadSeriesByUrls(
+            // The loader is purely additive, so whatever the previous series
+            // left in this layer has to come out by hand.
+            clearOverlay(inst.layer);
+            inst.series = { sheets, loaded: new Set<string>() };
+            const { failed } = await loadSeriesInView(
               inst.layer,
               olMap,
-              sheets.map((s) => s.source),
+              inst.series,
+              lonLatViewport(),
               o.opacity
             );
             if (failed)
               console.warn(
-                `[LayerRenderer] series ${o.ref.key}: ${loaded} sheet(s) drawn, ${failed} failed`
+                `[LayerRenderer] series ${o.ref.key}: ${failed} sheet(s) failed to load`
               );
           } else {
             await loadOverlayByUrl(inst.layer, olMap, o.ref.allmapsId, o.opacity);
@@ -206,6 +261,28 @@
     }
   }
 
+  /**
+   * Fetch the annotations of any series sheet that has just come into view.
+   *
+   * A series layer starts holding only the sheets the reader could see when it
+   * was added; this is how the rest arrive. Additive by construction — a sheet
+   * already in the layer is never asked for twice — so this is safe to fire on
+   * every `moveend`, and it does nothing at all once the reader has visited the
+   * whole extent of the survey.
+   */
+  function topUpSeries() {
+    if (!olMap) return;
+    const view = lonLatViewport();
+    const overlays = get(layersStore).overlays;
+    for (const o of overlays) {
+      const inst = overlayInstances.get(o.id);
+      if (!inst?.series || !o.visible) continue;
+      loadSeriesInView(inst.layer, olMap, inst.series, view, o.opacity).catch((err) =>
+        console.warn('[LayerRenderer] series top-up failed', err)
+      );
+    }
+  }
+
   // ── Lifecycle ────────────────────────────────────────────────────
   onMount(() => {
     unsubs.push(
@@ -216,8 +293,7 @@
 
         unsubs.push(
           layersStore.subscribe(($l) => {
-            syncBase($l.base);
-            syncOverlays($l.overlays);
+            queueSync($l.base, $l.overlays);
           })
         );
 
@@ -225,11 +301,13 @@
           layerStore.subscribe(() => {
             refreshClips();
             // viewMode changes (e.g. entering/leaving side-by-side) affect overlay visibility.
-            syncOverlays(get(layersStore).overlays);
+            const $l = get(layersStore);
+            queueSync($l.base, $l.overlays);
           })
         );
 
         $map.on('moveend', refreshClips);
+        $map.on('moveend', topUpSeries);
         $map.on('change:size', refreshClips);
       })
     );

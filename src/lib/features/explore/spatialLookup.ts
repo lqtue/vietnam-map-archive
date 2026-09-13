@@ -10,7 +10,12 @@
  * hundred entries; swap for a PostGIS RPC later without changing callers.
  */
 import type { MapListItem } from '$lib/data/maps/types';
-import { annotationSourceFor, looksValidBbox, type Bbox } from '$lib/core/geo/mapBounds';
+import { looksValidBbox, unresolvedBoundsSources, type Bbox } from '$lib/core/geo/mapBounds';
+
+// The probe list moved to `core` when `useMapList` (in `map/`) needed the same
+// rungs — a shell may not import a feature. Re-exported so callers and
+// `tests/bounds-probe.spec.ts` keep their one import site.
+export { unresolvedBoundsSources };
 
 export type { Bbox };
 
@@ -72,26 +77,4 @@ export function matchMapsAtPoint(
     return (b.year ?? 0) - (a.year ?? 0);
   });
   return candidates;
-}
-
-/**
- * Returns the annotation sources (see `annotationSourceFor`) of the maps that
- * haven't had bounds resolved yet. Caller passes these to fetchMultipleBounds
- * to fill the gaps; the next call to matchMapsAtPoint picks them up.
- */
-export function unresolvedBoundsSources(mapList: MapListItem[], includeDrafts = false): string[] {
-  return mapList
-    .filter(
-      (m) =>
-        (includeDrafts || m.status === 'public' || m.status === 'featured') &&
-        // A map with no annotation cannot yield a bbox, so asking for one is
-        // 61 guaranteed 404s at annotations.allmaps.org on every page load.
-        // `annotation_url` overrides the flag: having a mirror means it is
-        // georeferenced whatever `georef_done` happens to say.
-        !(m.georef_done === false && !m.annotation_url) &&
-        !looksValidBbox(m.bbox) &&
-        !looksValidBbox(m.bounds)
-    )
-    .map(annotationSourceFor)
-    .filter((src): src is string => !!src);
 }

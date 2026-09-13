@@ -5,6 +5,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import type { MapListItem, MapSeries, MapSourceType, MapStatus } from './types';
+import { looksValidBbox } from '$lib/core/geo/mapBounds';
 
 export type DbRow = Database['public']['Tables']['maps']['Row'];
 
@@ -240,10 +241,10 @@ export async function fetchSheetEditions(
 export async function fetchSeriesSheets(
   supabase: SupabaseClient<Database>,
   collection: string
-): Promise<{ id: string; source: string }[]> {
+): Promise<{ id: string; source: string; bbox?: [number, number, number, number] }[]> {
   const { data, error } = await supabase
     .from('maps')
-    .select('id, allmaps_id, annotation_url')
+    .select('id, allmaps_id, annotation_url, bbox')
     .eq('collection', collection)
     .eq('georef_done', true)
     .order('year', { ascending: true });
@@ -253,8 +254,15 @@ export async function fetchSeriesSheets(
     return [];
   }
 
+  // `bbox` comes along because it is what lets the layer fetch the annotations
+  // of the sheets on screen and no others. It is four numbers in a row already
+  // being read; without it a 56-sheet series costs 56 round trips to draw four.
   return data
-    .map((row) => ({ id: row.id, source: row.annotation_url ?? row.allmaps_id ?? '' }))
+    .map((row) => ({
+      id: row.id,
+      source: row.annotation_url ?? row.allmaps_id ?? '',
+      bbox: looksValidBbox(row.bbox) ? (row.bbox as [number, number, number, number]) : undefined,
+    }))
     .filter((s) => s.source !== '');
 }
 

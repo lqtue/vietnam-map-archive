@@ -10,7 +10,11 @@ import { writable, type Readable, type Writable } from 'svelte/store';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { MapListItem } from '$lib/data/maps/types';
 import { fetchMaps } from '$lib/data/maps/service';
-import { annotationSourceFor, fetchMultipleBounds } from '$lib/core/geo/mapBounds';
+import {
+  annotationSourceFor,
+  fetchMultipleBounds,
+  unresolvedBoundsSources,
+} from '$lib/core/geo/mapBounds';
 
 export interface MapListController {
   /** Current list of maps. Reactive. */
@@ -27,10 +31,17 @@ export function createMapList(): MapListController {
   async function loadMaps(supabase: SupabaseClient): Promise<MapListItem[]> {
     const maps = await fetchMaps(supabase);
     store.set(maps);
-    // Background: fetch and merge bounds for georeferenced maps. Keyed by the
-    // annotation source, not allmaps_id — R2-mirrored maps carry the bounds
-    // under their annotation_url and were previously skipped entirely.
-    const sources = maps.map(annotationSourceFor).filter((s): s is string => !!s);
+    // Background: fetch and merge bounds for the maps that still need it —
+    // which today is none of them, and that is the point. This asked every
+    // georeferenced row for its annotation regardless of the `bbox` the same
+    // row was already carrying: 102 requests and ~200 kB on every cold
+    // /explore load, competing for the connection pool with the basemap's own
+    // byte ranges and the first sheet's tiles. `unresolvedBoundsSources` is
+    // the ladder /explore's own probe already climbed; the two are one list
+    // now, so a map is asked about once or not at all.
+    //
+    // Drafts are included because the list is whatever this reader could read.
+    const sources = unresolvedBoundsSources(maps, true);
     if (sources.length > 0) {
       fetchMultipleBounds(sources).then((boundsMap) => {
         store.update((cur) =>
