@@ -112,7 +112,16 @@ Four lessons, each of which cost real time today:
       `series_key,sheet_number`, so re-running them is safe and idempotent. Real
       fix: derive `held_by`/`map_id` in a view, or a trigger on `maps`.
       Exit: publishing a draft moves its cell to *held* with nobody running
-      anything.
+      anything. **Until then there is a detector**, which is not the same thing
+      and does not close this item:
+      `node --env-file=.env scripts/check_series_index.mjs` joins the index to
+      `maps` on slugged collection + `sheet_number` and exits 1 on a cell the
+      index calls a gap that a `maps` row claims, or a `map_id` pointing at a
+      row that is gone. Clean on production 2026-09-13: **0 adrift, 0 dangling
+      over 706 sheets**, 461/627 and 59/79 held — the same numbers the two
+      coverage pages print. `--self-check` needs no database and was verified
+      to fail before it was trusted. Run it after any publish, georeference or
+      re-import.
 - [ ] **Six L7014 rows have no `full/400,/` derivative** — Gò Công 6329-4, Nhơn
       Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1 and two more. All draft, so
       harmless now and **fatal on publish**. Fix:
