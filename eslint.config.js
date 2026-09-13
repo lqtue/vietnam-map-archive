@@ -112,6 +112,10 @@ export default ts.config(
       // so `npm run lint` broke for anyone who had run the suite.
       'test-results/',
       'playwright-report/',
+      // Same story for wrangler's build scratch: a deploy leaves bundled
+      // worker code in `.wrangler/tmp/`, and linting somebody's bundler output
+      // reported 334 errors in four generated files and none in ours.
+      '.wrangler/',
     ],
   }
 );
