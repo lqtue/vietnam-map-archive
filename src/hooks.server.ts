@@ -76,6 +76,15 @@ const PAGES_DEV_HOST = 'vmabeta.pages.dev';
  * reports would break the map. Tighten `connect-src`/`img-src` to the hosts
  * that actually appear, then drop the `-Report-Only` suffix here and there.
  *
+ * **Two directives must survive that tightening or /explore stops working
+ * entirely**, and neither is about hosts, which is why reading the reports for
+ * origins alone would miss them. `@allmaps/render` compiles its WebGL
+ * transformer at runtime, so `script-src` needs `'unsafe-eval'`; it warps in a
+ * worker built from a blob, so `worker-src blob:` (and `child-src blob:` for
+ * older engines) has to be there too. Both show in the console as report-only
+ * violations today — nothing is blocked, so the map works and the warnings
+ * look like noise. They are the enforcement bill, itemised in advance.
+ *
  * `X-Frame-Options: DENY` is safe: nothing in src/ renders an iframe, and the
  * Allmaps Editor is opened in a new tab rather than embedded.
  */
