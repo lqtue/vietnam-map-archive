@@ -80,8 +80,17 @@ def maps_in_collection(collection: str) -> list[dict]:
         return json.load(r)
 
 
+# The edge refuses `Python-urllib/3.x` with a 403, and `head_status` reads
+# anything that is not a 200 as "this width is missing" — so with the default
+# User-Agent this script reports every width of every sheet as absent, would
+# rewrite them all, and would then fail its own verification the same way.
+# Measured 2026-09-13: 31 of 31 L7014 and 62 of 62 Indochine sheets "missing"
+# all three widths under urllib, 6 and 0 under curl.
+UA = {"User-Agent": "vma-backfill/1.0 (+https://maparchive.vn)"}
+
+
 def head_status(url: str) -> int:
-    req = urllib.request.Request(url, method="HEAD")
+    req = urllib.request.Request(url, method="HEAD", headers=UA)
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return r.status
