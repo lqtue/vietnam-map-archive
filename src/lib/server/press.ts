@@ -46,6 +46,18 @@ export type PressResult = {
    * per decade, so only `nlv` is present.
    */
   curve?: { nlv?: PressCurve };
+  /**
+   * The Vietnamese archive's nearest items to the requested year, present only
+   * when the window itself held none of them.
+   *
+   * They are kept OUT of `items` rather than merged into it. `mergeByDate`
+   * returns the earliest `limit` of the run, so for a pre-1900 window — where
+   * Gallica has plenty and the Vietnamese press does not yet exist — anything
+   * from the 1920s sorts last and is sliced off, and the panel shows a curve
+   * promising 88 hits above a list with none of them. A separate group also
+   * lets the caller label them honestly: these are not from the years asked for.
+   */
+  nlvNearest?: PressItem[];
 };
 
 /**
@@ -72,8 +84,15 @@ const NLV_PAGE = 50;
  * whole newspaper page at ~1.4 MB.
  */
 const NLV_IMAGE = 'https://baochi-tvqg.vercel.app/api/image';
-/** Direct, the search answers in about 1.5 s; this is headroom, not the budget. */
-const NLV_DEADLINE_MS = 8_000;
+/**
+ * Measured over a working day: 3-5 s warm, and up to 20 s on a cold CGI. The
+ * page size barely moves it (o=20 and o=50 both land around 3.5 s), so this is
+ * the archive's own variance, not our request. Only the first caller of a
+ * (q, decade) pays it — the route is edge-cached for a day — so the deadline is
+ * set past the common case rather than at it; too tight and the panel silently
+ * loses the Vietnamese half and its curve, which is the more expensive failure.
+ */
+const NLV_DEADLINE_MS = 15_000;
 
 /** One parsed result row. `crop` is `x,y,w,h` on the page scan, when stated. */
 export type NlvRow = {
@@ -238,12 +257,33 @@ export function nlvSearchUrl(q: string, limit: number): string {
   return `${NLV_SEARCH}?${p}`;
 }
 
+/**
+ * Rows nearest the requested year, for when the window holds none. Pure.
+ *
+ * The curve states what the whole archive has, so a window that excludes all of
+ * it leaves the panel promising 88 hits and listing none — which reads as a bug.
+ * These are returned instead, flagged, so the reader sees the material and the
+ * fact that it is outside the years they asked for.
+ */
+export function nearestNlvRows<T extends { dateId?: string }>(
+  rows: T[],
+  year: number,
+  limit: number
+): T[] {
+  return rows
+    .map((r) => ({ r, y: nlvYear(r.dateId) }))
+    .filter((x): x is { r: T; y: number } => x.y !== null)
+    .sort((a, b) => Math.abs(a.y - year) - Math.abs(b.y - year))
+    .slice(0, limit)
+    .map((x) => x.r);
+}
+
 async function fetchNlvPress(opts: {
   q: string;
   year: number;
   windowYears: number;
   limit: number;
-}): Promise<{ items: PressItem[]; curve: PressCurve }> {
+}): Promise<{ items: PressItem[]; curve: PressCurve; nearest: PressItem[] }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), NLV_DEADLINE_MS);
   try {
@@ -256,9 +296,17 @@ async function fetchNlvPress(opts: {
     const rows = parseNlvRows(html);
     if (!rows.length && (parseNlvTotal(html) ?? 0) > 0)
       throw new Error('nlv parse failed: results stated, none parsed');
+    const inWindow = filterNlvByYear(rows, opts.year, opts.windowYears);
+    // The Vietnamese press begins around 1900, so any window before that holds
+    // none of it however much the archive has on the place.
+    const nearest =
+      inWindow.length === 0 && rows.length > 0
+        ? nearestNlvRows(rows, opts.year, opts.limit).map(nlvItem)
+        : [];
     return {
-      items: filterNlvByYear(rows, opts.year, opts.windowYears).slice(0, opts.limit).map(nlvItem),
+      items: inWindow.slice(0, opts.limit).map(nlvItem),
       curve: parseNlvCurve(html),
+      nearest,
     };
   } finally {
     clearTimeout(timer);
@@ -315,9 +363,11 @@ export async function fetchPress(opts: {
     reasons.push('gallica unavailable');
   }
   let curve: { nlv?: PressCurve } | undefined;
+  let nlvNearest: PressItem[] = [];
   if (nlv.status === 'fulfilled' && nlv.value) {
     lists.push(nlv.value.items);
     if (nlv.value.curve.total) curve = { nlv: nlv.value.curve };
+    nlvNearest = nlv.value.nearest;
   } else if (nlv.status === 'rejected') {
     console.error('[press] nlv rejected:', nlv.reason);
     reasons.push(
@@ -333,5 +383,6 @@ export async function fetchPress(opts: {
     query,
     reason: reasons.length ? reasons.join('; ') : undefined,
     curve,
+    nlvNearest: nlvNearest.length ? nlvNearest : undefined,
   };
 }

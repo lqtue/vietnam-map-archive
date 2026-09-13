@@ -9,6 +9,7 @@ import {
   filterNlvByYear,
   mergeByDate,
   nlvDate,
+  nearestNlvRows,
   nlvItem,
   nlvSearchUrl,
   oidDate,
@@ -156,6 +157,19 @@ test('the nlv year window keeps 1923 and drops 1936 at ±10 around 1923', () => 
   expect(filterNlvByYear([{ dateId: undefined }, { dateId: 'RbD' }], 1923, 10)).toEqual([]);
 });
 
+test('nearestNlvRows answers a window the archive cannot reach', () => {
+  // The Vietnamese press begins around 1900, so a window over the 1870s holds
+  // none of it however much the archive has on the place. The curve still says
+  // 88, so an empty list reads as a bug — these are what gets shown instead.
+  const rows = parseNlvRows(NLV_HTML);
+  expect(filterNlvByYear(rows, 1878, 20)).toEqual([]);
+  expect(nearestNlvRows(rows, 1878, 2).map((r) => r.dateId)).toEqual(['19230501', '19360228']);
+  // Nearest means nearest in either direction, not simply the earliest.
+  expect(nearestNlvRows(rows, 1990, 1).map((r) => r.dateId)).toEqual(['19360228']);
+  // An undated row can have no distance, so it is dropped rather than sorted first.
+  expect(nearestNlvRows([{ dateId: undefined }], 1878, 2)).toEqual([]);
+});
+
 test('nlvDate unpacks the packed date, degrading on zeroed parts', () => {
   expect(nlvDate('19360228')).toBe('1936-02-28');
   expect(nlvDate('19360200')).toBe('1936-02');
@@ -165,9 +179,9 @@ test('nlvDate unpacks the packed date, degrading on zeroed parts', () => {
 
 test('nlvItem maps a parsed row to the response shape', () => {
   const [withCrop, without] = parseNlvRows(NLV_HTML);
-  // The thumbnail is the matched phrase, not the newspaper page: ~120 kB rather
-  // than ~1.4 MB. It goes through the https proxy because the archive itself is
-  // http only and a browser blocks a mixed-content image.
+  // The thumbnail is the archive's snippet box rather than the whole newspaper
+  // page: ~120 kB rather than ~1.4 MB. It goes through the https proxy because
+  // the archive itself is http only and a browser blocks a mixed-content image.
   expect(nlvItem(withCrop)).toEqual({
     source: 'nlv',
     title: 'Sài Gòn — Chợ Khánh Hội',

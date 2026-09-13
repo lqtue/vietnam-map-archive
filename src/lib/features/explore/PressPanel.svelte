@@ -50,6 +50,12 @@
    */
   let curve: { total: number; decades: Record<string, number> } | null = null;
   let items: PressItem[] = [];
+  /**
+   * The Vietnamese archive's nearest items, when the window held none. Kept
+   * apart from `items` and labelled, because they are not from the years the
+   * heading names.
+   */
+  let nearest: PressItem[] = [];
   let loading = false;
   let reason: string | null = null;
   let loadedKey = '';
@@ -82,6 +88,7 @@
     if (key === loadedKey) return;
     loadedKey = key;
     items = [];
+    nearest = [];
     curve = null;
     reason = null;
     loading = true;
@@ -95,6 +102,7 @@
       if (loadedKey !== key) return; // a newer pick won
       items = data.items ?? [];
       curve = data.curve?.nlv ?? null;
+      nearest = data.nlvNearest ?? [];
       reason = data.reason ?? null;
     } catch {
       // The archives are third-party and sometimes slow or down. An empty
@@ -142,13 +150,20 @@
             count: String(curve?.total ?? 0),
             span,
           })}
+          {#if nearest.length}
+            <!-- The Vietnamese press starts around 1900, so an earlier window
+                 holds none of it. Showing the nearest beats an empty list under
+                 a curve that says the archive has dozens. -->
+            <span class="outside">{$t('None in these years — showing the archive’s nearest.')}</span
+            >
+          {/if}
         </figcaption>
       </figure>
     {/if}
 
     {#if loading}
       <p class="state">{$t('Searching the newspapers…')}</p>
-    {:else if items.length === 0}
+    {:else if items.length === 0 && nearest.length === 0}
       <p class="state">
         {#if reason}{$t('Nothing found — {query}.', { query: reason })}{:else}{$t(
             'Nothing found.'
@@ -166,6 +181,28 @@
                 <span class="date">{it.date ?? '—'}</span>
                 <span class="title">{it.title}</span>
                 {#if it.snippet}<span class="snippet">{it.snippet}</span>{/if}
+                <span class="src">{SOURCE_LABEL[it.source] ?? it.source}</span>
+              </div>
+            </a>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
+    {#if nearest.length}
+      <p class="group-label">
+        {$t('Nearest in the Vietnamese press')}
+      </p>
+      <ul>
+        {#each nearest as it (it.url)}
+          <li>
+            <a href={it.url} target="_blank" rel="noopener noreferrer">
+              {#if it.thumb}
+                <img src={it.thumb} alt="" loading="lazy" />
+              {/if}
+              <div class="meta">
+                <span class="date">{it.date ?? '—'}</span>
+                <span class="title">{it.title}</span>
                 <span class="src">{SOURCE_LABEL[it.source] ?? it.source}</span>
               </div>
             </a>
@@ -288,6 +325,16 @@
   figcaption {
     margin-top: 4px;
     font-size: var(--text-xs);
+    color: var(--color-gray-500);
+  }
+  .outside {
+    display: block;
+    color: var(--color-text);
+  }
+  .group-label {
+    margin: var(--space-3) 0 var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: var(--font-bold);
     color: var(--color-gray-500);
   }
   ul {

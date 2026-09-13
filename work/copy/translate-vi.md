@@ -377,6 +377,8 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Searching the newspapers… | Đang tìm kiếm bài báo… |
 | Nothing found — {query}. | Không tìm thấy kết quả cho — {query}. |
 | {count} in the Vietnamese press, {span} | {count} lần trên báo chí tiếng Việt, {span} |
+| None in these years — showing the archive’s nearest. | Không có trong khoảng năm này — hiển thị kết quả gần nhất của kho lưu trữ. |
+| Nearest in the Vietnamese press | Gần nhất trên báo chí tiếng Việt |
 
 ## 19 · Walking trip
 
