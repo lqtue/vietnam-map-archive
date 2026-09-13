@@ -110,7 +110,7 @@
                 on:click={() =>
                   dispatch('zoomToOverlay', {
                     mapId: o.ref.mapId,
-                    bounds: o.ref.kind === 'raster' ? o.ref.bounds : undefined,
+                    bounds: o.ref.kind === 'historical' ? undefined : o.ref.bounds,
                   })}
                 title="Zoom to {o.ref.name ?? 'this layer'}"
                 >{o.ref.name ?? o.ref.mapId.slice(0, 8)}</button

@@ -22,14 +22,20 @@
     createWarpedLayer,
     destroyWarpedLayer,
     loadOverlayByUrl,
+    loadSeriesByUrls,
     setOverlayOpacity,
     applyClipMask,
   } from './warpedOverlay';
   import { layersStore, type OverlayLayer, type LayerRef } from '$lib/map/stores/layersStore';
   import { buildRasterOverlayLayer } from '$lib/map/basemapStyle';
+  import { fetchSeriesSheets } from '$lib/data/maps/service';
+  import { getSupabaseContext } from '$lib/data/supabase/context';
   import type TileLayer from 'ol/layer/Tile';
 
   const { map: mapWritable, layerStore } = getShellContext();
+  // Set by the root layout, so it is there for every MapShell in the app. A
+  // series row is the only thing here that needs the database at all.
+  const { supabase } = getSupabaseContext();
 
   let olMap: OlMap | null = null;
   let initialized = false;
@@ -146,10 +152,36 @@
         } catch {}
       }
 
-      if (inst.loadedAllmapsId !== o.ref.allmapsId) {
-        inst.loadedAllmapsId = o.ref.allmapsId;
+      // A series and a single sheet are the same layer with a different number
+      // of annotations in it. `loadedAllmapsId` is the sentinel for "what is in
+      // this layer already" either way — the collection name stands in for it,
+      // so a series reloads only when the row itself changes.
+      const wanted = o.ref.kind === 'sheets' ? `sheets:${o.ref.collection}` : o.ref.allmapsId;
+
+      if (inst.loadedAllmapsId !== wanted) {
+        inst.loadedAllmapsId = wanted;
         try {
-          await loadOverlayByUrl(inst.layer, olMap, o.ref.allmapsId, o.opacity);
+          if (o.ref.kind === 'sheets') {
+            const sheets = await fetchSeriesSheets(supabase, o.ref.collection);
+            if (!sheets.length) {
+              // Every sheet in the series is a draft this reader may not read,
+              // or the collection name has drifted. Either way an empty layer
+              // explains nothing, so say it once.
+              console.warn('[LayerRenderer] series resolved to no sheets', o.ref.collection);
+            }
+            const { loaded, failed } = await loadSeriesByUrls(
+              inst.layer,
+              olMap,
+              sheets.map((s) => s.source),
+              o.opacity
+            );
+            if (failed)
+              console.warn(
+                `[LayerRenderer] series ${o.ref.key}: ${loaded} sheet(s) drawn, ${failed} failed`
+              );
+          } else {
+            await loadOverlayByUrl(inst.layer, olMap, o.ref.allmapsId, o.opacity);
+          }
         } catch (err) {
           console.warn('[LayerRenderer] overlay load failed', o, err);
         }

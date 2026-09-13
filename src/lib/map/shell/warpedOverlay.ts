@@ -123,6 +123,54 @@ export async function loadOverlayByUrl(
   map.render();
 }
 
+/**
+ * Loads a whole series into one WarpedMapLayer.
+ *
+ * A `WarpedMapLayer` is a *set* of georeferenced maps, not one of them —
+ * `addGeoreferenceAnnotationByUrl` is additive — so 56 sheets cost one OL
+ * layer, one z-index and one opacity rather than 56 of each. That is the whole
+ * reason a live-warped series is affordable at all; the alternative is the
+ * pre-tiled mosaic L7014 needs, which is 4 GB and a pipeline.
+ *
+ * Annotations are fetched together and failures counted rather than thrown: one
+ * sheet whose annotation 404s should cost the reader that sheet, not the
+ * series. The count comes back so the caller can say so.
+ *
+ * Counting them is less obvious than it looks. `addGeoreferenceAnnotationByUrl`
+ * resolves with `(string | Error)[]` — one entry per georeferenced map in the
+ * annotation — so a sheet that fails to parse comes back *inside* a fulfilled
+ * promise rather than as a rejection. Only a fetch that throws rejects. Both
+ * have to be counted, or a half-empty series reports itself complete.
+ */
+export async function loadSeriesByUrls(
+  layer: WarpedMapLayer,
+  map: Map,
+  sources: string[],
+  opacity = 0.8
+): Promise<{ loaded: number; failed: number }> {
+  layer.clear();
+
+  const results = await Promise.allSettled(
+    sources.map((s) => layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s)))
+  );
+
+  let loaded = 0;
+  let failed = 0;
+  for (const r of results) {
+    if (r.status === 'rejected') failed += 1;
+    else
+      for (const entry of r.value) {
+        if (entry instanceof Error) failed += 1;
+        else loaded += 1;
+      }
+  }
+
+  (layer as any).setOpacity(opacity);
+  map.render();
+
+  return { loaded, failed };
+}
+
 // ── Opacity ──────────────────────────────────────────────────────
 
 /**

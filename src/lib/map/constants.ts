@@ -13,7 +13,7 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import type BaseLayer from 'ol/layer/Base';
 import { buildPmtilesBasemapLayer, buildPmtilesRegionLayer } from './basemapStyle';
-import type { RasterRef } from '$lib/map/stores/layersStore';
+import type { RasterRef, SheetsRef } from '$lib/map/stores/layersStore';
 
 export const DEFAULT_ANNOTATION_COLOR = INK.blue;
 
@@ -38,6 +38,28 @@ export const L7014_OVERLAY: RasterRef = {
   key: 'l7014',
   name: 'AMS 1:50,000 (1963–89)',
   bounds: [102.2499, 8.4999, 109.5001, 23.25],
+};
+
+/**
+ * The Service géographique de l'Indochine's 1:25,000 survey of Tonkin and
+ * Thanh Hóa, as one stack row.
+ *
+ * Unlike L7014 there is no mosaic behind this: the sheets are ordinary
+ * catalogue rows, warped live by Allmaps from the control points
+ * `scripts/tonkin_georef.py` read off each sheet's own printed index. One
+ * `WarpedMapLayer` carries all of them, so the cost of the whole series is one
+ * layer and one annotation fetch per sheet — which is why this can be a
+ * `SheetsRef` rather than another 4 GB archive.
+ *
+ * The bounds are the union of the 56 georeferenced sheets' `bbox` columns.
+ */
+export const TONKIN_OVERLAY: SheetsRef = {
+  kind: 'sheets',
+  mapId: 'sheets:tonkin-25k',
+  key: 'tonkin-25k',
+  collection: 'Indochine 1:25,000 — Tonkin & Thanh Hóa',
+  name: 'Indochine 1:25,000 (1903–27)',
+  bounds: [105.2972, 19.8, 106.9172, 21.4875],
 };
 
 export interface BasemapDefinition {

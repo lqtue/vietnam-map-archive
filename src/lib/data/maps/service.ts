@@ -217,3 +217,36 @@ export async function fetchSheetEditions(
     };
   });
 }
+
+/**
+ * Every georeferenced sheet in one series, as annotation sources.
+ *
+ * The `SheetsRef` on the overlay stack stores only the collection name, so this
+ * is what turns that into something drawable. `annotation_url` (the R2 mirror)
+ * wins over the bare Allmaps id, the same precedence `toHistoricalRef` uses.
+ *
+ * RLS decides what comes back. A series still in `draft` resolves to its sheets
+ * for a signed-in reader and to nothing at all for an anonymous one — which
+ * draws an empty layer rather than an error, so the caller is the one that has
+ * to decide whether to offer the row.
+ */
+export async function fetchSeriesSheets(
+  supabase: SupabaseClient<Database>,
+  collection: string
+): Promise<{ id: string; source: string }[]> {
+  const { data, error } = await supabase
+    .from('maps')
+    .select('id, allmaps_id, annotation_url')
+    .eq('collection', collection)
+    .eq('georef_done', true)
+    .order('year', { ascending: true });
+
+  if (error || !data) {
+    console.error('fetchSeriesSheets:', error);
+    return [];
+  }
+
+  return data
+    .map((row) => ({ id: row.id, source: row.annotation_url ?? row.allmaps_id ?? '' }))
+    .filter((s) => s.source !== '');
+}

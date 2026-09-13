@@ -13,8 +13,8 @@
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
-  import { layersStore, toggleRasterOverlay } from '$lib/map/stores/layersStore';
-  import { L7014_OVERLAY } from '$lib/map/constants';
+  import { layersStore, toggleSeriesOverlay } from '$lib/map/stores/layersStore';
+  import { L7014_OVERLAY, TONKIN_OVERLAY } from '$lib/map/constants';
 
   export let matches: ResolvedMap[] = [];
   // Admins/mods may browse draft maps in the viewer; everyone else is
@@ -60,10 +60,17 @@
   // rather than among them because they are not catalogue entries: no record
   // page, no year to sort by, no single scan behind them. Same gesture though
   // — tap to put it on the map, tap again to take it off.
-  const SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000' }];
+  // `draft: true` means the sheets behind the row are not published yet, so an
+  // anonymous reader would resolve it to nothing and get an empty layer. Drop
+  // the flag when the series is published — it is the only thing gating it.
+  const SERIES = [
+    { ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000', draft: false },
+    { ref: TONKIN_OVERLAY, sheets: 56, note: '1903–27 · Tonkin & Thanh Hóa', draft: true },
+  ];
+  $: visibleSeries = SERIES.filter((s) => !s.draft || canSeeDrafts);
   $: seriesOn = new Set(
     $layersStore.overlays
-      .filter((o) => o.ref.kind === 'raster')
+      .filter((o) => o.ref.kind !== 'historical')
       .map((o) => (o.ref as { key: string }).key)
   );
 </script>
@@ -83,14 +90,14 @@
   </div>
 
   <ul class="series">
-    {#each SERIES as s (s.ref.key)}
+    {#each visibleSeries as s (s.ref.key)}
       <li>
         <button
           type="button"
           class="series-row"
           class:is-on={seriesOn.has(s.ref.key)}
           aria-pressed={seriesOn.has(s.ref.key)}
-          on:click={() => toggleRasterOverlay(s.ref)}
+          on:click={() => toggleSeriesOverlay(s.ref)}
         >
           <span class="series-mark" aria-hidden="true">{seriesOn.has(s.ref.key) ? '✓' : '+'}</span>
           <span class="series-text">

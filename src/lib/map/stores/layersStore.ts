@@ -46,9 +46,35 @@ export type RasterRef = {
   bounds: [number, number, number, number];
 };
 
+/**
+ * A whole sheet series as one stack row — the sheets warped live by Allmaps,
+ * rather than a mosaic someone tiled in advance.
+ *
+ * The difference from `RasterRef` is only where the pixels come from: that one
+ * is a raster archive on our tile domain, this one is N `maps` rows that share
+ * a `collection`. Both are one row, one opacity, one visibility toggle, and
+ * neither is a catalogue entry — hence the same synthetic `mapId` trick.
+ *
+ * The sheet list is deliberately **not** stored here. It is resolved from the
+ * collection at render time, so the row survives in localStorage as four short
+ * fields and a series that gains a sheet does not need the reader to re-add it.
+ */
+export type SheetsRef = {
+  kind: 'sheets';
+  mapId: string;
+  key: string;
+  name: string;
+  /** `maps.collection` — the series is whatever carries this string. */
+  collection: string;
+  /** [minLon, minLat, maxLon, maxLat] — what "zoom to this layer" means. */
+  bounds: [number, number, number, number];
+};
+
 export type LayerRef = BasemapRef | HistoricalRef;
 /** Anything that can sit in the overlay stack. */
-export type OverlayRef = HistoricalRef | RasterRef;
+export type OverlayRef = HistoricalRef | RasterRef | SheetsRef;
+/** A stack row that is a series rather than one catalogued sheet. */
+export type SeriesRef = RasterRef | SheetsRef;
 
 /** Build a HistoricalRef from a catalogue row. `annotation_url` (R2 mirror) wins over the bare Allmaps id. */
 export function toHistoricalRef(map: {
@@ -97,7 +123,9 @@ function load(): LayersState {
         .filter((o: any) =>
           o?.ref?.kind === 'raster'
             ? o.ref.key && o.ref.mapId
-            : o?.ref?.kind === 'historical' && o.ref.mapId && o.ref.allmapsId
+            : o?.ref?.kind === 'sheets'
+              ? o.ref.key && o.ref.mapId && o.ref.collection
+              : o?.ref?.kind === 'historical' && o.ref.mapId && o.ref.allmapsId
         )
         .slice(0, MAX_OVERLAYS)
         .map((o: any) => ({
@@ -221,14 +249,14 @@ function create() {
 
 export const layersStore = create();
 
-/** True when this raster archive is already in the stack. */
-export function hasRasterOverlay(key: string): boolean {
-  return get(layersStore).overlays.some((o) => o.ref.kind === 'raster' && o.ref.key === key);
+/** True when this series — raster archive or live-warped sheets — is already in the stack. */
+export function hasSeriesOverlay(key: string): boolean {
+  return get(layersStore).overlays.some((o) => o.ref.kind !== 'historical' && o.ref.key === key);
 }
 
-/** Put the raster archive on the stack, or take it off. Returns its new membership. */
-export function toggleRasterOverlay(ref: RasterRef): boolean {
-  if (hasRasterOverlay(ref.key)) {
+/** Put the series on the stack, or take it off. Returns its new membership. */
+export function toggleSeriesOverlay(ref: SeriesRef): boolean {
+  if (hasSeriesOverlay(ref.key)) {
     layersStore.removeOverlayByMapId(ref.mapId);
     return false;
   }
