@@ -644,8 +644,11 @@ def cmd_batch(args: argparse.Namespace) -> None:
             if fit.mean > COARSE_SCAN_METRES_PER_PX:
                 print(f"  ⚠ Coarse scan: {fit.mean:.2f} m in every source pixel. The frame is "
                       "normalised to a fixed patch budget before the model sees it, so no "
-                      "tile size or render size recovers ink the scan never captured — "
-                      "expect low recall and look for a better source before spending more.")
+                      "tile size or render size recovers ink the scan never captured. "
+                      "Calibrated on city plans, where a name spans tens of metres; a "
+                      "small-scale sheet spends hundreds per name and reads fine well past "
+                      "this line (An Thi, 4.26 m/px, 272 names in one pass). A flag to read "
+                      "beside the map's scale, not a reason to stop.")
 
     target_calls = getattr(args, "target_calls", None)
     if target_calls and sized_from_scale:
@@ -2893,7 +2896,8 @@ def cmd_scout(args: argparse.Namespace) -> None:
                   f"{len(tiles) - n_skip - n_low} full")
             if fit.mean > COARSE_SCAN_METRES_PER_PX:
                 print(f"  ⚠ Coarse scan ({fit.mean:.2f} m per source pixel): no tile size "
-                      "recovers ink the scan never captured. Look for a better source.")
+                      "recovers ink the scan never captured. Calibrated on city plans — a "
+                      "small-scale sheet can read well past this line.")
 
     # Save results
     map_label = args.map_id or "unknown"
@@ -3034,7 +3038,8 @@ def cmd_scale(args: argparse.Namespace) -> None:
             coarse.append(f"{label} ({fit.mean:.2f} m/px)")
 
     if coarse:
-        print(f"\nCoarse scans — a better source beats a bigger budget ({len(coarse)}):")
+        print(f"\nCoarse scans — worth a look at the scan, but the line is calibrated on "
+              f"city plans and a small-scale sheet can read well past it ({len(coarse)}):")
         for c in coarse:
             print(f"  {c}")
 

@@ -107,6 +107,20 @@ ANISOTROPY_LIMIT = 0.05
 # 1959 at 0.999 m/px reads 0.712 of its printed names in one pass, 1968 at
 # 1.273 reads 0.327. Two points, so treat it as a flag to raise at triage —
 # "this needs a better scan" — not as a refusal.
+#
+# **Both of those points are large-scale city plans (1:4,000–1:12,500), and the
+# threshold does not transfer to a small-scale sheet.** What sets recall is
+# ground per printed *name*, not ground per pixel, and those move in opposite
+# directions with scale: a street name on a city plan spans tens of metres, a
+# village name on a 1:25,000 topographic sheet spans hundreds, so the same m/px
+# leaves the second one several times taller in pixels. Measured 2026-09-13 on
+# An Thi (Indochine 1:25,000, 5089×3615, 4.26 m/px — nearly 4× this line):
+# **272 unique extractions in a single pass**, 222 of them places, 216 carrying
+# correct Vietnamese diacritics. That is between the 1882 cadastral's 499 over
+# two passes and the 1968 sheet's 392. The flag fires on 95 of 109 georeferenced
+# sheets, so it separates almost nothing on its own; read it next to the map's
+# scale, and prefer `TileFit.metres_per_tile` against a ground target, which is
+# the number the tiling experiment actually moved recall with.
 COARSE_SCAN_METRES_PER_PX = 1.1
 
 
