@@ -4,7 +4,7 @@ import {
   sheetStatus,
   tally,
   cellCamera,
-  fetchSeriesSheets,
+  fetchSeriesSheetIndex,
   type SeriesSheet,
 } from '../src/lib/data/maps/seriesSheets';
 
@@ -77,7 +77,7 @@ test('a degenerate cell asks for a zoom a basemap has, not Infinity', () => {
   expect(cam.zoom).toBe(16);
 });
 
-/** Enough of PostgREST's builder for `fetchSeriesSheets`, counting its pages. */
+/** Enough of PostgREST's builder for `fetchSeriesSheetIndex`, counting its pages. */
 function stubDb(total: number, ranges: [number, number][]) {
   const q = {
     select: () => q,
@@ -99,7 +99,7 @@ test('a survey longer than one page is read whole', () => {
   // L7014 is 627 today; Cochinchine's three series are 826 and the cap is the
   // kind of ceiling that is crossed by ingesting data, not by editing code.
   const ranges: [number, number][] = [];
-  return fetchSeriesSheets(stubDb(1500, ranges), 's').then((sheets) => {
+  return fetchSeriesSheetIndex(stubDb(1500, ranges), 's').then((sheets) => {
     expect(sheets).toHaveLength(1500);
     expect(ranges).toEqual([
       [0, 999],
@@ -112,7 +112,7 @@ test('a survey that exactly fills a page still stops', () => {
   // The off-by-one: a final page of exactly `page` rows is indistinguishable
   // from a full one, so the loop must ask once more and get nothing.
   const ranges: [number, number][] = [];
-  return fetchSeriesSheets(stubDb(1000, ranges), 's').then((sheets) => {
+  return fetchSeriesSheetIndex(stubDb(1000, ranges), 's').then((sheets) => {
     expect(sheets).toHaveLength(1000);
     expect(ranges).toHaveLength(2);
   });
@@ -120,7 +120,7 @@ test('a survey that exactly fills a page still stops', () => {
 
 test('sheets come back in the order a person reads them', () => {
   const ranges: [number, number][] = [];
-  return fetchSeriesSheets(stubDb(12, ranges), 's').then((sheets) => {
+  return fetchSeriesSheetIndex(stubDb(12, ranges), 's').then((sheets) => {
     // Plain string order puts "10" before "9"; `numeric` collation is what the
     // sheet-number column needs, and 6329-4 must precede 6330-1.
     expect(sheets.map((s) => s.sheet_number).slice(-4)).toEqual(['8', '9', '10', '11']);

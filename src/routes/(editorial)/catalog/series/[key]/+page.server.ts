@@ -21,7 +21,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
-import { fetchSeriesSheets, tally } from '$lib/data/maps/seriesSheets';
+import { fetchSeriesSheetIndex, tally } from '$lib/data/maps/seriesSheets';
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = decodeURIComponent(params.key);
@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   if (!series || !series.published_sheets) throw error(404, 'No such series');
 
-  const sheets = await fetchSeriesSheets(supabase, key);
+  const sheets = await fetchSeriesSheetIndex(supabase, key);
   if (!sheets.length) throw error(404, 'That series has no index');
 
   /**

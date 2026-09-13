@@ -130,9 +130,11 @@ export async function loadOverlayByUrl(
  * `SeriesSheet`, and that one is a row of the `series_sheets` table — the
  * survey's own denominator, what it contains whether or not the archive holds
  * it. This is the other end: a sheet the archive *has*, reduced to the two
- * things drawing it needs. (The same two files also each export a
- * `fetchSeriesSheets`, against different tables with different signatures.
- * Nothing imports both, but read the import line before assuming which.)
+ * things drawing it needs. (The two files also each had a `fetchSeriesSheets`,
+ * against different tables with different signatures; the index reader is
+ * `fetchSeriesSheetIndex` now, and this one kept the name. Nothing imported
+ * both, but the trap is worth a sentence even after the collision is gone —
+ * read the import line before assuming which side of the survey you have.)
  *
  * The bbox is what makes a 627-sheet survey affordable. A `WarpedMapLayer` only
  * ever *draws* the maps in the viewport — `loadMissingImagesInViewport` is the

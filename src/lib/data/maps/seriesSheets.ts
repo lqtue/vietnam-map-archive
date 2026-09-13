@@ -109,7 +109,7 @@ function decorate(row: SeriesSheet): SeriesSheetView {
  * nothing about it, and L7014 alone is 627 today with the Cochinchine surveys
  * in the scout queue running to 826.
  */
-export async function fetchSeriesSheets(
+export async function fetchSeriesSheetIndex(
   db: SupabaseClient,
   seriesKey: string
 ): Promise<SeriesSheetView[]> {
