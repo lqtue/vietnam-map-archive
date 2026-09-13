@@ -135,3 +135,85 @@ export async function fetchMapRow(
   }
   return data as DbRow;
 }
+
+/** One printing of a sheet: what tells two rows of the same cell apart. */
+export interface SheetEdition {
+  id: string;
+  name: string;
+  year?: number;
+  status: MapStatus;
+  /** As printed on the sheet — "5-DMA", "2-AMS (29 ETB)", "3". */
+  edition?: string;
+  /** When the paper says it was printed, which is not always its content date. */
+  printing?: string;
+  /** Both carried so the row can go straight onto the layer stack. */
+  allmaps_id?: string;
+  annotation_url?: string;
+  thumbnail?: string;
+  /**
+   * Whether the sheet can actually be drawn. Not `allmaps_id != null`: the
+   * bulk uploader derives that id from the IIIF URL for every self-hosted
+   * scan, georeferenced or not, so the loose test calls a sheet warped the
+   * moment it is tiled and the layer draws nothing.
+   */
+  georef_done: boolean;
+}
+
+/**
+ * The other printings of the same sheet.
+ *
+ * A sheet is `(series, sheet_number)` and an edition is a row, so the grouping
+ * key is the one `extra_metadata` already carries — no join table, and the
+ * dropped `pipeline_sheets` (mig 012, `UNIQUE (series, sheet_number)`) is the
+ * reminder of why not: it asserted one scan per cell, which the corpus does
+ * not honour. Cell 6330-4 alone is SÀI GÒN 1965 and THÀNH PHỐ HỒ CHÍ MINH 1984.
+ *
+ * Two round trips because PostgREST has no subquery: the row's own key, then
+ * its siblings. RLS decides what comes back, which is the whole visibility
+ * story — anonymous readers see published editions, a signed-in one also sees
+ * drafts (mig 063). Nothing here filters by status.
+ */
+export async function fetchSheetEditions(
+  supabase: SupabaseClient<Database>,
+  mapId: string
+): Promise<SheetEdition[]> {
+  const { data: self, error: selfError } = await supabase
+    .from('maps')
+    .select('extra_metadata')
+    .eq('id', mapId)
+    .single();
+  if (selfError || !self) return [];
+
+  const meta = (self.extra_metadata ?? {}) as Record<string, unknown>;
+  const sheet = typeof meta.sheet_number === 'string' ? meta.sheet_number : null;
+  const series = typeof meta.series === 'string' ? meta.series : null;
+  if (!sheet || !series) return [];
+
+  const { data, error } = await supabase
+    .from('maps')
+    .select('id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,georef_done')
+    .eq('extra_metadata->>sheet_number', sheet)
+    .eq('extra_metadata->>series', series)
+    .neq('id', mapId)
+    .order('year', { ascending: true });
+  if (error || !data) {
+    console.error('fetchSheetEditions:', error);
+    return [];
+  }
+
+  return data.map((row) => {
+    const rowMeta = (row.extra_metadata ?? {}) as Record<string, unknown>;
+    return {
+      id: row.id,
+      name: row.name,
+      year: row.year ?? undefined,
+      status: (row.status ?? 'draft') as MapStatus,
+      edition: typeof rowMeta.edition === 'string' ? rowMeta.edition : undefined,
+      printing: typeof rowMeta.printing === 'string' ? rowMeta.printing : undefined,
+      allmaps_id: row.allmaps_id ?? undefined,
+      annotation_url: row.annotation_url ?? undefined,
+      thumbnail: row.thumbnail ?? undefined,
+      georef_done: row.georef_done ?? false,
+    };
+  });
+}

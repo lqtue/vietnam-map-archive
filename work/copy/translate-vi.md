@@ -132,6 +132,8 @@ keyed on its own rather than as part of a sentence.
 | Search the archive | Tìm kiếm kho lưu trữ |
 | Search maps, places and pages… | Tìm kiếm bản đồ, địa điểm và trang… |
 | Search results | Kết quả tìm kiếm |
+| Searching… | Đang tìm… |
+| Type to search. | Nhập để tìm kiếm. |
 | On the map | Trên bản đồ |
 | Place | Địa điểm |
 | move | di chuyển |
@@ -358,6 +360,11 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | This sheet | Bản đồ này |
 | Add a map layer to see its details. | Thêm lớp bản đồ để xem chi tiết. |
 | Holding library | Thư viện lưu giữ |
+| Other editions of this sheet | Các lần xuất bản khác của mảnh này |
+| draft | bản nháp |
+| On map | Trên bản đồ |
+| Compare | So sánh |
+| not georeferenced | chưa định vị |
 | Add a map layer to read its legend. | Thêm lớp bản đồ để xem chú giải. |
 | Reading the legend… | Đang đọc chú giải… |
 | This sheet has no numbered legend. | Bản đồ này không có chú giải đánh số. |

@@ -33,6 +33,7 @@
   import LayerControlsPanel from '$lib/features/shared/LayerControlsPanel.svelte';
   import SidebarCard from '$lib/features/shared/SidebarCard.svelte';
   import TopSheetActions from '$lib/features/shared/TopSheetActions.svelte';
+  import SheetEditions from '$lib/features/shared/SheetEditions.svelte';
   import PlaceSearchBar from '$lib/features/shared/PlaceSearchBar.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import { LABEL_ZOOM } from '$lib/features/explore/exploreUrl';
@@ -220,6 +221,7 @@
           {#if map.dc_description}
             <p class="if-desc">{map.dc_description}</p>
           {/if}
+          <SheetEditions {mapId} />
           {#if map.source_url}
             <div class="if-links">
               <!-- No catalogue-page link here: that is TopSheetActions' Share,
