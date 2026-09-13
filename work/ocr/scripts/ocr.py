@@ -2833,7 +2833,6 @@ def cmd_scout(args: argparse.Namespace) -> None:
             metres_per_pixel,
             tile_size_for,
         )
-        from supabase_client import save_triage_grid
 
         ann = annotation_for_map(args.map_id)
         fit = metres_per_pixel(ann) if ann else None
@@ -2895,17 +2894,6 @@ def cmd_scout(args: argparse.Namespace) -> None:
             if fit.mean > COARSE_SCAN_METRES_PER_PX:
                 print(f"  ⚠ Coarse scan ({fit.mean:.2f} m per source pixel): no tile size "
                       "recovers ink the scan never captured. Look for a better source.")
-
-            if getattr(args, "save_triage", False):
-                save_triage_grid(args.map_id, {
-                    "tile_size": plan.tile,
-                    "overlap": overlap_px,
-                    "crop": list(crop),
-                    "priorities": priorities,
-                    "source": "scout",
-                })
-                print("  Saved the proposed grid to maps.triage "
-                      "(still needs accepting in triage — this is a proposal, not a run)")
 
     # Save results
     map_label = args.map_id or "unknown"
