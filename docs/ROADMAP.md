@@ -54,6 +54,91 @@ Measured budget, from the 49 calls already logged in `work/ocr/outputs/*/runs/*/
 - [ ] 3b. **Deferred on purpose: `--auto-priority` in the worker.** The flag exists in `ocr.py batch` and would let a sheet nobody triaged still skip its blank and water tiles. That is the automation, and the decision (2026-09-04) is to do the first sheets by hand first, so there is a human-triaged baseline to judge the automatic grid against. Reopen once ~5 sheets have been triaged and OCR'd by hand. Exit: on a triaged sheet, `--auto-priority` picks a grid within a tile or two of the human one.
 - [ ] 3c. **A second API key, and know the tier.** `.env` holds one `GEMINI_API_KEY`; `gemini_client.py` already rotates across `GEMINI_API_KEYS` (comma-separated) when one exhausts its daily quota, and 38 maps unattended is precisely the run that needs the spare. Google no longer publishes per-model RPM/TPM/RPD — read the real limits at <https://aistudio.google.com/rate-limit> before starting. Exit: `GEMINI_API_KEYS` set with two keys, and the tier's daily request cap written down here.
 
+### The survey layer — done 2026-09-13
+
+The archive learned the difference between what it **holds** and what a survey
+**contains**, and the gap turned out to be most of the corpus.
+
+- **`series_sheets` (mig 083)** — one row per sheet a survey contains, held or
+  not. Status is derived from `held_by`/`source`, never stored. 703 rows seeded:
+  L7014 627 cells (461 held / 123 obtainable at Texas Tech / 43 no known scan),
+  Indochine 79 (59 held).
+- **`map_series` counts cells, not rows (084)** — the Indochine survey holds
+  three cells twice, so /explore said "56 sheets" over 53. Adds `survey_sheets`,
+  the denominator. **085** rebuilds 083's check constraint, which was null-blind
+  and had never once fired: `held_by = 'map'` against a NULL `held_by` evaluates
+  to NULL, and a CHECK rejects only false.
+- **L7014 is one row in /explore, not two.** The mosaic and the nine warped city
+  sheets are complementary, not alternative — the mosaic's hole over Saigon *is*
+  the city sheets' coverage. A row carries `refs` and they go on together.
+- **`/catalog/series/<key>` and `/catalog/series/<key>/<number>`** — 452 mosaic
+  cells had no URL anywhere. Unheld sheets get a page too, `noindex`.
+- **62 Indochine sheets had no width-addressed derivative at all** and 404'd
+  every one, `?force_proxy=1` included. `MapCard` hid the image outright, so 56
+  published sheets drew nothing in /catalog's grid while the same rows drew fine
+  in list view. Both fixed; `backfill_iiif_widths.py` rebuilds derivatives from
+  the tile pyramid. 0/62 → 62/62.
+- **Indochine metadata**: descriptions 0/62 → 62/62, `source_url` 0/62 → 60/62.
+
+Four lessons, each of which cost real time today:
+
+1. **A green gate over a broken thing happened three times in one day** — 56
+   sheets published and drawing nothing, a constraint that could not fire, a
+   denominator seeded from the wrong catalogue. Verify the thing, not the gate.
+2. **Check which edition you are comparing against.** CartoMundi catalogues the
+   Tonkin 1:25,000 **three** times. Against serie 175 our rows matched 8 of 62
+   with a thirty-year offset, which reads exactly like a bad attribution; against
+   serie 243 it is 60 of 62. The existing `holding_institution` was right all
+   along and was nearly overwritten.
+3. **Neither catalogue is complete, and they are incomplete in different
+   directions.** 175 has cells 7/8/9/19; 243 has 1/34/67. We *hold* cell 1 (Viet
+   Tri), so the index said the survey did not contain a sheet we own. The
+   denominator is the union: 79.
+4. **A freshly written R2 object is not immediately readable through the
+   worker.** Verified straight after rclone reported success and got 404 on all
+   three widths; 200 a few seconds later. Nearly logged a working fix as broken.
+
+### Open from the survey layer (2026-09-13)
+
+- [ ] **Six L7014 rows have no `full/400,/` derivative** — Gò Công 6329-4, Nhơn
+      Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1 and two more. All draft, so
+      harmless now and **fatal on publish**. Fix:
+      `python scripts/oneoff/backfill_iiif_widths.py --collection 'Series L7014 (Vietnam 1:50,000)'`.
+      Exit: that command reports 0 missing.
+- [ ] **`rights` on all 62 Indochine rows is an unverified "Public domain".**
+      CartoMundi's Nakala items for the neighbouring 1:100,000 series are
+      CC-BY-NC-SA-4.0. Check before any bulk export claims a licence.
+- [ ] **Two Indochine sheets have no `source_url`**: 35 "An Thi" (ours 1904;
+      serie 243 holds 1905 and 1924 — our year may be a typo) and `0 bis` "Nha
+      nam" (absent from 243 entirely; 175 has it).
+- [ ] **AMS L909 has no `series_sheets` index**, which is why its /explore row
+      offers no coverage page. Three sheets; someone must decide what that
+      survey contains.
+- [ ] **Nothing lists all surveys in one place.** `/catalog/series/<key>` is
+      reachable only from the /explore rail, and the two new routes are in
+      neither `sitemap.xml` nor `paletteDestinations.ts` — which `CLAUDE.md`
+      says is how a page joins /directory and the command palette.
+- [ ] **Sheet titles should come off the sheet, not the catalogue.** CartoMundi's
+      spellings are French colonial transcriptions: `Kim Thanh` → `Kim-Thành`
+      restores a real diacritic, `Bac Ninh` → `Bac-Ninh` only adds a hyphen, and
+      `Yen Dinh` → `Yên-Dinh` is half-accented for Yên Định and reads as an
+      error. Deliberately **not** applied; it is behind `--names` in
+      `backfill_indochine_descriptions.mjs`. OCR the title block instead.
+- [ ] **The Vietnamese string `'All sheets in this survey'`** was written by a
+      non-speaker as "Tất cả bản đồ trong bộ này", following the dictionary's
+      use of `bản đồ` for a sheet. Wants a native check.
+- [ ] **The L7014 coverage page is ~500 kB of HTML for 627 rows**, server-
+      rendered per request. Fine today; revisit before Cochinchine's 826 lands.
+- [ ] **Cochinchine 1:25,000 is the next survey to index** — 826 sheets across
+      three series, Saigon and the Mekong delta, top of the scout queue at
+      `/admin?tab=scout`. The importer pattern is
+      `scripts/oneoff/import_indochine_series_sheets.mjs`; union every edition
+      of the survey, not one.
+
+A client trap found on the way, worth not rediscovering: selecting a column
+`map_series` no longer has returns `null` through `.maybeSingle()` rather than
+erroring — so a stale column name reads as "no such series" instead of failing.
+
 ### Found while starting the OCR pass (2026-09-04)
 
 - [x] T1. **Done 2026-09-04. `fetch_crop` could not read an R2-hosted map — every OCR run is dead.** It requests an arbitrary region at an arbitrary scale (`{x},{y},{w},{h}/{size},/0/default.jpg`); `worker/` renders nothing, it is a key lookup (`key = tiles/${mapId}${rest}`) serving only what `vips dzsave` wrote. Measured: **39 of 39** georeferenced maps resolve to `iiif.maparchive.vn`, and both an OCR tile and the overview 404. `info.json` claims `profile: level2`, which is false and is why this went unseen. Fix in Python only — compose the region from the pyramid: sf ∈ 1…32 (not 64, though `scaleFactors` lists it), origin a multiple of 256·sf, region clipped to the image, and **`size = ceil(region_w / sf)`**, which is the non-obvious part — plain `256,` 404s on clipped edge tiles. Proven by hand: a 379×281 overview of the 1882 sheet assembles from 4 requests. `fetch_crop` now falls back to `fetch_crop_level0`, which composes the region from the pyramid. Verified against the live host: overview, an aligned OCR tile and an off-grid crop all return correct pixels; `iiif_tiles.py --self-check` covers the addressing.
