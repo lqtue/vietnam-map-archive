@@ -16,6 +16,73 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: 'two-map-series-2026-09',
+    title: 'Two Map Series, 514 Sheets: Vietnam at 1:50,000 and 1:25,000 (1903–1989)',
+    date: '2026-09-13',
+    category: 'announcement',
+    excerpt:
+      "The archive now holds surveys, not just sheets. Two of them go onto the map as one row each — the US Army's Series L7014, 461 of its 627 sheets, and the French Indochine 1:25,000 of Tonkin — with a public page for every sheet a survey contains, held or not.",
+    content: `
+<p><strong>461 map sheets went onto the map this week</strong>, close to six times what the archive could draw seven days ago: 94 georeferenced sheets, now 555. They are one survey — the US Army Map Service's <strong>Series L7014</strong>, Vietnam at 1:50,000, published 1963 to 1989, at a scale where individual villages, roads and river bends are drawn.</p>
+<p>And the archive learned what a <em>series</em> is, which is the part that will matter longer. Two surveys are now one row each in the layer panel — L7014, and the French <strong>Indochine 1:25,000 of Tonkin and Thanh Hóa</strong> (1903–27), whose sheets have been here since May as 53 separate rows to add one at a time. Tap a row and the whole survey goes on the map with one opacity slider for all of it.</p>
+<p>A link can do the tapping: <a href="/explore?series=l7014#@16.1,107.2,5.7z,0r">Series L7014 over the whole country</a> · <a href="/explore?series=indochine-1-25-000-tonkin-thanh-hoa#@20.65,106.10,8.2z,0r">the Indochine 1:25,000 over the Tonkin delta</a>.</p>
+
+<figure>
+  <a href="/explore?series=l7014#@16.1,107.2,5.7z,0r">
+  <img
+    src="/images/blog/l7014-series-on-map.webp"
+    alt="Vietnam seen from above with the AMS L7014 topographic sheets drawn over it as a quilt of small square scans — dense across the Tonkin delta in the north, running down the Annamite coast, and filling the Mekong delta in the south, with blank ground inland where the archive holds no sheet."
+    loading="lazy"
+    width="1000"
+    height="1084"
+  />
+  </a>
+  <figcaption><strong>One row, 461 sheets.</strong> <a href="/explore?series=l7014#@16.1,107.2,5.7z,0r">Open it on the map →</a> Each small square is a single 15′ × 15′ sheet, warped and drawn at its own place on the ground. The breaks in the quilt are sheets the archive does not hold — most of them over Laos and Cambodia, which the survey also covers.</figcaption>
+</figure>
+
+<h2>Two surveys, opposite routes</h2>
+<p>L7014 is <strong>pre-tiled</strong>. The Perry-Castañeda Library publishes its sheets as GeoPDFs carrying their own georeference — control points, the printed neatline, the edition and date — so a script clips each sheet to its neatline, warps it, and tiles the series into one raster archive we host. Adjacent sheet edges agree to between 2.5 and 14 metres, inside the series' own drafting accuracy; what you notice at a seam is a difference in scan brightness, not in geometry.</p>
+<p>Tonkin is <strong>warped live</strong>, by Allmaps, in your browser, from 56 ordinary archive records covering 53 grid cells. That should be 56 times the work and is not: a warped-map layer is a <em>set</em> of georeferenced maps rather than one, so the whole survey costs one layer, one position in the stack and one opacity control — no pipeline, no multi-gigabyte archive, no rebuild when a sheet is added.</p>
+<p>Which route a survey takes is decided by what the source library published. L7014 <em>had</em> to be pre-tiled, because most of its sheets are not archive records at all; Tonkin did not, because all of its are.</p>
+
+<h2>The hole over Saigon</h2>
+<p>Of the 535 L7014 sheets that library scanned, <strong>24 are plain JPEGs with no georeference attached</strong> — and they are, with some irony, exactly the ones over Saigon, Biên Hòa, Cần Giờ, Huế, Đà Nẵng and Hải Phòng. The cities. So the mosaic has a hole punched in it precisely where most people will look first.</p>
+<p>Those 24 are being placed by hand, four clicks a sheet, and become normal archive records as they are done — nine so far. One row adds both halves, mosaic underneath and hand-placed city sheets on top, because they are complementary rather than alternative. Offered as two rows they would read as a choice between two things, and picking either would be wrong.</p>
+
+<h2>A page for the sheets we do not have</h2>
+<p>A count of what the archive holds is only half a fact. "9 sheets" means one thing if the survey has 12 and quite another if it has 627.</p>
+<p>So each survey's own printed index is imported as its denominator, and every series has a public coverage page: one row per sheet the survey contains, held or not, in three states — <strong>held</strong>, <strong>scan identified but not yet fetched</strong>, and <strong>no known scan</strong>. Every sheet has a URL whether or not we have it. A researcher after one specific sheet can find out that it exists, what it is numbered, and that we do not hold it.</p>
+
+<figure>
+  <a href="/catalog/series/series-l7014-vietnam-1-50-000">
+  <img
+    src="/images/blog/l7014-coverage-page.webp"
+    alt="The coverage page for Series L7014: a heading reading 627 sheets, catalogued 1966 to 1984, then a Coverage card saying the archive holds 461 of this survey's 627 sheets — 74 per cent — above a three-colour bar and a table of sheet numbers, names, status and source."
+    loading="lazy"
+    width="1400"
+    height="910"
+  />
+  </a>
+  <figcaption><strong>What the survey contains, not what we hold.</strong> 461 held, 123 whose scans are identified at Texas Tech but not yet fetched, 43 with no known scan anywhere. <a href="/catalog/series/series-l7014-vietnam-1-50-000">The whole table →</a> The Indochine 1:25,000's <a href="/catalog/series/indochine-1-25-000-tonkin-thanh-hoa">own page</a> reads 59 held of 79, the other 20 identified at CartoMundi.</figcaption>
+</figure>
+
+<p>Building those indexes turned up the usual archival mess. The Texas library publishes L7014 twice — a flat alphabetical list and a clickable index diagram — and <em>neither is complete</em>: the flat page is missing two sheets immediately north of Saigon, the diagram is missing thirty-seven the flat page has, and the prose on one misprints two sheet numbers. The index is read from both and merged, and where the printed number and the filename disagree, the filename wins.</p>
+<p>The Indochine survey's denominator came from elsewhere: <a href="https://www.cartomundi.fr/">CartoMundi</a>, the Aix-Marseille catalogue of European map series, which says that survey is <strong>79 sheets</strong>. We hold 59, of which 53 are published and drawn; CartoMundi has located scans of the other 20. Reading its catalogue also turned up <strong>25 further Indochina series</strong> — Cochinchine and Annam at 1:25,000, the Tonkin delta, the 1:100,000 of Indochina — now leads in the review queue rather than a list in someone's notes.</p>
+<p>One decision worth recording: what counts as a series is a database question, not a file someone edits. Three rules, all read off the data — the sheets carry a sheet number, more than one is georeferenced, and this reader may see them. Adding a survey means ingesting sheets. Nothing is deployed.</p>
+
+<h2>Credit where it is due</h2>
+<p>The archive scanned none of these sheets. It placed them, counted them and put them on one row; the paper, the cameras and the cataloguing were other people's work, most of it given away for nothing.</p>
+<ul>
+<li><strong><a href="https://maps.lib.utexas.edu/maps/topo/vietnam/">Perry-Castañeda Library Map Collection</a>, University of Texas at Austin</strong> — scanned Series L7014 and published it openly, most sheets as GeoPDFs carrying their own control points. 452 of the 461, and the reason the mosaic exists.</li>
+<li><strong>The Virtual Vietnam Archive, Vietnam Center and Sam Johnson Vietnam Archive, Texas Tech University</strong> — holds scans of 123 sheets the Texas collection never published. The yellow band on the coverage bar, and the next thing to fetch.</li>
+<li><strong><a href="https://www.cartomundi.fr/">CartoMundi</a> (Aix-Marseille Université)</strong> — the catalogue that tells us the Indochine 1:25,000 is 79 sheets rather than however many we happen to hold.</li>
+<li><strong><a href="https://allmaps.org/">Allmaps</a></strong> — open-source georeferencing and in-browser warping. The Tonkin series draws through it live, with no pipeline of ours involved.</li>
+<li><strong>OpenStreetMap contributors</strong>, via <strong><a href="https://protomaps.com/">Protomaps</a></strong> — the modern map underneath, which is what makes a 1966 sheet checkable rather than merely pretty.</li>
+</ul>
+<p>Series L7014 is a US Army Map Service product and carries no copyright. Where a holding library's terms apply, they are recorded on the sheet's own catalogue page.</p>
+		`,
+  },
+  {
     slug: 'measuring-the-ocr-2026-09',
     title: 'The Gate That Could Not Read Vietnamese, and the One Printed on the Sheet Itself',
     date: '2026-09-10',
