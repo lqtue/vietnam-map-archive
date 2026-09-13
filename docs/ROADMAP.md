@@ -97,6 +97,20 @@ Four lessons, each of which cost real time today:
 4. **A freshly written R2 object is not immediately readable through the
    worker.** Verified straight after rclone reported success and got 404 on all
    three widths; 200 a few seconds later. Nearly logged a working fix as broken.
+5. **A probe that is refused reads exactly like a probe that was answered "no".**
+   `backfill_iiif_widths.py` asked the edge whether a width existed using
+   urllib's default User-Agent and got 403, which its "not 200 means missing"
+   rule turned into 93 phantom gaps. Curl, same URLs, same second: 6. Whenever a
+   script decides what work to do by probing a network service, make the refusal
+   distinguishable from the answer.
+6. **Two `npm run build` runs in one shared worktree lose each other's output.**
+   `build` wipes `.svelte-kit/output` before writing it, so two builds a minute
+   apart leave a half-overwritten tree and the deploy that runs last publishes
+   it. Tonight that put a deployment on production missing a blog post and two
+   images while serving every other new page — same commit, different bytes,
+   and nothing in either build log said so. Found by diffing the two deployment
+   URLs against the custom domain; fixed by one clean build alone. In a shared
+   worktree, announce a build and hold all writes until it is deployed.
 
 ### Open from the survey layer (2026-09-13)
 
@@ -122,11 +136,18 @@ Four lessons, each of which cost real time today:
       coverage pages print. `--self-check` needs no database and was verified
       to fail before it was trusted. Run it after any publish, georeference or
       re-import.
-- [ ] **Six L7014 rows have no `full/400,/` derivative** — Gò Công 6329-4, Nhơn
-      Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1 and two more. All draft, so
-      harmless now and **fatal on publish**. Fix:
-      `python scripts/oneoff/backfill_iiif_widths.py --collection 'Series L7014 (Vietnam 1:50,000)'`.
-      Exit: that command reports 0 missing.
+- [x] **Done 2026-09-13. Six L7014 rows had no `full/400,/` derivative** — Gò
+      Công 6329-4, Nhơn Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1, Cần Giờ
+      6329-1, Cần Giuộc 6330-3, each missing 400 and 200 while 800 served. 12
+      objects written; all 31 sheets x 3 widths now serve, re-checked with curl.
+      **The script's own probe was the obstacle, not the derivatives.**
+      `head_status` used urllib's default User-Agent, which the edge answers
+      with 403, and it reads anything that is not a 200 as "missing" — so it
+      reported 31 of 31 L7014 and 62 of 62 Indochine sheets as missing all three
+      widths. Same URLs under curl: 6 and 0. A real run would have rewritten 93
+      objects that already served and then failed its own verification pass the
+      same way, which shares the probe — so a wholly successful run and a total
+      failure printed the same thing. One User-Agent header, `2e9fd48b`.
 - [ ] **`rights` on all 62 Indochine rows is an unverified "Public domain".**
       CartoMundi's Nakala items for the neighbouring 1:100,000 series are
       CC-BY-NC-SA-4.0. Check before any bulk export claims a licence.
@@ -136,10 +157,18 @@ Four lessons, each of which cost real time today:
 - [ ] **AMS L909 has no `series_sheets` index**, so it has no coverage page and
       its /explore row offers no link — one decision, not two. Three sheets;
       someone must decide what that survey contains.
-- [ ] **Nothing lists all surveys in one place.** `/catalog/series/<key>` is
-      reachable only from the /explore rail, and the two new routes are in
-      neither `sitemap.xml` nor `paletteDestinations.ts` — which `CLAUDE.md`
-      says is how a page joins /directory and the command palette.
+- [x] **Done 2026-09-13. `/catalog/series` is the index.** The coverage pages
+      had one way in — the `›` beside a series row in the /explore rail, which is
+      a control inside a full-screen tool behind `ssr = false`, so no address a
+      crawler could follow and nothing for the palette to offer. The index reads
+      `map_series` rather than a hand-kept array, so a survey appears by being
+      ingested; it is in the sitemap with one entry per survey, and in
+      `paletteDestinations.ts`, which is what puts it on /directory too. A survey
+      with no imported index is excluded from both, because its coverage page
+      404s on purpose — `ams-l909` was in the sitemap for one revision, which is
+      a crawl invitation to a 404. Palette ties now break by position in
+      `DESTINATIONS` instead of alphabetically: "Map series" had taken `map` off
+      "Map viewer" on the strength of an s preceding a v.
 - [ ] **Sheet titles should come off the sheet, not the catalogue.** CartoMundi's
       spellings are French colonial transcriptions: `Kim Thanh` → `Kim-Thành`
       restores a real diacritic, `Bac Ninh` → `Bac-Ninh` only adds a hyphen, and
@@ -151,6 +180,15 @@ Four lessons, each of which cost real time today:
       use of `bản đồ` for a sheet. Wants a native check.
 - [ ] **The L7014 coverage page is ~500 kB of HTML for 627 rows**, server-
       rendered per request. Fine today; revisit before Cochinchine's 826 lands.
+- [ ] **`series_sheets` can name only one printing of a cell.** Its primary key
+      is `(series_key, sheet_number)`, one row per cell — but the archive holds
+      **10 cells in more than one edition**, three of them with two *published*
+      printings each, fourteen years apart, and `SheetEditions.svelte` already
+      surfaces those in the Info rail. So the survey index and its coverage page
+      can point at exactly one of them, silently. Verified 2026-09-13 by counting
+      `maps` rows grouped on collection + `sheet_number`. Migration 086 (two
+      nullable columns, `year` and `edition`) is drafted by a concurrent session
+      and not pushed; whether the fix is those columns or a widened key is open.
 - [ ] **Cochinchine 1:25,000 is the next survey to index** — 826 sheets across
       three series, Saigon and the Mekong delta, top of the scout queue at
       `/admin?tab=scout`. The importer pattern is

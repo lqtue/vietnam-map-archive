@@ -34,10 +34,23 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '7.2',
+    date: '2026-09-13',
+    headline: 'Whole surveys, and a page for every sheet in one',
+    current: true,
+    changes: [
+      "Two complete map surveys go onto the map as a single layer each: the US Army's 1:50,000 of all Vietnam (1963–1989) and the French 1:25,000 of Tonkin and Thanh Hóa (1903–1927). 514 sheets, two taps.",
+      'Every survey now has a page listing every sheet it contains — including the ones the archive does not have. It says how many are held, how many have a scan someone has located, and how many nobody has found anywhere.',
+      'Each of those sheets has its own page too, with the patch of ground it covers and a way to open the map there. 452 sheets of the 1:50,000 were drawable on the map but appeared in no list and no search, because the archive held them as tiles rather than as records.',
+      'A survey is something you can send someone: the link now carries which survey is on the map, the same way it already carried which single sheet.',
+      'The map thumbnails on the catalogue were blank for 56 published sheets. They are not blank any more, and the archive stopped asking for picture sizes that were never made.',
+      'The front page says what the archive holds today rather than what it held in May, and no longer stops its date range at 1968 when the newest sheets run to 1984.',
+    ],
+  },
+  {
     version: '7.1',
     date: '2026-09-12',
     headline: 'The volunteer tools, named after the work',
-    current: true,
     changes: [
       'The tools for working on a scanned sheet are called what they do: Prepare a sheet, Check the text, Draw shapes. No more "triage" and "OCR".',
       'Checking the text is now four jobs you can pick between — the names on the map, the printed index, the numbers, and everything else — each showing how many rows are left. Clear all four and the sheet is done.',

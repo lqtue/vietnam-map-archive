@@ -12,7 +12,7 @@ match. So the hand-drawn HTML app keeps **1.x–2.x**, the SvelteKit rewrite kee
 **3.x**, and everything after that continues from `v3.3` — the last number
 anyone wrote down.
 
-Versions 6.0, 7.0 and 7.1 are written out in full, because that is the
+Versions 6.0, 7.0, 7.1 and 7.2 are written out in full, because that is the
 architecture that exists today. Everything earlier is summarised; the detail is in `git log`,
 and most of it has been replaced.
 
@@ -24,6 +24,7 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 | Version | Date | In one line |
 |---|---|---|
+| [7.2](#72--september-2026) | Sept 2026 | A survey is one thing: 514 sheets on the map as two layers, and a page for every sheet a survey contains, held or not |
 | [7.1](#71--september-2026) | Sept 2026 | The scan tools renamed after what they do, and split by the job in front of you |
 | [7.0](#70--september-2026) | Sept 2026 | Sixteen pages instead of twenty-three, one design system with dark mode, a front page that costs nothing, and OCR that can measure itself |
 | [6.0](#60--august-2026) | Aug 2026 | A job queue and a worker, layered source, status transitions inside Postgres |
@@ -41,9 +42,81 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 ---
 
+## 7.2 — September 2026
+
+**Current.** The archive learned the difference between what it **holds** and
+what a survey **contains**, and the gap turned out to be most of the corpus.
+Two migrations, three routes, no new dependency.
+
+### A survey is a thing now
+
+- **`series_sheets` (mig 083)** — one row per sheet a survey contains, held or not. Status is derived from `held_by`/`source` and never stored: `held_by` set is held, `source` alone is a scan somebody has located, neither is a gap. 706 rows: L7014 627 cells (461 / 123 / 43), Indochine 79 (59 held).
+- **`map_series` counts cells, not rows (084)**, and gains `survey_sheets` as the denominator. The Indochine survey holds three cells in two printings each, so /explore had been saying "56 sheets" over 53. **085** rebuilds 083's check constraint, which was null-blind and had never once fired — `held_by = 'map'` against a NULL `held_by` evaluates to NULL, and a CHECK rejects only false.
+- **L7014 is one row in /explore, not two.** The pre-tiled mosaic and the nine hand-placed city sheets are complementary, not alternative: the mosaic's hole over Saigon *is* what the city sheets cover. `buildSeriesRows` folds a raster archive together with the database series it declares itself `halfOf`, so one tap adds both layers and the row reads *461 of 627 sheets*.
+- **`?series=<key>`** — the counterpart of `?map=<id>`. The layer stack lives in localStorage and had no address, so a survey was not something you could send anyone. Takes either half of a folded row's key, carries no camera of its own, and is consumed once applied.
+
+### Every sheet a survey contains has a URL
+
+- **`/catalog/series/<key>`** and **`/catalog/series/<key>/<number>`** — 452 mosaic cells were drawable on the map and invisible in every list and every search, because they have no `maps` row. Unheld sheets get a page too, carrying `noindex`: useful to a researcher, not something to compete in search with the sheets that exist.
+- **`/catalog/series`** is the index. The coverage pages had one way in — a `›` inside a full-screen tool behind `ssr = false` — so no address a crawler could follow and nothing for the command palette. It reads `map_series` rather than a hand-kept list, so a survey appears by being ingested. In `sitemap.xml` with one entry per survey, and in `paletteDestinations.ts`, which is what also puts it on /directory.
+- A survey with no imported index appears in neither, because its coverage page 404s deliberately. `ams-l909` was in the sitemap for one revision, which is a crawl invitation to a 404.
+- The per-sheet pages are deliberately **not** in the sitemap: the series page links all 706, and the ~200 unheld ones are `noindex`.
+- Palette ties break by position in `DESTINATIONS` instead of alphabetically. "Map series" had taken the query `map` off "Map viewer" on the strength of an s preceding a v.
+
+### IIIF derivatives that were never written
+
+- **62 Indochine sheets 404'd every width-addressed derivative**, `?force_proxy=1` included, because the R2 worker renders nothing and they were mirrored before `tile_map.sh` grew its `full/800,` step. `MapCard` hid a failed image outright, so 56 published sheets drew nothing in /catalog's grid while the same rows drew fine in list view, which has always stepped down. Both ends fixed; 0/62 → 62/62.
+- **Six L7014 drafts** were missing 400 and 200 while 800 served. 12 objects written from the tile pyramid; 31 sheets × 3 widths all serve.
+- **`backfill_iiif_widths.py` could not tell "missing" from "refused".** Its probe used urllib's default User-Agent, which the edge answers with **403**, and it reads anything that is not a 200 as missing — so it reported 31 of 31 L7014 and 62 of 62 Indochine sheets as missing all three widths. Curl, same URLs, same second: 6 and 0. A real run would have rewritten 93 objects that already served, then failed its own verification pass through the same probe, so a wholly successful run and a total failure printed the same thing. One User-Agent header.
+- **The status column on a coverage page had no colour to say it with**: `is-{status}` spelled a modifier that does not exist in `editorial.css`, whose tints are `.chip-green` / `.chip-yellow` / `.chip-gray`, so all 627 badges rendered as one bare pill.
+
+### An index nobody maintains
+
+`series_sheets.held_by` and `map_id` have no trigger and no function behind them
+— the one-off importers are the only writers. The index is correct today and
+goes wrong silently the first time anyone publishes a draft or georeferences one
+of the obtainable sheets: the coverage page keeps drawing that cell as missing,
+and its percentage is wrong by a plausible amount. `scripts/check_series_index.mjs`
+joins the index to `maps` and exits 1 on a cell the index calls a gap that a
+`maps` row claims, or a `map_id` pointing at a row that is gone. **It is the
+detector, not the fix** — deriving those columns in a view or a trigger is still
+open. Clean on production: 0 adrift, 0 dangling over 706 sheets.
+
+Known limit, recorded rather than fixed: `series_sheets` is keyed
+`(series_key, sheet_number)`, one row per cell, and the archive holds **10 cells
+in more than one edition** — three with two published printings each, fourteen
+years apart. The coverage page can name exactly one of them.
+
+### Around the edges
+
+- The front page's "Where things stand" band announces both surveys. It had said *"The last written update was in May"* four posts later, and the page said **"1791 to 1968"** twice when published sheets run to 1984.
+- /about gains a count read from `series_sheets` — 520 of 706 sheets across two complete surveys — with copy saying why it must not be added to the 103 catalogued maps. Its city line is capped at four places plus a count; it had grown to thirteen.
+- `maps.location` had two spellings each of Saigon and Huế, typed from an ASCII sheet title during this week's L7014 ingest. Merged, 29 distinct → 27. Data only.
+- `vi.ts` is **generated** from `work/copy/translate-vi.md`; a hand edit to it survives exactly until the next regeneration, which is how `'All sheets in this survey'` went missing. Restored at source, 283 entries.
+
+### Tests
+
+`tests/series-sheets.spec.ts` pins what a coverage page claims — that `source` is
+provenance and not possession, that the three statuses partition the survey, the
+cell camera including a zero-area bbox, and the paging loop, since PostgREST caps
+an unbounded select at 1000 rows silently and Cochinchine's three series are 826.
+Mutation-checked: three deliberate breaks fail five of the nine. Suite 263 → 273.
+
+### The deploy
+
+Two `npm run build` runs in one shared worktree, a minute apart, published a
+deployment missing a blog post and two images while serving every other new page
+— same commit, different bytes. `build` wipes `.svelte-kit/output` before writing
+it, so the loser's output is half-overwritten and the deploy that runs last
+publishes whatever is on disk. Neither build log said anything; it was found by
+diffing the two deployment URLs against the custom domain, and fixed by one clean
+build alone.
+
+---
+
 ## 7.1 — September 2026
 
-**Current.** `/scan` re-cut around the work rather than around the machinery
+`/scan` re-cut around the work rather than around the machinery
 that does it. No migration, no new dependency; the whole change is which
 component a URL mounts and what the panels are called.
 
