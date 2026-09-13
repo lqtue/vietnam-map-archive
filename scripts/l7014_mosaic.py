@@ -14,6 +14,10 @@ way `basemap/vietnam-*.pmtiles` already is.
     python3 scripts/l7014_mosaic.py tile       # mosaic -> MBTiles -> PMTiles
     python3 scripts/l7014_mosaic.py upload     # rclone to r2:vma-tiles
     python3 scripts/l7014_mosaic.py check      # prove the graticule check fails
+    python3 scripts/l7014_mosaic.py pinned     # warp the hand-pinned JPG sheets
+    python3 scripts/l7014_mosaic.py meta       # re-read each PDF's XMP + graticule check
+    python3 scripts/l7014_mosaic.py corners    # ground GCPs for the plain-JPG sheets
+    python3 scripts/l7014_mosaic.py manifest   # one outline per sheet in the mosaic
 
 Every phase is resumable: it skips what it has already produced. `--limit N`
 caps any phase, `--jobs N` sets concurrency.
@@ -63,9 +67,15 @@ gdal.UseExceptions()
 gdal.PushErrorHandler("CPLQuietErrorHandler")
 
 INDEX_URL = "https://maps.lib.utexas.edu/maps/topo/vietnam/"
+# PCL publishes the series twice: a flat alphabetical list and a clickable
+# sheet diagram. Neither is complete -- the diagram is missing 37 sheets the
+# list has, and the list is missing two the diagram has (6331-3 Ben Cat and
+# 6331-4 Xom Ruong, both immediately north of Saigon). So both are read.
+INDEX_MAP_URL = INDEX_URL + "vietnam_index.html"
 WORK = Path("work/l7014")
 SHEETS = WORK / "sheets.json"
 PDF_DIR = WORK / "pdfs"
+JPG_DIR = WORK / "jpgs"
 COG_DIR = WORK / "cogs"
 BUILD = WORK / "build"
 
@@ -94,6 +104,10 @@ def save_sheets(rows):
 
 # ── index ────────────────────────────────────────────────────────────────────
 
+FILE_SHEET = re.compile(r"(\d{4})[-_](\d)\s*\.(?:pdf|jpg)$", re.I)
+
+AREA = re.compile(r'<area[^>]*href="[^"]*/([^"/]+\.(?:pdf|jpg))"', re.I)
+
 ENTRY = re.compile(
     r'<a href="([^"]+\.(?:pdf|jpg))"\s*>([^<]+)</a>[^<]*?Sheet\s+([0-9][\w-]*)',
     re.I,
@@ -115,17 +129,49 @@ def phase_index(args):
         if key in seen:
             continue
         seen.add(key)
+        # The index page's own "Sheet NNNN-N" text has typos (5654-1 printed as
+        # 5641-1, 5949-3 as 5943-3). The filename is the one PCL actually serves,
+        # so it wins wherever it parses. Nothing in the warp cares -- each GeoPDF
+        # carries its own georeference -- but the join to the ArcGIS index does.
+        m = FILE_SHEET.search(href)
         rows.append(
             {
                 "file": href,
                 "name": name.strip(),
-                "sheet": sheet.strip().rstrip(","),
+                "sheet": f"{m.group(1)}-{m.group(2)}" if m else sheet.strip().rstrip(","),
                 # The ~35 JPGs carry no georeference at all. They are recorded
                 # rather than dropped, so what the mosaic is missing is legible.
                 "kind": "pdf" if href.lower().endswith(".pdf") else "jpg",
                 "url": INDEX_URL + urllib.parse.quote(href),
             }
         )
+
+    res = subprocess.run(CURL + ["--max-time", "90", INDEX_MAP_URL], capture_output=True)
+    for href in AREA.findall(res.stdout.decode("utf-8", "replace")):
+        href = urllib.parse.unquote(href).strip()
+        m = FILE_SHEET.search(href)
+        # The diagram carries no sheet name, and one href is doubly suffixed
+        # (don_duong-6732-4.pdf.pdf). A row without a parseable number is noise.
+        if not m or href.lower() in seen or href.lower().count(".pdf") > 1:
+            continue
+        seen.add(href.lower())
+        rows.append({
+            "file": href,
+            "name": Path(href).stem.rsplit("-", 2)[0].replace("_", " ").title(),
+            "sheet": f"{m.group(1)}-{m.group(2)}",
+            "kind": "pdf" if href.lower().endswith(".pdf") else "jpg",
+            "url": INDEX_URL + urllib.parse.quote(href),
+        })
+
+    # Merge onto what is already recorded. `warp` writes year, edition,
+    # crs_forced and graticule_err back onto these rows -- the audit trail
+    # behind the datum trap -- and a plain overwrite here discards all of it
+    # for every sheet that is not re-warped, silently and irrecoverably.
+    known = {r["file"].lower(): r for r in load_sheets()}
+    for r in rows:
+        prev = known.get(r["file"].lower())
+        if prev:
+            r.update({k: v for k, v in prev.items() if k not in r})
 
     save_sheets(rows)
     pdfs = sum(1 for r in rows if r["kind"] == "pdf")
@@ -139,8 +185,16 @@ def local_pdf(row):
     return PDF_DIR / (Path(row["file"]).stem.strip() + ".pdf")
 
 
+def local_src(row):
+    """Where a sheet's scan lands. The JPGs are fetched too -- they are the ones
+    that need hand-georeferencing, and QGIS needs the file, not the URL."""
+    if row["kind"] == "jpg":
+        return JPG_DIR / (Path(row["file"]).stem.strip() + ".jpg")
+    return local_pdf(row)
+
+
 def download(row):
-    dest = local_pdf(row)
+    dest = local_src(row)
     if dest.exists() and dest.stat().st_size > 0:
         return None
     tmp = dest.with_suffix(".part")
@@ -154,10 +208,11 @@ def download(row):
 
 
 def phase_fetch(args):
-    rows = [r for r in load_sheets() if r["kind"] == "pdf"]
+    rows = load_sheets()
     if args.limit:
         rows = rows[: args.limit]
     PDF_DIR.mkdir(parents=True, exist_ok=True)
+    JPG_DIR.mkdir(parents=True, exist_ok=True)
     done = skipped = failed = 0
     with cf.ThreadPoolExecutor(max_workers=args.jobs) as pool:
         for row, res in zip(rows, pool.map(lambda r: _safe(download, r), rows)):
@@ -435,6 +490,18 @@ def phase_upload(args):
     run(["rclone", "copyto", str(pm), f"r2:vma-tiles/{key}", "--s3-no-check-bucket",
          "--progress"])
     print(f"uploaded: https://tiles.maparchive.vn/{key}")
+
+    # The sheet index rides the same dated key: pixels and the outlines that
+    # address them are one release, or a reader clicks a sheet the archive
+    # does not hold.
+    gj = BUILD / f"{args.key}.geojson"
+    if gj.exists():
+        run(["rclone", "copyto", str(gj), f"r2:vma-tiles/overlay/{args.key}.geojson",
+             "--s3-no-check-bucket"])
+        print(f"uploaded: https://tiles.maparchive.vn/overlay/{args.key}.geojson")
+    else:
+        print("no sheet manifest built (run `manifest`) — uploading pixels only")
+
     print("Now point L7014_PMTILES_URL in src/lib/map/basemapStyle.ts at that URL.")
 
 
@@ -478,12 +545,358 @@ def phase_check(args):
 
 # ── cli ──────────────────────────────────────────────────────────────────────
 
+# ── corners ──────────────────────────────────────────────────────────────────
+
+# The ArcGIS index (Vietnam_50k_L7014.mpk, 627 sheets) draws every sheet as an
+# exact 15' x 15' cell and labels the layer WGS 84. It is not: those corners are
+# the printed graticule, which is Indian 1960, and taken at face value they land
+# every sheet ~480 m northwest. Reprojected from 4131 they agree with the
+# GeoPDFs' own NEATLINE to 4-17 m, which is inside the series' drafting error.
+#
+#   ogr2ogr -f GeoJSON work/l7014/index.geojson <extracted>.gdb Vietnam_50k_L7014
+#   python3 scripts/l7014_mosaic.py corners
+#
+# Output is a crib sheet for hand-georeferencing the sheets PCL publishes as
+# plain JPGs: the ground half of each GCP. The pixel half is four clicks per
+# sheet in QGIS's Georeferencer -- a scan's collar and skew are not in any index.
+INDEX_GEOJSON = WORK / "index.geojson"
+CORNERS_CSV = WORK / "corners.csv"
+GCP_DIR = WORK / "gcp"
+# Mean neatline inset (left, top, right, bottom) as a fraction of the page,
+# measured over 36 georeferenced sheets. sd is 0.013 of the width -- ~700 m --
+# so this positions a marker to drag, never a control point to trust.
+INSET = (0.0333, 0.0326, 0.9629, 0.7788)
+ROMAN = {"1": "I", "2": "II", "3": "III", "4": "IV"}
+
+
+def phase_corners(args):
+    if not INDEX_GEOJSON.exists():
+        sys.exit(f"{INDEX_GEOJSON} missing -- see the comment above phase_corners")
+    feats = json.loads(INDEX_GEOJSON.read_text())["features"]
+    cells = {}
+    for f in feats:
+        ring = f["geometry"]["coordinates"][0][0]
+        lons = [x for x, _ in ring]
+        lats = [y for _, y in ring]
+        cells[f["properties"]["Sheet_no"].replace(" ", "")] = (
+            min(lons), min(lats), max(lons), max(lats), f["properties"]["Sheet_name"])
+
+    # EPSG:4131 -> 4326 is NOT usable here. PROJ picks a transformation whose
+    # area of use stops at 106.5E, and for a point on or west of that line GDAL
+    # returns the input unchanged rather than failing -- so the Mekong Delta and
+    # western Saigon sheets, which are the ones this phase exists for, came back
+    # silently unshifted and ~450 m out. The Helmert is spelled out instead:
+    # Everest 1830 (1937 Adjustment) and the Vietnam shift, no grid to fall off.
+    # It reproduces A Luoi's printed neatline to 4-17 m, same as the grid did
+    # where the grid worked.
+    src = osr.SpatialReference()
+    src.ImportFromProj4("+proj=longlat +a=6377276.345 +rf=300.8017 "
+                        "+towgs84=198,881,317 +no_defs")
+    dst = osr.SpatialReference(); dst.ImportFromEPSG(4326)
+    for sr in (src, dst):
+        sr.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    to_wgs = osr.CoordinateTransformation(src, dst)
+    # ...and a transform that quietly does nothing is the failure this phase is
+    # most exposed to, so it has to be able to fail.
+    probe = to_wgs.TransformPoint(106.5, 10.75)[:2]
+    if abs(probe[0] - 106.5) < 1e-4:
+        sys.exit("corners: the datum shift is not being applied (got %r)" % (probe,))
+
+    sheets = load_sheets()
+    # Phu Vang 6542-3 is published both ways. The GeoPDF is already in the
+    # mosaic, so its JPG needs no hand work -- and any future overlap likewise.
+    as_pdf = {r["sheet"] for r in sheets if r["kind"] == "pdf"}
+    rows = [r for r in sheets if r["kind"] == "jpg" and r["sheet"] not in as_pdf]
+    if args.limit:
+        rows = rows[: args.limit]
+    out = ["sheet,name,corner,lon,lat"]
+    missing = []
+    for r in rows:
+        num, quad = r["sheet"].split("-")
+        cell = cells.get(num + ROMAN[quad])
+        if not cell:
+            missing.append(r["sheet"])
+            continue
+        w, s_, e, n, name = cell
+        for corner, (lon, lat) in (("NW", (w, n)), ("NE", (e, n)),
+                                   ("SE", (e, s_)), ("SW", (w, s_))):
+            x, y, _ = to_wgs.TransformPoint(lon, lat)
+            out.append(f'{r["sheet"]},"{name or r["name"]}",{corner},{x:.6f},{y:.6f}')
+    CORNERS_CSV.write_text("\n".join(out) + "\n")
+
+    # ...and one QGIS Georeferencer .points file per sheet, so the ground half
+    # is already typed in and the operator only drags each of the four markers
+    # onto the neatline corner it belongs to. The pixel positions are a guess
+    # from the mean neatline inset measured over 36 georeferenced sheets; that
+    # mean is worth +/-700 m, which is useless as an answer and fine as a place
+    # to start dragging from. QGIS writes image rows negative, hence -y.
+    GCP_DIR.mkdir(parents=True, exist_ok=True)
+    for r in rows:
+        src = local_src(r)
+        if not src.exists():
+            continue
+        ds = gdal.Open(str(src))
+        w, h = ds.RasterXSize, ds.RasterYSize
+        ds = None
+        num, quad = r["sheet"].split("-")
+        cell = cells.get(num + ROMAN[quad])
+        if not cell:
+            continue
+        west, south, east, north, _ = cell
+        guess = {"NW": (INSET[0] * w, INSET[1] * h), "NE": (INSET[2] * w, INSET[1] * h),
+                 "SE": (INSET[2] * w, INSET[3] * h), "SW": (INSET[0] * w, INSET[3] * h)}
+        lines = ["#CRS: EPSG:4326",
+                 "mapX,mapY,sourceX,sourceY,enable,dX,dY,residual"]
+        for corner, (lon, lat) in (("NW", (west, north)), ("NE", (east, north)),
+                                   ("SE", (east, south)), ("SW", (west, south))):
+            x, y, _ = to_wgs.TransformPoint(lon, lat)
+            px, py = guess[corner]
+            lines.append(f"{x:.7f},{y:.7f},{px:.1f},{-py:.1f},1,0,0,0")
+        (GCP_DIR / f"{r['sheet']}.points").write_text("\n".join(lines) + "\n")
+
+    print(f"{CORNERS_CSV}: {len(rows) - len(missing)} sheets x 4 corners")
+    print(f"{GCP_DIR}/: one .points per sheet, ground filled in, corners to drag")
+    if missing:
+        print("not in the index:", ", ".join(missing))
+
+
+# ── meta ─────────────────────────────────────────────────────────────────────
+
+
+def meta_one(row):
+    """Everything `warp` records about a sheet, minus the warp. Reads the PDF
+    only, so re-deriving the whole series is a couple of minutes rather than a
+    couple of hours -- which is what makes a lost audit trail recoverable."""
+    pdf = local_pdf(row)
+    if not pdf.exists():
+        return "miss"
+    ds = gdal.Open(str(pdf))
+    m = xmp_fields(ds)
+    if not ds.GetGCPs() and ds.GetGeoTransform(can_return_null=True) is None:
+        row["graticule_err"] = None
+        return "nogeo"
+    srs, trusted = sheet_crs(ds, m)
+    row["year"] = (m.get("pri_date") or "")[:4] or None
+    row["edition"] = m.get("edition")
+    row["crs_forced"] = not trusted
+    row["graticule_err"] = graticule_error(ds, srs, m)
+    return "ok"
+
+
+def phase_meta(args):
+    rows = [r for r in load_sheets() if r["kind"] == "pdf"]
+    if args.limit:
+        rows = rows[: args.limit]
+    tally = {}
+    with cf.ThreadPoolExecutor(max_workers=args.jobs) as pool:
+        for status in pool.map(lambda r: _safe(meta_one, r) or "fail", rows):
+            tally[status] = tally.get(status, 0) + 1
+    save_sheets(load_sheets_merged(rows))
+    print("meta: " + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
+
+
+def load_sheets_merged(updated):
+    by_file = {r["file"].lower(): r for r in updated}
+    return [by_file.get(r["file"].lower(), r) for r in load_sheets()]
+
+
+# ── pinned ───────────────────────────────────────────────────────────────────
+
+PINS = WORK / "pins.json"
+CITY = {"6330-4", "6330-1", "6330-2", "6330-3", "6329-1", "6329-4",
+        "6541-4", "6641-3", "6350-4"}
+
+
+def warp_pinned_one(row, pin):
+    """A hand-pinned JPG, warped like any other sheet.
+
+    Four corners, so an affine — not a projective, which needs more points, and
+    not a thin-plate spline, which would bend the sheet to fit noise. Measured
+    over 105 GeoPDFs the printed edges are straight to a median of 0.00 px and
+    opposite edges here agree to 0.25%, so there is no perspective for a richer
+    transform to recover. The cutline is the graticule cell itself.
+    """
+    src = JPG_DIR / (Path(row["file"]).stem.strip() + ".jpg")
+    out = COG_DIR / (Path(row["file"]).stem.strip() + ".tif")
+    if out.exists():
+        return "skip", f"{row['sheet']}: already warped"
+    if not src.exists():
+        return "miss", f"{row['sheet']}: {src.name} not downloaded"
+
+    order = ("NW", "NE", "SE", "SW")
+    gcps = []
+    for c in order:
+        px, py = pin["pixels"][c]
+        lon, lat = pin["ground"][c]
+        gcps += ["-gcp", f"{px}", f"{py}", f"{lon}", f"{lat}"]
+
+    vrt = out.with_suffix(".src.vrt")
+    res = subprocess.run(["gdal_translate", "-of", "VRT", "-a_srs", "EPSG:4326",
+                          *gcps, str(src), str(vrt)], capture_output=True, text=True)
+    if res.returncode:
+        return "fail", f"{row['sheet']}: translate: {res.stderr.strip()[-160:]}"
+
+    cut = out.with_suffix(".cutline.gpkg")
+    cut.unlink(missing_ok=True)
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    for c in order + ("NW",):
+        ring.AddPoint_2D(*pin["ground"][c])
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4326)
+    srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    ds = ogr.GetDriverByName("GPKG").CreateDataSource(str(cut))
+    layer = ds.CreateLayer("cutline", srs, ogr.wkbPolygon)
+    feat = ogr.Feature(layer.GetLayerDefn())
+    feat.SetGeometry(poly)
+    layer.CreateFeature(feat)
+    ds = None
+
+    cmd = ["gdalwarp", "-t_srs", "EPSG:3857", "-r", "cubic", "-dstalpha",
+           "-order", "1",
+           # The same white-under-transparent and GTiff+DEFLATE as the GeoPDF
+           # path, for the same two reasons: black bleeds into every hole edge
+           # through resampling, and the COG driver silently drops the alpha.
+           "-wo", "INIT_DEST=255,255,255,0",
+           "-of", "GTiff", "-co", "COMPRESS=DEFLATE", "-co", "PREDICTOR=2",
+           "-co", "TILED=YES", "-co", "BIGTIFF=IF_SAFER",
+           "-cutline", str(cut), "-cl", "cutline", "-crop_to_cutline",
+           "-multi", "-overwrite", str(vrt), str(out)]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode:
+        out.unlink(missing_ok=True)
+        return "fail", f"{row['sheet']}: warp: {res.stderr.strip()[-160:]}"
+    return "ok", f"{row['sheet']}: {out.stat().st_size // 1048576}MB"
+
+
+def phase_pinned(args):
+    if not PINS.exists():
+        sys.exit(f"{PINS} missing — save the pins from pin.html first")
+    pins = json.loads(PINS.read_text())
+    rows = {r["sheet"]: r for r in load_sheets() if r["kind"] == "jpg"}
+    todo = [(rows[s], p) for s, p in sorted(pins.items())
+            if s in rows and s not in CITY]
+    if args.limit:
+        todo = todo[: args.limit]
+    COG_DIR.mkdir(parents=True, exist_ok=True)
+    tally = {}
+    for row, pin in todo:
+        status, msg = _safe(lambda a: warp_pinned_one(*a), (row, pin)) or ("fail", "?")
+        if isinstance(status, Exception):
+            status, msg = "fail", str(status)
+        tally[status] = tally.get(status, 0) + 1
+        if status != "ok":
+            print(f"  {status.upper()} {msg}")
+    print("pinned: " + ", ".join(f"{k}={v}" for k, v in sorted(tally.items())))
+    print(f"  ({len(CITY)} city sheets are left out — they go through Allmaps)")
+
+
+# ── manifest ─────────────────────────────────────────────────────────────────
+
+# A sheet is registered by a name, a number and an outline -- not by a second
+# copy of its pixels. Those live once, in the archive `tile` builds. So the
+# manifest is one feature per sheet actually in that archive, sharing its dated
+# key so the two cannot drift apart.
+MANIFEST_PROPS = ("sheet", "name", "year", "edition", "kind", "url")
+# Generous box around the series. A footprint outside it means the transform
+# put the sheet somewhere Vietnam is not -- which is what an axis-order slip
+# looks like, and it throws no error on the way past.
+MANIFEST_BOUNDS = (100.0, 5.0, 112.0, 25.0)
+
+
+def sheet_outline(tif):
+    """A sheet's outline in WGS 84: its cutline if it has one, else its extent.
+
+    The cutline is the printed neatline, which is what the mosaic actually
+    shows. The extent is that neatline's bounding box in Web Mercator, so
+    falling back to it overstates a sheet by its own rotation -- a few hundred
+    metres at the corners. Only sheets warped without a NEATLINE take it.
+    """
+    wgs84 = osr.SpatialReference()
+    wgs84.ImportFromEPSG(4326)
+    wgs84.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+    cut = tif.with_suffix(".cutline.gpkg")
+    if cut.exists():
+        ds = ogr.Open(str(cut))
+        layer = ds.GetLayer()
+        src = layer.GetSpatialRef().Clone()
+        # `feat` has to outlive the GetGeometryRef() borrow: chaining the two
+        # frees the feature first and the reference comes back invalid.
+        feat = layer.GetNextFeature()
+        geom = feat.GetGeometryRef().Clone()
+        ds = None
+    else:
+        img = gdal.Open(str(tif))
+        gt = img.GetGeoTransform()
+        w, h = img.RasterXSize, img.RasterYSize
+        src = osr.SpatialReference(wkt=img.GetProjection())
+        img = None
+        ring = ogr.Geometry(ogr.wkbLinearRing)
+        for px, py in ((0, 0), (w, 0), (w, h), (0, h), (0, 0)):
+            ring.AddPoint_2D(gt[0] + px * gt[1] + py * gt[2],
+                             gt[3] + px * gt[4] + py * gt[5])
+        geom = ogr.Geometry(ogr.wkbPolygon)
+        geom.AddGeometry(ring)
+
+    src.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    geom.Transform(osr.CoordinateTransformation(src, wgs84))
+    return geom
+
+
+def phase_manifest(args):
+    tifs = sorted(COG_DIR.glob("*.tif"))
+    if not tifs:
+        sys.exit("manifest: no warped sheets; run warp first")
+    if args.limit:
+        tifs = tifs[: args.limit]
+    rows = {Path(r["file"]).stem.strip(): r for r in load_sheets()}
+    BUILD.mkdir(parents=True, exist_ok=True)
+
+    features, unknown, astray = [], [], []
+    for tif in tifs:
+        row = rows.get(tif.stem)
+        if not row:
+            unknown.append(tif.stem)
+            continue
+        geom = sheet_outline(tif)
+        c = geom.Centroid()
+        x0, y0, x1, y1 = MANIFEST_BOUNDS
+        if not (x0 < c.GetX() < x1 and y0 < c.GetY() < y1):
+            astray.append(f"{row['sheet']} at {c.GetX():.3f},{c.GetY():.3f}")
+            continue
+        features.append({
+            "type": "Feature",
+            # 5 decimals is ~1 m, an order finer than a 1:50,000 sheet's own
+            # drafting error, and a third of the bytes of the default 15.
+            "geometry": json.loads(geom.ExportToJson(options=["COORDINATE_PRECISION=5"])),
+            "properties": {k: row.get(k) for k in MANIFEST_PROPS},
+        })
+
+    out = BUILD / f"{args.key}.geojson"
+    out.write_text(json.dumps({"type": "FeatureCollection", "features": features},
+                              separators=(",", ":")))
+    print(f"manifest: {len(features)} sheets -> {out} ({out.stat().st_size // 1024} kB)")
+    print(f"  {len(rows) - len(features)} of {len(rows)} indexed sheets are not in the mosaic")
+    for stem in unknown:
+        print(f"  UNKNOWN {stem}: warped but not in sheets.json — re-run index")
+    for msg in astray:
+        print(f"  ASTRAY  {msg}: outside the series' own bounds")
+    if astray:
+        sys.exit("manifest: refused to write a sheet that lands outside Vietnam")
+
+
 PHASES = {
     "index": phase_index,
     "fetch": phase_fetch,
     "warp": phase_warp,
     "tile": phase_tile,
     "upload": phase_upload,
+    "pinned": phase_pinned,
+    "meta": phase_meta,
+    "corners": phase_corners,
+    "manifest": phase_manifest,
     "check": phase_check,
 }
 
