@@ -22,6 +22,39 @@ export function placeKey(text: string): string {
     .trim();
 }
 
+/**
+ * The generic words a place name is written in front of, already unaccented and
+ * lowercased the way `placeKey` leaves them (`duong` is Đường, `rach` is Rạch).
+ * Verbatim twin of Postgres's `place_generic_words()` (migration 081) — the two
+ * are pinned against each other by `tests/palette.spec.ts`.
+ */
+export const GENERIC_WORDS =
+  'rue|r|ruelle|boulevard|boul|bould|bd|blvd|avenue|av|ave|quai|quay|impasse|imp|' +
+  'place|pl|chemin|ch|route|rte|passage|village|vge|vlge|hameau|marche|pont|canal|' +
+  'arroyo|riviere|riv|fleuve|faubourg|duong|dg|pho|hem|rach|song|kenh|cho|ap|xom|' +
+  'cau|ben|khu|phuong|quan|xa|thon|lang|de|du|des|d|le|la|les|l|au|aux';
+
+/** The floor below which a stripped core is rejected. Twin of migration 081's `length(core) >= 4`. */
+export const CORE_KEY_MIN = 4;
+
+const LEADING_GENERIC = new RegExp(`^((${GENERIC_WORDS}) )+`);
+const TRAILING_ARTICLE = / (de|du|des|d|le|la|les|l)$/;
+
+/**
+ * The gazetteer's identity key: `placeKey` with the generic word in front of the
+ * name removed, so `Rue Catinat`, `R. Catinat` and `Catinat` are one place, and
+ * `Khánh Hội`, `Village de Khanh-Hoi` and `Vge de Khánh Hồi` are one more.
+ *
+ * Client twin of `place_core_key()` (migration 081), including its four-character
+ * floor: below that the full key is kept, or `Chợ Lớn` strips to `lon` and
+ * collects every other name ending in Lớn.
+ */
+export function placeCoreKey(text: string): string {
+  const key = placeKey(text);
+  const core = key.replace(LEADING_GENERIC, '').replace(TRAILING_ARTICLE, '');
+  return core.length >= CORE_KEY_MIN ? core : key;
+}
+
 /** Gazetteer `name_key` → the slug `/catalog/place/[name]` expects. */
 export const keyToSlug = (key: string) => key.replace(/\s+/g, '-');
 

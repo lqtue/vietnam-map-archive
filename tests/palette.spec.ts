@@ -16,10 +16,14 @@ import {
 } from '../src/lib/features/shared/paletteDestinations';
 import {
   placeKey,
+  placeCoreKey,
   keyToSlug,
   placeHrefFor,
   GAZETTEER_CATEGORIES,
+  GENERIC_WORDS,
+  CORE_KEY_MIN,
 } from '../src/lib/core/utils/placeKey';
+import { readFileSync } from 'node:fs';
 import { letteringRole, letteringClass } from '../src/lib/core/utils/mapLettering';
 import { isPaletteShortcut, isTypingTarget } from '../src/lib/core/utils/commandPalette';
 
@@ -121,6 +125,72 @@ test('only the five gazetteer categories get a place link', () => {
   // Categories the view does not group.
   expect(placeHrefFor('Échelle 1:5000', 'legend')).toBeNull();
   expect(placeHrefFor('Plan de Saigon', 'title')).toBeNull();
+});
+
+// ── the gazetteer's identity key ────────────────────────────────────────────
+//
+// `placeCoreKey` decides what counts as one place, so a change here merges or
+// splits pages and, with them, the per-name lookups `press.ts` bills to Gallica
+// and the NLV. Measured on the corpus when it went in: 2554 entries to 1796.
+
+test('the generic word in front of a name is not part of the name', () => {
+  // The screenshot case: three spellings, one village.
+  const khanhHoi = ['Khánh Hội', 'Village de Khanh-Hoi', 'Vge de Khánh Hồi'].map(placeCoreKey);
+  expect(new Set(khanhHoi).size).toBe(1);
+  expect(khanhHoi[0]).toBe('khanh hoi');
+
+  // A street written six ways across forty years is one street. This is what
+  // `Boul.d` / `Bould.` / `Bd` / `R.` cost before: six gazetteer pages, and six
+  // SRU calls to ask the French press about one boulevard.
+  const charner = ['Boulevard Charner', 'Bd Charner', 'Bould. Charner', 'Charner'].map(
+    placeCoreKey
+  );
+  expect(new Set(charner).size).toBe(1);
+
+  // Vietnamese generics too, since the same feature is written both ways.
+  expect(placeCoreKey('Đường Bình Tây')).toBe(placeCoreKey('Rue de Binh Tay'));
+  expect(placeCoreKey('Rạch Bến Nghé')).toBe(placeCoreKey('Arroyo de Ben Nghe'));
+
+  // A trailing article is not a name either.
+  expect(placeCoreKey('Rue de la Grandière')).toBe(placeCoreKey('Rue Grandière'));
+});
+
+test('a core too short to be a name keeps its generic word', () => {
+  // Vietnamese names are short syllables, so the generic word is a much bigger
+  // fraction of them. Without the floor "Chợ Lớn" strips to "lon" and collects
+  // every other name ending in Lớn — the merge that would be hardest to notice,
+  // because a gazetteer page that is wrong still renders.
+  expect(placeCoreKey('Chợ Lớn')).toBe('cho lon');
+  expect(placeCoreKey('Rạch Bà')).toBe('rach ba');
+  expect(placeCoreKey('Rue Cây')).toBe('rue cay');
+  // Exactly at the floor it strips.
+  expect('cong'.length).toBe(CORE_KEY_MIN);
+  expect(placeCoreKey('Rạch Công')).toBe('cong');
+});
+
+test('a place cannot be stripped down to nothing', () => {
+  // Every token is generic. The regex must not consume the whole key and leave
+  // a row whose identity is the empty string, which would swallow the others.
+  for (const all of ['Rue', 'Quai de la', 'Đường', 'de la']) {
+    expect(placeCoreKey(all).length).toBeGreaterThan(0);
+  }
+});
+
+test('the generic word list is the same one Postgres strips', () => {
+  // The list exists twice — here and in `place_generic_words()` (migration 081).
+  // A JS-only assertion would pass happily while the SQL drifted, and the
+  // symptom is not an error: it is a place page that quietly stops merging, or
+  // starts merging two streets that are not one. So read the migration.
+  const sql = readFileSync('supabase/migrations/081_place_core_key.sql', 'utf8');
+  const fnBody = sql.slice(
+    sql.indexOf('place_generic_words()'),
+    sql.indexOf('create or replace function public.place_core_key')
+  );
+  // Postgres concatenates adjacent string literals across newlines; JS uses `+`.
+  const words = (s: string) => (s.match(/'([a-z|]+)'/g) ?? []).map((m) => m.slice(1, -1)).join('');
+  expect(words(fnBody)).toBe(GENERIC_WORDS);
+  // And the floor, which is the other half of the rule.
+  expect(sql).toContain(`length(core) >= ${CORE_KEY_MIN}`);
 });
 
 test('a folded key carries nothing PostgREST reads as syntax', () => {

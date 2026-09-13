@@ -52,6 +52,8 @@ export interface LabelHit {
   bbox: [number, number, number, number];
   lng: number | null;
   lat: number | null;
+  /** Further sheets carrying the same name, collapsed into this row by /api/search. */
+  other_sheets: number;
 }
 
 export interface CatalogSearchController {

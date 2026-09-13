@@ -996,6 +996,7 @@ export type Database = {
       place_names: {
         Row: {
           category: string | null
+          core_key: string | null
           first_year: number | null
           geom_rmse: number | null
           last_year: number | null
@@ -1093,6 +1094,11 @@ export type Database = {
         Args: { p_geom_src?: string; p_map_id: string; p_public_only?: boolean }
         Returns: Json
       }
+      place_core_key: {
+        Args: { p_text: string; p_validated: string }
+        Returns: string
+      }
+      place_generic_words: { Args: never; Returns: string }
       place_key: {
         Args: { p_text: string; p_validated: string }
         Returns: string

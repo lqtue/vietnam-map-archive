@@ -10,11 +10,29 @@
  */
 
 /**
+ * Letters that are one character but two sounds. NFD does not decompose them —
+ * they are not a base letter plus a mark — so they survive the strip below and
+ * then die in the caller's `[^a-z0-9]` pass, which is how `Rue Schrœder` became
+ * the key `rue schr der` and its place page a 404. Postgres's `unaccent`
+ * expands all of these, and it is the side that decides what a row's key is.
+ */
+const LIGATURES: [RegExp, string][] = [
+  [/œ/g, 'oe'],
+  [/Œ/g, 'OE'],
+  [/æ/g, 'ae'],
+  [/Æ/g, 'AE'],
+  [/ß/g, 'ss'],
+];
+
+/**
  * Strip diacritics the way a 1920s French typesetter would have: NFD-decompose
- * and drop the combining marks, then handle `đ`, which has no decomposition.
+ * and drop the combining marks, then handle `đ` and the ligatures, which have no
+ * decomposition.
  */
 export function unaccent(s: string): string {
-  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+  let out = s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+  for (const [re, to] of LIGATURES) out = out.replace(re, to);
+  return out;
 }
 
 /** `unaccent`, lowercased — the form a case-insensitive substring match wants. */

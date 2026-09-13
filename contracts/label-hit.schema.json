@@ -2,13 +2,32 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://maparchive.vn/contracts/label-hit.schema.json",
   "title": "Label hit",
-  "description": "One OCR'd label matched inside a map, warped to the ground where the map's georeference allows it. Returned by GET /api/search?include=labels.",
+  "description": "One OCR'd label matched inside a map, warped to the ground where the map's georeference allows it. Returned by GET /api/search?include=labels. One hit per place, not per sheet: the same name on several maps is collapsed into the best match, which carries the count of the rest in other_sheets.",
   "type": "object",
-  "required": ["id", "map_id", "map_name", "year", "text", "category", "bbox", "lng", "lat"],
+  "required": [
+    "id",
+    "map_id",
+    "map_name",
+    "year",
+    "text",
+    "category",
+    "bbox",
+    "lng",
+    "lat",
+    "other_sheets"
+  ],
   "properties": {
-    "id": { "type": "string", "description": "ocr_extractions.id" },
-    "map_id": { "type": "string", "description": "maps.id (uuid)" },
-    "map_name": { "type": ["string", "null"] },
+    "id": {
+      "type": "string",
+      "description": "ocr_extractions.id"
+    },
+    "map_id": {
+      "type": "string",
+      "description": "maps.id (uuid)"
+    },
+    "map_name": {
+      "type": ["string", "null"]
+    },
     "year": {
       "type": ["integer", "null"],
       "description": "The source map's year; the only date a single sheet supports."
@@ -25,12 +44,20 @@
     "bbox": {
       "type": "array",
       "description": "Source-image pixel bbox [x, y, w, h]. Always present, because pixels are the master.",
-      "items": { "type": "number" }
+      "items": {
+        "type": "number"
+      }
     },
     "lng": {
       "type": ["number", "null"],
       "description": "Null when the map has no usable georeference."
     },
-    "lat": { "type": ["number", "null"] }
+    "lat": {
+      "type": ["number", "null"]
+    },
+    "other_sheets": {
+      "type": "integer",
+      "description": "Further sheets carrying this same name, collapsed into this hit. The sheets themselves are listed on the place page."
+    }
   }
 }

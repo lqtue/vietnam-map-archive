@@ -7,6 +7,7 @@ import {
 import { createClient, type Session } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { loadSchema, unsupportedKeywords, validate } from './schemaCheck';
+import { placeCoreKey } from '../src/lib/core/utils/placeKey';
 
 /**
  * Write-path smokes (ROADMAP A5). Unlike smoke.spec.ts these DO write rows, so
@@ -1227,6 +1228,58 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
   expect(await (await anon.get('/catalog/place/rue-de-cay-mai')).text()).not.toContain(draft!.id);
 
   await anon.dispose();
+});
+
+test('Postgres and the browser agree on what counts as one place', async () => {
+  // `place_core_key` exists twice — migration 081 and `placeCoreKey` in
+  // `$lib/core/utils/placeKey` — because a label on screen has to link to its
+  // place page without a round trip. When they disagree the link is a 404, and
+  // nothing logs it: the page renders "No place with that name in the archive"
+  // and the reader assumes the archive has not got it.
+  //
+  // `tests/palette.spec.ts` pins the word list by reading the migration, which
+  // catches an edit to one side only. It cannot catch the two engines folding a
+  // character differently — which is exactly what was wrong when this went in:
+  // Postgres's `unaccent` expands `œ` to `oe`, and NFD does not decompose it at
+  // all, so `Rue Schrœder` keyed as `schroeder` in the view and `schr der` in
+  // the browser. Hence this test, which asks the database rather than a fixture.
+  const spellings = [
+    'Rue Schrœder',
+    'Rue des Sœurs',
+    'Khánh Hội',
+    'Village de Khanh-Hoi',
+    'Vge de Khánh Hồi',
+    'Boulevard Charner',
+    'Bd Charner',
+    'Chợ Lớn', // under the four-character floor once stripped: keeps its generic
+    'Rạch Bà',
+    'Đường Bình Tây',
+    'Rue de la Grandière',
+    'Arroyo de l’Avalanche',
+    'Quai de la', // every token generic — must not strip to nothing
+    'Gia Định',
+  ];
+  for (const text of spellings) {
+    const { data, error: err } = await admin.rpc('place_core_key', {
+      p_text: text,
+      p_validated: null,
+    });
+    expect(err, `${text}: ${err?.message}`).toBeNull();
+    expect(data, `place_core_key disagrees on ${JSON.stringify(text)}`).toBe(placeCoreKey(text));
+  }
+
+  // The three Khánh Hội spellings are one place, and that is the whole point:
+  // one gazetteer page, and one lookup billed to Gallica and the NLV instead of
+  // three.
+  const khanhHoi = new Set(
+    await Promise.all(
+      spellings.slice(2, 5).map(async (t) => {
+        const { data } = await admin.rpc('place_core_key', { p_text: t, p_validated: null });
+        return data;
+      })
+    )
+  );
+  expect([...khanhHoi]).toEqual(['khanh hoi']);
 });
 
 test('geometry writes are batched, capped, and ordered correctly', async () => {

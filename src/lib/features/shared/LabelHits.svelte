@@ -1,6 +1,8 @@
 <!--
   LabelHits.svelte — "On the map" results: OCR'd labels matching the search
-  query, one row per (map, label), from `/api/search?include=labels`.
+  query, from `/api/search?include=labels`. One row per *place*: the same name
+  found on four sheets is one row carrying `+3`, not four rows, which is what it
+  was until Sept 2026 — directly under a gazetteer row already counting them.
 
   mode="link" (default) navigates to /explore?map=<id>&at=<lng>,<lat>.
   mode="pick" dispatches `pick` instead, for a caller already on /explore.
@@ -51,7 +53,11 @@
           >
             <span class="dot" style:background={CAT_COLORS[h.category] ?? CAT_COLORS.other}></span>
             <span class="text {letteringClass(h.category)}">{h.text}</span>
-            <span class="map">{h.year ?? '—'} · {h.map_name ?? 'Untitled'}</span>
+            <span class="map"
+              >{h.year ?? '—'} · {h.map_name ?? 'Untitled'}{#if h.other_sheets}<span class="more"
+                  >+{h.other_sheets}</span
+                >{/if}</span
+            >
           </svelte:element>
           {#if place}
             <a class="place-link" href={place} title="Every map that names {h.text}"
@@ -79,6 +85,16 @@
   .n {
     font-weight: var(--font-normal);
     margin-left: var(--space-1);
+  }
+  /* The other sheets carrying this same name, collapsed into this row by
+     /api/search. The place link beside it is where all of them are listed. */
+  .more {
+    margin-left: var(--space-1);
+    padding: 0 4px;
+    border-radius: var(--radius-sm);
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+    font-variant-numeric: tabular-nums;
   }
   ul {
     list-style: none;

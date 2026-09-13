@@ -23,7 +23,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { tally } from '$lib/server/facets';
 import { getTransformer } from '$lib/server/transformer';
-import { placeKey } from '$lib/core/utils/placeKey';
+import { placeKey, placeCoreKey } from '$lib/core/utils/placeKey';
 
 /**
  * Distinct maps whose annotation we will fetch to warp label hits that have no
@@ -68,6 +68,8 @@ export interface LabelHit {
   /** Null when the map has no usable annotation. */
   lng: number | null;
   lat: number | null;
+  /** Further sheets carrying this same name, collapsed into this row. */
+  other_sheets: number;
 }
 
 /** Everything a catalog card, the facet rail and the admin editor read. */
@@ -293,10 +295,23 @@ export const GET: RequestHandler = async ({ locals, url }) => {
           bbox: [h.x, h.y, h.w, h.h],
           lng,
           lat,
+          other_sheets: 0,
         });
       }
     }
-    return labels;
+    // One row per place, not one per sheet. `search_labels` already collapses a
+    // name repeated within one sheet; across sheets "Khánh Hội" on four maps was
+    // four near-identical rows under "On the map", directly beneath the
+    // gazetteer row that already says how many mentions there are. The first
+    // survives — the RPC orders by similarity, so it is the best match — and
+    // carries the count of the rest, which is what the row prints.
+    const byPlace = new Map<string, LabelHit>();
+    for (const l of labels) {
+      const first = byPlace.get(placeCoreKey(l.text));
+      if (first) first.other_sheets += 1;
+      else byPlace.set(placeCoreKey(l.text), l);
+    }
+    return [...byPlace.values()];
   };
 
   // The four blocks above share nothing but the client, and each is a round
