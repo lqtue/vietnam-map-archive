@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { stepDown } from '$lib/core/iiif/thumbUrl';
   import type { MapListItem } from '$lib/data/maps/types';
   export let map: MapListItem;
   /** Full href for the card link. Caller builds it (home page adds &city=, catalog doesn't).
@@ -17,8 +18,23 @@
   export let showSourceBadge: boolean = false;
   const dispatch = createEventDispatcher<{ toggleFavorite: string; open: MapListItem }>();
 
+  /** The `thumbnail` prop is a width the caller asked for, and a width is not
+   *  guaranteed to exist: the R2 worker renders nothing, so a sheet mirrored
+   *  without that derivative and without a `sources/` proxy entry 404s it
+   *  forever. 62 Indochine sheets are in exactly that state — only the `w,h`
+   *  form vips wrote is stored, which is what `map.thumbnail` holds. Hiding the
+   *  image outright made 56 published sheets invisible in /catalog's grid while
+   *  the same rows drew fine in list view, which has always used `stepDown`. */
+  let failedSrc: string | null = null;
+  $: showPlaceholder = !thumbnail || failedSrc === thumbnail;
+
   function handleImageError(e: Event) {
-    (e.target as HTMLImageElement).style.display = 'none';
+    const img = e.currentTarget as HTMLImageElement;
+    if (map.thumbnail && img.src !== map.thumbnail) {
+      stepDown(e, map.thumbnail);
+      return;
+    }
+    failedSrc = thumbnail ?? null;
   }
 
   function shortCollection(c: string | undefined): string {
@@ -49,10 +65,10 @@
     on:click={() => !href && dispatch('open', map)}
   >
     <div class="map-thumbnail">
-      {#if thumbnail}
-        <img src={thumbnail} alt={map.name} loading="lazy" on:error={handleImageError} />
-      {:else}
+      {#if showPlaceholder}
         <div class="placeholder-pattern"></div>
+      {:else}
+        <img src={thumbnail} alt={map.name} loading="lazy" on:error={handleImageError} />
       {/if}
       <div class="map-badges">
         {#if map.year}
