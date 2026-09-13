@@ -62,7 +62,19 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     if (r.location) cities.set(r.location, (cities.get(r.location) ?? 0) + 1);
   }
 
-  setHeaders({ 'cache-control': 'public, max-age=3600' });
+  // One minute, not one hour. The data behind this page changes slowly and an
+  // hour was right about that — but the header caches the *HTML*, and a
+  // SvelteKit page's HTML names its JS chunks by content hash. A deploy writes
+  // new hashes and deletes the old files, so for the rest of its TTL this page
+  // served a cached document pointing at eight chunks that no longer existed:
+  // 404s, no hydration, and nothing in the page itself to say so. Measured on
+  // the 2026-09-13 deploy at `age: 3193` — 53 minutes of a page that renders
+  // and does not work.
+  //
+  // /about is the only editorial page setting a max-age at all; the rest are
+  // dynamic and were unaffected. A minute keeps the six queries off a crawl
+  // burst and shrinks the post-deploy window to something a hard reload fixes.
+  setHeaders({ 'cache-control': 'public, max-age=60' });
 
   return {
     stats: {
