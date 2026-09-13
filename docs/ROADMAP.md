@@ -100,6 +100,19 @@ Four lessons, each of which cost real time today:
 
 ### Open from the survey layer (2026-09-13)
 
+- [ ] **`series_sheets.held_by` / `map_id` is a snapshot, and nothing maintains
+      it.** Verified 2026-09-13: no trigger, no function, and the only writers
+      in the tree are the one-off import scripts. So the day anyone
+      georeferences one of the 123 obtainable L7014 sheets, or publishes a
+      draft, the index still says *gap* and the coverage page still draws it as
+      missing — right about the survey, wrong about us, with no symptom but a
+      plausible-looking number. That is the same shape as all three of today's
+      green-gate failures, one level up. The index is consistent **right now**
+      (no cell marked gap has a `maps` row). Stopgap: both seeders upsert on
+      `series_key,sheet_number`, so re-running them is safe and idempotent. Real
+      fix: derive `held_by`/`map_id` in a view, or a trigger on `maps`.
+      Exit: publishing a draft moves its cell to *held* with nobody running
+      anything.
 - [ ] **Six L7014 rows have no `full/400,/` derivative** — Gò Công 6329-4, Nhơn
       Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1 and two more. All draft, so
       harmless now and **fatal on publish**. Fix:
@@ -111,9 +124,9 @@ Four lessons, each of which cost real time today:
 - [ ] **Two Indochine sheets have no `source_url`**: 35 "An Thi" (ours 1904;
       serie 243 holds 1905 and 1924 — our year may be a typo) and `0 bis` "Nha
       nam" (absent from 243 entirely; 175 has it).
-- [ ] **AMS L909 has no `series_sheets` index**, which is why its /explore row
-      offers no coverage page. Three sheets; someone must decide what that
-      survey contains.
+- [ ] **AMS L909 has no `series_sheets` index**, so it has no coverage page and
+      its /explore row offers no link — one decision, not two. Three sheets;
+      someone must decide what that survey contains.
 - [ ] **Nothing lists all surveys in one place.** `/catalog/series/<key>` is
       reachable only from the /explore rail, and the two new routes are in
       neither `sitemap.xml` nor `paletteDestinations.ts` — which `CLAUDE.md`
@@ -135,9 +148,20 @@ Four lessons, each of which cost real time today:
       `scripts/oneoff/import_indochine_series_sheets.mjs`; union every edition
       of the survey, not one.
 
-A client trap found on the way, worth not rediscovering: selecting a column
-`map_series` no longer has returns `null` through `.maybeSingle()` rather than
-erroring — so a stale column name reads as "no such series" instead of failing.
+**Four numbers can all be correct and all differ**, and a mismatch between them
+is not a bug. L7014: an ArcGIS index says 627 cells, PCL publishes 535 scans, we
+hold 461, and 9 are `maps` rows. Indochine: its own series record declares 81,
+the union of CartoMundi's two catalogues gives 79 — so 79 is a floor, not the
+truth. Say which of the four a number is before comparing it to another.
+
+Two traps found on the way, worth not rediscovering:
+
+- **`map_series.sheets` counts CELLS as of 084, not rows.** Compare it against a
+  `maps` row count and you are off by the multi-edition cells: for a signed-in
+  reader L7014 is 24 cells over 31 rows, Indochine 59 over 62.
+- Selecting a column `map_series` no longer has returns `null` through
+  `.maybeSingle()` rather than erroring — so a stale column name reads as "no
+  such series" instead of failing.
 
 ### Found while starting the OCR pass (2026-09-04)
 
@@ -252,6 +276,10 @@ The surface a person walks through: one District 4 route on foot, the warped she
 - ~~43 maps `georef_done` but 404 upstream~~ — **not true as of 2026-09-01**. Measured against production: every one of the 39 `georef_done` maps has a mirrored `annotation_url`, and the 62 that 404 on allmaps.org all have `georef_done = false`, correctly, because they were never georeferenced. `sync-georef` has nothing to fix.
 - `/scan?mode=shapes&tab=validate` back-link: the round icon button overlaps the "Contribute" label
 - `/explore` Display row: the "Side-by-side" button label is clipped
+- `/explore`: adding a series layer switches the left rail to the Picked tab,
+  which unmounts the browse list — so the "tap again to remove" the hint
+  promises is not reachable from where the reader just tapped. Pre-existing,
+  found driving the merged L7014 row (2026-09-13)
 - API response shapes → `{ ok, data }`
 - tokens.css grey ramp → fold the `color-mix` hacks
 - 69 eslint warnings (mostly unkeyed `{#each}`)
