@@ -11,6 +11,10 @@ import {
   nlvDate,
   nlvItem,
   nlvSearchUrl,
+  oidDate,
+  parseNlvCurve,
+  parseNlvRows,
+  parseNlvTotal,
 } from '../src/lib/server/press';
 
 // Pure checks for the two /api/press providers: Gallica's CQL builder and the
@@ -82,64 +86,115 @@ test('gallicaSearchUrl is a well-formed SRU call', () => {
 
 /* ------------------------------------------------------- nlv (baochi.nlv.gov.vn) */
 
-// The proxy ignores every date parameter, so the year window is ours to apply.
-// If this filter regresses, /api/press silently answers with the wrong decade.
-const NLV_ROWS = [
-  {
-    article_id: 1,
-    title: 'Page 3 Advertisements Column 1',
-    date_id: '19230501',
-    publication_name: 'Sài Gòn',
-    article_url: 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi?a=d&d=RbD19230501.2.9.1',
-    image_srcset: 'https://p.example/i?w=480 480w, https://p.example/i?w=900 900w',
-  },
-  {
-    article_id: 2,
-    title: 'Page 4 Advertisements Column 2',
-    date_id: '19360228',
-    publication_name: 'Sài Gòn',
-    article_url: 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi?a=d&d=RbD19360228.2.15.2',
-    image_srcset: 'https://p.example/j?w=480 480w, https://p.example/j?w=900 900w',
-  },
-];
+// One Veridian results page, trimmed to two results and the decade facet. The
+// archive answers over http only and returns no matched text — the page image
+// and its `crop` box are the evidence — so what these checks defend is that the
+// oid, the date, the publication and the crop all survive the parse.
+//
+// The important failure is silent: a Veridian template change produces zero rows
+// against a stated total, which reads as "the archive has nothing on this place"
+// rather than as a bug. `fetchNlvPress` turns that into a degradation; this pins
+// the parse itself.
+const NLV_HTML = `
+<td class="veridiansearchtablesubcontrolcell">
+  Quá trình tìm kiếm for <b>Khánh Hội</b> trả về 88 kết quả. Hiển thị các kết quả từ 1 to 20.
+</td>
+<table cellpadding="3" cellspacing="0"><tr valign="top">
+  <td><a href="/baochi/cgi-bin/baochi?a=d&amp;d=RbD19230501.2.9.1&amp;srpos=1&amp;e=-----">Chợ Khánh Hội &#91;Bài báo&#93;</a>
+  <div>Sài Gòn 1 Tháng Năm 1923</div>
+  <div class="veridiansnippetimagecontainerdiv"><img src="/baochi/cgi-bin/imageserver/imageserver.pl?oid=RbD19230501.2.9.1&amp;area=1&amp;crop=209,3322,621,81&amp;width=311&amp;color=all&amp;ext=jpg&amp;key=" /></div>
+  </td></tr></table>
+<table cellpadding="3" cellspacing="0"><tr valign="top">
+  <td><a href="/baochi/cgi-bin/baochi?a=d&amp;d=RbD19360228.2.15.2&amp;srpos=2&amp;e=-----">Page 4 Advertisements Column 2 &#91;ADVERTISEMENT&#93;</a>
+  <div>Sài Gòn 28 Tháng Hai 1936</div>
+  </td></tr></table>
+<script>initialiseCollapsibleTableEntry('facet-de', 'expanded');</script>
+  <a href="?x">1920-1929</a> (7) <a href="?x">1930-1939</a> (42) <a href="?x">1970-1979</a> (19)
+<script>initialiseCollapsibleTableEntry('facet-wo', 'expanded');</script>
+  <a href="?x">51 - 1000</a> (60)
+`;
+
+test('parseNlvRows reads oid, headline, document type, publication and crop', () => {
+  const rows = parseNlvRows(NLV_HTML);
+  expect(rows).toHaveLength(2);
+  expect(rows[0]).toEqual({
+    oid: 'RbD19230501.2.9.1',
+    title: 'Chợ Khánh Hội',
+    docType: 'Bài báo',
+    publication: 'Sài Gòn',
+    dateId: '19230501',
+    crop: '209,3322,621,81',
+  });
+  // The printed date is stripped off the publication, and a result with no
+  // snippet image still parses — it just has no crop.
+  expect(rows[1].publication).toBe('Sài Gòn');
+  expect(rows[1].crop).toBeNull();
+});
+
+test('parseNlvTotal and parseNlvCurve read the stated total and the decade facet', () => {
+  expect(parseNlvTotal(NLV_HTML)).toBe(88);
+  expect(parseNlvTotal('<p>no results here</p>')).toBeNull();
+  // Only the publication-decade facet, never the word-count facet after it.
+  expect(parseNlvCurve(NLV_HTML)).toEqual({
+    total: 68,
+    decades: { 1920: 7, 1930: 42, 1970: 19 },
+  });
+  expect(parseNlvCurve('<p>nothing</p>')).toEqual({ total: 0, decades: {} });
+});
+
+test('oidDate pulls the packed date out of the archive key', () => {
+  expect(oidDate('HtCq19320421.1.31')).toBe('19320421');
+  expect(oidDate('nonsense')).toBe('');
+});
 
 test('the nlv year window keeps 1923 and drops 1936 at ±10 around 1923', () => {
-  const kept = filterNlvByYear(NLV_ROWS, 1923, 10);
-  expect(kept.map((r) => r.date_id)).toEqual(['19230501']);
+  const rows = parseNlvRows(NLV_HTML);
+  expect(filterNlvByYear(rows, 1923, 10).map((r) => r.dateId)).toEqual(['19230501']);
   // Widen the window and the 1936 issue comes back.
-  expect(filterNlvByYear(NLV_ROWS, 1923, 15).map((r) => r.date_id)).toEqual([
+  expect(filterNlvByYear(rows, 1923, 15).map((r) => r.dateId)).toEqual([
     '19230501',
     '19360228',
   ]);
-  // A missing or junk date_id is dropped, never treated as year zero.
-  expect(filterNlvByYear([{ date_id: undefined }, { date_id: 'RbD' }], 1923, 10)).toEqual([]);
+  // A missing or junk date is dropped, never treated as year zero.
+  expect(filterNlvByYear([{ dateId: undefined }, { dateId: 'RbD' }], 1923, 10)).toEqual([]);
 });
 
-test('nlvDate unpacks date_id, degrading on zeroed parts', () => {
+test('nlvDate unpacks the packed date, degrading on zeroed parts', () => {
   expect(nlvDate('19360228')).toBe('1936-02-28');
   expect(nlvDate('19360200')).toBe('1936-02');
   expect(nlvDate('19360000')).toBe('1936');
   expect(nlvDate('')).toBe('');
 });
 
-test('nlvItem maps a proxy row to the response shape', () => {
-  const item = nlvItem(NLV_ROWS[1]);
-  expect(item).toEqual({
+test('nlvItem maps a parsed row to the response shape', () => {
+  const [withCrop, without] = parseNlvRows(NLV_HTML);
+  // The thumbnail is the matched phrase, not the newspaper page: ~120 kB rather
+  // than ~1.4 MB. It goes through the https proxy because the archive itself is
+  // http only and a browser blocks a mixed-content image.
+  expect(nlvItem(withCrop)).toEqual({
     source: 'nlv',
-    title: 'Sài Gòn — Page 4 Advertisements Column 2',
-    date: '1936-02-28',
+    title: 'Sài Gòn — Chợ Khánh Hội',
+    date: '1923-05-01',
     snippet: '',
-    url: 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi?a=d&d=RbD19360228.2.15.2',
-    thumb: 'https://p.example/j?w=480',
+    url: 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi?a=d&d=RbD19230501.2.9.1',
+    thumb:
+      'https://baochi-tvqg.vercel.app/api/image?oid=RbD19230501.2.9.1&area=1' +
+      '&crop=209,3322,621,81&w=621&color=all&ext=jpg',
   });
+  // No crop stated: fall back to the whole page at a small width.
+  expect(nlvItem(without).thumb).toContain('&w=480&');
 });
 
-test('nlvSearchUrl sends the label as typed', () => {
+test('nlvSearchUrl quotes the label, because txq ANDs unquoted words', () => {
   const url = new URL(nlvSearchUrl('Khánh Hội', 50));
-  expect(url.origin + url.pathname).toBe('https://baochi-tvqg.vercel.app/api/search');
-  expect(url.searchParams.get('q')).toBe('Khánh Hội');
-  expect(url.searchParams.get('limit')).toBe('50');
-  expect(url.searchParams.get('offset')).toBe('0');
+  expect(url.origin + url.pathname).toBe('http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi');
+  // Unquoted, this is "Khánh anywhere and Hội anywhere" — a different question,
+  // and on this archive an enormously noisier one.
+  expect(url.searchParams.get('txq')).toBe('"Khánh Hội"');
+  expect(url.searchParams.get('txf')).toBe('txIN');
+  expect(url.searchParams.get('o')).toBe('50');
+  // A quote in the label cannot end the phrase early.
+  expect(new URL(nlvSearchUrl('Khanh" Hoi', 50)).searchParams.get('txq')).toBe('"Khanh Hoi"');
 });
 
 /* --------------------------------------------------------------------- merge */

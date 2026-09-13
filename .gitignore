@@ -40,3 +40,5 @@ work/cleanup/
 scripts/scout_all_*.json
 scripts/scout_review.csv
 work/l7014/
+work/press/
+work/legend/

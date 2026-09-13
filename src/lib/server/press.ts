@@ -5,9 +5,10 @@
  *  - **gallica** (`./gallica.ts`) — BnF. The French-language colonial press:
  *    *L'Écho annamite*, *Le Courrier saïgonnais*, the *Annuaire général*.
  *  - **nlv** (here) — the National Library of Vietnam's newspaper archive
- *    (`baochi.nlv.gov.vn`): *Sài Gòn*, *Công luận báo*, *Điện tín* and ~76 other
+ *    (`baochi.nlv.gov.vn`): *Sài Gòn*, *Công luận báo*, *Điện tín* and 78 other
  *    titles. The Vietnamese-language press, and the better source for a
- *    Vietnamese place name after 1900.
+ *    Vietnamese place name after 1900. Queried **directly** — see below — which
+ *    also returns a decade-by-decade curve for the name at no extra cost.
  *
  * Nothing is stored. One provider failing never fails the response — the caller
  * still answers 200 and names the degradation in `reason`.
@@ -38,44 +39,131 @@ export type PressResult = {
   query?: string;
   /** Present only when a provider degraded. */
   reason?: string;
+  /**
+   * Hits per decade across the whole archive, not just the requested window —
+   * "when was this place in the news". Free: it comes off the same NLV response
+   * as the items. Gallica has no facet and a curve there would be one request
+   * per decade, so only `nlv` is present.
+   */
+  curve?: { nlv?: PressCurve };
 };
 
 /**
- * ponytail: the National Library has no public API of its own, so this is the
- * hanoimaps project's Vercel proxy in front of `baochi.nlv.gov.vn` — a courtesy,
- * not an institutional endpoint. Hence: one request per lookup, a bounded
- * timeout, the route's 24 h edge cache, and no retry, ever. The durable fixes
- * are the library's own interface at baochi.nlv.gov.vn or asking hanoimaps for
- * permission; until one of those, treat an `nlv` failure as normal.
+ * The National Library's archive runs **Veridian**, whose search is a plain GET
+ * and needs no session — so this talks to the library directly rather than to
+ * the proxy behind hanoimaps.github.io/news, which was 8-16 s per call, stated
+ * no result total, and exposed none of the filters below.
+ *
+ * `txq` ANDs words unless they are quoted, so the label goes over **quoted**:
+ * unquoted, `bản đồ` means "bản anywhere and đồ anywhere" and returns 15,154
+ * rows of noise against 838 for the phrase.
+ *
+ * `o` is the page size (50 max) and `r` the 1-based index of the first result.
  */
-const NLV_ENDPOINT = 'https://baochi-tvqg.vercel.app/api/search';
+const NLV_SEARCH = 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi';
+const NLV_PAGE = 50;
 /**
- * Measured: the proxy answers in ~7.5 s regardless of `limit` (the upstream CGI
- * is the cost, not the page size), so a "short" timeout has to be this long to
- * be worth having at all. Only the first caller of a (q, decade) pays it — the
- * route's 24 h edge cache absorbs the rest.
+ * The archive answers on **http only** — no https listener at all. A server-side
+ * subrequest is fine with that, but a browser on an https page blocks an http
+ * image, so thumbnails cannot come from the library's own image server. They
+ * come from the hanoimaps proxy instead, which is https and passes Veridian's
+ * `crop` straight through. That crop is the box of the matched phrase on the
+ * page, so a thumbnail is now the clipping itself at ~120 kB rather than the
+ * whole newspaper page at ~1.4 MB.
  */
-const NLV_DEADLINE_MS = 9_000;
-/**
- * ponytail: the proxy ignores every date parameter (`date_from`, `date_to`,
- * `year`, `from`/`to`, `publication` were all probed — identical results), so
- * the year window is applied here on `date_id`. Consequence, and the ceiling:
- * we over-fetch by this factor and filter down, which means a narrow window can
- * legitimately come back empty even though the archive holds matches outside it.
- * A real date filter has to come from the upstream interface.
- */
-const NLV_OVERFETCH = 5;
-const NLV_MAX_FETCH = 60;
-/** The proxy has no /api/publications (404) — do not try to enumerate titles. */
+const NLV_IMAGE = 'https://baochi-tvqg.vercel.app/api/image';
+/** Direct, the search answers in about 1.5 s; this is headroom, not the budget. */
+const NLV_DEADLINE_MS = 8_000;
 
-type NlvResult = {
-  title?: string;
-  date_id?: string;
-  publication_name?: string;
-  article_url?: string;
-  image_srcset?: string;
-  image_url?: string;
+/** One parsed result row. `crop` is `x,y,w,h` on the page scan, when stated. */
+export type NlvRow = {
+  oid: string;
+  title: string;
+  docType: string;
+  publication: string;
+  dateId: string;
+  crop: string | null;
 };
+
+/** Hits per decade, keyed by the decade's first year. */
+export type PressCurve = { total: number; decades: Record<number, number> };
+
+/** Strip tags and decode the few entities Veridian emits. Pure. */
+function plain(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(Number(d)))
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** `"HtCq19320421.1.31"` → the packed date `"19320421"`. Pure. */
+export function oidDate(oid: string): string {
+  return /^[A-Za-z]+(\d{8})\b/.exec(oid ?? '')?.[1] ?? '';
+}
+
+/** `"…trả về 15154 kết quả…"` → 15154. Null when the page states no total. Pure. */
+export function parseNlvTotal(html: string): number | null {
+  const m = /trả về\s+([\d.,]+)\s+kết quả/.exec(plain(html));
+  return m ? Number(m[1].replace(/[.,]/g, '')) : null;
+}
+
+/**
+ * The results page's decade facet → the whole time curve, from the same
+ * response as the results. This is the reason to talk to the archive directly:
+ * "when was this place in the news" costs no extra request.
+ *
+ * Pure.
+ */
+export function parseNlvCurve(html: string): PressCurve {
+  const start = html.indexOf("'facet-de'");
+  const end = html.indexOf("'facet-wo'");
+  const decades: Record<number, number> = {};
+  let total = 0;
+  if (start >= 0 && end > start)
+    for (const [, d, n] of plain(html.slice(start, end)).matchAll(/(\d{4})-\d{4}\D{0,120}?\((\d+)\)/g)) {
+      decades[Number(d)] = Number(n);
+      total += Number(n);
+    }
+  return { total, decades };
+}
+
+/**
+ * One results page → its rows. Each result is a `<table cellpadding="3">`: the
+ * title anchor carries the oid, the `<div>` under it the publication and printed
+ * date, and the snippet `<img>` the crop box.
+ *
+ * ponytail: regexes, not a parser — Workers have no DOMParser and this is flat
+ * machine-generated markup from one publisher. The ceiling is a Veridian
+ * template change, which shows up as zero rows against a non-zero total; the
+ * caller reports that as a degradation rather than as an empty archive.
+ *
+ * Pure.
+ */
+export function parseNlvRows(html: string): NlvRow[] {
+  const rows: NlvRow[] = [];
+  for (const block of html.split(/<table cellpadding="3"/).slice(1)) {
+    const a = /<a href="[^"]*a=d&amp;d=([^&"]+)&amp;srpos=\d+[^"]*"\s*>([^<]*)<\/a>/.exec(block);
+    if (!a) continue;
+    const line = /<\/a>\s*<div>([^<]*)<\/div>/.exec(block);
+    const crop = /crop=(\d+,\d+,\d+,\d+)/.exec(block);
+    const title = plain(a[2]);
+    // Veridian appends the document type in brackets: "Bản đồ Công-gô [Bài báo]".
+    const typed = /^(.*?)\s*\[([^\]]+)\]\s*$/.exec(title);
+    rows.push({
+      oid: a[1],
+      title: typed ? typed[1] : title,
+      docType: typed ? typed[2] : '',
+      publication: line ? plain(line[1]).replace(/\s*\d{1,2} Tháng .*$/, '').trim() : '',
+      dateId: oidDate(a[1]),
+      crop: crop ? crop[1] : null,
+    });
+  }
+  return rows;
+}
 
 /** `"19360228"` → 1936. Null when the id is not a plausible packed date. */
 export function nlvYear(dateId: string | undefined): number | null {
@@ -94,8 +182,8 @@ export function nlvDate(dateId: string | undefined): string {
   return `${y}-${mm}-${dd}`;
 }
 
-/** Pure: keep only results whose `date_id` year is inside `year ± windowYears`. */
-export function filterNlvByYear<T extends { date_id?: string }>(
+/** Pure: keep only rows whose year is inside `year ± windowYears`. */
+export function filterNlvByYear<T extends { dateId?: string }>(
   results: T[],
   year: number,
   windowYears: number
@@ -103,32 +191,45 @@ export function filterNlvByYear<T extends { date_id?: string }>(
   const lo = Math.trunc(year) - Math.trunc(windowYears);
   const hi = Math.trunc(year) + Math.trunc(windowYears);
   return results.filter((r) => {
-    const y = nlvYear(r.date_id);
+    const y = nlvYear(r.dateId);
     return y !== null && y >= lo && y <= hi;
   });
 }
 
-/** Pure: one proxy result → the response item shape. */
-export function nlvItem(r: NlvResult): PressItem {
-  const pub = (r.publication_name ?? '').trim();
-  const headline = (r.title ?? '').trim();
-  // The 480w candidate off image_srcset; image_url is the 900w one.
-  const thumb = r.image_srcset?.split(',')[0]?.trim().split(' ')[0] ?? r.image_url ?? '';
+/** Pure: one parsed row → the response item shape. */
+export function nlvItem(r: NlvRow): PressItem {
+  const headline = r.title.trim();
   return {
     source: 'nlv',
-    title: [pub, headline].filter(Boolean).join(' — ') || '(untitled)',
-    date: nlvDate(r.date_id),
-    // ponytail: the proxy returns no matched text, only the page image. The
-    // image *is* the evidence here; a snippet would need the upstream OCR.
+    title: [r.publication, headline].filter(Boolean).join(' — ') || '(untitled)',
+    date: nlvDate(r.dateId),
+    // ponytail: the archive returns no matched text, only the page image. The
+    // crop below *is* the evidence; a snippet would need the upstream OCR.
     snippet: '',
-    url: r.article_url ?? '',
-    thumb,
+    url: `${NLV_SEARCH}?a=d&d=${r.oid}`,
+    thumb: r.crop
+      ? `${NLV_IMAGE}?oid=${r.oid}&area=1&crop=${r.crop}&w=${r.crop.split(',')[2]}&color=all&ext=jpg`
+      : `${NLV_IMAGE}?oid=${r.oid}&area=1&w=480&color=all&ext=jpg`,
   };
 }
 
+/**
+ * The search URL. `limit` is capped at Veridian's own page size — one page is
+ * one request, and the year window is applied to the rows we get back.
+ */
 export function nlvSearchUrl(q: string, limit: number): string {
-  const p = new URLSearchParams({ q, limit: String(limit), offset: '0' });
-  return `${NLV_ENDPOINT}?${p}`;
+  const p = new URLSearchParams({
+    a: 'q',
+    r: '1',
+    results: '1',
+    // Quoted: unquoted, `txq` ANDs the words rather than matching the phrase.
+    txq: `"${q.replace(/"/g, '')}"`,
+    txf: 'txIN',
+    ssnip: 'img',
+    o: String(Math.min(NLV_PAGE, Math.max(1, limit))),
+    e: '-------vi-20--1--img-txIN------',
+  });
+  return `${NLV_SEARCH}?${p}`;
 }
 
 async function fetchNlvPress(opts: {
@@ -136,24 +237,23 @@ async function fetchNlvPress(opts: {
   year: number;
   windowYears: number;
   limit: number;
-}): Promise<PressItem[]> {
-  const ask = Math.min(NLV_MAX_FETCH, opts.limit * NLV_OVERFETCH);
+}): Promise<{ items: PressItem[]; curve: PressCurve }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), NLV_DEADLINE_MS);
   try {
-    // ponytail: the label goes over as typed — one query, no spelling variants.
-    // The proxy exposes no OR syntax, and its corpus is accented Vietnamese.
-    const res = await fetch(nlvSearchUrl(opts.q, ask), {
-      signal: controller.signal,
-      headers: { Accept: 'application/json' },
-    });
+    // One request. The window is applied here rather than through the archive's
+    // own `dafyq`/`datyq`, because the decade facet on this page is the whole
+    // curve and asking for a window would narrow that to the window too.
+    const res = await fetch(nlvSearchUrl(opts.q, NLV_PAGE), { signal: controller.signal });
     if (!res.ok) throw new Error(`nlv http ${res.status}`);
-    const body = (await res.json()) as { results?: NlvResult[] };
-    const rows = Array.isArray(body?.results) ? body.results : [];
-    return filterNlvByYear(rows, opts.year, opts.windowYears)
-      .slice(0, opts.limit)
-      .map(nlvItem)
-      .filter((i) => i.url);
+    const html = await res.text();
+    const rows = parseNlvRows(html);
+    if (!rows.length && (parseNlvTotal(html) ?? 0) > 0)
+      throw new Error('nlv parse failed: results stated, none parsed');
+    return {
+      items: filterNlvByYear(rows, opts.year, opts.windowYears).slice(0, opts.limit).map(nlvItem),
+      curve: parseNlvCurve(html),
+    };
   } finally {
     clearTimeout(timer);
   }
@@ -208,8 +308,10 @@ export async function fetchPress(opts: {
     console.error('[press] gallica rejected:', gallica.reason);
     reasons.push('gallica unavailable');
   }
+  let curve: { nlv?: PressCurve } | undefined;
   if (nlv.status === 'fulfilled' && nlv.value) {
-    lists.push(nlv.value);
+    lists.push(nlv.value.items);
+    if (nlv.value.curve.total) curve = { nlv: nlv.value.curve };
   } else if (nlv.status === 'rejected') {
     console.error('[press] nlv rejected:', nlv.reason);
     reasons.push(
@@ -224,5 +326,6 @@ export async function fetchPress(opts: {
     sources,
     query,
     reason: reasons.length ? reasons.join('; ') : undefined,
+    curve,
   };
 }

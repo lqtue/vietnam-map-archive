@@ -1,0 +1,26 @@
+# Map/survey vocabulary for scripts/scout_nlv_press.mjs (baochi.nlv.gov.vn).
+#
+# QUOTED ON PURPOSE. The archive's txq ANDs the words in an unquoted query, so
+# `bản đồ` means "bản anywhere AND đồ anywhere" — 15,154 pages, nearly all of it
+# noise, and `đồ bản` returns the identical set. The quoted form is the phrase:
+# 838. The count after each line is that phrase's total, measured 2026-09-13.
+#
+# Geography is NOT a query term. "bản đồ" "Sài Gòn" is only 41 rows — a paper
+# printing a city map rarely names the city in the same breath. The HCMC corpus
+# comes from the publication instead: harvest the vocabulary, then split on the
+# southern titles (--pub, or the publication facet). See docs/pipelines.md.
+"bản đồ"        # 838
+"quy hoạch"     # 562  — post-1975
+"carte"         # 457  — French, and the papers do print it
+"địa dư"        # 213
+"plan"          # 191
+"họa đồ"        # 189  — the archive folds diacritic placement; "hoạ đồ" is the same query
+"địa đồ"        # 174
+"đo đạc"        # 115
+"cadastre"      # 76
+"sơ đồ"         # 72
+"địa chính"     # 67
+"đồ bản"        # 41
+"địa chánh"     # 40   — southern spelling
+"trắc địa"      # 19
+"bình đồ"       # 8    — site plan; rarer than the proxy's AND-matching suggested

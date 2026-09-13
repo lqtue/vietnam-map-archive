@@ -42,16 +42,47 @@
     nlv: 'National Library of Vietnam',
   };
 
+  /**
+   * Hits per decade across the whole archive, not just the window shown below.
+   * It arrives with the items — the National Library's results page carries a
+   * decade facet, so "when was this place in the news" costs no extra request.
+   * Gallica has no facet, so the curve is the Vietnamese press only and says so.
+   */
+  let curve: { total: number; decades: Record<string, number> } | null = null;
   let items: PressItem[] = [];
   let loading = false;
   let reason: string | null = null;
   let loadedKey = '';
+
+  /**
+   * Only the decades the archive actually has, in order — the axis comes from
+   * the data rather than from a fixed range, because the run is usually a few
+   * decades wide and this panel is 21rem. A decade overlapping the window shown
+   * below is marked, so the clippings can be read against the whole curve.
+   */
+  function bars(c: { decades: Record<string, number> }, y: number | null, w: number) {
+    const rows = Object.entries(c.decades)
+      .map(([decade, n]) => ({ decade: Number(decade), n }))
+      .sort((a, b) => a.decade - b.decade);
+    const peak = Math.max(1, ...rows.map((r) => r.n));
+    return rows.map((r) => ({
+      ...r,
+      pct: Math.max(6, Math.round((r.n / peak) * 100)),
+      inWindow: y !== null && r.decade + 9 >= y - w && r.decade <= y + w,
+    }));
+  }
+
+  $: decadeBars = curve ? bars(curve, year, window_) : [];
+  $: span = decadeBars.length
+    ? `${decadeBars[0].decade}s–${decadeBars[decadeBars.length - 1].decade}s`
+    : '';
 
   async function load(name: string, y: number | null) {
     const key = `${name}|${y ?? ''}|${variants.join('|')}`;
     if (key === loadedKey) return;
     loadedKey = key;
     items = [];
+    curve = null;
     reason = null;
     loading = true;
     try {
@@ -63,6 +94,7 @@
       const data = await res.json();
       if (loadedKey !== key) return; // a newer pick won
       items = data.items ?? [];
+      curve = data.curve?.nlv ?? null;
       reason = data.reason ?? null;
     } catch {
       // The archives are third-party and sometimes slow or down. An empty
@@ -94,6 +126,25 @@
         >
       {/if}
     </header>
+
+    {#if decadeBars.length}
+      <figure class="curve">
+        <ul class="ticks">
+          {#each decadeBars as b (b.decade)}
+            <li class:in-window={b.inWindow} style:--h="{b.pct}%">
+              <span class="bar"><i></i></span>
+              <span class="lbl">{String(b.decade).slice(2)}</span>
+            </li>
+          {/each}
+        </ul>
+        <figcaption>
+          {$t('{count} in the Vietnamese press, {span}', {
+            count: String(curve?.total ?? 0),
+            span,
+          })}
+        </figcaption>
+      </figure>
+    {/if}
 
     {#if loading}
       <p class="state">{$t('Searching the newspapers…')}</p>
@@ -179,6 +230,64 @@
   .state {
     margin: 0;
     font-size: var(--text-sm);
+    color: var(--color-gray-500);
+  }
+  .curve {
+    margin: 0 0 var(--space-2);
+  }
+  .ticks {
+    display: flex;
+    /* The items list below is also a `ul` and sets `flex-direction: column`;
+       this class only overrides the properties it names, so say `row`. */
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 2px;
+    height: 2.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ticks li {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    height: 100%;
+  }
+  .bar {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-xs);
+  }
+  .bar i {
+    display: block;
+    width: 100%;
+    height: var(--h);
+    border-radius: var(--radius-xs);
+    background: var(--color-gray-300);
+  }
+  /* The decades the clippings below are drawn from, against the whole run. */
+  .in-window .bar i {
+    background: var(--color-blue);
+  }
+  .lbl {
+    font-size: 9px;
+    line-height: 1;
+    text-align: center;
+    color: var(--color-gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+  .in-window .lbl {
+    color: var(--color-text);
+    font-weight: var(--font-bold);
+  }
+  figcaption {
+    margin-top: 4px;
+    font-size: var(--text-xs);
     color: var(--color-gray-500);
   }
   ul {

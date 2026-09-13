@@ -1,0 +1,26 @@
+# Publication ids for the southern press — the HCMC half of the NLV corpus.
+# Geography is not a query term (see scripts/nlv-queries.txt): a Saigon paper
+# printing a city map rarely writes "Sài Gòn" next to it. The paper itself is
+# the evidence of where, so the corpus is split here instead.
+#
+# Ids come from work/press/publications.json (the archive's own `puq` list).
+# TAGGED BY EYE, NOT BY THE ARCHIVE — baochi.nlv.gov.vn publishes no place of
+# publication field. Correct freely; the counts are what this harvest holds.
+RbD    # Sài Gòn                      302
+WHfY   # Công luận báo                177
+UyRi   # Sài Gòn Giải phóng            77
+RcX    # Lục Tỉnh Tân Văn              70
+RgH    # Đông Pháp thời báo            59
+WKwC   # Dân mới (Sài Gòn)             46
+WJLJ   # Điễn tín                      38
+RXV    # Trung lập báo                 31
+HtCq   # Phụ Nữ Tân Văn                31
+Gi     # Tuổi Trẻ                      24
+Rdi    # Nông Công thương (Nhật báo)   21
+WKsL   # Tân tiến (hàng ngày)          19   — Sa Đéc
+WHht   # An Hà nhựt báo                19   — Cần Thơ
+WMUH   # Dân báo                        5
+IEQA   # Nam Kỳ tuần báo                3
+WJJw   # Tân văn                        3
+RgI    # Đông Phương                    2
+WHjH   # Gia Định báo                   1

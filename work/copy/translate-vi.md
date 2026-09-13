@@ -376,6 +376,7 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | In the press | Báo chí đưa tin |
 | Searching the newspapers… | Đang tìm kiếm bài báo… |
 | Nothing found — {query}. | Không tìm thấy kết quả cho — {query}. |
+| {count} in the Vietnamese press, {span} | {count} lần trên báo chí tiếng Việt, {span} |
 
 ## 19 · Walking trip
 

@@ -312,6 +312,7 @@ export const vi: Record<string, string> = {
   'In the press': 'Báo chí đưa tin',
   'Searching the newspapers…': 'Đang tìm kiếm bài báo…',
   'Nothing found — {query}.': 'Không tìm thấy kết quả cho — {query}.',
+  '{count} in the Vietnamese press, {span}': '{count} lần trên báo chí tiếng Việt, {span}',
   'Loading your trip…': 'Đang tải hành trình…',
   'Trip unavailable': 'Hành trình không khả dụng',
   'Walking trip': 'Hành trình đi bộ',
