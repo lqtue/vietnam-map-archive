@@ -60,7 +60,7 @@
   // rather than among them because they are not catalogue entries: no record
   // page, no year to sort by, no single scan behind them. Same gesture though
   // — tap to put it on the map, tap again to take it off.
-  const SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1965–72 · 1:50,000' }];
+  const SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000' }];
   $: seriesOn = new Set(
     $layersStore.overlays
       .filter((o) => o.ref.kind === 'raster')
