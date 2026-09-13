@@ -43,3 +43,7 @@ work/l7014/
 work/press/
 work/legend/
 work/reports/
+
+# Bulk-upload run logs — one per run, megabytes of per-sheet output.
+# The record that matters is the maps rows the run created, not the transcript.
+scripts/bulk_upload_*.log
