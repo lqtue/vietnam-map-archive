@@ -42,6 +42,17 @@
     no_scan: 'No known scan',
   };
 
+  // The chip tints are `editorial.css`'s own vocabulary, not an `is-<status>`
+  // modifier — there is no such thing, and spelling one rendered all three
+  // statuses as the same bare pill. Green/yellow/gray follows the bar above so
+  // the column and the bar read as one thing; `chip-gray` is the nearest tint
+  // the vocabulary has to the bar's `--color-border`.
+  const STATUS_CHIP: Record<string, string> = {
+    held: 'chip-green',
+    obtainable: 'chip-yellow',
+    no_scan: 'chip-gray',
+  };
+
   const COLUMNS = [
     { key: 'sheet_number', label: 'Sheet', sortable: false },
     { key: 'name', label: 'Name', sortable: false },
@@ -101,7 +112,10 @@
           >
         </td>
         <td>{sheet.name ?? '—'}</td>
-        <td><span class="badge-chip is-sm is-{sheet.status}">{STATUS_LABEL[sheet.status]}</span></td
+        <td
+          ><span class="badge-chip is-sm {STATUS_CHIP[sheet.status]}"
+            >{STATUS_LABEL[sheet.status]}</span
+          ></td
         >
         <td class="src">{sheet.source ?? '—'}</td>
       </tr>
