@@ -188,7 +188,12 @@ Four lessons, each of which cost real time today:
       can point at exactly one of them, silently. Verified 2026-09-13 by counting
       `maps` rows grouped on collection + `sheet_number`. Migration 086 (two
       nullable columns, `year` and `edition`) is drafted by a concurrent session
-      and not pushed; whether the fix is those columns or a widened key is open.
+      and not pushed, and **it does not lift this**: it hangs a printing off the
+      existing one-row-per-cell key, so the page can say which printing it serves
+      and, with a count off `maps`, that others exist — but the index still
+      cannot enumerate them. Widening the key is the open half, and it is the
+      whole item. Exit: a survey's coverage page lists both published printings
+      of Indochine cell 1 without either being the one the other hides behind.
 - [ ] **Cochinchine 1:25,000 is the next survey to index** — 826 sheets across
       three series, Saigon and the Mekong delta, top of the scout queue at
       `/admin?tab=scout`. The importer pattern is
