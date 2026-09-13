@@ -73,7 +73,13 @@
   // domain, so nothing in the database describes it. Every other series comes
   // from the `map_series` view (mig 082), which is what makes adding one a
   // matter of ingesting sheets rather than editing this file.
-  const RASTER_SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000' }];
+  // `sheets` is what the deployed archive actually holds, not what the series
+  // has: 452 of the 627 cells in `work/l7014/index.geojson`. The rest are 93
+  // PCL never published, 62 with no usable georeference (the city sheets, which
+  // are `maps` rows warped live instead) and 11 off-grid. Read it off
+  // `work/l7014/build/<build>.geojson`, whose name matches L7014_PMTILES_URL —
+  // counting anything else is counting a series rather than an archive.
+  const RASTER_SERIES = [{ ref: L7014_OVERLAY, sheets: 452, note: '1963–89 · 1:50,000' }];
 
   let dbSeries: { ref: SheetsRef; sheets: number; note: string }[] = [];
   onMount(async () => {
