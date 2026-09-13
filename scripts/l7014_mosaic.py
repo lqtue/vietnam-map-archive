@@ -18,11 +18,12 @@ way `basemap/vietnam-*.pmtiles` already is.
     python3 scripts/l7014_mosaic.py meta       # re-read each PDF's XMP + graticule check
     python3 scripts/l7014_mosaic.py corners    # ground GCPs for the plain-JPG sheets
     python3 scripts/l7014_mosaic.py manifest   # one outline per sheet in the mosaic
+    python3 scripts/l7014_mosaic.py residuals  # how well each sheet's GCPs actually fit
 
 Every phase is resumable: it skips what it has already produced. `--limit N`
 caps any phase, `--jobs N` sets concurrency.
 
-Four traps, each of which otherwise yields a plausible, wrong map:
+Five traps, each of which otherwise yields a plausible, wrong map:
 
 1. GDAL cannot map some NGA LGIDict datum codes (`IND-I`, `INF-A`) and silently
    falls back to WGS84 -- the whole sheet lands ~450 m off, and the warp still
@@ -40,6 +41,13 @@ Four traps, each of which otherwise yields a plausible, wrong map:
    rectangle over the basemap. Hence plain GTiff + DEFLATE for the intermediates.
 4. Some NEATLINE polygons repeat their closing vertex or self-intersect, which
    gdalwarp rejects outright.
+5. A georeference annotation declares its own transformation, and warping it
+   with a different one is invisible from both ends -- the fit still looks
+   right in the Allmaps Editor, the warp still succeeds here. So `warp_flags`
+   refuses a type gdalwarp cannot spell rather than falling back to an affine,
+   and the mask is pushed through the very GCPs gdalwarp is handed, so the crop
+   and the warp cannot disagree. `residuals` is the check that runs before any
+   of it.
 
 One honest limit: a few sheets declare Indian 1954 codes rather than Indian
 1960, and this forces 1960 on all of them. The two differ by roughly 20 m here,
@@ -52,6 +60,7 @@ rclone with the `r2:` remote for `upload`.
 import argparse
 import concurrent.futures as cf
 import json
+import math
 import os
 import re
 import subprocess
@@ -61,6 +70,7 @@ import urllib.parse
 from datetime import date
 from pathlib import Path
 
+import numpy as np
 from osgeo import gdal, ogr, osr
 
 gdal.UseExceptions()
@@ -700,21 +710,197 @@ def load_sheets_merged(updated):
     return [by_file.get(r["file"].lower(), r) for r in load_sheets()]
 
 
-# ── pinned ───────────────────────────────────────────────────────────────────
+# ── gcps ─────────────────────────────────────────────────────────────────────
 
 PINS = WORK / "pins.json"
 CITY = {"6330-4", "6330-1", "6330-2", "6330-3", "6329-1", "6329-4",
         "6541-4", "6641-3", "6350-4"}
+CORNERS = ("NW", "NE", "SE", "SW")
 
 
-def warp_pinned_one(row, pin):
+def warp_flags(transformation):
+    """gdalwarp flags for the transformation an annotation declares.
+
+    Silence here is the trap. An annotation that says thinPlateSpline, warped
+    with this script's old hardcoded affine, fits beautifully in the Allmaps
+    Editor and lands wrong in the archive with no error on either side. So an
+    unmappable type is refused rather than approximated: gdalwarp has -order
+    and -tps and nothing else, which leaves helmert and projective with no
+    honest spelling.
+    """
+    t = (transformation or {}).get("type", "polynomial").lower()
+    order = int(((transformation or {}).get("options") or {}).get("order", 1))
+    if t == "thinplatespline":
+        return ["-tps"], "tps"
+    if t == "polynomial" and order in (1, 2, 3):
+        return ["-order", str(order)], f"order {order}"
+    raise ValueError(f"transformation {t!r} order {order} has no gdalwarp equivalent")
+
+
+def parse_gcp_text(text):
+    """GCPs from either text format the Allmaps GCP box accepts.
+
+    QGIS .points is CSV with a header and the ground pair first, and its
+    sourceY is NEGATIVE -- QGIS measures the georeferencer's y up from the
+    image top. The GDAL form is bare whitespace columns, pixel pair first, y
+    already down. They are told apart by the header rather than by looking at
+    the numbers: a column-order guess reads a longitude as a pixel on any
+    sheet wider than 105 px, which is all of them.
+    """
+    pts = []
+    qgis = "sourceX" in text
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("mapX"):
+            continue
+        f = [x for x in re.split(r"[,\s]+", line) if x]
+        if len(f) < 4:
+            continue
+        try:
+            a, b, c, d = (float(x) for x in f[:4])
+        except ValueError:
+            continue
+        pts.append((c, -d, a, b) if qgis else (a, b, c, d))
+    return pts
+
+
+def gcps_from_annotation(path):
+    """Control points, transformation and mask out of a georeference annotation."""
+    doc = json.loads(path.read_text())
+    items = doc.get("items") if doc.get("type") == "AnnotationPage" else [doc]
+    if len(items or []) != 1:
+        raise ValueError(f"{path.name}: {len(items or [])} annotations, expected one")
+    anno = items[0]
+    body = anno.get("body") or {}
+    pts = []
+    for feat in body.get("features") or []:
+        px, py = feat["properties"]["resourceCoords"]
+        lon, lat = feat["geometry"]["coordinates"]
+        pts.append((float(px), float(py), float(lon), float(lat)))
+    if len(pts) < 3:
+        raise ValueError(f"{path.name}: {len(pts)} control points, need 3")
+    flags, label = warp_flags(body.get("transformation"))
+    sel = (((anno.get("target") or {}).get("selector")) or {}).get("value") or ""
+    hit = re.search(r'points="([^"]+)"', sel)
+    mask = [tuple(float(v) for v in p.split(",")) for p in hit.group(1).split()] if hit else None
+    return {"pts": pts, "flags": flags, "label": label, "mask": mask, "src": path.name}
+
+
+def load_gcps(sheet, pins=None):
+    """A sheet's control points, from the most recently approved source it has.
+
+    An annotation wins because it is the only one of the three a person has
+    watched warp. pins.html's four dragged corners come next, and the .points
+    `corners` writes is last: its ground is real but its pixels are a guess,
+    placed there to be dragged.
+    """
+    anno = GCP_DIR / f"{sheet}.json"
+    if anno.exists():
+        return gcps_from_annotation(anno)
+    pin = (pins or {}).get(sheet)
+    if pin:
+        pts = [(*pin["pixels"][c], *pin["ground"][c]) for c in CORNERS]
+        ground = [tuple(pin["ground"][c]) for c in CORNERS]
+        return {"pts": pts, "flags": ["-order", "1"], "label": "order 1",
+                "mask": None, "ground_quad": ground, "src": "pins.json"}
+    pf = GCP_DIR / f"{sheet}.points"
+    if pf.exists():
+        pts = parse_gcp_text(pf.read_text())
+        if len(pts) >= 3:
+            return {"pts": pts, "flags": ["-order", "1"], "label": "order 1",
+                    "mask": None, "src": pf.name}
+    return None
+
+
+# ── residuals ────────────────────────────────────────────────────────────────
+
+
+def fit_residuals(pts, order):
+    """Per-point miss, in local metres, for a least-squares fit of this order.
+
+    Metres and not degrees: a degree of longitude here is ~109 km against
+    latitude's 110.5, so a residual left in degrees understates the east-west
+    error by the cosine of the latitude and cannot be held against the sheet's
+    own ground resolution -- which is the only number that says whether a fit
+    is good enough.
+    """
+    P = np.array([[p[0], p[1]] for p in pts], float)
+    G = np.array([[p[2], p[3]] for p in pts], float)
+    mx = 111320.0 * math.cos(math.radians(G[:, 1].mean()))
+    M = np.c_[(G[:, 0] - G[:, 0].mean()) * mx, (G[:, 1] - G[:, 1].mean()) * 110540.0]
+    x, y = P[:, 0], P[:, 1]
+    A = (np.c_[x, y, np.ones(len(P))] if order == 1
+         else np.c_[x, y, np.ones(len(P)), x * y, x * x, y * y])
+    if len(P) < A.shape[1]:
+        return None, None
+    coef, *_ = np.linalg.lstsq(A, M, rcond=None)
+    res = np.hypot(*(M - A @ coef).T)
+    # Singular values of the linear block are the fit's own metres per pixel,
+    # one per axis. Taking them from the fit rather than from the sheet's
+    # declared scale means a residual in pixels stays honest on the city sheets,
+    # which are ~1.3 m/px against the series' 4.2.
+    mpp = float(np.linalg.svd(coef[:2], compute_uv=False).mean())
+    return res, mpp
+
+
+def phase_residuals(args):
+    """What the control points say before anything is warped."""
+    pins = json.loads(PINS.read_text()) if PINS.exists() else {}
+    rows = [r for r in load_sheets() if not args.sheet or r["sheet"] == args.sheet]
+    if args.limit:
+        rows = rows[: args.limit]
+    seen = 0
+    for row in rows:
+        try:
+            gcp = load_gcps(row["sheet"], pins)
+        except ValueError as e:
+            print(f"{row['sheet']:9s} ERROR {e}")
+            seen += 1
+            continue
+        if not gcp:
+            continue
+        seen += 1
+        r1, mpp = fit_residuals(gcp["pts"], 1)
+        line = (f"{row['sheet']:9s} n={len(gcp['pts']):3d}  {gcp['src']:22s} "
+                f"{gcp['label']:8s} rms {r1.mean():6.1f} m ({r1.mean() / mpp:4.1f} px)"
+                f"  max {r1.max():6.1f} m")
+        r2, _ = fit_residuals(gcp["pts"], 2)
+        if r2 is not None:
+            line += f"  [order 2: rms {r2.mean():5.1f} m]"
+        print(line)
+        # Two different faults, and they want different fixes. One point far
+        # outside the spread is a misplaced click -- order 2 will not rescue it,
+        # which is exactly how you tell the two apart. A high rms that order 2
+        # halves is the paper itself, and the annotation should say so.
+        worst = int(r1.argmax())
+        if r1.max() > 3 * r1.mean() and len(r1) > 4:
+            px, py, lon, lat = gcp["pts"][worst]
+            print(f"          ^ point {worst + 1} at px({px:.0f},{py:.0f}) misses by "
+                  f"{r1.max():.1f} m, {r1.max() / r1.mean():.1f}x the rest — check it")
+        elif r2 is not None and r2.mean() < 0.5 * r1.mean():
+            print(f"          ^ order 2 halves the rms — real distortion; "
+                  f"set the annotation's transformation rather than leaving it order 1")
+        elif r1.mean() / mpp > 2:
+            print(f"          ^ rms is {r1.mean() / mpp:.1f} px — loose for a warp")
+    print(f"residuals: {seen} sheets with control points")
+
+
+# ── pinned ───────────────────────────────────────────────────────────────────
+
+
+def warp_pinned_one(row, gcp):
     """A hand-pinned JPG, warped like any other sheet.
 
-    Four corners, so an affine — not a projective, which needs more points, and
-    not a thin-plate spline, which would bend the sheet to fit noise. Measured
-    over 105 GeoPDFs the printed edges are straight to a median of 0.00 px and
-    opposite edges here agree to 0.25%, so there is no perspective for a richer
-    transform to recover. The cutline is the graticule cell itself.
+    Four corners and an affine was all pin.html could give, and the sheets were
+    measured as having no perspective a richer transform could recover. An
+    Allmaps annotation can carry more points and declares its own
+    transformation, so the flags come from `gcp` rather than from here.
+
+    The cutline is the annotation's own mask, pushed through the very GCPs
+    gdalwarp is about to use -- via gdal.Transformer on the VRT rather than a
+    second fit of our own, so the crop and the warp cannot disagree. Without a
+    mask it is the ground quad of the four corners, and with neither it is
+    refused: where the paper ends is not a thing to guess.
     """
     src = JPG_DIR / (Path(row["file"]).stem.strip() + ".jpg")
     out = COG_DIR / (Path(row["file"]).stem.strip() + ".tif")
@@ -723,24 +909,39 @@ def warp_pinned_one(row, pin):
     if not src.exists():
         return "miss", f"{row['sheet']}: {src.name} not downloaded"
 
-    order = ("NW", "NE", "SE", "SW")
-    gcps = []
-    for c in order:
-        px, py = pin["pixels"][c]
-        lon, lat = pin["ground"][c]
-        gcps += ["-gcp", f"{px}", f"{py}", f"{lon}", f"{lat}"]
+    flat = []
+    for px, py, lon, lat in gcp["pts"]:
+        flat += ["-gcp", f"{px}", f"{py}", f"{lon}", f"{lat}"]
 
     vrt = out.with_suffix(".src.vrt")
     res = subprocess.run(["gdal_translate", "-of", "VRT", "-a_srs", "EPSG:4326",
-                          *gcps, str(src), str(vrt)], capture_output=True, text=True)
+                          *flat, str(src), str(vrt)], capture_output=True, text=True)
     if res.returncode:
         return "fail", f"{row['sheet']}: translate: {res.stderr.strip()[-160:]}"
+
+    if gcp.get("mask"):
+        ds = gdal.Open(str(vrt))
+        method = (["METHOD=GCP_TPS"] if "-tps" in gcp["flags"]
+                  else ["METHOD=GCP_POLYNOMIAL", f"MAX_GCP_ORDER={gcp['flags'][1]}"])
+        tr = gdal.Transformer(ds, None, method)
+        ground = []
+        for px, py in gcp["mask"]:
+            ok, pt = tr.TransformPoint(0, float(px), float(py))
+            if not ok:
+                return "fail", f"{row['sheet']}: mask point ({px},{py}) would not transform"
+            ground.append((pt[0], pt[1]))
+        ds = None
+    elif gcp.get("ground_quad"):
+        ground = list(gcp["ground_quad"])
+    else:
+        return "fail", (f"{row['sheet']}: {gcp['src']} has no mask and is not four "
+                        f"corners — give it a mask in the Allmaps Editor")
 
     cut = out.with_suffix(".cutline.gpkg")
     cut.unlink(missing_ok=True)
     ring = ogr.Geometry(ogr.wkbLinearRing)
-    for c in order + ("NW",):
-        ring.AddPoint_2D(*pin["ground"][c])
+    for lon, lat in ground + [ground[0]]:
+        ring.AddPoint_2D(lon, lat)
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
     srs = osr.SpatialReference()
@@ -754,7 +955,7 @@ def warp_pinned_one(row, pin):
     ds = None
 
     cmd = ["gdalwarp", "-t_srs", "EPSG:3857", "-r", "cubic", "-dstalpha",
-           "-order", "1",
+           *gcp["flags"],
            # The same white-under-transparent and GTiff+DEFLATE as the GeoPDF
            # path, for the same two reasons: black bleeds into every hole edge
            # through resampling, and the COG driver silently drops the alpha.
@@ -767,22 +968,32 @@ def warp_pinned_one(row, pin):
     if res.returncode:
         out.unlink(missing_ok=True)
         return "fail", f"{row['sheet']}: warp: {res.stderr.strip()[-160:]}"
-    return "ok", f"{row['sheet']}: {out.stat().st_size // 1048576}MB"
+    return "ok", f"{row['sheet']}: {gcp['label']}, {len(gcp['pts'])} gcps, {out.stat().st_size // 1048576}MB"
 
 
 def phase_pinned(args):
-    if not PINS.exists():
-        sys.exit(f"{PINS} missing — save the pins from pin.html first")
-    pins = json.loads(PINS.read_text())
-    rows = {r["sheet"]: r for r in load_sheets() if r["kind"] == "jpg"}
-    todo = [(rows[s], p) for s, p in sorted(pins.items())
-            if s in rows and s not in CITY]
+    pins = json.loads(PINS.read_text()) if PINS.exists() else {}
+    rows = [r for r in load_sheets() if r["kind"] == "jpg" and r["sheet"] not in CITY]
+    if args.sheet:
+        rows = [r for r in rows if r["sheet"] == args.sheet]
+    todo = []
+    for row in sorted(rows, key=lambda r: r["sheet"]):
+        try:
+            gcp = load_gcps(row["sheet"], pins)
+        except ValueError as e:
+            print(f"  FAIL {row['sheet']}: {e}")
+            continue
+        if gcp:
+            todo.append((row, gcp))
+    if not todo:
+        sys.exit(f"no control points — save an annotation to {GCP_DIR}/<sheet>.json, "
+                 f"or the pins from pin.html to {PINS}")
     if args.limit:
         todo = todo[: args.limit]
     COG_DIR.mkdir(parents=True, exist_ok=True)
     tally = {}
-    for row, pin in todo:
-        status, msg = _safe(lambda a: warp_pinned_one(*a), (row, pin)) or ("fail", "?")
+    for row, gcp in todo:
+        status, msg = _safe(lambda a: warp_pinned_one(*a), (row, gcp)) or ("fail", "?")
         if isinstance(status, Exception):
             status, msg = "fail", str(status)
         tally[status] = tally.get(status, 0) + 1
@@ -897,6 +1108,7 @@ PHASES = {
     "meta": phase_meta,
     "corners": phase_corners,
     "manifest": phase_manifest,
+    "residuals": phase_residuals,
     "check": phase_check,
 }
 
@@ -905,6 +1117,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("phase", choices=PHASES)
     p.add_argument("--limit", type=int, help="cap the sheets this phase touches")
+    p.add_argument("--sheet", help="one sheet number, e.g. 6150-2")
     p.add_argument("--jobs", type=int, default=6, help="concurrency (default 6)")
     p.add_argument("--quality", type=int, default=80, help="WEBP/JPEG quality (default 80)")
     p.add_argument("--tile-format", default="WEBP", choices=["WEBP", "PNG", "PNG8", "JPEG"],
