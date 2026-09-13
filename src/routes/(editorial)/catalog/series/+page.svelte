@@ -43,7 +43,12 @@
           <a class="section-card is-sm is-link" href="/catalog/series/{encodeURIComponent(s.key)}">
             <span class="name">{s.name}</span>
             <span class="meta">
-              {#if years}<span>{years}</span>{/if}
+              <!-- Labelled, because it is not the survey's dates: the span is an
+                   aggregate over `maps` rows, which for L7014 is 9 sheets against
+                   a survey of 627 printed 1963–89. Wording follows the single
+                   series page. It still flatters — the 452 mosaic cells are held
+                   too and carry no year here — so it says what it counts. -->
+              {#if years}<span>catalogued {years}</span>{/if}
               <span>
                 {s.index.held} of {s.index.total} sheets — {pct(s.index.held, s.index.total)}%
               </span>
