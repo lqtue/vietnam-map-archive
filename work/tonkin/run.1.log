@@ -1,0 +1,21 @@
+16 sheets
+
+  explicit cache unavailable (400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Cached content is too small. tot); sending prompt inline
+  1/16 Bac Ninh               ok   115.20/23.625g 4.252m/px  axes 0.20%   
+  2/16 Binh Xuyen             ok   114.80/23.750g 4.238m/px  axes 0.41%   
+  3/16 Cua Thai Binh          ok   115.80/23.000g 4.227m/px  axes 0.71%   
+  4/16 Gia Binh               FAILED  T: no rim found inside the thick line
+  5/16 Hai Phong              ok   115.80/23.250g 4.231m/px  axes 0.56%    fixed:north 23.25 vs 23.125
+  6/16 Hung Yen               ok   115.20/23.000g 4.233m/px  axes 0.56%   
+  7/16 Kim Thanh              ok   115.60/23.250g 4.234m/px  axes 0.68%   
+  8/16 Nam Dinh               ok   115.20/22.750g 4.221m/px  axes 0.98%   
+  9/16 Phat Diem              ok   115.20/22.375g 4.245m/px  axes 0.54%    fixed:north 22.575 vs 22.375
+ 10/16 Phu Nghia Hung         ok   115.20/22.625g 4.247m/px  axes 0.18%   
+ 11/16 Phu Tu Son             ok   115.00/23.500g 4.233m/px  axes 0.56%   
+ 12/16 Quang Oai              ok   114.40/23.625g 4.237m/px  axes 0.49%   
+ 13/16 Quynh Coi              ok   115.40/23.000g 4.229m/px  axes 0.86%   
+ 14/16 Thai Binh              CHECK 115.40/22.750g 4.230m/px  axes 0.44%  rim offsets spread 14% 
+ 15/16 Vinh Yen               ok   114.60/23.750g 4.242m/px  axes 0.57%   
+ 16/16 Yen Luu                ok   115.60/23.375g 4.248m/px  axes 0.43%   
+
+14/16 clear the gate

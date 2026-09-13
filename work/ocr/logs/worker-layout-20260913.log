@@ -1,0 +1,159 @@
+vma-worker layout-TueLQs-Macbook-Pro.local polling ['layout'] every 10.0s
+[layout] 238e4145-132b-4e0f-8d04-cadf956cc04c running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id e21f1e1e-a1ce-4633-aae4-82408b7d35bd --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-e21f1e1e
+[layout] 238e4145-132b-4e0f-8d04-cadf956cc04c done
+[layout] 5de7e69b-28ed-4612-a216-ffe6b97d5357 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id d4ec51b8-a3a1-4414-99c7-2bb46ea851e3 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-d4ec51b8
+[layout] 5de7e69b-28ed-4612-a216-ffe6b97d5357 done
+[layout] 63e58343-5ef0-48f6-96cb-566e9d497699 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id a90c2464-f6aa-46d2-b167-272214b4545f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-a90c2464
+[layout] 63e58343-5ef0-48f6-96cb-566e9d497699 done
+[layout] 45a54496-2cec-4f50-a3b1-a6a5678e37b8 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id bdf3936f-4501-4b54-8acd-d80f352f26fa --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-bdf3936f
+[layout] 45a54496-2cec-4f50-a3b1-a6a5678e37b8 done
+[layout] 7a4bfe86-0ae2-4ffd-b2a1-7a3d17f107f7 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id f10a84aa-b0a7-47db-af45-e25158f120d0 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-f10a84aa
+[layout] 7a4bfe86-0ae2-4ffd-b2a1-7a3d17f107f7 done
+[layout] 9b7ef522-95c5-4769-8181-2fa201361ddb running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id c569cfd2-994d-4a48-819f-8bdba4b3f0bd --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-c569cfd2
+[layout] 9b7ef522-95c5-4769-8181-2fa201361ddb done
+[layout] e5e9800d-c8f3-46e1-9b6e-60747fb5a64b running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 88437562-9bce-4ffb-b70d-c564d02531fc --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-88437562
+[layout] e5e9800d-c8f3-46e1-9b6e-60747fb5a64b done
+[layout] 87afc228-5502-4e14-a417-417f3cfcc289 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 54cd94cc-3450-4d57-9909-877b6b389a17 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-54cd94cc
+[layout] 87afc228-5502-4e14-a417-417f3cfcc289 done
+[layout] 5b032869-155e-45e6-9bb2-f8cbe1da6049 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 9a167536-d24d-48a1-b403-91a01acbf6e2 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-9a167536
+[layout] 5b032869-155e-45e6-9bb2-f8cbe1da6049 done
+[layout] b2f71065-45a1-4f41-afed-908c8e9bf9c9 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id a37a985f-d5a5-4674-9b94-5ffa81f0c086 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-a37a985f
+[layout] b2f71065-45a1-4f41-afed-908c8e9bf9c9 done
+[layout] 7a86a5a1-6a0b-41eb-808d-1f033beb155a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id dd575794-8ff0-485f-9875-39f697b1b009 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-dd575794
+[layout] 7a86a5a1-6a0b-41eb-808d-1f033beb155a done
+[layout] 542e5cfe-0ef1-4447-acb3-3ce191f00703 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id d2178fe7-c2fa-4ab7-9e48-eb62070ac980 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-d2178fe7
+[layout] 542e5cfe-0ef1-4447-acb3-3ce191f00703 done
+[layout] 43fa602b-90bc-4d89-ba11-263fe76f9ddb running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id e6c5e467-ae7b-478f-9357-6fe12b8e7361 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-e6c5e467
+[layout] 43fa602b-90bc-4d89-ba11-263fe76f9ddb done
+[layout] 70e058b9-e228-4c7f-992c-42322968b5f8 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id f04311b8-b122-45f7-84a7-19c53638938e --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-f04311b8
+[layout] 70e058b9-e228-4c7f-992c-42322968b5f8 done
+[layout] 3dded255-a09d-4a2a-a094-459095e08911 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 02d32cbd-be89-4274-9dff-dc2337b29511 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-02d32cbd
+[layout] 3dded255-a09d-4a2a-a094-459095e08911 done
+[layout] b1e8e9d2-9ee4-47eb-9ed9-dfa1f894d42d running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id ef6a439a-ae4d-428f-b0f9-8b37a2852156 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-ef6a439a
+[layout] b1e8e9d2-9ee4-47eb-9ed9-dfa1f894d42d done
+[layout] 6dcb8bfd-a6a7-4ae0-b69b-521b5e00e156 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 1a7e0a67-7a92-465c-93d7-003b8439880f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-1a7e0a67
+[layout] 6dcb8bfd-a6a7-4ae0-b69b-521b5e00e156 done
+[layout] 7111eaeb-c585-4fb1-9f53-6a87cc46e1cb running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8d6936ed-55d0-4215-9d39-57b3d8543d3f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8d6936ed
+[layout] 7111eaeb-c585-4fb1-9f53-6a87cc46e1cb done
+[layout] ee2a503e-422d-4c46-a5a3-599ca0047ce2 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id e8241d5f-f694-45cd-a41a-1f9293ab9a0e --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-e8241d5f
+[layout] ee2a503e-422d-4c46-a5a3-599ca0047ce2 done
+[layout] 231c0c5c-1889-4a34-af8e-0aaa61313e33 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id c5db9be9-d131-45bf-a133-3c4a206207ae --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-c5db9be9
+[layout] 231c0c5c-1889-4a34-af8e-0aaa61313e33 done
+[layout] c2527fa7-e64d-4df5-9fb8-19b0081a07e5 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id dfd7dadd-3841-4cdf-872c-44d55e15bb78 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-dfd7dadd
+[layout] c2527fa7-e64d-4df5-9fb8-19b0081a07e5 done
+[layout] 4d3ad087-ea6d-4e2b-b9f9-c9f6656c1ad4 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 0aef7123-8767-44e0-8687-570878040801 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-0aef7123
+[layout] 4d3ad087-ea6d-4e2b-b9f9-c9f6656c1ad4 done
+[layout] 200bf5d7-135b-41a6-bf0e-06a061301dd9 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 27698eaa-e56b-4778-9e61-c66b6bc0cc08 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-27698eaa
+[layout] 200bf5d7-135b-41a6-bf0e-06a061301dd9 done
+[layout] c88a7307-d9c0-41b9-a69f-21d2a7c931f3 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 398f3897-75ce-4ea0-be4c-29d28aee7e0e --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-398f3897
+[layout] c88a7307-d9c0-41b9-a69f-21d2a7c931f3 done
+[layout] 35c768e1-3ca6-4331-9365-e0ed6a47691a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 9c6bdac2-ffab-4803-ae0f-846b51b8009c --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-9c6bdac2
+[layout] 35c768e1-3ca6-4331-9365-e0ed6a47691a done
+[layout] 9aa92f40-41eb-42c4-b0c6-92023e38bcf5 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id be36fb42-c0dd-4667-9f6e-aefb4f24abb6 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-be36fb42
+[layout] 9aa92f40-41eb-42c4-b0c6-92023e38bcf5 done
+[layout] e724085f-f5de-4a89-a1fb-c03bfa7106e2 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 84ef795c-221d-477b-b584-e5ef047ed5ce --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-84ef795c
+[layout] e724085f-f5de-4a89-a1fb-c03bfa7106e2 done
+[layout] 9985ccc7-63f5-4b11-b461-c32c3555985f running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 0e943fca-ea08-4f4b-bb5e-0e80a4888f91 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-0e943fca
+[layout] 9985ccc7-63f5-4b11-b461-c32c3555985f done
+[layout] c7ebbaaa-d666-4704-88a1-657a22a3daab running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id d2e230dc-88b1-4069-9f84-304cecb393fa --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-d2e230dc
+[layout] c7ebbaaa-d666-4704-88a1-657a22a3daab done
+[layout] 26acf449-ad03-4819-8207-d8cc6a86437f running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 91513ec8-4f6f-47bb-a4c7-4abe33d7ff11 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-91513ec8
+[layout] 26acf449-ad03-4819-8207-d8cc6a86437f done
+[layout] bab0f4c8-beab-40e3-852c-8df39858f8ae running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8baf9b22
+[layout] bab0f4c8-beab-40e3-852c-8df39858f8ae done
+[layout] 0c77d009-3f6c-4fdf-a0ea-9ec9d7cb77ad running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8b06f217-d408-4092-8124-becb8cd30cb9 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8b06f217
+[layout] 0c77d009-3f6c-4fdf-a0ea-9ec9d7cb77ad done
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 08369651-7d3d-4a8f-9b4d-390a6d0defd6 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-08369651
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 FAILED rc=1
+Sheet is 800×628 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 08369651-7d3d-4a8f-9b4d-390a6d0defd6 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-08369651
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 FAILED rc=1
+Sheet is 800×628 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 08369651-7d3d-4a8f-9b4d-390a6d0defd6 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-08369651
+[layout] 829a4ce5-830e-4724-9c65-06feb7836bc0 FAILED rc=1
+Sheet is 800×628 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] d222f5a2-f302-4457-9546-b47b1e0c88e8 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 19a677af-8d42-4402-9943-1f6608871b6c --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-19a677af
+[layout] d222f5a2-f302-4457-9546-b47b1e0c88e8 done
+[layout] 84206939-61b4-4c08-9520-65c25c6e611c running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-5f9d4d1b
+[layout] 84206939-61b4-4c08-9520-65c25c6e611c done
+[layout] 790151cd-58e4-4236-82b1-0f92b737f41b running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 1f480a2b-3bbd-44ed-adea-2dad9e24d254 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-1f480a2b
+[layout] 790151cd-58e4-4236-82b1-0f92b737f41b done
+[layout] 9865b3ab-fc23-42eb-b7ae-125668d376cd running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 1707c017-16e3-4c1f-95e7-5a0a685b2e5f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-1707c017
+[layout] 9865b3ab-fc23-42eb-b7ae-125668d376cd done
+[layout] 3e1319c7-c536-453f-acd6-551d58cd16c8 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 71894f3f-c2aa-4133-9c42-4e27941e2969 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-71894f3f
+[layout] 3e1319c7-c536-453f-acd6-551d58cd16c8 done
+[layout] f5177493-0e5a-42a2-9400-a204d228959c running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id e17b7fe0-6428-4a59-921f-17924273d8de --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-e17b7fe0
+[layout] f5177493-0e5a-42a2-9400-a204d228959c done
+[layout] a0d2d969-ca22-48c8-92d7-691a8350ad23 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8d4defb1-f713-4c9f-81fc-7719508b55c2 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8d4defb1
+[layout] a0d2d969-ca22-48c8-92d7-691a8350ad23 done
+[layout] 3b1eee3a-87ee-456b-acba-22ca1989317c running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 2bd040e9-68e0-4b98-acbe-fea97a6e3bc2 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-2bd040e9
+[layout] 3b1eee3a-87ee-456b-acba-22ca1989317c done
+[layout] ad2eaabf-f1be-45e5-b5a2-deffe58a8bae running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 37ba77db-4d55-4fa3-a32b-55a44c9af8b3 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-37ba77db
+[layout] ad2eaabf-f1be-45e5-b5a2-deffe58a8bae done
+[layout] bb2048f2-a073-4d77-85e6-8109886ce2ef running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-6b5d8f92
+[layout] bb2048f2-a073-4d77-85e6-8109886ce2ef done
+[layout] 0f1fba81-027d-422d-942a-47fdc9ceea34 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 013daa15-185a-4d59-b854-e581557d65ce --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-013daa15
+[layout] 0f1fba81-027d-422d-942a-47fdc9ceea34 done
+[layout] 97f02894-eda8-47cb-ba94-0e11e1e3ac97 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id b4cbfd8c-b38b-4270-8ed2-aef05e241a14 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-b4cbfd8c
+[layout] 97f02894-eda8-47cb-ba94-0e11e1e3ac97 done
+[layout] 1bacd628-52e8-41f5-af08-657ebfda75db running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id a33ced6f-e106-40f6-9bdc-ab0f92a4882e --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-a33ced6f
+[layout] 1bacd628-52e8-41f5-af08-657ebfda75db done
+[layout] d8fc0181-dace-408a-bf0f-68975dbf8f2d running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id a1de9760-8073-4ea1-b7ed-f8f4e2835cd3 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-a1de9760
+[layout] d8fc0181-dace-408a-bf0f-68975dbf8f2d done
+[layout] 3d78a714-f16e-4405-bc83-bd24ff3230e9 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id d597464d-5e6e-4f66-9805-40dff437b131 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-d597464d
+[layout] 3d78a714-f16e-4405-bc83-bd24ff3230e9 done
+[layout] ad985534-150b-4379-b456-65310639d50b running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 6c1c0913-10e0-4e8d-8f18-2200f390231f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-6c1c0913
+[layout] ad985534-150b-4379-b456-65310639d50b done
+[layout] bf244d6d-0ee6-4476-9d6c-47f7cfa4683c running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 0dac511a-dba2-46f5-8177-730371340baa --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-0dac511a
+[layout] bf244d6d-0ee6-4476-9d6c-47f7cfa4683c done
+[layout] a76b4e0d-5c3e-4176-be6b-afb3d749d1e2 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id c7fe3e9d-d012-4e49-9863-eb863b97978b --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-c7fe3e9d
+[layout] a76b4e0d-5c3e-4176-be6b-afb3d749d1e2 done
+[layout] 21f969fa-1144-43d4-bbed-16cee2e9e6b6 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 50ee792d-633c-4c3a-af8e-ab576ce7300b --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-50ee792d
+[layout] 21f969fa-1144-43d4-bbed-16cee2e9e6b6 done
+[layout] 6923b437-8ebf-47eb-9292-de1f41fad73f running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id c2b5360f-024b-4e49-a587-9a2a7d7a3aad --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-c2b5360f
+[layout] 6923b437-8ebf-47eb-9292-de1f41fad73f done
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 6b91f382-450b-4324-bdef-b437f9a35e1f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-6b91f382
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a FAILED rc=1
+Sheet is 754×877 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 6b91f382-450b-4324-bdef-b437f9a35e1f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-6b91f382
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a FAILED rc=1
+Sheet is 754×877 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 6b91f382-450b-4324-bdef-b437f9a35e1f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-6b91f382
+[layout] 8a2d78b6-affe-418f-905d-b161739d829a FAILED rc=1
+Sheet is 754×877 px, under the 1024 px the scout needs to read a label. That is the scan itself, not the mirror: find a larger source (map_iiif_sources) before running layout or OCR on this map.
+[layout] 1895761c-43d7-4570-9531-38aa70b0f3a2 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 45c50503-a010-46ca-8aba-25409b603878 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-45c50503
+[layout] 1895761c-43d7-4570-9531-38aa70b0f3a2 done
+[layout] 34de93fd-10dd-473f-9d04-f368558b2cec running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 07859658-c9cd-4006-80b7-e3fbd45b6f2c --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-07859658
+[layout] 34de93fd-10dd-473f-9d04-f368558b2cec done
+[layout] adcad1c0-0cf7-42c6-8561-fa92f75d07e9 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id cdef2d04-4749-48a8-99f9-1a8b8f1c14ad --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-cdef2d04
+[layout] adcad1c0-0cf7-42c6-8561-fa92f75d07e9 done
+[layout] 261c0698-79d3-4722-86b9-7a7a305c12eb running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 232e921a-7504-4d78-bbb6-526e8cd6afef --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-232e921a
+[layout] 261c0698-79d3-4722-86b9-7a7a305c12eb done
+[layout] 8b467ecf-1db8-4d35-bbc7-6f6c0a2336da running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8bb23b06-3f98-4e27-9a1e-118ca5d6092c --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8bb23b06
+[layout] 8b467ecf-1db8-4d35-bbc7-6f6c0a2336da done
+[layout] 32614cfa-97ba-4c0f-b8ef-882afafcdd10 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 8716b8cc-1ee3-4e4a-9026-e2995d466a49 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-8716b8cc
+[layout] 32614cfa-97ba-4c0f-b8ef-882afafcdd10 done
+[layout] ef95d4ed-4b57-4e8c-89d9-51df75203836 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 7c4e2eaa-2113-4561-a339-d031f1161429 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-7c4e2eaa
+[layout] ef95d4ed-4b57-4e8c-89d9-51df75203836 done
+[layout] 554bc315-dcc4-49be-8347-e86a7bd190e6 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 08f9e044-c324-4291-99da-69783768e85f --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-08f9e044
+[layout] 554bc315-dcc4-49be-8347-e86a7bd190e6 done
+[layout] 1097eac3-7ee6-4b75-8c10-c1cde1adcc4f running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 93792eea-2b60-4871-a689-7783816f2062 --render-size 2048 --save-triage --run-id layout-2026-09-13T1040-93792eea
+[layout] 1097eac3-7ee6-4b75-8c10-c1cde1adcc4f done
+[layout] 434889b3-69da-41f9-b3a8-6ff1ba289fed running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 4f6e91ba-1388-4c7e-9146-89fb324511f1 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-4f6e91ba
+[layout] 434889b3-69da-41f9-b3a8-6ff1ba289fed done
+[layout] 089eb47f-227d-48b1-97cf-617d23e921b8 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 7a4f8b7d-60fd-4d1a-a07d-19636265f073 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-7a4f8b7d
+[layout] 089eb47f-227d-48b1-97cf-617d23e921b8 done
+[layout] 3223d24c-5ecb-4c4b-93c2-09dea1d825e7 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 470c119b-44f1-47ba-9f0e-80dcbb4763f0 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-470c119b
+[layout] 3223d24c-5ecb-4c4b-93c2-09dea1d825e7 done
+[layout] af5c3503-9b53-4ae6-a735-f8d1890b00d4 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id c0103a62-d766-44cd-8efc-5e0c9143b093 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-c0103a62
+[layout] af5c3503-9b53-4ae6-a735-f8d1890b00d4 done
+[layout] 094b4fa1-91f6-4a48-bc7a-14e259f08bc3 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 78c507fb-a6a3-457e-ae79-19575d0ff90c --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-78c507fb
+[layout] 094b4fa1-91f6-4a48-bc7a-14e259f08bc3 done
+[layout] 480052bd-1adc-4edc-a8c3-dec6b91ea808 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 10c654fc-9eb8-4a09-90b5-731e1cb72c79 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-10c654fc
+[layout] 480052bd-1adc-4edc-a8c3-dec6b91ea808 done
+[layout] 83564173-bd68-4370-850a-a9c2d2fdd4ce running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 37f35a63-2841-47d6-bd94-8765dac81387 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-37f35a63
+[layout] 83564173-bd68-4370-850a-a9c2d2fdd4ce done
+[layout] e3be2135-8f84-4600-91e8-aae4d2c2923a running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 4deb3728-bc1e-48f1-9e02-164a95e88326 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-4deb3728
+[layout] e3be2135-8f84-4600-91e8-aae4d2c2923a done
+[layout] 8cc0d6a0-b87d-4adf-b890-cdf3b7900f77 running 1/1: /Users/airm1/Desktop/svelte-beta/work/ocr/.venv/bin/python /Users/airm1/Desktop/svelte-beta/work/ocr/scripts/ocr.py scout --map-id 56a459b1-8650-49ad-9913-461e6461edc8 --render-size 2048 --save-triage --run-id layout-2026-09-13T1048-56a459b1
+[layout] 8cc0d6a0-b87d-4adf-b890-cdf3b7900f77 done

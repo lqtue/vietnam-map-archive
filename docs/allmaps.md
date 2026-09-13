@@ -175,6 +175,127 @@ WGS 84. The first two are verified on one sheet; the datum is not. Same class as
 hundred metres off with no error anywhere. Check one sheet against a known point before
 trusting the batch.
 
+### The corner detector, and what the sheets actually print (13 Sep 2026)
+
+`scripts/tonkin_georef.py`. Two phases, `detect` (where the corners are, in the
+scan's own pixels) and `read` (what the two labelled corners say), and between
+them the annotation is arithmetic.
+
+**MapEdge's shape, one substitution.** Low-resolution look, full-resolution strips
+at the edges only, a trimmed line fit per side, intersect. What could not be
+carried over is *which line*. `scripts/l7014_neatline.py` walks inward from the
+blank margin until the paper stops being paper, which is right for L7014's single
+neat line; run on Nhu Trac it gives residuals of 14-41 px and every edge rejected.
+These sheets print, from the outside in: a thin line, a thick neatline, a thin
+line, blank paper, the graticule band, **a wider run of blank paper**, then a pair
+of thin lines at the rim of the map, then content. A walk in from the margin stops
+at the band, 40 px and 170 m short.
+
+**What works is to anchor on the thick line and never look for the rim twice.**
+The thick neatline is the darkest thing on the strip by a factor of three, so per
+patch it is `argmax` with no threshold and no rule; that fit settles where the side
+runs *and* how far off square the scan was laid down. Only then is the strip
+de-tilted onto that fit and averaged into one profile, in which the rim -- faint in
+any single patch, and sitting against map content that is not faint -- is plain.
+The distance from the thick line to it is a printed constant: measured on Nhu Trac
+it is 83.2, 84.9, 83.5 and 83.9 px on the four sides.
+
+Two things that cost an hour each and would cost it again:
+
+- **The rough pass must average a narrow band, not half the sheet.** These scans
+  are laid on the glass up to 0.8 degrees off square, which over half a sheet
+  smears a 10 px line across 30 and lets a weaker, shorter feature win the argmax.
+  A half-width average put Nhu Trac's top neatline 35 px from where it is.
+- **One sheet, one rotation.** Each side's slope is fitted from its own two dozen
+  patches and lands within a thousandth of the others -- but a thousandth over three
+  thousand pixels is three, and four sides disagreeing by that much made opposite
+  edges of the quad differ by 14 px where the projection says 4. Solve for the
+  angle once from all four sides and let each side keep only its own offset.
+
+**Which of the rim's two lines is unresolved, and it is worth 30 m.** They are 7 px
+apart. The inner one puts the two axes' ground scales 0.29% apart, the outer 0.49%,
+so the inner is taken -- but the floor of that test is about 0.3% (paper shrinkage
+across the grain is that size, and the detection noise is not far below it), so it
+separates them by less than it looks. The inner line is also what a *mask* wants,
+being the boundary of the drawn map. Settling it properly means reading the
+graticule ticks printed in the band -- `25'`, `30'`, `35'` in centesimal minutes,
+0.05 grade apart, with the meridians drawn down into the sheet -- which would also
+give interior control points and a much better warp than four corners. Not done.
+
+### The 1903 datum is not the Indian 1960 trap (13 Sep 2026, measured on Nhu Trac)
+
+The question the L7014 work taught us to ask: take the printed graticule at face
+value and does the sheet land a few hundred metres from where it belongs? For
+L7014 the answer was 480 m northwest. **For this series, on the one sheet
+measured, it is about 60 m and the sign is the other way.**
+
+Method, and its limits. The sheet was warped onto a web-Mercator grid from its
+four detected corners, Esri World Imagery fetched for the same grid, and water
+masked out of both -- blue ink on one side, a green-minus-red index on the other.
+The Red River's channel is drawn on the 1903 sheet and visible on the imagery; for
+each of 794 rows the modern channel's centre was compared with the 1903 one.
+
+    median  +58 m east   (modern minus 1903)
+    spread  +/-180 m, which is the river's own migration, not the georeference
+
+So a several-hundred-metre systematic shift is ruled out **east-west**. Three
+things this does not say. It is one sheet. The channel runs north-south, so it
+carries no north-south information at all -- a full 2-D correlation put the peak
+against the edge of its search window at z = 2.0, which is the aperture problem
+and not a result. And the confluence at the sheet's south-east, the one point
+feature available that constrains both axes, agrees to within about 100 m, which
+is reassurance rather than measurement.
+
+Two things that did **not** work and should not be retried as-is. OSM place nodes
+are useless here: of twenty village names read off the sheet, four returned a
+single hit, and Vinh Tru's `administrative` node is 1.1 km from the 1903 village
+core -- the modern district town grew along a road. And correlating 1903 ink
+density against modern red-roof pixels gives a smooth, peakless surface: the
+masks' rectangular overlap dominates, and band-passing was not tried.
+
+**Practical position.** Treat the printed grades as WGS 84, record that as an
+assumption rather than a finding, and keep the correction a single number: if a
+later check finds a shift it is one constant for all 62 sheets, not a per-sheet
+problem.
+
+### The series, placed (13 Sep 2026)
+
+56 of 62 sheets written: `annotation_url`, `georef_done`, `bbox`. All still `draft`,
+so they warp on /explore for a signed-in reviewer and reach no visitor.
+
+**The check that earned its place is the grid, not the gate.** Every sheet was read
+independently, and the series is a quadrangle lattice, so the readings have to agree
+with each other whether or not anyone checks. They do:
+
+    west edges   9 distinct, smallest step 0.200g, off the 0.20g lattice by 0.000
+    north edges  15 distinct,                      off the 0.125g lattice by 0.000
+    rim offset   84.2 px median, 58/58 sheets within 15% of it
+    sheet numbers 0 rows out of order
+
+Zero drift on both axes over 58 sheets read one at a time is the strongest evidence
+we have that the whole thing is right, and it cost nothing -- the series checks itself.
+
+**One sheet passed every per-sheet test and was still wrong.** `Ha Noi` (sheet 20,
+1903) prints `115g,00'`-`115g,20'` and `22g,50'`-`22g,62'5"`. Its four corners agree
+with each other, its ground scale agrees with its pixels to 0.78%, its rim sits at the
+series offset -- and the map it draws is Hanoi, with the red urban core, the Fleuve
+Rouge, Bat Trang and Thanh Tri. At 22g,56 that sheet would sit at 20.3 N, 75 km south
+of the city it is named after. The longitude is right; the latitude is a clean **0.75g**
+out, and the content it should be at is 23g,25'-23g,37'5". Nothing inside the sheet can
+tell: what caught it is that it landed on Ninh Binh's cell in the lattice, and two
+sheets cannot be the same quadrangle unless they are two editions of one sheet. Both
+are held; a person decides which is the engraver's error and which is ours.
+
+**Three sheets are a different edition.** Gia Binh (Oct 1911), Phuc Nhac (1906) and
+Quat Lam are printed with a thin ruled frame and narrow margins instead of the heavy
+neatline the detector anchors on -- Phuc Nhac also carries a numbered kilometre grid in
+the margin. On those the strongest thing in an edge strip is map content: Phuc Nhac's
+per-patch argmax scatters over 181-276 and the fit lands at a 17 px residual, Quat Lam
+at 26. They print their corner figures in the same convention, so only the pixel
+corners need supplying; `place` takes them from a person and runs everything downstream
+unchanged. Thai Binh is held separately -- its four sides disagree about the rim by 14%,
+which is the one way a sheet can be shifted bodily and still look square.
+
 ### Measured GDAL behaviour worth contributing (13 Sep 2026, GDAL 3.13.1)
 
 - `TILE_FORMAT=JPEG` on a sparse mosaic paints every hole **pure black** — 21k–34k
@@ -257,8 +378,19 @@ copy here.
 - [ ] Decide whether to publish L7014 as a IIIF Collection with `navPlace`
       (free; makes the series discoverable by their tools).
 - [ ] Offer our L7014 sheet-index work to Martijn as a MapEdge step-1 case study.
-- [ ] Verify the 1903 datum on one sheet against a known point before batching.
-- [ ] Build the corner detector + corner-text OCR for the Indochine 1:25,000 series.
+- [x] Verify the 1903 datum on one sheet — done, §3: about 60 m east-west, no
+      Indian-1960-class trap. North-south still unmeasured.
+- [x] Build the corner detector + corner-text OCR — `scripts/tonkin_georef.py`.
+- [ ] Read the band's `25'` / `30'` / `35'` graticule ticks: settles which of the
+      rim's two lines is the quadrangle, and gives interior control points.
+- [x] Emit Georeference Annotations and write them back — 56 of 62 done, all still
+      `draft`. Publishing (`status='public'`) is deliberately not done: it waits on
+      the eyeball pass.
+- [ ] Decide `Ha Noi` vs `Ninh Binh`: one of them is on the other's quadrangle.
+- [ ] Hand-place Gia Binh, Phuc Nhac, Quat Lam (thin-frame edition) via `place`,
+      and Thai Binh, whose rim offsets spread 14%.
+- [ ] Constrain the datum north-south: needs an east-west feature, which the Red
+      River is not.
 
 ## 7. Log
 
@@ -270,3 +402,9 @@ copy here.
   was wrong: the pixels are mirrored, the worker is level 0, and only exact tile-grid
   addresses resolve. Decoded the printed corner coordinates on Như Trác — grades from the
   Paris meridian — and cross-checked them two ways. Section 3.
+- **2026-09-13** — Built `scripts/tonkin_georef.py`: corner detection and corner-text
+  OCR for the Indochine 1:25,000 series, end to end on Nhu Trac. Measured the datum
+  against satellite imagery rather than assuming it. Section 3.
+- **2026-09-13** — Ran the series: 56 of 62 sheets georeferenced and written as drafts.
+  The lattice check came back exact on both axes over 58 sheets. It also caught the one
+  sheet that passed everything else and was still 75 km out. Section 3.
