@@ -2,6 +2,8 @@ interface Env {
   TILES: R2Bucket;
 }
 
+import { widthOnlySizeToExplicit, wholeRegionToFull } from './iiifKeys';
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
@@ -128,6 +130,29 @@ export default {
     let obj = null;
     if (!url.searchParams.has('force_proxy')) {
       obj = await env.TILES.get(key);
+      // The mirrored copy under the spelling dzsave used. See
+      // `widthOnlySizeToExplicit`: without this, a width-only request misses R2
+      // for every map in the bucket and either proxies to the origin or 404s.
+      if (!obj) {
+        const alt = widthOnlySizeToExplicit(rest);
+        if (alt) obj = await env.TILES.get(`tiles/${mapId}${alt}`);
+      }
+      // The whole-image overview, which dzsave files under `full/`. Costs one
+      // extra read of a small JSON, and only on a miss — but it is the request
+      // the renderer makes before it can draw anything, so without it a map
+      // with a complete tile pyramid still comes up blank.
+      if (!obj && /^\/0,0,\d+,\d+\//.test(rest)) {
+        const infoObj = await env.TILES.get(`tiles/${mapId}/info.json`);
+        if (infoObj) {
+          try {
+            const info = JSON.parse(await infoObj.text());
+            const full = wholeRegionToFull(rest, info.width, info.height);
+            if (full) obj = await env.TILES.get(`tiles/${mapId}${full}`);
+          } catch {
+            // A malformed info.json is the proxy path's problem, not ours.
+          }
+        }
+      }
     }
 
     const serviceUrl = new URL(url.href);
