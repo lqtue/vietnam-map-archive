@@ -37,7 +37,17 @@ import { createClient } from '@supabase/supabase-js';
 
 const dry = process.argv.includes('--dry');
 const ALL = 'https://www.cartomundi.fr/ctmd-services/serie/all';
-const ZONES = ['Indochine', 'Tonkin', 'Annam', 'Cochinchine', 'Viet', 'Laos', 'Cambodge', 'Hanoi', 'Saigon'];
+const ZONES = [
+  'Indochine',
+  'Tonkin',
+  'Annam',
+  'Cochinchine',
+  'Viet',
+  'Laos',
+  'Cambodge',
+  'Hanoi',
+  'Saigon',
+];
 // Vietnam proper is the archive's subject; Laos and Cambodia are adjacent
 // interest, kept but ranked below.
 const VIETNAM = ['Tonkin', 'Annam', 'Cochinchine', 'Viet', 'Hanoi', 'Saigon'];
@@ -69,12 +79,31 @@ const rows = hits.map((s) => {
   // does not decide anything.
   let score = 10;
   const reasons = [];
-  if (vn) { score += 25; reasons.push('+vietnam'); } else { reasons.push('+indochina'); }
-  if (scale && scale <= 25000) { score += 20; reasons.push('+large-scale'); }
-  else if (scale && scale <= 100000) { score += 8; reasons.push('+medium-scale'); }
-  if (sheets >= 100) { score += 10; reasons.push('+bulk'); }
-  if (zone.includes('Cochinchine') || zone.includes('Saigon')) { score += 10; reasons.push('+saigon-region'); }
-  if (HELD.has(s.skey)) { score -= 40; reasons.push('-already-held'); }
+  if (vn) {
+    score += 25;
+    reasons.push('+vietnam');
+  } else {
+    reasons.push('+indochina');
+  }
+  if (scale && scale <= 25000) {
+    score += 20;
+    reasons.push('+large-scale');
+  } else if (scale && scale <= 100000) {
+    score += 8;
+    reasons.push('+medium-scale');
+  }
+  if (sheets >= 100) {
+    score += 10;
+    reasons.push('+bulk');
+  }
+  if (zone.includes('Cochinchine') || zone.includes('Saigon')) {
+    score += 10;
+    reasons.push('+saigon-region');
+  }
+  if (HELD.has(s.skey)) {
+    score -= 40;
+    reasons.push('-already-held');
+  }
   reasons.push(`+${sheets}sheets`);
 
   const category = scale && scale <= 50000 ? 'topographic' : 'regional';
@@ -89,7 +118,7 @@ const rows = hits.map((s) => {
     publisher: s.s9ResponsabiliteCollective || null,
     date: `${s.s5DateDebutAaaa ?? '?'}-${s.s6DatefinAaaa ?? '?'}`,
     year: s.s5DateDebutAaaa || null,
-    rights: null,             // per-item on Nakala, not per-series; must be read per sheet
+    rights: null, // per-item on Nakala, not per-series; must be read per sheet
     language: 'fre',
     holding_institution: holders.join(', ') || null,
     collection: 'CartoMundi',
@@ -105,7 +134,9 @@ const rows = hits.map((s) => {
       `Sheet list: /ctmd-services/serie/${s.skey}/feuilles — number, title, date and catalogue extent per sheet. ` +
       `NO GEOREFERENCE is provided, only a ~1 arcminute catalogue extent; warping is still ours to do. ` +
       `Images are Nakala IIIF, licence is per-item (sample was CC-BY-4.0).` +
-      (HELD.has(s.skey) ? ' ALREADY IN THE ARCHIVE as "Indochine 1:25,000 — Tonkin & Thanh Hóa".' : ''),
+      (HELD.has(s.skey)
+        ? ' ALREADY IN THE ARCHIVE as "Indochine 1:25,000 — Tonkin & Thanh Hóa".'
+        : ''),
     raw: {
       skey: s.skey,
       zone,
@@ -119,7 +150,8 @@ const rows = hits.map((s) => {
       note: s.s8NoteGenerale || null,
       titles: (s.serieTitres || []).map((t) => t.s50TitreSerie),
       holders: (s.etablissementDetenteurs || []).map((e) => ({
-        name: e.et70Etablissement, city: e.et71Ville,
+        name: e.et70Etablissement,
+        city: e.et71Ville,
         nakala_series: e.et75IdCollecNakalaSeries || null,
       })),
       feuilles_api: `https://www.cartomundi.fr/ctmd-services/serie/${s.skey}/feuilles`,
@@ -129,10 +161,18 @@ const rows = hits.map((s) => {
 
 rows.sort((a, b) => b.score - a.score);
 console.log(`\n${'score'.padStart(5)} ${'sheets'.padStart(6)}  title`);
-for (const r of rows) console.log(`${String(r.score).padStart(5)} ${String(r.raw.sheets).padStart(6)}  ${r.title.slice(0, 52)}`);
+for (const r of rows)
+  console.log(
+    `${String(r.score).padStart(5)} ${String(r.raw.sheets).padStart(6)}  ${r.title.slice(0, 52)}`
+  );
 
-if (dry) { console.log('\n--dry: nothing written'); process.exit(0); }
+if (dry) {
+  console.log('\n--dry: nothing written');
+  process.exit(0);
+}
 
-const { error } = await db.from('scout_candidates').upsert(rows, { onConflict: 'source,external_id' });
+const { error } = await db
+  .from('scout_candidates')
+  .upsert(rows, { onConflict: 'source,external_id' });
 if (error) throw error;
 console.log(`\nupserted ${rows.length} rows into scout_candidates (source=cartomundi)`);

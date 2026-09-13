@@ -36,7 +36,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const dry = process.argv.includes('--dry');
 const SERIE = 175;
-const SERIES = 'indochine-1-25-000-tonkin-thanh-hoa';   // series_key(), mig 082
+const SERIES = 'indochine-1-25-000-tonkin-thanh-hoa'; // series_key(), mig 082
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
 const API = `https://www.cartomundi.fr/ctmd-services/serie/${SERIE}/feuilles`;
 
@@ -82,10 +82,15 @@ for (const [sn, editions] of byNumber) {
   // The newest edition carries the best title; any of them carries the extent.
   const best = editions.slice().sort((a, b) => (b.f103DateAaaa || 0) - (a.f103DateAaaa || 0))[0];
   const g = best.geometrieEmprise || {};
-  const w = unimarc(g.l123dLimiteOuestUnimarc), e = unimarc(g.l123eLimiteEstUnimarc);
-  const n = unimarc(g.l123fLimiteNordUnimarc), s = unimarc(g.l123gLimiteSudUnimarc);
+  const w = unimarc(g.l123dLimiteOuestUnimarc),
+    e = unimarc(g.l123eLimiteEstUnimarc);
+  const n = unimarc(g.l123fLimiteNordUnimarc),
+    s = unimarc(g.l123gLimiteSudUnimarc);
   const m = held.get(sn);
-  const years = editions.map((x) => x.f103DateAaaa).filter(Boolean).sort();
+  const years = editions
+    .map((x) => x.f103DateAaaa)
+    .filter(Boolean)
+    .sort();
   out.push({
     series_key: SERIES,
     sheet_number: sn,
@@ -96,9 +101,15 @@ for (const [sn, editions] of byNumber) {
     source: 'CartoMundi',
     source_ref: best.fkey ? String(best.fkey) : null,
     note: [
-      years.length > 1 ? `${editions.length} editions: ${years.join(', ')}` : years[0] ? `edition ${years[0]}` : null,
+      years.length > 1
+        ? `${editions.length} editions: ${years.join(', ')}`
+        : years[0]
+          ? `edition ${years[0]}`
+          : null,
       'bbox is CartoMundi catalogue extent, not a georeference',
-    ].filter(Boolean).join(' · '),
+    ]
+      .filter(Boolean)
+      .join(' · '),
   });
 }
 
@@ -106,18 +117,27 @@ const heldN = out.filter((r) => r.held_by).length;
 console.log(`${out.length} distinct sheets | held ${heldN} | gaps ${out.length - heldN}`);
 console.log(`no bbox parsed: ${out.filter((r) => !r.bbox).length}`);
 console.log('\ngaps:');
-for (const r of out.filter((x) => !x.held_by).sort((a, b) => a.sheet_number.localeCompare(b.sheet_number, undefined, { numeric: true })))
-  console.log(`  ${r.sheet_number.padStart(6)}  ${(r.name || '?').padEnd(20)} ${r.bbox ? r.bbox.map((v) => v.toFixed(3)).join(',') : 'no bbox'}`);
+for (const r of out
+  .filter((x) => !x.held_by)
+  .sort((a, b) => a.sheet_number.localeCompare(b.sheet_number, undefined, { numeric: true })))
+  console.log(
+    `  ${r.sheet_number.padStart(6)}  ${(r.name || '?').padEnd(20)} ${r.bbox ? r.bbox.map((v) => v.toFixed(3)).join(',') : 'no bbox'}`
+  );
 
 // Our rows whose number the catalogue does not list — a spelling mismatch or a
 // sheet filed under a number the series never issued. Either way, worth seeing.
 const orphan = [...held.keys()].filter((k) => !byNumber.has(k));
 if (orphan.length) console.log(`\nour sheet numbers not in the catalogue: ${orphan.join(', ')}`);
 
-if (dry) { console.log('\n--dry: nothing written'); process.exit(0); }
+if (dry) {
+  console.log('\n--dry: nothing written');
+  process.exit(0);
+}
 
 for (let i = 0; i < out.length; i += 200) {
-  const { error: upErr } = await db.from('series_sheets').upsert(out.slice(i, i + 200), { onConflict: 'series_key,sheet_number' });
+  const { error: upErr } = await db
+    .from('series_sheets')
+    .upsert(out.slice(i, i + 200), { onConflict: 'series_key,sheet_number' });
   if (upErr) throw upErr;
 }
 console.log(`\nupserted ${out.length} rows`);

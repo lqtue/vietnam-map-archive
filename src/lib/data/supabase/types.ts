@@ -793,6 +793,63 @@ export type Database = {
           },
         ]
       }
+      series_sheets: {
+        Row: {
+          bbox: number[] | null
+          created_at: string
+          held_by: string | null
+          map_id: string | null
+          name: string | null
+          note: string | null
+          series_key: string
+          sheet_number: string
+          source: string | null
+          source_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          bbox?: number[] | null
+          created_at?: string
+          held_by?: string | null
+          map_id?: string | null
+          name?: string | null
+          note?: string | null
+          series_key: string
+          sheet_number: string
+          source?: string | null
+          source_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bbox?: number[] | null
+          created_at?: string
+          held_by?: string | null
+          map_id?: string | null
+          name?: string | null
+          note?: string | null
+          series_key?: string
+          sheet_number?: string
+          source?: string | null
+          source_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "series_sheets_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "series_sheets_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stories: {
         Row: {
           created_at: string

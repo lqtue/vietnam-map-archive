@@ -71,14 +71,21 @@ for (const m of rows) {
 const out = [];
 for (const c of cov) {
   const sheet = String(c.sheet);
-  let held_by = null, map_id = null, source = null, source_ref = null, note = null;
+  let held_by = null,
+    map_id = null,
+    source = null,
+    source_ref = null,
+    note = null;
 
   if (c.status === 'in mosaic') {
     held_by = 'raster:l7014';
     source = 'PCL';
   } else if (c.status === 'city (Allmaps)') {
     const m = bySheet.get(sheet);
-    if (m) { held_by = 'map'; map_id = m.id; }
+    if (m) {
+      held_by = 'map';
+      map_id = m.id;
+    }
     source = 'PCL';
   } else if (c.status === 'off-grid') {
     note = 'off-grid: outside the regular 15′ lattice';
@@ -86,8 +93,10 @@ for (const c of cov) {
 
   // Source of a scan for anything not already served, and for the record on
   // what is. TTU is the fallback and, for 50 cells, the only holder.
-  if (!source && c.ttu) { source = 'TTU'; source_ref = c.ttu; }
-  else if (source && c.ttu && !source_ref) source_ref = c.ttu;
+  if (!source && c.ttu) {
+    source = 'TTU';
+    source_ref = c.ttu;
+  } else if (source && c.ttu && !source_ref) source_ref = c.ttu;
 
   if (c.status === 'not published by PCL' && !c.ttu) note = 'no known scan in any indexed archive';
 
@@ -96,25 +105,46 @@ for (const c of cov) {
     sheet_number: sheet,
     name: c.name || null,
     bbox: c.bbox || null,
-    held_by, map_id, source, source_ref, note,
+    held_by,
+    map_id,
+    source,
+    source_ref,
+    note,
   });
 }
 
 const tally = out.reduce((a, r) => {
-  const k = r.held_by ? `held (${r.held_by})` : r.source ? `obtainable (${r.source})` : 'no known scan';
+  const k = r.held_by
+    ? `held (${r.held_by})`
+    : r.source
+      ? `obtainable (${r.source})`
+      : 'no known scan';
   a[k] = (a[k] || 0) + 1;
   return a;
 }, {});
 console.log(`${out.length} cells:`);
-for (const [k, v] of Object.entries(tally).sort((a, b) => b[1] - a[1])) console.log(`  ${String(v).padStart(4)}  ${k}`);
+for (const [k, v] of Object.entries(tally).sort((a, b) => b[1] - a[1]))
+  console.log(`  ${String(v).padStart(4)}  ${k}`);
 
-const unmatched = out.filter((r) => r.held_by === null && cov.find((c) => String(c.sheet) === r.sheet_number)?.status === 'city (Allmaps)');
-if (unmatched.length) console.log(`\nWARNING: ${unmatched.length} city cells found no maps row: ${unmatched.map((r) => r.sheet_number).join(', ')}`);
+const unmatched = out.filter(
+  (r) =>
+    r.held_by === null &&
+    cov.find((c) => String(c.sheet) === r.sheet_number)?.status === 'city (Allmaps)'
+);
+if (unmatched.length)
+  console.log(
+    `\nWARNING: ${unmatched.length} city cells found no maps row: ${unmatched.map((r) => r.sheet_number).join(', ')}`
+  );
 
-if (dry) { console.log('\n--dry: nothing written'); process.exit(0); }
+if (dry) {
+  console.log('\n--dry: nothing written');
+  process.exit(0);
+}
 
 for (let i = 0; i < out.length; i += 200) {
-  const { error } = await db.from('series_sheets').upsert(out.slice(i, i + 200), { onConflict: 'series_key,sheet_number' });
+  const { error } = await db
+    .from('series_sheets')
+    .upsert(out.slice(i, i + 200), { onConflict: 'series_key,sheet_number' });
   if (error) throw error;
 }
 console.log(`\nupserted ${out.length} rows into series_sheets`);

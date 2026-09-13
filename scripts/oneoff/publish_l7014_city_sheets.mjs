@@ -86,10 +86,14 @@ if (dry) {
 const { error: upErr } = await db
   .from('maps')
   .update({ status: 'public' })
-  .in('id', ready.map((m) => m.id));
+  .in(
+    'id',
+    ready.map((m) => m.id)
+  );
 if (upErr) throw upErr;
 console.log(`\npublished ${ready.length}`);
 
 const { data: series } = await db.from('map_series').select('*');
 console.log('\nmap_series as an anonymous reader sees it:');
-for (const r of series) console.log(`   ${r.key} | ${r.sheets} sheets | ${r.first_year}-${r.last_year}`);
+for (const r of series)
+  console.log(`   ${r.key} | ${r.sheets} sheets | ${r.first_year}-${r.last_year}`);
