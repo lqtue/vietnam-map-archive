@@ -162,11 +162,18 @@ export interface SheetEdition {
 /**
  * The other printings of the same sheet.
  *
- * A sheet is `(series, sheet_number)` and an edition is a row, so the grouping
- * key is the one `extra_metadata` already carries — no join table, and the
- * dropped `pipeline_sheets` (mig 012, `UNIQUE (series, sheet_number)`) is the
- * reminder of why not: it asserted one scan per cell, which the corpus does
- * not honour. Cell 6330-4 alone is SÀI GÒN 1965 and THÀNH PHỐ HỒ CHÍ MINH 1984.
+ * A sheet is `(series, sheet_number)` and an edition is a row, so this needs no
+ * join table — the dropped `pipeline_sheets` (mig 012, `UNIQUE (series,
+ * sheet_number)`) is the reminder of why not: it asserted one scan per cell,
+ * which the corpus does not honour. Cell 6330-4 alone is SÀI GÒN 1965 and
+ * THÀNH PHỐ HỒ CHÍ MINH 1984.
+ *
+ * The series half of that key is **`collection`**, not `extra_metadata.series`.
+ * Collection is what makes a series a series everywhere else — `series_key()`
+ * (mig 082) and `series_sheets` (083) are both built on it — and the metadata
+ * spelling is a second name for the same fact that only some rows carry: all
+ * 62 Indochine 1:25,000 rows have a sheet number and none has a `series`, so
+ * keying on it hid the three cells that survey holds in two editions.
  *
  * Two round trips because PostgREST has no subquery: the row's own key, then
  * its siblings. RLS decides what comes back, which is the whole visibility
@@ -179,21 +186,21 @@ export async function fetchSheetEditions(
 ): Promise<SheetEdition[]> {
   const { data: self, error: selfError } = await supabase
     .from('maps')
-    .select('extra_metadata')
+    .select('extra_metadata, collection')
     .eq('id', mapId)
     .single();
   if (selfError || !self) return [];
 
   const meta = (self.extra_metadata ?? {}) as Record<string, unknown>;
   const sheet = typeof meta.sheet_number === 'string' ? meta.sheet_number : null;
-  const series = typeof meta.series === 'string' ? meta.series : null;
+  const series = self.collection;
   if (!sheet || !series) return [];
 
   const { data, error } = await supabase
     .from('maps')
     .select('id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,georef_done')
     .eq('extra_metadata->>sheet_number', sheet)
-    .eq('extra_metadata->>series', series)
+    .eq('collection', series)
     .neq('id', mapId)
     .order('year', { ascending: true });
   if (error || !data) {
@@ -255,15 +262,19 @@ export async function fetchSeriesSheets(
  * Every sheet series the archive holds, from the `map_series` view (mig 082).
  *
  * The view is the definition: a collection whose sheets carry a sheet number,
- * has more than one of them georeferenced, and that this reader is allowed to
- * see. That last clause is why there is no `draft` flag anywhere in the UI — a
+ * has more than one distinct one georeferenced, and that this reader is allowed
+ * to see. `sheets` counts cells rather than rows (mig 084), so a survey holding
+ * two printings of one sheet is one sheet, and `surveySheets` is the survey's
+ * own denominator from `series_sheets`. That last clause is why there is no `draft` flag anywhere in the UI — a
  * wholly-unpublished series simply has no row for an anonymous reader, so the
  * list is already the list of series worth offering.
  */
 export async function fetchMapSeries(supabase: SupabaseClient<Database>): Promise<MapSeries[]> {
   const { data, error } = await supabase
     .from('map_series')
-    .select('key, collection, name, sheets, published_sheets, first_year, last_year, bounds')
+    .select(
+      'key, collection, name, sheets, published_sheets, survey_sheets, first_year, last_year, bounds'
+    )
     .order('first_year', { ascending: true });
 
   if (error || !data) {
@@ -285,6 +296,10 @@ export async function fetchMapSeries(supabase: SupabaseClient<Database>): Promis
         name: (row.name as string) ?? (row.collection as string),
         sheets: Number(row.sheets ?? 0),
         publishedSheets: Number(row.published_sheets ?? 0),
+        // Null where the survey's index was never imported (mig 083), which is
+        // not the same as zero — a caller showing a denominator has to fall
+        // back to `sheets` rather than print "9 of 0".
+        surveySheets: row.survey_sheets == null ? undefined : Number(row.survey_sheets),
         firstYear: row.first_year ?? undefined,
         lastYear: row.last_year ?? undefined,
         bounds: b as [number, number, number, number],

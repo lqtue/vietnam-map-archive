@@ -79,9 +79,29 @@
   // are `maps` rows warped live instead) and 11 off-grid. Read it off
   // `work/l7014/build/<build>.geojson`, whose name matches L7014_PMTILES_URL —
   // counting anything else is counting a series rather than an archive.
-  const RASTER_SERIES = [{ ref: L7014_OVERLAY, sheets: 452, note: '1963–89 · 1:50,000' }];
+  // "of 627" is what ties this row to the warped-sheets row below it: they are
+  // one survey served two ways — 452 cells as pixels here, 9 as `maps` rows
+  // warped live — and nothing else on either row says so. The denominator is
+  // the same number `series_sheets` gives the other row, hardcoded here beside
+  // the 452 because the mosaic is not in the database to be counted.
+  //
+  // The note ends in how the layer is served, and so does every database
+  // series' below. That pairing is the rename: "pre-tiled" and "warped live"
+  // are the only difference between these two L7014 rows, and neither row said
+  // it. It costs no per-series knowledge — a raster row is always pre-tiled and
+  // a `map_series` row is always warped live — which is the whole reason this
+  // is a word in a note rather than a rename of `maps.collection`. That string
+  // is what `series_key()` is a function of, so renaming it would re-key all
+  // 627 `series_sheets` rows and break five scripts that hardcode it.
+  const RASTER_SERIES = [
+    {
+      ref: L7014_OVERLAY,
+      label: '452 of 627 sheets',
+      note: '1963–89 · 1:50,000 · pre-tiled',
+    },
+  ];
 
-  let dbSeries: { ref: SheetsRef; sheets: number; note: string }[] = [];
+  let dbSeries: { ref: SheetsRef; label: string; note: string }[] = [];
   onMount(async () => {
     // The view carries the visibility gate, so an unpublished series simply is
     // not in the answer for a reader who may not see it. There is no `draft`
@@ -98,10 +118,23 @@
         name: s.name,
         bounds: s.bounds,
       },
-      sheets: s.sheets,
+      label: seriesCount(s),
       note: seriesNote(s),
     }));
   });
+
+  /**
+   * "53 sheets", or "9 of 627 sheets" where the survey's own index says how
+   * many it contains (mig 083/084). The denominator matters most exactly where
+   * it is largest: without it L7014 said "9 sheets" for a survey of 627, which
+   * is what `maps` knows rather than what is true. Null denominator means no
+   * index was imported, which is not zero — say nothing rather than "of 0".
+   */
+  function seriesCount(s: MapSeries): string {
+    return s.surveySheets && s.surveySheets > s.sheets
+      ? `${s.sheets} of ${s.surveySheets} sheets`
+      : `${s.sheets} sheets`;
+  }
 
   /** "1903–27", plus what a reader who can see drafts should know about them. */
   function seriesNote(s: MapSeries): string {
@@ -118,7 +151,10 @@
       canSeeDrafts && s.publishedSheets < s.sheets
         ? `${s.sheets - s.publishedSheets} unpublished`
         : '';
-    return [span, draftNote].filter(Boolean).join(' · ');
+    // See RASTER_SERIES: every row from the view is `maps` rows warped by
+    // Allmaps at draw time, which is what tells the L7014 city sheets apart
+    // from the L7014 mosaic sitting above them under the same survey's count.
+    return [span, draftNote, 'warped live'].filter(Boolean).join(' · ');
   }
 
   $: visibleSeries = [...RASTER_SERIES, ...dbSeries];
@@ -156,7 +192,7 @@
           <span class="series-mark" aria-hidden="true">{seriesOn.has(s.ref.key) ? '✓' : '+'}</span>
           <span class="series-text">
             <span class="series-name">{s.ref.name}</span>
-            <span class="series-note">{s.sheets} sheets · {s.note}</span>
+            <span class="series-note">{s.label} · {s.note}</span>
           </span>
         </button>
       </li>

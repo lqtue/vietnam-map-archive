@@ -36,7 +36,7 @@ export const L7014_OVERLAY: RasterRef = {
   kind: 'raster',
   mapId: 'raster:l7014',
   key: 'l7014',
-  name: 'AMS 1:50,000 (1963–89)',
+  name: 'AMS L7014 1:50,000 (mosaic)',
   bounds: [102.2499, 8.4999, 109.5001, 23.25],
 };
 

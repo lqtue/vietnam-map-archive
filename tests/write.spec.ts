@@ -52,6 +52,7 @@ const created = {
   storyIds: [] as string[],
   jobIds: [] as string[],
   mapIds: [] as string[],
+  seriesKeys: [] as string[],
 };
 
 test.beforeAll(async () => {
@@ -108,6 +109,8 @@ test.afterAll(async () => {
     await admin.from('footprint_submissions').delete().eq('id', id);
   for (const id of created.storyIds) await admin.from('stories').delete().eq('id', id);
   for (const id of created.jobIds) await admin.from('pipeline_jobs').delete().eq('id', id);
+  for (const key of created.seriesKeys)
+    await admin.from('series_sheets').delete().eq('series_key', key);
   for (const id of created.mapIds) await admin.from('maps').delete().eq('id', id);
   await staffRequest?.dispose();
 });
@@ -1415,8 +1418,19 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   await mk('draft b', draftSeries, 'draft', { sheet_number: '2' }, [105.5, 20.5, 106, 21]);
   await mk('pub a', pubSeries, 'public', { sheet_number: '1' }, [106, 10, 106.5, 10.5]);
   await mk('pub b', pubSeries, 'featured', { sheet_number: '2' }, [106.5, 10.5, 107, 11]);
+  // A second printing of a cell the survey already has. It is a row, not a
+  // sheet (mig 084) — the corpus has three of these in the Indochine 1:25,000
+  // alone, and counting rows told /explore the survey was three sheets bigger
+  // than it is. Its bbox sits inside the union so a miscount cannot hide here
+  // as a bounds change.
+  await mk('pub a, 2nd ed', pubSeries, 'public', { sheet_number: '1' }, [106.1, 10.1, 106.2, 10.2]);
   // Numbered, but only one sheet: a map, not a series.
   await mk('solo', `ZZ Solo ${Date.now()}`, 'public', { sheet_number: '1' }, [100, 5, 101, 6]);
+  // The same trap one level down: two rows, one cell. Two printings of a single
+  // sheet are a map printed twice, and `count(*) > 1` called it a survey.
+  const twins = `ZZ Twins ${Date.now()}`;
+  await mk('twin a', twins, 'public', { sheet_number: '7' }, [101, 6, 102, 7]);
+  await mk('twin b', twins, 'public', { sheet_number: '7' }, [101, 6, 102, 7]);
   // Two published sheets with no sheet numbers: the archive's catch-all bucket,
   // which must never be offered as a survey to stack on itself.
   await mk('bucket a', bucket, 'public', {}, [100, 5, 110, 23]);
@@ -1426,8 +1440,34 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   const asUser = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   await asUser.auth.setSession(session);
 
+  // The survey's own index (mig 083): what it CONTAINS, which `maps` cannot
+  // say because it only holds successes. Five cells, of which we hold two.
+  const pubKeyForIndex = pubSeries.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  created.seriesKeys.push(pubKeyForIndex);
+  const { error: idxError } = await admin.from('series_sheets').insert(
+    ['1', '2', '3', '4', '5'].map((n) => ({
+      series_key: pubKeyForIndex,
+      sheet_number: n,
+      held_by: n === '1' || n === '2' ? 'map' : null,
+    })) as never
+  );
+  if (idxError) throw new Error(`series_sheets fixture failed: ${idxError.message}`);
+
+  // 083's check constraint, which had never been shown to fire: a row pointing
+  // at a map must say it is held by one, or it is a held sheet that would not
+  // be counted — the exact miscount that table exists to prevent.
+  const { error: badHold } = await admin.from('series_sheets').insert({
+    series_key: pubKeyForIndex,
+    sheet_number: 'unheld-with-a-map',
+    map_id: created.mapIds[0],
+    held_by: null,
+  } as never);
+  expect(badHold?.message ?? '').toContain('series_sheets_held_by_map');
+
   const keysFor = async (client: typeof anon) => {
-    const { data, error } = await client.from('map_series').select('key, sheets, bounds');
+    const { data, error } = await client
+      .from('map_series')
+      .select('key, sheets, survey_sheets, bounds');
     if (error) throw new Error(`map_series read failed: ${error.message}`);
     return data ?? [];
   };
@@ -1456,6 +1496,19 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   // Bounds are the union of the sheets' own boxes — what "zoom to the series"
   // means. A wrong fold here points the camera at the wrong country silently.
   const pub = userRows.find((r) => r.key === pubKey);
+  // Three rows over two cells. `sheets` is what the layer draws and what the
+  // row promises, so it counts cells (mig 084).
   expect(pub?.sheets).toBe(2);
   expect(pub?.bounds).toEqual([106, 10, 107, 11]);
+
+  // Two printings of one cell are not a survey, for either reader.
+  const twinKey = twins.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  expect(anonKeys).not.toContain(twinKey);
+  expect(userKeys).not.toContain(twinKey);
+
+  // The denominator comes from the survey's index, not from `maps` — "2 of 5",
+  // which is the whole point of joining it. A survey with no index row reads
+  // null rather than 0, so a caller can tell "not counted" from "contains none".
+  expect(pub?.survey_sheets).toBe(5);
+  expect(userRows.find((r) => r.key === draftKey)?.survey_sheets).toBeNull();
 });

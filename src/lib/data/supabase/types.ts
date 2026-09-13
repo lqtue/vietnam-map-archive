@@ -1060,6 +1060,7 @@ export type Database = {
           name: string | null
           published_sheets: number | null
           sheets: number | null
+          survey_sheets: number | null
         }
         Relationships: []
       }

@@ -144,8 +144,11 @@ export interface MapSeries {
   key: string;
   collection: string;
   name: string;
+  /** Distinct cells held as `maps` rows — not rows, which double-count editions. */
   sheets: number;
   publishedSheets: number;
+  /** What the survey contains, from its own index (mig 083). Null: never imported. */
+  surveySheets?: number;
   firstYear?: number;
   lastYear?: number;
   bounds: [number, number, number, number];
