@@ -103,7 +103,16 @@ Four lessons, each of which cost real time today:
    rule turned into 93 phantom gaps. Curl, same URLs, same second: 6. Whenever a
    script decides what work to do by probing a network service, make the refusal
    distinguishable from the answer.
-6. **Two `npm run build` runs in one shared worktree lose each other's output.**
+6. **A sheet number is not a token — four of them contain a space.** The 086
+   backfill keyed its updates on `` `${series_key} ${sheet_number}` `` and split
+   on the space, so `"0 bis"` came back as sheet `"0"` and that cell was written
+   with the wrong row's printing. It was invisible because Ha-Châu and Nha-Nam
+   are both 1907 — and only because of that: `5`/`5 bis` are 1912 and 1907, and
+   `10`/`10 bis` are 1911 and 1907, so probing either of those instead would have
+   shown it immediately. Separator is NUL now, and all four pairs (`0`, `5`,
+   `10`, `73` and their `bis`) were verified against their own `maps` rows
+   afterwards. Any future writer to `series_sheets` has the same trap waiting.
+7. **Two `npm run build` runs in one shared worktree lose each other's output.**
    `build` wipes `.svelte-kit/output` before writing it, so two builds a minute
    apart leave a half-overwritten tree and the deploy that runs last publishes
    it. Tonight that put a deployment on production missing a blog post and two
@@ -186,14 +195,18 @@ Four lessons, each of which cost real time today:
       printings each, fourteen years apart, and `SheetEditions.svelte` already
       surfaces those in the Info rail. So the survey index and its coverage page
       can point at exactly one of them, silently. Verified 2026-09-13 by counting
-      `maps` rows grouped on collection + `sheet_number`. Migration 086 (two
-      nullable columns, `year` and `edition`) is drafted by a concurrent session
-      and not pushed, and **it does not lift this**: it hangs a printing off the
-      existing one-row-per-cell key, so the page can say which printing it serves
-      and, with a count off `maps`, that others exist — but the index still
-      cannot enumerate them. Widening the key is the open half, and it is the
-      whole item. Exit: a survey's coverage page lists both published printings
-      of Indochine cell 1 without either being the one the other hides behind.
+      `maps` rows grouped on collection + `sheet_number`. **Migration 086 is
+      pushed and backfilled** (2026-09-13 — `year`/`edition`, 505 of 706 rows
+      with a year, 445 with an edition, 505 of the 520 held carrying a printing;
+      editions normalised to `1`–`6` plus `3-DMA`/`4-DMA`/`5-DMA`, since PCL
+      spells one edition `"003"` and `"3"`). The coverage page now has a Version
+      column and a `2 editions` badge — Indochine sheets 2, 13 and 14, published
+      printings only. **That does not lift this item**: 086 hangs a printing off
+      the existing one-row-per-cell key, so the page can say which printing it
+      serves and that others exist, while the index still cannot enumerate them.
+      Widening the key is the open half and it is the whole item. Exit: a
+      survey's coverage page lists both published printings of Indochine cell 1
+      without either being the one the other hides behind.
 - [ ] **Cochinchine 1:25,000 is the next survey to index** — 826 sheets across
       three series, Saigon and the Mekong delta, top of the scout queue at
       `/admin?tab=scout`. The importer pattern is
