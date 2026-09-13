@@ -799,8 +799,9 @@ rows in about 90 seconds**, every query paged to 100%.
 <https://hanoimaps.github.io/news>. That site
 (`github.com/hanoimaps/hanoimaps.github.io`, one repo, author Tran Minh Tri)
 contains **no NLV code at all** — it is 150 lines of `fetch()`; the whole proxy
-is a closed Vercel function. It is 8–16 s per call against ~1.5 s direct, states
-no result total, and exposes none of the filters. `/api/press` now queries the
+is a closed Vercel function. It is 8–16 s per call against 3–5 s direct
+(up to 20 s on a cold CGI — the archive's own variance, not the page size),
+states no result total, and exposes none of the filters. `/api/press` now queries the
 library directly, which also made two things possible:
 
 - **A decade curve for free.** The results page carries a decade facet, so
@@ -810,8 +811,10 @@ library directly, which also made two things possible:
   would be one request per decade, so the curve is the Vietnamese press only
   and the caption says so.
 - **Thumbnails that are the clipping.** Each result states `crop=x,y,w,h`, the
-  box of the matched phrase on the scan — ~120 kB against ~1.4 MB for the whole
-  newspaper page the panel used to load.
+  archive's snippet box — ~120 kB against ~1.4 MB for the whole newspaper page
+  the panel used to load. It is the matched line for an advertisement but the
+  article's *heading* for an article-level hit, so it is a thumbnail, not proof
+  the phrase is in the picture — see the place report below.
 
 **The archive answers on http only** — there is no https listener. A server-side
 subrequest is fine with that, but a browser on an https page blocks a
@@ -837,8 +840,8 @@ proxy is used for.
   eye — the archive publishes no place-of-publication field.
 - **There is no text, only the scan** — and its coordinates. A result carries the
   headline, the document type, the publication, the date (packed into the `oid`,
-  so no Vietnamese date parsing), and `crop=x,y,w,h`: **the pixel box of the
-  matched phrase on the page image**, which the proxy throws away. Both the crop
+  so no Vietnamese date parsing), and `crop=x,y,w,h`: the archive's snippet box,
+  which the proxy throws away. Both the crop
   and the full page come off the same image server:
 
   ```
@@ -954,6 +957,51 @@ decade facet with counts. Gallica has no facet, so it is one request per decade.
 
 Politeness is the same rule as the NLV harvest: sequential, ~1.2 s apart, one
 retry, two public archives.
+
+## Place report (`scripts/place_report.mjs`)
+
+A cited, dated evidence report for one place from both period archives.
+
+```bash
+node scripts/place_report.mjs --selftest
+node scripts/place_report.mjs "Khánh Hội" --max 14
+node scripts/place_report.mjs "Khánh Hội" --variants "Khanh Hoi,Khánh-Hội"
+```
+
+Writes `work/reports/<slug>.md` (gitignored): the decade curve, a synthesis, then
+every source numbered with its date, archive and URL. The synthesis is written by
+Gemini from the evidence table **and nothing else**, with `[n]` citations into it,
+so a reader checks rather than trusts.
+
+The two archives answer in different media, and that is the whole design:
+
+- **Gallica** has OCR'd full text, so `services/ContentSearch` returns the actual
+  sentence — quotable as it stands.
+- **The NLV returns no text at all.** Each clipping is *read* from the scan by a
+  vision model before it can be cited, and every entry links its image.
+
+Three things this gets right that a naive version gets wrong, all of them silent
+failures that return confident, irrelevant evidence:
+
+- **All three endpoints match loose words unless told otherwise, and each spells
+  it differently**: NLV `txq` takes `"…"`, Gallica SRU takes `gallica adj "…"`,
+  Gallica ContentSearch takes `"…"`. Unquoted, ContentSearch for `Khanh Hoi`
+  returns 18 hits on *quan*, *Quant* and *quand* and one on the place.
+- **The crop is not always the match.** Veridian crops the matched line for an
+  advertisement but the article's *heading* for an article-level hit — the 1918
+  *Lục Tỉnh Tân Văn* hit crops to the section header "TẠP TRỞ (Variétés)", which
+  says nothing about the place. So the crop is widened for context and the model
+  is asked whether the name is actually visible; on the Khánh Hội run **8 of 14
+  were not**, and those are printed as "the name is not visible in this crop"
+  rather than quoted as though the headline were the source.
+- **A catalogue hit with no locatable sentence is a lead, not evidence**, and is
+  dropped — so the Gallica count is smaller than the catalogue would report.
+
+Even with all three, `adj "Khanh Hoi"` still matches Vietnamese prose where
+*Khánh* is followed by *hỏi* ("Khánh asked"), because Gallica's index is
+unaccented. The Khánh Hội synthesis caught those itself and named them as
+typographical matches — which is the argument for the numbered table sitting
+under the prose rather than instead of it.
 
 ## MapSAM2 inference (`work/MapSAM2/`)
 

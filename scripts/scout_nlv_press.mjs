@@ -124,6 +124,29 @@ export function parseTotal(html) {
 }
 
 /**
+ * Hits per decade off the results page's facet, keyed by the decade's first
+ * year — the whole time curve, from the same response as the results.
+ *
+ * Pure.
+ */
+export function parseDecades(html) {
+  const text = (x) =>
+    x
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d))
+      .replace(/&amp;/g, '&')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ');
+  const i = html.indexOf("'facet-de'");
+  const j = html.indexOf("'facet-wo'");
+  const out = {};
+  if (i > 0 && j > i)
+    for (const [, d, n] of text(html.slice(i, j)).matchAll(/(\d{4})-\d{4}\D{0,120}?\((\d+)\)/g))
+      out[Number(d)] = Number(n);
+  return out;
+}
+
+/**
  * One results page → its rows. Pure, so --selftest can pin it against a saved
  * page: a Veridian template change shows up as zero rows on a non-zero total.
  *
@@ -325,6 +348,7 @@ function selftest() {
   ok(oidYear('19320421') === 1932 && oidYear('') === null, 'year');
   ok(parseTotal('trả về 15154 kết quả') === 15154, 'total');
   ok(parseTotal('<p>nothing</p>') === null, 'absent total is null, not 0');
+  ok(Object.keys(parseDecades('<p>nothing</p>')).length === 0, 'no facet is an empty curve');
   if (!existsSync(fixture)) {
     console.log(
       bad
@@ -341,6 +365,12 @@ function selftest() {
   // as an archive with nothing in it.
   ok(rows.length === PAGE, `expected ${PAGE} rows from a full page, got ${rows.length}`);
   ok(total > 0, 'fixture states a total');
+  const decades = parseDecades(html);
+  ok(Object.keys(decades).length > 1, `decade facet parsed, got ${JSON.stringify(decades)}`);
+  ok(
+    Object.values(decades).reduce((a, b) => a + b, 0) <= total,
+    'the decades cannot sum past the stated total'
+  );
   const r = rows[0];
   ok(/^[A-Za-z]+\d{8}/.test(r.oid), 'oid shape');
   ok(r.year >= 1800 && r.year <= 2100, `year in range, got ${r.year}`);
@@ -359,11 +389,19 @@ function selftest() {
   console.log(`selftest ok (${rows.length} rows parsed from the fixture, total ${total})`);
 }
 
-mkdirSync(OUT_DIR, { recursive: true });
+/**
+ * CLI entry. Guarded so the parser above can be imported — scripts/place_report.mjs
+ * reuses `parseResults`/`parseTotal` rather than keeping a second copy of the
+ * regexes, and an unguarded module would run this whole block on import.
+ */
+const isCli = process.argv[1] && /scout_nlv_press\.mjs$/.test(process.argv[1]);
 
-if (flag('--selftest')) {
+if (!isCli) {
+  // imported as a library
+} else if (flag('--selftest')) {
   selftest();
 } else if (flag('--fixture')) {
+  mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(`${OUT_DIR}/fixture-results.html`, await get(searchUrl('"bản đồ"', 1, null)));
   console.log(`saved ${OUT_DIR}/fixture-results.html`);
 } else if (flag('--pubs')) {
@@ -379,6 +417,7 @@ if (flag('--selftest')) {
   );
   process.exit(1);
 } else {
+  mkdirSync(OUT_DIR, { recursive: true });
   const seen = seenOids();
   const offsets = existsSync(OFFSETS) ? JSON.parse(readFileSync(OFFSETS, 'utf8')) : {};
   console.log(`${seen.size} rows already in ${OUT}`);
