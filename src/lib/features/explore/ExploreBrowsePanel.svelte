@@ -161,6 +161,21 @@
             <span class="series-note">{s.label} · {s.note}</span>
           </span>
         </button>
+        <!-- Beside the toggle, never inside it: the row is a button that puts
+             two layers on the map, and a nested anchor would be invalid markup
+             and would swallow that tap. This goes to the survey's coverage
+             page, which is where its unheld sheets are — the ones the map
+             cannot show, because we do not have them. -->
+        {#if s.seriesKey}
+          <a
+            class="series-info"
+            href="/catalog/series/{encodeURIComponent(s.seriesKey)}"
+            title={$t('All sheets in this survey')}
+            aria-label="{$t('All sheets in this survey')}: {s.name}"
+          >
+            <span aria-hidden="true">›</span>
+          </a>
+        {/if}
       </li>
     {/each}
   </ul>
@@ -194,8 +209,15 @@
     flex-direction: column;
     gap: 0.3rem;
   }
+  .series li {
+    display: flex;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
   .series-row {
-    width: 100%;
+    /* The toggle takes the row; the link is a fixed tab beside it. */
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -242,6 +264,23 @@
   .series-note {
     font-size: 0.7rem;
     color: var(--sb-text-muted);
+  }
+  .series-info {
+    flex: none;
+    width: 1.75rem;
+    display: grid;
+    place-items: center;
+    background: var(--sb-card-bg);
+    border: 1px solid var(--sb-border);
+    border-radius: var(--sb-radius);
+    color: var(--sb-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+  .series-info:hover {
+    background: var(--sb-row-hover);
+    color: var(--sb-text);
   }
 
   .ebp {

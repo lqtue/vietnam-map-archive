@@ -342,4 +342,5 @@ export const vi: Record<string, string> = {
   'You made it.': 'Bạn đã hoàn thành.',
   'Save your trip': 'Lưu hành trình',
   'Log in to keep this on your profile.': 'Đăng nhập để lưu vào hồ sơ cá nhân.',
+  'All sheets in this survey': 'Tất cả bản đồ trong bộ này',
 };

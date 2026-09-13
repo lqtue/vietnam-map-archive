@@ -23,6 +23,21 @@ export interface SeriesRow {
   refs: SeriesRef[];
   label: string;
   note: string;
+  /**
+   * The survey's `map_series.key`, which is also its `series_sheets.series_key`
+   * and so the address of its coverage page at `/catalog/series/<key>`. Not the
+   * same as `key` above, which for a folded row is the raster archive's own key
+   * — the page is keyed on the database series, and a pure raster archive that
+   * is `halfOf` nothing has no index and therefore no page.
+   *
+   * Undefined unless the survey's index has actually been imported. A
+   * `map_series` row exists for every survey with georeferenced sheets, but
+   * `series_sheets` is seeded per survey by hand: AMS L909 has three sheets and
+   * no index, so its page is a 404, and offering a link to it from a row that
+   * works is worse than offering none. `surveySheets` is exactly that signal —
+   * null means "not counted", which is the same thing as "no page".
+   */
+  seriesKey?: string;
 }
 
 /**
@@ -119,6 +134,11 @@ export function buildSeriesRows(
       // mosaic's 1963–89 already contains the sheets' 1966–84.
       label: count(r.sheets + (half?.sheets ?? 0), half?.surveySheets),
       note: [r.note, half && draftsNote(half, canSeeDrafts)].filter(Boolean).join(' · '),
+      // The coverage page belongs to the database series, not the archive: the
+      // index lives in `series_sheets`, keyed by `series_key`. An archive that
+      // is half of nothing, or a survey whose index was never imported, has no
+      // page — so no link.
+      seriesKey: half?.surveySheets ? half.key : undefined,
     };
   });
 
@@ -130,6 +150,7 @@ export function buildSeriesRows(
       refs: [sheetsRef(s)],
       label: count(s.sheets, s.surveySheets),
       note: seriesNote(s, canSeeDrafts),
+      seriesKey: s.surveySheets ? s.key : undefined,
     });
   }
   return rows;
