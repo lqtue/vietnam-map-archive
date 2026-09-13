@@ -76,7 +76,7 @@ const REGION_HANDOFF_ZOOM = 8;
  * sits behind a long edge TTL — a rebuild written over the same key would
  * strand readers on stale bytes. A new build is a new name and a new constant.
  */
-export const L7014_PMTILES_URL = 'https://tiles.maparchive.vn/overlay/l7014-20260912.pmtiles';
+export const L7014_PMTILES_URL = 'https://tiles.maparchive.vn/overlay/l7014-20260913.pmtiles';
 
 /**
  * A tile the archive does not hold, as something drawable.
