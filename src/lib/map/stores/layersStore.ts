@@ -249,20 +249,6 @@ function create() {
 
 export const layersStore = create();
 
-/** True when this series — raster archive or live-warped sheets — is already in the stack. */
-export function hasSeriesOverlay(key: string): boolean {
-  return get(layersStore).overlays.some((o) => o.ref.kind !== 'historical' && o.ref.key === key);
-}
-
-/** Put the series on the stack, or take it off. Returns its new membership. */
-export function toggleSeriesOverlay(ref: SeriesRef): boolean {
-  if (hasSeriesOverlay(ref.key)) {
-    layersStore.removeOverlayByMapId(ref.mapId);
-    return false;
-  }
-  layersStore.addOverlay(ref);
-  return true;
-}
 export const MAX_OVERLAY_LAYERS = MAX_OVERLAYS;
 
 // ── Derived: top overlay ──

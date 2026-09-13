@@ -14,11 +14,12 @@
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
   import { onMount } from 'svelte';
-  import { layersStore, toggleSeriesOverlay } from '$lib/map/stores/layersStore';
-  import type { SheetsRef } from '$lib/map/stores/layersStore';
-  import { L7014_OVERLAY } from '$lib/map/constants';
+  import { layersStore, MAX_OVERLAY_LAYERS } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
   import type { MapSeries } from '$lib/data/maps/types';
+  import { L7014_OVERLAY } from '$lib/map/constants';
+  import { buildSeriesRows } from './seriesRows';
+  import type { RasterSeries, SeriesRow } from './seriesRows';
   import { getSupabaseContext } from '$lib/data/supabase/context';
 
   const { supabase } = getSupabaseContext();
@@ -68,96 +69,60 @@
   // page, no year to sort by, no single scan behind them. Same gesture though
   // — tap to put it on the map, tap again to take it off.
   //
-  // Only the L7014 mosaic is hardcoded, because it is the one series that is
-  // not `maps` rows at all: it is a pre-tiled raster archive on our own tile
-  // domain, so nothing in the database describes it. Every other series comes
-  // from the `map_series` view (mig 082), which is what makes adding one a
-  // matter of ingesting sheets rather than editing this file.
-  // `sheets` is what the deployed archive actually holds, not what the series
-  // has: 452 of the 627 cells in `work/l7014/index.geojson`. The rest are 93
-  // PCL never published, 62 with no usable georeference (the city sheets, which
-  // are `maps` rows warped live instead) and 11 off-grid. Read it off
-  // `work/l7014/build/<build>.geojson`, whose name matches L7014_PMTILES_URL —
-  // counting anything else is counting a series rather than an archive.
-  // "of 627" is what ties this row to the warped-sheets row below it: they are
-  // one survey served two ways — 452 cells as pixels here, 9 as `maps` rows
-  // warped live — and nothing else on either row says so. The denominator is
-  // the same number `series_sheets` gives the other row, hardcoded here beside
-  // the 452 because the mosaic is not in the database to be counted.
-  //
-  // The note ends in how the layer is served, and so does every database
-  // series' below. That pairing is the rename: "pre-tiled" and "warped live"
-  // are the only difference between these two L7014 rows, and neither row said
-  // it. It costs no per-series knowledge — a raster row is always pre-tiled and
-  // a `map_series` row is always warped live — which is the whole reason this
-  // is a word in a note rather than a rename of `maps.collection`. That string
-  // is what `series_key()` is a function of, so renaming it would re-key all
-  // 627 `series_sheets` rows and break five scripts that hardcode it.
-  const RASTER_SERIES = [
+  // The rows themselves are built in `seriesRows.ts`: which surveys exist comes
+  // from the `map_series` view (mig 082), so adding one is a matter of
+  // ingesting sheets rather than editing this file, and only the L7014 raster
+  // archive is hardcoded because it is the one survey that is not `maps` rows.
+  /**
+   * `sheets` is what the deployed archive holds, not what the survey has: 452
+   * of the 627 cells in `work/l7014/index.geojson`. The rest are 93 PCL never
+   * published, 62 with no usable georeference (the city sheets, which are the
+   * `maps` rows `halfOf` folds in) and 11 off-grid. Read it off
+   * `work/l7014/build/<build>.geojson`, whose name matches `L7014_PMTILES_URL`
+   * — counting anything else is counting a survey rather than an archive.
+   */
+  const RASTER_SERIES: RasterSeries[] = [
     {
       ref: L7014_OVERLAY,
-      label: '452 of 627 sheets',
-      note: '1963–89 · 1:50,000 · pre-tiled',
+      name: 'AMS L7014 1:50,000',
+      halfOf: 'series-l7014-vietnam-1-50-000',
+      sheets: 452,
+      note: '1963–89 · 1:50,000',
     },
   ];
 
-  let dbSeries: { ref: SheetsRef; label: string; note: string }[] = [];
+  let dbSeries: MapSeries[] = [];
+  // Nothing is offered until the view has answered. The raster archive is a
+  // constant and could render at once, but it is HALF of L7014 — a tap in that
+  // window would put the mosaic on the map without the city sheets that fill
+  // its Saigon-shaped hole, which is the one state `toggleRow` exists to
+  // prevent and which looks like a broken layer rather than a race.
+  let loaded = false;
   onMount(async () => {
     // The view carries the visibility gate, so an unpublished series simply is
     // not in the answer for a reader who may not see it. There is no `draft`
     // flag here on purpose — that was one more fact about the data kept in the
     // code, and it went stale the moment a sheet was published.
-    dbSeries = (await fetchMapSeries(supabase)).map((s) => ({
-      ref: {
-        kind: 'sheets',
-        mapId: `sheets:${s.key}`,
-        key: s.key,
-        collection: s.collection,
-        // The collection is the layer's name in the stack, where it sits beside
-        // sheet names — so no year span here, which belongs in the note below.
-        name: s.name,
-        bounds: s.bounds,
-      },
-      label: seriesCount(s),
-      note: seriesNote(s),
-    }));
+    dbSeries = await fetchMapSeries(supabase);
+    loaded = true;
   });
 
   /**
-   * "53 sheets", or "9 of 627 sheets" where the survey's own index says how
-   * many it contains (mig 083/084). The denominator matters most exactly where
-   * it is largest: without it L7014 said "9 sheets" for a survey of 627, which
-   * is what `maps` knows rather than what is true. Null denominator means no
-   * index was imported, which is not zero — say nothing rather than "of 0".
+   * A row's layers go on and come off together. Half a survey on the stack is
+   * worse than none — it is the mosaic's Saigon-shaped hole with nothing in it,
+   * which reads as a broken layer rather than a partial pick — so the cap is
+   * checked for the whole row before anything is added.
    */
-  function seriesCount(s: MapSeries): string {
-    return s.surveySheets && s.surveySheets > s.sheets
-      ? `${s.sheets} of ${s.surveySheets} sheets`
-      : `${s.sheets} sheets`;
+  function toggleRow(row: SeriesRow) {
+    if (row.refs.some((r) => seriesOn.has(r.key))) {
+      for (const r of row.refs) layersStore.removeOverlayByMapId(r.mapId);
+      return;
+    }
+    if ($layersStore.overlays.length + row.refs.length > MAX_OVERLAY_LAYERS) return;
+    for (const r of row.refs) layersStore.addOverlay(r);
   }
 
-  /** "1903–27", plus what a reader who can see drafts should know about them. */
-  function seriesNote(s: MapSeries): string {
-    const span =
-      s.firstYear && s.lastYear
-        ? s.firstYear === s.lastYear
-          ? `${s.firstYear}`
-          : `${s.firstYear}–${String(s.lastYear).slice(-2)}`
-        : '';
-    // Only a reader who can see drafts is shown a draft count, because only
-    // they can be looking at one: for everyone else `sheets` is already the
-    // published count and saying so twice would be noise.
-    const draftNote =
-      canSeeDrafts && s.publishedSheets < s.sheets
-        ? `${s.sheets - s.publishedSheets} unpublished`
-        : '';
-    // See RASTER_SERIES: every row from the view is `maps` rows warped by
-    // Allmaps at draw time, which is what tells the L7014 city sheets apart
-    // from the L7014 mosaic sitting above them under the same survey's count.
-    return [span, draftNote, 'warped live'].filter(Boolean).join(' · ');
-  }
-
-  $: visibleSeries = [...RASTER_SERIES, ...dbSeries];
+  $: visibleSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts, RASTER_SERIES) : [];
   $: seriesOn = new Set(
     $layersStore.overlays
       .filter((o) => o.ref.kind !== 'historical')
@@ -180,18 +145,19 @@
   </div>
 
   <ul class="series">
-    {#each visibleSeries as s (s.ref.key)}
+    {#each visibleSeries as s (s.key)}
+      {@const on = s.refs.some((r) => seriesOn.has(r.key))}
       <li>
         <button
           type="button"
           class="series-row"
-          class:is-on={seriesOn.has(s.ref.key)}
-          aria-pressed={seriesOn.has(s.ref.key)}
-          on:click={() => toggleSeriesOverlay(s.ref)}
+          class:is-on={on}
+          aria-pressed={on}
+          on:click={() => toggleRow(s)}
         >
-          <span class="series-mark" aria-hidden="true">{seriesOn.has(s.ref.key) ? '✓' : '+'}</span>
+          <span class="series-mark" aria-hidden="true">{on ? '✓' : '+'}</span>
           <span class="series-text">
-            <span class="series-name">{s.ref.name}</span>
+            <span class="series-name">{s.name}</span>
             <span class="series-note">{s.label} · {s.note}</span>
           </span>
         </button>
