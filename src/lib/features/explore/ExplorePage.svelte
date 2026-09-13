@@ -152,7 +152,11 @@
   $: paramMapId = $page.url.searchParams.get('map');
   $: paramAt = $page.url.searchParams.get('at');
   $: paramStoryId = $page.url.searchParams.get('story');
-  $: hasDeeplink = !!(paramMapId || paramStoryId);
+  // `?series=` is applied by ExploreBrowsePanel, which is where the series rows
+  // are built — but the welcome chooser is this page's, and a reader arriving
+  // on a survey link must not be asked how they would like to start.
+  $: paramSeries = $page.url.searchParams.get('series');
+  $: hasDeeplink = !!(paramMapId || paramStoryId || paramSeries);
   $: if (hasDeeplink && !choseMode) {
     choseMode = true;
     mode = 'all';

@@ -13,7 +13,7 @@
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { layersStore, MAX_OVERLAY_LAYERS } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
   import type { MapSeries } from '$lib/data/maps/types';
@@ -21,6 +21,7 @@
   import { buildSeriesRows } from './seriesRows';
   import type { RasterSeries, SeriesRow } from './seriesRows';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { replaceState } from '$app/navigation';
 
   const { supabase } = getSupabaseContext();
 
@@ -105,7 +106,49 @@
     // code, and it went stale the moment a sheet was published.
     dbSeries = await fetchMapSeries(supabase);
     loaded = true;
+    // `visibleSeries` is a reactive statement, so it is still the empty
+    // pre-`loaded` array on this line — the deeplink has to wait for the
+    // recompute it just triggered.
+    await tick();
+    applySeriesParam();
   });
+
+  /**
+   * `?series=<key>` puts a whole survey on the map from a link — the series
+   * counterpart of `?map=<id>`, and the only way to hand someone a survey,
+   * since the layer stack lives in localStorage and not in the URL.
+   *
+   * It carries no camera of its own, and does not fit the survey's bounds
+   * either: `mapStore` is created per page rather than globally, so this panel
+   * cannot reach the camera without a prop or a context it has no other use
+   * for. A link that wants a view appends the `#@lat,lng,zoomz` hash urlStore
+   * already reads — which is what the blog links do, and what ExplorePage's
+   * `hasDeeplink` now protects by not asking a reader arriving on one how they
+   * would like to start. Without a hash the survey lands on the reader's last
+   * camera, which for a country-sized layer means seeing one corner of it.
+   * ponytail: wire the bounds fit through if a bare `?series=` is ever shared.
+   *
+   * The key is either half of a folded row — the database series
+   * (`series-l7014-vietnam-1-50-000`, which is also its coverage page's
+   * address) or the raster archive (`l7014`) — because a reader copying a key
+   * out of one of those URLs should not have to know which half they took.
+   *
+   * Consumed once: the param is dropped from the URL after it is applied, or a
+   * reload would put back the survey the reader had just taken off.
+   */
+  function applySeriesParam() {
+    const url = new URL(window.location.href);
+    const key = url.searchParams.get('series');
+    if (!key) return;
+    url.searchParams.delete('series');
+    replaceState(url, {});
+    const row = visibleSeries.find((r) => r.key === key || r.seriesKey === key);
+    // Already on the stack is not a failure — the reader has it; adding the
+    // refs a second time would be a duplicate layer.
+    if (!row || row.refs.some((r) => seriesOn.has(r.key))) return;
+    if ($layersStore.overlays.length + row.refs.length > MAX_OVERLAY_LAYERS) return;
+    for (const r of row.refs) layersStore.addOverlay(r);
+  }
 
   /**
    * A row's layers go on and come off together. Half a survey on the stack is
