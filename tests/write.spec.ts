@@ -1375,3 +1375,87 @@ test('geometry writes are batched, capped, and ordered correctly', async () => {
   expect(hit.lat).toBeCloseTo(10.77, 4);
   await anon.dispose();
 });
+
+test('a sheet series is offered only to a reader who can see its sheets', async () => {
+  // `map_series` (mig 082) is what /explore lists as "show the whole series".
+  // The view is the gate: a wholly-draft survey must not reach an anonymous
+  // reader, who would switch it on and get an empty layer, and a collection
+  // that is not a numbered survey must not be a series at all. Both are
+  // decided in SQL, so both are asserted against a real Postgres.
+  const mk = async (
+    name: string,
+    collection: string,
+    status: string,
+    extra: Record<string, unknown>,
+    bbox: number[]
+  ) => {
+    const { data, error } = await admin
+      .from('maps')
+      .insert({
+        name,
+        collection,
+        status,
+        georef_done: true,
+        year: 1910,
+        bbox,
+        extra_metadata: extra,
+        allmaps_id: `se${Math.random().toString(16).slice(2, 16)}`.slice(0, 16),
+      } as never)
+      .select('id')
+      .single();
+    if (error || !data) throw new Error(`fixture insert failed: ${error?.message}`);
+    created.mapIds.push((data as { id: string }).id);
+  };
+
+  const draftSeries = `ZZ Draft Survey ${Date.now()}`;
+  const pubSeries = `ZZ Published Survey ${Date.now()}`;
+  const bucket = `ZZ Bucket ${Date.now()}`;
+
+  await mk('draft a', draftSeries, 'draft', { sheet_number: '1' }, [105, 20, 105.5, 20.5]);
+  await mk('draft b', draftSeries, 'draft', { sheet_number: '2' }, [105.5, 20.5, 106, 21]);
+  await mk('pub a', pubSeries, 'public', { sheet_number: '1' }, [106, 10, 106.5, 10.5]);
+  await mk('pub b', pubSeries, 'featured', { sheet_number: '2' }, [106.5, 10.5, 107, 11]);
+  // Numbered, but only one sheet: a map, not a series.
+  await mk('solo', `ZZ Solo ${Date.now()}`, 'public', { sheet_number: '1' }, [100, 5, 101, 6]);
+  // Two published sheets with no sheet numbers: the archive's catch-all bucket,
+  // which must never be offered as a survey to stack on itself.
+  await mk('bucket a', bucket, 'public', {}, [100, 5, 110, 23]);
+  await mk('bucket b', bucket, 'public', {}, [106, 10, 107, 11]);
+
+  const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
+  const asUser = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
+  await asUser.auth.setSession(session);
+
+  const keysFor = async (client: typeof anon) => {
+    const { data, error } = await client.from('map_series').select('key, sheets, bounds');
+    if (error) throw new Error(`map_series read failed: ${error.message}`);
+    return data ?? [];
+  };
+
+  const anonRows = await keysFor(anon);
+  const userRows = await keysFor(asUser);
+  const anonKeys = anonRows.map((r) => r.key);
+  const userKeys = userRows.map((r) => r.key);
+
+  const draftKey = draftSeries.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const pubKey = pubSeries.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const bucketKey = bucket.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  // The published survey is public; the draft one is not.
+  expect(anonKeys).toContain(pubKey);
+  expect(anonKeys).not.toContain(draftKey);
+  // A signed-in reader may read drafts (mig 063), so the survey appears.
+  expect(userKeys).toContain(draftKey);
+  expect(userKeys).toContain(pubKey);
+
+  // Neither reader is offered the bucket or the one-sheet collection.
+  expect(anonKeys).not.toContain(bucketKey);
+  expect(userKeys).not.toContain(bucketKey);
+  expect([...anonKeys, ...userKeys].filter((k) => k?.startsWith('zz-solo'))).toEqual([]);
+
+  // Bounds are the union of the sheets' own boxes — what "zoom to the series"
+  // means. A wrong fold here points the camera at the wrong country silently.
+  const pub = userRows.find((r) => r.key === pubKey);
+  expect(pub?.sheets).toBe(2);
+  expect(pub?.bounds).toEqual([106, 10, 107, 11]);
+});

@@ -4,7 +4,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
-import type { MapListItem, MapSourceType, MapStatus } from './types';
+import type { MapListItem, MapSeries, MapSourceType, MapStatus } from './types';
 
 export type DbRow = Database['public']['Tables']['maps']['Row'];
 
@@ -249,4 +249,46 @@ export async function fetchSeriesSheets(
   return data
     .map((row) => ({ id: row.id, source: row.annotation_url ?? row.allmaps_id ?? '' }))
     .filter((s) => s.source !== '');
+}
+
+/**
+ * Every sheet series the archive holds, from the `map_series` view (mig 082).
+ *
+ * The view is the definition: a collection whose sheets carry a sheet number,
+ * has more than one of them georeferenced, and that this reader is allowed to
+ * see. That last clause is why there is no `draft` flag anywhere in the UI — a
+ * wholly-unpublished series simply has no row for an anonymous reader, so the
+ * list is already the list of series worth offering.
+ */
+export async function fetchMapSeries(supabase: SupabaseClient<Database>): Promise<MapSeries[]> {
+  const { data, error } = await supabase
+    .from('map_series')
+    .select('key, collection, name, sheets, published_sheets, first_year, last_year, bounds')
+    .order('first_year', { ascending: true });
+
+  if (error || !data) {
+    console.error('fetchMapSeries:', error);
+    return [];
+  }
+
+  return data.flatMap((row) => {
+    // `bounds` is built by the view as four aggregates, so a null can only mean
+    // a sheet slipped through with a malformed bbox. Without four numbers the
+    // row cannot answer "zoom to this layer", which is the one thing the stack
+    // needs from it.
+    const b = row.bounds;
+    if (!Array.isArray(b) || b.length !== 4 || b.some((n) => typeof n !== 'number')) return [];
+    return [
+      {
+        key: row.key as string,
+        collection: row.collection as string,
+        name: (row.name as string) ?? (row.collection as string),
+        sheets: Number(row.sheets ?? 0),
+        publishedSheets: Number(row.published_sheets ?? 0),
+        firstYear: row.first_year ?? undefined,
+        lastYear: row.last_year ?? undefined,
+        bounds: b as [number, number, number, number],
+      },
+    ];
+  });
 }

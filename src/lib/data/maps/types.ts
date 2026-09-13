@@ -134,3 +134,19 @@ export type StoredTriage = {
   regions_at?: string;
   saved_at?: string;
 };
+
+/**
+ * One sheet series, from the `map_series` view (migration 082) — a collection
+ * of numbered sheets that /explore can put on the map as a single layer.
+ * `sheets` and `bounds` count only what the reader is allowed to see.
+ */
+export interface MapSeries {
+  key: string;
+  collection: string;
+  name: string;
+  sheets: number;
+  publishedSheets: number;
+  firstYear?: number;
+  lastYear?: number;
+  bounds: [number, number, number, number];
+}

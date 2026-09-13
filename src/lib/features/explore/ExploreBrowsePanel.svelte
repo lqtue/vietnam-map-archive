@@ -13,8 +13,15 @@
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
+  import { onMount } from 'svelte';
   import { layersStore, toggleSeriesOverlay } from '$lib/map/stores/layersStore';
-  import { L7014_OVERLAY, TONKIN_OVERLAY } from '$lib/map/constants';
+  import type { SheetsRef } from '$lib/map/stores/layersStore';
+  import { L7014_OVERLAY } from '$lib/map/constants';
+  import { fetchMapSeries } from '$lib/data/maps/service';
+  import type { MapSeries } from '$lib/data/maps/types';
+  import { getSupabaseContext } from '$lib/data/supabase/context';
+
+  const { supabase } = getSupabaseContext();
 
   export let matches: ResolvedMap[] = [];
   // Admins/mods may browse draft maps in the viewer; everyone else is
@@ -56,18 +63,59 @@
     .filter((m) => canSeeDrafts || m.status === 'public' || m.status === 'featured')
     .sort(byYear);
 
-  // Sheet series — whole pre-warped archives. They sit above the sheet rows
+  // Sheet series — a whole survey as one layer. They sit above the sheet rows
   // rather than among them because they are not catalogue entries: no record
   // page, no year to sort by, no single scan behind them. Same gesture though
   // — tap to put it on the map, tap again to take it off.
-  // `draft: true` means the sheets behind the row are not published yet, so an
-  // anonymous reader would resolve it to nothing and get an empty layer. Drop
-  // the flag when the series is published — it is the only thing gating it.
-  const SERIES = [
-    { ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000', draft: false },
-    { ref: TONKIN_OVERLAY, sheets: 56, note: '1903–27 · Tonkin & Thanh Hóa', draft: true },
-  ];
-  $: visibleSeries = SERIES.filter((s) => !s.draft || canSeeDrafts);
+  //
+  // Only the L7014 mosaic is hardcoded, because it is the one series that is
+  // not `maps` rows at all: it is a pre-tiled raster archive on our own tile
+  // domain, so nothing in the database describes it. Every other series comes
+  // from the `map_series` view (mig 082), which is what makes adding one a
+  // matter of ingesting sheets rather than editing this file.
+  const RASTER_SERIES = [{ ref: L7014_OVERLAY, sheets: 435, note: '1963–89 · 1:50,000' }];
+
+  let dbSeries: { ref: SheetsRef; sheets: number; note: string }[] = [];
+  onMount(async () => {
+    // The view carries the visibility gate, so an unpublished series simply is
+    // not in the answer for a reader who may not see it. There is no `draft`
+    // flag here on purpose — that was one more fact about the data kept in the
+    // code, and it went stale the moment a sheet was published.
+    dbSeries = (await fetchMapSeries(supabase)).map((s) => ({
+      ref: {
+        kind: 'sheets',
+        mapId: `sheets:${s.key}`,
+        key: s.key,
+        collection: s.collection,
+        // The collection is the layer's name in the stack, where it sits beside
+        // sheet names — so no year span here, which belongs in the note below.
+        name: s.name,
+        bounds: s.bounds,
+      },
+      sheets: s.sheets,
+      note: seriesNote(s),
+    }));
+  });
+
+  /** "1903–27", plus what a reader who can see drafts should know about them. */
+  function seriesNote(s: MapSeries): string {
+    const span =
+      s.firstYear && s.lastYear
+        ? s.firstYear === s.lastYear
+          ? `${s.firstYear}`
+          : `${s.firstYear}–${String(s.lastYear).slice(-2)}`
+        : '';
+    // Only a reader who can see drafts is shown a draft count, because only
+    // they can be looking at one: for everyone else `sheets` is already the
+    // published count and saying so twice would be noise.
+    const draftNote =
+      canSeeDrafts && s.publishedSheets < s.sheets
+        ? `${s.sheets - s.publishedSheets} unpublished`
+        : '';
+    return [span, draftNote].filter(Boolean).join(' · ');
+  }
+
+  $: visibleSeries = [...RASTER_SERIES, ...dbSeries];
   $: seriesOn = new Set(
     $layersStore.overlays
       .filter((o) => o.ref.kind !== 'historical')

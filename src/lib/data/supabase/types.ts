@@ -976,6 +976,19 @@ export type Database = {
       }
     }
     Views: {
+      map_series: {
+        Row: {
+          bounds: number[] | null
+          collection: string | null
+          first_year: number | null
+          key: string | null
+          last_year: number | null
+          name: string | null
+          published_sheets: number | null
+          sheets: number | null
+        }
+        Relationships: []
+      }
       map_pipeline_status: {
         Row: {
           exported_at: string | null
@@ -1093,6 +1106,10 @@ export type Database = {
       map_context: {
         Args: { p_geom_src?: string; p_map_id: string; p_public_only?: boolean }
         Returns: Json
+      }
+      series_key: {
+        Args: { p_collection: string }
+        Returns: string
       }
       place_core_key: {
         Args: { p_text: string; p_validated: string }
