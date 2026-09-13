@@ -133,7 +133,7 @@
       rotate: false,
       zoom: false,
     }).extend([
-      new Attribution({ collapsible: false }),
+      new Attribution(),
       new Rotate({ autoHide: false }),
       new Zoom(),
       new ScaleLine(),

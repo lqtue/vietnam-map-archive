@@ -101,7 +101,7 @@
       }).extend([
         // Tile attribution + scale live on the secondary pane so they sit in
         // the rightmost (desktop) / bottommost (mobile) corner of the workspace.
-        new Attribution({ collapsible: false }),
+        new Attribution(),
         new ScaleLine(),
       ]),
     });
