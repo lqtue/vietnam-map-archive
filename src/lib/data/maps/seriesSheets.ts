@@ -38,6 +38,18 @@ export interface SeriesSheet {
   held_by: string | null;
   map_id: string | null;
   note: string | null;
+  /**
+   * The printing this row refers to (migration 086). Null when unrecorded —
+   * 93 of the PCL GeoPDFs carry no edition, and ~200 rows are sheets nobody
+   * holds, so absent is the common case rather than the exception.
+   *
+   * Optional, not required: a row read through `COLUMNS` always carries both,
+   * but every other constructor of this type predates 086 and does not care
+   * about a printing. Requiring them would make the type's job "the shape of
+   * a database row" when its job is "a sheet of a survey".
+   */
+  year?: number | null;
+  edition?: string | null;
 }
 
 export interface SeriesSheetView extends SeriesSheet {
@@ -46,7 +58,8 @@ export interface SeriesSheetView extends SeriesSheet {
   heldAs: string | null;
 }
 
-const COLUMNS = 'series_key,sheet_number,name,bbox,source,source_ref,held_by,map_id,note';
+const COLUMNS =
+  'series_key,sheet_number,name,bbox,source,source_ref,held_by,map_id,note,year,edition';
 
 export function sheetStatus(row: Pick<SeriesSheet, 'held_by' | 'source'>): SheetStatus {
   if (row.held_by) return 'held';
@@ -64,6 +77,24 @@ function heldAs(held_by: string | null): string | null {
   if (held_by === 'map') return 'Warped from its own scan';
   if (held_by.startsWith('raster:')) return 'Part of the pre-tiled mosaic';
   return held_by;
+}
+
+/**
+ * The printing, as a reader would say it. A cell of L7014 was printed and
+ * reprinted over 26 years, so "we hold 6329-1" without this is half an answer.
+ *
+ * Either half may be missing and the other still reads: 93 of the PCL GeoPDFs
+ * carry no edition in their XMP, and the Indochine sheets carry a year and no
+ * edition at all, which is how that survey identifies a printing.
+ *
+ * A function rather than a field on `SeriesSheetView`, because it is a display
+ * string and the view type is a row: putting it on the type would also oblige
+ * every hand-built fixture to carry a formatted string it does not care about.
+ */
+export function printing(row: Pick<SeriesSheet, 'year' | 'edition'>): string | null {
+  const parts = [row.year ? String(row.year) : null, row.edition ? `ed. ${row.edition}` : null];
+  const s = parts.filter(Boolean).join(' · ');
+  return s || null;
 }
 
 function decorate(row: SeriesSheet): SeriesSheetView {

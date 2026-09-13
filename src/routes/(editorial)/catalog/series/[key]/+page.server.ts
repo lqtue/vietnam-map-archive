@@ -41,5 +41,38 @@ export const load: PageServerLoad = async ({ params }) => {
   const sheets = await fetchSeriesSheets(supabase, key);
   if (!sheets.length) throw error(404, 'That series has no index');
 
-  return { series, sheets, counts: tally(sheets) };
+  /**
+   * How many printings of each cell the archive publishes.
+   *
+   * `series_sheets` is keyed `(series_key, sheet_number)` — one row per cell —
+   * so it can name the printing it serves and cannot enumerate the others. Ten
+   * cells are held in more than one edition (three of them with two *published*
+   * printings fourteen years apart), and a page that silently showed one of the
+   * two would be making a claim about the archive that is not true.
+   *
+   * Published only: the second row behind L7014 6541-4 is a known-bad
+   * three-point georeference, deliberately left as a draft, and counting it
+   * would advertise an edition no reader can open.
+   */
+  // `map_series.collection` is nullable in the view's type. Without it there is
+  // nothing to group on, and no printings to count.
+  const { data: rows } = series.collection
+    ? await supabase
+        .from('maps')
+        .select('extra_metadata')
+        .eq('collection', series.collection)
+        .in('status', ['public', 'featured'])
+        .not('extra_metadata->>sheet_number', 'is', null)
+    : { data: [] };
+
+  const editions: Record<string, number> = {};
+  for (const r of rows ?? []) {
+    const n = (r.extra_metadata as { sheet_number?: string } | null)?.sheet_number;
+    if (n) editions[n] = (editions[n] ?? 0) + 1;
+  }
+  // Only the cells with more than one, so the payload carries the exceptions
+  // rather than a 1 against every sheet of a 627-sheet survey.
+  for (const n of Object.keys(editions)) if (editions[n] < 2) delete editions[n];
+
+  return { series, sheets, counts: tally(sheets), editions };
 };

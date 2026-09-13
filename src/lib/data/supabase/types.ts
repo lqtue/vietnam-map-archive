@@ -797,6 +797,7 @@ export type Database = {
         Row: {
           bbox: number[] | null
           created_at: string
+          edition: string | null
           held_by: string | null
           map_id: string | null
           name: string | null
@@ -806,10 +807,12 @@ export type Database = {
           source: string | null
           source_ref: string | null
           updated_at: string
+          year: number | null
         }
         Insert: {
           bbox?: number[] | null
           created_at?: string
+          edition?: string | null
           held_by?: string | null
           map_id?: string | null
           name?: string | null
@@ -819,10 +822,12 @@ export type Database = {
           source?: string | null
           source_ref?: string | null
           updated_at?: string
+          year?: number | null
         }
         Update: {
           bbox?: number[] | null
           created_at?: string
+          edition?: string | null
           held_by?: string | null
           map_id?: string | null
           name?: string | null
@@ -832,6 +837,7 @@ export type Database = {
           source?: string | null
           source_ref?: string | null
           updated_at?: string
+          year?: number | null
         }
         Relationships: [
           {

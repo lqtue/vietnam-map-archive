@@ -8,6 +8,7 @@
 <script lang="ts">
   import PageHero from '$lib/ui/PageHero.svelte';
   import DataTable from '$lib/ui/DataTable.svelte';
+  import { printing } from '$lib/data/maps/seriesSheets';
   import type { PageData } from './$types';
   import type { SeriesSheetView } from '$lib/data/maps/seriesSheets';
 
@@ -29,6 +30,17 @@
     no_scan: number;
   };
 
+  /**
+   * The span of the sheets the archive has **catalogued**, not of the survey,
+   * and not of everything it holds either. It comes from `map_series`, an
+   * aggregate over `maps` rows, and L7014 has 9 of those against a survey of
+   * 627 printed between 1963 and 1989 — so an unlabelled "1966–1984" beside
+   * "627 sheets" reads as the survey's dates and is wrong by a decade at each
+   * end. "held" was the first label and is still too strong: `counts.held` is
+   * 461, and 452 of those are mosaic cells with no `maps` row and therefore no
+   * year in the view at all. "catalogued" is true of exactly the rows the
+   * number comes from. `/catalog/series` uses the same word.
+   */
   $: span =
     series.first_year && series.last_year && series.first_year !== series.last_year
       ? `${series.first_year}–${series.last_year}`
@@ -56,22 +68,33 @@
   const COLUMNS = [
     { key: 'sheet_number', label: 'Sheet', sortable: false },
     { key: 'name', label: 'Name', sortable: false },
+    { key: 'version', label: 'Version', sortable: false },
     { key: 'status', label: 'Status', sortable: false },
     { key: 'source', label: 'Source', sortable: false },
   ];
+
+  /**
+   * Cells the archive publishes in more than one printing, `sheet_number` to a
+   * count. The row itself can name only the printing it serves — `series_sheets`
+   * is keyed one row per cell — so without this a sheet held twice would look
+   * like a sheet held once, which is a claim about the archive that is false.
+   */
+  $: editions = (data.editions ?? {}) as Record<string, number>;
 </script>
 
 <svelte:head>
   <title>{series.name} — Vietnam Map Archive</title>
   <meta
     name="description"
-    content="{series.name}: {counts.held} of {counts.total} sheets held{span ? `, ${span}` : ''}."
+    content="{series.name}: {counts.held} of {counts.total} sheets held{span
+      ? `; the catalogued sheets date ${span}`
+      : ''}."
   />
 </svelte:head>
 
 <PageHero
   title={series.name}
-  sub={span ? `${span} · ${counts.total} sheets` : `${counts.total} sheets`}
+  sub={span ? `${counts.total} sheets · catalogued ${span}` : `${counts.total} sheets`}
 />
 
 <div class="page-wrap">
@@ -112,6 +135,12 @@
           >
         </td>
         <td>{sheet.name ?? '—'}</td>
+        <td class="ver">
+          {printing(sheet) ?? '—'}
+          {#if editions[sheet.sheet_number] > 1}
+            <span class="ver-more">{editions[sheet.sheet_number]} editions</span>
+          {/if}
+        </td>
         <td
           ><span class="badge-chip is-sm {STATUS_CHIP[sheet.status]}"
             >{STATUS_LABEL[sheet.status]}</span
@@ -127,15 +156,15 @@
   .page-wrap {
     max-width: 60rem;
     margin: 0 auto;
-    padding-block: var(--space-lg);
-    padding-inline: var(--space-md);
+    padding-block: var(--space-6);
+    padding-inline: var(--space-4);
   }
   .coverage {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-6);
   }
   .lead {
     font-size: 1.05rem;
-    margin: 0 0 var(--space-sm);
+    margin: 0 0 var(--space-2);
   }
   .bar {
     display: flex;
@@ -164,9 +193,9 @@
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-md);
+    gap: var(--space-4);
     padding: 0;
-    margin: var(--space-sm) 0 0;
+    margin: var(--space-2) 0 0;
     font-size: 0.85rem;
     color: var(--color-text-muted);
   }
@@ -185,6 +214,22 @@
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
+  /* The printing, and whether the archive has more than one of it. Narrow and
+     nowrap: it is "1984 · ed. 5-DMA" at its longest, and the Name column is
+     the one that should take the slack. */
+  .ver {
+    white-space: nowrap;
+    font-size: 0.85rem;
+  }
+  .ver-more {
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+  }
+
   .src {
     color: var(--color-text-muted);
     font-size: 0.85rem;
