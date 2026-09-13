@@ -13,32 +13,76 @@
 // our own `0b`/`5b`/`10b` spelling.
 //
 // CartoMundi (MMSH, Aix-Marseille) publishes the catalogue as open JSON at
-// `/ctmd-services/`, no key. `serie/175` is the assembled-sheet edition,
-// 1901–1944, held by IGN — deliberately not the two half-sheet editions in the
-// same catalogue (157 sheets in colour, 160 in black 1945–53), which are a
-// different product and would double-count every sheet.
+// `/ctmd-services/`, no key. It catalogues this survey more than once, and
+// **both lists are incomplete, in different directions** — so the denominator
+// is the UNION of serie 175 (assembled sheets, 1901–1944, IGN) and serie 243
+// (half-sheets in colour), not either alone:
 //
-// The series declares 81 sheets and lists 88 records over 76 distinct numbers,
-// the surplus being second and third editions of the same sheet.
-// `series_sheets` is keyed by sheet number, so the editions collapse to one
-// row and their count goes in the note — the question this table answers is
-// "does the survey contain this sheet", not "how many printings exist".
+//     175: 76 cells     only in 175: 7, 8, 9, 19
+//     243: 75 cells     only in 243: 1, 34, 67
+//     union: 79
 //
-// The bbox is CartoMundi's catalogue extent (UNIMARC corner fields), NOT a
-// georeference. It is right to about a minute of arc and is here so an unheld
-// sheet can be drawn as a gap on a map; nothing should warp against it. Our
-// own sheets' `maps.bbox` disagrees with it by a few hundred metres, which is
-// unsurprising for a catalogue value and is also the subject of the open
-// question about this series' projection.
+// The first seeding took 175 alone, on the reasoning that the half-sheet
+// editions would double-count every sheet. That reasoning is right about
+// PRINTINGS and wrong about CELLS, which is what this table is keyed on:
+// collapsing a sheet's W and E halves onto their cell number double-counts
+// nothing. The cost of getting it wrong was not an abstract three: **we hold
+// sheet 1, Viet Tri 1906, and 175 does not list it** — so the archive held a
+// sheet its own survey index said the survey did not contain, which is the
+// exact failure this table exists to prevent, one level up. It also explains an
+// arithmetic mismatch nobody had chased: 58 held against 59 distinct cells in
+// `maps`. The missing one was cell 1.
+//
+// Two normalisations, both of them the catalogue's own typography rather than
+// real distinctions:
+//
+//   - 243 brackets a number it is inferring — `[42]` is cell 42 — and for a
+//     cell held as two half-sheets it brackets the WEST half and leaves the
+//     east bare, so `[1]` and `1` are one cell's two halves. Unbracketed, 243
+//     has 142 "cells"; bracket-stripped it has 75.
+//   - `0bis` is written without the space that `5 bis`, `10 bis` and `73 bis`
+//     all have. Left alone it lands as an 80th cell. This is the same class of
+//     bug as the `00b` → `0 bis` renumbering below, which is why it is called
+//     out here: it has now bitten twice.
+//
+// The bbox is the union of every record for that cell, across both series,
+// which is what makes a half-sheet pair come out as its whole cell. It is the
+// catalogue's UNIMARC corner fields (right to about a minute of arc), NOT a
+// georeference — it is here so an unheld sheet can be drawn as a gap, and
+// nothing should warp against it. Checked against our own 59 georeferenced
+// cells: every one agrees with the catalogue to better than 0.01°.
+//
+// The series declares 81 sheets and neither list reaches that, so 79 is still a
+// floor rather than the truth.
 
 import fs from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 
 const dry = process.argv.includes('--dry');
-const SERIE = 175;
+const SERIES_IDS = [175, 243]; // see the header: neither list is complete
 const SERIES = 'indochine-1-25-000-tonkin-thanh-hoa'; // series_key(), mig 082
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
-const API = `https://www.cartomundi.fr/ctmd-services/serie/${SERIE}/feuilles`;
+const api = (id) => `https://www.cartomundi.fr/ctmd-services/serie/${id}/feuilles`;
+
+/** The catalogue's own typography, not a distinct sheet. See the header. */
+function cellNumber(v) {
+  return String(v ?? '')
+    .trim()
+    .replace(/^\[|\]$/g, '')
+    .trim()
+    .replace(/^(\d+)bis$/i, '$1 bis')
+    .toLowerCase();
+}
+
+/** Brackets mark a part the catalogue is reconstructing; the name is the rest. */
+function cellName(v) {
+  return (
+    String(v ?? '')
+      .replace(/[[\]]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim() || null
+  );
+}
 
 /** UNIMARC corner: a hemisphere letter then DDDMMSS, e.g. "e1055008" -> 105.8356. */
 function unimarc(v) {
@@ -48,8 +92,15 @@ function unimarc(v) {
   return /[sw]/i.test(m[1]) ? -deg : deg;
 }
 
-const sheets = await (await fetch(API, { headers: { Accept: 'application/json' } })).json();
-console.log(`CartoMundi serie ${SERIE}: ${sheets.length} records`);
+const sheets = [];
+for (const id of SERIES_IDS) {
+  const recs = await (await fetch(api(id), { headers: { Accept: 'application/json' } })).json();
+  console.log(
+    `CartoMundi serie ${id}: ${recs.length} records over ` +
+      `${new Set(recs.map((f) => cellNumber(f.f100NumeroOuCode))).size} cells`
+  );
+  for (const f of recs) sheets.push({ ...f, serie: id });
+}
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false },
@@ -72,40 +123,55 @@ for (const m of rows) {
 
 const byNumber = new Map();
 for (const f of sheets) {
-  const sn = String(f.f100NumeroOuCode).trim();
+  const sn = cellNumber(f.f100NumeroOuCode);
+  if (!sn) continue;
   if (!byNumber.has(sn)) byNumber.set(sn, []);
   byNumber.get(sn).push(f);
 }
 
 const out = [];
 for (const [sn, editions] of byNumber) {
-  // The newest edition carries the best title; any of them carries the extent.
+  // The newest record carries the best title; the extent is the union of every
+  // record, which is what turns a bracketed/bare pair back into its whole cell.
   const best = editions.slice().sort((a, b) => (b.f103DateAaaa || 0) - (a.f103DateAaaa || 0))[0];
-  const g = best.geometrieEmprise || {};
-  const w = unimarc(g.l123dLimiteOuestUnimarc),
-    e = unimarc(g.l123eLimiteEstUnimarc);
-  const n = unimarc(g.l123fLimiteNordUnimarc),
-    s = unimarc(g.l123gLimiteSudUnimarc);
+  let bbox = null;
+  for (const f of editions) {
+    const g = f.geometrieEmprise || {};
+    const b = [
+      unimarc(g.l123dLimiteOuestUnimarc),
+      unimarc(g.l123gLimiteSudUnimarc),
+      unimarc(g.l123eLimiteEstUnimarc),
+      unimarc(g.l123fLimiteNordUnimarc),
+    ];
+    if (!b.every((v) => typeof v === 'number')) continue;
+    bbox = bbox
+      ? [
+          Math.min(bbox[0], b[0]),
+          Math.min(bbox[1], b[1]),
+          Math.max(bbox[2], b[2]),
+          Math.max(bbox[3], b[3]),
+        ]
+      : b;
+  }
   const m = held.get(sn);
-  const years = editions
-    .map((x) => x.f103DateAaaa)
-    .filter(Boolean)
-    .sort();
+  const years = [...new Set(editions.map((x) => x.f103DateAaaa).filter(Boolean))].sort();
+  const series = [...new Set(editions.map((x) => x.serie))].sort();
   out.push({
     series_key: SERIES,
     sheet_number: sn,
-    name: best.f105Titre || null,
-    bbox: [w, s, e, n].every((v) => typeof v === 'number') ? [w, s, e, n] : null,
+    name: cellName(best.f105Titre),
+    bbox,
     held_by: m ? 'map' : null,
     map_id: m ? m.id : null,
     source: 'CartoMundi',
     source_ref: best.fkey ? String(best.fkey) : null,
     note: [
       years.length > 1
-        ? `${editions.length} editions: ${years.join(', ')}`
+        ? `${editions.length} records, ${years.length} dates: ${years.join(', ')}`
         : years[0]
           ? `edition ${years[0]}`
           : null,
+      `serie ${series.join('+')}`,
       'bbox is CartoMundi catalogue extent, not a georeference',
     ]
       .filter(Boolean)
@@ -126,7 +192,7 @@ for (const r of out
 
 // Our rows whose number the catalogue does not list — a spelling mismatch or a
 // sheet filed under a number the series never issued. Either way, worth seeing.
-const orphan = [...held.keys()].filter((k) => !byNumber.has(k));
+const orphan = [...held.keys()].filter((k) => !byNumber.has(cellNumber(k)));
 if (orphan.length) console.log(`\nour sheet numbers not in the catalogue: ${orphan.join(', ')}`);
 
 if (dry) {
