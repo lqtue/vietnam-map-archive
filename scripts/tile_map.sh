@@ -123,12 +123,28 @@ if [[ -f "$MAP_DIR/info.json" ]]; then
   fi
 fi
 
-# 2. The only full/ derivative dzsave writes is a ~200px thumbnail, but the share
-#    page's OG image asks for full/800,. Write it so social previews never
-#    depend on the upstream library.
-echo "→ Rendering full/800, derivative..."
-mkdir -p "$MAP_DIR/full/800,/0"
-vips thumbnail "$TMPDIR/source.jpg" "$MAP_DIR/full/800,/0/default.jpg[Q=88]" 800
+# 2. The only full/ derivative dzsave writes is a ~200px thumbnail named for its
+#    own `w,h`, but every caller asks by width: the share page's OG image wants
+#    full/800,, and `atWidth` in thumbUrl.ts rewrites the stored URL to full/200,
+#    or full/400, for the 48px rail cell and the 96px catalog cell. A width we do
+#    not write is a hard 404 for a self-hosted map, because there is no upstream
+#    library behind the miss to proxy to — which is how 56 published sheets came
+#    to draw nothing in /catalog's grid.
+#
+#    `--height` is the whole trick. `vips thumbnail in out 800` fits 800 into
+#    BOTH axes, so a portrait sheet lands at 615x800: a valid JPEG, at a key that
+#    promises width 800, silently the wrong size. Every portrait sheet tiled
+#    before this line was fixed is in that state.
+#
+#    Re-tiling an existing map overwrites these keys, and the worker serves them
+#    `immutable` for a year — so a correction here reaches the edge only on a new
+#    map id, never on a sheet already mirrored.
+for w in 200 400 800; do
+  echo "→ Rendering full/$w, derivative..."
+  mkdir -p "$MAP_DIR/full/$w,/0"
+  vips thumbnail "$TMPDIR/source.jpg" "$MAP_DIR/full/$w,/0/default.jpg[Q=88]" \
+    "$w" --height 1000000 --size down
+done
 
 echo "→ Uploading to R2 bucket: $BUCKET/tiles/$MAP_ID ..."
 rclone copy "$OUTPUT_DIR/$MAP_ID" "r2:$BUCKET/tiles/$MAP_ID" \
