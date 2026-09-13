@@ -114,14 +114,22 @@ while IFS= read -r path; do
     fail=$((fail+1)); continue
   fi
 
-  # 4) Fetch info.json → derive thumbnail URL from smallest pyramid size
-  THUMB_URL=""
-  info=$(curl -sf "${IIIF_URL}/info.json" || echo "")
-  if [[ -n "$info" ]]; then
-    last=$(echo "$info" | jq -r '.sizes // [] | last | "\(.width),\(.height)"' 2>/dev/null || echo "")
-    if [[ -n "$last" && "$last" != "null,null" ]]; then
-      THUMB_URL="${IIIF_URL}/full/${last}/0/default.jpg"
-    fi
+  # 4) Thumbnail URL.
+  #
+  # NOT from info.json's `sizes`. The worker computes that array from the
+  # pyramid's scaleFactors, so it advertises sizes as available that no one ever
+  # wrote to R2 — `vips dzsave` emits tiles plus two `full/` derivatives and
+  # nothing else. Taking the smallest listed size gave every map a thumbnail
+  # that 404s, and for a self-hosted map there is no upstream IIIF server behind
+  # the miss to proxy to, so `stepDown` in thumbUrl.ts ran out of fallbacks and
+  # the row showed no picture at all.
+  #
+  # 800 is what dzsave actually writes and what every other row in the archive
+  # stores, which is also the width thumbUrl.ts treats as the guaranteed one.
+  THUMB_URL="${IIIF_URL}/full/800,/0/default.jpg"
+  if ! curl -sf -o /dev/null "$THUMB_URL"; then
+    echo "   ! thumbnail 404s: $THUMB_URL" | tee -a "$LOG"
+    THUMB_URL=""
   fi
 
   # 5) Derive allmaps_id via @allmaps/id (SHA-1 hex first 16 of canonical IIIF URL).
