@@ -5,7 +5,19 @@
  * page whose job is to be honest about the state of the archive was the page
  * most out of date. Counting on render is cheaper than remembering to edit.
  *
- * Six queries, cached at the edge for an hour: nothing here changes faster.
+ * Nine queries, cached at the edge for an hour: nothing here changes faster.
+ *
+ * The seventh is `series_sheets`, and it is here because `maps` alone gives a
+ * false floor. 452 of the L7014 1:50,000's held sheets are cells of a pre-tiled
+ * mosaic with no `maps` row at all, so the honest answer to "how much of this
+ * survey can you draw" lives in the survey's own index, not in the catalogue.
+ * Counting them apart from `published` is deliberate: the two overlap (a sheet
+ * with a record is in both) and must never be added together.
+ *
+ * Those three are head counts rather than a `select` of the rows, because
+ * PostgREST caps an unbounded select at 1000 and says nothing about it — the
+ * indexes are 706 rows today and the surveys in the scout queue run past that.
+ * A truncated count here would not look wrong, it would just be low.
  */
 
 import type { PageServerLoad } from './$types';
@@ -15,14 +27,32 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
   const db = adminClient();
   const head = { count: 'exact' as const, head: true };
 
-  const [published, drafts, labels, labelsChecked, shapes, shapesApproved] = await Promise.all([
-    // Not a head count: the same 39 rows give the year range and the city split.
+  const [
+    published,
+    drafts,
+    labels,
+    labelsChecked,
+    shapes,
+    shapesApproved,
+    surveySheets,
+    surveySheetsHeld,
+    surveys,
+  ] = await Promise.all([
+    // Not a head count: the same rows give the year range and the city split.
     db.from('maps').select('year, location').in('status', ['public', 'featured']),
     db.from('maps').select('id', head).eq('status', 'draft'),
     db.from('ocr_extractions').select('id', head),
     db.from('ocr_extractions').select('id', head).eq('status', 'validated'),
     db.from('footprint_submissions').select('id', head),
     db.from('footprint_submissions').select('id', head).eq('status', 'approved'),
+    // One row per sheet a survey contains, held or not. `held_by` says how it
+    // reaches a reader — `'map'` for a catalogue record, `'raster:<key>'` for
+    // a mosaic cell — and null means the archive has not got it.
+    db.from('series_sheets').select('series_key', head),
+    db.from('series_sheets').select('series_key', head).not('held_by', 'is', null),
+    // `survey_sheets` is non-null for exactly the surveys whose own index has
+    // been imported, which is the same set `series_sheets` has rows for.
+    db.from('map_series').select('key', head).not('survey_sheets', 'is', null),
   ]);
 
   const rows = published.data ?? [];
@@ -46,6 +76,9 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
       yearTo: years.length ? Math.max(...years) : null,
       // Biggest first — "Saigon 22, Huế 10, Hanoi 7".
       cities: [...cities.entries()].sort((a, b) => b[1] - a[1]),
+      surveys: surveys.count ?? 0,
+      surveySheets: surveySheets.count ?? 0,
+      surveySheetsHeld: surveySheetsHeld.count ?? 0,
     },
   };
 };

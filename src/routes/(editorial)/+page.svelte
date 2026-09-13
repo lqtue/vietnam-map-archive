@@ -182,7 +182,23 @@
    * re-run on some sheets and `ocr_extractions` holds 1,767 rows for 958 actual
    * labels, so quoting the row count would inflate the number by 85%.
    */
-  const STATS = { snapshot: 'September 2026', labels: 958, labelsChecked: 43, footprints: 46 };
+  /**
+   * The front page's hand-kept numbers. `mapCount` beside them is a real query
+   * over `maps`, and the two answer different questions on purpose: a catalogue
+   * record is a sheet someone can open, while `sheetsDrawn` counts everything
+   * the map can paint — 452 of which are cells of the L7014 mosaic and have no
+   * `maps` row at all. Say which is which wherever both appear.
+   */
+  const STATS = {
+    snapshot: 'September 2026',
+    labels: 958,
+    labelsChecked: 43,
+    footprints: 46,
+    l7014Held: 461,
+    l7014Total: 627,
+    sheetsDrawn: 555,
+    sheetsDrawnBefore: 94,
+  };
 
   /**
    * The three things to type into an empty search box. Every one of them
@@ -420,7 +436,7 @@
       </h1>
       <p class="hero-subtitle">
         {$t(
-          '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1968 — laid back over the ground they drew.',
+          '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.',
           {
             N: mapCount,
           }
@@ -620,15 +636,34 @@
         <p class="band-note">{STATS.snapshot}</p>
         <p class="band-desc">
           {$t(
+            'Two surveys went on the map this week: the US Army 1:50,000 of Vietnam — {N} of its {T} sheets — and the Indochine 1:25,000 of Tonkin. The map draws {D} sheets now, against {B} a week ago.',
+            {
+              N: STATS.l7014Held,
+              T: STATS.l7014Total,
+              D: STATS.sheetsDrawn,
+              B: STATS.sheetsDrawnBefore,
+            }
+          )}
+        </p>
+        <p class="band-desc">
+          {$t(
             'The OCR pass has read {N} distinct place names off six sheets, {M} of which have been checked by a person — so that queue has barely started.',
             { N: STATS.labels, M: STATS.labelsChecked }
           )}
           {$t(
-            '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet. The last written update was in May.',
+            '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet.',
             { N: STATS.footprints }
           )}
         </p>
-        <a href="/blog" class="info-link">{$t('All updates →')}</a>
+        <!-- Two links, so one wrapper takes the `margin-top: auto` that pins
+             them to the foot of the column; on the anchors themselves it would
+             push the pair apart instead. -->
+        <div class="band-links">
+          <a href="/blog/two-map-series-2026-09" class="info-link">{$t('Read the update →')}</a>
+          <a href="/explore?series=l7014#@16.1,107.2,5.7z,0r" class="info-link"
+            >{$t('Open L7014 on the map →')}</a
+          >
+        </div>
       </section>
     </div>
 
@@ -638,7 +673,7 @@
     <section class="home-cta">
       <h2 class="home-cta-title">{$t('What will you find?')}</h2>
       <p class="home-cta-sub">
-        {$t('Most people come for one street and stay for the city. {N} sheets, 1791 to 1968.', {
+        {$t('Most people come for one street and stay for the city. {N} sheets, 1791 to 1984.', {
           N: mapCount,
         })}
       </p>

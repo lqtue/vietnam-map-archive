@@ -597,6 +597,19 @@
   margin-top: auto;
   padding-top: 0.5rem;
 }
+
+/* A column with two of them. `.band-col` is a flex column, so `margin-top: auto`
+   on each anchor would push them to opposite ends of the leftover space; the
+   wrapper takes it once and the pair stays together at the foot. */
+.home-page .band-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  margin-top: auto;
+}
+.home-page .band-links .info-link {
+  margin-top: 0;
+}
 .home-page .info-link:hover {
   text-decoration: underline;
 }

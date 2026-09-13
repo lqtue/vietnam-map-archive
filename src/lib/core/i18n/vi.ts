@@ -90,11 +90,13 @@ export const vi: Record<string, string> = {
   open: 'mở',
   'Vietnam Map Archive — historical maps of Vietnam, open and georeferenced':
     'Kho Lưu trữ Bản đồ Việt Nam — bản đồ lịch sử mở và đã định vị tọa độ',
-  '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1968 — laid back over the ground they drew.':
-    '{N} mảnh bản đồ Sài Gòn, Huế và Hà Nội (1791–1968) được chồng khớp lên không gian thực tế.',
+  '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.':
+    '{N} mảnh bản đồ Sài Gòn, Huế và Hà Nội (1791–1984) được chồng khớp lên không gian thực tế.',
   Today: 'Hôm nay',
   'The 1882 cadastral survey of Saigon laid over the modern city, fading between the two':
     'Bản đồ địa chính Sài Gòn năm 1882 chồng lên thành phố hiện đại, hiệu ứng chuyển đổi giữa hai thời kỳ',
+  'All sheets in this survey': 'Tất cả bản đồ trong bộ này',
+  '⌘ / Ctrl + scroll to zoom · drag to move': '⌘ / Ctrl + lăn chuột để phóng to · kéo để di chuyển',
   'How much of the 1882 sheet to show': 'Tỷ lệ hiển thị bản đồ năm 1882',
   'Imagery © Esri, Maxar, Earthstar Geographics · Sheet: Plan Cadastral de Saïgon, 1882':
     'Hình ảnh © Esri, Maxar, Earthstar Geographics · Bản đồ: Plan Cadastral de Saïgon, 1882',
@@ -124,12 +126,15 @@ export const vi: Record<string, string> = {
   'Where things stand': 'Trạng thái hiện tại',
   'The OCR pass has read {N} distinct place names off six sheets, {M} of which have been checked by a person — so that queue has barely started.':
     'Bộ lọc OCR đã đọc {N} địa danh riêng biệt từ 6 bản đồ, với {M} địa danh đã được kiểm duyệt thủ công — tiến độ mới chỉ bắt đầu.',
-  '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet. The last written update was in May.':
-    '{N} khối công trình đã được vẽ trên bản đồ địa chính 1882, chưa có bản nào được phê duyệt. Cập nhật gần nhất vào tháng 5.',
-  'All updates →': 'Tất cả cập nhật →',
+  'Two surveys went on the map this week: the US Army 1:50,000 of Vietnam — {N} of its {T} sheets — and the Indochine 1:25,000 of Tonkin. The map draws {D} sheets now, against {B} a week ago.':
+    'Tuần này có hai bộ bản đồ địa hình lên bản đồ: bộ 1:50.000 của Lục quân Hoa Kỳ ({N} trong tổng số {T} mảnh) và bộ Đông Dương 1:25.000 vùng Bắc Kỳ. Bản đồ hiện hiển thị {D} mảnh, so với {B} mảnh một tuần trước.',
+  '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet.':
+    '{N} khối công trình đã được vẽ trên bản đồ địa chính 1882, chưa có bản nào được phê duyệt.',
+  'Read the update →': 'Đọc bài cập nhật →',
+  'Open L7014 on the map →': 'Mở bộ L7014 trên bản đồ →',
   'What will you find?': 'Bạn sẽ tìm thấy gì?',
-  'Most people come for one street and stay for the city. {N} sheets, 1791 to 1968.':
-    'Khám phá {N} bản đồ từ năm 1791 đến 1968 của Sài Gòn và các vùng lân cận.',
+  'Most people come for one street and stay for the city. {N} sheets, 1791 to 1984.':
+    'Khám phá {N} bản đồ từ năm 1791 đến 1984 của Sài Gòn và các vùng lân cận.',
   "Crop a map's neatline, set tile priorities, and check the place names the OCR pass read off the sheet. Around 950 distinct names are waiting; 43 have been checked.":
     'Cắt khung bản đồ, thiết lập mức độ ưu tiên và kiểm tra địa danh OCR. Khoảng 950 địa danh đang chờ xử lý; 43 đã hoàn thành.',
   "Data is openly licensed (CC-BY / ODbL) and the code is public. Every sheet credits the institution holding the scan — the Bibliothèque nationale de France, Université Côte d'Azur, UT Austin, the Library of Congress and others — and links back to their record. None of that is a formal partnership. Any city with a map archive can fork the whole thing and run it locally; that is the point of building it this way.":
@@ -149,8 +154,6 @@ export const vi: Record<string, string> = {
   'Counted from the database when this page loaded.':
     'Dữ liệu được trích xuất trực tiếp từ hệ thống.',
   'What you can do today': 'Tính năng khả dụng',
-  'Four things work, and they work in an ordinary browser. No account is needed for the first one.':
-    'Bốn tính năng hoạt động trực tiếp trên trình duyệt. Không cần tài khoản cho tính năng đầu tiên.',
   'What is not built': 'Các tính năng chưa phát triển',
   'The plan is larger than the archive. Written out so nobody has to guess which parts exist.':
     'Kế hoạch vượt ngoài quy mô hiện tại của kho lưu trữ.',
@@ -173,6 +176,11 @@ export const vi: Record<string, string> = {
   'Get in touch': 'Liên hệ',
   'sheets placed on the map — {city}, {from} to {to}':
     'bản đồ đã được định vị — {city}, từ năm {from} đến {to}',
+  'and {N} other places': 'và {N} địa phương khác',
+  'of {T} sheets in {N} complete surveys, each on the map as a single layer — most are cells of a pre-tiled mosaic and have no catalogue record of their own, which is why the count above is smaller':
+    'trong tổng số {T} mảnh thuộc {N} bộ bản đồ hoàn chỉnh, mỗi bộ là một lớp duy nhất trên bản đồ — phần lớn là ô của một khảm ảnh dựng sẵn, không có bản ghi riêng trong kho, nên con số phía trên nhỏ hơn',
+  'Five things work, and they work in an ordinary browser. No account is needed for the first two.':
+    'Năm việc đã dùng được, ngay trên trình duyệt thông thường. Hai việc đầu không cần tài khoản.',
   'more georeferenced but not published, so nobody outside the project sees them yet':
     'bản đồ đã định vị nhưng chưa xuất bản',
   'place names read off the sheets by the OCR pass — {M} checked by a person':
@@ -342,5 +350,4 @@ export const vi: Record<string, string> = {
   'You made it.': 'Bạn đã hoàn thành.',
   'Save your trip': 'Lưu hành trình',
   'Log in to keep this on your profile.': 'Đăng nhập để lưu vào hồ sơ cá nhân.',
-  'All sheets in this survey': 'Tất cả bản đồ trong bộ này',
 };

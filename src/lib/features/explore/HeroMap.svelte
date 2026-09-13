@@ -252,14 +252,18 @@
        the section shows the finished picture until OL has tiles to paint. */
   }
 
-  /* Centred, not tucked at the bottom: for four beats this line is the only
-     thing on the map, so it is the hero. The grid keeps each line in one spot
-     while the outgoing one fades under the incoming. */
+  /* Along the bottom, where the fade slider appears once the beats are over —
+     the two never coexist (`caption` is null exactly when `settled` is true),
+     so they share the spot and neither covers the sheet the section exists to
+     show. It was dead centre for a while, which put a pill over the middle of
+     the map for four beats. The grid keeps each line in one place while the
+     outgoing one fades under the incoming. */
   .hero-caption {
     position: absolute;
     inset: 0;
     display: grid;
-    place-items: center;
+    place-items: end center;
+    padding-bottom: 1rem;
     z-index: 3;
     pointer-events: none;
   }
@@ -272,12 +276,12 @@
   .hero-caption span {
     display: inline-block;
     background: var(--color-white);
-    border: var(--border-thick);
+    border: var(--border-thin);
     border-radius: var(--radius-pill);
-    padding: 0.7rem 1.4rem;
+    padding: 0.4rem 0.9rem;
     font-family: var(--font-family-display);
     font-weight: 700;
-    font-size: clamp(0.95rem, 2vw, 1.35rem);
+    font-size: clamp(0.8rem, 1.3vw, 0.95rem);
     color: var(--color-text);
     text-decoration: none;
     white-space: nowrap;
@@ -300,7 +304,7 @@
 
   @media (max-width: 640px) {
     .hero-caption span {
-      font-size: 0.95rem;
+      font-size: 0.8rem;
       white-space: normal;
       text-align: center;
       max-width: 22ch;

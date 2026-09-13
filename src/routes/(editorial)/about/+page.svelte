@@ -11,7 +11,21 @@
 
   /** `maps.location` holds the catalog key; the page says the short name. */
   const CITY_NAMES: Record<string, string> = { 'Saigon-HCMC': 'Saigon' };
-  $: cityLine = s.cities.map(([key, n]) => `${CITY_NAMES[key] ?? key} ${n}`).join(', ');
+  /**
+   * The four biggest places, then a count. It printed every place, which was
+   * fine at three and became a thirteen-item line the moment the L7014 city
+   * sheets landed — a long tail of ones, in which the reader has to notice
+   * that "Saigon 22" and "Saigon 1" are the same city under two `location`
+   * spellings. Capping does not fix the spellings; it stops the page leading
+   * with them.
+   */
+  const CITIES_SHOWN = 4;
+  $: cityLine = [
+    ...s.cities.slice(0, CITIES_SHOWN).map(([key, n]) => `${CITY_NAMES[key] ?? key} ${n}`),
+    ...(s.cities.length > CITIES_SHOWN
+      ? [$t('and {N} other places', { N: s.cities.length - CITIES_SHOWN })]
+      : []),
+  ].join(', ');
 </script>
 
 <svelte:head>
@@ -57,6 +71,20 @@
             )}
           </dd>
         </div>
+        <!-- Not addable to the number above, and the copy has to say so: a
+             sheet with a catalogue record is counted in both, and 452 mosaic
+             cells are counted only here. -->
+        {#if s.surveys > 0}
+          <div class="stat">
+            <dt>{s.surveySheetsHeld}</dt>
+            <dd>
+              {$t(
+                'of {T} sheets in {N} complete surveys, each on the map as a single layer — most are cells of a pre-tiled mosaic and have no catalogue record of their own, which is why the count above is smaller',
+                { T: s.surveySheets, N: s.surveys }
+              )}
+            </dd>
+          </div>
+        {/if}
         <div class="stat">
           <dt>{s.labels}</dt>
           <dd>
@@ -82,13 +110,22 @@
       <h2 class="section-title-sm">{$t('What you can do today')}</h2>
       <p class="section-desc">
         {$t(
-          'Four things work, and they work in an ordinary browser. No account is needed for the first one.'
+          'Five things work, and they work in an ordinary browser. No account is needed for the first two.'
         )}
       </p>
       <ul class="plain-list">
         <li>
           <a href="/catalog">Browse the sheets</a> and lay any of them over the modern city in
           <a href="/explore">the viewer</a>.
+        </li>
+        <li>
+          Put a whole survey on the map in one tap — the
+          <a href="/explore?series=l7014#@16.1,107.2,5.7z,0r">US Army 1:50,000 of Vietnam</a>
+          or the
+          <a href="/explore?series=indochine-1-25-000-tonkin-thanh-hoa#@20.65,106.10,8.2z,0r"
+            >Indochine 1:25,000 of Tonkin</a
+          >, and see
+          <a href="/catalog/series/series-l7014-vietnam-1-50-000">which sheets are missing</a>.
         </li>
         <li>
           <a href="/scan?mode=shapes">Trace a building</a> — the same skill as tracing on OpenStreetMap.

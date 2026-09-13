@@ -135,19 +135,27 @@
     />
 
     {#if settled}
-      <label class="hero-fade" transition:fade={{ duration: 400 }}>
-        <span>{$t('Today')}</span>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={overlayOpacity ?? 0.88}
-          on:input={(e) => (overlayOpacity = Number(e.currentTarget.value))}
-          aria-label={$t('How much of the 1882 sheet to show')}
-        />
-        <span>1882</span>
-      </label>
+      <div class="hero-controls" transition:fade={{ duration: 400 }}>
+        <label class="hero-fade">
+          <span>{$t('Today')}</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={overlayOpacity ?? 0.88}
+            on:input={(e) => (overlayOpacity = Number(e.currentTarget.value))}
+            aria-label={$t('How much of the 1882 sheet to show')}
+          />
+          <span>1882</span>
+        </label>
+        <!-- Pointer-only: this map takes ⌘/Ctrl-wheel rather than the bare
+             wheel, which would otherwise trap the page's scroll — an unusual
+             gesture nobody guesses. On touch neither half is true, since
+             `.ol-viewport` sets `touch-action: pan-y` so a swipe scrolls the
+             page rather than panning the map. -->
+        <p class="hero-hint">{$t('⌘ / Ctrl + scroll to zoom · drag to move')}</p>
+      </div>
     {/if}
   </div>
 
@@ -184,25 +192,55 @@
     object-fit: cover;
   }
 
-  /* Top-left, on its own paper plate: unlike the header there is no ink wash
-     here to read against, and the bottom corners belong to OL's scale line and
-     its attribution. */
-  .hero-fade {
+  /* Bottom centre, under the sheet rather than over it — the slot the caption
+     vacates when the beats end, which is exactly when this appears. It sat
+     top-left on its own plate for a while, where it was the first thing over
+     the map and the heaviest. The corners stay clear for OL's scale line and
+     attribution. */
+  .hero-controls {
     position: absolute;
-    left: 1rem;
-    top: 1rem;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
     z-index: 4;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.85rem;
+    gap: 0.35rem;
+    max-width: calc(100% - 2rem);
+  }
+
+  .hero-fade {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
     background: var(--color-white);
-    border: var(--border-thick);
+    border: var(--border-thin);
     border-radius: var(--radius-pill);
     font-family: var(--font-family-display);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: var(--color-text);
+  }
+
+  /* Its own plate, not a third item inside the pill: the pill is a control and
+     this is a caption about one. Hidden where neither gesture exists. */
+  .hero-hint {
+    margin: 0;
+    padding: 0.2rem 0.6rem;
+    background: var(--color-white);
+    border: var(--border-thin);
+    border-radius: var(--radius-pill);
+    font-size: 0.66rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .hero-hint {
+      display: none;
+    }
   }
 
   .hero-fade input {
