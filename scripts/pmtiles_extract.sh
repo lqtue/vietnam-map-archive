@@ -11,6 +11,10 @@
 #
 # Examples — the two extracts that exist today, and the two the roadmap wants:
 #
+#   scripts/pmtiles_extract.sh vietnam 105.5,8.5,108.5,21.6 15         # ~348 MB, z<=15
+#   scripts/pmtiles_extract.sh seasia  90,-13,132,32 8                 # ~28 MB, the
+#     surroundings at low zoom only — wide and shallow costs nothing, and without
+#     it the detailed extract's own bbox is a visible edge when you zoom out.
 #   scripts/pmtiles_extract.sh saigon 106.3,10.3,107.1,11.2            # ~37 MB
 #   scripts/pmtiles_extract.sh hoian  108.3150,15.8690,108.3420,15.8860 # ~1.3 MB
 #   scripts/pmtiles_extract.sh hanoi  105.75,20.95,105.95,21.10

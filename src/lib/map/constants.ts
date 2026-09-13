@@ -12,7 +12,7 @@ import Text from 'ol/style/Text';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import type BaseLayer from 'ol/layer/Base';
-import { buildPmtilesBasemapLayer } from './basemapStyle';
+import { buildPmtilesBasemapLayer, buildPmtilesRegionLayer } from './basemapStyle';
 import type { RasterRef } from '$lib/map/stores/layersStore';
 
 export const DEFAULT_ANNOTATION_COLOR = INK.blue;
@@ -87,7 +87,9 @@ function buildStreetsGroup(visible: boolean): LayerGroup {
     visible,
     properties: { name: 'g-streets', base: true },
     zIndex: 0,
-    layers: [buildPmtilesBasemapLayer(true), buildVnClaimsLayer()],
+    // Two archives, one style: the wide thin one below z8, the Vietnam one above
+    // it. Their zoom ranges do not overlap, so only one draws at any zoom.
+    layers: [buildPmtilesRegionLayer(true), buildPmtilesBasemapLayer(true), buildVnClaimsLayer()],
   });
 }
 

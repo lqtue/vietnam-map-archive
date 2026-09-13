@@ -46,6 +46,27 @@ import { isDarkTheme } from '$lib/core/utils/theme';
 export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260906.pmtiles';
 
 /**
+ * The surroundings, thinly: the same Protomaps build clipped to
+ * 90,-13 → 132,32 — Bay of Bengal to the Philippines, Java to southern China —
+ * but stopping at z8, which is 28 MB against the detailed archive's 348.
+ *
+ *   scripts/pmtiles_extract.sh seasia 90,-13,132,32 8 --upload
+ *
+ * Zoomed out, the detailed extract's own bbox is the thing you see: Vietnam
+ * drawn, Thailand and Hainan and the Malay peninsula absent, with a hard tile
+ * edge between them. The archive is clipped at z15, where 40° of neighbouring
+ * country would be gigabytes, but the same 40° at z8 is a rounding error — so
+ * the low zooms read this and the high ones read the detailed one. The handoff
+ * is exclusive on one side and inclusive on the other (OL: a layer draws when
+ * `minZoom < zoom <= maxZoom`), so exactly one of the two is ever live and no
+ * zoom draws both — two decluttering copies of Vietnam would double its labels.
+ */
+export const REGION_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/seasia-20260912.pmtiles';
+
+/** Where the regional archive hands over to the detailed one. */
+const REGION_HANDOFF_ZOOM = 8;
+
+/**
  * The AMS Series L7014 mosaic: 509 GeoPDF sheets from the Perry-Castañeda
  * Library, each clipped to its own printed neatline and warped off the eight
  * control points the sheet carries, tiled into one raster archive by
@@ -364,13 +385,27 @@ function styleFor(feature: FeatureLike, resolution: number): Style | Style[] | u
   }
 }
 
-/** The basemap layer. `visible` is owned by the caller, as with every base layer. */
-export function buildPmtilesBasemapLayer(visible: boolean): VectorTileLayer {
+/**
+ * One PMTiles archive as a styled layer. The two below differ only in which
+ * archive they read and which zooms they answer for.
+ */
+function buildPmtilesLayer(
+  url: string,
+  visible: boolean,
+  zoom: { minZoom?: number; maxZoom?: number }
+): VectorTileLayer {
   const layer = new VectorTileLayer({
     // Labels must not collide; polygons and lines are drawn in schema order.
     declutter: true,
+    // Past the archive's own bbox there are no tiles at all, and an unpainted
+    // map is the page's black. Sea is what is actually out there at every edge
+    // of both extracts, so the layer paints its water colour behind itself and
+    // a gap reads as ocean rather than as a hole. A function, not a string: it
+    // is called per frame, so `layer.changed()` on a theme flip repaints it.
+    background: () => C.water,
+    ...zoom,
     source: new PMTilesVectorSource({
-      url: BASEMAP_PMTILES_URL,
+      url,
       attributions: [
         '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
         '<a href="https://protomaps.com" target="_blank">Protomaps</a>',
@@ -382,4 +417,14 @@ export function buildPmtilesBasemapLayer(visible: boolean): VectorTileLayer {
   });
   built.add(layer);
   return layer;
+}
+
+/** The detailed layer: Vietnam, z8 and in. `visible` is owned by the caller. */
+export function buildPmtilesBasemapLayer(visible: boolean): VectorTileLayer {
+  return buildPmtilesLayer(BASEMAP_PMTILES_URL, visible, { minZoom: REGION_HANDOFF_ZOOM });
+}
+
+/** The surroundings: all of Southeast Asia, z8 and out. */
+export function buildPmtilesRegionLayer(visible: boolean): VectorTileLayer {
+  return buildPmtilesLayer(REGION_PMTILES_URL, visible, { maxZoom: REGION_HANDOFF_ZOOM });
 }
