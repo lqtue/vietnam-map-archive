@@ -124,7 +124,9 @@ export function parseNlvCurve(html: string): PressCurve {
   const decades: Record<number, number> = {};
   let total = 0;
   if (start >= 0 && end > start)
-    for (const [, d, n] of plain(html.slice(start, end)).matchAll(/(\d{4})-\d{4}\D{0,120}?\((\d+)\)/g)) {
+    for (const [, d, n] of plain(html.slice(start, end)).matchAll(
+      /(\d{4})-\d{4}\D{0,120}?\((\d+)\)/g
+    )) {
       decades[Number(d)] = Number(n);
       total += Number(n);
     }
@@ -157,7 +159,11 @@ export function parseNlvRows(html: string): NlvRow[] {
       oid: a[1],
       title: typed ? typed[1] : title,
       docType: typed ? typed[2] : '',
-      publication: line ? plain(line[1]).replace(/\s*\d{1,2} Tháng .*$/, '').trim() : '',
+      publication: line
+        ? plain(line[1])
+            .replace(/\s*\d{1,2} Tháng .*$/, '')
+            .trim()
+        : '',
       dateId: oidDate(a[1]),
       crop: crop ? crop[1] : null,
     });

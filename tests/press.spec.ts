@@ -151,10 +151,7 @@ test('the nlv year window keeps 1923 and drops 1936 at ±10 around 1923', () => 
   const rows = parseNlvRows(NLV_HTML);
   expect(filterNlvByYear(rows, 1923, 10).map((r) => r.dateId)).toEqual(['19230501']);
   // Widen the window and the 1936 issue comes back.
-  expect(filterNlvByYear(rows, 1923, 15).map((r) => r.dateId)).toEqual([
-    '19230501',
-    '19360228',
-  ]);
+  expect(filterNlvByYear(rows, 1923, 15).map((r) => r.dateId)).toEqual(['19230501', '19360228']);
   // A missing or junk date is dropped, never treated as year zero.
   expect(filterNlvByYear([{ dateId: undefined }, { dateId: 'RbD' }], 1923, 10)).toEqual([]);
 });

@@ -46,18 +46,64 @@ const SHEETS = {
  * out of the proper name, which is what the match key is built from.
  */
 const TYPES = [
-  ['hospital', ['bảo-sanh viện', 'bệnh-viện', 'bệnh viện', 'y-viện', 'nhà thương', 'hôpital', 'hopital', 'clinique', 'infirmerie']],
+  [
+    'hospital',
+    [
+      'bảo-sanh viện',
+      'bệnh-viện',
+      'bệnh viện',
+      'y-viện',
+      'nhà thương',
+      'hôpital',
+      'hopital',
+      'clinique',
+      'infirmerie',
+    ],
+  ],
   ['court', ['tòa án', 'toà án', 'tòa-án', 'palais de justice', 'justice de paix', 'tribunal']],
   // `poste de police` before anything matching bare `poste`, or a police post
   // becomes a post office and can never meet a 1959 `Cảnh-Sát-cuộc`.
-  ['police', ['cảnh-sát-cuộc', 'cảnh sát cuộc', 'cảnh-sát', 'poste de police', 'commissariat de police', 'commissariat', 'sûreté', 'surete', 'gendarmerie']],
-  ['school', ['trường', 'truong', 'école', 'ecole', 'lycée', 'lycee', 'collège', 'college', 'institut']],
+  [
+    'police',
+    [
+      'cảnh-sát-cuộc',
+      'cảnh sát cuộc',
+      'cảnh-sát',
+      'poste de police',
+      'commissariat de police',
+      'commissariat',
+      'sûreté',
+      'surete',
+      'gendarmerie',
+    ],
+  ],
+  [
+    'school',
+    ['trường', 'truong', 'école', 'ecole', 'lycée', 'lycee', 'collège', 'college', 'institut'],
+  ],
   ['market', ['chợ', 'cho', 'marché', 'marche', 'halles']],
   ['cemetery', ['nghĩa-địa', 'nghĩa địa', 'nghĩa-trang', 'nghĩa trang', 'cimetière', 'cimetiere']],
-  ['church', ['nhà-thờ', 'nhà thờ', 'thánh-đường', 'cathédrale', 'cathedrale', 'église', 'eglise', 'chapelle', 'evêché', 'eveche']],
+  [
+    'church',
+    [
+      'nhà-thờ',
+      'nhà thờ',
+      'thánh-đường',
+      'cathédrale',
+      'cathedrale',
+      'église',
+      'eglise',
+      'chapelle',
+      'evêché',
+      'eveche',
+    ],
+  ],
   ['pagoda', ['chùa', 'đình', 'miếu', 'pagode', 'temple']],
   ['ministry', ['bộ', 'ministère', 'ministere', 'secrétariat d’état', 'secretariat']],
-  ['post', ['bưu-điện', 'nhà dây thép', 'bureau de poste', 'poste aux lettres', 'poste', 'télégraphe']],
+  [
+    'post',
+    ['bưu-điện', 'nhà dây thép', 'bureau de poste', 'poste aux lettres', 'poste', 'télégraphe'],
+  ],
   ['directorate', ['nha', 'direction', 'service', 'bureaux', 'bureau', 'office']],
   ['theatre', ['hý-viện', 'hý viện', 'rạp', 'théâtre', 'theatre', 'cinéma', 'cinema']],
   ['park', ['công-viên', 'công viên', 'vườn', 'parc', 'square', 'jardin']],
@@ -79,8 +125,22 @@ const TYPES = [
 
 /** Words that carry no identity — dropped before the proper name is keyed. */
 const STOP = new Set([
-  'de', 'du', 'des', 'la', 'le', 'les', 'd', 'l', 'et', 'aux', 'au', 'a',
-  'và', 'cua', 'của', 'the',
+  'de',
+  'du',
+  'des',
+  'la',
+  'le',
+  'les',
+  'd',
+  'l',
+  'et',
+  'aux',
+  'au',
+  'a',
+  'và',
+  'cua',
+  'của',
+  'the',
 ]);
 
 /** Lowercase, strip Vietnamese and French diacritics, collapse punctuation. Pure. */
@@ -105,7 +165,10 @@ export function parseEntry(raw) {
   let rest = (m ? m[2] : (raw ?? '')).trim();
 
   const aliases = [...rest.matchAll(/\(([^)]+)\)/g)].map((x) => x[1].trim());
-  rest = rest.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  rest = rest
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   const folded = fold(rest);
   let type = '';
@@ -117,7 +180,10 @@ export function parseEntry(raw) {
     });
     if (hit) {
       type = canon;
-      name = rest.slice(0, rest.length).replace(new RegExp(`^\\s*${escapeRe(hit)}`, 'i'), '').trim();
+      name = rest
+        .slice(0, rest.length)
+        .replace(new RegExp(`^\\s*${escapeRe(hit)}`, 'i'), '')
+        .trim();
       // The lexicon word may itself be spelled with different diacritics than
       // the entry; fall back to trimming by folded length when the slice missed.
       if (name === rest) name = rest.split(/\s+/).slice(fold(hit).split(' ').length).join(' ');
@@ -157,7 +223,8 @@ export function buildThreads(entries) {
   for (const e of entries) {
     if (!e.key) continue;
     const k = `${e.type}|${e.key}`;
-    if (!threads.has(k)) threads.set(k, { key: k, type: e.type, name: e.key, years: {}, links: [] });
+    if (!threads.has(k))
+      threads.set(k, { key: k, type: e.type, name: e.key, years: {}, links: [] });
     (threads.get(k).years[e.year] ??= []).push(e);
   }
   // An alias is a pointer to another thread of the same type, in another year.
@@ -169,7 +236,12 @@ export function buildThreads(entries) {
           if (!target || target === t) continue;
           const otherYears = Object.keys(target.years).filter((y) => y !== year);
           if (!otherYears.length) continue;
-          t.links.push({ to: target.key, via: a, from_year: Number(year), to_years: otherYears.map(Number) });
+          t.links.push({
+            to: target.key,
+            via: a,
+            from_year: Number(year),
+            to_years: otherYears.map(Number),
+          });
         }
       }
     }
@@ -186,7 +258,10 @@ async function loadFromDb() {
   );
   const url = `${env.PUBLIC_SUPABASE_URL}/rest/v1/ocr_extractions?select=map_id,text,text_validated,status&category=eq.legend_entry&limit=2000`;
   const res = await fetch(url, {
-    headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+    },
   });
   if (!res.ok) throw new Error(`supabase http ${res.status}`);
   return (await res.json())
@@ -202,7 +277,10 @@ function selftest() {
       console.error(`  FAIL ${m}`);
     }
   };
-  ok(fold('Bệnh-viện Đồn Đất') === 'benh vien don dat', `fold vietnamese: ${fold('Bệnh-viện Đồn Đất')}`);
+  ok(
+    fold('Bệnh-viện Đồn Đất') === 'benh vien don dat',
+    `fold vietnamese: ${fold('Bệnh-viện Đồn Đất')}`
+  );
   ok(fold("Cimetière d'Akas") === 'cimetiere d akas', `fold french: ${fold("Cimetière d'Akas")}`);
 
   const vi = parseEntry('3. Bệnh-viện Đồn Đất (Grall)');
@@ -211,10 +289,19 @@ function selftest() {
   ok(vi.key === 'don dat', `vi key, got "${vi.key}"`);
   ok(vi.aliases[0] === 'Grall', 'parenthetical kept as alias');
 
-  ok(parseEntry('141. Poste de Police de Phú Lâm').type === 'police', 'a police post is police, not post');
+  ok(
+    parseEntry('141. Poste de Police de Phú Lâm').type === 'police',
+    'a police post is police, not post'
+  );
   ok(parseEntry('141. Poste de Police de Phú Lâm').key === 'phu lam', 'and keys on the place');
-  ok(parseEntry('158. Bureau de Poste de Chợ Quán').type === 'post', 'a post office is post, not a directorate');
-  ok(parseEntry('83. Bureaux des Chemins de fer').type === 'directorate', 'a bare bureau is still a directorate');
+  ok(
+    parseEntry('158. Bureau de Poste de Chợ Quán').type === 'post',
+    'a post office is post, not a directorate'
+  );
+  ok(
+    parseEntry('83. Bureaux des Chemins de fer').type === 'directorate',
+    'a bare bureau is still a directorate'
+  );
 
   const conn = parseEntry('211. Marché de Binh-Đông');
   ok(conn.name === 'Binh-Đông', `the connector comes off the name too, got "${conn.name}"`);
@@ -269,23 +356,31 @@ function report(threads, entries) {
   const linked = threads.filter((t) => t.links.length);
   console.log(`${entries.length} entries → ${threads.length} threads`);
   console.log(`  ${multi.length} appear on more than one sheet`);
-  console.log(`  ${multi.filter((t) => t.years[1959]).length} of those survive into the 1959 Vietnamese legend`);
-  console.log(`  ${linked.length} carry a parenthetical naming another entry (renames and consolidations)\n`);
+  console.log(
+    `  ${multi.filter((t) => t.years[1959]).length} of those survive into the 1959 Vietnamese legend`
+  );
+  console.log(
+    `  ${linked.length} carry a parenthetical naming another entry (renames and consolidations)\n`
+  );
 
   console.log('— across the 1959 rename —');
   for (const t of multi.filter((t) => t.years[1959]).sort((a, b) => a.key.localeCompare(b.key))) {
     console.log(`${t.type.padEnd(11)} ${t.name}`);
-    for (const y of years) if (t.years[y]) console.log(`   ${y}  ${t.years[y].map((e) => e.raw).join(' / ')}`);
+    for (const y of years)
+      if (t.years[y]) console.log(`   ${y}  ${t.years[y].map((e) => e.raw).join(' / ')}`);
   }
 
   console.log('\n— renames and consolidations named in the legend itself —');
   const byTarget = new Map();
-  for (const t of linked) for (const l of t.links) (byTarget.get(l.to) ?? byTarget.set(l.to, []).get(l.to)).push({ t, l });
+  for (const t of linked)
+    for (const l of t.links)
+      (byTarget.get(l.to) ?? byTarget.set(l.to, []).get(l.to)).push({ t, l });
   for (const [to, list] of byTarget) {
     const target = threads.find((x) => x.key === to);
     const verb = list.length > 1 ? `${list.length} →` : '→';
     console.log(`${verb} ${target ? Object.values(target.years).flat()[0].raw : to}`);
-    for (const { t, l } of list) console.log(`     ${Object.values(t.years).flat()[0].raw}   (via "${l.via}")`);
+    for (const { t, l } of list)
+      console.log(`     ${Object.values(t.years).flat()[0].raw}   (via "${l.via}")`);
   }
 
   console.log('\n— on every French sheet but gone by 1959 —');
@@ -298,9 +393,10 @@ mkdirSync(OUT_DIR, { recursive: true });
 if (process.argv.includes('--selftest')) {
   selftest();
 } else {
-  const raw = existsSync(ENTRIES) && process.argv.includes('--report')
-    ? JSON.parse(readFileSync(ENTRIES, 'utf8'))
-    : await loadFromDb();
+  const raw =
+    existsSync(ENTRIES) && process.argv.includes('--report')
+      ? JSON.parse(readFileSync(ENTRIES, 'utf8'))
+      : await loadFromDb();
   writeFileSync(ENTRIES, JSON.stringify(raw, null, 1));
   const entries = raw.map((r) => ({ ...parseEntry(r.raw), year: r.year }));
   const threads = buildThreads(entries);

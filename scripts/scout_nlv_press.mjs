@@ -151,7 +151,11 @@ export function parseResults(html, query) {
       title: typed ? typed[1] : title,
       doc_type: typed ? typed[2] : '',
       publication_id,
-      publication_name: line ? unent(line[1]).replace(/\s*\d{1,2} Tháng .*$/, '').trim() : '',
+      publication_name: line
+        ? unent(line[1])
+            .replace(/\s*\d{1,2} Tháng .*$/, '')
+            .trim()
+        : '',
       printed_date: line ? unent(line[1]) : '',
       date_id,
       year: oidYear(date_id),
@@ -234,7 +238,9 @@ async function harvest(q, pub, seen, offsets) {
     offsets[key] = { next: r, total };
     writeFileSync(OFFSETS, JSON.stringify(offsets, null, 2));
     if (page % 10 === 0 || rows.length < PAGE)
-      console.log(`  r=${r - rows.length}: ${rows.length} rows, ${added} new, ${total ? Math.min(100, Math.round(((r - 1) / total) * 100)) : '?'}%`);
+      console.log(
+        `  r=${r - rows.length}: ${rows.length} rows, ${added} new, ${total ? Math.min(100, Math.round(((r - 1) / total) * 100)) : '?'}%`
+      );
     if (rows.length < PAGE || (total && r > total)) break;
     await sleep(PAUSE_MS);
   }
@@ -259,7 +265,10 @@ async function pullImages(items) {
 }
 
 function report() {
-  const rows = readFileSync(OUT, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
+  const rows = readFileSync(OUT, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map((l) => JSON.parse(l));
   const tally = (f) => {
     const m = new Map();
     for (const r of rows) m.set(f(r), (m.get(f(r)) ?? 0) + 1);
@@ -267,14 +276,19 @@ function report() {
   };
   console.log(`${rows.length} rows\n\nby publication`);
   for (const [k, n] of tally((r) => r.publication_name || r.publication_id || '?')) {
-    const ys = rows.filter((r) => (r.publication_name || r.publication_id || '?') === k && r.year).map((r) => r.year);
-    console.log(`  ${String(n).padStart(6)}  ${k}  ${ys.length ? `${Math.min(...ys)}-${Math.max(...ys)}` : ''}`);
+    const ys = rows
+      .filter((r) => (r.publication_name || r.publication_id || '?') === k && r.year)
+      .map((r) => r.year);
+    console.log(
+      `  ${String(n).padStart(6)}  ${k}  ${ys.length ? `${Math.min(...ys)}-${Math.max(...ys)}` : ''}`
+    );
   }
   console.log('\nby decade');
   for (const [k, n] of tally((r) => (r.year ? `${Math.floor(r.year / 10) * 10}s` : '?')).sort())
     console.log(`  ${String(n).padStart(6)}  ${k}`);
   console.log('\nby type');
-  for (const [k, n] of tally((r) => r.doc_type || '?')) console.log(`  ${String(n).padStart(6)}  ${k}`);
+  for (const [k, n] of tally((r) => r.doc_type || '?'))
+    console.log(`  ${String(n).padStart(6)}  ${k}`);
   console.log('\nby query');
   for (const [k, n] of tally((r) => r.query)) console.log(`  ${String(n).padStart(6)}  ${k}`);
   const southFile = 'scripts/nlv-southern-pubs.txt';
@@ -312,7 +326,11 @@ function selftest() {
   ok(parseTotal('trả về 15154 kết quả') === 15154, 'total');
   ok(parseTotal('<p>nothing</p>') === null, 'absent total is null, not 0');
   if (!existsSync(fixture)) {
-    console.log(bad ? `selftest FAILED (${bad})` : 'selftest ok (no fixture — run --fixture once to pin the parser)');
+    console.log(
+      bad
+        ? `selftest FAILED (${bad})`
+        : 'selftest ok (no fixture — run --fixture once to pin the parser)'
+    );
     process.exitCode = bad ? 1 : 0;
     return;
   }
@@ -328,7 +346,10 @@ function selftest() {
   ok(r.year >= 1800 && r.year <= 2100, `year in range, got ${r.year}`);
   ok(r.publication_name.length > 1, 'publication name parsed');
   ok(Array.isArray(r.crop) && r.crop.length === 4, 'crop box parsed');
-  ok(rows.every((x) => x.oid && x.article_url.includes(x.oid)), 'every row addressable');
+  ok(
+    rows.every((x) => x.oid && x.article_url.includes(x.oid)),
+    'every row addressable'
+  );
   ok(new Set(rows.map((x) => x.srpos)).size === rows.length, 'one row per result, not per anchor');
   if (bad) {
     console.error(`selftest FAILED (${bad})`);
@@ -353,7 +374,9 @@ if (flag('--selftest')) {
 } else if (flag('--report')) {
   report();
 } else if (!QUERIES.length) {
-  console.error('usage: scout_nlv_press.mjs "<phrase>" [...] | --queries <file> [--pub ids] [--from Y --to Y] [--max pages] [--images] | --pubs | --report | --selftest');
+  console.error(
+    'usage: scout_nlv_press.mjs "<phrase>" [...] | --queries <file> [--pub ids] [--from Y --to Y] [--max pages] [--images] | --pubs | --report | --selftest'
+  );
   process.exit(1);
 } else {
   const seen = seenOids();
@@ -361,7 +384,8 @@ if (flag('--selftest')) {
   console.log(`${seen.size} rows already in ${OUT}`);
   const fresh = [];
   for (const q of QUERIES)
-    for (const pub of PUBS.length ? PUBS : [null]) fresh.push(...(await harvest(q, pub, seen, offsets)));
+    for (const pub of PUBS.length ? PUBS : [null])
+      fresh.push(...(await harvest(q, pub, seen, offsets)));
   console.log(`\n${fresh.length} new rows → ${OUT}`);
   if (flag('--images')) await pullImages(fresh);
 }

@@ -44,7 +44,8 @@ const flag = (n) => argv.includes(n);
 const opt = (n, d) => (argv.indexOf(n) > -1 ? argv[argv.indexOf(n) + 1] : d);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const unaccent = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+const unaccent = (s) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
 
 /**
  * The spellings one name takes in a French OCR corpus. Same rule as
@@ -52,7 +53,10 @@ const unaccent = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g
  * colonial press's hyphenated house style, then the accented modern form.
  */
 export function spellingVariants(name) {
-  const clean = (name ?? '').replace(/["()[\]{}\\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const clean = (name ?? '')
+    .replace(/["()[\]{}\\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!clean) return [];
   const plain = unaccent(clean);
   const out = [plain];
@@ -138,14 +142,25 @@ async function get(url, headers = {}) {
 
 async function nlvCurve(name) {
   const p = new URLSearchParams({
-    a: 'q', r: '1', results: '1', txq: `"${name}"`, txf: 'txIN', ssnip: 'img', o: '50',
+    a: 'q',
+    r: '1',
+    results: '1',
+    txq: `"${name}"`,
+    txf: 'txIN',
+    ssnip: 'img',
+    o: '50',
     e: '-------vi-20--1--img-txIN------',
   });
   return parseNlvFacet(await get(`${NLV}?${p}`));
 }
 
 async function sruCount(cql) {
-  const p = new URLSearchParams({ operation: 'searchRetrieve', version: '1.2', query: cql, maximumRecords: '1' });
+  const p = new URLSearchParams({
+    operation: 'searchRetrieve',
+    version: '1.2',
+    query: cql,
+    maximumRecords: '1',
+  });
   return parseSruCount(await get(`${SRU}?${p}`)) ?? 0;
 }
 
@@ -262,8 +277,9 @@ function report(rows) {
   const head = decades.map((d) => `${String(d).slice(2)}s`.padStart(5)).join('');
   console.log(
     {
-      index: 'corpus-corrected, indexed 0-99 against each row\'s own peak (--rate for per-mille, --raw for counts)',
-      rate: 'per 1,000 of each archive\'s own universe (--raw for counts)',
+      index:
+        "corpus-corrected, indexed 0-99 against each row's own peak (--rate for per-mille, --raw for counts)",
+      rate: "per 1,000 of each archive's own universe (--raw for counts)",
       raw: 'raw counts as the archives gave them',
     }[mode]
   );
@@ -281,9 +297,13 @@ function report(rows) {
           : '')
     );
     if (r.gallica)
-      console.log(`  BnF ${(r.fr ?? '').slice(0, 20).padEnd(21)}${curveLine(r.gallica, decades, base?.gallica, mode)}  ${String(r.gallica.total).padStart(6)}`);
+      console.log(
+        `  BnF ${(r.fr ?? '').slice(0, 20).padEnd(21)}${curveLine(r.gallica, decades, base?.gallica, mode)}  ${String(r.gallica.total).padStart(6)}`
+      );
     if (r.nlv)
-      console.log(`  NLV ${(r.vi ?? '').slice(0, 20).padEnd(21)}${curveLine(r.nlv, decades, base?.nlv, mode)}  ${String(r.nlv.total).padStart(6)}`);
+      console.log(
+        `  NLV ${(r.vi ?? '').slice(0, 20).padEnd(21)}${curveLine(r.nlv, decades, base?.nlv, mode)}  ${String(r.nlv.total).padStart(6)}`
+      );
   }
 }
 
@@ -302,7 +322,10 @@ function selftest() {
         'and (dc.date >= "1913" and dc.date <= "1933")',
     `CQL parity with the TypeScript builder:\n    ${buildGallicaQuery('Khánh Hội', 1913, 1933)}`
   );
-  ok(!buildGallicaQuery('Khanh" or (gallica all "war', 1920, 1929).includes('"war"'), 'quotes cannot escape the CQL');
+  ok(
+    !buildGallicaQuery('Khanh" or (gallica all "war', 1920, 1929).includes('"war"'),
+    'quotes cannot escape the CQL'
+  );
   ok(
     buildScopedQuery('Binh Tay', 1920, 1929).endsWith('and (gallica adj "Saigon")'),
     'every gallica query is scoped to Saigon'
@@ -363,7 +386,8 @@ if (flag('--selftest')) {
       console.warn(`  SKIPPED ${t.key}: ${err.message}`);
     }
   }
-  if (failed.length) console.warn(`\n${failed.length} threads failed and were not written; re-run to retry them`);
+  if (failed.length)
+    console.warn(`\n${failed.length} threads failed and were not written; re-run to retry them`);
   console.log(`\n${rows.length} rows → ${OUT}`);
 }
 
@@ -371,7 +395,12 @@ async function one(t, rows) {
   {
     const { vi, fr } = namesFor(t);
     const row = {
-      key: t.key, type: t.type, vi, fr, nlv: null, gallica: null,
+      key: t.key,
+      type: t.type,
+      vi,
+      fr,
+      nlv: null,
+      gallica: null,
       // Both sides query the proper name, not the whole entry — the type word
       // is noise the period press does not repeat ("Chợ Bình Tây" is 4 hits,
       // "Bình Tây" is 60) — and the Gallica side is scoped to Saigon.
