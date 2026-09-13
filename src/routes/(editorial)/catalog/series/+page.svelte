@@ -16,12 +16,7 @@
   const span = (a: number | null, b: number | null) =>
     a && b && a !== b ? `${a}–${b}` : (a ?? b ?? '');
 
-  /** "461 of 627 sheets — 74%", or what we hold when nothing counted the rest. */
-  function coverage(s: (typeof series)[number]): string {
-    if (!s.index) return `${s.sheets} ${s.sheets === 1 ? 'sheet' : 'sheets'} held`;
-    const pct = s.index.total ? Math.round((s.index.held / s.index.total) * 100) : 0;
-    return `${s.index.held} of ${s.index.total} sheets — ${pct}%`;
-  }
+  const pct = (held: number, total: number) => (total ? Math.round((held / total) * 100) : 0);
 </script>
 
 <svelte:head>
@@ -43,12 +38,15 @@
   {#if series.length}
     <ul class="rows">
       {#each series as s (s.key)}
+        {@const years = span(s.firstYear, s.lastYear)}
         <li>
           <a class="section-card is-sm is-link" href="/catalog/series/{encodeURIComponent(s.key)}">
             <span class="name">{s.name}</span>
             <span class="meta">
-              {#if span(s.firstYear, s.lastYear)}<span>{span(s.firstYear, s.lastYear)}</span>{/if}
-              <span>{coverage(s)}</span>
+              {#if years}<span>{years}</span>{/if}
+              <span>
+                {s.index.held} of {s.index.total} sheets — {pct(s.index.held, s.index.total)}%
+              </span>
             </span>
           </a>
         </li>

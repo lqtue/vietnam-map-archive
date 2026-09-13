@@ -83,7 +83,7 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
        its prose is not translated, and a `/vi` twin with an hreflang pair
        would be the same document claiming to be two. */
     entry('/catalog/series'),
-    ...(series ?? []).map((s) => entry(`/catalog/series/${encodeURIComponent(s.key as string)}`)),
+    ...(series ?? []).map((s) => entry(`/catalog/series/${s.key}`)),
     ...(places ?? [])
       .filter((p) => p.name_key)
       .map((p) => entry(`/catalog/place/${keyToSlug(p.name_key as string)}`)),

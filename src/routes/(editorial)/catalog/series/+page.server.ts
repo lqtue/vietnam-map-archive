@@ -17,7 +17,6 @@
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { fetchMapSeries } from '$lib/data/maps/service';
-import { sheetStatus } from '$lib/data/maps/seriesSheets';
 
 export const load: PageServerLoad = async () => {
   const supabase = adminClient();
@@ -33,15 +32,18 @@ export const load: PageServerLoad = async () => {
      reader by more than one route: 452 of L7014's 461 are mosaic cells with no
      `maps` row, and `publishedSheets` cannot see them. Two columns over ~700
      rows is cheaper than a per-series round trip, and the same read the drift
-     detector makes. */
-  const { data: cells } = await supabase.from('series_sheets').select('series_key,held_by,source');
+     detector makes. `held_by` is the whole test — `sheetStatus` in
+     `seriesSheets.ts` owns the rule and its first line is this one; the rest of
+     what it decides separates two kinds of *unheld*, which this page does not
+     draw. */
+  const { data: cells } = await supabase.from('series_sheets').select('series_key,held_by');
 
   const held = new Map<string, { held: number; total: number }>();
   for (const c of cells ?? []) {
     const k = c.series_key as string;
     const t = held.get(k) ?? { held: 0, total: 0 };
     t.total += 1;
-    if (sheetStatus(c as { held_by: string | null; source: string | null }) === 'held') t.held += 1;
+    if (c.held_by) t.held += 1;
     held.set(k, t);
   }
 
@@ -49,12 +51,11 @@ export const load: PageServerLoad = async () => {
     series: series.map((s) => ({
       key: s.key,
       name: s.name,
-      sheets: s.sheets,
       firstYear: s.firstYear ?? null,
       lastYear: s.lastYear ?? null,
-      // Null where the survey's index was never imported, which is not zero —
-      // AMS L909 has three sheets and no index, and must not read "3 of 0".
-      index: held.get(s.key) ?? null,
+      // Always set: the filter above kept only surveys whose index exists, and
+      // `survey_sheets` is a count over the very rows this counts.
+      index: held.get(s.key)!,
     })),
   };
 };
