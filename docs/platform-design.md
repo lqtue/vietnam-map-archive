@@ -1,7 +1,7 @@
 # Platform design — one codebase for VMA, HACW and what comes next (2026-09-02)
 
 **Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `feat/label-search` @ bccd495, HACW `main` @ 2026-08-30, Tasco `platform/docs` read 2026-09-02.
-Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is `docs/time-machine-plan.md`.
+Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is `docs/time-machine-plan.md`, Track F is `docs/time-walk-plan.md` — which forks the event app rather than merging it, and jumps §6's queue with `story.schema.json` (it needs neither the engine nor `packages/contracts`).
 
 **For the hurried reader.** At the core is not an app but a **place-time index**: Postgres + PostGIS answering *what was here, when, and what was it called* (§0). Three codebases share an author: VMA (SvelteKit, legacy syntax, OpenLayers + Allmaps, Supabase, Python workers), HACW (SvelteKit, runes, MapLibre + shipped PMTiles, no backend), and Tasco's mobility platform (employer's Go/React monorepo — a source of practices, not code). Tasco's docs encode one rule that settles the unification question: **promote something to shared only when a second real consumer exists** (`tasco/platform/docs/engineering-workflow.md:79`). Applied honestly, that yields a small pnpm monorepo whose shared surface is **contracts, basemap recipe, deploy conventions, docs system, decision register** — and leaves map engine, data store, auth, design tokens and Svelte syntax per-app. Unify the seams, not the bodies.
 

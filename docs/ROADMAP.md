@@ -152,6 +152,16 @@ Label search → temporal fabric → period sources, on the existing jobs + HITL
 - [~] E4 Corpus growth — georef sprint by decade gap (62 drafts, all 1900–1929) · new scout sources (UT PCL, NARA, ANOM) · **the Hanoi/Huế extracts are now one command** (`scripts/pmtiles_extract.sh`, Huế already built)
 - [ ] E5 Building attributes → OSM tags → LoD2 — deferred until E2 fabric is reviewed on ≥ 3 maps; `tags jsonb` lands with its first writer
 
+## Track F — Time walk (`docs/time-walk-plan.md`, planned 2026-09-12)
+The surface a person walks through: one District 4 route on foot, the warped sheets underneath, the old names on top. HACW (the Hội An event PWA) forked for Saigon — it is built to be forked per event — with its single modern basemap replaced by a stack of warped historical sheets and a year slider. HCMC is the opposite substrate to Hội An: no usable L7014 topo (the series' ungeoreferenced JPGs are exactly the sheets over Saigon), but 17 georeferenced city plans and a complete D4 series of 8.
+- [ ] F0 Walk the route on a phone and decide whether offline is real — if it is not, this whole track collapses into `/trip/[id]` plus a year slider, and the fork should be deleted rather than maintained
+- [ ] F1 `scripts/sheet_pmtiles.py <mapId> --bbox` — `l7014_mosaic.py` with the Allmaps annotation's GCPs and `tilingCrop()`'s `main_map`; one sheet drawing in MapLibre proves the chain. IIIF level0 tiles are not web-mercator XYZ, which is why every sheet must be warped once, server-side
+- [ ] F2 Warp 1923 + 1968, then the year slider — a raster basemap entry per year, the pattern `l7014` in `BASEMAP_DEFS` already uses
+- [ ] F3 `contracts/story.schema.json` + `GET /api/stories/[id].json`, validated in the write smoke. **Independent of F1/F2, and it jumps `platform-design.md` §6's queue**: it needs neither the engine (1.5) nor `packages/contracts` (2)
+- [ ] F4 Fork HACW → D4 content, Saigon extract, `pull-archive.mjs`, `checkStory()` — links by frozen JSON + PMTiles, never a shared runtime
+- [ ] F5 `gen-hero-fabric --bbox` per sheet → the names layer (1882 today, more as OCR lands)
+- [ ] F6 Stops, quizzes, stamps — content only, machinery unchanged
+
 ## Track D — Burn-down (when it hurts)
 - ~~Basemap on a third-party tile server~~ — **done 2026-09-01**: self-hosted PMTiles in R2, served by the existing worker at `iiif.maparchive.vn/basemap/*`, styled in `src/lib/map/basemapStyle.ts`. No key, no quota, no usage policy. Widened 2026-09-06 from the Saigon extract (37 MB) to Hanoi–Mekong (348 MB) — the Saigon bbox left every Huế and Hanoi sheet floating on blank ground. Moved 2026-09-08 off the worker onto `tiles.maparchive.vn`, an R2 custom domain, and the key gained its build date (`vietnam-20260906.pmtiles`) so a long edge TTL cannot strand readers on a rebuild.
 - ~~43 maps `georef_done` but 404 upstream~~ — **not true as of 2026-09-01**. Measured against production: every one of the 39 `georef_done` maps has a mirrored `annotation_url`, and the 62 that 404 on allmaps.org all have `georef_done = false`, correctly, because they were never georeferenced. `sync-georef` has nothing to fix.
@@ -226,4 +236,4 @@ it cost us this week, cheapest fix first.
 ## Order
 A1–A4 → B1 → B2 → C0 → C1 → B3 → B4 → B5 → C2… ; B6/B7 interleave when a public/moderation need shows; A5 alongside B3 (RPCs are what make write tests cheap). D never blocks.
 
-Next: **E1 → E2 → E3**; E4 whenever there is human time; E5 not before E2 is reviewed.
+Next: **E1 → E2 → E3**; E4 whenever there is human time; E5 not before E2 is reviewed. F0 before any of F1–F6 is worth starting; F3 is independent and can run alongside E.
