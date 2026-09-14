@@ -81,14 +81,23 @@ def main():
             skipped += 1
             continue
         code, size = fetch(f"{BASE}/PDF/{sheet}.pdf", dest, args.check)
+        # Believe the bytes, not the status, and check them on EVERY path.
+        #
+        # This used to sit inside `if code == 200`, which left a wrong file on
+        # disk on every other path: curl writes the body whatever the status,
+        # and the `dest.exists()` skip above then calls it fetched forever. Six
+        # sheets of the 2026-09-14 run ended as 721-byte copies of TTU's "The
+        # specified URL cannot be found." — and they were not missing sheets at
+        # all. 5946-1 answers a HEAD with `application/pdf`, 10.4 MB; the six
+        # are consecutive in the list, so TTU hiccuped under a sustained run and
+        # the script recorded the hiccup as the map.
+        if not args.check and dest.exists() and not dest.read_bytes().startswith(b"%PDF"):
+            dest.unlink()
+            print(f"  {sheet}  HTTP {code}, not a PDF — discarded, retry later")
+            missing += 1
+            time.sleep(PAUSE)
+            continue
         if code == 200:
-            # A missing sheet can come back as an HTML error page with a 200,
-            # so believe the bytes rather than the status.
-            if not args.check and not dest.read_bytes().startswith(b"%PDF"):
-                dest.unlink()
-                print(f"  {sheet}  not a PDF — no TTU copy")
-                missing += 1
-                continue
             print(f"  {sheet}  ok" + (f"  {size / 1e6:.1f} MB" if size else ""))
             got += 1
         else:
