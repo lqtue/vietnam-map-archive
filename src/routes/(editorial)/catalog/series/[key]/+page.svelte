@@ -32,20 +32,26 @@
   };
 
   /**
-   * The span of the sheets the archive has **catalogued**, not of the survey,
-   * and not of everything it holds either. It comes from `map_series`, an
-   * aggregate over `maps` rows, and L7014 has 9 of those against a survey of
-   * 627 printed between 1963 and 1989 — so an unlabelled "1966–1984" beside
-   * "627 sheets" reads as the survey's dates and is wrong by a decade at each
-   * end. "held" was the first label and is still too strong: `counts.held` is
-   * 461, and 452 of those are mosaic cells with no `maps` row and therefore no
-   * year in the view at all. "catalogued" is true of exactly the rows the
-   * number comes from. `/catalog/series` uses the same word.
+   * The span of the survey, read off the sheets themselves.
+   *
+   * This used to come from `map_series.first_year/last_year`, an aggregate over
+   * `maps` rows — and L7014 has 9 of those against a survey of 627, so the hero
+   * read "catalogued 1966–1984" while the About panel on the same screen said
+   * the sheets run 1963 to 1989. Both were true and the page contradicted
+   * itself eight lines apart; the qualifying word "catalogued" was carrying an
+   * explanation no reader can be expected to unpack.
+   *
+   * `series_sheets` carries a year per cell (mig 086), 446 of L7014's 627, so
+   * the span is a min/max over rows already on the page and costs no query.
+   * Cells with no recorded year are skipped rather than counted as a gap in the
+   * range — 182 of them are unrecorded, which is honest and not a date.
    */
-  $: span =
-    series.first_year && series.last_year && series.first_year !== series.last_year
-      ? `${series.first_year}–${series.last_year}`
-      : (series.first_year ?? series.last_year ?? '');
+  $: years = sheets.map((s) => s.year).filter((y): y is number => typeof y === 'number');
+  $: span = years.length
+    ? Math.min(...years) === Math.max(...years)
+      ? `${Math.min(...years)}`
+      : `${Math.min(...years)}–${Math.max(...years)}`
+    : '';
 
   $: pct = counts.total ? Math.round((counts.held / counts.total) * 100) : 0;
 
@@ -157,14 +163,14 @@
   <meta
     name="description"
     content="{series.name}: {counts.held} of {counts.total} sheets held{span
-      ? `; the catalogued sheets date ${span}`
+      ? `; the sheets date ${span}`
       : ''}."
   />
 </svelte:head>
 
 <PageHero
   title={series.name}
-  sub={span ? `${counts.total} sheets · catalogued ${span}` : `${counts.total} sheets`}
+  sub={span ? `${counts.total} sheets · ${span}` : `${counts.total} sheets`}
 />
 
 <div class="page-wrap">
@@ -207,7 +213,7 @@
     <div
       class="bar"
       role="img"
-      aria-label="{counts.held} held, {counts.obtainable} identified but not fetched, {counts.no_scan} with no known scan"
+      aria-label="{counts.held} held, {counts.obtainable} located elsewhere but not served, {counts.no_scan} with no known scan"
     >
       <span class="seg is-held" style:flex-grow={counts.held}></span>
       <span class="seg is-obtainable" style:flex-grow={counts.obtainable}></span>
@@ -215,8 +221,15 @@
     </div>
     <ul class="legend">
       <li><span class="dot is-held"></span>{counts.held} held</li>
+      <!-- "not yet fetched" was false for 116 of L7014's 123: 73 are PCL GeoPDFs
+           that carry no usable georeference and 43 are Texas Tech scans already
+           mirrored. What those cells lack is not the pixels, it is a place on
+           the ground — 083's three states have no term for a scan held and
+           unplaceable, so the wording claimed the one thing it could say, and
+           sent the next reader to download files the archive already has. -->
       <li>
-        <span class="dot is-obtainable"></span>{counts.obtainable} scan identified, not yet fetched
+        <span class="dot is-obtainable"></span>{counts.obtainable} scan located elsewhere, not served
+        here
       </li>
       <li><span class="dot is-none"></span>{counts.no_scan} no known scan</li>
     </ul>
