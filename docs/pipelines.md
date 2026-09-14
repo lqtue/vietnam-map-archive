@@ -21,8 +21,20 @@ python3 scripts/l7014_mosaic.py fetch --jobs 4  # download the GeoPDFs (~4 GB)
 python3 scripts/l7014_mosaic.py warp            # clip to neatline, reproject
 python3 scripts/l7014_mosaic.py tile            # mosaic -> MBTiles -> PMTiles
 python3 scripts/l7014_mosaic.py upload          # rclone to r2:vma-tiles/overlay/
+python3 scripts/l7014_mosaic.py manifest         # one outline per sheet in the archive
+python3 scripts/l7014_mosaic.py fit             # where every warped sheet actually landed
 python3 scripts/l7014_mosaic.py check           # prove the datum check can fail
 ```
+
+> **The live archive `l7014-20260913` is wrong and a rebuild is pending.** 285 of
+> its 437 GeoPDF sheets shipped without the Indian 1960 datum shift and sit
+> ~470 m northwest of where they belong; `fit` reports 341 of 452 sheets more
+> than 150 m off their cell. The cause and the fix are trap 1 below. The fix is
+> committed and `fit` now fails on the shipped archive, but nothing has been
+> re-warped or re-uploaded — do that before trusting a measurement taken off
+> these tiles. The 24 hand-georeferenced sheets are **not** affected: their
+> control points fit to 2.3–19.0 m rms (`residuals`), and the ~460 m step a
+> reader sees where one of them meets the mosaic is the mosaic edge moving.
 
 Every phase is resumable — it skips what it already produced — so a failed run
 is re-run, not restarted. Needs GDAL with the PDF driver, the `pmtiles` CLI,
@@ -34,24 +46,58 @@ NGA control points in pixel space, its printed neatline as a polygon, and an XMP
 block with the sheet's title, edition, date and graticule corners. The pipeline
 clips each sheet to its own neatline (which is what removes the collar, so
 sheets butt together instead of overlapping their margins), warps it to Web
-Mercator, and tiles the lot. Measured on four adjacent sheets, neighbouring
-sheet edges agree to **2.5–14 m** — inside the series' own ±25 m drafting
-accuracy, and grid lines and streams run unbroken across a join. What *is*
-visible at a seam is tone: the scans differ in brightness sheet to sheet.
+Mercator, and tiles the lot. Where two sheets were warped the same way their
+edges agree to **2.5–14 m** — inside the series' own ±25 m drafting accuracy,
+and grid lines and streams run unbroken across a join. What *is* visible at such
+a seam is tone: the scans differ in brightness sheet to sheet.
+
+That "warped the same way" is load-bearing, and it is how the datum fault above
+was found. Over all **750** adjacent seams in `l7014-20260913` the median is
+19 m, but **56 are over 300 m** — those are the joins where an unshifted sheet
+meets a shifted one — and **every one of the 33 seams where a hand-georeferenced
+sheet meets the mosaic measures 447–504 m**. A seam is the cheapest measurement
+here because it needs no outside data at all, only two sheets that claim to
+share an edge; four sheets is not enough of them to notice a fault that splits
+the corpus 285/151.
 
 **Five things that will silently produce a plausible wrong result.** All five
 are handled; all five are worth knowing before editing this script. Every one of
 them was found by looking at the output, not by reading the code.
 
-1. **GDAL cannot map every NGA LGIDict datum code.** On `IND-I` and `INF-A` it
-   emits a warning, falls back to WGS84, and *the warp still succeeds* — putting
-   the sheet ~450 m off with no error anywhere. So the CRS is rebuilt from the
-   projection GDAL did parse (its central meridian names the UTM zone exactly)
-   or, failing that, the sheet's XMP; and every sheet's registration is then
-   checked against the graticule corners the XMP prints. A sheet that fails is
-   left out of the mosaic rather than placed wrongly. `check` runs a real sheet
-   through WGS84 on purpose and asserts the check rejects it — 147 m out on the
-   sheet it was measured on. A check that cannot fail is not one.
+1. **The datum, twice over, and the second one shipped.** GDAL cannot map every
+   NGA LGIDict code: on `IND-I` and `INF-A` it emits a warning, falls back to
+   WGS84, and *the warp still succeeds* — putting the sheet ~450 m off with no
+   error anywhere. So the projection is rebuilt from what GDAL did parse (its
+   central meridian names the UTM zone exactly) or, failing that, the sheet's
+   XMP.
+
+   That is only half of it, and the other half reached production. **A sheet
+   that says `Indian_1960` plainly gets no shift either**, because PROJ's
+   `EPSG:4131` → `EPSG:4326` pipeline has an area of use covering part of the
+   country and, for a point outside it, GDAL returns the input **unchanged**
+   rather than failing. Probed: `106.00,16.00` moves 470 m, `109.25,13.25`
+   moves 0. `phase_corners` already spelled the Helmert out by hand for exactly
+   this reason; `warp` did not, and 285 of 336 sheets that declare Indian 1960
+   in their own PDF shipped with the shift silently skipped. The shift is now
+   `INDIAN_1960_PROJ4` — Everest 1830 (1937 Adjustment) plus
+   `+towgs84=198,881,317` — and is never looked up.
+
+   **The check that was supposed to catch this could not.** `graticule_error`
+   reads the sheet's control points into the sheet's *own* datum and compares
+   them with the graticule the sheet itself prints. Both sides move together
+   when the datum is wrong, so it returns ~0 for precisely the fault it looks
+   like it is guarding — A Luoi's `graticule_err` is `2e-12` — and it is blind
+   by construction, not by accident. What replaces it is an **outside opinion**:
+   `pick_crs` warps the neatline under both readings, the sheet's declaration
+   and Indian 1960 with the Helmert, and keeps whichever lands on the sheet's
+   15′ lattice cell. That is a measurement between two candidates ~470 m apart
+   against a third party good to ~15 m, so the choice is never close; a sheet
+   that misses on **both** readings is refused rather than warped in at the
+   smaller miss. Dry-run over all 437: median miss 430 m → **0 m**, p95 9 m,
+   max 115 m, none over 150. `fit` is the same measurement over a built archive
+   and exits 1, so it belongs between `tile` and `upload`. `check` still runs a
+   real sheet through WGS84 on purpose and asserts the graticule test rejects
+   it — that test is fine at what it does see, which is a wrong zone.
 2. **The UTM zone must come from the sheet's centre, never an edge.** Many
    sheets end at longitude 108.000, exactly the zone 48/49 boundary; taking the
    east edge puts them a zone over. That is a clean 6.00001° error, and it looks

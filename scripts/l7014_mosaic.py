@@ -19,19 +19,27 @@ way `basemap/vietnam-*.pmtiles` already is.
     python3 scripts/l7014_mosaic.py corners    # ground GCPs for the plain-JPG sheets
     python3 scripts/l7014_mosaic.py manifest   # one outline per sheet in the mosaic
     python3 scripts/l7014_mosaic.py residuals  # how well each sheet's GCPs actually fit
+    python3 scripts/l7014_mosaic.py fit        # where every warped sheet actually landed
 
 Every phase is resumable: it skips what it has already produced. `--limit N`
 caps any phase, `--jobs N` sets concurrency.
 
 Five traps, each of which otherwise yields a plausible, wrong map:
 
-1. GDAL cannot map some NGA LGIDict datum codes (`IND-I`, `INF-A`) and silently
-   falls back to WGS84 -- the whole sheet lands ~450 m off, and the warp still
-   succeeds. So the CRS is rebuilt from the projection GDAL *did* parse (its
-   central meridian names the UTM zone exactly) or from the sheet's XMP, and
-   every sheet's registration is then checked against the graticule corners the
-   XMP prints. `check` shows that check failing on purpose, because a check that
-   cannot fail is not one.
+1. The datum is where a plausible wrong map comes from, twice over. GDAL cannot
+   map some NGA LGIDict codes (`IND-I`, `INF-A`) and silently falls back to
+   WGS84; and even a sheet that says Indian 1960 plainly gets no shift at all,
+   because PROJ's EPSG:4131 -> 4326 pipeline covers only part of the country and
+   returns the input UNCHANGED outside it rather than failing. Either way the
+   sheet lands ~470 m northwest and the warp reports success. So the projection
+   is rebuilt from what GDAL *did* parse (the central meridian names the UTM
+   zone exactly), the datum shift is spelled out as a Helmert (INDIAN_1960_PROJ4)
+   and never looked up, and `pick_crs` chooses between the sheet's declaration
+   and that reading by measuring both against the 15' lattice -- an outside
+   opinion, since the sheet's own graticule check cannot see this fault at all
+   (see `lattice_error`). `fit` is the same measurement over a built archive and
+   exits 1, so it belongs between `tile` and `upload`. `check` shows the
+   graticule test failing on purpose, because a check that cannot fail is not one.
 2. The UTM zone must come from the sheet's CENTRE. Many sheets end at longitude
    108.000, exactly the 48/49 boundary, and taking an edge puts them one zone
    over -- a clean 6 degree error that reads like a datum fault and is not.
@@ -91,6 +99,19 @@ BUILD = WORK / "build"
 
 # The whole series is on Indian 1960; only the codes vary (IND, INS, IND-I).
 INDIAN_1960 = 4131
+# ...and EPSG:4131 is not how to spell it. PROJ picks a transformation to WGS 84
+# whose area of use covers only part of the country, and for a point outside it
+# GDAL returns the input UNCHANGED rather than failing -- so the sheet warps,
+# reports success and lands ~470 m northwest. Measured on the 20260913 archive:
+# 314 of 437 GeoPDFs had come through with no datum shift at all, including 252
+# that declared Indian 1960 outright. The Helmert is spelled out instead, the
+# same one `corners` already uses: Everest 1830 (1937 Adjustment) and the
+# Vietnam shift, no grid to fall off.
+INDIAN_1960_PROJ4 = "+a=6377276.345 +rf=300.8017 +towgs84=198,881,317 +no_defs"
+# How far a warped neatline may sit from the 15' lattice cell the sheet is
+# named for. The fault this catches is ~470 m and the lattice itself is good to
+# ~15 m, so anything in between is a comfortable place to draw the line.
+LATTICE_TOL = 150.0
 # Control points must land on the printed graticule to within this, in degrees.
 # 5e-4 is ~55 m: loose enough for the sheets that genuinely sit a little off
 # their declared cell (the worst measured is 31 m), tight enough that the datum
@@ -101,6 +122,86 @@ GRATICULE_TOL = 5e-4
 # and waves curl's own user agent through, so both fetches shell out to curl
 # rather than dressing urllib up as Chrome.
 CURL = ["curl", "-sL", "--fail", "--retry", "3", "--retry-delay", "2"]
+
+
+# ── the 15' lattice ──────────────────────────────────────────────────────────
+
+# The ArcGIS index (Vietnam_50k_L7014.mpk, 627 sheets) draws every sheet as an
+# exact 15' x 15' cell and labels the layer WGS 84. It is not: those corners are
+# the printed graticule, which is Indian 1960. Shifted, they reproduce a
+# GeoPDF's own NEATLINE to 4-17 m -- which is what makes them usable as an
+# outside opinion on where a sheet belongs.
+#
+#   ogr2ogr -f GeoJSON work/l7014/index.geojson <extracted>.gdb Vietnam_50k_L7014
+INDEX_GEOJSON = WORK / "index.geojson"
+ROMAN = {"1": "I", "2": "II", "3": "III", "4": "IV"}
+_LATTICE = None
+
+
+def wgs84():
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4326)
+    srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    return srs
+
+
+def indian_1960_geog():
+    """Indian 1960 as lat/lon, with the datum shift written out rather than
+    looked up. See INDIAN_1960_PROJ4 for why a lookup is not an option."""
+    srs = osr.SpatialReference()
+    srs.ImportFromProj4("+proj=longlat " + INDIAN_1960_PROJ4)
+    srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    return srs
+
+
+def ground_metres(a, b):
+    """Distance between two lon/lat pairs, locally. Degrees would understate
+    the east-west miss by the cosine of the latitude and could not be held
+    against a sheet's own ground resolution, which is the only number that
+    says whether a fit is good enough."""
+    return math.hypot((a[0] - b[0]) * 111320.0 * math.cos(math.radians(a[1])),
+                      (a[1] - b[1]) * 110540.0)
+
+
+def lattice_cells():
+    """Every sheet's cell, keyed `6441IV`, as (west, south, east, north, name).
+    Coordinates are Indian 1960, straight off the index -- `cell_corners`
+    shifts them."""
+    global _LATTICE
+    if _LATTICE is None:
+        if not INDEX_GEOJSON.exists():
+            sys.exit(f"{INDEX_GEOJSON} missing -- see the comment above lattice_cells")
+        cells = {}
+        for f in json.loads(INDEX_GEOJSON.read_text())["features"]:
+            ring = f["geometry"]["coordinates"][0][0]
+            lons = [x for x, _ in ring]
+            lats = [y for _, y in ring]
+            cells[f["properties"]["Sheet_no"].replace(" ", "")] = (
+                min(lons), min(lats), max(lons), max(lats), f["properties"]["Sheet_name"])
+        _LATTICE = cells
+    return _LATTICE
+
+
+def cell_of(sheet, cells=None):
+    """A sheet's raw index row, keyed `6441-4` -> `6441IV`. None if not indexed."""
+    cells = cells if cells is not None else lattice_cells()
+    num, _, quad = sheet.partition("-")
+    return cells.get(num + ROMAN.get(quad, ""))
+
+
+def cell_corners(sheet, cells=None):
+    """A sheet's four cell corners in WGS 84, NW NE SE SW. None if not indexed."""
+    cell = cell_of(sheet, cells)
+    if not cell:
+        return None
+    w, s_, e, n, _ = cell
+    to_wgs = osr.CoordinateTransformation(indian_1960_geog(), wgs84())
+    # A transform that quietly does nothing is the failure this whole module is
+    # most exposed to, so it has to be able to fail.
+    if abs(to_wgs.TransformPoint(106.5, 10.75)[0] - 106.5) < 1e-4:
+        sys.exit("the Indian 1960 datum shift is not being applied")
+    return [to_wgs.TransformPoint(lon, lat)[:2]
+            for lon, lat in ((w, n), (e, n), (e, s_), (w, s_))]
 
 
 def load_sheets():
@@ -286,9 +387,84 @@ def sheet_crs(ds, meta, force_epsg=None):
         zone = int((lon + 180) // 6) + 1
 
     forced = osr.SpatialReference()
-    forced.ImportFromEPSG(force_epsg or INDIAN_1960)
-    forced.SetUTM(zone, True)
+    if force_epsg:
+        forced.ImportFromEPSG(force_epsg)
+        forced.SetUTM(zone, True)
+    else:
+        forced.ImportFromProj4(f"+proj=utm +zone={zone} +units=m {INDIAN_1960_PROJ4}")
     return forced, False
+
+
+def indian_1960_utm(srs):
+    """The same projection, re-declared on Indian 1960 with the shift spelled out.
+
+    Datum codes on these sheets are a mess -- IND, INS, IND-I, and GDAL warns
+    `Unhandled value for Datum` and defaults to WGS84 on some of them -- so the
+    declared datum is not evidence. What it is good for is the projection: the
+    zone came out of the same WKT either way. `pick_crs` decides between this
+    and the declaration by measurement rather than by trusting either.
+    """
+    zone = srs.GetUTMZone()
+    if not zone:
+        cm = srs.GetProjParm("central_meridian")
+        zone = int(round((cm + 183) / 6)) if cm else 0
+    if not zone:
+        return None
+    out = osr.SpatialReference()
+    out.ImportFromProj4(f"+proj=utm +zone={abs(zone)} +units=m {INDIAN_1960_PROJ4}")
+    return out
+
+
+def lattice_error(ds, srs, sheet, cells=None):
+    """Mean metres from the sheet's registration to its 15' lattice cell.
+
+    This is the check `graticule_error` cannot be. That one reads the sheet's
+    control points into the sheet's OWN datum and compares them with the
+    graticule the sheet itself prints -- both sides move together when the
+    datum is wrong, so it returns ~0 for exactly the fault it looks like it is
+    guarding. The lattice is outside the sheet, in WGS 84, and does not move.
+
+    None when the sheet is not in the ArcGIS index (93 of them are not).
+    """
+    cells = cells if cells is not None else lattice_cells()
+    corners = cell_corners(sheet, cells)
+    if not corners:
+        return None
+    pts = registration_points(ds)
+    if not pts:
+        return None
+    to_wgs = osr.CoordinateTransformation(srs, wgs84())
+    got = [to_wgs.TransformPoint(x, y)[:2] for x, y in pts]
+    return sum(min(ground_metres(g, c) for g in got) for c in corners) / len(corners)
+
+
+def pick_crs(ds, meta, sheet, cells=None):
+    """The CRS whose warp actually lands on the sheet's cell, and its miss.
+
+    Two candidates, ~470 m apart: what the PDF declares, and the same
+    projection on Indian 1960 with the Helmert written out. The lattice is a
+    third party to both, so this is a measurement and not a preference -- and
+    it can fail, which is the whole point: a sheet that misses on both readings
+    is refused rather than warped into the archive at whichever miss is smaller.
+    """
+    declared, trusted = sheet_crs(ds, meta)
+    candidates = [(declared, "declared" if trusted else "forced")]
+    alt = indian_1960_utm(declared)
+    if alt is not None and not alt.IsSame(declared):
+        candidates.append((alt, "indian1960"))
+    scored = []
+    for srs, label in candidates:
+        err = lattice_error(ds, srs, sheet, cells)
+        scored.append((float("inf") if err is None else err, srs, label))
+    # No cell to check against: nothing to choose with, so keep the declaration
+    # and let graticule_error be the only guard, as it was for these all along.
+    if all(e == float("inf") for e, _, _ in scored):
+        return declared, ("declared" if trusted else "forced"), None
+    err, srs, label = min(scored, key=lambda t: t[0])
+    if err > LATTICE_TOL:
+        raise ValueError(f"no reading of the CRS lands on cell {sheet}: "
+                         + ", ".join(f"{l} {e:.0f} m" for e, _, l in scored))
+    return srs, label, err
 
 
 def registration_points(ds):
@@ -372,7 +548,11 @@ def warp_one(row):
     if not ds.GetGCPs() and ds.GetGeoTransform(can_return_null=True) is None:
         return "nogeo", f"{pdf.stem}: no georeference of any kind"
 
-    srs, trusted = sheet_crs(ds, meta)
+    try:
+        srs, crs_src, lat_err = pick_crs(ds, meta, row["sheet"])
+    except ValueError as e:
+        return "offcell", f"{pdf.stem}: {e}"
+    trusted = crs_src == "declared"
     err = graticule_error(ds, srs, meta)
     if err is not None and err > GRATICULE_TOL:
         return "offgrid", f"{pdf.stem}: control points {err:.5f} deg off the printed graticule"
@@ -410,8 +590,12 @@ def warp_one(row):
     row["year"] = (meta.get("pri_date") or "")[:4] or None
     row["edition"] = meta.get("edition")
     row["crs_forced"] = not trusted
+    row["crs_src"] = crs_src
     row["graticule_err"] = err
-    note = " [CRS forced]" if not trusted else ""
+    row["lattice_err"] = lat_err
+    note = "" if trusted else f" [CRS {crs_src}]"
+    if lat_err is not None:
+        note += f" [cell {lat_err:.0f} m]"
     return "ok", f"{pdf.stem}: {out.stat().st_size // 1048576}MB{note}"
 
 
@@ -557,61 +741,20 @@ def phase_check(args):
 
 # ── corners ──────────────────────────────────────────────────────────────────
 
-# The ArcGIS index (Vietnam_50k_L7014.mpk, 627 sheets) draws every sheet as an
-# exact 15' x 15' cell and labels the layer WGS 84. It is not: those corners are
-# the printed graticule, which is Indian 1960, and taken at face value they land
-# every sheet ~480 m northwest. Reprojected from 4131 they agree with the
-# GeoPDFs' own NEATLINE to 4-17 m, which is inside the series' drafting error.
-#
-#   ogr2ogr -f GeoJSON work/l7014/index.geojson <extracted>.gdb Vietnam_50k_L7014
-#   python3 scripts/l7014_mosaic.py corners
-#
-# Output is a crib sheet for hand-georeferencing the sheets PCL publishes as
-# plain JPGs: the ground half of each GCP. The pixel half is four clicks per
-# sheet in QGIS's Georeferencer -- a scan's collar and skew are not in any index.
-INDEX_GEOJSON = WORK / "index.geojson"
+# `corners` is a crib sheet for hand-georeferencing the sheets PCL publishes as
+# plain JPGs: the ground half of each GCP, off the lattice (see lattice_cells).
+# The pixel half is four clicks per sheet in QGIS's Georeferencer -- a scan's
+# collar and skew are not in any index.
 CORNERS_CSV = WORK / "corners.csv"
 GCP_DIR = WORK / "gcp"
 # Mean neatline inset (left, top, right, bottom) as a fraction of the page,
 # measured over 36 georeferenced sheets. sd is 0.013 of the width -- ~700 m --
 # so this positions a marker to drag, never a control point to trust.
 INSET = (0.0333, 0.0326, 0.9629, 0.7788)
-ROMAN = {"1": "I", "2": "II", "3": "III", "4": "IV"}
 
 
 def phase_corners(args):
-    if not INDEX_GEOJSON.exists():
-        sys.exit(f"{INDEX_GEOJSON} missing -- see the comment above phase_corners")
-    feats = json.loads(INDEX_GEOJSON.read_text())["features"]
-    cells = {}
-    for f in feats:
-        ring = f["geometry"]["coordinates"][0][0]
-        lons = [x for x, _ in ring]
-        lats = [y for _, y in ring]
-        cells[f["properties"]["Sheet_no"].replace(" ", "")] = (
-            min(lons), min(lats), max(lons), max(lats), f["properties"]["Sheet_name"])
-
-    # EPSG:4131 -> 4326 is NOT usable here. PROJ picks a transformation whose
-    # area of use stops at 106.5E, and for a point on or west of that line GDAL
-    # returns the input unchanged rather than failing -- so the Mekong Delta and
-    # western Saigon sheets, which are the ones this phase exists for, came back
-    # silently unshifted and ~450 m out. The Helmert is spelled out instead:
-    # Everest 1830 (1937 Adjustment) and the Vietnam shift, no grid to fall off.
-    # It reproduces A Luoi's printed neatline to 4-17 m, same as the grid did
-    # where the grid worked.
-    src = osr.SpatialReference()
-    src.ImportFromProj4("+proj=longlat +a=6377276.345 +rf=300.8017 "
-                        "+towgs84=198,881,317 +no_defs")
-    dst = osr.SpatialReference(); dst.ImportFromEPSG(4326)
-    for sr in (src, dst):
-        sr.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-    to_wgs = osr.CoordinateTransformation(src, dst)
-    # ...and a transform that quietly does nothing is the failure this phase is
-    # most exposed to, so it has to be able to fail.
-    probe = to_wgs.TransformPoint(106.5, 10.75)[:2]
-    if abs(probe[0] - 106.5) < 1e-4:
-        sys.exit("corners: the datum shift is not being applied (got %r)" % (probe,))
-
+    cells = lattice_cells()
     sheets = load_sheets()
     # Phu Vang 6542-3 is published both ways. The GeoPDF is already in the
     # mosaic, so its JPG needs no hand work -- and any future overlap likewise.
@@ -622,15 +765,12 @@ def phase_corners(args):
     out = ["sheet,name,corner,lon,lat"]
     missing = []
     for r in rows:
-        num, quad = r["sheet"].split("-")
-        cell = cells.get(num + ROMAN[quad])
-        if not cell:
+        pts = cell_corners(r["sheet"], cells)
+        if not pts:
             missing.append(r["sheet"])
             continue
-        w, s_, e, n, name = cell
-        for corner, (lon, lat) in (("NW", (w, n)), ("NE", (e, n)),
-                                   ("SE", (e, s_)), ("SW", (w, s_))):
-            x, y, _ = to_wgs.TransformPoint(lon, lat)
+        name = cell_of(r["sheet"], cells)[4]
+        for corner, (x, y) in zip(CORNERS, pts):
             out.append(f'{r["sheet"]},"{name or r["name"]}",{corner},{x:.6f},{y:.6f}')
     CORNERS_CSV.write_text("\n".join(out) + "\n")
 
@@ -648,18 +788,14 @@ def phase_corners(args):
         ds = gdal.Open(str(src))
         w, h = ds.RasterXSize, ds.RasterYSize
         ds = None
-        num, quad = r["sheet"].split("-")
-        cell = cells.get(num + ROMAN[quad])
-        if not cell:
+        pts = cell_corners(r["sheet"], cells)
+        if not pts:
             continue
-        west, south, east, north, _ = cell
         guess = {"NW": (INSET[0] * w, INSET[1] * h), "NE": (INSET[2] * w, INSET[1] * h),
                  "SE": (INSET[2] * w, INSET[3] * h), "SW": (INSET[0] * w, INSET[3] * h)}
         lines = ["#CRS: EPSG:4326",
                  "mapX,mapY,sourceX,sourceY,enable,dX,dY,residual"]
-        for corner, (lon, lat) in (("NW", (west, north)), ("NE", (east, north)),
-                                   ("SE", (east, south)), ("SW", (west, south))):
-            x, y, _ = to_wgs.TransformPoint(lon, lat)
+        for corner, (x, y) in zip(CORNERS, pts):
             px, py = guess[corner]
             lines.append(f"{x:.7f},{y:.7f},{px:.1f},{-py:.1f},1,0,0,0")
         (GCP_DIR / f"{r['sheet']}.points").write_text("\n".join(lines) + "\n")
@@ -1098,6 +1234,62 @@ def phase_manifest(args):
         sys.exit("manifest: refused to write a sheet that lands outside Vietnam")
 
 
+# ── fit ──────────────────────────────────────────────────────────────────────
+
+
+def phase_fit(args):
+    """Where every sheet in the built archive actually landed.
+
+    `manifest` writes one outline per sheet in the mosaic; the lattice says
+    where each of those outlines belongs. The two are independent, which is
+    what `graticule_error` never was -- it reads the sheet's control points
+    into the sheet's own datum and compares them with the graticule the sheet
+    itself prints, so a wrong datum moves both sides together and the check
+    returns ~0 for the one fault it looks like it is guarding. That is how 314
+    of 437 sheets reached the 20260913 archive ~470 m northwest of their cells
+    with nothing in the log.
+
+    Exit 1 when any sheet misses by more than LATTICE_TOL, so this can stand
+    between `tile` and `upload`.
+    """
+    path = BUILD / f"{args.key}.geojson"
+    if not path.exists():
+        sys.exit(f"{path} missing -- run `manifest --key {args.key}` first")
+    cells = lattice_cells()
+    rows, unindexed = [], []
+    for feat in json.loads(path.read_text())["features"]:
+        sheet = feat["properties"]["sheet"]
+        corners = cell_corners(sheet, cells)
+        if not corners:
+            unindexed.append(sheet)
+            continue
+        geom = feat["geometry"]
+        polys = (geom["coordinates"] if geom["type"] == "MultiPolygon"
+                 else [geom["coordinates"]])
+        ring = [v for poly in polys for v in poly[0]]
+        # Nearest outline vertex to each cell corner, not the outline's own
+        # bounding box: a sheet's paper is a little bigger than its cell and a
+        # little rotated, so the box corners sit outside the neatline by more
+        # than the fault being measured.
+        miss = [min(ground_metres(v, c) for v in ring) for c in corners]
+        rows.append((sum(miss) / 4, max(miss), sheet, feat["properties"]["kind"],
+                     feat["properties"]["name"]))
+    rows.sort(reverse=True)
+    bad = [r for r in rows if r[0] > LATTICE_TOL]
+    for mean, worst, sheet, kind, name in (bad or rows[:10]):
+        print(f"  {sheet:9s} {kind:3s} mean {mean:7.0f} m  worst {worst:7.0f} m  {name}")
+    good = sorted(r[0] for r in rows if r[0] <= LATTICE_TOL)
+    if good:
+        print(f"fit: {len(good)} sheets on cell, median {good[len(good) // 2]:.0f} m, "
+              f"worst {good[-1]:.0f} m")
+    if unindexed:
+        print(f"  {len(unindexed)} not in the index, unchecked: "
+              + ", ".join(sorted(unindexed)[:12]) + ("..." if len(unindexed) > 12 else ""))
+    if bad:
+        sys.exit(f"fit: {len(bad)} of {len(rows)} sheets more than {LATTICE_TOL:.0f} m "
+                 f"off their cell -- do not upload this archive")
+
+
 PHASES = {
     "index": phase_index,
     "fetch": phase_fetch,
@@ -1110,6 +1302,7 @@ PHASES = {
     "manifest": phase_manifest,
     "residuals": phase_residuals,
     "check": phase_check,
+    "fit": phase_fit,
 }
 
 
