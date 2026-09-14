@@ -2,7 +2,17 @@ interface Env {
   TILES: R2Bucket;
 }
 
-import { widthOnlySizeToExplicit, wholeRegionToFull } from './iiifKeys';
+import type { FullSizeDir } from './iiifKeys';
+import {
+  explicitFullSizeToWidthOnly,
+  fullMaxToSize,
+  fullSizeOf,
+  iiifR2Key,
+  parseFullSizeDirs,
+  splitIiifPath,
+  wholeRegionToFull,
+  widthOnlySizeToExplicit,
+} from './iiifKeys';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -51,6 +61,37 @@ async function serveRange(env: Env, key: string, request: Request): Promise<Resp
   return new Response(request.method === 'HEAD' ? null : obj.body, { status: 200, headers });
 }
 
+/**
+ * What `full/` actually holds for this map, widest last.
+ *
+ * One R2 Class A op, and only on a cache miss. It buys the two things the old
+ * synthesised `sizes` array could not: an advertisement that is true, and a
+ * `full/max` that resolves. info.json is already `s-maxage=3600` at the colo
+ * and tiles are `immutable`, so the list runs once per colo per hour rather
+ * than once per view.
+ *
+ * `null` means the list itself failed — the caller falls back to the old
+ * behaviour rather than erroring the request. `[]` means it succeeded and there
+ * is nothing under `full/`, which is an answer, not a failure.
+ */
+async function listFullSizeDirs(
+  env: Env,
+  mapId: string,
+  version: string
+): Promise<FullSizeDir[] | null> {
+  try {
+    const listed = await env.TILES.list({
+      prefix: `${iiifR2Key(mapId, version, '/full')}/`,
+      delimiter: '/',
+    });
+    // No pagination: `full/` holds a handful of directories (dzsave's single
+    // top-level tile plus tile_map.sh's three thumbnails), far under one page.
+    return parseFullSizeDirs(listed.delimitedPrefixes ?? []);
+  } catch {
+    return null;
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (request.method === 'OPTIONS') {
@@ -71,13 +112,20 @@ export default {
     const basemap = url.pathname.match(/^\/basemap\/([A-Za-z0-9._-]+)$/);
     if (basemap) return serveRange(env, `basemap/${basemap[1]}`, request);
 
-    // /iiif/{mapId}/info.json  or  /iiif/{mapId}/{region}/{size}/{rotation}/{quality}.{format}
-    const match = url.pathname.match(/^\/iiif\/([^/]+)(\/.*)?$/);
-    if (!match) return new Response('Not found', { status: 404, headers: CORS_HEADERS });
+    // /iiif/{mapId}[/v{N}]/info.json
+    // /iiif/{mapId}[/v{N}]/{region}/{size}/{rotation}/{quality}.{format}
+    //
+    // The version segment is optional and peeled off here, so every rewrite
+    // below sees the same `rest` it saw before versions existed. Without the
+    // peel the old regex still produces the right key by accident, but
+    // `widthOnlySizeToExplicit` and `wholeRegionToFull` — both anchored on the
+    // region — stop matching, which sends every tile of a re-tiled map to the
+    // proxy instead of to the copy we just made.
+    const parts = splitIiifPath(url.pathname);
+    if (!parts) return new Response('Not found', { status: 404, headers: CORS_HEADERS });
 
-    const mapId = match[1];
-    const rest = decodeURIComponent(match[2] || '');
-    const key = `tiles/${mapId}${rest}`;
+    const { mapId, version, rest } = parts;
+    const key = iiifR2Key(mapId, version, rest);
 
     // ── Edge cache ────────────────────────────────────────────────────────
     // A Worker response is not cached unless we cache it, so before this every
@@ -108,7 +156,7 @@ export default {
       if (hit) return hit;
     }
 
-    const response = await this.serveIiif(request, env, url, mapId, rest, key);
+    const response = await this.serveIiif(request, env, url, mapId, version, rest, key);
 
     // Only success: a 404 here means the tile is missing from R2 *and* the
     // origin refused it, and both of those can stop being true.
@@ -123,10 +171,16 @@ export default {
     env: Env,
     url: URL,
     mapId: string,
+    version: string,
     rest: string,
     key: string
   ): Promise<Response> {
     // ── R2 cache hit ──────────────────────────────────────────────────────
+    // Every candidate below is the same request spelled the way something
+    // actually wrote it to the bucket. `get` re-attaches the version prefix, so
+    // each rewrite keeps working on the bare path it was written against.
+    const get = (path: string) => env.TILES.get(iiifR2Key(mapId, version, path));
+
     let obj = null;
     if (!url.searchParams.has('force_proxy')) {
       obj = await env.TILES.get(key);
@@ -135,7 +189,7 @@ export default {
       // for every map in the bucket and either proxies to the origin or 404s.
       const explicit = widthOnlySizeToExplicit(rest);
       if (!obj && explicit) {
-        obj = await env.TILES.get(`tiles/${mapId}${explicit}`);
+        obj = await get(explicit);
       }
       // The whole-image overview, which dzsave files under `full/`. Costs one
       // extra read of a small JSON, and only on a miss — but it is the request
@@ -148,14 +202,44 @@ export default {
       // and missed. The two rewrites have to compose, because the one request
       // that needs both is the first one the renderer makes.
       if (!obj && /^\/0,0,\d+,\d+\//.test(rest)) {
-        const infoObj = await env.TILES.get(`tiles/${mapId}/info.json`);
+        const infoObj = await get('/info.json');
         if (infoObj) {
           try {
             const info = JSON.parse(await infoObj.text());
             const full = wholeRegionToFull(explicit ?? rest, info.width, info.height);
-            if (full) obj = await env.TILES.get(`tiles/${mapId}${full}`);
+            if (full) {
+              obj = await get(full);
+              // …and `full/` has a second spelling of its own, see below.
+              const widthOnly = obj ? null : explicitFullSizeToWidthOnly(full);
+              if (widthOnly) obj = await get(widthOnly);
+            }
           } catch {
             // A malformed info.json is the proxy path's problem, not ours.
+          }
+        }
+      }
+      // A `full/w,h` whose directory is really named `w,`. `info.json` now
+      // advertises every `full/` derivative in the `w,h` syntax the spec asks
+      // the `sizes` array to use, but three of the four directories a map
+      // carries were written by `vips thumbnail` under a width-only name. This
+      // is what keeps the advertisement honest: a client that requests a size
+      // off the list gets the picture rather than the proxy.
+      if (!obj) {
+        const widthOnly = explicitFullSizeToWidthOnly(rest);
+        if (widthOnly) obj = await get(widthOnly);
+      }
+      // `full/max` — the one request level0 requires, and the one nothing ever
+      // wrote a key for. It resolves to the widest derivative in the bucket,
+      // which is the same one `maxWidth` in info.json declares.
+      if (!obj && /^\/full\/max\//.test(rest)) {
+        const dirs = await listFullSizeDirs(env, mapId, version);
+        const widest = dirs?.[dirs.length - 1];
+        const path = widest ? fullMaxToSize(rest, widest.name) : null;
+        if (path) {
+          obj = await get(path);
+          // v2 clients ask for native.jpg; dzsave writes only default.jpg.
+          if (!obj && path.endsWith('/native.jpg')) {
+            obj = await get(path.replace(/\/native\.jpg$/, '/default.jpg'));
           }
         }
       }
@@ -175,7 +259,14 @@ export default {
           info['@context'] = 'http://iiif.io/api/image/3/context.json';
           info['type'] = 'ImageService3';
           info['protocol'] = 'http://iiif.io/api/image';
-          info['profile'] = 'level2';
+          // level0, said out loud. This service renders nothing: it maps a IIIF
+          // path onto an R2 key and serves only what `vips dzsave` wrote, so an
+          // arbitrary region at an arbitrary scale, a `pct:` size, a rotation,
+          // a `gray` quality and a `.png` format all 404. It claimed level2 for
+          // a year, which was contained only because our own client
+          // (`src/lib/core/iiif/level0.ts`) reconstructs dzsave's naming rules
+          // and never reads this field.
+          info['profile'] = 'level0';
           // vips dzsave iiif3 omits tile height and the sizes array; OL's IIIFInfo
           // parser produces stretched/seamy output without them.
           if (Array.isArray(info.tiles)) {
@@ -183,12 +274,40 @@ export default {
               if (t && typeof t.width === 'number' && t.height == null) t.height = t.width;
             }
           }
-          if (
+          // `sizes`, read out of the bucket rather than invented. The old array
+          // was synthesised from `scaleFactors` and every entry of it 404d —
+          // `scaleFactors` describes the *tile* pyramid, and nothing writes a
+          // whole-image derivative at each of those factors.
+          const dirs = await listFullSizeDirs(env, mapId, version);
+          const sizes = (dirs ?? [])
+            .map((d) => fullSizeOf(d, info.width, info.height))
+            .filter((size): size is { width: number; height: number } => size !== null);
+          if (sizes.length) {
+            info.sizes = sizes;
+            // `maxWidth` is what makes `full/max` well defined for a service
+            // that holds no full-resolution derivative — 3.0 lets a service cap
+            // what `max` means. It is declared only when it is at least as wide
+            // as a tile, because clients read it as a cap on *every* request,
+            // not just on `full/`: @allmaps/iiif-parser throws outright when a
+            // requested width exceeds it, so a map whose only `full/`
+            // derivative is narrower than 256 would stop rendering altogether.
+            const widest = sizes[sizes.length - 1].width;
+            const tileWidth = Array.isArray(info.tiles)
+              ? Math.max(
+                  0,
+                  ...info.tiles.map((t: any) => (typeof t?.width === 'number' ? t.width : 0))
+                )
+              : 0;
+            if (widest >= tileWidth) info.maxWidth = widest;
+          } else if (
+            dirs === null &&
             !Array.isArray(info.sizes) &&
             typeof info.width === 'number' &&
             typeof info.height === 'number' &&
             info.tiles?.[0]?.scaleFactors
           ) {
+            // The list failed. Degrade to what this did before rather than
+            // failing a request that is head-of-line for every map view.
             const factors: number[] = info.tiles[0].scaleFactors;
             info.sizes = factors.map((f: number) => ({
               width: Math.ceil(info.width / f),

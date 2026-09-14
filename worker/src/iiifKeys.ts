@@ -106,3 +106,175 @@ export function wholeRegionToFull(rest: string, width: number, height: number): 
   if (Number(m[1]) !== width || Number(m[2]) !== height) return null;
   return `/full/${m[3]}`;
 }
+
+// ── The optional version segment ──────────────────────────────────────────
+//
+// A re-tile cannot reuse a map's existing keys: the worker serves every
+// derivative `Cache-Control: public, max-age=31536000, immutable`, so new bytes
+// at an old URL reach no existing reader for a year. The answer is a new URL —
+// `/iiif/<mapId>/v<N>/…`, mapping to `tiles/<mapId>/v<N>/…` — which is purely
+// additive. The 155 maps and ~119,616 objects already under `tiles/<mapId>/…`
+// are untouched and their URLs keep working unchanged.
+//
+// The peel has to happen *before* any of the key arithmetic above runs.
+// `widthOnlySizeToExplicit` and `wholeRegionToFull` both anchor on `^\/` + the
+// region, so behind a `/v2` prefix they silently match nothing — which is not a
+// 404, it is the proxy path, i.e. every tile of a re-tiled map fetched from the
+// originating library instead of from the copy we just made.
+
+/**
+ * A `/iiif/` pathname split into the three things a key is built from.
+ *
+ * `rest` is decoded, as it was before this function existed — a malformed
+ * escape falls back to the raw text rather than throwing the request into a
+ * 500, which is what `decodeURIComponent` does on `%ZZ`.
+ *
+ * `version` is `''` or `/v<N>`, and is *not* part of `rest`, so everything
+ * downstream sees the same string it saw when no map had a version.
+ */
+export function splitIiifPath(
+  pathname: string
+): { mapId: string; version: string; rest: string } | null {
+  const match = pathname.match(/^\/iiif\/([^/]+)(\/.*)?$/);
+  if (!match) return null;
+  let rest = match[2] || '';
+  try {
+    rest = decodeURIComponent(rest);
+  } catch {
+    // Keep the raw text: a bad escape is a bad request, not a crash.
+  }
+  const v = rest.match(/^\/v(\d+)(\/.*)?$/);
+  return v
+    ? { mapId: match[1], version: `/v${v[1]}`, rest: v[2] || '' }
+    : { mapId: match[1], version: '', rest };
+}
+
+/**
+ * The R2 key for a request. Unversioned requests must land on exactly the key
+ * they landed on before — that is the whole compatibility promise.
+ */
+export function iiifR2Key(mapId: string, version: string, rest: string): string {
+  return `tiles/${mapId}${version}${rest}`;
+}
+
+// ── What `full/` actually holds ───────────────────────────────────────────
+//
+// The `sizes` array used to be synthesised from `scaleFactors`, and every entry
+// it produced was fiction: on 0775a31e it advertised `full/2652,3753`,
+// `full/1326,1877`, `full/663,939` and `full/332,470`, all four of which 404,
+// while the one `w,h` derivative that does exist — `full/166,235` — went
+// unadvertised. So the array is now read out of the bucket instead.
+//
+// Two spellings live side by side under `full/`, because two different
+// producers write there:
+//
+//  - `w,h` — `vips dzsave --layout iiif3` writes the top of the pyramid, the
+//    level that fits in a single tile, under its own explicit size. The name
+//    states the real pixel dimensions, so it needs no arithmetic.
+//  - `w,` — `scripts/tile_map.sh` renders `full/200,`, `full/400,` and
+//    `full/800,` with `vips thumbnail` for the OG image and the catalog cells.
+//    The name states only the width.
+
+export type FullSizeDir = {
+  /** The directory name as it sits in R2 — the thing a key is built from. */
+  name: string;
+  width: number;
+  /** null for the `w,` spelling, whose height the name does not record. */
+  height: number | null;
+};
+
+/**
+ * The `full/` derivatives an R2 `list({ delimiter: '/' })` found, widest last.
+ *
+ * Input is `delimitedPrefixes` — whole keys like `tiles/<id>/full/166,235/` —
+ * because that is what the bucket hands back; only the last segment matters.
+ * Names that are neither spelling (`max`, `pct:…`, anything else that ends up
+ * there) are dropped rather than guessed at. Where both spellings exist for one
+ * width the explicit one wins, since its height is read rather than derived.
+ */
+export function parseFullSizeDirs(delimitedPrefixes: string[]): FullSizeDir[] {
+  const byWidth = new Map<number, FullSizeDir>();
+  for (const prefix of delimitedPrefixes) {
+    const name = prefix.replace(/\/+$/, '').split('/').pop() ?? '';
+    const both = name.match(/^(\d+),(\d+)$/);
+    const widthOnly = name.match(/^(\d+),$/);
+    let dir: FullSizeDir | null = null;
+    if (both && Number(both[1]) > 0 && Number(both[2]) > 0) {
+      dir = { name, width: Number(both[1]), height: Number(both[2]) };
+    } else if (widthOnly && Number(widthOnly[1]) > 0) {
+      dir = { name, width: Number(widthOnly[1]), height: null };
+    }
+    if (!dir) continue;
+    const seen = byWidth.get(dir.width);
+    if (!seen || (seen.height === null && dir.height !== null)) byWidth.set(dir.width, dir);
+  }
+  return [...byWidth.values()].sort((a, b) => a.width - b.width);
+}
+
+/**
+ * The size to advertise for one `full/` directory.
+ *
+ * For `w,h` the name is the answer. For `w,` the height has to be derived, and
+ * **it cannot be derived exactly** — which is worth stating plainly, because
+ * the obvious rules are all wrong some of the time. Measured over 81 live
+ * derivatives (27 maps x 200/400/800): `ceil` reproduces 47, `round` 68,
+ * `floor` 36. No rule reproduces all of them, because `vips thumbnail` shrinks
+ * on load first (a ceil of its own) and then resizes with `rint` against the
+ * already-shrunk size, so the rounding is a function of an intermediate the
+ * name does not record. `round` is used here as the best of the three.
+ *
+ * A derived height that is one pixel off is harmless, but only because
+ * `explicitFullSizeToWidthOnly` below catches the request it produces. Without
+ * that, advertising `full/200,284` where the bucket holds `full/200,` would be
+ * the same class of bug as the synthesised array this replaces.
+ *
+ * `--size down` means a requested width wider than the image leaves the image
+ * alone, so the advertised size is clamped to the image rather than promising
+ * an upscale nothing will perform.
+ */
+export function fullSizeOf(
+  dir: FullSizeDir,
+  imageWidth: number,
+  imageHeight: number
+): { width: number; height: number } | null {
+  if (dir.height !== null) return { width: dir.width, height: dir.height };
+  if (!(imageWidth > 0) || !(imageHeight > 0)) return null;
+  const width = Math.min(dir.width, imageWidth);
+  const height =
+    width === imageWidth ? imageHeight : Math.round((imageHeight * width) / imageWidth);
+  return height > 0 ? { width, height } : null;
+}
+
+/**
+ * The same `full/` derivative, spelled width-only.
+ *
+ * The mirror image of `widthOnlySizeToExplicit`, and needed for the same
+ * reason in the other direction: `sizes` advertises `w,h` for every derivative
+ * (that is the syntax the spec asks the array to be given in), but three of the
+ * four `full/` directories on a typical map are named `w,`. Without this a
+ * client that does the one thing `info.json` invites it to do — request a size
+ * off the list — misses R2 and falls through to the proxy.
+ *
+ * Only `full/` is rewritten. A region request's `w,h` is dzsave's own spelling
+ * and is never a width-only key.
+ */
+export function explicitFullSizeToWidthOnly(rest: string): string | null {
+  const m = rest.match(/^\/full\/(\d+),\d+\/(.+)$/);
+  if (!m) return null;
+  return `/full/${m[1]},/${m[2]}`;
+}
+
+/**
+ * `full/max/...` re-pointed at a derivative that exists.
+ *
+ * `full/max/0/default.jpg` is the one request a level0 service is required to
+ * answer, and it 404s today: nothing writes a key called `max`. Image API 3.0
+ * lets a service cap what `max` means with `maxWidth` ("the maximum width in
+ * pixels supported for this image"), so declaring the widest derivative we hold
+ * and serving it here is the compliant reading rather than a fudge.
+ */
+export function fullMaxToSize(rest: string, sizeName: string): string | null {
+  const m = rest.match(/^\/full\/max\/(.+)$/);
+  if (!m) return null;
+  return `/full/${sizeName}/${m[1]}`;
+}
