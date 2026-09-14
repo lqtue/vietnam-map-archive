@@ -51,7 +51,7 @@
  *    `printedYear` anchors on the two Vietnamese phrases that do mean printing.
  */
 import { createClient } from '@supabase/supabase-js';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 const apply = process.argv.includes('--apply');
 
@@ -60,6 +60,7 @@ const INDOCHINE = 'indochine-1-25-000-tonkin-thanh-hoa';
 
 const PCL = 'work/l7014/sheets.json';
 const TTU = 'work/l7014/ttu/EDITIONS.md';
+const TTU_DIR = 'work/l7014/ttu';
 const ANU = 'work/l7014/anu-sources.json';
 const IGN = ['work/tonkin/sources/ign-serie-243.json', 'work/tonkin/sources/ign-serie-175.json'];
 
@@ -139,6 +140,42 @@ function printedYear(s) {
   const t = String(s ?? '');
   const m = /in\s+l[ạa]i\s+(\d{4})/i.exec(t) || /in\s+l[ầa]n\s+th[ứu][^\d]{0,20}(\d{4})/i.exec(t);
   return m ? yearOf(m[1]) : null;
+}
+
+/**
+ * Every TTU sheet actually mirrored, from the directory rather than the notes.
+ *
+ * `EDITIONS.md` documents 25 sheets whose collars were read by hand. The fetch
+ * on 2026-09-14 pulled 108 more and put them in R2, and those have no notes at
+ * all — nobody has read their collars. Loading only the markdown recorded 25 of
+ * 133 and made the other 108 look like sheets Texas Tech does not hold, which
+ * is the opposite of true and the kind of gap that sends someone to re-fetch
+ * what is already mirrored.
+ *
+ * So the directory is the source for *existence* and the markdown for
+ * *description*. These rows are deliberately thin: year and edition are null
+ * because they are unknown, not because the sheet has none. Emitted BEFORE
+ * `ttuRows()` so the 25 hand-read records overwrite their stubs on the shared
+ * `(institution, source_ref)` key.
+ */
+function ttuMirroredRows() {
+  return readdirSync(TTU_DIR)
+    .filter((f) => f.endsWith('.pdf'))
+    .map((f) => f.replace(/\.pdf$/, ''))
+    .filter((sheet) => /^\d{4}-\d$/.test(sheet))
+    .map((sheet) => ({
+      series_key: L7014,
+      sheet_number: sheet,
+      institution: 'TTU',
+      source_ref: `${sheet}.pdf`,
+      title: null,
+      year: null,
+      edition: null,
+      part: 'whole',
+      url: `https://vva.vietnam.ttu.edu/images.php?img=/maps/PDF/${sheet}.pdf`,
+      rights: null,
+      note: 'Mirrored 2026-09-14; collar not yet read.',
+    }));
 }
 
 function ttuRows() {
@@ -273,7 +310,9 @@ function ignRows() {
 // ── collect, check, report ─────────────────────────────────────────────────
 const sources = {
   PCL: pclRows(),
-  TTU: ttuRows(),
+  // Merged on the table's own unique key, markdown last so a hand-read collar
+  // replaces its stub rather than arriving beside it as a second printing.
+  TTU: [...new Map([...ttuMirroredRows(), ...ttuRows()].map((r) => [r.source_ref, r])).values()],
   ANU: anuRows(),
   IGN: ignRows(),
 };

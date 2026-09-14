@@ -26,7 +26,15 @@ import { fetchSeriesSheetIndex, type SeriesSheetView } from './seriesSheets';
  * stores, because the code is a database join key and 'PCL' is not a library.
  */
 export interface SheetPrinting {
-  institution: string; // 'Perry-Castañeda' | 'Texas Tech' | 'ANU' | 'IGN'
+  /**
+   * Who holds this scan. Every row this module returns names one; `null` is
+   * reserved for a printing the archive serves itself, which the series page
+   * pushes into the same list. That is the signal a reader needs — it is what
+   * separates "this is ours" from "Texas Tech has one too" inside a single
+   * list — and a sentinel string would have to be excluded from the display
+   * everywhere instead of being absent.
+   */
+  institution: string | null; // 'Perry-Castañeda' | 'Texas Tech' | 'ANU' | 'IGN'
   year: number | null;
   edition: string | null;
   part: 'whole' | 'W' | 'E' | 'assemblage' | null;
@@ -195,7 +203,12 @@ export async function fetchSheetSources(
     // 9999 rather than Infinity: two unrecorded years would subtract to NaN,
     // and a NaN comparator does not sort, it shuffles.
     list.sort(
-      (a, b) => (a.year ?? 9999) - (b.year ?? 9999) || a.institution.localeCompare(b.institution)
+      // `institution` is null only on a printing the archive serves, which
+      // this module never emits — but the page merges its own into these lists
+      // and then sorts again, so the tiebreak has to survive one.
+      (a, b) =>
+        (a.year ?? 9999) - (b.year ?? 9999) ||
+        (a.institution ?? '').localeCompare(b.institution ?? '')
     );
   }
   return out;

@@ -22,38 +22,23 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { fetchSeriesSheetIndex, tally } from '$lib/data/maps/seriesSheets';
+import { fetchSheetSources, type SheetPrinting } from '$lib/data/maps/sheetSources';
 import { SERIES_NOTES } from './notes';
 
 /**
- * One printing of one cell.
+ * One printing of one cell, held or not.
  *
- * The field names are `SheetPrinting` in `$lib/data/maps/sheetSources.ts`,
- * which is being written alongside this page and will supply the printings the
- * archive does *not* hold (Perry-Castañeda, Texas Tech, ANU, IGN). Spelling the
- * shape the same way now means the merge below is a concatenation rather than a
- * translation layer. The one field of that shape this page does not carry is
- * `rights` — nothing here renders a licence, and it is ~45 bytes a row.
+ * The shape was declared here while `$lib/data/maps/sheetSources.ts` was being
+ * written beside it, deliberately spelled the same so the merge would be a
+ * concatenation rather than a translation layer. That module now exists, so the
+ * local copy is gone: a second declaration of a shape two files must agree on
+ * does not error when it drifts, it just stops type-checking the thing it was
+ * written to check.
+ *
+ * `institution` is null on a held printing, and that is the useful signal
+ * rather than a missing value — it is what separates "this is ours" from
+ * "Texas Tech has one too" in a single list.
  */
-interface SheetPrinting {
-  /**
-   * Who holds the scan — the fact that identifies a printing the archive does
-   * not serve. Null on every held printing, deliberately: the row's Source
-   * column already answers "where did this come from" (`series_sheets.source`,
-   * "CartoMundi" for the Indochine sheets) and `maps.holding_institution`
-   * answers a different question ("IGN", who licenses it). Printing both in one
-   * row without the sentence that separates them reads as a contradiction, and
-   * the record behind each link states it in full anyway.
-   */
-  institution: string | null;
-  year: number | null;
-  edition: string | null;
-  /** Which piece of paper. See `sheetPart`. */
-  part: 'whole' | 'W' | 'E' | 'assemblage';
-  /** The record for this printing: an internal `/catalog/<id>` while `held`. */
-  url: string | null;
-  /** True when the archive serves this printing itself. */
-  held: boolean;
-}
 
 /**
  * The half marker the Indochine ingest writes into the record's name —
@@ -176,6 +161,7 @@ export const load: PageServerLoad = async ({ params }) => {
       edition: meta.edition ?? null,
       part: sheetPart(meta.sheet_half, row.name),
       url: `/catalog/${row.id}`,
+      rights: null,
       held: true,
     });
   }
@@ -198,14 +184,27 @@ export const load: PageServerLoad = async ({ params }) => {
    * stays a count of the printings *this archive serves*, which is what the
    * badge claims, so it is computed before the merge would widen the list.
    */
+  // `editions` counts only what the archive SERVES, which is what the badge
+  // claims, so it is computed before the merge below widens the list.
   const editions: Record<string, number> = {};
   for (const [number, cell] of Object.entries(printings)) {
-    if (cell.length < 2) {
-      delete printings[number];
-      continue;
-    }
+    if (cell.length < 2) continue;
     const count = distinctPrintings(cell);
     if (count > 1) editions[number] = count;
+  }
+
+  // Every printing anyone is known to hold, merged in beside ours.
+  const known = await fetchSheetSources(supabase, key);
+  for (const [number, external] of Object.entries(known)) {
+    (printings[number] ??= []).push(...external.filter((p) => !p.held));
+  }
+
+  // Keep a cell that has anything to say, which now includes one the archive
+  // does not hold at all: its entries are all elsewhere, and those links are
+  // the whole answer the Source column can give for a gap. A cell with one
+  // held printing and no second anywhere still carries nothing.
+  for (const [number, cell] of Object.entries(printings)) {
+    if (cell.length < 2 && !cell.some((p) => !p.held)) delete printings[number];
   }
 
   // Prose about the survey itself, when it has been written. Undefined is a

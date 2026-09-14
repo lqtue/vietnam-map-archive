@@ -856,6 +856,57 @@ export type Database = {
           },
         ]
       }
+      sheet_sources: {
+        Row: {
+          created_at: string
+          edition: string | null
+          id: string
+          institution: string
+          note: string | null
+          part: string | null
+          rights: string | null
+          series_key: string
+          sheet_number: string
+          source_ref: string
+          title: string | null
+          updated_at: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          edition?: string | null
+          id?: string
+          institution: string
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key: string
+          sheet_number: string
+          source_ref: string
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          edition?: string | null
+          id?: string
+          institution?: string
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key?: string
+          sheet_number?: string
+          source_ref?: string
+          title?: string | null
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       stories: {
         Row: {
           created_at: string

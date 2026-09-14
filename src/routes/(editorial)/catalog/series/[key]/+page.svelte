@@ -337,12 +337,16 @@
             <details>
               <summary>
                 {printing(sheet) ?? heldYears(cell) ?? '—'}
-                <!-- `count > 1` is the badge's old claim, now true: below it the
-                     cell is two halves of one map, which is `cell.length` pieces
-                     of paper and one printing. -->
-                <span class="ver-more"
-                  >{count > 1 ? `${count} editions` : `${cell.length} half-sheets`}</span
-                >
+                <!-- Three different facts, and the badge has to say which one
+                     it is counting. `cell` holds our printings AND everyone
+                     else's since the merge, so a bare `cell.length` called two
+                     whole sheets at Perry-Castañeda and Texas Tech "2
+                     half-sheets" on a cell the archive does not hold at all —
+                     wrong about the paper and wrong about whose it is. -->
+                <span class="ver-more">
+                  {#if count > 1}{count} editions{:else if heldHere.length > 1}{heldHere.length}
+                    half-sheets{:else}{elsewhere.length} elsewhere{/if}
+                </span>
               </summary>
 
               <ul class="printings">
