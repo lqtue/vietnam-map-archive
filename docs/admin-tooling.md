@@ -218,8 +218,9 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/scout_humazur.mjs --merge scripts/sc
 # 2. Load into DB (auto-picks latest scout JSON)
 node scripts/load_scout_to_db.mjs
 
-# 3. (Optional) Backfill Humazur thumbnails
-NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/oneoff/backfill_humazur_thumbs.mjs --min-score 40
+# 3. (Optional) Backfill Omeka S thumbnails — dry run, then --apply
+NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/oneoff/backfill_omeka_thumbs.mjs
+NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/oneoff/backfill_omeka_thumbs.mjs --apply
 
 # 4. Review + ingest via UI
 open https://<host>/admin?tab=scout
@@ -253,6 +254,57 @@ their diff) were deleted once they had run — git history has them if a second
 corpus ever needs the same treatment. `/admin?tab=bulk` and the scout pipeline
 cover new maps.
 
+## The shared ingest library (`scripts/lib/`)
+
+Four institutional catalogues went into `sheet_sources` in September 2026 — Perry-Castañeda, Texas
+Tech, ANU, IGN via CartoMundi and Nakala — and each arrived as its own script in `scripts/oneoff/`.
+They share a shape: read a catalogue dump out of `work/`, parse a cell number and a title and a year
+and an edition, report, upsert. Only the parsing is per-source. The rest was written fifteen times.
+
+| Module | What it holds |
+|--------|---------------|
+| `lib/cells.mjs` | **How a sheet of paper is named.** `cellNumber` (Indochine `bis` cells and the catalogue's brackets), `cellOrder`, `cellOf` (an L7014 quadrant off an ANU title), `sheetPart` (demi-format / assemblage / W / E), `partFromTitle` (the same fact off the title's brackets, as an independent check), `printedYear` (a TTU collar), plus `clean` and `yearOf`. |
+| `lib/db.mjs` | `serviceClient()` — and an error naming `--env-file=.env` rather than a 401 later. `upsertChunked()`, which takes `onConflict` as a required argument because a re-run without one duplicates instead of correcting. `duplicateKeys()`, the pre-flight that a duplicate item key otherwise turns into rows quietly lost inside a right-looking total. |
+| `lib/http.mjs` | `UA` (one string, which identifies us and where to complain — three different ones were in the tree, one a bare `Mozilla/5.0`), `sleep`, and `fetchJson` with a timeout, backoff and throttle that retries a 429, a 5xx or a timeout and never a 404. |
+| `lib/cli.mjs` | `willApply()`, `flag()`, `opt()`, `dryNotice()`. |
+
+**Nothing writes without `--apply`.** That is the point of `cli.mjs`. Until 2026-09-14 eight scripts
+wrote only with `--apply` and four wrote *unless* you passed `--dry` — same directory, opposite
+defaults, and the writing default was the one that looks like an ordinary invocation:
+`node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs` inserted `maps` rows and tiled
+scans. The four (`ingest_indochine_nakala`, `import_indochine_series_sheets`,
+`backfill_series_printings`, `normalize_map_locations`) were flipped; `--dry` is still accepted and
+now means what it always read as.
+
+### Why the parsers moved
+
+They were copies, and the headers admitted it — "lifted verbatim from `scout_anu_l7014.mjs`",
+"verbatim from `import_indochine_series_sheets.mjs`", "same rule as `half()` in
+`ingest_indochine_nakala.mjs`, widened" — with nothing keeping any of them so. Measured over the 304
+real IGN copy records: the cell-number spellings agreed on all 304, and the three part classifiers
+**disagreed on 79** — every assemblage. `ingest_indochine_nakala.mjs` had no assemblage branch and
+answered 'whole'.
+
+That never reached the database, because `nakala.json` is a pre-filtered read holding 11 demi-format
+and 21 demi-feuille records and no assemblage. It was a landmine: regenerate that file over serie
+175, which is *all* assemblages, and 79 two-half cells get minted as single whole-cell sheets, with
+nothing in the output saying so. The merged `half()` now throws on one instead, because that script's
+row model has no way to represent it.
+
+`tests/ingest-cells.spec.ts` pins all of it on bytes copied out of the four catalogues (20 checks, in
+`npm run test`). `node scripts/lib/cells.test.mjs` is the full-corpus run — every old parser beside
+its replacement over all 304 IGN records, 160 ANU items and both hand-read TTU tables; the dumps are
+42 MB and gitignored, so it skips cleanly when they are not on disk and is worth running after any
+re-fetch, which is when a new spelling would arrive.
+
+### What has not moved
+
+`tile_map.sh` and `bulk_upload_local.sh` still each do their own `maps` insert, and
+`ingest_indochine_nakala.mjs` shells into the first. Unifying the mirror step is worth doing **after**
+the container decision in `docs/journals/260914-iiif-space-efficiency.md` — 119,616 tile objects
+against one COG — because packaging it first means packaging it twice.
+
+The other 20 scripts in `scripts/oneoff/` were left alone. They have already run and are kept as a
+record of what was done to the data; rewriting them would change the record and buy nothing.
 
 ## Other admin scripts
-

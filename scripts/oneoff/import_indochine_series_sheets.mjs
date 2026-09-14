@@ -56,23 +56,16 @@
 // floor rather than the truth.
 
 import fs from 'node:fs';
-import { createClient } from '@supabase/supabase-js';
+import { cellNumber } from '../lib/cells.mjs';
+import { serviceClient, upsertChunked } from '../lib/db.mjs';
+import { willApply, dryNotice } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+// Was: write unless --dry. Nothing in scripts/ writes without --apply now.
+const apply = willApply();
 const SERIES_IDS = [175, 243]; // see the header: neither list is complete
 const SERIES = 'indochine-1-25-000-tonkin-thanh-hoa'; // series_key(), mig 082
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
 const api = (id) => `https://www.cartomundi.fr/ctmd-services/serie/${id}/feuilles`;
-
-/** The catalogue's own typography, not a distinct sheet. See the header. */
-function cellNumber(v) {
-  return String(v ?? '')
-    .trim()
-    .replace(/^\[|\]$/g, '')
-    .trim()
-    .replace(/^(\d+)bis$/i, '$1 bis')
-    .toLowerCase();
-}
 
 /** Brackets mark a part the catalogue is reconstructing; the name is the rest. */
 function cellName(v) {
@@ -102,9 +95,7 @@ for (const id of SERIES_IDS) {
   for (const f of recs) sheets.push({ ...f, serie: id });
 }
 
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 const { data: rows, error } = await db
   .from('maps')
   .select('id,status,georef_done,extra_metadata')
@@ -195,15 +186,13 @@ for (const r of out
 const orphan = [...held.keys()].filter((k) => !byNumber.has(cellNumber(k)));
 if (orphan.length) console.log(`\nour sheet numbers not in the catalogue: ${orphan.join(', ')}`);
 
-if (dry) {
-  console.log('\n--dry: nothing written');
+if (!apply) {
+  dryNotice(`It would upsert ${out.length} rows into series_sheets.`);
   process.exit(0);
 }
 
-for (let i = 0; i < out.length; i += 200) {
-  const { error: upErr } = await db
-    .from('series_sheets')
-    .upsert(out.slice(i, i + 200), { onConflict: 'series_key,sheet_number' });
-  if (upErr) throw upErr;
-}
+await upsertChunked(db, 'series_sheets', out, {
+  onConflict: 'series_key,sheet_number',
+  quiet: true,
+});
 console.log(`\nupserted ${out.length} rows`);

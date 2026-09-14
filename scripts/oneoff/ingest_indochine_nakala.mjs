@@ -2,8 +2,11 @@
 // Fetch the Indochine 1:25,000 cells the archive does not hold, from IGN's own
 // scans, and mirror them the way every other sheet in the series is mirrored.
 //
-//   node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs --dry
-//   node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs
+//   node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs --apply
+//
+// This used to insert rows and tile scans unless you passed --dry. Nothing in
+// scripts/ writes without --apply now.
 //
 // WHERE THE SCANS ARE, AND WHY IT TOOK A WRONG TURN TO FIND THEM. CartoMundi is
 // a union catalogue: `serie/<id>/feuilles` lists what the survey contains and
@@ -41,9 +44,11 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { createClient } from '@supabase/supabase-js';
+import { sheetPart, partFromTitle } from '../lib/cells.mjs';
+import { serviceClient } from '../lib/db.mjs';
+import { willApply, dryNotice } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const apply = willApply();
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
 const SERIES_KEY = 'indochine-1-25-000-tonkin-thanh-hoa';
 const SRC = 'work/tonkin/sources/nakala.json';
@@ -59,34 +64,34 @@ function cleanName(t) {
     .trim();
 }
 
-/** Which half of the cell this record is. A demi-format sheet is the whole of it.
+/** Which half of the cell this record is, in the two values `sheet_half` holds.
  *
- * Anchored on the note's opening `Demi-feuille <X>`, because a few notes go on
- * to discuss the OTHER half -- 73 bis 1927 reads "Demi-feuille Est. La partie
- * de la mention de date ... demi-feuille Ouest", and a search of the whole
- * string calls the east half west. The title is the independent check: brackets
- * mark the part this sheet does not print, so `[Cua-] Day` is the east half and
- * `Cua- [Day]` the west, and `halfFromTitle` must agree.
+ * The classifier is `sheetPart()` in ../lib/cells.mjs; this is the mapping into
+ * this table's vocabulary, and the ASSEMBLAGE branch is the reason it is a
+ * mapping rather than a call. This script's row model has no way to say "one
+ * sheet of paper covering both halves of the cell": it mints one `maps` row per
+ * half. The copy of this function that used to live here had no assemblage test
+ * at all and answered 'whole' — which on the 304 IGN copy records is 79 of them
+ * (measured 2026-09-14), every one of which would have been minted as a
+ * whole-cell sheet with nothing in the output saying so.
+ *
+ * It has never happened, because `nakala.json` is a pre-filtered read holding
+ * 11 demi-format and 21 demi-feuille records and no assemblage. Regenerate that
+ * file over serie 175, which is ALL assemblages, and it would. So it stops.
  */
 function half(note) {
-  const n = String(note || '');
-  if (/demi-format/i.test(n)) return 'whole';
-  const m = /^\s*demi-feuille\s+(ouest|est)\b/i.exec(n);
-  if (m) return /ouest/i.test(m[1]) ? 'W' : 'E';
-  return 'whole';
+  const p = sheetPart(note);
+  if (p === 'assemblage') {
+    throw new Error(
+      `assemblage in ${SRC}: this script mints one row per half and cannot ingest one. ` +
+        'Filter it out of the source read, or teach it the third case. Note: ' +
+        JSON.stringify(String(note ?? '').slice(0, 120))
+    );
+  }
+  return p === 'W' || p === 'E' ? p : 'whole';
 }
 
-/** The same fact read off the title's brackets. Disagreement means stop. */
-function halfFromTitle(title) {
-  const t = String(title || '');
-  const i = t.indexOf('[');
-  if (i < 0) return null;
-  return t.slice(0, i).replace(/[\s-]/g, '') ? 'W' : 'E';
-}
-
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 
 const { cells } = JSON.parse(readFileSync(SRC, 'utf8'));
 const { data: held, error } = await db
@@ -112,7 +117,7 @@ for (const cell of Object.keys(cells).sort((a, b) => parseFloat(a) - parseFloat(
   const byHalf = new Map();
   for (const r of cells[cell]) {
     const h = half(r.note);
-    const t = halfFromTitle(r.title);
+    const t = partFromTitle(r.title);
     if (h !== 'whole' && t && t !== h) {
       throw new Error(`cell ${cell} ${r.year}: note says ${h}, title "${r.title}" says ${t}`);
     }
@@ -136,7 +141,7 @@ for (const { cell, h, r } of jobs) {
   const upstream = r.iiif.replace(/\/info\.json$/, '');
   const label = `${cell}${h === 'whole' ? '' : ' ' + h}`;
 
-  if (dry) {
+  if (!apply) {
     console.log(`  ${label.padStart(8)}  ${name.padEnd(22)} ${r.year}  ${r.nakala}`);
     continue;
   }
@@ -183,7 +188,9 @@ for (const { cell, h, r } of jobs) {
       stdio: ['ignore', 'ignore', 'pipe'],
     });
   } catch (e) {
-    console.log(`  ${label.padStart(8)}  ${name.padEnd(22)} TILING FAILED — row left draft, no pixels`);
+    console.log(
+      `  ${label.padStart(8)}  ${name.padEnd(22)} TILING FAILED — row left draft, no pixels`
+    );
     console.log(String(e.stderr || e).slice(-400));
     continue;
   }
@@ -207,4 +214,8 @@ for (const { cell, h, r } of jobs) {
   console.log(`  ${label.padStart(8)}  ${name.padEnd(22)} ${r.year}  ${id}`);
 }
 
-if (!dry) console.log(`\n${done}/${jobs.length} mirrored. Next: tonkin_georef.py all, then annotate --write.`);
+if (apply)
+  console.log(
+    `\n${done}/${jobs.length} mirrored. Next: tonkin_georef.py all, then annotate --write.`
+  );
+else dryNotice(`It would insert ${jobs.length} maps rows and tile each scan.`);

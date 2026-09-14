@@ -1,0 +1,842 @@
+[
+ {
+  "cell": "67",
+  "name": "Kien Hanh (W)",
+  "year": 1926,
+  "id": "fb6ed962-ad9f-4829-bb7b-a5e0c885f11f",
+  "w": 2721,
+  "h": 3866,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "72",
+  "name": "Yen Dinh",
+  "year": 1905,
+  "id": "dd575794-8ff0-485f-9875-39f697b1b009",
+  "w": 5085,
+  "h": 3795,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "36",
+  "name": "My Dong",
+  "year": 1924,
+  "id": "b4cbfd8c-b38b-4270-8ed2-aef05e241a14",
+  "w": 4988,
+  "h": 3797,
+  "r": 1.31,
+  "doi": false
+ },
+ {
+  "cell": "13",
+  "name": "Hoai Duc Phu",
+  "year": 1925,
+  "id": "a1de9760-8073-4ea1-b7ed-f8f4e2835cd3",
+  "w": 4983,
+  "h": 3786,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "10",
+  "name": "Bac Ninh",
+  "year": 1911,
+  "id": "1f480a2b-3bbd-44ed-adea-2dad9e24d254",
+  "w": 4885,
+  "h": 3661,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "21",
+  "name": "Ban Yen Nhan",
+  "year": 1924,
+  "id": "37ba77db-4d55-4fa3-a32b-55a44c9af8b3",
+  "w": 4886,
+  "h": 3673,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "23",
+  "name": "Yen Luu",
+  "year": 1904,
+  "id": "54cd94cc-3450-4d57-9909-877b6b389a17",
+  "w": 4751,
+  "h": 3611,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "32",
+  "name": "Quang Yen",
+  "year": 1904,
+  "id": "8bb37c31-67e2-4623-924e-ac6381e94c8e",
+  "w": 5209,
+  "h": 3848,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "69",
+  "name": "Phat Diem",
+  "year": 1927,
+  "id": "c2b5360f-024b-4e49-a587-9a2a7d7a3aad",
+  "w": 5001,
+  "h": 3771,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "14",
+  "name": "Phu Tu Son",
+  "year": 1911,
+  "id": "19a677af-8d42-4402-9943-1f6608871b6c",
+  "w": 5048,
+  "h": 3772,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "24",
+  "name": "Mai Dong",
+  "year": 1904,
+  "id": "d4ec51b8-a3a1-4414-99c7-2bb46ea851e3",
+  "w": 5156,
+  "h": 3675,
+  "r": 1.4,
+  "doi": false
+ },
+ {
+  "cell": "60",
+  "name": "Phu Nghia Hung",
+  "year": 1903,
+  "id": "e21f1e1e-a1ce-4633-aae4-82408b7d35bd",
+  "w": 5216,
+  "h": 3783,
+  "r": 1.38,
+  "doi": false
+ },
+ {
+  "cell": "31",
+  "name": "Hai Phong",
+  "year": 1904,
+  "id": "470c119b-44f1-47ba-9f0e-80dcbb4763f0",
+  "w": 5080,
+  "h": 3760,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "30",
+  "name": "Kim Thanh",
+  "year": 1904,
+  "id": "f10a84aa-b0a7-47db-af45-e25158f120d0",
+  "w": 5189,
+  "h": 3844,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "55",
+  "name": "Nam Dinh",
+  "year": 1905,
+  "id": "f04311b8-b122-45f7-84a7-19c53638938e",
+  "w": 4939,
+  "h": 3718,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "50",
+  "name": "Phu Tien Hung",
+  "year": 1904,
+  "id": "c569cfd2-994d-4a48-819f-8bdba4b3f0bd",
+  "w": 5011,
+  "h": 3678,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "35",
+  "name": "An Thi",
+  "year": 1904,
+  "id": "bdf3936f-4501-4b54-8acd-d80f352f26fa",
+  "w": 5089,
+  "h": 3615,
+  "r": 1.41,
+  "doi": false
+ },
+ {
+  "cell": "16",
+  "name": "Sept Pagodes",
+  "year": 1925,
+  "id": "6c1c0913-10e0-4e8d-8f18-2200f390231f",
+  "w": 5013,
+  "h": 3782,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "54",
+  "name": "Y Yen",
+  "year": 1905,
+  "id": "e6c5e467-ae7b-478f-9357-6fe12b8e7361",
+  "w": 5117,
+  "h": 3718,
+  "r": 1.38,
+  "doi": false
+ },
+ {
+  "cell": "48",
+  "name": "Phu Ly",
+  "year": 1905,
+  "id": "02d32cbd-be89-4274-9dff-dc2337b29511",
+  "w": 5083,
+  "h": 3804,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "10 bis",
+  "name": "Cam Ly",
+  "year": 1907,
+  "id": "8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5",
+  "w": 5037,
+  "h": 3691,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "68",
+  "name": "Bien Son",
+  "year": 1906,
+  "id": "be36fb42-c0dd-4667-9f6e-aefb4f24abb6",
+  "w": 4993,
+  "h": 3791,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "74",
+  "name": "Loi Duong",
+  "year": 1919,
+  "id": "8d4defb1-f713-4c9f-81fc-7719508b55c2",
+  "w": 5052,
+  "h": 3711,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "41",
+  "name": "Dong Van",
+  "year": 1905,
+  "id": "1a7e0a67-7a92-465c-93d7-003b8439880f",
+  "w": 5042,
+  "h": 3720,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "2",
+  "name": "Vinh Yen",
+  "year": 1919,
+  "id": "2bd040e9-68e0-4b98-acbe-fea97a6e3bc2",
+  "w": 4775,
+  "h": 3645,
+  "r": 1.31,
+  "doi": false
+ },
+ {
+  "cell": "62",
+  "name": "Cua Ba Lat",
+  "year": 1905,
+  "id": "ef6a439a-ae4d-428f-b0f9-8b37a2852156",
+  "w": 5160,
+  "h": 3695,
+  "r": 1.4,
+  "doi": false
+ },
+ {
+  "cell": "2",
+  "name": "Vinh Yen",
+  "year": 1906,
+  "id": "9c6bdac2-ffab-4803-ae0f-846b51b8009c",
+  "w": 4752,
+  "h": 3652,
+  "r": 1.3,
+  "doi": false
+ },
+ {
+  "cell": "14",
+  "name": "Phu Tu Son",
+  "year": 1925,
+  "id": "d597464d-5e6e-4f66-9805-40dff437b131",
+  "w": 5011,
+  "h": 3783,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "27",
+  "name": "Phu Thuong Tin",
+  "year": 1905,
+  "id": "e8241d5f-f694-45cd-a41a-1f9293ab9a0e",
+  "w": 5041,
+  "h": 3694,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "25",
+  "name": "Quang Yen",
+  "year": 1904,
+  "id": "88437562-9bce-4ffb-b70d-c564d02531fc",
+  "w": 4789,
+  "h": 3619,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "28",
+  "name": "Ke Sat",
+  "year": 1905,
+  "id": "8d6936ed-55d0-4215-9d39-57b3d8543d3f",
+  "w": 5095,
+  "h": 3799,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "73",
+  "name": "Sen Cu",
+  "year": 1905,
+  "id": "a37a985f-d5a5-4674-9b94-5ffa81f0c086",
+  "w": 5074,
+  "h": 3773,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "5 bis",
+  "name": "Bao Loc",
+  "year": 1907,
+  "id": "8b06f217-d408-4092-8124-becb8cd30cb9",
+  "w": 4813,
+  "h": 3614,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "45",
+  "name": "Cua Thai Binh",
+  "year": 1905,
+  "id": "d2178fe7-c2fa-4ab7-9e48-eb62070ac980",
+  "w": 5020,
+  "h": 3673,
+  "r": 1.37,
+  "doi": false
+ },
+ {
+  "cell": "3",
+  "name": "Binh Xuyen",
+  "year": 1924,
+  "id": "a33ced6f-e106-40f6-9bdc-ab0f92a4882e",
+  "w": 4759,
+  "h": 3663,
+  "r": 1.3,
+  "doi": false
+ },
+ {
+  "cell": "4",
+  "name": "Hiep Hoa",
+  "year": 1912,
+  "id": "71894f3f-c2aa-4133-9c42-4e27941e2969",
+  "w": 4890,
+  "h": 3741,
+  "r": 1.31,
+  "doi": false
+ },
+ {
+  "cell": "29",
+  "name": "Gia Loc",
+  "year": 1904,
+  "id": "c0103a62-d766-44cd-8efc-5e0c9143b093",
+  "w": 5141,
+  "h": 3834,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "12",
+  "name": "Son Tay",
+  "year": 1924,
+  "id": "013daa15-185a-4d59-b854-e581557d65ce",
+  "w": 4998,
+  "h": 3780,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "13",
+  "name": "Hoai Duc Phu",
+  "year": 1911,
+  "id": "5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c",
+  "w": 4890,
+  "h": 3747,
+  "r": 1.31,
+  "doi": false
+ },
+ {
+  "cell": "64",
+  "name": "Cho Ganh",
+  "year": 1905,
+  "id": "dfd7dadd-3841-4cdf-872c-44d55e15bb78",
+  "w": 5069,
+  "h": 3732,
+  "r": 1.36,
+  "doi": false
+ },
+ {
+  "cell": "44",
+  "name": "Phu Duc",
+  "year": 1926,
+  "id": "50ee792d-633c-4c3a-af8e-ab576ce7300b",
+  "w": 5015,
+  "h": 3780,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "0 bis",
+  "name": "Nha nam",
+  "year": 1907,
+  "id": "91513ec8-4f6f-47bb-a4c7-4abe33d7ff11",
+  "w": 5064,
+  "h": 3686,
+  "r": 1.37,
+  "doi": false
+ },
+ {
+  "cell": "33",
+  "name": "Phu Ung Hoa",
+  "year": 1924,
+  "id": "6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece",
+  "w": 5032,
+  "h": 3758,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "49",
+  "name": "Nhu Trac",
+  "year": 1903,
+  "id": "7a4f8b7d-60fd-4d1a-a07d-19636265f073",
+  "w": 5232,
+  "h": 3862,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "51",
+  "name": "Dong Quan",
+  "year": 1905,
+  "id": "398f3897-75ce-4ea0-be4c-29d28aee7e0e",
+  "w": 5045,
+  "h": 3677,
+  "r": 1.37,
+  "doi": false
+ },
+ {
+  "cell": "17",
+  "name": "Dong Trieu",
+  "year": 1905,
+  "id": "9a167536-d24d-48a1-b403-91a01acbf6e2",
+  "w": 4707,
+  "h": 3415,
+  "r": 1.38,
+  "doi": false
+ },
+ {
+  "cell": "75",
+  "name": "Thanh Hoa",
+  "year": 1904,
+  "id": "a90c2464-f6aa-46d2-b167-272214b4545f",
+  "w": 5116,
+  "h": 3831,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "66",
+  "name": "Quat Lam",
+  "year": 1926,
+  "id": "56a459b1-8650-49ad-9913-461e6461edc8",
+  "w": 5012,
+  "h": 3783,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "71",
+  "name": "Yen Lang",
+  "year": 1919,
+  "id": "e17b7fe0-6428-4a59-921f-17924273d8de",
+  "w": 5039,
+  "h": 3655,
+  "r": 1.38,
+  "doi": false
+ },
+ {
+  "cell": "38",
+  "name": "Kien An",
+  "year": 1926,
+  "id": "0dac511a-dba2-46f5-8177-730371340baa",
+  "w": 6706,
+  "h": 5021,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "61",
+  "name": "Phu Xuan Truong",
+  "year": 1905,
+  "id": "c5db9be9-d131-45bf-a133-3c4a206207ae",
+  "w": 5134,
+  "h": 3695,
+  "r": 1.39,
+  "doi": false
+ },
+ {
+  "cell": "56",
+  "name": "Thai Binh",
+  "year": 1905,
+  "id": "78c507fb-a6a3-457e-ae79-19575d0ff90c",
+  "w": 5050,
+  "h": 3728,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "57",
+  "name": "Kien Xuong",
+  "year": 1905,
+  "id": "0aef7123-8767-44e0-8687-570878040801",
+  "w": 5083,
+  "h": 3853,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "0",
+  "name": "Ha chau",
+  "year": 1907,
+  "id": "d2e230dc-88b1-4069-9f84-304cecb393fa",
+  "w": 4876,
+  "h": 3644,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "6",
+  "name": "Quang Oai",
+  "year": 1906,
+  "id": "84ef795c-221d-477b-b584-e5ef047ed5ce",
+  "w": 4920,
+  "h": 3632,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "37",
+  "name": "Phu Ninh Giang (E)",
+  "year": 1904,
+  "id": "1ae3f781-cabb-4bc9-9804-577c6447a00b",
+  "w": 2728,
+  "h": 3868,
+  "r": 0.71,
+  "doi": true
+ },
+ {
+  "cell": "1",
+  "name": "Viet Tri",
+  "year": 1906,
+  "id": "0e943fca-ea08-4f4b-bb5e-0e80a4888f91",
+  "w": 4898,
+  "h": 3681,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "70",
+  "name": "Van Ly (E)",
+  "year": 1905,
+  "id": "c34745b7-c4c2-4770-86b9-2de2ed769dbb",
+  "w": 2722,
+  "h": 3908,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "5",
+  "name": "Phu Lang Thuong",
+  "year": 1912,
+  "id": "1707c017-16e3-4c1f-95e7-5a0a685b2e5f",
+  "w": 4995,
+  "h": 3747,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "59",
+  "name": "Ninh Binh",
+  "year": 1924,
+  "id": "4deb3728-bc1e-48f1-9e02-164a95e88326",
+  "w": 5023,
+  "h": 3773,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "46",
+  "name": "Hon Dau",
+  "year": 1924,
+  "id": "189aaeae-77a1-4002-8690-c44cfd1d0ab7",
+  "w": 2745,
+  "h": 3880,
+  "r": 0.71,
+  "doi": true
+ },
+ {
+  "cell": "43",
+  "name": "Quynh Coi",
+  "year": 1905,
+  "id": "27698eaa-e56b-4778-9e61-c66b6bc0cc08",
+  "w": 5069,
+  "h": 3768,
+  "r": 1.35,
+  "doi": false
+ },
+ {
+  "cell": "15",
+  "name": "Gia Binh",
+  "year": 1911,
+  "id": "37f35a63-2841-47d6-bd94-8765dac81387",
+  "w": 4902,
+  "h": 3692,
+  "r": 1.33,
+  "doi": false
+ },
+ {
+  "cell": "42",
+  "name": "Hung Yen",
+  "year": 1926,
+  "id": "c7fe3e9d-d012-4e49-9863-eb863b97978b",
+  "w": 5010,
+  "h": 3787,
+  "r": 1.32,
+  "doi": false
+ },
+ {
+  "cell": "76",
+  "name": "Lach Truong",
+  "year": 1943,
+  "id": "b1f15654-3ef5-4557-a34d-dbc8afcf0803",
+  "w": 3440,
+  "h": 3744,
+  "r": 0.92,
+  "doi": true
+ },
+ {
+  "cell": "20",
+  "name": "Ha Noi",
+  "year": 1903,
+  "id": "4f6e91ba-1388-4c7e-9146-89fb324511f1",
+  "w": 5167,
+  "h": 3856,
+  "r": 1.34,
+  "doi": false
+ },
+ {
+  "cell": "65",
+  "name": "Phu Nhac",
+  "year": 1906,
+  "id": "10c654fc-9eb8-4a09-90b5-731e1cb72c79",
+  "w": 5111,
+  "h": 3678,
+  "r": 1.39,
+  "doi": false
+ },
+ {
+  "cell": "52",
+  "name": "Thuy Anh",
+  "year": 1926,
+  "id": "caa5df25-1f6f-4fe2-99d5-a2a0679cdb97",
+  "w": 2755,
+  "h": 3890,
+  "r": 0.71,
+  "doi": true
+ },
+ {
+  "cell": "26",
+  "name": "Thanh Oai (W)",
+  "year": 1925,
+  "id": "a484611b-c756-4e62-8a77-1d7f4748a250",
+  "w": 2676,
+  "h": 3879,
+  "r": 0.69,
+  "doi": true
+ },
+ {
+  "cell": "34",
+  "name": "Phu Xuyen (W)",
+  "year": 1917,
+  "id": "b526d180-d21d-46bc-883e-7a645dbb4d17",
+  "w": 2700,
+  "h": 3801,
+  "r": 0.71,
+  "doi": true
+ },
+ {
+  "cell": "34",
+  "name": "Phu Xuyen (E)",
+  "year": 1903,
+  "id": "fdfb961d-de66-4b0c-8c78-f90114811bda",
+  "w": 2746,
+  "h": 3919,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "73 bis",
+  "name": "Cua Day (W)",
+  "year": 1905,
+  "id": "aa921556-5ad3-42dc-8040-f9307ac4ee30",
+  "w": 2725,
+  "h": 3926,
+  "r": 0.69,
+  "doi": true
+ },
+ {
+  "cell": "73 bis",
+  "name": "Cua Day (E)",
+  "year": 1927,
+  "id": "e8187c2b-7e2d-4476-a911-870b22cd0bb0",
+  "w": 2710,
+  "h": 3890,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "37",
+  "name": "Phu Ninh Giang (W)",
+  "year": 1904,
+  "id": "0775a31e-7dd8-470a-8b06-67bb8707275f",
+  "w": 2652,
+  "h": 3753,
+  "r": 0.71,
+  "doi": true
+ },
+ {
+  "cell": "11",
+  "name": "Nhan Ly",
+  "year": 1924,
+  "id": "2d55aed7-a7e9-4d84-b8e0-0ffa95f04e79",
+  "w": 2611,
+  "h": 3756,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "40",
+  "name": "Quang Thua (W)",
+  "year": 1906,
+  "id": "8b2378cd-1674-46a1-a085-5d914df97c21",
+  "w": 2734,
+  "h": 3895,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "39",
+  "name": "Do Son (E)",
+  "year": 1904,
+  "id": "c8dcff3d-250b-406d-bac8-a7255c5b6f95",
+  "w": 2652,
+  "h": 3768,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "22",
+  "name": "Hai Duong (E)",
+  "year": 1925,
+  "id": "cbceebb3-76cb-4e92-8928-1b0856654ae1",
+  "w": 2568,
+  "h": 3828,
+  "r": 0.67,
+  "doi": true
+ },
+ {
+  "cell": "58",
+  "name": "Cua Tra Ly",
+  "year": 1926,
+  "id": "96408f51-0b57-47a3-9c8b-4299beee9f88",
+  "w": 2749,
+  "h": 3737,
+  "r": 0.74,
+  "doi": true
+ },
+ {
+  "cell": "63",
+  "name": "Nam Dong",
+  "year": 1926,
+  "id": "7ee0ac7d-0026-4358-adfa-9963d82aa973",
+  "w": 2668,
+  "h": 3678,
+  "r": 0.73,
+  "doi": true
+ },
+ {
+  "cell": "67",
+  "name": "Kien Hanh (E)",
+  "year": 1926,
+  "id": "a2680483-2f77-4fe1-bcf9-393b100bc318",
+  "w": 2721,
+  "h": 3874,
+  "r": 0.7,
+  "doi": true
+ },
+ {
+  "cell": "70",
+  "name": "Van Ly (W)",
+  "year": 1905,
+  "id": "33fd891c-b383-42b1-8aee-cc270be9862c",
+  "w": 2673,
+  "h": 3914,
+  "r": 0.68,
+  "doi": true
+ },
+ {
+  "cell": "18",
+  "name": "Phu Quoc Oai (E)",
+  "year": 1906,
+  "id": "1589e6c8-3bd0-4960-9505-05e39eb97d2c",
+  "w": 2523,
+  "h": 3673,
+  "r": 0.69,
+  "doi": true
+ },
+ {
+  "cell": "39",
+  "name": "Do Son (W)",
+  "year": 1923,
+  "id": "49851c38-7608-44f5-9459-a6c67f7d6aab",
+  "w": 2689,
+  "h": 3883,
+  "r": 0.69,
+  "doi": true
+ }
+]

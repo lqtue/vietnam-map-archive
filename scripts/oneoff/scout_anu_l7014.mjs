@@ -20,39 +20,28 @@
  * with two spaces), so the parse is a regex over the whole title rather than a
  * split.
  */
-import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'node:fs';
+import { cellOf } from '../lib/cells.mjs';
+import { serviceClient } from '../lib/db.mjs';
+import { fetchJson } from '../lib/http.mjs';
 
 const SCOPE = 'cccec9bf-da69-449f-8946-03d79d6063f9';
 const API = 'https://openresearch-repository.anu.edu.au/server/api/discover/search/objects';
 const OUT = 'work/l7014/anu-sources.json';
-const ROMAN = { I: 1, II: 2, III: 3, IV: 4 };
 
 const first = (md, key) => md?.[key]?.[0]?.value ?? null;
 
-/** "Vietnam, Gia Rai, Series: L7014, Sheet  6027 II, 1966, 1:50 000" -> 6027-2
- *
- * 21 of the 160 titles spell the Roman numeral with lowercase L — "Sheet 6738
- * lll", "6631 lV", "6539 Il" — which is a typist reaching for the nearest key,
- * not a different numbering. Fold `l` to `I` before reading it, or an eighth of
- * the collection silently fails to match a cell and reads as ANU not holding it.
- *
- * The collection's index sheet ("Vietnam INDEX, 1:50 000, Series: L7014") has
- * no cell at all and correctly returns null. */
-function cellOf(title) {
-  const m = /Sheet\s+(\d{4})\s*([IVl]{1,3})(?=[,\s]|$)/i.exec(title || '');
-  if (!m) return null;
-  const q = ROMAN[m[2].replace(/l/g, 'I').toUpperCase()];
-  return q ? `${m[1]}-${q}` : null;
-}
+// `cellOf` — "Vietnam, Gia Rai, Series: L7014, Sheet  6027 II, 1966" -> 6027-2,
+// and the lowercase-L typist trap it exists for — is in ../lib/cells.mjs, which
+// is where this file's copy went and where every other reader of an L7014 title
+// takes it from.
 
 const items = [];
 for (let page = 0; ; page++) {
-  const res = await fetch(`${API}?scope=${SCOPE}&size=100&page=${page}`, {
-    headers: { Accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`ANU page ${page}: HTTP ${res.status}`);
-  const sr = (await res.json())._embedded?.searchResult;
+  // Paged: a transient failure on page 7 of 2 would otherwise lose the rest of
+  // the collection and report a short one, which reads as ANU holding less.
+  const sr = (await fetchJson(`${API}?scope=${SCOPE}&size=100&page=${page}`))._embedded
+    ?.searchResult;
   const objs = sr?._embedded?.objects ?? [];
   for (const o of objs) {
     const it = o._embedded.indexableObject;
@@ -81,9 +70,7 @@ if (unparsed.length) {
   unparsed.slice(0, 8).forEach((i) => console.log('  ' + i.title));
 }
 
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 const { data: ours, error } = await db
   .from('series_sheets')
   .select('sheet_number,name,held_by,source,year,edition')

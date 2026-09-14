@@ -28,8 +28,8 @@
  *    lll", "6631 lV", "6539 Il" — on 21 of 160 titles. That is a typist
  *    reaching for the nearest key, not a different numbering. Unfolded, an
  *    eighth of the collection parses to no cell and reads as ANU not holding
- *    it. `cellOf` is lifted verbatim from `scout_anu_l7014.mjs`, which already
- *    solved this; it is not re-derived here.
+ *    it. `cellOf` lives in `scripts/lib/cells.mjs` with every other parser that
+ *    decides what a sheet is called; this file no longer keeps its own copy.
  *
  * 2. The Roman numeral is the QUADRANT of the 1:100,000 sheet, not an edition.
  *    ANU's "6531 II" is this archive's "6531-2". At least one secondary source
@@ -38,10 +38,10 @@
  * 3. Indochine cell numbers carry the catalogue's own typography rather than
  *    distinct cells: `[42]` is cell 42 with the bracketed half of the title
  *    restituted, and `0bis`, `0 bis`, `[0bis]`, `5 bis`, `73 bis` are three
- *    cells spelled five ways. `cellNumber` is lifted verbatim from
- *    `import_indochine_series_sheets.mjs` so this loader and the index that
- *    already exists cannot disagree about what a cell is called — a mismatch
- *    there does not error, it just finds nothing.
+ *    cells spelled five ways. `cellNumber` is shared with the index importer
+ *    through `scripts/lib/cells.mjs`, so this loader and the index that already
+ *    exists cannot disagree about what a cell is called — a mismatch there does
+ *    not error, it just finds nothing.
  *
  * 4. A four-digit number on a TTU collar is not necessarily a printing year.
  *    "Indian Datum 1960", "renseignements cartographiques 1960" and
@@ -49,11 +49,16 @@
  *    dates. A greedy `\d{4}` would file three of the 25 sheets under a decade
  *    they were not printed in, and the result would look entirely reasonable.
  *    `printedYear` anchors on the two Vietnamese phrases that do mean printing.
+ *
+ * Every parser named above is pinned by `tests/ingest-cells.spec.ts`, on bytes
+ * copied out of these same four catalogues.
  */
-import { createClient } from '@supabase/supabase-js';
 import { readFileSync, readdirSync } from 'node:fs';
+import { clean, yearOf, cellNumber, cellOf, sheetPart, printedYear } from '../lib/cells.mjs';
+import { serviceClient, upsertChunked, duplicateKeys } from '../lib/db.mjs';
+import { willApply, dryNotice } from '../lib/cli.mjs';
 
-const apply = process.argv.includes('--apply');
+const apply = willApply();
 
 const L7014 = 'series-l7014-vietnam-1-50-000'; // series_key(), mig 082
 const INDOCHINE = 'indochine-1-25-000-tonkin-thanh-hoa';
@@ -65,21 +70,6 @@ const ANU = 'work/l7014/anu-sources.json';
 const IGN = ['work/tonkin/sources/ign-serie-243.json', 'work/tonkin/sources/ign-serie-175.json'];
 
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
-const clean = (s) => {
-  // CartoMundi's CSV export doubled every quote and then wrapped the field, so
-  // a handful of IGN notes arrive as `"""Assemblage … """`. Left alone the
-  // leading quotes defeat every anchored match below.
-  const t = String(s ?? '')
-    .replace(/"{2,}/g, '"')
-    .replace(/^"+|"+$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return t || null;
-};
-const yearOf = (v) => {
-  const n = Number(v);
-  return Number.isInteger(n) && n > 1800 && n < 2100 ? n : null;
-};
 
 // ── Perry-Castañeda ────────────────────────────────────────────────────────
 // One item per scanned file, which is not quite one per cell: 6542-3 is there
@@ -130,16 +120,6 @@ function mdTables(md) {
     out.push(Object.fromEntries(head.map((h, i) => [h, cells[i] ?? ''])));
   }
   return out;
-}
-
-/** The only two phrases on these collars that mean "printed in": `in lần thứ
- *  nhất 1980` (first printing) and `vẽ và in lại 1978` (redrawn and reprinted).
- *  Everything else four-digit on the sheet is a datum or a survey currency
- *  date — see trap 4 in the header. */
-function printedYear(s) {
-  const t = String(s ?? '');
-  const m = /in\s+l[ạa]i\s+(\d{4})/i.exec(t) || /in\s+l[ầa]n\s+th[ứu][^\d]{0,20}(\d{4})/i.exec(t);
-  return m ? yearOf(m[1]) : null;
 }
 
 /**
@@ -202,18 +182,6 @@ function ttuRows() {
 }
 
 // ── ANU ────────────────────────────────────────────────────────────────────
-const ROMAN = { I: 1, II: 2, III: 3, IV: 4 };
-
-/** Verbatim from `scout_anu_l7014.mjs` — see traps 1 and 2. The collection's
- *  index sheet ("Vietnam INDEX, 1:50 000, Series: L7014") has no cell and
- *  correctly returns null. */
-function cellOf(title) {
-  const m = /Sheet\s+(\d{4})\s*([IVl]{1,3})(?=[,\s]|$)/i.exec(title || '');
-  if (!m) return null;
-  const q = ROMAN[m[2].replace(/l/g, 'I').toUpperCase()];
-  return q ? `${m[1]}-${q}` : null;
-}
-
 function anuRows() {
   const items = read(ANU).items;
   const rows = [];
@@ -243,35 +211,14 @@ function anuRows() {
 }
 
 // ── IGN ────────────────────────────────────────────────────────────────────
-/** Verbatim from `import_indochine_series_sheets.mjs` — see trap 3. */
-function cellNumber(v) {
-  return String(v ?? '')
-    .trim()
-    .replace(/^\[|\]$/g, '')
-    .trim()
-    .replace(/^(\d+)bis$/i, '$1 bis')
-    .toLowerCase();
-}
-
-/** Which part of the cell this sheet of paper is.
- *
- *  Anchored on the note's OPENING clause, because several notes go on to
- *  discuss the other half — 73 bis 1927 reads "Demi-feuille Est. La partie de
- *  la mention de date … demi-feuille Ouest", and a search of the whole string
- *  calls the east half west. Same rule as `half()` in
- *  `ingest_indochine_nakala.mjs`, widened for serie 175's assemblies.
- *
- *  "Feuille de demi-format titrée comme une feuille complète" is a half-format
- *  sheet that carries the whole of the cell the series covers, so it is
- *  'whole', not a half. */
-function partOf(note) {
-  const n = clean(note) ?? '';
-  if (/demi-format/i.test(n)) return 'whole';
-  if (/^assemblage/i.test(n)) return 'assemblage';
-  const m = /^demi-feuille\s+(ouest|est)\b/i.exec(n);
-  if (m) return /ouest/i.test(m[1]) ? 'W' : 'E';
-  return null;
-}
+/** This table's spelling of `sheetPart()`. A demi-format sheet is a half-format
+ *  piece of paper carrying the WHOLE of the cell the series covers, which this
+ *  column calls 'whole'; `plan_indochine_halfsheet_migration.mjs` needs the two
+ *  told apart and keeps the module's own word for it. */
+const partOf = (note) => {
+  const p = sheetPart(note);
+  return p === 'demi-format' ? 'whole' : p;
+};
 
 function ignRows() {
   const rows = [];
@@ -319,14 +266,11 @@ const sources = {
 const rows = Object.values(sources).flat();
 
 // A duplicate item key would make the upsert lose rows rather than fail, and
-// the loss would be invisible in the totals. Caught here instead.
-const seen = new Map();
-const dups = [];
-for (const r of rows) {
-  const k = `${r.institution} ${r.source_ref}`;
-  if (seen.has(k)) dups.push(k);
-  else seen.set(k, r);
-}
+// the loss would be invisible in the totals. Caught here instead. NUL separates
+// the two halves of the key because either may contain anything printable; it
+// is written as an escape now, having been a literal byte in this file, which
+// made grep(1) and file(1) treat the whole script as binary data.
+const dups = duplicateKeys(rows, (r) => `${r.institution}\0${r.source_ref}`);
 
 const bad = rows.filter((r) => !r.sheet_number || !r.source_ref);
 
@@ -362,7 +306,7 @@ for (const key of [L7014, INDOCHINE]) {
 
 if (dups.length) {
   console.log(`\nDUPLICATE item keys: ${dups.length}`);
-  for (const d of dups.slice(0, 10)) console.log('  ' + d.replace(' ', ' / '));
+  for (const d of dups.slice(0, 10)) console.log('  ' + d.replace('\0', ' / '));
 }
 if (bad.length) {
   console.log(`\nrows with no cell or no item key: ${bad.length}`);
@@ -370,19 +314,12 @@ if (bad.length) {
 }
 
 if (!apply) {
-  console.log('\nDry run. Nothing was written. Re-run with --apply.');
+  dryNotice();
   process.exit(dups.length || bad.length ? 1 : 0);
 }
 if (dups.length || bad.length) throw new Error('refusing to write: see the report above');
 
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
+await upsertChunked(serviceClient(), 'sheet_sources', rows, {
+  onConflict: 'institution,source_ref', // 087's item key
 });
-for (let i = 0; i < rows.length; i += 200) {
-  const { error } = await db
-    .from('sheet_sources')
-    .upsert(rows.slice(i, i + 200), { onConflict: 'institution,source_ref' });
-  if (error) throw new Error(error.message);
-  console.log(`  upserted ${Math.min(i + 200, rows.length)}/${rows.length}`);
-}
 console.log(`\napplied: ${rows.length} rows`);

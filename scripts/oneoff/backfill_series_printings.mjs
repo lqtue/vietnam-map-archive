@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Fill `series_sheets.year` / `.edition` (migration 086).
 //
-//   node --env-file=.env scripts/oneoff/backfill_series_printings.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/backfill_series_printings.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/backfill_series_printings.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // Two sources, because a survey's sheets reach a reader two ways and the
 // printing is recorded in a different place for each:
@@ -33,15 +37,14 @@
 // for one to drop, and nothing here is order-dependent. The failure looks like
 // a data problem and is not one.
 
-import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'node:fs';
+import { serviceClient } from '../lib/db.mjs';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 const L7014 = 'series-l7014-vietnam-1-50-000';
 
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 
 /** "003" -> "3"; "3-DMA" -> "3-DMA"; "" -> null. */
 function normEdition(e) {
@@ -131,7 +134,10 @@ for (const [key, v] of wanted) {
   if (error) throw error;
   written++;
 }
-console.log(`${dry ? 'dry run — ' : ''}${written} rows updated, ${skipped} not in any index`);
+console.log(
+  `${dry ? 'dry run — ' : ''}${written} rows ${dry ? 'would be ' : ''}updated, ` +
+    `${skipped} not in any index${dry ? ' — re-run with --apply' : ''}`
+);
 
 // Read it back: this is the number the coverage page will print.
 const { count: withPrinting, error: cErr } = await db

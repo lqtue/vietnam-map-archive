@@ -31,10 +31,11 @@
  * cells. Worse, `f100NumeroOuCode` uses the same bracket convention as the
  * titles: a half-sheet that does not print the cell number is catalogued as
  * `[59]`, and serie 175 spaces `0 bis` where serie 243 writes `0bis`. Match on
- * `cellKey()` below, never on `parseFloat`.
+ * `cellNumber()` from ../lib/cells.mjs, never on `parseFloat`.
  */
-import { createClient } from '@supabase/supabase-js';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { cellNumber, cellOrder, sheetPart, partFromTitle } from '../lib/cells.mjs';
+import { serviceClient } from '../lib/db.mjs';
 
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
 const SERIES_KEY = 'indochine-1-25-000-tonkin-thanh-hoa';
@@ -50,55 +51,15 @@ if (process.argv.includes('--apply')) {
   process.exit(2);
 }
 
-/** One spelling for a cell, across both series and both bracket conventions. */
-function cellKey(raw) {
-  return String(raw ?? '')
-    .replace(/[[\]]/g, '')
-    .toLowerCase()
-    .replace(/(\d)\s*bis/g, '$1 bis')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+// `cellKey`, `cellOrder`, `part` and `partFromTitle` all moved to
+// ../lib/cells.mjs, which is the only copy now. `cellKey` was the better of the
+// two cell-number spellings in the tree and is the one that survived; the
+// classifier keeps this file's four-value vocabulary, with 'unknown' spelled
+// null at the module boundary and mapped back here so the report reads the same.
+const cellKey = cellNumber;
 
-/** Sort cells the way a sheet index does: numerically, `bis` after its number. */
-function cellOrder(key) {
-  const m = /^(\d+)(\s*bis)?$/.exec(key);
-  if (!m) return [Number.POSITIVE_INFINITY, key];
-  return [Number(m[1]) + (m[2] ? 0.5 : 0), key];
-}
-
-/**
- * Which part of the cell an IGN record is, off its note.
- *
- * `assemblage` first, because an assemblage note never mentions demi-feuille
- * but a demi-feuille note sometimes discusses the other half — 73 bis 1927
- * reads "Demi-feuille Est. La partie … demi-feuille Ouest", and an unanchored
- * search calls the east half west. Hence the `^` on the demi-feuille test,
- * matching `ingest_indochine_nakala.mjs`.
- */
-function part(note) {
-  const n = String(note ?? '').replace(/^"+/, '');
-  if (/assemblage/i.test(n)) return 'assemblage';
-  if (/demi-format/i.test(n)) return 'demi-format';
-  const m = /^\s*demi-feuille\s+(ouest|est)\b/i.exec(n);
-  if (m) return /ouest/i.test(m[1]) ? 'W' : 'E';
-  return 'unknown';
-}
-
-/**
- * The same fact read off the title's brackets, as `ingest_indochine_nakala.mjs`
- * reads it: brackets mark the half of the title this sheet does not print, so
- * `[Quang] -Yên` is the east half and `Quang [-Yên]` the west. It is an
- * independent check on the note, and the notes are not all right — see the
- * `part_disputed` warning. Not a correction: a disagreement is reported, never
- * resolved, because which of the two is wrong is a judgement about the paper.
- */
-function partFromTitle(title) {
-  const t = String(title ?? '');
-  const i = t.indexOf('[');
-  if (i < 0) return null;
-  return t.slice(0, i).replace(/[\s-]/g, '') ? 'W' : 'E';
-}
+/** @returns {'assemblage'|'demi-format'|'W'|'E'|'unknown'} */
+const part = (note) => sheetPart(note) ?? 'unknown';
 
 const PART_LABEL = {
   W: 'west half',
@@ -153,9 +114,7 @@ for (const list of ign.values()) list.sort((a, b) => (a.year ?? 0) - (b.year ?? 
 const shapes = new Map(JSON.parse(readFileSync(SHAPES, 'utf8')).map((s) => [s.id, s]));
 
 // ── what the archive holds ─────────────────────────────────────────────────
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 const { data: maps, error } = await db
   .from('maps')
   .select(

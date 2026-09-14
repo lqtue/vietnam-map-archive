@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Merge the duplicate `maps.location` spellings.
 //
-//   node --env-file=.env scripts/oneoff/normalize_map_locations.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/normalize_map_locations.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/normalize_map_locations.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // `maps.location` is a free-text catalogue key, and /about prints one entry per
 // distinct value. That was three values and read fine; the L7014 city sheets
@@ -29,9 +33,10 @@
 // 27 legitimate values would be a list to maintain rather than a rule. If a
 // third spelling turns up, the fix is a gazetteer FK, not a longer list.
 
-import { createClient } from '@supabase/supabase-js';
+import { serviceClient } from '../lib/db.mjs';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 
 /** from -> to. Both sides verified present in the corpus before writing. */
 const MERGES = [
@@ -39,9 +44,7 @@ const MERGES = [
   ['Hue', 'Huế'],
 ];
 
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false },
-});
+const db = serviceClient();
 
 let moved = 0;
 
@@ -88,7 +91,8 @@ const { data: after, error } = await db.from('maps').select('location').not('loc
 if (error) throw error;
 const distinct = new Set(after.map((r) => r.location));
 console.log(
-  `${dry ? 'dry run — ' : ''}moved ${moved} row(s); ${distinct.size} distinct locations remain`
+  `${dry ? 'dry run — ' : ''}moved ${moved} row(s); ${distinct.size} distinct locations remain` +
+    (dry ? ' — re-run with --apply' : '')
 );
 for (const [from] of MERGES) {
   if (distinct.has(from)) console.error(`STILL PRESENT: ${from}`);
