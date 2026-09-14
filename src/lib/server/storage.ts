@@ -19,6 +19,13 @@ export async function uploadJson(bucket: string, path: string, obj: unknown): Pr
   const res = await fetch(url, {
     method: 'POST',
     headers: {
+      // Both headers, and the `apikey` one is not optional. Since the project
+      // moved to the new key format (`sb_secret_…`, not a JWT), Storage given
+      // only a Bearer tries to parse it as one and answers 400 "Invalid
+      // Compact JWS" — which surfaced as "Storage upload failed (400)" on
+      // every mirror and every GCP save. supabase-js sends `apikey` itself,
+      // which is why database writes never noticed. Harmless for a legacy JWT.
+      apikey: SUPABASE_SERVICE_KEY,
       Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
       'Content-Type': 'application/json',
       'x-upsert': 'true',
