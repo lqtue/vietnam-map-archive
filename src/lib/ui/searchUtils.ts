@@ -1,45 +1,10 @@
-// Shared search utilities: coordinate parsing, covering map detection, bounds helpers
+// Shared search utilities: covering map detection, bounds helpers.
+// Coordinate parsing lives in `$lib/core/geo/coordinates.ts` — this file carried
+// a second, weaker copy (decimal pairs only, no datum, no grid references) that
+// nothing ever called.
 
-import type { SearchResult } from '$lib/map/types';
 import type { MapListItem } from '$lib/data/maps/types';
 import { haversineDistance } from '$lib/core/geo/geo';
-
-/**
- * Parse a coordinate string into lat/lng.
- * Supports formats like:
- *   "10.776, 106.700"
- *   "10.776 106.700"
- *   "10.776,106.700"
- *
- * Uses a heuristic to determine lat vs lng:
- * - If both values are <= 90, assume lat,lng order
- * - If first > 90 and second <= 90, swap to lng,lat
- */
-export function parseCoordinates(input: string): { lat: number; lng: number } | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  // Match two numbers separated by comma and/or whitespace
-  const match = trimmed.match(/^(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)$/);
-  if (!match) return null;
-
-  const a = parseFloat(match[1]);
-  const b = parseFloat(match[2]);
-
-  if (isNaN(a) || isNaN(b)) return null;
-
-  // Validate ranges: lat in [-90, 90], lng in [-180, 180]
-  if (Math.abs(a) <= 90 && Math.abs(b) <= 180) {
-    return { lat: a, lng: b };
-  }
-
-  // If first value looks like longitude and second like latitude, swap
-  if (Math.abs(a) <= 180 && Math.abs(b) <= 90) {
-    return { lat: b, lng: a };
-  }
-
-  return null;
-}
 
 /**
  * Distance from a point to the nearest edge of a bounding box (km).
@@ -114,16 +79,4 @@ export function boundsZoom(bounds: [number, number, number, number]): number {
   // Approximate: 360 degrees = zoom 1, halving each level
   const zoom = Math.log2(360 / maxSpan);
   return Math.max(2, Math.min(18, Math.round(zoom)));
-}
-
-/**
- * Build the SearchResult a "Go to <lat>, <lng>" coordinate hit dispatches.
- */
-export function coordinateResult(coords: { lat: number; lng: number }): SearchResult {
-  return {
-    display_name: `${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`,
-    lat: String(coords.lat),
-    lon: String(coords.lng),
-    type: 'coordinate',
-  };
 }
