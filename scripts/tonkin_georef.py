@@ -693,29 +693,49 @@ def read_sheet(base, W, H, which="inner", verbose=False, cut=None):
     return finish(base, W, H, got)
 
 
-def finish(base, W, H, got):
-    """Everything after the corners: read them, reconcile them, judge the result."""
+def finish(base, W, H, got, given=None):
+    """Everything after the corners: read them, reconcile them, judge the result.
+
+    `given` supplies the four edges in grades when the paper cannot. A sheet at
+    the survey's boundary is cut where the mapping stopped rather than on a
+    graticule line, so that edge has no coordinate to print and none is printed:
+    Lach Truong (76) carries 115g,00 west, 22g,125 north and 22g,00 south, and
+    nothing at either east corner. Reading corners that have no figures cannot
+    be made to work, and inventing an edge silently is the failure this whole
+    pipeline exists to prevent -- so it is supplied explicitly, in a file, by a
+    person who wrote down why. The aspect check still runs against it.
+    """
     C = got["corners"]
-    # All four corners print both figures, not just the diagonal pair. Reading all
-    # four is four Gemini calls instead of two and buys the only check that
-    # localises a misreading: the two corners on a side must agree about that
-    # side's coordinate. A sheet 14 km out of place is otherwise invisible -- it
-    # still lies flat on the basemap and still looks like a map.
-    cut = got.get("cut")
-    # A cut edge prints no figures at all -- what sits outside it is the Bonne
-    # kilometre chiffraison, not grades -- so its two corners are not read. Two
-    # Gemini calls instead of four, and the check that survives is the longitude,
-    # printed at both ends of the framed side.
-    wanted = CORNERS if not cut else (("NE", "SE") if cut == "L" else ("NW", "SW"))
-    read = {k: read_corner(corner_crop(base, C[k], k, W, H)) for k in wanted}
-    if any(v is None for pair in read.values() for v in pair):
-        return None, "corner figures unread: " + ", ".join(
-            f"{k} {a},{b}" for k, (a, b) in read.items())
-    q = quad(got)
-    edges, disagree, err = (resolve_cut(read, q["aspect"], cut) if cut
-                            else resolve(read, q["aspect"]))
-    if edges is None:
-        return None, f"corner figures irreconcilable: {disagree}"
+    if given:
+        # Supplied, but not exempt. The aspect check is exactly what tests a
+        # derived edge -- get the span wrong and the sheet is the wrong shape --
+        # so it is computed here rather than skipped with the reading.
+        q = quad(got)
+        edges, disagree, read = dict(given), [], {}
+        _gx, _gy = ground(edges["west"] * GRADE + PARIS, edges["north"] * GRADE,
+                          edges["east"] * GRADE + PARIS, edges["south"] * GRADE)
+        err = abs(_gx / _gy - q["aspect"]) / q["aspect"]
+    else:
+        # All four corners print both figures, not just the diagonal pair.
+        # Reading all four is four Gemini calls instead of two and buys the only
+        # check that localises a misreading: the two corners on a side must agree
+        # about that side's coordinate. A sheet 14 km out of place is otherwise
+        # invisible -- it still lies flat on the basemap and still looks like a map.
+        cut = got.get("cut")
+        # A cut edge prints no figures at all -- what sits outside it is the Bonne
+        # kilometre chiffraison, not grades -- so its two corners are not read. Two
+        # Gemini calls instead of four, and the check that survives is the
+        # longitude, printed at both ends of the framed side.
+        wanted = CORNERS if not cut else (("NE", "SE") if cut == "L" else ("NW", "SW"))
+        read = {k: read_corner(corner_crop(base, C[k], k, W, H)) for k in wanted}
+        if any(v is None for pair in read.values() for v in pair):
+            return None, "corner figures unread: " + ", ".join(
+                f"{k} {a},{b}" for k, (a, b) in read.items())
+        q = quad(got)
+        edges, disagree, err = (resolve_cut(read, q["aspect"], cut) if cut
+                                else resolve(read, q["aspect"]))
+        if edges is None:
+            return None, f"corner figures irreconcilable: {disagree}"
     nw_lon, se_lon = edges["west"], edges["east"]
     nw_lat, se_lat = edges["north"], edges["south"]
     west, east = nw_lon * GRADE + PARIS, se_lon * GRADE + PARIS
@@ -726,7 +746,7 @@ def finish(base, W, H, got):
     # rim, with no thick line to measure in from -- so including it would make
     # every half-sheet fail the spread gate that exists to catch a side which
     # locked onto the graticule band instead.
-    offs = [v["offset"] for k, v in got["lines"].items() if k != cut]
+    offs = [v["offset"] for k, v in got["lines"].items() if k != got.get("cut")]
     mean_off = sum(offs) / len(offs)
     got.update({
         "rim_spread": (max(offs) - min(offs)) / mean_off if mean_off else 0.0,
@@ -1074,17 +1094,35 @@ def place(map_id):
     the same four-corner reading, the same arbitration against the measured quad,
     the same gate. What a person supplies here is only what the detector could not.
 
-    Reads work/tonkin/hand/<map-id>.json: {"corners": {"NW": [x, y], ...}}.
+    Reads work/tonkin/hand/<map-id>.json, which supplies whichever half is
+    missing -- and only that half:
+
+        {"corners": {"NW": [x, y], ...}}      the frame would not fit
+        {"edges": {"west": 115.0, ...}}       an edge the paper does not label
+        {"note": "why"}                       always, for the next person
+
+    With no "corners" the detector runs as usual; with no "edges" the printed
+    figures are read as usual.
     """
     hand = json.loads((WORK / "hand" / f"{map_id}.json").read_text())
     base = f"https://iiif.maparchive.vn/iiif/{map_id}"
     info = T.get_image_info(base)
     W, H = info["width"], info["height"]
-    got = {"corners": {k: [float(v[0]), float(v[1])] for k, v in hand["corners"].items()},
-           "lines": {k: {"res": 0.0, "kept": 0, "found": 0, "offset": hand.get("offset", 0.0)}
-                     for k in "LRTB"},
-           "by_hand": True}
-    got, err = finish(base, W, H, got)
+    if "corners" in hand:
+        got = {"corners": {k: [float(v[0]), float(v[1])] for k, v in hand["corners"].items()},
+               "lines": {k: {"res": 0.0, "kept": 0, "found": 0,
+                             "offset": hand.get("offset", 0.0)} for k in "LRTB"},
+               "by_hand": True}
+    else:
+        # Corners the detector can find; only the coordinates were missing. Two
+        # different things can be wrong with a sheet and they are worth keeping
+        # apart -- a frame the detector cannot fit, and an edge the paper does
+        # not label. Supplying both by hand when only one is broken throws away
+        # a measurement in favour of a person's estimate of it.
+        got, err = detect(base, W, H, verbose=True)
+        if err:
+            sys.exit(f"place failed: {err}")
+    got, err = finish(base, W, H, got, given=hand.get("edges"))
     if err:
         sys.exit(f"place failed: {err}")
     rows = {r["id"]: r for r in sheets()}
