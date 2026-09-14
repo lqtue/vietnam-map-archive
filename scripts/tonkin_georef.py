@@ -240,10 +240,100 @@ def side_line(d, which):
             "offset": r - ref}, None
 
 
-def detect(base, W, H, which="inner", verbose=False):
+def cut_side(base, W, H, side, tan, frame):
+    """The one edge of a half-sheet that was never printed as a frame.
+
+    Most of this survey was issued as two half-sheets, cut down the middle
+    meridian of the cell, and a few whole-cell sheets stop where the survey
+    stopped. On that edge there is no thick neatline, no thin companion, no
+    graticule band -- just paper, one thin rim line, and the kilometre-grid
+    figures printed OUTSIDE it. `side_line` cannot work there: its whole design
+    is to anchor on the thick line, which is the strongest thing on a normal
+    strip by a factor of three, and then find the rim at a printed distance in
+    from it. With no anchor it reports "no rim found inside the thick line".
+
+    What replaces it is the one thing that edge does have: the rim runs the full
+    height of the sheet and nothing else there does. So the rotation is taken
+    from the three real sides -- it is a property of how the scan was laid on the
+    glass, not of any one edge -- the search window is de-tilted onto it and
+    averaged down the whole span, and in that average a continuous line stands up
+    while grid numerals (a few patches tall) and map content (irregular) average
+    away. No anchor, no offset, no second pass: the line found IS the rim.
+
+    The window is wide because `rough_frame`'s guess for this side is worthless
+    -- its argmax over a narrow central band picks whatever is darkest in the
+    outer third, which on a cut edge may be a grid numeral or a patch of ink, and
+    that is what produced the 58 px and 97 px "thick line residual" failures.
+    """
+    search = max(300, int(0.16 * W))
+    lo, hi = SPAN
+    a0, a1 = int(H * lo), int(H * hi)
+    x0, x1 = (0, search) if side == "L" else (W - search, W)
+    d = darkness(T.fetch_crop_level0(base, x0, a0, x1 - x0, a1 - a0, x1 - x0))
+    origin, step = (x0, 1) if side == "L" else (x1 - 1, -1)
+    if step < 0:
+        d = d[:, ::-1]
+
+    n = d.shape[0]
+    edges = np.linspace(0, n, PATCHES + 1).round().astype(int)
+    mids, profiles = [], []
+    for k in range(PATCHES):
+        u, v = edges[k], edges[k + 1]
+        if v - u < 8:
+            continue
+        mids.append((u + v) / 2.0)
+        profiles.append(d[u:v].mean(axis=0))
+    if len(mids) < 6:
+        return None, "cut edge: too few patches"
+    # De-tilt onto the rotation the framed sides already settled. `tan` is dy/dx
+    # for a horizontal side; along a vertical strip the across-position moves by
+    # -tan per unit of along-position, and the strip was flipped for R so that
+    # both sides read outside-inward.
+    slope = -tan * step
+    ref = float(np.mean(mids))
+    grid = np.arange(d.shape[1], dtype=float)
+    avg = np.mean([np.interp(grid, grid + slope * (ref - mid), prof)
+                   for mid, prof in zip(mids, profiles)], axis=0)
+
+    # The strongest prominent peak, ignoring the outermost sliver where the scan
+    # carries the edge of the paper and sometimes the scanner's own backing.
+    paper = float(np.percentile(avg, 25))
+    best, bestp = None, 0.0
+    for j in range(12, len(avg) - 1):
+        if not (avg[j] >= avg[j - 1] and avg[j] > avg[j + 1]):
+            continue
+        u, v = max(0, j - 12), min(len(avg), j + 13)
+        prom = avg[j] - max(avg[u:j + 1].min(), avg[j:v].min())
+        if prom > bestp:
+            best, bestp = j, prom
+    if best is None or bestp < max(8.0, 0.12 * (float(avg.max()) - paper)):
+        return None, "cut edge: no continuous line found"
+    # Centroid of the line, as rim_in does, so the position is sub-pixel.
+    thr = paper + bestp * 0.25
+    u = v = best
+    while u > 0 and avg[u - 1] > thr and avg[u - 1] <= avg[u]:
+        u -= 1
+    while v < len(avg) - 1 and avg[v + 1] > thr and avg[v + 1] <= avg[v]:
+        v += 1
+    w = avg[u:v + 1] - thr
+    if w.sum() <= 0:
+        return None, "cut edge: line has no weight"
+    r = u + float((np.arange(len(w)) * w).sum() / w.sum())
+
+    m = slope * step
+    c = origin + step * r - m * a0
+    mid = H * (SPAN[0] + SPAN[1]) / 2
+    return {"m": m, "c": c, "anchor": [mid, m * mid + c], "res": 0.0,
+            "kept": len(mids), "found": len(mids), "offset": 0.0,
+            "cut": True}, None
+
+
+def detect(base, W, H, which="inner", verbose=False, cut=None):
     frame = rough_frame(base, W, H)
     lines = {}
     for side in "LRTB":
+        if side == cut:
+            continue
         d, origin, step, a0 = strip(base, side, frame, W, H)
         got, err = side_line(d, which)
         if err:
@@ -263,8 +353,18 @@ def detect(base, W, H, which="inner", verbose=False):
     # once, from all four sides, and let each side keep only the offset its own rim
     # measurement gives. This is the difference between telling the rim's two lines
     # apart -- they are 7 px apart -- and not being able to.
-    tan = float(np.mean([lines["T"]["m"], lines["B"]["m"],
-                         -lines["L"]["m"], -lines["R"]["m"]]))
+    # A cut side contributes no slope -- there is nothing there fitted well
+    # enough to trust with it -- so the angle comes from the three real sides and
+    # is then handed to the cut side, which is the only reason its single faint
+    # line can be found at all.
+    tan = float(np.mean([s * lines[k]["m"] for k, s in
+                         (("T", 1), ("B", 1), ("L", -1), ("R", -1))
+                         if k != cut]))
+    if cut:
+        got, err = cut_side(base, W, H, cut, tan, frame)
+        if err:
+            return None, f"{cut}: {err}"
+        lines[cut] = got
     for side in "LRTB":
         m = -tan if side in "LR" else tan
         ax, ay = lines[side]["anchor"]
@@ -284,7 +384,7 @@ def detect(base, W, H, which="inner", verbose=False):
     corners = {k: cross(*ab) for k, ab in
                (("NW", ("L", "T")), ("NE", ("R", "T")),
                 ("SE", ("R", "B")), ("SW", ("L", "B")))}
-    return {"corners": corners, "lines": lines, "rotation": tan}, None
+    return {"corners": corners, "lines": lines, "rotation": tan, "cut": cut}, None
 
 
 def quad(c):
@@ -424,9 +524,67 @@ def resolve(read, aspect_px):
     return best[1], disagree, best[0]
 
 
-def read_sheet(base, W, H, which="inner", verbose=False):
-    """Corners in pixels, corners in degrees, and whether the two agree."""
-    got, err = detect(base, W, H, which, verbose)
+# A half-sheet is half a cell wide, and a cell is 0.20 grades. The lattice check
+# measures that constant over the whole series and finds it exact to 0.000, which
+# is what makes it safe to supply the edge the paper does not print.
+CELL_LON, CELL_LAT = 0.20, 0.125
+
+
+def resolve_cut(read, aspect_px, cut):
+    """Two printed corners, and the third edge taken from the lattice.
+
+    A cut sheet prints its figures only at the two corners on its framed vertical
+    side, so `resolve`'s cross-check -- each side's coordinate printed twice, at
+    both its corners -- is available for the longitude and gone for the two
+    latitudes. The lattice puts it back: every sheet in this survey is 0.125
+    grades tall, measured over 66 of them and exact to 0.000, so the latitude read
+    at one corner predicts the other. Both readings and both predictions go in as
+    candidates and the pixel quad arbitrates, exactly as it does for a whole
+    sheet. The missing longitude is not a candidate but a derivation -- framed
+    edge plus or minus half a cell -- which the aspect gate then tests: get the
+    width wrong by a factor of two and the shape is wrong by a factor of two.
+    """
+    if cut == "L":                       # framed on the east
+        lons, (nc, sc) = [read["NE"][0], read["SE"][0]], ("NE", "SE")
+    else:                                # framed on the west
+        lons, (nc, sc) = [read["NW"][0], read["SW"][0]], ("NW", "SW")
+    n_read, s_read = read[nc][1], read[sc][1]
+    disagree = ([f"{'east' if cut == 'L' else 'west'} {lons[0]} vs {lons[1]}"]
+                if lons[0] != lons[1] else [])
+    norths = sorted({n_read, round(s_read + CELL_LAT, 4)})
+    souths = sorted({s_read, round(n_read - CELL_LAT, 4)})
+    best = None
+    for lon in sorted(set(lons)):
+        w, e = ((lon - CELL_LON / 2, lon) if cut == "L"
+                else (lon, lon + CELL_LON / 2))
+        for n in norths:
+            for s_ in souths:
+                if not (e > w and n > s_):
+                    continue
+                gx, gy = ground(w * GRADE + PARIS, n * GRADE,
+                                e * GRADE + PARIS, s_ * GRADE)
+                err = abs(gx / gy - aspect_px) / aspect_px
+                if best is None or err < best[0]:
+                    best = (err, {"west": w, "east": e, "north": n, "south": s_})
+    if best is None:
+        return None, "; ".join(disagree) or "no rectangle", None
+    return best[1], disagree, best[0]
+
+
+def read_sheet(base, W, H, which="inner", verbose=False, cut=None):
+    """Corners in pixels, corners in degrees, and whether the two agree.
+
+    A sheet is tried as a whole sheet first and only re-read as a cut one when
+    exactly one vertical side failed -- which is what a missing frame looks like
+    and is also, honestly, what a badly scanned frame looks like. The two are
+    told apart downstream rather than here: a sheet wrongly called cut is handed
+    a width half of its real one, and `aspect` and `scale_gap` both fail on it.
+    """
+    got, err = detect(base, W, H, which, verbose, cut)
+    if err and cut is None and err[0] in "LR" and err[1] == ":":
+        if verbose:
+            print(f"  {err}\n  -- retrying with {err[0]} as a cut edge")
+        return read_sheet(base, W, H, which, verbose, cut=err[0])
     if err:
         return None, err
     return finish(base, W, H, got)
@@ -440,12 +598,19 @@ def finish(base, W, H, got):
     # localises a misreading: the two corners on a side must agree about that
     # side's coordinate. A sheet 14 km out of place is otherwise invisible -- it
     # still lies flat on the basemap and still looks like a map.
-    read = {k: read_corner(corner_crop(base, C[k], k, W, H)) for k in CORNERS}
+    cut = got.get("cut")
+    # A cut edge prints no figures at all -- what sits outside it is the Bonne
+    # kilometre chiffraison, not grades -- so its two corners are not read. Two
+    # Gemini calls instead of four, and the check that survives is the longitude,
+    # printed at both ends of the framed side.
+    wanted = CORNERS if not cut else (("NE", "SE") if cut == "L" else ("NW", "SW"))
+    read = {k: read_corner(corner_crop(base, C[k], k, W, H)) for k in wanted}
     if any(v is None for pair in read.values() for v in pair):
         return None, "corner figures unread: " + ", ".join(
             f"{k} {a},{b}" for k, (a, b) in read.items())
     q = quad(got)
-    edges, disagree, err = resolve(read, q["aspect"])
+    edges, disagree, err = (resolve_cut(read, q["aspect"], cut) if cut
+                            else resolve(read, q["aspect"]))
     if edges is None:
         return None, f"corner figures irreconcilable: {disagree}"
     nw_lon, se_lon = edges["west"], edges["east"]
@@ -454,8 +619,12 @@ def finish(base, W, H, got):
     north, south = nw_lat * GRADE, se_lat * GRADE
     gx, gy = ground(west, north, east, south)
     mx, my = gx / q["w"], gy / q["h"]
-    offs = [lines["offset"] for lines in got["lines"].values()]
-    mean_off = sum(offs) / 4
+    # The cut side's offset is 0 by construction -- the line found there IS the
+    # rim, with no thick line to measure in from -- so including it would make
+    # every half-sheet fail the spread gate that exists to catch a side which
+    # locked onto the graticule band instead.
+    offs = [v["offset"] for k, v in got["lines"].items() if k != cut]
+    mean_off = sum(offs) / len(offs)
     got.update({
         "rim_spread": (max(offs) - min(offs)) / mean_off if mean_off else 0.0,
         "read": {k: list(v) for k, v in read.items()},
@@ -548,6 +717,11 @@ def run_all(which="inner", shard=None):
                 print(f"{i:3d}/{len(rows)} {name:22.22s} FAILED  {err}")
                 continue
             got["id"], got["name"] = mid, name
+            # Which of the rim's two lines this sheet was read on. Normally
+            # `inner`; a sheet that had to fall back to `outer` sits about 7 px
+            # -- some 30 m -- further out, and that is worth being able to see
+            # later without re-running anything.
+            got["which"] = which
             out.write_text(json.dumps(got, indent=1))
             note = ""
         v = got["verdict"]
@@ -683,6 +857,7 @@ def check():
     """
     rows = {r["id"]: r for r in sheets()}
     cells, bad, rims = {}, [], []
+    whole_lons, half_lons = set(), set()
     for f in sorted(WORK.glob("*.json")):
         got = json.loads(f.read_text())
         if got.get("verdict"):
@@ -691,9 +866,21 @@ def check():
         n = (row.get("extra_metadata") or {}).get("sheet_number", "??")
         cells.setdefault(g["NW"][1], {}).setdefault(g["NW"][0], []).append(
             (n, got["name"], f))
+        (half_lons if got.get("cut") else whole_lons).add(g["NW"][0])
         if not got.get("by_hand"):
-            off = sum(v["offset"] for v in got["lines"].values()) / 4
-            rims.append((off / got["quad"]["w"], off, got["name"]))
+            real = [v["offset"] for k, v in got["lines"].items()
+                    if k != got.get("cut")]
+            off = sum(real) / len(real)
+            # Against the sheet's HEIGHT, not its width. The margin is a printed
+            # constant and the division is only there to be independent of scan
+            # resolution -- but this survey has two formats, the full sheet
+            # (~4500 px wide) and the demi-format (~2700), and they share their
+            # other dimension. Normalised by width, four correctly-read
+            # demi-format sheets reported "+100% off the series" while their
+            # absolute offsets -- 84.3, 84.2, 84.2, 81.7 px -- were the closest
+            # in the corpus to the 84.2 px median. A gate that fires on every
+            # sheet of a whole format teaches the reader to ignore it.
+            rims.append((off / got["quad"]["h"], off, got["name"]))
 
     # The frame is printed, so the distance from the thick neatline in to the rim
     # is a constant of the edition -- about 84 px on a 4400 px sheet, everywhere.
@@ -702,7 +889,7 @@ def check():
     # four sides shifted together change the size but barely the shape.
     if rims:
         med = float(np.median([r[0] for r in rims]))
-        print(f"  rim offset: median {med*1e4:.1f} parts per 10k of sheet width "
+        print(f"  rim offset: median {med*1e4:.1f} parts per 10k of sheet height "
               f"({np.median([r[1] for r in rims]):.1f} px)")
         out = [r for r in rims if abs(r[0] - med) / med > 0.15]
         for frac, off, name in sorted(out, key=lambda r: -abs(r[0] - med)):
@@ -712,10 +899,23 @@ def check():
     lons = sorted({lon for r in cells.values() for lon in r})
     lats = sorted(cells, reverse=True)
     if lons:
+        # Two lattices, because the survey has two formats. A whole sheet spans a
+        # full cell and its west edge is a multiple of 0.20g; a half-sheet spans
+        # half a cell, so the east one starts at a half-step. Checked against a
+        # single 0.20g lattice the sixteen half-sheets all read "off by 0.500",
+        # which is the check misdescribing the paper rather than a misplaced
+        # sheet -- and a gate that reports a whole correct format as broken is
+        # worse than no gate. Each format is held to its own.
+        base = min(whole_lons) if whole_lons else lons[0]
         step_lon = min((b - a) for a, b in zip(lons, lons[1:])) if len(lons) > 1 else 0.2
-        off = [round((x - lons[0]) / 0.20, 3) % 1 for x in lons]
-        print(f"  west edges: {len(lons)} distinct, smallest step {step_lon:.3f}g, "
-              f"off the 0.20g lattice by {max(off + [0]):.3f}")
+        ow = [round((x - base) / 0.20, 3) % 1 for x in sorted(whole_lons)]
+        oh = [round((x - base) / 0.10, 3) % 1 for x in sorted(half_lons)]
+        print(f"  west edges: {len(lons)} distinct, smallest step {step_lon:.3f}g")
+        print(f"    {len(whole_lons)} whole-sheet, off the 0.20g lattice by "
+              f"{max(ow + [0]):.3f}")
+        if half_lons:
+            print(f"    {len(half_lons)} half-sheet, off the 0.10g lattice by "
+                  f"{max(oh + [0]):.3f}")
     if len(lats) > 1:
         off = [round((lats[0] - y) / 0.125, 3) % 1 for y in lats]
         print(f"  north edges: {len(lats)} distinct, off the 0.125g lattice by "

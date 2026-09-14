@@ -1,0 +1,23 @@
+18 sheets
+
+  explicit cache unavailable (400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Cached content is too small. tot); sending prompt inline
+  1/18 Cua Day (E)            ok   115.30/22.250g 4.227m/px  axes 1.11%   
+  2/18 Cua Day (W)            ok   115.20/22.250g 4.250m/px  axes 0.04%   
+  3/18 Do Son (E)             ok   116.10/23.125g 4.243m/px  axes 0.08%   
+  4/18 Do Son (W)             ok   116.00/23.125g 4.228m/px  axes 0.38%   
+  5/18 Hai Duong (E)          CHECK 115.50/23.375g 4.229m/px  axes 0.75%  rim offsets spread 28% 
+  6/18 Kien Hanh (E)          ok   115.70/22.500g 4.259m/px  axes 0.13%   
+  7/18 Kien Hanh (W)          ok   115.60/22.500g 4.261m/px  axes 0.05%   
+  8/18 Lach Truong            CHECK 115.00/22.125g 3.010m/px  axes 29.36%  shape off by 29.4%; axes disagree 29.4% 
+  9/18 Nhan Ly                ok   114.50/23.500g 4.246m/px  axes 0.10%   
+ 10/18 Phu Ninh Giang (E)     ok   115.70/23.125g 4.244m/px  axes 0.29%   
+ 11/18 Phu Ninh Giang (W)     ok   115.60/23.125g 4.256m/px  axes 0.19%   
+ 12/18 Phu Quoc Oai (E)       ok   114.70/23.375g 4.246m/px  axes 0.32%   
+ 13/18 Phu Xuyen (E)          ok   115.10/23.125g 4.270m/px  axes 0.50%   
+ 14/18 Phu Xuyen (W)          ok   115.00/23.125g 4.255m/px  axes 0.01%   
+ 15/18 Quang Thua (W)         ok   114.80/23.000g 4.294m/px  axes 0.92%   
+ 16/18 Thanh Oai (W)          ok   114.80/23.250g 4.257m/px  axes 0.03%   
+ 17/18 Van Ly (E)             ok   115.50/22.375g 4.244m/px  axes 0.49%   
+ 18/18 Van Ly (W)             ok   115.40/22.375g 4.257m/px  axes 0.41%   
+
+16/18 clear the gate

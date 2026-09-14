@@ -1,0 +1,25 @@
+21 scans to ingest
+
+        11  Nhan Ly                1924  2d55aed7-a7e9-4d84-b8e0-0ffa95f04e79
+      18 E  Phu Quoc Oai (E)       1906  1589e6c8-3bd0-4960-9505-05e39eb97d2c
+      22 E  Hai Duong (E)          1925  cbceebb3-76cb-4e92-8928-1b0856654ae1
+      26 W  Thanh Oai (W)          1925  a484611b-c756-4e62-8a77-1d7f4748a250
+      34 W  Phu Xuyen (W)          1917  b526d180-d21d-46bc-883e-7a645dbb4d17
+      34 E  Phu Xuyen (E)          1903  fdfb961d-de66-4b0c-8c78-f90114811bda
+      37 W  Phu Ninh Giang (W)     1904  0775a31e-7dd8-470a-8b06-67bb8707275f
+      37 E  Phu Ninh Giang (E)     1904  1ae3f781-cabb-4bc9-9804-577c6447a00b
+      39 E  Do Son (E)             1904  c8dcff3d-250b-406d-bac8-a7255c5b6f95
+      39 W  Do Son (W)             1923  49851c38-7608-44f5-9459-a6c67f7d6aab
+      40 W  Quang Thua (W)         1906  8b2378cd-1674-46a1-a085-5d914df97c21
+        46  Hon Dau                1924  189aaeae-77a1-4002-8690-c44cfd1d0ab7
+        52  Thuy Anh               1926  caa5df25-1f6f-4fe2-99d5-a2a0679cdb97
+        63  Nam Dong               1926  7ee0ac7d-0026-4358-adfa-9963d82aa973
+      67 W  Kien Hanh (W)          1926  fb6ed962-ad9f-4829-bb7b-a5e0c885f11f
+      67 E  Kien Hanh (E)          1926  a2680483-2f77-4fe1-bcf9-393b100bc318
+      70 E  Van Ly (E)             1905  c34745b7-c4c2-4770-86b9-2de2ed769dbb
+      70 W  Van Ly (W)             1905  33fd891c-b383-42b1-8aee-cc270be9862c
+  73 bis E  Cua Day (E)            1927  e8187c2b-7e2d-4476-a911-870b22cd0bb0
+  73 bis W  Cua Day (W)            1905  aa921556-5ad3-42dc-8040-f9307ac4ee30
+        76  Lach Truong            1943  b1f15654-3ef5-4557-a34d-dbc8afcf0803
+
+21/21 mirrored. Next: tonkin_georef.py all, then annotate --write.

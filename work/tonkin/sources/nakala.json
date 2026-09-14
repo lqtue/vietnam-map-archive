@@ -1,0 +1,356 @@
+{
+ "_source": "CartoMundi /ctmd-services/public/etablissement/3/serie/{243,175}/feuille/exemplaire/all, read 2026-09-14",
+ "_note": "IGN copies deposited in Nakala, CC-BY-4.0, IIIF level2 with CORS. 16 of the 20 unheld cells have one; cells 7, 8, 9 and 19 have none.",
+ "cells": {
+  "11": [
+   {
+    "title": "Nhan-Ly",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Ouest n'est pas couverte par la série",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23805,
+    "nakala": "10.34847/nkl.d33e0e26",
+    "sha1": "7cd781f06950b20236b3bcd2ffc3123a6fa9e11f",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d33e0e26/7cd781f06950b20236b3bcd2ffc3123a6fa9e11f/info.json"
+   },
+   {
+    "title": "Nhan-Ly",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Ouest n'est pas couverte par la série",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23804,
+    "nakala": "10.34847/nkl.77a4gkd9",
+    "sha1": "d3945401fec65498acd2c6e1e1ae9330770a77b6",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.77a4gkd9/d3945401fec65498acd2c6e1e1ae9330770a77b6/info.json"
+   },
+   {
+    "title": "Nhan-Ly",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Ouest n'est pas couverte par la série",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23806,
+    "nakala": "10.34847/nkl.b410trge",
+    "sha1": "0f95ca38e8d12e3057d9da1e58f587cce4ededaa",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b410trge/0f95ca38e8d12e3057d9da1e58f587cce4ededaa/info.json"
+   }
+  ],
+  "67": [
+   {
+    "title": "Kiên- [Hành]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23914,
+    "nakala": "10.34847/nkl.535d77h8",
+    "sha1": "e2223eb369835ab88ffeceb7dbffe6bb6bd447c8",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.535d77h8/e2223eb369835ab88ffeceb7dbffe6bb6bd447c8/info.json"
+   },
+   {
+    "title": "[Kiên-] Hành",
+    "note": "Demi-feuille Est",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23739,
+    "nakala": "10.34847/nkl.a43d56j8",
+    "sha1": "2f54c39c79f834748040d9f67096411c7cdf910f",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a43d56j8/2f54c39c79f834748040d9f67096411c7cdf910f/info.json"
+   },
+   {
+    "title": "[Kiên-] Hành",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23738,
+    "nakala": "10.34847/nkl.e3e20m0x",
+    "sha1": "5b3f47e46a04d2010f0ce80bff742ba6d3ade2e4",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e3e20m0x/5b3f47e46a04d2010f0ce80bff742ba6d3ade2e4/info.json"
+   },
+   {
+    "title": "Kiên- [Hành]",
+    "note": "Demi-feuille Ouest",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23915,
+    "nakala": "10.34847/nkl.acday7w3",
+    "sha1": "cc914936fac4f16450934e1b39970c52d9d17d8b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.acday7w3/cc914936fac4f16450934e1b39970c52d9d17d8b/info.json"
+   }
+  ],
+  "34": [
+   {
+    "title": "Phu- [Xuyên]",
+    "note": "Demi-feuille Ouest",
+    "year": 1917,
+    "serie": 243,
+    "fkey": 23868,
+    "nakala": "10.34847/nkl.e554y758",
+    "sha1": "4b2abf5df0f393d2c8f1b6bb1119d4394c3764a3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e554y758/4b2abf5df0f393d2c8f1b6bb1119d4394c3764a3/info.json"
+   },
+   {
+    "title": "[Phu-] Xuyên",
+    "note": "Demi-feuille Est",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23775,
+    "nakala": "10.34847/nkl.1def8rua",
+    "sha1": "ff7dea66ddf8e14212a58c81b0a441fbc064e65a",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.1def8rua/ff7dea66ddf8e14212a58c81b0a441fbc064e65a/info.json"
+   },
+   {
+    "title": "Phu- [Xuyên]",
+    "note": "Demi-feuille Ouest",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23867,
+    "nakala": "10.34847/nkl.379559jq",
+    "sha1": "33e50b7e19baef1aa3570b5dc1afc8c58eedc83b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.379559jq/33e50b7e19baef1aa3570b5dc1afc8c58eedc83b/info.json"
+   }
+  ],
+  "52": [
+   {
+    "title": "Thuy-Anh",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23760,
+    "nakala": "10.34847/nkl.83e5sw4q",
+    "sha1": "69333ffdda888c40bb0e438236f4de996acddab6",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.83e5sw4q/69333ffdda888c40bb0e438236f4de996acddab6/info.json"
+   },
+   {
+    "title": "Thuy-Anh",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23761,
+    "nakala": "10.34847/nkl.f88dg74u",
+    "sha1": "b162635356279db9a58105be317384eed8699df3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f88dg74u/b162635356279db9a58105be317384eed8699df3/info.json"
+   }
+  ],
+  "22": [
+   {
+    "title": "[Hai-] Du'o'ng",
+    "note": "Demi-feuille Est",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23798,
+    "nakala": "10.34847/nkl.f5d3miez",
+    "sha1": "fb85943b738ebc70af0c7f1d27c4eec0a19ac40a",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f5d3miez/fb85943b738ebc70af0c7f1d27c4eec0a19ac40a/info.json"
+   },
+   {
+    "title": "[Hai-] Du'o'ng",
+    "note": "Demi-feuille Est",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23797,
+    "nakala": "10.34847/nkl.a46c29l1",
+    "sha1": "0c3b39bd8e62803ad9f687185b3b54572eb5976b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a46c29l1/0c3b39bd8e62803ad9f687185b3b54572eb5976b/info.json"
+   }
+  ],
+  "39": [
+   {
+    "title": "[Dô-] Son",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23783,
+    "nakala": "10.34847/nkl.57d87f02",
+    "sha1": "423b1d35ee4c20566385ce961253e7b20af2aafc",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.57d87f02/423b1d35ee4c20566385ce961253e7b20af2aafc/info.json"
+   },
+   {
+    "title": "Dô- [Son]",
+    "note": "Demi-feuille Ouest",
+    "year": 1923,
+    "serie": 243,
+    "fkey": 23933,
+    "nakala": "10.34847/nkl.e44d47sy",
+    "sha1": "9e7dd4a693aa248892885f5116dceb4a17979c3c",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e44d47sy/9e7dd4a693aa248892885f5116dceb4a17979c3c/info.json"
+   }
+  ],
+  "63": [
+   {
+    "title": "Nam-Dông",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23748,
+    "nakala": "10.34847/nkl.5ec4x6ha",
+    "sha1": "fc6d3ec97a5e20c5744ab5b04d9734645baf44d1",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5ec4x6ha/fc6d3ec97a5e20c5744ab5b04d9734645baf44d1/info.json"
+   },
+   {
+    "title": "Nam-Dông",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23747,
+    "nakala": "10.34847/nkl.aeba39bu",
+    "sha1": "6a992dd9158bcddeef95267770f4ae56dba3f419",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.aeba39bu/6a992dd9158bcddeef95267770f4ae56dba3f419/info.json"
+   }
+  ],
+  "70": [
+   {
+    "title": "[Van] -Ly",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23733,
+    "nakala": "10.34847/nkl.c20016dy",
+    "sha1": "07390854105067cc2250660b6c7330f46c7d6150",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c20016dy/07390854105067cc2250660b6c7330f46c7d6150/info.json"
+   },
+   {
+    "title": "Van [-Ly]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23897,
+    "nakala": "10.34847/nkl.b97fb2j2",
+    "sha1": "586e497aa620e186e13c03f6fd4e4c16a47c8826",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b97fb2j2/586e497aa620e186e13c03f6fd4e4c16a47c8826/info.json"
+   }
+  ],
+  "46": [
+   {
+    "title": "Hon-Dâu",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23772,
+    "nakala": "10.34847/nkl.68021hy8",
+    "sha1": "01e8ec538371e00784fb6503099bba3dc607393c",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.68021hy8/01e8ec538371e00784fb6503099bba3dc607393c/info.json"
+   },
+   {
+    "title": "Hon-Dâu",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23771,
+    "nakala": "10.34847/nkl.eebe2ex5",
+    "sha1": "e7979973098a293561797a6f7d0ed0d962cce6b6",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eebe2ex5/e7979973098a293561797a6f7d0ed0d962cce6b6/info.json"
+   }
+  ],
+  "73 bis": [
+   {
+    "title": "[Cua-] Day",
+    "note": "Demi-feuille Est. La partie de la mention de date qui est donnée entre crochets est située sur la demi-feuille Ouest",
+    "year": 1927,
+    "serie": 243,
+    "fkey": 23729,
+    "nakala": "10.34847/nkl.f28e52xg",
+    "sha1": "5ac7af9fd2fc617d29afa4835de42e84648c959d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f28e52xg/5ac7af9fd2fc617d29afa4835de42e84648c959d/info.json"
+   },
+   {
+    "title": "[Cua-] Day",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23728,
+    "nakala": "10.34847/nkl.0fd927om",
+    "sha1": "8f1640772fa9e4977e089540527cf990d9fdf4d9",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0fd927om/8f1640772fa9e4977e089540527cf990d9fdf4d9/info.json"
+   },
+   {
+    "title": "Cua- [Day]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23876,
+    "nakala": "10.34847/nkl.0c41b1om",
+    "sha1": "d5a3a31a3720e95630c868101cf8a883782fe01d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0c41b1om/d5a3a31a3720e95630c868101cf8a883782fe01d/info.json"
+   }
+  ],
+  "40": [
+   {
+    "title": "Quang [-Thua]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23762,
+    "nakala": "10.34847/nkl.1b966s30",
+    "sha1": "979d78fdcb752b579019fae2333ecf07b99c648f",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.1b966s30/979d78fdcb752b579019fae2333ecf07b99c648f/info.json"
+   }
+  ],
+  "76": [
+   {
+    "title": "Lach-Tru'o'ng",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1943,
+    "serie": 243,
+    "fkey": 23856,
+    "nakala": "10.34847/nkl.5b3470d9",
+    "sha1": "7227b3c33dad5ca9835ca09dd69abe1c233cfae2",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5b3470d9/7227b3c33dad5ca9835ca09dd69abe1c233cfae2/info.json"
+   },
+   {
+    "title": "Lach-Tru'o'ng",
+    "note": "Feuille de demi-format titrée comme une feuille complète. La zone Est n'est pas couverte par la série",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23855,
+    "nakala": "10.34847/nkl.56a014c0",
+    "sha1": "0438b1d082a63ac204ac547d1722925b1202dbdb",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.56a014c0/0438b1d082a63ac204ac547d1722925b1202dbdb/info.json"
+   }
+  ],
+  "37": [
+   {
+    "title": "Phu-Nin[h-Giang]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23921,
+    "nakala": "10.34847/nkl.1adc179d",
+    "sha1": "c4061467d9cff94a4f6165f78d81a551bc2f0bb9",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.1adc179d/c4061467d9cff94a4f6165f78d81a551bc2f0bb9/info.json"
+   },
+   {
+    "title": "[Phu-Nin]h-Giang",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23780,
+    "nakala": "10.34847/nkl.e15aezuw",
+    "sha1": "b3bed5e3674de3b8f0255560d90fe1d303a8fdac",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e15aezuw/b3bed5e3674de3b8f0255560d90fe1d303a8fdac/info.json"
+   }
+  ],
+  "26": [
+   {
+    "title": "Thanh [-Oai]",
+    "note": "Demi-feuille Ouest",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23784,
+    "nakala": "10.34847/nkl.b8a6x51s",
+    "sha1": "dcd87e52bfbbcd9a72eb5cb49ea34d8bb68b4f73",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b8a6x51s/dcd87e52bfbbcd9a72eb5cb49ea34d8bb68b4f73/info.json"
+   }
+  ],
+  "18": [
+   {
+    "title": "[Phu-Qu]oc-Oai",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23842,
+    "nakala": "10.34847/nkl.a14fz7hw",
+    "sha1": "d618cb331df403b3f4165c660142b59066dce5a3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a14fz7hw/d618cb331df403b3f4165c660142b59066dce5a3/info.json"
+   }
+  ]
+ }
+}

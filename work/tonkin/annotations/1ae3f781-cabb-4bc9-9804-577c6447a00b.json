@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/1ae3f781-cabb-4bc9-9804-577c6447a00b/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/1ae3f781-cabb-4bc9-9804-577c6447a00b",
+     "type": "ImageService3",
+     "width": 2728,
+     "height": 3868
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"2728\" height=\"3868\"><polygon points=\"146,412 2354,409 2358,3335 149,3338\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        146,
+        412
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.4672292,
+        20.8125
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2354,
+        409
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.5572292,
+        20.8125
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2358,
+        3335
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.5572292,
+        20.7
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        149,
+        3338
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.4672292,
+        20.7
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}
