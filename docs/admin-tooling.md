@@ -268,13 +268,22 @@ and an edition, report, upsert. Only the parsing is per-source. The rest was wri
 | `lib/http.mjs` | `UA` (one string, which identifies us and where to complain — three different ones were in the tree, one a bare `Mozilla/5.0`), `sleep`, and `fetchJson` with a timeout, backoff and throttle that retries a 429, a 5xx or a timeout and never a 404. |
 | `lib/cli.mjs` | `willApply()`, `flag()`, `opt()`, `dryNotice()`. |
 
-**Nothing writes without `--apply`.** That is the point of `cli.mjs`. Until 2026-09-14 eight scripts
-wrote only with `--apply` and four wrote *unless* you passed `--dry` — same directory, opposite
-defaults, and the writing default was the one that looks like an ordinary invocation:
-`node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs` inserted `maps` rows and tiled
-scans. The four (`ingest_indochine_nakala`, `import_indochine_series_sheets`,
+**Nothing that reads `cli.mjs` writes without `--apply`.** That is the point of it. Until
+2026-09-14 eight scripts wrote only with `--apply` and nine wrote *unless* you passed `--dry` —
+same directory, opposite defaults, and the writing default was the one that looks like an ordinary
+invocation: `node --env-file=.env scripts/oneoff/ingest_indochine_nakala.mjs` inserted `maps` rows
+and tiled scans. Four of the nine (`ingest_indochine_nakala`, `import_indochine_series_sheets`,
 `backfill_series_printings`, `normalize_map_locations`) were flipped; `--dry` is still accepted and
 now means what it always read as.
+
+**Five were not, and they are the live hazard** (audited 2026-09-15, after the refactor claimed the
+count was four): `backfill_indochine_descriptions`, `fix_l909_series_index`,
+`import_l7014_series_sheets`, `publish_l7014_city_sheets` and `scout_cartomundi_series` still write
+to production unless `--dry` is passed — three `maps` updates, one `series_sheets` upsert, one
+`scout_candidates` upsert, including one that flips sheets to `status = 'public'`. Each has run
+already; the risk is a re-run typed from the header comment. The fix is four lines apiece —
+`import { willApply } from '../lib/cli.mjs'` and invert — and it is on the roadmap rather than done
+here because the change is worth verifying against each script's own dry output, not batched blind.
 
 ### Why the parsers moved
 
