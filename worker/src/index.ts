@@ -133,20 +133,26 @@ export default {
       // The mirrored copy under the spelling dzsave used. See
       // `widthOnlySizeToExplicit`: without this, a width-only request misses R2
       // for every map in the bucket and either proxies to the origin or 404s.
-      if (!obj) {
-        const alt = widthOnlySizeToExplicit(rest);
-        if (alt) obj = await env.TILES.get(`tiles/${mapId}${alt}`);
+      const explicit = widthOnlySizeToExplicit(rest);
+      if (!obj && explicit) {
+        obj = await env.TILES.get(`tiles/${mapId}${explicit}`);
       }
       // The whole-image overview, which dzsave files under `full/`. Costs one
       // extra read of a small JSON, and only on a miss — but it is the request
       // the renderer makes before it can draw anything, so without it a map
       // with a complete tile pyramid still comes up blank.
+      //
+      // It looks up the *normalised* spelling, not the request: `full/` keys
+      // carry an explicit `w,h` like every other derivative, so the overview
+      // asked for width-only — `/0,0,2652,3753/166,/` — resolved to `full/166,`
+      // and missed. The two rewrites have to compose, because the one request
+      // that needs both is the first one the renderer makes.
       if (!obj && /^\/0,0,\d+,\d+\//.test(rest)) {
         const infoObj = await env.TILES.get(`tiles/${mapId}/info.json`);
         if (infoObj) {
           try {
             const info = JSON.parse(await infoObj.text());
-            const full = wholeRegionToFull(rest, info.width, info.height);
+            const full = wholeRegionToFull(explicit ?? rest, info.width, info.height);
             if (full) obj = await env.TILES.get(`tiles/${mapId}${full}`);
           } catch {
             // A malformed info.json is the proxy path's problem, not ours.

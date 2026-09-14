@@ -25,12 +25,47 @@ test('a square tile keeps its size', () => {
   );
 });
 
-test('an edge tile rounds the way dzsave rounded', () => {
+test('an edge tile rounds the way dzsave rounded — up, not to nearest', () => {
   // Real key: 3758 * 256 / 4096 = 234.875, and the bucket holds `256,235`.
   // Math.floor would ask for 234 and miss.
   expect(widthOnlySizeToExplicit('/0,0,4096,3758/256,/0/default.jpg')).toBe(
     '/0,0,4096,3758/256,235/0/default.jpg'
   );
+
+  // …but .875 rounds up under *every* rule, so the case above cannot tell
+  // `ceil` from `round`, and for a year it did not: the bottom row of the
+  // Indochine sheets lands below .5, where round becomes floor. Real key from
+  // 0775a31e (2652 x 3753) at factor 8: 1705 / 8 = 213.125, bucket holds
+  // `256,214`. Math.round asks 213 and misses.
+  expect(widthOnlySizeToExplicit('/0,2048,2048,1705/256,/0/default.jpg')).toBe(
+    '/0,2048,2048,1705/256,214/0/default.jpg'
+  );
+  // Same sheet, factor 16, whole image: 3753 / 16 = 234.5625.
+  expect(widthOnlySizeToExplicit('/0,0,2652,3753/166,/0/default.jpg')).toBe(
+    '/0,0,2652,3753/166,235/0/default.jpg'
+  );
+});
+
+test('a corner tile takes its height from the factor, not the rounded width', () => {
+  // Both axes inexact. The width is already rounded up (604 / 8 = 75.5 -> 76),
+  // so the ratio it carries is not the scale factor: 1705 * 76 / 604 = 214.56
+  // overshoots, and ceil and round alike ask for 215. The bucket holds
+  // `76,214` — only recovering the factor gets there.
+  expect(widthOnlySizeToExplicit('/2048,2048,604,1705/76,/0/default.jpg')).toBe(
+    '/2048,2048,604,1705/76,214/0/default.jpg'
+  );
+  // Real key from 013daa15 (4998 x 3780), factor 16: 902 / 16 = 56.375 -> 57,
+  // and 3780 / 16 = 236.25 -> 237.
+  expect(widthOnlySizeToExplicit('/4096,0,902,3780/57,/0/default.jpg')).toBe(
+    '/4096,0,902,3780/57,237/0/default.jpg'
+  );
+});
+
+test('a width no power of two produces is left to the proxy', () => {
+  // Nothing in the pyramid answers to it, so inventing a height would only
+  // manufacture a second miss.
+  expect(widthOnlySizeToExplicit('/0,0,2048,2048/200,/0/default.jpg')).toBeNull();
+  expect(widthOnlySizeToExplicit('/0,0,2048,2048/999,/0/default.jpg')).toBeNull();
 });
 
 test('the offset is carried through untouched', () => {
@@ -101,6 +136,15 @@ test('a region that is not the whole image is never full', () => {
 
 test('a region with an offset is not the whole image', () => {
   expect(wholeRegionToFull('/512,0,5001,3771/157,118/0/default.jpg', 5001, 3771)).toBeNull();
+});
+
+test('the width-only overview composes both rewrites', () => {
+  // The renderer asks for the whole image width-only, and `full/` keys carry an
+  // explicit `w,h` like every other derivative — so the two rewrites have to
+  // run in series. `/full/166,` is not a key; `/full/166,235` is.
+  const explicit = widthOnlySizeToExplicit('/0,0,2652,3753/166,/0/default.jpg');
+  expect(explicit).toBe('/0,0,2652,3753/166,235/0/default.jpg');
+  expect(wholeRegionToFull(explicit as string, 2652, 3753)).toBe('/full/166,235/0/default.jpg');
 });
 
 test('non-region paths are left alone', () => {
