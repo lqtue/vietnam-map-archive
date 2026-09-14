@@ -70,7 +70,14 @@ export interface CatalogSearchController {
   filteredScout: Readable<Row[]>;
   results: Readable<Row[]>;
   facets: Readable<Record<string, Record<string, number>>>;
-  total: Readable<{ maps: number; scout: number }>;
+  /**
+   * `maps` is the number of map rows on screen, drafts included — it has to
+   * match the list under it. `drafts` says how many of those are unpublished,
+   * which is zero for a reader (the API only returns published rows to one)
+   * and non-zero for staff. Without it the toolbar called 153 rows "in
+   * archive" while /about said 103, and both were right.
+   */
+  total: Readable<{ maps: number; drafts: number; scout: number }>;
   /** Distinct areas/types present in the corpus, frequency-sorted (for dropdowns). */
   areaChoices: Readable<string[]>;
   typeChoices: Readable<string[]>;
@@ -302,6 +309,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const results = derived([filteredMaps, filteredScout], ([$m, $s]) => [...$m, ...$s]);
   const total = derived([filteredMaps, filteredScout], ([$m, $s]) => ({
     maps: $m.length,
+    drafts: $m.filter((r) => r.status === 'draft').length,
     scout: $s.length,
   }));
 

@@ -267,6 +267,7 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Submit a map | Gửi bản đồ |
 | Search by title, creator, year, or description… | Tìm theo tiêu đề, tác giả, năm hoặc mô tả… |
 | {N} in archive · {M} in scout queue | {N} trong kho lưu trữ · {M} trong hàng chờ |
+| · {N} drafts | · {N} bản nháp |
 | Include scout queue | Bao gồm hàng chờ sơ duyệt |
 | Catalog view | Chế độ xem |
 | List | Danh sách |

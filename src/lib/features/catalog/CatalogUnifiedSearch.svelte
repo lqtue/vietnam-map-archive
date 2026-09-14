@@ -112,6 +112,12 @@
             N: $total.maps,
             M: $total.scout,
           })}{:else}{$t('{N} in archive', { N: $total.maps })}{/if}
+        <!-- Drafts are in that count, because they are in the list under it.
+             Saying so is the whole fix: a reader sees no drafts and no suffix,
+             staff saw 153 called "in archive" while /about said 103. Gated on
+             the number, not the role — the API decides which rows arrive. -->
+        {#if $total.drafts}<span class="v2-drafts">{$t('· {N} drafts', { N: $total.drafts })}</span
+          >{/if}
         {#if $loading}<span class="v2-loading">…</span>{/if}
       </span>
       <div class="v2-tools">
@@ -214,6 +220,10 @@
   .v2-loading {
     margin-left: 0.4rem;
     opacity: 0.6;
+  }
+  .v2-drafts {
+    margin-left: 0.3rem;
+    opacity: 0.65;
   }
   .v2-scout-toggle {
     display: inline-flex;
