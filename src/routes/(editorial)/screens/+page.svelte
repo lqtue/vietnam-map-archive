@@ -731,10 +731,22 @@
           <div class="sc-item-head">
             <code class="sc-code">LocationSearch</code>
             <span class="sc-role">
-              Nominatim place lookup. Live — typing here really queries OpenStreetMap.
+              Place lookup, plus coordinates parsed locally — decimal, DMS, and the military grid
+              the US Army sheets carry (<code>XS 8965 4123</code>), which resolves on both the
+              wartime Indian 1960 datum and WGS 84. Live — a place name really queries
+              OpenStreetMap.
             </span>
           </div>
           <div class="sc-stage sc-stage-narrow">
+            <label class="sb-search">
+              <input
+                class="sb-search-input"
+                type="search"
+                placeholder="Ben Thanh · 48Q XD 850 418 · 10.7769, 106.7009"
+                aria-label="Location search demo"
+                bind:value={locQuery}
+              />
+            </label>
             <LocationSearch bind:query={locQuery} />
           </div>
         </div>

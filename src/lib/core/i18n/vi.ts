@@ -350,4 +350,12 @@ export const vi: Record<string, string> = {
   'You made it.': 'Bạn đã hoàn thành.',
   'Save your trip': 'Lưu hành trình',
   'Log in to keep this on your profile.': 'Đăng nhập để lưu vào hồ sơ cá nhân.',
+  Coordinates: 'Tọa độ',
+  Places: 'Địa điểm',
+  'Military grid': 'Lưới tọa độ quân sự',
+  'as printed on US Army sheets': 'như in trên bản đồ Quân đội Mỹ',
+  'modern GPS datum': 'hệ quy chiếu GPS hiện đại',
+  '{N} m square': 'Ô {N} m',
+  '{N} km square': 'Ô {N} km',
+  'Search a place or coordinates…': 'Tìm địa điểm hoặc tọa độ…',
 };

@@ -18,7 +18,13 @@
   type Pick = { lat: number; lng: number; label: string; bbox?: [number, number, number, number] };
   const dispatch = createEventDispatcher<{ pickLocation: Pick }>();
 
-  export let placeholder = 'Search a place…';
+  /** Overrides the default. Blank takes the translated one below. */
+  export let placeholder = '';
+
+  // The field takes a typed position as well as a name — decimal, DMS, or the
+  // `XS 8965 4123` grid off a US Army sheet. Nobody tries that unless the
+  // placeholder says so, which is the whole reason this string changed.
+  $: label = placeholder || $t('Search a place or coordinates…');
 
   let query = '';
 
@@ -47,8 +53,8 @@
     <input
       class="sb-search-input"
       type="search"
-      {placeholder}
-      aria-label={placeholder}
+      placeholder={label}
+      aria-label={label}
       bind:value={query}
     />
     {#if query}

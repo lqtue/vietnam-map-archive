@@ -414,6 +414,23 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Save your trip | Lưu hành trình |
 | Log in to keep this on your profile. | Đăng nhập để lưu vào hồ sơ cá nhân. |
 
+## 20 · Coordinate & grid search
+
+The location field accepts a typed position as well as a place name. The wartime
+US Army grid (`XS 8965 4123`) is on the Indian 1960 datum, so the same reference
+resolves to two points ~480 m apart — both are offered, labelled by datum.
+
+| English | Tiếng Việt |
+|---|---|
+| Coordinates | Tọa độ |
+| Places | Địa điểm |
+| Military grid | Lưới tọa độ quân sự |
+| as printed on US Army sheets | như in trên bản đồ Quân đội Mỹ |
+| modern GPS datum | hệ quy chiếu GPS hiện đại |
+| {N} m square | Ô {N} m |
+| {N} km square | Ô {N} km |
+| Search a place or coordinates… | Tìm địa điểm hoặc tọa độ… |
+
 ---
 
 ## Open questions for review
