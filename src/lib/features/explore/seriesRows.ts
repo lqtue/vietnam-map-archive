@@ -1,26 +1,30 @@
-import type { SeriesRef, SheetsRef } from '$lib/map/stores/layersStore';
+import type { SeriesPart, SeriesRef } from '$lib/map/stores/layersStore';
+import { RASTER_SERIES, type RasterSeries } from '$lib/map/rasterSeries';
 import type { MapSeries } from '$lib/data/maps/types';
+
+export type { RasterSeries };
+
+type Bbox = [number, number, number, number];
 
 /**
  * The series list /explore offers above the sheet rows: one row per survey,
  * tap to put the whole thing on the map.
  *
- * A row is not one layer. L7014 is held two ways — 452 cells pre-tiled into a
- * raster archive, 9 as `maps` rows warped live by Allmaps — and those two are
- * complementary, not alternative: the mosaic cannot draw Saigon, because the
- * 24 sheets over the city are the plain JPGs PCL published with no embedded
- * georeference, which is exactly why they are `maps` rows at all; and the city
- * sheets cannot draw anywhere else. Offered as two rows they read as a choice
- * between two things. Added together they compose into one survey, the warped
- * sheets filling the hole in the mosaic.
- *
- * So a row carries `refs`, and they go on and come off together.
+ * A row is one layer, and it was two until Sept 2026. L7014 is held two ways —
+ * 452 cells pre-tiled into a raster archive, 9 as `maps` rows warped live by
+ * Allmaps — and those two are complementary, not alternative: the mosaic cannot
+ * draw Saigon, because the 24 sheets over the city are the plain JPGs PCL
+ * published with no embedded georeference, which is exactly why they are `maps`
+ * rows at all; and the city sheets cannot draw anywhere else. Stacked as two
+ * rows they read as a choice between two things, and cost the reader two
+ * opacity sliders, two eyes and two of the ten stack slots to control one
+ * survey. So they are the two `parts` of one `SeriesRef` instead.
  */
 export interface SeriesRow {
   key: string;
   name: string;
-  /** Bottom-up: `addOverlay` puts each new layer on top of the stack. */
-  refs: SeriesRef[];
+  /** The one layer this row puts on the map. */
+  ref: SeriesRef;
   label: string;
   note: string;
   /**
@@ -40,38 +44,10 @@ export interface SeriesRow {
   seriesKey?: string;
 }
 
-/**
- * A pre-tiled raster archive, which no database row describes. The list of them
- * is the caller's (`ExploreBrowsePanel`), because `L7014_OVERLAY` lives in
- * `map/constants.ts` next to OpenLayers layer builders — importing it here
- * would pull OL into a module that is otherwise pure arithmetic over the view's
- * rows, and out of reach of the browser-less tests.
- */
-export interface RasterSeries {
-  ref: SeriesRef;
-  name: string;
-  /**
-   * The `series_key` of the database series this archive is the other half of,
-   * or undefined when it stands alone.
-   */
-  halfOf?: string;
-  /** Cells in the archive. Not in the database, so it cannot be counted. */
-  sheets: number;
-  note: string;
-}
-
-/** The `SheetsRef` that draws a database series' sheets, warped live. */
-export function sheetsRef(s: MapSeries): SheetsRef {
-  return {
-    kind: 'sheets',
-    mapId: `sheets:${s.key}`,
-    key: s.key,
-    collection: s.collection,
-    // The collection is the layer's name in the stack, where it sits beside
-    // sheet names — so no year span here, which belongs in the note.
-    name: s.name,
-    bounds: s.bounds,
-  };
+/** The box that holds both halves — what "zoom to this layer" means for a row. */
+function union(a: Bbox, b?: Bbox): Bbox {
+  if (!b) return a;
+  return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])];
 }
 
 /**
@@ -116,7 +92,7 @@ function count(held: number, total?: number): string {
 export function buildSeriesRows(
   db: MapSeries[],
   canSeeDrafts: boolean,
-  rasters: RasterSeries[]
+  rasters: RasterSeries[] = RASTER_SERIES
 ): SeriesRow[] {
   const claimed = new Set<string>();
   const rows: SeriesRow[] = rasters.map((r) => {
@@ -124,11 +100,19 @@ export function buildSeriesRows(
     if (half) claimed.add(half.key);
     // Mosaic under, warped sheets over. The sheets are a sharper survey of the
     // ground the mosaic is missing, and belong above the pixels.
-    const refs: SeriesRef[] = half ? [r.ref, sheetsRef(half)] : [r.ref];
+    const parts: SeriesPart[] = [{ kind: 'raster', key: r.key }];
+    if (half) parts.push({ kind: 'sheets', collection: half.collection });
     return {
-      key: r.ref.key,
+      key: r.key,
       name: r.name,
-      refs,
+      ref: {
+        kind: 'series',
+        mapId: `series:${r.key}`,
+        key: r.key,
+        name: r.name,
+        parts,
+        bounds: union(r.bounds, half?.bounds),
+      },
       // Summed, this is finally the honest number: a row that draws both halves
       // may say what both halves hold. Only one year span, because the
       // mosaic's 1963–89 already contains the sheets' 1966–84.
@@ -147,7 +131,16 @@ export function buildSeriesRows(
     rows.push({
       key: s.key,
       name: s.name,
-      refs: [sheetsRef(s)],
+      ref: {
+        kind: 'series',
+        mapId: `series:${s.key}`,
+        key: s.key,
+        // The collection is the layer's name in the stack, where it sits beside
+        // sheet names — so no year span here, which belongs in the note.
+        name: s.name,
+        parts: [{ kind: 'sheets', collection: s.collection }],
+        bounds: s.bounds,
+      },
       label: count(s.sheets, s.surveySheets),
       note: seriesNote(s, canSeeDrafts),
       seriesKey: s.surveySheets ? s.key : undefined,

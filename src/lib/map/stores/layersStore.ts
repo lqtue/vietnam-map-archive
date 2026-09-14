@@ -6,13 +6,15 @@
  *
  * Conventions:
  *   - overlays array is TOP-OF-STACK FIRST (overlays[0] = topmost, displayed at top of UI list)
- *   - z-index when rendering: base = 0, overlays[N-1] = 10, overlays[N-2] = 11, … overlays[0] = 10 + (N-1)
+ *   - z-index when rendering: base = 0, then two per overlay row, bottom-up —
+ *     overlays[N-1] = 10, overlays[N-2] = 12, … overlays[0] = 10 + 2(N-1). The
+ *     gap is the second half of a two-part series row (LayerRenderer).
  */
 import { writable, derived, get, type Readable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { randomId } from '$lib/core/utils/id';
 import { readJson, writeJson } from '$lib/core/utils/persistence/storage';
-import { isSheetLayer } from './overlayKind';
+import { foldLegacyOverlays, isSheetLayer, readOverlayRef } from './overlayKind';
 
 export { isSheetLayer };
 
@@ -25,56 +27,52 @@ export type HistoricalRef = {
   thumbnail?: string;
 };
 /**
- * A pre-warped raster archive on our own tile domain — the AMS L7014 mosaic.
+ * A whole survey as one stack row.
  *
- * It is an overlay rather than a basemap because it is one sheet series among
- * others, not a backdrop: the reader wants it *over* whichever basemap they
- * chose, at an opacity they pick, and where the series has no sheet the gap
- * should show their basemap rather than punch a hole in the page.
+ * A survey can reach the map by two routes, and they are complementary rather
+ * than alternative: the AMS L7014 is 452 cells pre-tiled into a raster archive
+ * on our own tile domain, **plus** 9 `maps` rows warped live by Allmaps — the
+ * city sheets the source library published with no georeference attached, which
+ * are exactly the ones the mosaic is missing. A reader does not want to hold
+ * those two apart, so they are `parts` of one row: one name, one opacity, one
+ * eye, one ×, one slot against `MAX_OVERLAYS`. `LayerRenderer` is where a part
+ * becomes an OpenLayers layer, and `parts[0]` draws beneath `parts[1]`.
  *
- * `mapId` is synthetic and stable (`raster:<key>`). It is not a `maps.id`, and
+ * It is an overlay rather than a basemap because a series is one thing among
+ * the archive's others, not a backdrop: the reader wants it *over* whichever
+ * basemap they chose, at an opacity they pick, and where the survey has no
+ * sheet the gap should show their basemap rather than punch a hole in the page.
+ *
+ * `mapId` is synthetic and stable (`series:<key>`). It is not a `maps.id`, and
  * nothing will resolve it in the catalogue — it exists so that the overlay
- * stack's identity, dedupe and removal keep working on one field for every
- * kind of overlay.
- */
-export type RasterRef = {
-  kind: 'raster';
-  mapId: string;
-  key: string;
-  name: string;
-  /** [minLon, minLat, maxLon, maxLat] — what "zoom to this layer" means. */
-  bounds: [number, number, number, number];
-};
-
-/**
- * A whole sheet series as one stack row — the sheets warped live by Allmaps,
- * rather than a mosaic someone tiled in advance.
- *
- * The difference from `RasterRef` is only where the pixels come from: that one
- * is a raster archive on our tile domain, this one is N `maps` rows that share
- * a `collection`. Both are one row, one opacity, one visibility toggle, and
- * neither is a catalogue entry — hence the same synthetic `mapId` trick.
+ * stack's identity, dedupe and removal keep working on one field for every kind
+ * of overlay.
  *
  * The sheet list is deliberately **not** stored here. It is resolved from the
- * collection at render time, so the row survives in localStorage as four short
- * fields and a series that gains a sheet does not need the reader to re-add it.
+ * collection at render time, so the row survives in localStorage as a handful
+ * of short fields and a series that gains a sheet does not need the reader to
+ * re-add it.
  */
-export type SheetsRef = {
-  kind: 'sheets';
+export type SeriesPart =
+  /** A pre-warped raster archive, by the key `buildRasterOverlayLayer` knows. */
+  | { kind: 'raster'; key: string }
+  /** `maps.collection` — the sheets are whatever rows carry this string. */
+  | { kind: 'sheets'; collection: string };
+
+export type SeriesRef = {
+  kind: 'series';
   mapId: string;
   key: string;
   name: string;
-  /** `maps.collection` — the series is whatever carries this string. */
-  collection: string;
+  /** Bottom-up: `parts[0]` is drawn under `parts[1]`. */
+  parts: SeriesPart[];
   /** [minLon, minLat, maxLon, maxLat] — what "zoom to this layer" means. */
   bounds: [number, number, number, number];
 };
 
 export type LayerRef = BasemapRef | HistoricalRef;
-/** Anything that can sit in the overlay stack. */
-export type OverlayRef = HistoricalRef | RasterRef | SheetsRef;
-/** A stack row that is a series rather than one catalogued sheet. */
-export type SeriesRef = RasterRef | SheetsRef;
+/** Anything that can sit in the overlay stack: one catalogued sheet, or a survey. */
+export type OverlayRef = HistoricalRef | SeriesRef;
 
 /** Build a HistoricalRef from a catalogue row. `annotation_url` (R2 mirror) wins over the bare Allmaps id. */
 export function toHistoricalRef(map: {
@@ -118,24 +116,23 @@ function load(): LayersState {
     parsed.base?.kind === 'historical' || parsed.base?.kind === 'basemap'
       ? parsed.base
       : DEFAULT_BASE;
+  // `readOverlayRef` is both the validator and half the migration: it drops a
+  // row it cannot read, and reads the two pre-`series` shapes (`raster`,
+  // `sheets`) as one-part series rows. `foldLegacyOverlays` is the other half —
+  // it puts the halves of one survey back together as the single row a survey
+  // is added as today.
   const overlays: OverlayLayer[] = Array.isArray(parsed.overlays)
     ? parsed.overlays
-        .filter((o: any) =>
-          o?.ref?.kind === 'raster'
-            ? o.ref.key && o.ref.mapId
-            : o?.ref?.kind === 'sheets'
-              ? o.ref.key && o.ref.mapId && o.ref.collection
-              : o?.ref?.kind === 'historical' && o.ref.mapId && o.ref.allmapsId
-        )
         .slice(0, MAX_OVERLAYS)
         .map((o: any) => ({
-          id: String(o.id ?? makeId()),
-          ref: o.ref,
-          opacity: clamp01(typeof o.opacity === 'number' ? o.opacity : 1),
-          visible: o.visible !== false,
+          id: String(o?.id ?? makeId()),
+          ref: readOverlayRef(o?.ref),
+          opacity: clamp01(typeof o?.opacity === 'number' ? o.opacity : 1),
+          visible: o?.visible !== false,
         }))
+        .filter((o): o is OverlayLayer => o.ref !== null)
     : [];
-  return { base, overlays };
+  return { base, overlays: foldLegacyOverlays(overlays) };
 }
 
 function persist(s: LayersState) {
@@ -273,8 +270,8 @@ export function toggleOverlayFor(map: Parameters<typeof toHistoricalRef>[0]): bo
 
 /**
  * The topmost *sheet* on the stack — what `?map=`, the Info rail and story
- * playback all mean by "this sheet". A raster archive is skipped: it is a whole
- * series, has no catalogue row, and putting it here would write a `?map=` that
+ * playback all mean by "this sheet". A series row is skipped: it is a whole
+ * survey, has no catalogue row, and putting it here would write a `?map=` that
  * resolves to nothing.
  */
 export const topOverlay: Readable<HistoricalRef | null> = derived(

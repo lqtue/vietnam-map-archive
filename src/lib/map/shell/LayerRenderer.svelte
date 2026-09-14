@@ -2,7 +2,10 @@
   LayerRenderer.svelte — single component that owns all map-layer rendering.
   Subscribes to layersStore and maintains:
     - The basemap (modern TileLayer) OR a historical base (WarpedMapLayer at z=5)
-    - One WarpedMapLayer per overlay (z = 10+i, opacity from layer, visibility toggle)
+    - One OL layer per overlay PART (z = 10 + 2i, opacity from layer, visibility
+      toggle). A catalogued sheet is one part; a series row is up to two — a
+      pre-tiled raster archive and the sheets warped live above it — which is
+      why each row owns two z-slots rather than one.
 
   Replaces HistoricalOverlay + HistoricalBaseLayer + manual StackedOverlay loops.
 
@@ -56,9 +59,10 @@
     { layer: WarpedMapLayer; loadedAllmapsId: string | null; series?: SeriesLoad }
   >();
 
-  // Raster overlays (the pre-warped tile archives) keyed by layer.id. They are
-  // ordinary OL tile layers, so they are kept apart from the Allmaps ones —
-  // nothing about loading, clipping or teardown is shared.
+  // The raster part of a series row (a pre-warped tile archive), keyed by
+  // layer.id. Ordinary OL tile layers, so they are kept apart from the Allmaps
+  // ones — nothing about loading, clipping or teardown is shared. One row can
+  // have an entry in both maps: that is a survey held both ways.
   const rasterInstances = new Map<string, TileLayer>();
 
   function dropRaster(id: string) {
@@ -149,8 +153,6 @@
   // ── Overlays sync ────────────────────────────────────────────────
   async function syncOverlays(overlays: OverlayLayer[]) {
     if (!olMap) return;
-    // In side-by-side mode the left pane shows ONLY the topmost overlay; the right pane
-    // (DualMapPane) handles the second overlay independently. Hide everything beyond index 0.
     const ls = get(layerStore);
     const sideBySide = ls.viewMode === 'dual';
     // Top of stack = first item → highest z. base sits at z=0 or 5; overlays start at z=10.
@@ -173,32 +175,53 @@
     const N = overlays.length;
     for (let i = 0; i < N; i++) {
       const o = overlays[i];
-      const z = 10 + (N - 1 - i); // topmost (i=0) → highest z
+      // Two z-slots per row: a series row draws its raster archive at `z` and
+      // its warped sheets at `z + 1`, because the sheets are the sharper survey
+      // of the ground the archive is missing and belong above its pixels.
+      const z = 10 + 2 * (N - 1 - i); // topmost (i=0) → highest z
+      // Side-by-side: the left pane shows ONLY the topmost overlay; the right
+      // pane (DualMapPane) handles the second overlay independently.
+      const visible = o.visible && !(sideBySide && i > 0);
+      const parts = o.ref.kind === 'series' ? o.ref.parts : [];
 
-      if (o.ref.kind === 'raster') {
+      const archive = parts.find((p) => p.kind === 'raster');
+      if (archive) {
         let raster = rasterInstances.get(o.id);
         if (!raster) {
-          raster = buildRasterOverlayLayer(o.ref.key);
+          raster = buildRasterOverlayLayer(archive.key);
           rasterInstances.set(o.id, raster);
           olMap.addLayer(raster);
         }
         raster.setZIndex(z);
         raster.setOpacity(o.opacity);
-        raster.setVisible(o.visible && !(sideBySide && i > 0));
+        raster.setVisible(visible);
+      } else if (rasterInstances.has(o.id)) {
+        dropRaster(o.id);
+      }
+
+      // Everything below is the Allmaps half: one WarpedMapLayer holding either
+      // a single sheet's annotation or a whole series' worth.
+      const sheets = parts.find((p) => p.kind === 'sheets');
+      if (o.ref.kind === 'series' && !sheets) {
+        const stale = overlayInstances.get(o.id);
+        if (stale) {
+          destroyWarpedLayer(stale.layer);
+          overlayInstances.delete(o.id);
+        }
         continue;
       }
 
       let inst = overlayInstances.get(o.id);
       if (!inst) {
         const layer = await createWarpedLayer(olMap, {
-          zIndex: z,
+          zIndex: z + 1,
           name: `allmaps-overlay-${o.id}`,
         });
         inst = { layer, loadedAllmapsId: null };
         overlayInstances.set(o.id, inst);
       } else {
         try {
-          (inst.layer as any).setZIndex(z);
+          (inst.layer as any).setZIndex(z + 1);
         } catch {}
       }
 
@@ -206,23 +229,27 @@
       // of annotations in it. `loadedAllmapsId` is the sentinel for "what is in
       // this layer already" either way — the collection name stands in for it,
       // so a series reloads only when the row itself changes.
-      const wanted = o.ref.kind === 'sheets' ? `sheets:${o.ref.collection}` : o.ref.allmapsId;
+      const wanted = sheets
+        ? `sheets:${sheets.collection}`
+        : o.ref.kind === 'historical'
+          ? o.ref.allmapsId
+          : '';
 
       if (inst.loadedAllmapsId !== wanted) {
         inst.loadedAllmapsId = wanted;
         try {
-          if (o.ref.kind === 'sheets') {
-            const sheets = await fetchSeriesSheets(supabase, o.ref.collection);
-            if (!sheets.length) {
+          if (sheets) {
+            const found = await fetchSeriesSheets(supabase, sheets.collection);
+            if (!found.length) {
               // Every sheet in the series is a draft this reader may not read,
               // or the collection name has drifted. Either way an empty layer
               // explains nothing, so say it once.
-              console.warn('[LayerRenderer] series resolved to no sheets', o.ref.collection);
+              console.warn('[LayerRenderer] series resolved to no sheets', sheets.collection);
             }
             // The loader is purely additive, so whatever the previous series
             // left in this layer has to come out by hand.
             clearOverlay(inst.layer);
-            inst.series = { sheets, loaded: new Set<string>() };
+            inst.series = { sheets: found, loaded: new Set<string>() };
             const { failed } = await loadSeriesInView(
               inst.layer,
               olMap,
@@ -232,10 +259,10 @@
             );
             if (failed)
               console.warn(
-                `[LayerRenderer] series ${o.ref.key}: ${failed} sheet(s) failed to load`
+                `[LayerRenderer] series ${sheets.collection}: ${failed} sheet(s) failed to load`
               );
           } else {
-            await loadOverlayByUrl(inst.layer, olMap, o.ref.allmapsId, o.opacity);
+            await loadOverlayByUrl(inst.layer, olMap, wanted, o.opacity);
           }
         } catch (err) {
           console.warn('[LayerRenderer] overlay load failed', o, err);
@@ -244,8 +271,6 @@
         setOverlayOpacity(inst.layer, olMap, o.opacity);
       }
 
-      // Visibility: respect the layer's own toggle, and in side-by-side hide overlays past the top.
-      const visible = o.visible && !(sideBySide && i > 0);
       const canvas = inst.layer.canvas;
       if (canvas) canvas.style.display = visible ? '' : 'none';
     }

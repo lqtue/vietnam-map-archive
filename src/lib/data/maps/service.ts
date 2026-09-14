@@ -229,8 +229,8 @@ export async function fetchSheetEditions(
 /**
  * Every georeferenced sheet in one series, as annotation sources.
  *
- * The `SheetsRef` on the overlay stack stores only the collection name, so this
- * is what turns that into something drawable. `annotation_url` (the R2 mirror)
+ * A series row on the overlay stack stores only the collection name, so this is
+ * what turns that into something drawable. `annotation_url` (the R2 mirror)
  * wins over the bare Allmaps id, the same precedence `toHistoricalRef` uses.
  *
  * RLS decides what comes back. A series still in `draft` resolves to its sheets

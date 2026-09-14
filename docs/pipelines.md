@@ -71,8 +71,9 @@ The US Army Map Service's 1:50,000 coverage of Vietnam, as **one raster PMTiles
 archive** rather than 509 catalogue rows. It is served exactly the way the
 street basemap is — an object in `vma-tiles` behind `tiles.maparchive.vn`, read
 by byte range — but it is a **layer, not a basemap**: it joins the overlay stack
-as a `RasterRef`, with its own opacity, eye and position, and is switched on
-from the **Series** row of the map controls. A basemap was the first attempt and
+as the raster `part` of one `SeriesRef`, sharing its opacity, eye and position
+with the nine warped city sheets that fill its Saigon-shaped hole, and is
+switched on from the **Series** row of the map controls. A basemap was the first attempt and
 was wrong in two ways — a sheet series is one thing among the archive's others
 and wants an opacity slider, and underneath it the ~99 missing sheets showed the
 *basemap*, which in dark mode is near-black, so every gap read as a hole punched

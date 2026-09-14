@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 import { buildSeriesRows, type RasterSeries } from '../src/lib/features/explore/seriesRows';
 import type { MapSeries } from '../src/lib/data/maps/types';
 
-// The series list /explore offers, where one row can be more than one layer.
+// The series list /explore offers, where one row is one layer with up to two
+// parts in it.
 //
 // L7014 is held two ways — 452 cells pre-tiled into a raster archive, 9 as
 // `maps` rows warped live — and they are complementary, not alternative: the
@@ -12,8 +13,9 @@ import type { MapSeries } from '../src/lib/data/maps/types';
 // like an error. That is the property here.
 
 const mosaic: RasterSeries = {
-  ref: { kind: 'raster', mapId: 'raster:l7014', key: 'l7014', name: 'm', bounds: [0, 0, 1, 1] },
+  key: 'l7014',
   name: 'AMS L7014 1:50,000',
+  bounds: [102, 8, 110, 24],
   halfOf: 'series-l7014-vietnam-1-50-000',
   sheets: 452,
   note: '1963–89 · 1:50,000',
@@ -38,14 +40,24 @@ test('the two halves of one survey are a single row', () => {
   expect(rows[0].name).toBe('AMS L7014 1:50,000');
 });
 
-test('that row adds both layers, mosaic first', () => {
-  // `addOverlay` puts each new layer on top, so this order is bottom-up: the
-  // warped city sheets must end up ABOVE the pixels they are filling in for.
+test('that row is one layer holding both halves, mosaic first', () => {
+  // `parts` is bottom-up: the warped city sheets must draw ABOVE the pixels
+  // they are filling in for. One row means one opacity slider, one eye, one ×
+  // and one of the ten stack slots for the whole survey.
   const [row] = buildSeriesRows([series()], false, [mosaic]);
-  expect(row.refs.map((r) => r.mapId)).toEqual([
-    'raster:l7014',
-    'sheets:series-l7014-vietnam-1-50-000',
+  expect(row.ref.mapId).toBe('series:l7014');
+  expect(row.ref.parts).toEqual([
+    { kind: 'raster', key: 'l7014' },
+    { kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' },
   ]);
+});
+
+test('the row reaches the whole survey, not one half of it', () => {
+  // Tapping the name zooms to the layer, and the layer is both halves — so the
+  // box is their union. The mosaic's alone would cut off any city sheet that
+  // reaches past it, and the sheets' alone is a corner of the country.
+  const [row] = buildSeriesRows([series()], false, [mosaic]);
+  expect(row.ref.bounds).toEqual([102, 8, 110, 24]);
 });
 
 test('its count is both halves against the survey, not one half', () => {
@@ -64,7 +76,7 @@ test('a database series nothing claims stands on its own', () => {
   });
   const rows = buildSeriesRows([series(), tonkin], false, [mosaic]);
   expect(rows.map((r) => r.key)).toEqual(['l7014', 'tonkin-25k']);
-  expect(rows[1].refs).toHaveLength(1);
+  expect(rows[1].ref.parts).toEqual([{ kind: 'sheets', collection: 'Indochine 1:25,000' }]);
   expect(rows[1].label).toBe('53 of 76 sheets');
 });
 
@@ -80,7 +92,7 @@ test('the mosaic still offers itself when its other half is not visible', () => 
   // An anonymous reader sees no `map_series` row for a wholly-draft survey, and
   // the pre-tiled half is public regardless — it must not vanish with it.
   const [row] = buildSeriesRows([], false, [mosaic]);
-  expect(row.refs).toHaveLength(1);
+  expect(row.ref.parts).toEqual([{ kind: 'raster', key: 'l7014' }]);
   expect(row.label).toBe('452 sheets');
 });
 

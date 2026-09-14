@@ -359,7 +359,10 @@
     // A removed sheet takes its fabric with it.
     vectorMapIds = vectorMapIds.filter((id) => id !== e.detail.mapId);
     layersStore.removeOverlayByMapId(e.detail.mapId);
-    syncMapParam($layersStore.overlays[0]?.ref.mapId ?? null);
+    // The topmost SHEET, not the topmost row: a series left on top has no
+    // catalogue row, so writing its id here hands out a `?map=` that resolves
+    // to nothing — a share link that opens an empty page, with no error.
+    syncMapParam($layersStore.overlays.find(isSheetLayer)?.ref.mapId ?? null);
   }
   function handleZoomToOverlay(
     e: CustomEvent<{ mapId: string; bounds?: [number, number, number, number] }>

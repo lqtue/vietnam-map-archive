@@ -14,12 +14,11 @@
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
   import { onMount, tick } from 'svelte';
-  import { layersStore, MAX_OVERLAY_LAYERS } from '$lib/map/stores/layersStore';
+  import { layersStore } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
   import type { MapSeries } from '$lib/data/maps/types';
-  import { L7014_OVERLAY } from '$lib/map/constants';
   import { buildSeriesRows } from './seriesRows';
-  import type { RasterSeries, SeriesRow } from './seriesRows';
+  import type { SeriesRow } from './seriesRows';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { replaceState } from '$app/navigation';
 
@@ -72,32 +71,14 @@
   //
   // The rows themselves are built in `seriesRows.ts`: which surveys exist comes
   // from the `map_series` view (mig 082), so adding one is a matter of
-  // ingesting sheets rather than editing this file, and only the L7014 raster
-  // archive is hardcoded because it is the one survey that is not `maps` rows.
-  /**
-   * `sheets` is what the deployed archive holds, not what the survey has: 452
-   * of the 627 cells in `work/l7014/index.geojson`. The rest are 93 PCL never
-   * published, 62 with no usable georeference (the city sheets, which are the
-   * `maps` rows `halfOf` folds in) and 11 off-grid. Read it off
-   * `work/l7014/build/<build>.geojson`, whose name matches `L7014_PMTILES_URL`
-   * — counting anything else is counting a survey rather than an archive.
-   */
-  const RASTER_SERIES: RasterSeries[] = [
-    {
-      ref: L7014_OVERLAY,
-      name: 'AMS L7014 1:50,000',
-      halfOf: 'series-l7014-vietnam-1-50-000',
-      sheets: 452,
-      note: '1963–89 · 1:50,000',
-    },
-  ];
-
+  // ingesting sheets rather than editing this file, and only the raster
+  // archives are hardcoded there, because they are the surveys that are not
+  // `maps` rows.
   let dbSeries: MapSeries[] = [];
   // Nothing is offered until the view has answered. The raster archive is a
   // constant and could render at once, but it is HALF of L7014 — a tap in that
   // window would put the mosaic on the map without the city sheets that fill
-  // its Saigon-shaped hole, which is the one state `toggleRow` exists to
-  // prevent and which looks like a broken layer rather than a race.
+  // its Saigon-shaped hole, which looks like a broken layer rather than a race.
   let loaded = false;
   onMount(async () => {
     // The view carries the visibility gate, so an unpublished series simply is
@@ -107,8 +88,8 @@
     dbSeries = await fetchMapSeries(supabase);
     loaded = true;
     // `visibleSeries` is a reactive statement, so it is still the empty
-    // pre-`loaded` array on this line — the deeplink has to wait for the
-    // recompute it just triggered.
+    // pre-`loaded` array on this line — the fold and the deeplink both have to
+    // wait for the recompute it just triggered.
     await tick();
     applySeriesParam();
   });
@@ -143,33 +124,20 @@
     url.searchParams.delete('series');
     replaceState(url, {});
     const row = visibleSeries.find((r) => r.key === key || r.seriesKey === key);
-    // Already on the stack is not a failure — the reader has it; adding the
-    // refs a second time would be a duplicate layer.
-    if (!row || row.refs.some((r) => seriesOn.has(r.key))) return;
-    if ($layersStore.overlays.length + row.refs.length > MAX_OVERLAY_LAYERS) return;
-    for (const r of row.refs) layersStore.addOverlay(r);
+    // Already on the stack is not a failure — the reader has it, and
+    // `addOverlay` would refuse the duplicate anyway.
+    if (row) layersStore.addOverlay(row.ref);
   }
 
-  /**
-   * A row's layers go on and come off together. Half a survey on the stack is
-   * worse than none — it is the mosaic's Saigon-shaped hole with nothing in it,
-   * which reads as a broken layer rather than a partial pick — so the cap is
-   * checked for the whole row before anything is added.
-   */
+  /** Tap to put the survey on the map, tap again to take it off. */
   function toggleRow(row: SeriesRow) {
-    if (row.refs.some((r) => seriesOn.has(r.key))) {
-      for (const r of row.refs) layersStore.removeOverlayByMapId(r.mapId);
-      return;
-    }
-    if ($layersStore.overlays.length + row.refs.length > MAX_OVERLAY_LAYERS) return;
-    for (const r of row.refs) layersStore.addOverlay(r);
+    if (seriesOn.has(row.ref.mapId)) layersStore.removeOverlayByMapId(row.ref.mapId);
+    else layersStore.addOverlay(row.ref);
   }
 
-  $: visibleSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts, RASTER_SERIES) : [];
+  $: visibleSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts) : [];
   $: seriesOn = new Set(
-    $layersStore.overlays
-      .filter((o) => o.ref.kind !== 'historical')
-      .map((o) => (o.ref as { key: string }).key)
+    $layersStore.overlays.filter((o) => o.ref.kind === 'series').map((o) => o.ref.mapId)
   );
 </script>
 
@@ -189,7 +157,7 @@
 
   <ul class="series">
     {#each visibleSeries as s (s.key)}
-      {@const on = s.refs.some((r) => seriesOn.has(r.key))}
+      {@const on = seriesOn.has(s.ref.mapId)}
       <li>
         <button
           type="button"
@@ -205,7 +173,7 @@
           </span>
         </button>
         <!-- Beside the toggle, never inside it: the row is a button that puts
-             two layers on the map, and a nested anchor would be invalid markup
+             the survey on the map, and a nested anchor would be invalid markup
              and would swallow that tap. This goes to the survey's coverage
              page, which is where its unheld sheets are — the ones the map
              cannot show, because we do not have them. -->
