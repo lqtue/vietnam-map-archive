@@ -1,8 +1,8 @@
 /**
  * The self-hosted vector basemap.
  *
- * One ~348 MB PMTiles archive (Protomaps' daily OpenStreetMap build, bbox
- * 105.5,8.5 → 108.5,21.6, z0–15) living in our own R2 bucket and served by
+ * One ~421 MB PMTiles archive (Protomaps' daily OpenStreetMap build, bbox
+ * 105.0,8.5 → 108.5,22.0, z0–15) living in our own R2 bucket and served by
  * `worker/` at `iiif.maparchive.vn/basemap/`. No API key, no quota, no
  * third-party usage policy — the same independence the map imagery already has.
  *
@@ -11,9 +11,19 @@
  * maps — every Huế and Hanoi sheet, two of them featured — floating on the
  * bare `earth` fill with no roads or water beneath them.
  *
- * Rebuild when OSM has moved on enough to matter:
+ * **The same thing happened again, westward, and the lesson is that the bbox
+ * tracks the collection.** The 105.5 edge was set when the archive stopped at
+ * Hanoi; the Indochine 1:25,000 Tonkin survey then landed reaching 105.297, so
+ * eight sheets — Quảng Oai and Việt Trì furthest out — sat on ground the
+ * basemap did not cover, and above z8 that is not a thin edge but bare
+ * background, because the regional archive below hands over at z8 and stops.
+ * Widened to 105.0,8.5 → 108.5,22.0 on 2026-09-14. Before adding a collection,
+ * check its extent against this bbox: `maps.bbox` already knows the answer.
  *
- *   scripts/pmtiles_extract.sh vietnam 105.5,8.5,108.5,21.6 15 --upload
+ * Rebuild when OSM has moved on enough to matter, or when a collection reaches
+ * past the bbox:
+ *
+ *   scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload
  *
  * Builds are retained for about a week; the script walks back from today, and
  * names the uploaded key after the build date it found. The date is not
@@ -43,7 +53,7 @@ import type { FeatureLike } from 'ol/Feature';
 import type { Loader, LoaderOptions } from 'ol/source/DataTile';
 import { isDarkTheme } from '$lib/core/utils/theme';
 
-export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260906.pmtiles';
+export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260913.pmtiles';
 
 /**
  * The surroundings, thinly: the same Protomaps build clipped to
