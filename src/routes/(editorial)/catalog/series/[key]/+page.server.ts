@@ -22,6 +22,7 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { fetchSeriesSheetIndex, tally } from '$lib/data/maps/seriesSheets';
+import { SERIES_NOTES } from './notes';
 
 export const load: PageServerLoad = async ({ params }) => {
   const key = decodeURIComponent(params.key);
@@ -74,5 +75,7 @@ export const load: PageServerLoad = async ({ params }) => {
   // rather than a 1 against every sheet of a 627-sheet survey.
   for (const n of Object.keys(editions)) if (editions[n] < 2) delete editions[n];
 
-  return { series, sheets, counts: tally(sheets), editions };
+  // Prose about the survey itself, when it has been written. Undefined is a
+  // normal state — the page renders no panel rather than an empty one.
+  return { series, sheets, counts: tally(sheets), editions, note: SERIES_NOTES[key] };
 };

@@ -11,6 +11,7 @@
   import { printing } from '$lib/data/maps/seriesSheets';
   import type { PageData } from './$types';
   import type { SeriesSheetView } from '$lib/data/maps/seriesSheets';
+  import type { SeriesNote } from './notes';
 
   export let data: PageData;
 
@@ -80,6 +81,12 @@
    * like a sheet held once, which is a claim about the archive that is false.
    */
   $: editions = (data.editions ?? {}) as Record<string, number>;
+
+  /**
+   * What the survey is, from `notes.ts`. Undefined for a survey nobody has
+   * written up yet, which renders nothing rather than an empty card.
+   */
+  $: note = data.note as SeriesNote | undefined;
 </script>
 
 <svelte:head>
@@ -98,6 +105,34 @@
 />
 
 <div class="page-wrap">
+  {#if note}
+    <!-- What the survey is, before how much of it we hold. A reader who has
+         landed on a sheet number needs to know what they are looking at first;
+         the coverage bar answers a question they have not asked yet. -->
+    <section class="section-card about">
+      <h2>About this survey</h2>
+      {#each note.summary as para}
+        <p class="lead">{para}</p>
+      {/each}
+
+      <dl class="facts">
+        {#each note.facts as fact (fact.label)}
+          <div class="fact">
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        {/each}
+      </dl>
+
+      {#if note.correction}
+        <p class="correction">
+          <strong>Commonly stated, and wrong:</strong>
+          {note.correction.claim} — {note.correction.actually}
+        </p>
+      {/if}
+    </section>
+  {/if}
+
   <section class="section-card coverage">
     <h2>Coverage</h2>
     <p class="lead">
@@ -161,6 +196,45 @@
   }
   .coverage {
     margin-bottom: var(--space-6);
+  }
+  .about {
+    margin-bottom: var(--space-4);
+  }
+  .about .lead {
+    max-width: 68ch;
+  }
+  /* Label above value, not beside it: several of these run to three lines, and
+     a two-column definition list at phone width gives the value a 12ch track. */
+  .facts {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 0;
+  }
+  @media (min-width: 40rem) {
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-5);
+    }
+  }
+  .fact dt {
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.15rem;
+  }
+  .fact dd {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .correction {
+    margin: var(--space-4) 0 0;
+    padding-left: var(--space-3);
+    border-left: 2px solid var(--color-border);
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    max-width: 68ch;
   }
   .lead {
     font-size: 1.05rem;
