@@ -23,20 +23,34 @@ it is IGN's work, released CC-BY-4.0 -- which obliges naming IGN. `maps.rights`
 is one column, so it has to mean one of the two, and this picks the scan's
 licence, as the layer that actually constrains a reader.
 
-WHAT IT FOUND, 2026-09-14: nothing, and that is the useful part. **0 of 62.**
-Not one of our sheets matches an IGN copy, and the reason is structural rather
-than marginal -- ours are about 4900x3750 and landscape, IGN's about 2700x3880
-and portrait. They are not two scans of one sheet; they are two editions. Ours
-are the ASSEMBLED sheets (CartoMundi serie 175, "feuilles assemblees") and all
-212 of IGN's digitised copies are serie 243, the half-sheet colour printing.
-IGN appears never to have digitised the assembled edition at all.
+WHAT IT FOUND, 2026-09-14, AND WHY THAT WAS THE WRONG CONCLUSION. **0 of 62.**
+Not one of our sheets matches an IGN copy on size, and not marginally: ours are
+about 4900x3750 and landscape, IGN's about 2700x3880 and portrait. Ours are the
+ASSEMBLED sheets and every one of IGN's 212 digitised copies is serie 243, the
+half-sheet printing.
 
-So the hypothesis this script was written to confirm is dead, and relabelling
-those 62 CC-BY would have been wrong. Their scan provenance stays genuinely
-unknown -- `rights` now says so instead of asserting a bare "Public domain"
-about a photograph nobody can place -- and the next person looking for it should
-start from the fact that the assembled edition is what needs tracing, which
-rules out the one obvious candidate before they spend a day on it.
+That was read here as "so they are not IGN's scans". It is not what the test
+shows. **A DIMENSION TEST CANNOT SEE A DERIVATIVE.** Two files differing in size
+tells you they are not the same file; it says nothing about whether one was made
+from the other. Ours were: a third party stitched IGN's two half-sheets into
+whole ones and we downloaded that.
+
+What settles it is not arithmetic but the paper. A scan carries the marks of the
+one physical copy photographed, and those survive being cut, resampled and
+pasted. Held side by side with IGN's west half:
+
+    cell 36  My Dong    the same blue pencil "36" at the head of the sheet
+    cell 72  Yen Dinh   the same library stamp and the same handwritten
+                        annotation, in the same position
+
+Two cells, two independent fingerprints. Same photographs. So CC-BY-4.0 and
+IGN's attribution reach all 84 sheets in the collection, not the 22 fetched from
+Nakala directly -- an assembler's stitching does not erase the photographer --
+and the rows say so, with the modification noted as the licence requires.
+
+If you re-run this expecting a verdict, it will still print 0 of 62 and it will
+still be right about what it measures. Compare the marks on the paper, not the
+pixel counts.
 """
 
 import argparse
