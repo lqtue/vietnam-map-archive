@@ -1,18 +1,130 @@
 #!/bin/bash
 # Tile a map image and upload to Cloudflare R2 for IIIF self-hosting.
+#
 # Usage: ./scripts/tile_map.sh <map-uuid> <source-image-url-or-local-path>
+#                              [original-iiif-base] [--new-version | --version N] [--dry-run]
 #
 # Requirements:
 #   - libvips (brew install vips / apt install libvips-tools)
 #   - rclone configured with R2 remote named "r2" (see: rclone config)
 #   - Optionally: wrangler logged in (wrangler r2 object put as fallback)
 #
-# After upload, update maps.iiif_image in Supabase to:
-#   https://iiif.maparchive.vn/iiif/<map-uuid>
+# FIRST tiling of a map: no flag. Keys land at tiles/<map-uuid>/ and the IIIF
+# image service is https://iiif.maparchive.vn/iiif/<map-uuid>.
+#
+# RE-TILING a map that is already mirrored: pass --new-version.
+#   Tiles go out as `Cache-Control: public, max-age=31536000, immutable`, so an
+#   object overwritten in place reaches no reader who already has it for a year.
+#   And `rclone copy` never deletes, so a rebuild with fewer levels leaves the
+#   old deep levels in the bucket, still answering 200 beside the new ones — a
+#   map half one render and half the other, with nothing to see it.
+#   The version therefore has to live in the image service id, because that is
+#   the only place a IIIF client takes tile URLs from: it derives every one of
+#   them from info.json's `id`. A query string or a response header does not
+#   propagate. Same discipline as basemap/vietnam-20260906.pmtiles.
+#   --new-version writes tiles/<map-uuid>/v<N>/ and prints the service id
+#   https://iiif.maparchive.vn/iiif/<map-uuid>/v<N> to put in the database.
+#
+# Versioning is additive: existing maps stay where they are, nothing is renamed
+# or re-uploaded, and the unversioned prefix keeps working forever.
+#
+# This script never writes to Supabase. The database update is yours to run, and
+# it is the step that makes a re-tile reach anyone — it is printed at the end.
 
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage: tile_map.sh <map-uuid> [source-image-url-or-path] [original-iiif-base]
+                   [--new-version | --version N] [--dry-run]
+
+  --new-version  Re-tile a map that is already mirrored, into the next free
+                 version. Asks R2 what is there and takes max+1, so the first
+                 re-tile is v2. Writes tiles/<map-uuid>/v<N>/ and touches no
+                 existing object.
+  --version N    The same prefix, named by hand (N >= 2). For resuming a
+                 versioned upload that died halfway, where you need to land on
+                 the exact same prefix again rather than a fresh one.
+  --dry-run      Print the keys and the service id this run would write, then
+                 stop. Downloads nothing, tiles nothing, uploads nothing.
+
+With no version flag nothing changes: keys at tiles/<map-uuid>/, service id
+https://iiif.maparchive.vn/iiif/<map-uuid>. That is right for a map's first
+tiling and wrong for every re-tile after it — see the header comment.
+EOF
+}
+
+VERSION=""          # empty = unversioned, i.e. exactly what this script always did
+VERSION_MODE=""     # "" | auto | explicit
+DRY_RUN=0
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --new-version)
+      VERSION_MODE="auto"; shift ;;
+    --version)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --version needs a number (2 or higher)." >&2; exit 1
+      fi
+      VERSION="$2"; VERSION_MODE="explicit"; shift 2 ;;
+    --version=*)
+      VERSION="${1#*=}"; VERSION_MODE="explicit"; shift ;;
+    --dry-run)
+      DRY_RUN=1; shift ;;
+    -h|--help)
+      usage; exit 0 ;;
+    --)
+      shift; while [[ $# -gt 0 ]]; do POSITIONAL+=("$1"); shift; done ;;
+    -*)
+      echo "Error: unknown option '$1'" >&2; usage >&2; exit 1 ;;
+    *)
+      POSITIONAL+=("$1"); shift ;;
+  esac
+done
+# bash 3.2 (macOS) treats "${a[@]}" on an empty array as unset under `set -u`.
+set -- ${POSITIONAL[@]+"${POSITIONAL[@]}"}
+
+if [[ "$VERSION_MODE" == "explicit" ]]; then
+  if ! [[ "$VERSION" =~ ^[0-9]+$ ]] || (( VERSION < 2 )); then
+    echo "Error: --version takes a whole number, 2 or higher." >&2
+    echo "       There is no v1 — a map's first tiling is the unversioned" >&2
+    echo "       prefix tiles/<map-uuid>/, and it stays that way." >&2
+    exit 1
+  fi
+fi
+
 MAP_ID="${1:?Usage: tile_map.sh <map-uuid> <source-image-url-or-path> [original-iiif-base]}"
+
+BUCKET="vma-tiles"
+WORKER_BASE="https://iiif.maparchive.vn/iiif"
+
+# ── Settle the version before anything expensive happens ────────────────────
+# A wrong version is only cheap to fix before the download, and it is the one
+# thing here that cannot be corrected afterwards by re-running: the tiles are
+# immutable once an id is published.
+if [[ "$VERSION_MODE" == "auto" ]]; then
+  echo "→ Asking R2 which versions of $MAP_ID already exist..."
+  EXISTING=$(rclone lsf --dirs-only "r2:$BUCKET/tiles/$MAP_ID/" 2>/dev/null || true)
+  if [[ -z "$EXISTING" ]]; then
+    echo "Error: nothing is mirrored at tiles/$MAP_ID/ yet." >&2
+    echo "       --new-version re-tiles a map that is already live. A first" >&2
+    echo "       tiling takes no flag and belongs at the unversioned prefix." >&2
+    exit 1
+  fi
+  # Directory entries come back with a trailing slash: "v2/", "full/", "0,0,…/".
+  LAST=$(printf '%s\n' "$EXISTING" | sed -n 's#^v\([0-9][0-9]*\)/$#\1#p' | sort -n | tail -1)
+  VERSION=$(( ${LAST:-1} + 1 ))
+  echo "→ Next free version: v$VERSION"
+fi
+
+if [[ -n "$VERSION" ]]; then
+  DEST_PREFIX="tiles/$MAP_ID/v$VERSION"
+  SERVICE_URL="$WORKER_BASE/$MAP_ID/v$VERSION"
+else
+  DEST_PREFIX="tiles/$MAP_ID"
+  SERVICE_URL="$WORKER_BASE/$MAP_ID"
+fi
 
 # ── Fetch from Supabase if missing ──────────────────────────────────────────
 if [[ -z "${2:-}" ]]; then
@@ -55,15 +167,27 @@ else
   ORIGINAL_IIIF="${3:-}"
 fi
 
-BUCKET="vma-tiles"
-WORKER_BASE="https://iiif.maparchive.vn/iiif"
-
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 echo "→ Map ID: $MAP_ID"
 echo "→ Source: $SOURCE"
 if [[ -n "$ORIGINAL_IIIF" ]]; then echo "→ Proxy Target: $ORIGINAL_IIIF"; fi
+if [[ -n "$VERSION" ]]; then echo "→ Version: v$VERSION"; fi
+
+if (( DRY_RUN )); then
+  echo ""
+  echo "── dry run — nothing downloaded, tiled or uploaded ──"
+  echo "   R2 prefix:    r2:$BUCKET/$DEST_PREFIX/"
+  echo "   info.json:    $DEST_PREFIX/info.json"
+  echo "   tile:         $DEST_PREFIX/0,0,1024,1024/256,/0/default.jpg"
+  echo "   thumbnails:   $DEST_PREFIX/full/200,/0/default.jpg  (and 400, 800)"
+  if [[ -n "$ORIGINAL_IIIF" ]]; then
+    echo "   proxy source: sources/$MAP_ID  (one per map, never versioned)"
+  fi
+  echo "   service id:   $SERVICE_URL"
+  exit 0
+fi
 
 # Download if URL, copy if local path
 if [[ "$SOURCE" == http* ]]; then
@@ -158,8 +282,9 @@ fi
 #    before this line was fixed is in that state.
 #
 #    Re-tiling an existing map overwrites these keys, and the worker serves them
-#    `immutable` for a year — so a correction here reaches the edge only on a new
-#    map id, never on a sheet already mirrored.
+#    `immutable` for a year — so a correction here reaches the edge only under a
+#    service id nobody has cached yet. That used to mean a new map id; it now
+#    means `--new-version`, which is why a re-tile of a live sheet takes it.
 for w in 200 400 800; do
   echo "→ Rendering full/$w, derivative..."
   mkdir -p "$MAP_DIR/full/$w,/0"
@@ -167,14 +292,16 @@ for w in 200 400 800; do
     "$w" --height 1000000 --size down
 done
 
-echo "→ Uploading to R2 bucket: $BUCKET/tiles/$MAP_ID ..."
-rclone copy "$OUTPUT_DIR/$MAP_ID" "r2:$BUCKET/tiles/$MAP_ID" \
+echo "→ Uploading to R2 bucket: $BUCKET/$DEST_PREFIX ..."
+rclone copy "$OUTPUT_DIR/$MAP_ID" "r2:$BUCKET/$DEST_PREFIX" \
   --progress \
   --transfers 8 \
   --checkers 16 \
   --s3-chunk-size 32M
 
-# Write original IIIF source URL so the Worker can proxy on cache miss
+# Write original IIIF source URL so the Worker can proxy on cache miss.
+# Deliberately unversioned: the upstream library a miss falls back to is a
+# property of the map, not of a render, and every version wants the same one.
 if [[ -n "$ORIGINAL_IIIF" ]]; then
   echo "→ Writing proxy source URL to R2..."
   echo -n "${ORIGINAL_IIIF%/}" > "$TMPDIR/source_url.txt"
@@ -182,8 +309,41 @@ if [[ -n "$ORIGINAL_IIIF" ]]; then
 fi
 
 echo ""
-echo "✓ Done. IIIF base URL:"
-echo "   $WORKER_BASE/$MAP_ID"
-echo ""
-echo "Database was updated automatically during mirroring."
-echo "If this was a manual rerun, verify maps.iiif_image = '$WORKER_BASE/$MAP_ID'"
+if [[ -z "$VERSION" ]]; then
+  echo "✓ Done. IIIF base URL:"
+  echo "   $WORKER_BASE/$MAP_ID"
+  echo ""
+  echo "Database was updated automatically during mirroring."
+  echo "If this was a manual rerun, verify maps.iiif_image = '$WORKER_BASE/$MAP_ID'"
+else
+  echo "✓ Tiles written to r2:$BUCKET/$DEST_PREFIX/"
+  echo ""
+  echo "   NEW IIIF IMAGE SERVICE ID"
+  echo "   $SERVICE_URL"
+  echo ""
+  echo "⚠ Nobody is looking at these tiles, and nobody will until you move the"
+  echo "  database row. The old objects under tiles/$MAP_ID/ are untouched and go"
+  echo "  out immutable for a year, so every reader still gets the old render; a"
+  echo "  IIIF client only ever learns tile URLs from info.json's id, so changing"
+  echo "  which id the row names IS the re-render. Until then this upload is inert."
+  echo ""
+  echo "  Run this yourself against production — this script does not write to"
+  echo "  Supabase, on purpose:"
+  echo ""
+  echo "    update maps"
+  echo "       set iiif_image = '$SERVICE_URL',"
+  echo "           thumbnail  = '$SERVICE_URL/full/800,/0/default.jpg'"
+  echo "     where id = '$MAP_ID';"
+  echo ""
+  echo "    update map_iiif_sources"
+  echo "       set iiif_image = '$SERVICE_URL'"
+  echo "     where map_id = '$MAP_ID'"
+  echo "       and iiif_image like '%maparchive.vn%';"
+  echo ""
+  echo "  Then the georeference: the annotation JSON at maps.annotation_url names"
+  echo "  the old service id as its source, so a warped view keeps drawing the old"
+  echo "  pixels until that copy is re-pointed at $SERVICE_URL too."
+  echo "  Do NOT reach for Mirror to R2 to do it — it rebuilds the base as"
+  echo "  $WORKER_BASE/$MAP_ID and would quietly undo both updates above."
+  echo "  docs/admin-tooling.md → 'Re-tiling a mirrored map'."
+fi

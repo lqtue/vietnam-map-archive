@@ -38,7 +38,7 @@ Companion CLI scripts:
 Self-hosted IIIF tile serving via Cloudflare R2 + Worker at `https://iiif.maparchive.vn/iiif`.
 
 - `worker/` — Cloudflare Worker source + `wrangler.toml`; proxies IIIF tile requests to R2.
-- `scripts/tile_map.sh <map-uuid> <source-image-url-or-path> [original-iiif-base]` — downloads (or copies a local file), tiles with `vips dzsave --layout iiif3 --tile-size 256`, uploads to R2 at `tiles/<map-uuid>/`. The mirror-r2 API and `/admin?tab=bulk` return the exact command.
+- `scripts/tile_map.sh <map-uuid> <source-image-url-or-path> [original-iiif-base] [--new-version | --version N] [--dry-run]` — downloads (or copies a local file), tiles with `vips dzsave --layout iiif3 --tile-size 256`, uploads to R2 at `tiles/<map-uuid>/`. **A re-tile of a map that is already mirrored takes `--new-version`**, which writes `tiles/<map-uuid>/v<N>/` instead and prints the versioned service id to put in the database — see *Re-tiling a mirrored map* below. `--dry-run` prints the keys and the service id and stops. The mirror-r2 API and `/admin?tab=bulk` return the exact command, always unversioned: they only ever mint a first tiling.
 - After mirroring: `maps.iiif_image` and the primary `map_iiif_sources` row point to `https://iiif.maparchive.vn/iiif/<map-uuid>`; `maps.annotation_url` becomes the Supabase Storage public URL of the updated annotation JSON (mig 047 — earlier code overloaded `allmaps_id` for this; the column now holds only bare image IDs).
 
 **info.json patching:** the worker patches `vips dzsave`'s info.json on the fly — injects `tiles[0].height` (defaults to width per spec but required by OL's IIIFInfo parser) and a `sizes` array computed from scaleFactors. Without these, OpenLayers renders stretched/seamy tiles. Served with `Cache-Control: public, max-age=0`.
@@ -62,6 +62,8 @@ caching because it is head-of-line: the renderer needs the image's dimensions
 before it can ask for one tile. 300-600 ms → ~130 ms. The hour (rather than a
 year) is because a re-tiled map can change size; **after re-running
 `tile_map.sh` on a map that is already live, wait the hour or purge that URL**.
+With `--new-version` there is nothing to wait for — the versioned `info.json`
+lives at an id no cache has ever seen.
 `HEAD` is excluded (`cache.match` keys on GET), as is anything with
 `?force_proxy`. Only `response.ok` is stored, because a 404 means the tile is
 absent from R2 *and* refused by the origin, and either can change.
@@ -87,13 +89,75 @@ Two things this does not cover, in the order they are worth doing:
   Tiered Cache and range requests both understand, and would fix the basemap in
   the same move. Costs one extra hop on a miss.
 
+### Re-tiling a mirrored map
+
+A second tiling of a map that is already live goes to a new version:
+
+```bash
+./scripts/tile_map.sh <uuid> <source> --new-version     # or --version N to name it
+./scripts/tile_map.sh <uuid> <source> --new-version --dry-run   # keys + service id, no writes
+```
+
+Keys land at `tiles/<uuid>/v<N>/` and the image service becomes
+`https://iiif.maparchive.vn/iiif/<uuid>/v<N>`. N starts at 2 — there is no v1, because a map's
+first tiling is the unversioned prefix and stays there forever. The scheme is **additive**: no
+migration, no re-upload, nothing renamed, and every existing map keeps the keys and the
+`maps.iiif_image` it has.
+
+`--new-version` asks R2 for the highest `v<N>` already under the map and takes max+1, rather than
+making the operator supply the number. Supplying it is the same failure one level down: guess a
+version that already exists and you overwrite *that* render in place, immutably, having taken the
+precaution that was supposed to prevent it. `--version N` exists for one case — resuming a
+versioned upload that died halfway, where you need the same prefix again, not a fresh one.
+
+**Overwriting in place looks like it works and does not.** Two reasons, and they compound:
+
+- **Tiles go out `Cache-Control: public, max-age=31536000, immutable`.** That is the point of
+  pre-tiling, and it means any browser or edge machine already holding a tile will not ask again
+  for a year. The operator reloads, sees the new render — their own cache was cold for those
+  keys — and calls it done; every reader who had opened the sheet keeps the old one.
+- **`rclone copy` never deletes.** A rebuild that emits fewer levels (a smaller source, a corrected
+  `scaleFactors` trim) leaves the old deep levels in the bucket, still answering 200. The new
+  `info.json` stops advertising them, but a client holding the old `info.json` keeps asking, and
+  gets one sheet served half from each render.
+
+The version lives in the **image service id** rather than a query parameter or a response header
+because that is the only thing a IIIF client takes tile URLs from: it derives every one of them
+from `info.json`'s `id`. Change anything else and the client goes on constructing the old keys.
+Same discipline as `basemap/vietnam-20260906.pmtiles` and `overlay/l7014-<date>.pmtiles`, and what
+`docs/platform-design.md` means by "derived is disposable, immutable, content-addressed, no
+`latest`".
+
+**The upload is inert until the database moves.** `tile_map.sh` writes nothing to Supabase — on
+purpose; applying a change to production is a person's job, not a script's side effect — and prints
+the exact statements at the end of a versioned run. Four things name the old service id, and all
+four move together:
+
+| What | New value |
+|------|-----------|
+| `maps.iiif_image` | `<base>/v<N>` |
+| `maps.thumbnail` | `<base>/v<N>/full/800,/0/default.jpg` |
+| the primary `map_iiif_sources` row (`source_type = 'r2'`) | `<base>/v<N>` |
+| the annotation JSON at `maps.annotation_url` | its source URL rewritten to `<base>/v<N>` |
+
+The last is the one that gets forgotten, and it fails silently: the georeference still resolves and
+the old tiles still answer, so a warped view draws the *previous* render over correct control
+points and nothing reports an error anywhere. **Do not reach for Mirror to R2 to fix it** —
+`mirrorAnnotation` (`src/lib/server/annotationMirror.ts`) builds its base as `${R2_BASE}/${mapId}`
+with no version, so it would rewrite the annotation back to the unversioned id and undo the other
+three updates on its way past. Until that is parameterised, a versioned re-tile is re-pointed by
+hand.
+
+`sources/<uuid>`, the proxy-fallback origin, is deliberately left unversioned: the upstream library
+behind a miss is a property of the map, not of a render, and every version wants the same one.
+
 ### Why pre-tiled
 
 Historical scans never change, so tiling once means zero compute at request time and no dependency on Internet Archive or Gallica staying up. `vips dzsave` takes any JPEG/PNG/TIFF directly — no pyramidal TIFF step. R2 egress is free, so tile serving costs storage only (~$0.15/mo at 20 maps × ~500 MB; ~$1.50/mo at 200).
 
 ### Layout and config
 
-- Bucket `vma-tiles`, binding `TILES` (`worker/wrangler.toml`). Keys under `tiles/{mapId}/…`, `info.json` at `tiles/{mapId}/info.json`.
+- Bucket `vma-tiles`, binding `TILES` (`worker/wrangler.toml`). Keys under `tiles/{mapId}/…`, `info.json` at `tiles/{mapId}/info.json`. A re-tile adds a sibling prefix `tiles/{mapId}/v{N}/…` served at `/iiif/{mapId}/v{N}` — the original keys are never touched (*Re-tiling a mirrored map* above).
 - Production route `iiif.maparchive.vn/iiif/*` on zone `maparchive.vn`. (Older notes say `iiif.vmaproject.org` — that host was never live; a stale comment survives at `scripts/tile_map.sh:11`.)
 - Tiles are served `Cache-Control: immutable`; `info.json` is served `max-age=0` because the worker patches it per-request.
 - `Access-Control-Allow-Origin: *` is required on **both** `info.json` and tile responses — Allmaps will not load the overlay without it.
