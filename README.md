@@ -207,7 +207,7 @@ written for both people and coding agents. Then:
 ## Stack
 
 SvelteKit 2 with Svelte 5 in **legacy syntax** (`$:`, `export let`, stores — not
-runes; the house style is in `CLAUDE.md`). TypeScript. OpenLayers 10 as the only
+runes; the house style is in `src/lib/CLAUDE.md`). TypeScript. OpenLayers 10 as the only
 map engine, with `@allmaps/openlayers` warping the historical sheets. Supabase
 for Postgres, auth and storage, with status transitions written as Postgres
 functions rather than in the API. Cloudflare Pages for the app, R2 for IIIF tiles

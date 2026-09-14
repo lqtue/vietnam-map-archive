@@ -1,6 +1,6 @@
 # Conventions — the long form
 
-The reasoning behind the one-line rules in `CLAUDE.md` §Conventions. Moved out of it (Sept 2026).
+The reasoning behind the one-line rules in `CLAUDE.md` and `src/lib/CLAUDE.md`. Moved out of the root file (Sept 2026).
 Verbatim: fonts, the gazetteer key, the generated Supabase types, the realtime stub, and the whole
 component/theme vocabulary.
 

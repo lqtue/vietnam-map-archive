@@ -219,7 +219,7 @@ All API routes live under `src/routes/api/`. Every handler is `requireRole → a
 | `probeAllmapsAnnotation`, `lookupAllmapsId` | `server/allmaps.ts` | georef probe + id derivation |
 | `bulkSetStatus`, `revertRecentValidations` | `server/ocrReview.ts` | OCR review write paths |
 
-Rules: accept JSON, return JSON — no form data. Admin routes re-check `profiles.role` in the handler; do not rely on RLS alone. The service key is `$env/static/private` and must never reach a component. The current route inventory is in `CLAUDE.md`.
+Rules: accept JSON, return JSON — no form data. Admin routes re-check `profiles.role` in the handler; do not rely on RLS alone. The service key is `$env/static/private` and must never reach a component. The current route inventory is in `src/routes/CLAUDE.md`.
 
 ---
 

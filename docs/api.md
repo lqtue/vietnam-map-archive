@@ -1,6 +1,6 @@
 # API routes (`src/routes/api/`)
 
-Reference for every server route. The rules that every handler follows are in `CLAUDE.md` → API routes; this file is the per-route detail, moved out of `CLAUDE.md` in September 2026 so the map stays short. Keep the two in step: a new route gets a line here, and only a new *rule* touches `CLAUDE.md`.
+Reference for every server route. The rules that every handler follows are in `src/routes/CLAUDE.md` → API routes; this file is the per-route detail, moved out of `CLAUDE.md` in September 2026 so the map stays short. Keep the two in step: a new route gets a line here, and only a new *rule* touches `CLAUDE.md`.
 
 Every handler follows the same shape: `requireRole → adminClient → query → json`, using the `$lib/server` helpers `requireRole`/`getRole` (`auth.ts`), `adminClient` (`supabaseAdmin.ts`), and `assertUuid`/`dbError` (`http.ts` — 400 on a malformed id, and no raw Postgres message ever reaches the client).
 
