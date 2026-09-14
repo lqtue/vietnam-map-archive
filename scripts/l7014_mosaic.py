@@ -182,6 +182,15 @@ def lattice_cells():
     return _LATTICE
 
 
+def sheet_keys(cells):
+    """`6441IV` back to `6441-4`, which is how every other file spells it."""
+    back = {v: k for k, v in ROMAN.items()}
+    for key in cells:
+        num, roman = key[:4], key[4:]
+        if roman in back:
+            yield f"{num}-{back[roman]}"
+
+
 def cell_of(sheet, cells=None):
     """A sheet's raw index row, keyed `6441-4` -> `6441IV`. None if not indexed."""
     cells = cells if cells is not None else lattice_cells()
@@ -746,6 +755,12 @@ def phase_check(args):
 # The pixel half is four clicks per sheet in QGIS's Georeferencer -- a scan's
 # collar and skew are not in any index.
 CORNERS_CSV = WORK / "corners.csv"
+# Every cell's four WGS 84 corners, written for readers outside this script --
+# `scripts/geo_audit.mjs` checks the archive's warped sheets against it. It is
+# an artifact rather than a second implementation on purpose: the datum shift
+# is the thing that goes wrong here, and a JS copy of the Helmert would be one
+# more place for it to go wrong differently.
+LATTICE_JSON = WORK / "lattice.json"
 GCP_DIR = WORK / "gcp"
 # Mean neatline inset (left, top, right, bottom) as a fraction of the page,
 # measured over 36 georeferenced sheets. sd is 0.013 of the width -- ~700 m --
@@ -800,7 +815,17 @@ def phase_corners(args):
             lines.append(f"{x:.7f},{y:.7f},{px:.1f},{-py:.1f},1,0,0,0")
         (GCP_DIR / f"{r['sheet']}.points").write_text("\n".join(lines) + "\n")
 
+    LATTICE_JSON.write_text(json.dumps({
+        "note": "Sheet cell corners, NW NE SE SW, WGS 84. Written by "
+                "`l7014_mosaic.py corners` from work/l7014/index.geojson, which is "
+                "Indian 1960 -- do not re-derive, the shift is the trap.",
+        "cells": {sheet: [[round(x, 7), round(y, 7)] for x, y in pts]
+                  for sheet in sorted(sheet_keys(cells))
+                  if (pts := cell_corners(sheet, cells))},
+    }, indent=0))
+
     print(f"{CORNERS_CSV}: {len(rows) - len(missing)} sheets x 4 corners")
+    print(f"{LATTICE_JSON}: {len(json.loads(LATTICE_JSON.read_text())['cells'])} cells")
     print(f"{GCP_DIR}/: one .points per sheet, ground filled in, corners to drag")
     if missing:
         print("not in the index:", ", ".join(missing))

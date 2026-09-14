@@ -2,6 +2,69 @@
 
 Pipelines that live outside the SvelteKit app. Each section is the canonical reference — CLAUDE.md only links here.
 
+## Is every map where it says it is? (`scripts/geo_audit.mjs`)
+
+```bash
+node --env-file=.env scripts/geo_audit.mjs          # the whole archive
+node scripts/geo_audit.mjs --self-test              # no database, no network
+```
+
+Exits 1 on any FAIL. Run it before publishing a sheet and after any mosaic
+rebuild.
+
+Every position in the archive is asserted by exactly one authority and, until
+Sept 2026, never cross-examined: a warped sheet is where its annotation says, a
+mosaic cell was where its GeoPDF's CRS said. That is how 285 of 437 sheets
+shipped ~470 m off. **So every check here compares two things that were arrived
+at independently**, and none needs a person to say what is true:
+
+| check | third party | level |
+|---|---|---|
+| the annotation resolves and carries ≥3 control points | — | FAIL if published, WARN if draft |
+| the drawn sheet lands inside Vietnam | a box round the country | FAIL |
+| the sheet sits on its printed 15′ cell | `work/l7014/lattice.json` | FAIL if published |
+| a cell held twice agrees with itself | the other holding | FAIL |
+| `maps.bbox` still matches its annotation | — (a copy vs its source) | WARN |
+
+Two distinctions the script turns on, both of which produce a confident wrong
+answer if collapsed:
+
+- **The drawn paper is not the control-point hull.** `maps.bbox` is the hull, on
+  purpose (`scripts/oneoff/backfill_map_bbox.mjs`), and on a sheet with three
+  interior GCPs it sits kilometres inside the paper while being perfectly
+  correct — up to 360 km on *Cochinchine Francaise*. The cell check therefore
+  uses the georeference **mask**, forward-transformed through the sheet's own
+  control points, and **skips a sheet that has no mask** rather than failing it.
+  That backfill script calls the gap "a slight under-estimate"; at three control
+  points it is not slight.
+- **The lattice is an artifact, not a formula.** `l7014_mosaic.py corners`
+  writes `work/l7014/lattice.json` — 627 cells, four WGS 84 corners each — and
+  this script reads it. A JS reimplementation of the Indian 1960 Helmert would
+  be a second place for the exact fault this audit exists to catch. `work/l7014/`
+  is gitignored, so that file and the mosaic manifest are **local build
+  artifacts**: on a machine that has not built the mosaic the audit still runs
+  and says which checks it had to skip, rather than passing quietly with two of
+  them switched off.
+
+`--self-test` runs the geometry against inputs it must refuse: a cell with the
+datum shift skipped (482 m, rejected), collinear control points, an axis swap
+landing off West Africa. A check that cannot fail is not one, and the one this
+replaces returned `2e-12`.
+
+**Reading today's run.** 0 fail, 23 warn — 21 of them the L7014 backdrop drafts
+that carry an `allmaps_id` but no annotation, which is expected and agreed. The
+two real ones: *Đô thành Sài Gòn*'s `bbox` is 3.2 km from its annotation, so it
+was re-georeferenced after the backfill; and the duplicate draft *Huế — Việt Nam
+1:50,000 (Sheet 6541 IV)* sits 5.9 km off cell 6541-4, which the published row
+for the same cell does not.
+
+**What it does not cover.** The 63 Indochine sheets carry sheet numbers but no
+lattice index, so nothing checks their position; and the "held twice" check
+found **0 pairs**, because the nine city sheets are deliberately out of the
+mosaic and the fifteen backdrop sheets have no annotation to compare against.
+Keeping a cell both ways only buys a standing check once both holdings are
+actually georeferenced.
+
 ## AMS Series L7014 mosaic (`scripts/l7014_mosaic.py`)
 
 The US Army Map Service's 1:50,000 coverage of Vietnam, as **one raster PMTiles
