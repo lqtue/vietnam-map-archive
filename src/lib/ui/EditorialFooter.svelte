@@ -12,7 +12,6 @@
       <a href="/">{$t('Home')}</a>
       <a href="/catalog">{$t('Catalog')}</a>
       <a href="/explore">{$t('Map viewer')}</a>
-      <a href="/scan">{$t('Inspect a scan')}</a>
       <a href="/contribute">{$t('Contribute')}</a>
       <a href="/about">{$t('About')}</a>
       <a href="/blog">{$t('Blog')}</a>

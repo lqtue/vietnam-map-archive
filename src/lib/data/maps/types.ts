@@ -49,6 +49,7 @@ export interface MapRecord {
 /** Lightweight item used in catalog lists and map selector dropdowns. */
 export interface MapListItem {
   id: string; // maps.id (uuid)
+  slug?: string; // maps.slug — the readable half of /catalog/<…> (migration 088)
   allmaps_id?: string; // 16-char Allmaps image ID (or null until derived)
   annotation_url?: string; // Optional override URL to the annotation JSON
   name: string;

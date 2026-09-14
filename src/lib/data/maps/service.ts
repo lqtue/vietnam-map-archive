@@ -16,11 +16,12 @@ export type DbRow = Database['public']['Tables']['maps']['Row'];
  * takes the whole row — the admin editor writes back columns no list carries.
  */
 const LIST_COLUMNS =
-  'id,allmaps_id,annotation_url,name,location,map_type,dc_description,thumbnail,status,year,year_label,collection,holding_institution,source_url,source_type,bbox,iiif_image,georef_done';
+  'id,slug,allmaps_id,annotation_url,name,location,map_type,dc_description,thumbnail,status,year,year_label,collection,holding_institution,source_url,source_type,bbox,iiif_image,georef_done';
 
 function toMapListItem(row: DbRow): MapListItem {
   return {
     id: row.id,
+    slug: row.slug,
     allmaps_id: row.allmaps_id ?? undefined,
     annotation_url: row.annotation_url ?? undefined,
     name: row.name,

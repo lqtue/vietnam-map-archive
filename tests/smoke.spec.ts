@@ -174,7 +174,14 @@ test('picking a map writes ?map= and tallies the open', async ({ page }) => {
   await expect(row).toBeVisible({ timeout: 20_000 });
   await row.click();
 
-  await expect(page).toHaveURL(/[?&]map=[0-9a-f-]{36}/);
+  // A slug, not a uuid (mig 088). Asserted as *not* 36 hex-and-hyphen characters
+  // rather than merely "something is there", because the way this regresses is
+  // silent and specific: a list query that forgets the `slug` column makes
+  // `mapRef` fall back to the uuid, and the link still works — /explore opens
+  // the right sheet, nothing errors, and the address bar quietly goes back to
+  // being the opaque string this whole route exists to replace.
+  await expect(page).toHaveURL(/[?&]map=[a-z0-9]+(?:-[a-z0-9]+)*(?:[&#]|$)/);
+  await expect(page).not.toHaveURL(/[?&]map=[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/);
   await expect.poll(tallied, { timeout: 10_000 }).toBe(1);
 
   // Tapping the same row again removes the overlay, which must drop the param
@@ -185,7 +192,14 @@ test('picking a map writes ?map= and tallies the open', async ({ page }) => {
 });
 
 test('the IIIF tool pages mount their ImageShell', async ({ page }) => {
-  for (const route of ['/scan', '/scan?mode=shapes', '/scan?mode=prepare', '/scan?mode=text']) {
+  // `/scan` bare is not in this list any more: it has no default mode since the
+  // viewer merged into /catalog/[id], and a request without one is redirected.
+  for (const route of [
+    '/scan?mode=inspect',
+    '/scan?mode=shapes',
+    '/scan?mode=prepare',
+    '/scan?mode=text',
+  ]) {
     await page.goto(route);
     await expect(page.locator('.tool-page')).toBeVisible();
 
@@ -203,9 +217,10 @@ test('the IIIF tool pages mount their ImageShell', async ({ page }) => {
 });
 
 test('the old /scan mode names still open the mode they became', async ({ page }) => {
-  // `MODE_ALIASES`, not redirects: these spellings are in bookmarks and in the
-  // links /admin?tab=status prints. An unknown mode falls through to inspect,
-  // which is public — so a broken alias would look like it worked.
+  // The aliases in `$lib/core/scanModes.ts`, not redirects: these spellings are
+  // in bookmarks and in the links /admin?tab=status prints. A mode that resolves
+  // to nothing now leaves /scan for /catalog, so a broken alias would take a
+  // contributor to the catalogue instead of the tool they asked for.
   for (const [alias, title] of [
     ['triage', 'Prepare'],
     ['prepare', 'Prepare'],
@@ -235,7 +250,11 @@ test('auth-gated and legacy routes redirect', async ({ page }) => {
     ['/contribute/digitalize', '/scan?mode=prepare'],
     ['/contribute/trace', '/scan?mode=shapes'],
     ['/contribute/review', '/scan?mode=shapes&tab=validate'],
-    ['/image', '/scan'],
+    ['/image', '/catalog'],
+    // /scan stopped being a public address in Sept 2026: the read-only viewer
+    // it offered is /catalog/[id], which has the same tiles plus the record.
+    ['/scan', '/catalog'],
+    ['/scan?mode=nonsense', '/catalog'],
     ['/admin/bulk', '/admin?tab=bulk'],
     ['/admin/status', '/admin?tab=status'],
     ['/place/rue-catinat', '/catalog/place/rue-catinat'],
@@ -243,6 +262,33 @@ test('auth-gated and legacy routes redirect', async ({ page }) => {
     await page.goto(from);
     const landed = new URL(page.url());
     expect(landed.pathname + landed.search).toBe(to);
+  }
+});
+
+/**
+ * The sheet a retired link named has to survive the retirement.
+ *
+ * `/scan?map=<id>` was how /explore, the /catalog drawer and every bookmark
+ * reached a scan. It redirects to that sheet's own page, which carries the
+ * scan now — dropping the id and landing everyone on /catalog would turn one
+ * broken habit into a hundred wrong pages. A `map` that is not a uuid is not
+ * pasted into a path.
+ */
+test('a retired /scan link keeps the sheet it named', async ({ page }) => {
+  // Synthetic references on purpose: the redirect is a URL rewrite in
+  // `hooks.server.ts` and knows nothing about the row, so pinning it to a real
+  // sheet would make this fail the day that sheet is unpublished — a data
+  // change masquerading as a routing bug. Only the landing path is asserted.
+  for (const ref of ['00000000-0000-4000-8000-000000000000', 'plan-de-saigon-1799']) {
+    await page.goto(`/scan?map=${ref}`);
+    expect(new URL(page.url()).pathname).toBe(`/catalog/${ref}`);
+  }
+
+  // `?map=` is a stranger's query string and whatever passes is pasted into a
+  // path, so anything that is neither a uuid nor a slug is dropped instead.
+  for (const junk of ['..%2Fadmin', 'Not A Slug', '']) {
+    await page.goto(`/scan?map=${junk}`);
+    expect(new URL(page.url()).pathname, junk).toBe('/catalog');
   }
 });
 

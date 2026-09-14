@@ -36,7 +36,7 @@
   <title>All pages — Vietnam Map Archive</title>
   <meta
     name="description"
-    content="Every page in the Vietnam Map Archive in one list: the catalog, the map viewer, the scan inspector, the contribution tools, and the writing."
+    content="Every page in the Vietnam Map Archive in one list: the catalog, the map viewer, the contribution tools, and the writing."
   />
 </svelte:head>
 

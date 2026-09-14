@@ -41,7 +41,7 @@ Verified against the tree, August 2026.
 | Public browse + layer stack viewer (`/explore`) | ✅ | Display modes: Stacked / Lens / Side-by-side |
 | Free-form annotation + timeline (`/explore?mode=annotate`) | ✅ | |
 | Story authoring + GPS playback (`/explore?mode=story`, `/trip/[id]`) | ✅ | |
-| IIIF inspector (`/scan`) | ✅ | |
+| IIIF viewer, on the sheet's own page (`/catalog/[id]`) | ✅ | |
 | OCR pipeline: Gemini Flash → `ocr_extractions` | ✅ | `work/ocr/` |
 | OCR triage + human review UI (`/scan?mode=prepare`) | ✅ | Neatline, tile grid, bbox review |
 | MapSAM2 footprint segmentation → `footprint_submissions` | ✅ | `work/MapSAM2/` (fine-tuned SAM2, LoRA) |

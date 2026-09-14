@@ -63,14 +63,6 @@ export const DESTINATIONS: Destination[] = [
     role: 'anyone',
     keywords: 'series survey sheets l7014 indochine coverage index gap',
   },
-  {
-    href: '/scan',
-    label: 'Scan inspector',
-    hint: 'Read one sheet at full resolution',
-    group: 'Browse',
-    role: 'anyone',
-    keywords: 'iiif zoom scan image viewer',
-  },
 
   // Make
   {

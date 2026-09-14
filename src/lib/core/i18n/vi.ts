@@ -57,7 +57,6 @@ export const vi: Record<string, string> = {
   Blog: 'Nhật ký',
   Tools: 'Công cụ',
   'Map viewer': 'Trình xem bản đồ',
-  'Inspect a scan': 'Xem chi tiết bản scan',
   'Story Builder': 'Tạo câu chuyện',
   Contribute: 'Đóng góp',
   Georeference: 'Định vị tọa độ',
@@ -109,6 +108,7 @@ export const vi: Record<string, string> = {
   'No maps match this view — try another tab or the catalog.':
     'Không có bản đồ nào phù hợp với góc nhìn này — hãy thử tab khác hoặc danh mục.',
   'Browse the catalog': 'Duyệt danh mục',
+  'Map series': 'Bộ bản đồ',
   'Build something on top of the archive — a scrollytelling story across historical layers, or your own points, lines and shapes on a sheet.':
     'Xây dựng nội dung dựa trên kho dữ liệu — câu chuyện lịch sử theo lớp không gian, hoặc thêm điểm, đường và hình khối trên bản đồ.',
   'Walk readers through a place, one layer at a time':
@@ -251,6 +251,18 @@ export const vi: Record<string, string> = {
   'All sheets': 'Toàn bộ mảnh',
   'Filter the catalog': 'Lọc danh mục',
   'Browse the archive': 'Duyệt kho lưu trữ',
+  'Open on the map': 'Mở trên bản đồ',
+  'Zoom into the scan': 'Phóng to bản quét',
+  'Loading the viewer…': 'Đang tải trình xem…',
+  'The viewer failed to load.': 'Không tải được trình xem.',
+  'Drag to pan, scroll to zoom.': 'Kéo để di chuyển, cuộn để phóng to.',
+  'Full screen': 'Toàn màn hình',
+  'Leave full screen': 'Thoát toàn màn hình',
+  'Close the viewer': 'Đóng trình xem',
+  'IIIF image service': 'Dịch vụ ảnh IIIF',
+  'Sheet page': 'Trang bản đồ',
+  'This sheet is a draft: it is not published, and this page is visible only because you are signed in.':
+    'Bản đồ này là bản nháp: chưa được xuất bản, và trang này chỉ hiển thị vì bạn đã đăng nhập.',
   'View the original at {institution}': 'Xem bản gốc tại {institution}',
   'Trace this sheet in OpenHistoricalMap': 'Số hóa bản đồ này trên OpenHistoricalMap',
   'The sheet is served as warped map tiles, so it can sit under the OpenHistoricalMap editor while you draw. The button opens the editor with it already set as the background; if the editor does not pick it up, add it by hand under Background → Custom with this URL.':

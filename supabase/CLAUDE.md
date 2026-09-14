@@ -16,12 +16,17 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
   `map_review_marks` holds the three human stages.
 - Full-text search uses the `simple` tsvector config on purpose — the corpus is
   French/Vietnamese/English.
+- **`maps.slug` is minted by Postgres, never by a caller** (mig 088): `map_slug_base` folds the
+  name, `map_slug_mint` applies name → name-year → name-year-N, and two triggers keep it true. A
+  rename does not re-address a sheet; clearing `slug` re-mints it and files the old one in
+  `map_slug_aliases`. The `default ''` on the column is load-bearing — it is what keeps `slug`
+  optional in the generated `Insert` type.
 - The gazetteer key exists twice — `place_core_key()` here and `placeCoreKey` in
   `$lib/core/utils/placeKey.ts`. They must agree or a place page 404s.
 
 ## Adding a migration
 
-Head is **086**, pushed 2026-09-13. Drop a new `supabase/migrations/NNN_*.sql` incrementing from it,
+Head is **088**, pushed 2026-09-14. Drop a new `supabase/migrations/NNN_*.sql` incrementing from it,
 `supabase db push`, then regenerate types:
 
 ```bash

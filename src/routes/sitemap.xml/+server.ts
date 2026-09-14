@@ -39,7 +39,11 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
   const supabase = adminClient();
 
   const [{ data: maps }, { data: places }, { data: series }] = await Promise.all([
-    supabase.from('maps').select('id, updated_at').in('status', ['public', 'featured']).limit(5000),
+    supabase
+      .from('maps')
+      .select('slug, updated_at')
+      .in('status', ['public', 'featured'])
+      .limit(5000),
     // The gazetteer is a view over an aggregate, so cap it rather than let a
     // crawler's request grow with the corpus.
     supabase
@@ -78,7 +82,7 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
     ...STATIC_PATHS.map((p) => entry(p)),
     ...STATIC_PATHS.map((p) => entry(withLocale(p))),
     ...posts.map((p) => entry(`/blog/${p.slug}`, p.date)),
-    ...(maps ?? []).map((m) => entry(`/catalog/${m.id}`, m.updated_at as string | null)),
+    ...(maps ?? []).map((m) => entry(`/catalog/${m.slug}`, m.updated_at as string | null)),
     /* Listed here rather than in `LOCALIZED_PATHS`: the index is a page, but
        its prose is not translated, and a `/vi` twin with an hreflang pair
        would be the same document claiming to be two. */

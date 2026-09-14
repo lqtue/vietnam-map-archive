@@ -679,7 +679,10 @@ test('the share page is server-rendered and hides drafts', async () => {
   const html = await res.text();
   expect(html).toContain('og:title');
   expect(html).toContain('Write-smoke fixture map');
-  expect(html).toContain(`/explore?map=${mapId}`);
+  // The page links onward by slug, not by uuid (mig 088) — the readable address
+  // is the one a reader copies out of this page.
+  const { data: fixture } = await admin.from('maps').select('slug').eq('id', mapId).single();
+  expect(html).toContain(`/explore?map=${fixture!.slug}`);
 
   const { data: draft } = await admin
     .from('maps')
@@ -1511,4 +1514,150 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   // null rather than 0, so a caller can tell "not counted" from "contains none".
   expect(pub?.survey_sheets).toBe(5);
   expect(userRows.find((r) => r.key === draftKey)?.survey_sheets).toBeNull();
+});
+
+/**
+ * ── migration 088: the readable address ──────────────────────────────────────
+ *
+ * `/catalog/<uuid>` told a reader nothing about what was on the other end. The
+ * rule these pin is in Postgres, not here: a sheet's name, then the year when
+ * the name collides, then a counter only when the year cannot split them
+ * either. What makes it worth a test is the second half — when a name collides,
+ * the sheet that already held the bare name has to GIVE IT UP, and the address
+ * it gave up has to keep working. Get only the first half right and the archive
+ * looks correct while every link to the older sheet has quietly moved.
+ */
+/** A unique 16-char `allmaps_id`. The column is unique and the width is fixed,
+ *  so a discriminator has to fit INSIDE the 16 rather than be appended to a
+ *  timestamp that already fills it. */
+const slugFixtureId = () => `s${Math.random().toString(36).slice(2)}${Date.now()}`.slice(0, 16);
+
+/** `status` is spelled out on every fixture below because `maps.status` still
+ *  defaults to `pending_georef` (migration 001) and migration 060 narrowed the
+ *  check constraint to draft|public|featured without touching the default — so
+ *  an insert that omits it is rejected. */
+
+test('a sheet is addressed by its name, and a collision moves both onto the year', async () => {
+  const stem = `Slug Fixture ${Date.now()}`;
+  const base = stem.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  const insert = (year: number) =>
+    admin
+      .from('maps')
+      .insert({ allmaps_id: slugFixtureId(), name: stem, year, status: 'draft' })
+      .select('id, slug')
+      .single();
+
+  // Alone, a sheet gets its name and nothing else.
+  const { data: first, error: firstErr } = await insert(1906);
+  expect(firstErr, firstErr?.message).toBeNull();
+  created.mapIds.push(first!.id);
+  expect(first!.slug).toBe(base);
+
+  // A second sheet of the same name cannot take it, and must not be handed a
+  // bare counter when the two are a decade apart — the year is the thing that
+  // tells a reader which sheet they are looking at.
+  const { data: second, error: secondErr } = await insert(1919);
+  expect(secondErr, secondErr?.message).toBeNull();
+  created.mapIds.push(second!.id);
+  expect(second!.slug).toBe(`${base}-1919`);
+
+  // ...and the incumbent gives up the bare name rather than keeping it by
+  // seniority. `/catalog/<base>` would otherwise claim to be *the* sheet of that
+  // name while being one of two, chosen by upload order.
+  const { data: firstNow } = await admin.from('maps').select('slug').eq('id', first!.id).single();
+  expect(firstNow!.slug).toBe(`${base}-1906`);
+
+  // The address it gave up still resolves. This is what makes the demotion
+  // affordable: nothing that was ever published dies.
+  const { data: alias } = await admin
+    .from('map_slug_aliases')
+    .select('map_id')
+    .eq('slug', base)
+    .single();
+  expect(alias!.map_id).toBe(first!.id);
+
+  // No sheet is addressable two ways at once.
+  const { data: all } = await admin.from('maps').select('slug');
+  expect(new Set(all!.map((m) => m.slug)).size).toBe(all!.length);
+});
+
+test('a true tie falls back to a counter, and only then', async () => {
+  const stem = `Tie Fixture ${Date.now()}`;
+  const base = stem.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const insert = () =>
+    admin
+      .from('maps')
+      .insert({ allmaps_id: slugFixtureId(), name: stem, year: 1904, status: 'draft' })
+      .select('id, slug')
+      .single();
+
+  const { data: a, error: aErr } = await insert();
+  expect(aErr, aErr?.message).toBeNull();
+  created.mapIds.push(a!.id);
+  const { data: b, error: bErr } = await insert();
+  expect(bErr, bErr?.message).toBeNull();
+  created.mapIds.push(b!.id);
+
+  // Same name AND same year: there is nothing left to tell them apart with, so
+  // a number is the honest answer rather than a fabricated distinction.
+  const slugs = [
+    (await admin.from('maps').select('slug').eq('id', a!.id).single()).data!.slug,
+    b!.slug,
+  ].sort();
+  expect(slugs).toEqual([`${base}-1904`, `${base}-1904-2`]);
+});
+
+test('renaming a sheet does not move its address', async () => {
+  const { data: map, error: mapErr } = await admin
+    .from('maps')
+    .insert({
+      allmaps_id: slugFixtureId(),
+      name: `Rename Fixture ${Date.now()}`,
+      status: 'draft',
+    })
+    .select('id, slug')
+    .single();
+  expect(mapErr, mapErr?.message).toBeNull();
+  created.mapIds.push(map!.id);
+
+  // A title is edited for a typo or a fuller transcription. If that moved the
+  // URL, every link already shared would break — silently, and after the fact.
+  await admin.from('maps').update({ name: 'Rename Fixture, corrected' }).eq('id', map!.id);
+  const { data: after } = await admin.from('maps').select('slug').eq('id', map!.id).single();
+  expect(after!.slug).toBe(map!.slug);
+});
+
+test('a uuid link and a retired name both 301 to the readable address', async () => {
+  const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
+  const { data: fixture } = await admin.from('maps').select('slug').eq('id', mapId).single();
+
+  // Every link the archive published before Sept 2026 is a uuid, and those are
+  // in other people's messages and bookmarks. They redirect; they never 404.
+  const byUuid = await anon.get(`/catalog/${mapId}`, { maxRedirects: 0 });
+  expect(byUuid.status()).toBe(301);
+  expect(byUuid.headers()['location']).toBe(`/catalog/${fixture!.slug}`);
+
+  // The canonical address answers directly — one page, one URL, no redirect
+  // chain for a crawler to discount.
+  expect((await anon.get(`/catalog/${fixture!.slug}`, { maxRedirects: 0 })).status()).toBe(200);
+
+  // A retired name (a demotion, or a deliberate re-mint) lands the same way.
+  await admin
+    .from('map_slug_aliases')
+    .insert({ slug: `retired-${Date.now()}`, map_id: mapId })
+    .select('slug')
+    .single()
+    .then(async ({ data }) => {
+      const res = await anon.get(`/catalog/${data!.slug}`, { maxRedirects: 0 });
+      expect(res.status()).toBe(301);
+      expect(res.headers()['location']).toBe(`/catalog/${fixture!.slug}`);
+      await admin.from('map_slug_aliases').delete().eq('slug', data!.slug);
+    });
+
+  // A name that was never an address is still a 404, not a redirect to nowhere.
+  expect((await anon.get('/catalog/no-such-sheet-anywhere', { maxRedirects: 0 })).status()).toBe(
+    404
+  );
+  await anon.dispose();
 });

@@ -65,6 +65,10 @@
    */
   const HERO_SHEET = {
     id: '0e02b9d9-9d40-4cca-8e41-8c8373d54d3b',
+    /* Pinned alongside the uuid rather than looked up: this is a hard-coded
+       sheet, and the slug is what the outbound link should say. The uuid stays
+       as the identity — `maps.slug` can be re-minted, `maps.id` cannot. */
+    slug: 'plan-cadastral-de-la-ville-de-saigon-cochinchine-francaise',
     view: {
       bbox: [106.687488, 10.759901, 106.716015, 10.797223] as [number, number, number, number],
       rotation: 1.5772,
@@ -539,7 +543,10 @@
       <div class="action-footer">
         <div class="footer-links-group">
           <a href="/catalog" class="text-link">{$t('Browse the catalog')}</a>
-          <a href="/scan" class="text-link">{$t('Inspect a scan')}</a>
+          <!-- "Inspect a scan" pointed at /scan, which stopped being a public
+               address in Sept 2026: a sheet's own catalogue page carries the
+               tiled scan now, so the catalogue link above is that door. -->
+          <a href="/catalog/series" class="text-link">{$t('Map series')}</a>
         </div>
         <a href="/explore" class="btn is-lg is-primary">{$t('Open the map')}</a>
       </div>
@@ -551,6 +558,7 @@
          for OpenLayers. -->
     <HeroDemo
       mapId={HERO_SHEET.id}
+      slug={HERO_SHEET.slug}
       view={HERO_SHEET.view}
       still={HERO_1882}
       stillSrcset={twoCuts(HERO_1882)}

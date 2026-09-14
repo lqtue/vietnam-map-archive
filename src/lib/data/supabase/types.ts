@@ -342,6 +342,39 @@ export type Database = {
           },
         ]
       }
+      map_slug_aliases: {
+        Row: {
+          created_at: string | null
+          map_id: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          map_id: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          map_id?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_slug_aliases_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "map_slug_aliases_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maps: {
         Row: {
           allmaps_id: string | null
@@ -375,6 +408,7 @@ export type Database = {
           rights: string | null
           search_vector: unknown
           shelfmark: string | null
+          slug: string
           source_type: string | null
           source_url: string | null
           status: string | null
@@ -416,6 +450,7 @@ export type Database = {
           rights?: string | null
           search_vector?: unknown
           shelfmark?: string | null
+          slug?: string
           source_type?: string | null
           source_url?: string | null
           status?: string | null
@@ -457,6 +492,7 @@ export type Database = {
           rights?: string | null
           search_vector?: unknown
           shelfmark?: string | null
+          slug?: string
           source_type?: string | null
           source_url?: string | null
           status?: string | null
@@ -1221,6 +1257,20 @@ export type Database = {
       map_context: {
         Args: { p_geom_src?: string; p_map_id: string; p_public_only?: boolean }
         Returns: Json
+      }
+      map_slug_base: { Args: { p_name: string }; Returns: string }
+      map_slug_mint: {
+        Args: {
+          p_except: string
+          p_forbid?: string
+          p_name: string
+          p_year: number
+        }
+        Returns: string
+      }
+      map_slug_taken: {
+        Args: { p_except: string; p_slug: string }
+        Returns: boolean
       }
       place_core_key: {
         Args: { p_text: string; p_validated: string }

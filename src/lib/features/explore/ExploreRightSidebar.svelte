@@ -208,6 +208,7 @@
           <h3 class="if-name">{map.name}</h3>
           <TopSheetActions
             {mapId}
+            slug={map?.slug ?? null}
             {published}
             {vectorsOn}
             on:toggleVectors={(e) => dispatch('toggleVectors', e.detail)}

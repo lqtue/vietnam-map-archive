@@ -16,7 +16,8 @@
   import type Map from 'ol/Map';
 
   import { getSupabaseContext } from '$lib/data/supabase/context';
-  import { resolveMapRef } from '$lib/features/stories/shared/applyPoint';
+  import { resolveMapRef } from '$lib/data/maps/resolveRef';
+  import { mapRef } from '$lib/core/utils/mapSlug';
   import { createGeoMapStores } from '$lib/map/shell/geoMapSetup';
   import type { Bbox } from '$lib/core/geo/mapBounds';
   import { layersStore, toHistoricalRef, isSheetLayer } from '$lib/map/stores/layersStore';
@@ -286,7 +287,7 @@
     if (!item?.id) return;
     const map = mapList.find((m) => m.id === item.id) ?? (item as MapListItem);
     addMapOverlay(map);
-    syncMapParam(map.id);
+    syncMapParam(mapRef(map));
     tallyMapOpen(map.id);
     await zoomToMap(map);
   }
@@ -296,7 +297,7 @@
     const map = mapList.find((m) => m.id === h.map_id);
     if (!map) return;
     addMapOverlay(map);
-    syncMapParam(map.id);
+    syncMapParam(mapRef(map));
     tallyMapOpen(map.id);
     if (h.lng != null && h.lat != null) {
       mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
@@ -336,7 +337,7 @@
       // than not swapping.
       if (!layersStore.addOverlay(toHistoricalRef(next), { opacity: top.opacity })) return;
       layersStore.removeOverlayByMapId(top.ref.mapId);
-      syncMapParam(next.id);
+      syncMapParam(mapRef(next));
       tallyMapOpen(next.id);
       return;
     }
@@ -362,7 +363,12 @@
     // The topmost SHEET, not the topmost row: a series left on top has no
     // catalogue row, so writing its id here hands out a `?map=` that resolves
     // to nothing — a share link that opens an empty page, with no error.
-    syncMapParam($layersStore.overlays.find(isSheetLayer)?.ref.mapId ?? null);
+    // The layer stack carries uuids, so the slug has to come back off the
+    // catalogue — otherwise removing a sheet would rewrite a readable URL as an
+    // opaque one, which is the change this whole route is undoing.
+    const top = $layersStore.overlays.find(isSheetLayer)?.ref.mapId ?? null;
+    const topMap = top ? mapList.find((m) => m.id === top) : null;
+    syncMapParam(topMap ? mapRef(topMap) : top);
   }
   function handleZoomToOverlay(
     e: CustomEvent<{ mapId: string; bounds?: [number, number, number, number] }>
@@ -475,6 +481,7 @@
         <LayerStackPanel {viewMode} {mapList} on:zoomToOverlay={handleZoomToOverlay} />
         <TopSheetActions
           mapId={activeOverlayMapId}
+          slug={activeOverlayMap?.slug ?? null}
           published={activeOverlayMap?.status === 'public' ||
             activeOverlayMap?.status === 'featured'}
           vectorsOn={!!activeOverlayMapId && vectorMapIds.includes(activeOverlayMapId)}

@@ -30,11 +30,8 @@
   import { createStoryLibraryStore } from '$lib/features/stories/shared/storyStore';
   import { fetchGeoreferencedMaps } from '$lib/data/maps/service';
   import { layersStore } from '$lib/map/stores/layersStore';
-  import {
-    applyPointOverlay,
-    applyStoryPoint,
-    resolveMapRef,
-  } from '$lib/features/stories/shared/applyPoint';
+  import { applyPointOverlay, applyStoryPoint } from '$lib/features/stories/shared/applyPoint';
+  import { resolveMapRef } from '$lib/data/maps/resolveRef';
   import { createMapPickHandlers } from '$lib/features/stories/shared/mapPickHandlers';
   import * as pointOps from '$lib/features/stories/shared/pointOps';
   import {

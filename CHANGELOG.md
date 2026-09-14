@@ -12,7 +12,7 @@ match. So the hand-drawn HTML app keeps **1.x–2.x**, the SvelteKit rewrite kee
 **3.x**, and everything after that continues from `v3.3` — the last number
 anyone wrote down.
 
-Versions 6.0, 7.0, 7.1 and 7.2 are written out in full, because that is the
+Versions 6.0, 7.0, 7.1, 7.2, 7.3 and 7.4 are written out in full, because that is the
 architecture that exists today. Everything earlier is summarised; the detail is in `git log`,
 and most of it has been replaced.
 
@@ -24,6 +24,8 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 | Version | Date | In one line |
 |---|---|---|
+| [7.4](#74--september-2026) | Sept 2026 | A sheet is addressed by its name: `/catalog/plan-de-la-ville-de-saigon-1799`, with every uuid link still landing |
+| [7.3](#73--september-2026) | Sept 2026 | One page per sheet: the scan itself moved onto the catalogue record, and `/scan` stopped being a public address |
 | [7.2](#72--september-2026) | Sept 2026 | A survey is one thing: 514 sheets on the map as two layers, and a page for every sheet a survey contains, held or not |
 | [7.1](#71--september-2026) | Sept 2026 | The scan tools renamed after what they do, and split by the job in front of you |
 | [7.0](#70--september-2026) | Sept 2026 | Sixteen pages instead of twenty-three, one design system with dark mode, a front page that costs nothing, and OCR that can measure itself |
@@ -42,9 +44,58 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 ---
 
+## 7.4 — September 2026
+
+**Current.** Every sheet was addressed by its uuid —
+`/catalog/787439c7-8015-496d-a458-df61b89a4391` — which is the URL a reader is
+asked to paste into a message, and which says nothing about what is on the
+other end. Migration 088 gives each sheet its name.
+
+### The rule, and why a collision takes the year
+
+- **`maps.slug`, minted in Postgres** (`map_slug_base` folds the name the way the gazetteer folds a place name; `map_slug_mint` picks a free address). Deliberately **no client-side slugifier** to be its twin — the gazetteer key needs one because a label on screen has to find its place page without a round trip, but nothing needs to *guess* a sheet's address: every row that can link to one already carries what the database minted.
+- **Measured before it was designed.** 147 of 153 names were already unique, and all six colliding groups were the same place in a different year — Vinh Yen 1906 and 1919, Plan de la ville de Saigon 1799 and 1878. So the disambiguator is the **year**: `vinh-yen-1906` tells a reader which sheet they have, `vinh-yen-2` tells them only that it was second in the door. A bare counter is the last resort and applies to exactly **one** row on today's corpus — a second *Quang Yen 1904* that shares its name, year, holding institution and source URL with the first, and is very likely a duplicate record rather than a second sheet.
+- **When a name collides, neither sheet keeps the bare slug.** Both take the year. There is no honest basis for crowning one; `/catalog/vinh-yen` would claim to be *the* Vinh Yen map while being one of two, chosen by upload order; and it stays stable as the archive grows, because a third Vinh Yen then renames nothing. Under first-one-wins the clean URL is decided by upload order and every later sheet inherits a number for good.
+- **A slug is minted once.** Renaming a sheet does not re-address it — a title is edited for a typo or a fuller transcription, and a URL that moved with it would break links already shared, silently and after the fact. Re-addressing is deliberate: set `slug` to null and the trigger mints a fresh one.
+
+### Nothing that was ever published dies
+
+- **`map_slug_aliases`** holds every address a sheet has answered on — a bare name it was demoted off, or one retired by a deliberate re-mint. `/catalog/[id]` resolves slug → alias → uuid and **301s** the last two, so every link minted before September 2026 still lands and says where it went.
+- `?map=` accepts all three shapes (`resolveMapRef`, moved to `$lib/data/maps/resolveRef.ts` — it was a pure two-line lookup sitting behind an import of the OpenLayers layer store, so no browser-less test could reach it). The uuid branches are not dead code: a label hit and a footprint submission reach the UI carrying only `map_id`, and a uuid there is a working 301 rather than no link at all.
+- `/api/*` stays on uuids. The slug is an **address**, not an identity: it can be re-minted and a collision can move it, so it is never a foreign key and never a join key.
+
+### Two bugs the tests caught
+
+- **The demotion silently did nothing.** `map_slug_mint` excludes the row it is minting for, so an incumbent asked to give up `vinh-yen` was told its own address was still free and handed straight back what it came to surrender. The fix is an explicit `p_forbid`; the test that pins it asserts the *incumbent* moved, not just that the newcomer got a year — get only that half right and the archive looks correct while every link to the older sheet has quietly moved.
+- **`slug` would have been a required field.** `supabase gen types` marks a NOT NULL column with no default as required in `Insert`, which would have forced both map-creating routes to compute a slug client-side — the duplicated rule this migration exists to avoid. The column carries `default ''` for that reason alone; `''` is never a value the mint can return, so it is a sentinel, and if the trigger were ever disabled the second row through would fail the unique index loudly.
+
+## 7.3 — September 2026
+
+Two pages showed one sheet. `/catalog/[id]` had the title, the
+date, the creator, the places, the rights and a URL worth pasting, and a picture
+of the scan 157 pixels wide. `/scan?mode=inspect` had the scan at full
+resolution and told you nothing about it. They are one page now.
+
+### The scan is on the sheet's own page
+
+- **`SheetZoom.svelte`** (`features/catalog/`) — the still, and the tiled IIIF image behind a click. `ImageShell` is **dynamically imported on that click**: /catalog/[id] is server-rendered for crawlers and most visits never zoom, so OpenLayers stays out of the first paint. Full screen is a CSS state on the same instance, with the view re-fitted on the way in and out; `requestFullscreen()` is not used, because it is refused for non-video elements on iOS Safari.
+- **The still was the stored thumbnail at whatever width the sheet was mirrored with.** For `1707c017` that is **157 px**, drawn across a 56 rem column. It asks for 800 through `atWidth` now and steps down if that width was never written.
+- **There is no "just link the full image".** A level0 sheet 404s every size it did not mirror — `/full/max/`, `/full/1249,937/` and the three its own `info.json` advertises, all verified against the live bucket. The tiles are the only way to see it whole, which is why the answer is a viewer rather than an `<a>`.
+
+### `/scan` is staff-only
+
+- **No default mode.** `/scan` with no mode, and any mode that is not in `$lib/core/scanModes.ts`, is redirected to `/catalog` by `hooks.server.ts`; `?map=<uuid>` becomes `/catalog/<uuid>`, so the address every bookmark, the /explore action strip and the catalog drawer used keeps the sheet it named. 302, not 301: the path is still live for the staff modes, and a cache careless about the query string would take them with it.
+- **An unknown mode used to fall through to inspect**, which is public — so a typo in a mode name looked like it had worked and quietly showed the wrong surface. That fallthrough is the redirect now. The mode vocabulary lives in one module because two files read it: the hook that redirects and the dispatcher that renders.
+- `?mode=inspect` stays, unlisted, and is gone from the footer, the Tools menu, the command palette and /directory. Its remaining job is a **draft**.
+
+### A draft sheet has somewhere to land
+
+- `/catalog/[id]` resolved published rows only, so retiring `/scan?map=` would have sent every draft to a 404. It serves a draft to a **signed-in** reader now, with a banner saying so and `noindex`; anonymous still gets a 404 rather than a redirect to sign in, which would confirm the id exists. That is the line **migration 063** already draws on `maps` itself — open contribution means a volunteer legitimately works on unpublished sheets, and anonymous is the boundary that matters.
+- Two buttons that had become one destination collapsed: the /explore rail's *Scan* and *Share*, and the catalog drawer's *Image* and *Share page*.
+
 ## 7.2 — September 2026
 
-**Current.** The archive learned the difference between what it **holds** and
+The archive learned the difference between what it **holds** and
 what a survey **contains**, and the gap turned out to be most of the corpus.
 Two migrations, three routes, no new dependency.
 

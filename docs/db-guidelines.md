@@ -15,6 +15,11 @@ id uuid primary key default gen_random_uuid()
 ### Canonical map identifier
 `maps.id` (UUID) is the single canonical reference to a map. Use it everywhere.
 
+`maps.slug` (mig 088) is an **address, not an identity**: it is what `/catalog/<slug>` and
+`?map=<slug>` carry so a shared link says what is on the other end. It can be re-minted and a
+collision can move it, which is exactly why it is never a foreign key, never a join key, and never
+what `/api/*` takes. Old addresses are kept in `map_slug_aliases` rather than dropped.
+
 `maps.allmaps_id` is a **service credential** — the Allmaps API key for this map's annotation. It is only used when calling Allmaps endpoints (building annotation URLs, loading warped tile layers). It is never a join key or URL parameter.
 
 Resolved (Aug 2026): `mapStore.activeMapId` now holds the `maps.id` UUID, mirrored from `layersStore.topOverlay`; the map deep-link is the `?map=<uuid>` query param, and the `&map=` hash writer is gone. The old `supabase/maps.ts` shim was deleted — read through `src/lib/data/maps/service.ts`.
@@ -173,7 +178,8 @@ Moved here from `CLAUDE.md` in September 2026. The table lists what exists; the 
 
 | Table | Purpose | Notes |
 |-------|---------|-------|
-| `maps` | Map catalogue | `id` (uuid), `allmaps_id`, `annotation_url` (mig 047), `iiif_image`, `iiif_manifest`, `source_type`, `holding_institution` (mig 044), `collection`, `map_type`, `bbox`, `status`, `thumbnail`, full DC fields, plus `georef_done`, `help_needed`, `legend_done`, `priority`, `label_config`, `triage` (mig 069, `regions` added by 070) |
+| `maps` | Map catalogue | `id` (uuid), `slug` (mig 088 — unique, minted by trigger, never moved by a rename), `allmaps_id`, `annotation_url` (mig 047), `iiif_image`, `iiif_manifest`, `source_type`, `holding_institution` (mig 044), `collection`, `map_type`, `bbox`, `status`, `thumbnail`, full DC fields, plus `georef_done`, `help_needed`, `legend_done`, `priority`, `label_config`, `triage` (mig 069, `regions` added by 070) |
+| `map_slug_aliases` | Addresses a sheet used to answer on (mig 088) | `slug` PK, `map_id → maps.id`. Written by the trigger when a sheet is demoted off a bare name or deliberately re-minted; `/catalog/[id]` 301s them. A slug is never both canonical and an alias |
 | `profiles` | Per-user role | `user`, `mod`, `admin`; read via `fetchUserRole` |
 | `scout_candidates` | External discoveries (mig 045) | `source`, `external_id` (unique with source), `manifest_url`, `score`, `category`, `status` (`pending/approved/rejected/ingested`), `map_id` on ingest, `raw` JSONB |
 | `map_iiif_sources` | Multiple IIIF sources per map | `map_id → maps.id`, `source_type`, `is_primary`, `sort_order`. Partial unique index = one primary per map; trigger syncs primary to `maps.iiif_image` |

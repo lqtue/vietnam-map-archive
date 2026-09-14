@@ -74,7 +74,7 @@ export interface LabelHit {
 
 /** Everything a catalog card, the facet rail and the admin editor read. */
 const FULL_MAP_COLUMNS =
-  'id,name,location,map_type,dc_description,thumbnail,year,year_label,collection,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done,creator,holding_institution,original_title,dc_publisher,shelfmark,physical_description,rights,language,source_url';
+  'id,slug,name,location,map_type,dc_description,thumbnail,year,year_label,collection,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done,creator,holding_institution,original_title,dc_publisher,shelfmark,physical_description,rights,language,source_url';
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -82,7 +82,7 @@ const FULL_MAP_COLUMNS =
  * source fields are most of a map row and no slim caller renders one of them.
  */
 const SLIM_MAP_COLUMNS =
-  'id,name,year,year_label,status,map_type,source_type,holding_institution,allmaps_id';
+  'id,slug,name,year,year_label,status,map_type,source_type,holding_institution,allmaps_id';
 
 // No pagination UI on the catalog/sidebar yet, so the page slice must be able
 // to hold the whole archive. Raw queries keep their own 2000-row safety ceiling.

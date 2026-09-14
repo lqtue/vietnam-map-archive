@@ -19,7 +19,7 @@ The Vietnam Map Archive is an open platform for exploring, georeferencing, and d
 | `/explore?mode=annotate` | Free-form annotation + timeline animation |
 | `/explore?mode=story` | Story / adventure authoring |
 | `/trip/[id]` | Story playback |
-| `/scan` | IIIF image inspector (no geo overlay) |
+| `/catalog/[id]` | One sheet: its record, and the scan itself at full resolution |
 | `/about`, `/blog` | Project background and dev log |
 | `/login`, `/profile` | Account and role badges |
 | `/contribute` | Contribution hub — where the volunteer tools start |

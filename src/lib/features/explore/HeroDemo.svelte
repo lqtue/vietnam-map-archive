@@ -28,6 +28,8 @@
 
   /** `maps.id` of the sheet to play, and the frame it opens on. */
   export let mapId: string;
+  /** The sheet's readable address, for the outbound link. Falls back to the uuid. */
+  export let slug: string | null = null;
   /** The sheet's bbox and the angle to hold it at — passed straight to `HeroMap`. */
   export let view: { bbox: [number, number, number, number]; rotation: number };
   /** The still frame of the same sheet, used as the header image too. */
@@ -160,7 +162,9 @@
   </div>
 
   <p>
-    <a href="/explore?map={mapId}" class="text-link">{$t('Open this sheet in the viewer')}</a>
+    <a href="/explore?map={slug ?? mapId}" class="text-link"
+      >{$t('Open this sheet in the viewer')}</a
+    >
   </p>
 </section>
 

@@ -6,7 +6,7 @@
   also where the staff pages appear once a role is known. A tool is something
   you go and do; putting eight of them in the bar made the bar the tool.
 
-  Tools ▾:  Map viewer /explore | Inspect a scan /scan
+  Tools ▾:  Map viewer /explore
             Story Builder /explore?mode=story | Studio /explore?mode=studio
             ── Contribute /contribute | Georeference /contribute/georef
                Prepare a sheet /scan?mode=prepare | Check the text /scan?mode=text
@@ -14,6 +14,10 @@
             ── Admin /admin (mod)
                Design system /screens (admin)
             ── All pages /directory
+
+  "Inspect a scan" came out in Sept 2026: /catalog/[id] shows the tiled scan
+  itself now, so the catalog is that door. /scan keeps only the staff modes,
+  which is why it is still in `activeTools` below.
 
   `role` gates the staff rows the same way the pages do — hidden rather than
   shown and then refused. It arrives from the (editorial) layout, because ui/
@@ -122,7 +126,6 @@
 
     <NavDropdown label="Tools" active={activeTools}>
       <a href="/explore" class="dropdown-item" on:click={closeDrawer}>{$t('Map viewer')}</a>
-      <a href="/scan" class="dropdown-item" on:click={closeDrawer}>{$t('Inspect a scan')}</a>
       <a href="/explore?mode=story" class="dropdown-item" on:click={closeDrawer}
         >{$t('Story Builder')}</a
       >
@@ -293,7 +296,6 @@
 
       <p class="drawer-section-label">{$t('Tools')}</p>
       <a href="/explore" class="drawer-link" on:click={closeDrawer}>{$t('Map viewer')}</a>
-      <a href="/scan" class="drawer-link" on:click={closeDrawer}>{$t('Inspect a scan')}</a>
       <a href="/explore?mode=story" class="drawer-link" on:click={closeDrawer}
         >{$t('Story Builder')}</a
       >

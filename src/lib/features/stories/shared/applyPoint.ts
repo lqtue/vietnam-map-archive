@@ -7,6 +7,7 @@
  * framed the camera at zoom 17.
  */
 import type { MapListItem } from '$lib/data/maps/types';
+import { resolveMapRef } from '$lib/data/maps/resolveRef';
 import type { StoryPoint } from './types';
 import type { MapStore } from '$lib/map/stores/mapStore';
 import { toHistoricalRef, layersStore } from '$lib/map/stores/layersStore';
@@ -15,18 +16,6 @@ export type LayersStore = typeof layersStore;
 
 /** Zoom a story playback frames a point at when the point pins no camera. */
 export const STORY_POINT_ZOOM = 17;
-
-/**
- * Resolve a story's `overlayMapId` against the catalogue. The id may be a
- * `maps.id` UUID (new) or a legacy `allmaps_id`, so both are matched.
- */
-export function resolveMapRef(
-  mapList: MapListItem[],
-  id: string | null | undefined
-): MapListItem | null {
-  if (!id) return null;
-  return mapList.find((m) => m.id === id || m.allmaps_id === id) ?? null;
-}
 
 /**
  * Swap the overlay stack to the point's pinned historical layer. No-op when the

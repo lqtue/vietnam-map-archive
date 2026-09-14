@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
+  import { mapHref, exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 
   export let item: any | null = null;
@@ -28,7 +29,6 @@
   $: isScout = item?._table === 'scout';
   $: canEdit = item && !isScout && (role === 'admin' || role === 'mod');
   $: canMap = item && !isScout && item.georef_done;
-  $: canImage = item && !isScout && item.iiif_image;
   $: canAnnotate = item && !isScout && item.georef_done;
 
   function statusLabel(): string {
@@ -100,16 +100,18 @@
         >
       {/if}
       {#if canMap}
-        <a class="chip is-primary act" href="/explore?map={item.id}">{$t('Map')}</a>
+        <a class="chip is-primary act" href={exploreHref(item)}>{$t('Map')}</a>
       {/if}
-      {#if canImage}
-        <a class="chip act" href="/scan?map={item.id}">{$t('Image')}</a>
-      {/if}
+
       {#if canAnnotate}
-        <a class="chip act" href="/explore?mode=studio&map={item.id}">✏️ Studio</a>
+        <a class="chip act" href="/explore?mode=studio&map={mapRef(item)}">✏️ Studio</a>
       {/if}
-      {#if !isScout && (item.status === 'public' || item.status === 'featured')}
-        <a class="chip act" href="/catalog/{item.id}">Share page</a>
+      <!-- One chip, not two: "Image" pointed at /scan?map= and "Share page" at
+           /catalog/[id], and those became the same page. A draft is included —
+           it resolves there for a signed-in reader, and the drawer only ever
+           lists rows this reader can already see. -->
+      {#if !isScout}
+        <a class="chip act" href={mapHref(item)}>{$t('Sheet page')}</a>
       {/if}
       {#if isScout && (item._scout?.source_url || item._scout?.manifest_url)}
         <a

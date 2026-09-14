@@ -14,15 +14,21 @@
     ohmEditorUrl,
   } from '$lib/core/iiif/annotationUrl';
   import { placeHref } from '$lib/core/utils/placeKey';
+  import { exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { page } from '$app/stores';
   import { SITE_ORIGIN } from '$lib/core/site';
   import { jsonLd } from '$lib/core/utils/jsonLd';
 
+  import SheetZoom from '$lib/features/catalog/SheetZoom.svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole, type UserRole } from '$lib/data/supabase/role';
 
   export let data;
   $: map = data.map;
+  /* False only for a draft, which the loader serves to signed-in readers alone.
+     `!== false` so an older cached payload without the field reads as published
+     rather than banner-ing every sheet. */
+  $: published = data.published !== false;
   /** Places this sheet names, from the gazetteer. Empty until the map is OCR'd. */
   $: places = (data.places ?? []) as Array<{
     name_key: string;
@@ -153,6 +159,11 @@
 
 <svelte:head>
   <title>{map.name} — Vietnam Map Archive</title>
+  {#if !published}
+    <!-- A draft is reachable so contributors can look at the scan, not so a
+         crawler can index a record the archive has not stood behind yet. -->
+    <meta name="robots" content="noindex, nofollow" />
+  {/if}
   <meta name="description" content={blurb} />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Vietnam Map Archive" />
@@ -185,21 +196,28 @@
   <PageHero eyebrow="Archive" title={map.name} sub={subtitle} />
 
   <main class="editorial-main share-page">
-    {#if shareImage}
-      <img class="share-image" src={shareImage} alt={map.name} loading="lazy" />
+    {#if !published}
+      <p class="share-draft">
+        {$t(
+          'This sheet is a draft: it is not published, and this page is visible only because you are signed in.'
+        )}
+      </p>
     {/if}
+
+    <SheetZoom iiifImage={map.iiif_image} preview={shareImage} title={map.name} />
 
     {#each paragraphs as para, i (i)}
       <p class="share-blurb">{para}</p>
     {/each}
 
     <div class="share-actions">
-      <!-- A map that has not been georeferenced cannot be laid on the world, but it
-         is still a scanned map we host: /scan opens it in the IIIF viewer. The
-         label already said "viewer"; only the destination was missing. -->
-      <a class="btn" href={map.georef_done ? `/explore?map=${map.id}` : `/scan?map=${map.id}`}>
-        {map.georef_done ? 'Open on the map' : 'Open in the viewer'}
-      </a>
+      <!-- Only /explore: it lays the warped sheet on the world, which is the one
+         thing this page cannot do. There is no "open the scan" button because
+         the scan is on this page — the button existed for a week, pointing at
+         /scan?map=, and that address now redirects back here. -->
+      {#if map.georef_done}
+        <a class="btn" href={exploreHref(map)}>{$t('Open on the map')}</a>
+      {/if}
       <a class="btn" href="/catalog">{$t('Browse the archive')}</a>
       {#if map.source_url}
         <a class="btn" href={map.source_url} target="_blank" rel="noopener noreferrer">
@@ -350,11 +368,14 @@
     gap: var(--space-6);
   }
 
-  .share-image {
-    width: 100%;
+  .share-draft {
+    margin: 0;
+    padding: var(--space-3);
     border: var(--border-thin);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     background: var(--color-gray-100);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
   }
 
   .share-blurb {

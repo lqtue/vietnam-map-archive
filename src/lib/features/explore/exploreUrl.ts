@@ -1,8 +1,13 @@
 /**
  * exploreUrl.ts — the `?map=` deeplink contract for /explore.
  *
- * `?map=<id>` (query, written here) is the inbound deep link: it is what
- * /catalog, /scan?mode=prepare and every share link point at. The `&map=`
+ * `?map=<ref>` (query, written here) is the inbound deep link: it is what
+ * /catalog, /scan?mode=prepare and every share link point at. Since migration
+ * 088 the reference written here is the sheet's readable `slug`, not its uuid —
+ * this is the URL a visitor copies out of the address bar, and it is the one
+ * place the archive gets to say what the sheet is. The reader
+ * (`resolveMapRef`) still accepts a uuid and a legacy `allmaps_id`, so every
+ * link minted before the slug existed still lands. The `&map=`
  * that urlStore used to append to the `#…` hash was a second, competing
  * mechanism for the same thing and was dropped — see `$lib/map/stores/urlStore.ts`.
  * The hash reader stays tolerant of `map=` so old links still land here.
@@ -12,7 +17,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import type { MapListItem } from '$lib/data/maps/types';
 import type { Story } from '$lib/features/stories/shared/types';
-import { resolveMapRef } from '$lib/features/stories/shared/applyPoint';
+import { resolveMapRef } from '$lib/data/maps/resolveRef';
 import { recordMapOpen } from '$lib/data/supabase/mapOpens';
 export { hasHashCamera } from '$lib/features/explore/hashCamera';
 
@@ -25,7 +30,7 @@ export interface ExploreUrlOptions {
 }
 
 export interface ExploreUrl {
-  syncMapParam(mapId: string | null): void;
+  syncMapParam(ref: string | null): void;
   /** Writes (or clears) `?at=` so the spot the reader landed on is shareable. */
   syncAtParam(at: { lng: number; lat: number } | null): void;
   tallyMapOpen(mapId: string): void;
@@ -43,7 +48,7 @@ export function createExploreUrl({ supabase, role, markApplied }: ExploreUrlOpti
    * encoding would need a reader change too — do that if sharing multi-map
    * stacks is ever asked for.
    */
-  function syncMapParam(mapId: string | null) {
+  function syncMapParam(ref: string | null) {
     // Read window.location, NOT $page.url: pushState() is shallow routing, so it
     // updates $page.state and leaves $page.url pinned at the last real
     // navigation ("/explore"). Building from $page.url meant the delete below hit
@@ -51,7 +56,7 @@ export function createExploreUrl({ supabase, role, markApplied }: ExploreUrlOpti
     // MapShell's initUrlSync also owns the #@lat,lng,zoom hash — carrying the
     // live href over keeps its camera state instead of clobbering it.
     const url = new URL(window.location.href);
-    if (mapId) url.searchParams.set('map', mapId);
+    if (ref) url.searchParams.set('map', ref);
     else url.searchParams.delete('map');
     if (url.href === window.location.href) return;
     // Belt-and-braces: $page.url doesn't currently see our writes, but if that
@@ -94,6 +99,7 @@ export function createExploreUrl({ supabase, role, markApplied }: ExploreUrlOpti
 }
 
 export interface ApplyExploreUrlParams {
+  /** Whatever `?map=` carried: a slug, a uuid, or a legacy `allmaps_id`. */
   mapId: string | null;
   /** `?at=<lng>,<lat>` — a spot on the map to land on (a label hit); needs `mapId`. */
   at: string | null;

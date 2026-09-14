@@ -21,6 +21,7 @@
   import { get } from 'svelte/store';
   import { paletteOpen, paletteSeed, closePalette } from '$lib/core/utils/commandPalette';
   import { letteringClass } from '$lib/core/utils/mapLettering';
+  import { exploreHref } from '$lib/core/utils/mapSlug';
   import { debounce } from '$lib/core/utils/debounce';
   import { destinationsFor, matchDestinations, type Destination } from './paletteDestinations';
   import { placeHref } from '$lib/core/utils/placeKey';
@@ -84,7 +85,7 @@
     })),
     ...maps.map((m): Row => ({
       kind: 'map',
-      href: `/explore?map=${m.id}`,
+      href: exploreHref(m),
       title: m.name,
       sub: m.year_label ?? (m.year ? String(m.year) : 'Undated'),
     })),

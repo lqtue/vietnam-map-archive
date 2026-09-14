@@ -34,10 +34,33 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '7.4',
+    date: '2026-09-15',
+    headline: 'Every sheet is addressed by its name',
+    current: true,
+    changes: [
+      'A sheet’s address used to be a line of 36 random characters. It is the sheet’s own name now — maparchive.vn/catalog/plan-de-la-ville-de-saigon-1799 — so a link you paste into a message says what is on the other end before anyone clicks it.',
+      'Every link anyone has ever shared still works. The old addresses forward to the new ones rather than breaking, and they will keep doing so.',
+      'Where two sheets share a name, both carry their year — vinh-yen-1906 and vinh-yen-1919 — rather than one of them keeping the plain name and the other being given a number. Which sheet was added first is not something a reader should have to know.',
+      'Correcting a sheet’s title no longer changes its address, so a typo fixed today cannot break a link someone shared last month.',
+      'Of the 153 sheets in the archive, 147 have a name unique enough to need nothing else.',
+    ],
+  },
+  {
+    version: '7.3',
+    date: '2026-09-14',
+    headline: 'The scan itself, on the sheet’s own page',
+    changes: [
+      'Every sheet’s page now carries the scan, not a picture of it: click the map and it opens where it is, tiled, down to the paper. Full screen is one more click.',
+      'The picture at the top of those pages was, for some sheets, 157 pixels wide stretched across the page. It is the largest size the archive actually holds now, and falls back on its own if that one was never made.',
+      'Reading a sheet used to mean leaving its record behind: the viewer was a separate page that showed the scan and nothing else — not the title, not the date, not the places on it. There is one page per sheet now, and the old viewer address sends you to it, carrying the sheet you asked for.',
+      'The tools for preparing and tracing sheets are unchanged and still where they were; only the read-only viewer moved.',
+    ],
+  },
+  {
     version: '7.2',
     date: '2026-09-13',
     headline: 'Whole surveys, and a page for every sheet in one',
-    current: true,
     changes: [
       "Two complete map surveys go onto the map as a single layer each: the US Army's 1:50,000 of all Vietnam (1963–1989) and the French 1:25,000 of Tonkin and Thanh Hóa (1903–1927). 514 sheets, two taps.",
       'Every survey now has a page listing every sheet it contains — including the ones the archive does not have. It says how many are held, how many have a scan someone has located, and how many nobody has found anywhere.',

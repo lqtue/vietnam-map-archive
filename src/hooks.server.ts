@@ -2,7 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { redirect, type Handle } from '@sveltejs/kit';
 import type { Database } from '$lib/data/supabase/types';
-import { LOCALE_COOKIE, isLocale, localeFromPath } from '$lib/core/i18n';
+import { LOCALE_COOKIE, isLocale, localeFromPath, stripLocale } from '$lib/core/i18n';
+import { resolveScanMode } from '$lib/core/scanModes';
 import { CANONICAL_HOST } from '$lib/core/site';
 
 /** Retired route paths → their replacements (301, query string preserved). */
@@ -11,7 +12,7 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/annotate': '/explore?mode=studio',
   '/studio': '/explore?mode=studio',
   '/create': '/explore?mode=story',
-  '/image': '/scan',
+  '/image': '/catalog',
   '/contribute/label': '/scan?mode=prepare',
   '/contribute/digitalize': '/scan?mode=prepare',
   '/contribute/trace': '/scan?mode=shapes',
@@ -36,6 +37,43 @@ const LEGACY_PREFIXES: [string, string][] = [
 function withSearch(target: string, search: string): string {
   if (!search) return target;
   return target + (target.includes('?') ? '&' + search.slice(1) : search);
+}
+
+/**
+ * `/scan` stopped being a public address (Sept 2026).
+ *
+ * The read-only viewer it offered is `/catalog/[id]` now — the same tiles with
+ * the sheet's title, date, places and a URL worth pasting — so a request that
+ * names no mode, or names one this shell does not serve, is a reader looking
+ * for the archive. `?map=` is the sheet they asked for and keeps its identity
+ * across the move; anything that is neither a uuid nor a slug is dropped rather
+ * than pasted into a path.
+ *
+ * **302, not 301.** The path is still live for the staff modes, and a permanent
+ * redirect on `/scan` risks a cache that is careless about the query string
+ * taking `/scan?mode=prepare` with it.
+ */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * `maps.slug` as migration 088 mints it: lowercase, digits, single hyphens.
+ * Matched rather than trusted, because whatever this accepts is pasted straight
+ * into a redirect path, and `?map=` is a stranger's query string rather than
+ * one of our own links.
+ */
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const isMapRef = (value: string): boolean =>
+  UUID_RE.test(value) || (value.length <= 100 && SLUG_RE.test(value));
+
+function retiredScanTarget(url: URL): string | null {
+  // `/vi/scan` is the same route (`src/hooks.ts` reroutes it), so it is the same
+  // retirement — and the reader stays in the language they arrived in.
+  const prefix = localeFromPath(url.pathname) ? '/vi' : '';
+  if (stripLocale(url.pathname) !== '/scan') return null;
+  if (resolveScanMode(url.searchParams.get('mode'))) return null;
+  const mapId = url.searchParams.get('map');
+  return mapId && isMapRef(mapId) ? `${prefix}/catalog/${mapId}` : `${prefix}/catalog`;
 }
 
 function legacyTarget(pathname: string): string | null {
@@ -109,6 +147,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const target = legacyTarget(event.url.pathname);
   if (target) throw redirect(301, withSearch(target, event.url.search));
+
+  const scanTarget = retiredScanTarget(event.url);
+  if (scanTarget) throw redirect(302, scanTarget);
 
   // Read before anything renders, so a server-rendered page is already in the
   // reader's language rather than flipping after hydration.

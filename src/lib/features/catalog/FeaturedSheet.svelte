@@ -9,6 +9,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { MapListItem } from '$lib/data/maps/types';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
+  import { mapHref, exploreHref } from '$lib/core/utils/mapSlug';
 
   export let maps: MapListItem[] = [];
   /** IIIF thumbnail URLs the page already resolved, keyed by map id. */
@@ -117,8 +118,8 @@
         <p class="fs-desc" class:fs-desc-stand-in={!selected.dc_description}>{blurb}</p>
 
         <div class="fs-actions">
-          <a class="chip is-primary" href="/explore?map={selected.id}">Open in the viewer</a>
-          <a class="chip" href="/catalog/{selected.id}">Record</a>
+          <a class="chip is-primary" href={exploreHref(selected)}>Open in the viewer</a>
+          <a class="chip" href={mapHref(selected)}>Record</a>
           {#if selected.source_url}
             <a
               class="fs-source"

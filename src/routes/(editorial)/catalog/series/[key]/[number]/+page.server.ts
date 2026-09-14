@@ -67,8 +67,7 @@ export const load: PageServerLoad = async ({ params }) => {
     // it draws, or nothing when the cell is held whole and the year is the only
     // thing telling two records apart.
     half: ((m.extra_metadata as { sheet_half?: string } | null)?.sheet_half ?? null) as
-      | string
-      | null,
+      string | null,
   }));
 
   return {
