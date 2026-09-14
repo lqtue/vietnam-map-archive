@@ -420,6 +420,29 @@ def cmd_self_check(args: argparse.Namespace) -> None:
     # Junk in the payload is dropped, not raised.
     assert origin_keyed_overrides({"": "skip", "a_b_c_d": "skip", "7": "skip"}, 0) == {}
 
+    # Every call must be costed as it is logged. Asserted against a written
+    # log rather than a mock, because the usage field names are google.genai's
+    # to change and a rename would silently make every cost None — which reads
+    # downstream as "cheap", not as "broken".
+    import tempfile as _tf, types as _ty
+    from gemini_client import _log_call as _lc
+    _usage = _ty.SimpleNamespace(prompt_token_count=3782, candidates_token_count=3423,
+                                 total_token_count=8504, cached_content_token_count=1607,
+                                 thoughts_token_count=1274)
+    with _tf.TemporaryDirectory() as _tmp:
+        _log = Path(_tmp) / "runs" / "r" / "calls.jsonl"   # parent must be created
+        _lc(log_path=_log, model="gemini-3.8-flash", elapsed=1.0,
+            usage=_usage, n_extractions=38)
+        _lc(log_path=_log, model="gemini-3-flash-preview", elapsed=1.0,
+            usage=_usage, n_extractions=2)
+        _priced, _unpriced = [json.loads(x) for x in _log.read_text().splitlines() if x.strip()]
+    # 1607 cached + 2175 fresh in, 4722 billed out, at 0.075/0.75/3.75 per Mtok.
+    assert _priced["cost_usd"] == 0.019459, _priced
+    assert _priced["thoughts_tokens"] == 1274, "the thinking field must be recorded"
+    # A model with no published rate logs null. A plausible guess here would be
+    # averaged into every report downstream as if it had been measured.
+    assert _unpriced["cost_usd"] is None, _unpriced
+
     # The cache must not serve a result shaped by a different schema.
     from cache import SCHEMA_VERSION, schema_version
     assert schema_version(None) == SCHEMA_VERSION
@@ -2700,6 +2723,15 @@ def cmd_scout(args: argparse.Namespace) -> None:
     schema = SCOUT_SCHEMA if prompt_key == "scout" else EXTRACTION_SCHEMA
     prompt_text = PROMPTS[prompt_key]
 
+    # The run dir is made here, before the call, rather than at "Save results"
+    # below, so the scout's spend lands in a calls.jsonl like every other pass.
+    # Until 2026-09-14 the layout sweep was the one pass that cost money
+    # invisibly: the 72 sheets scouted on 2026-09-13 left no token record, so
+    # `vma_worker._spend()` and every job-row budget read them as free.
+    map_label = args.map_id or "unknown"
+    run_dir = make_run_dir(map_label, args.run_id)
+    calls_log = run_dir / "calls.jsonl"
+
     if len(images) > 1:
         # Multi-scale sequence: one call, model sees all levels
         # Prepend level context to the prompt so the model knows what each frame is
@@ -2722,6 +2754,7 @@ def cmd_scout(args: argparse.Namespace) -> None:
             schema=schema,
             model=args.model,
             user_prompt=multi_prompt,
+            log_path=calls_log,
         )
         # Discard frame_idx — scout results are always global (full-map coords)
         for ext in res.get("extractions", []):
@@ -2734,6 +2767,7 @@ def cmd_scout(args: argparse.Namespace) -> None:
             user_prompt=prompt_text,
             schema=schema,
             model=args.model,
+            log_path=calls_log,
         )
     extractions = res.get("extractions", [])
 
@@ -2899,9 +2933,7 @@ def cmd_scout(args: argparse.Namespace) -> None:
                       "recovers ink the scan never captured. Calibrated on city plans — a "
                       "small-scale sheet can read well past this line.")
 
-    # Save results
-    map_label = args.map_id or "unknown"
-    run_dir = make_run_dir(map_label, args.run_id)
+    # Save results — run_dir was made above, before the call that costs money.
     out_path = run_dir / "scout.json"
     out_path.write_text(json.dumps({
         "map_id": args.map_id,
@@ -3139,7 +3171,11 @@ def cmd_grid(args: argparse.Namespace) -> None:
     print(f"  Overview {overview.size[0]}×{overview.size[1]} of {W}×{H}")
 
     from gemini_client import extract_grid
-    res = extract_grid(overview, model=args.model)
+    # Run dir before the call, so the grid read is costed like any other pass.
+    map_label = args.map_id or "unknown"
+    out_dir = make_run_dir(map_label, getattr(args, "run_id", None))
+    res = extract_grid(overview, model=args.model,
+                       log_path=out_dir / "calls.jsonl")
 
     cols = [str(c) for c in (res.get("columns") or []) if str(c).strip()]
     rows = [str(r) for r in (res.get("rows") or []) if str(r).strip()]
@@ -3160,8 +3196,7 @@ def cmd_grid(args: argparse.Namespace) -> None:
     print(f"    columns: {' '.join(cols)}")
     print(f"    rows:    {' '.join(rows)}")
 
-    map_label = args.map_id or "unknown"
-    out_dir = make_run_dir(map_label, getattr(args, "run_id", None))
+    # out_dir was made above, before the call that costs money.
     (out_dir / "grid.json").write_text(json.dumps(grid, indent=2, ensure_ascii=False))
     print(f"→ {out_dir / 'grid.json'}")
 
@@ -3654,7 +3689,8 @@ def _run_legend_pass(iiif_base: str, img_w: int, img_h: int, cartouche,
         return
     x, y, w, h = region
     crop = fetch_crop(iiif_base, x, y, w, h, size=2600, local_image=local_image, quality=quality)
-    entries = extract_legend(crop, model=model)
+    entries = extract_legend(crop, model=model,
+                             log_path=make_run_dir(map_id, run_id) / "calls.jsonl")
     n = _write_legend_rows(map_id, run_id, region, entries, model)
     print(f"[legend] region={region} entries={len(entries)} upserted={n}")
 
@@ -3721,6 +3757,11 @@ def cmd_legend(args: argparse.Namespace) -> None:
     multi = len(regions) > 1
     blocks: list[dict] = []
     flagged: list[int] = []
+    # Before the loop: a --consensus run calls several models per block, and
+    # every one of them bills. They all append to the same log.
+    map_label = args.map_id or "unknown"
+    out_dir = make_run_dir(map_label, getattr(args, "run_id", None))
+    calls_log = out_dir / "calls.jsonl"
     for bi, (x, y, w, h) in enumerate(regions):
         print(f"  block {bi}: region {(x, y, w, h)}")
         crop = fetch_crop(base, x, y, w, h, size=args.render_size, local_image=local_image)
@@ -3728,7 +3769,8 @@ def cmd_legend(args: argparse.Namespace) -> None:
         runs = {}
         for m in models:
             try:
-                entries = extract_legend(crop, model=m, bilingual=args.bilingual)
+                entries = extract_legend(crop, model=m, bilingual=args.bilingual,
+                                         log_path=calls_log)
                 runs[m] = {int(e["n"]): e for e in entries
                            if str(e.get("n", "")).strip().lstrip("-").isdigit()}
                 print(f"    {m}: {len(runs[m])} entries")
@@ -3762,8 +3804,7 @@ def cmd_legend(args: argparse.Namespace) -> None:
     all_entries = [e for b in blocks for e in b["entries"]]
     collisions = legend_block_collisions(blocks)
 
-    map_label = args.map_id or "unknown"
-    out_dir = make_run_dir(map_label, getattr(args, "run_id", None))
+    # out_dir and map_label were set above, before the first call that costs money.
     out_path = out_dir / "legend.json"
     out_path.write_text(json.dumps({
         "map_id": map_label,

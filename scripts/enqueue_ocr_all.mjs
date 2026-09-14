@@ -4,6 +4,7 @@
 //   node --env-file=.env scripts/enqueue_ocr_all.mjs [--dry] [--force] [--limit N]
 //                                                    [--untriaged] [--model NAME]
 //                                                    [--map <id|id-prefix>] [--max-calls N]
+//                                                    [--max-cost USD] [--low-thinking]
 //                                                    [--tile-metres M] [--single-pass]
 //
 // Label search (`/api/search?include=labels`, mig 065) is only as good as the
@@ -21,6 +22,10 @@
 // unchanged. That is the deliberate order — triage, look at what you did, then
 // queue. `--untriaged` includes the rest, which run in `auto` mode and let the
 // scout pass guess the neatline; that is the old behaviour and it is worse.
+
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { createClient } from '@supabase/supabase-js';
 import { GcpTransformer } from '@allmaps/transform';
@@ -52,6 +57,110 @@ const passes = args.includes('--single-pass') ? 1 : 2;
 // a fleet run from spending its afternoon on one sheet's last few labels.
 const mcIdx = args.indexOf('--max-calls');
 const maxCalls = mcIdx > -1 ? Number(args[mcIdx + 1]) : null;
+// The same ceiling in money. A call is a poor proxy: measured over 1,192 calls
+// on this corpus one ranges $0.0012 to $0.155, and the dearest tenth carry 28%
+// of all spend, so a call budget is roughly 6x loose either way.
+const costIdx = args.indexOf('--max-cost');
+const maxCost = costIdx > -1 ? Number(args[costIdx + 1]) : null;
+// Ask for thinking_level=low. Measured 2026-09-13: thinking was 59% of billed
+// output tokens and 56% of that day's bill. It changes the answer as well as
+// the price -- better on numerals, not established on body text -- so it is
+// opt-in rather than the default.
+const lowThinking = args.includes('--low-thinking');
+
+// ── What a sheet has actually cost ──────────────────────────────────────────
+// Queuing a sweep used to print how many maps it would touch and nothing about
+// what they would cost, so the only way to find out was the bill. On
+// 2026-09-13 one command queued 14 OCR jobs and 72 layout scouts; the figure
+// below would have said roughly what that was going to be, before it ran.
+//
+// Rates come from work/ocr/prices.json, the same file work/ocr/scripts/pricing.py
+// reads, so there is no second copy to drift.
+const REPO = new URL('..', import.meta.url);
+const PRICES = (() => {
+  try {
+    return JSON.parse(readFileSync(fileURLToPath(new URL('work/ocr/prices.json', REPO)), 'utf8'))
+      .models;
+  } catch {
+    return {};
+  }
+})();
+
+/** USD for one logged call, or null when the model has no published rate. */
+function callCost(rec) {
+  if (rec.cost_usd != null) return rec.cost_usd; // written by gemini_client since 2026-09-14
+  const rate = PRICES[rec.model];
+  if (!rate || rec.total_tokens == null || rec.input_tokens == null) return null;
+  const cached = rec.cached_tokens ?? 0;
+  return (
+    (Math.max(rec.input_tokens - cached, 0) * rate.input) / 1e6 +
+    (cached * rate.cached) / 1e6 +
+    (Math.max(rec.total_tokens - rec.input_tokens, 0) * rate.output) / 1e6
+  );
+}
+
+/** Every calls.jsonl under a directory, at any depth. */
+function findLogs(dir) {
+  const out = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, e.name);
+    if (e.isDirectory()) out.push(...findLogs(full));
+    else if (e.name === 'calls.jsonl') out.push(full);
+  }
+  return out;
+}
+
+/** Total USD already spent per map, from every calls.jsonl on disk.
+ *
+ * Walks the whole map directory rather than just `runs/`: the segmentation
+ * review writes to `<map>/seg-review/<run>/calls.jsonl`, which is $3.26 of
+ * real spend that a runs-only scan reports as zero.
+ */
+function costPerMap() {
+  const root = fileURLToPath(new URL('work/ocr/outputs', REPO));
+  if (!existsSync(root)) return [];
+  const totals = [];
+  // withFileTypes, because outputs/ also holds loose files (dedupe-*.json and
+  // friends) alongside the per-map directories, and recursing into one throws.
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const dir = join(root, entry.name);
+    let sum = 0;
+    let priced = 0;
+    for (const log of findLogs(dir)) {
+      for (const line of readFileSync(log, 'utf8').split('\n')) {
+        if (!line.trim()) continue;
+        let rec;
+        try {
+          rec = JSON.parse(line);
+        } catch {
+          continue; // a half-written last line is not worth failing an estimate over
+        }
+        const c = callCost(rec);
+        if (c != null) {
+          sum += c;
+          priced++;
+        }
+      }
+    }
+    if (priced) totals.push(sum);
+  }
+  return totals.sort((a, b) => a - b);
+}
+
+const q = (xs, p) => (xs.length ? xs[Math.min(Math.floor(p * xs.length), xs.length - 1)] : 0);
+
+/** One line of projected spend, or null when there is no history to go on. */
+function estimate(nMaps) {
+  const hist = costPerMap();
+  if (hist.length < 3 || !nMaps) return null;
+  const med = q(hist, 0.5);
+  return (
+    `  estimate: ${nMaps} x ~$${med.toFixed(2)} median = ~$${(nMaps * med).toFixed(2)} ` +
+    `(per-sheet range $${q(hist, 0.25).toFixed(2)}-$${q(hist, 0.9).toFixed(2)}, ` +
+    `measured over ${hist.length} sheets). Cap a sheet with --max-cost.`
+  );
+}
 
 // Mirrors RENDER_FLOOR in work/worker/vma_worker.py. Only used to print the
 // ground-per-call figure below — the worker computes the value it actually
@@ -179,6 +288,8 @@ console.log(
     `${hasOcr.size} already OCR'd · ${inFlight.size} in flight → ` +
     `${todo.length} to queue${dry ? ' (dry run)' : ''}`
 );
+const projected = estimate(todo.length);
+if (projected) console.log(projected);
 if (!untriaged && nTriaged < maps.length) {
   if (nNeedsLayout) {
     console.log(
@@ -319,6 +430,8 @@ for (const m of todo) {
         : {}),
       ...(model ? { model } : {}),
       ...(maxCalls ? { max_calls: maxCalls } : {}),
+      ...(maxCost ? { max_cost_usd: maxCost } : {}),
+      ...(lowThinking ? { low_thinking: true } : {}),
       passes,
     },
   });

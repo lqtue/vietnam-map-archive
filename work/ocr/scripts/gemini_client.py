@@ -35,6 +35,10 @@ except ImportError:
 # 1968 body pass was 48 calls at $1.236.
 DEFAULT_MODEL = "gemini-3.8-flash"
 
+# Prices and per-call cost live in `pricing.py` — no imports, so the worker
+# can read them back without pulling PIL and google.genai in for three numbers.
+from pricing import PRICES, call_cost_usd  # noqa: F401  (re-exported)
+
 
 def _load_keys() -> list[str]:
     """Return all available API keys. GEMINI_API_KEYS (comma-separated) takes priority."""
@@ -263,8 +267,15 @@ def extract_labels(
     image.save(buf, format="JPEG", quality=90)
     image_bytes = buf.getvalue()
 
-    # Cache hit — free result, no API call
-    sv = schema_version(schema)
+    # Cache hit — free result, no API call.
+    # The thinking level changes the answer, so it has to change the key, the
+    # same way extract_labels_sequence does it. Until 2026-09-14 it did not:
+    # a low-thinking run of a tile already read with thinking on was served the
+    # full-thinking answer from cache, silently, with no API call and no log
+    # line. That was a tolerable shortcut while the flag was set per run; it
+    # stopped being one when `low_thinking` became a per-job payload field, so
+    # two jobs on one sheet can now differ in exactly this and nothing else.
+    sv = schema_version(schema) + ("" if thinking else "+lowthink")
     cached = cache_get(image_bytes, user_prompt, model, cache_dir=cache_dir,
                        schema_version=sv)
     if cached is not None:
@@ -284,10 +295,6 @@ def extract_labels(
     # segmentation docs recommend it, and on a mask call thinking spends output
     # tokens re-deriving a polygon it has already committed to. Left on by
     # default, because every text path measured so far is better with it.
-    #
-    # ponytail: the cache key does not include this. Two runs of one tile that
-    # differ only here collide, so set it per run rather than to A/B it. Fold it
-    # into `schema_version` if that ever has to be an experiment.
     if not thinking:
         # "low", not the "minimal" the segmentation docs name: gemini-3.8-flash
         # answers MINIMAL with `400 INVALID_ARGUMENT. Thinking level MINIMAL is
@@ -397,16 +404,29 @@ def _log_call(
     n_extractions: int,
 ) -> None:
     log_path.parent.mkdir(parents=True, exist_ok=True)
+    input_tokens = getattr(usage, "prompt_token_count", None)
+    output_tokens = getattr(usage, "candidates_token_count", None)
+    total_tokens = getattr(usage, "total_token_count", None)
+    cached_tokens = getattr(usage, "cached_content_token_count", None)
     entry = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "model": model,
         "elapsed_s": round(elapsed, 2),
         "n_extractions": n_extractions,
-        "input_tokens": getattr(usage, "prompt_token_count", None),
-        "output_tokens": getattr(usage, "candidates_token_count", None),
-        "total_tokens": getattr(usage, "total_token_count", None),
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "total_tokens": total_tokens,
         # Non-zero only when the prompt-first ordering hit the implicit cache.
-        "cached_tokens": getattr(usage, "cached_content_token_count", None),
+        "cached_tokens": cached_tokens,
+        # The model's own reasoning, billed at the output rate but never shown.
+        # Until 2026-09-14 this field was dropped, which is why the repo could
+        # only infer the thinking share by subtracting: `total - input - output`
+        # is the same number when the API reports it, but a null here and a
+        # null there are not distinguishable from a zero.
+        "thoughts_tokens": getattr(usage, "thoughts_token_count", None),
+        # None when the model has no published rate — see PRICES.
+        "cost_usd": call_cost_usd(model, input_tokens, output_tokens,
+                                  total_tokens, cached_tokens),
     }
     with _log_lock:
         with open(log_path, "a") as f:
@@ -637,7 +657,8 @@ _GRID_SCHEMA = {
 }
 
 
-def extract_grid(image: Image.Image, model: str = DEFAULT_MODEL) -> dict:
+def extract_grid(image: Image.Image, model: str = DEFAULT_MODEL,
+                 log_path: Path | None = None) -> dict:
     """Read a sheet's printed reference grid as {bbox, columns, rows}.
 
     The labels are returned as printed rather than as an A-Z range on purpose:
@@ -673,13 +694,20 @@ def extract_grid(image: Image.Image, model: str = DEFAULT_MODEL) -> dict:
         response_mime_type="application/json",
         response_schema=_GRID_SCHEMA,
     )
+    t_start = time.monotonic()
     resp = client.models.generate_content(
         model=model,
         contents=[genai_types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"), prompt],
         config=config,
     )
     import json as _json
-    return _json.loads(resp.text)
+    data = _json.loads(resp.text)
+    if log_path:
+        _log_call(log_path=log_path, model=model,
+                  elapsed=time.monotonic() - t_start,
+                  usage=getattr(resp, "usage_metadata", None),
+                  n_extractions=len(data.get("columns") or []) + len(data.get("rows") or []))
+    return data
 
 
 _STREET_INDEX_PROMPT = (
@@ -740,7 +768,8 @@ def extract_street_index(image: Image.Image, model: str = DEFAULT_MODEL,
 
 
 def extract_legend(image: Image.Image, model: str = DEFAULT_MODEL,
-                   bilingual: bool = False) -> list[dict]:
+                   bilingual: bool = False,
+                   log_path: Path | None = None) -> list[dict]:
     """Extract a numbered map legend as [{n, name, name_vn?, grid}].
 
     Forces JSON via response_schema, so the return is always valid structured
@@ -774,10 +803,17 @@ def extract_legend(image: Image.Image, model: str = DEFAULT_MODEL,
         response_schema=_LEGEND_SCHEMA,
         max_output_tokens=65536,  # a 244-row bilingual legend is long — avoid truncation
     )
+    t_start = time.monotonic()
     resp = client.models.generate_content(
         model=model,
         contents=[genai_types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"), prompt],
         config=config,
     )
     data = json.loads(resp.text)
-    return data.get("entries", [])
+    entries = data.get("entries", [])
+    if log_path:
+        _log_call(log_path=log_path, model=model,
+                  elapsed=time.monotonic() - t_start,
+                  usage=getattr(resp, "usage_metadata", None),
+                  n_extractions=len(entries))
+    return entries

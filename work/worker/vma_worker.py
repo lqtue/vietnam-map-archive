@@ -49,6 +49,15 @@ OCR_SCRIPT = REPO_ROOT / "work" / "ocr" / "scripts" / "ocr.py"
 
 OCR_OUTPUTS = REPO_ROOT / "work" / "ocr" / "outputs"
 
+# `pricing` has no imports of its own, so this costs nothing and cannot fail on
+# a missing PIL. If it somehow does, a run still reports calls and tokens — it
+# just cannot enforce a money budget, and says so rather than silently passing.
+sys.path.insert(0, str(REPO_ROOT / "work" / "ocr" / "scripts"))
+try:
+    from pricing import call_cost_usd
+except ImportError:  # pragma: no cover
+    call_cost_usd = None
+
 
 def _spend(map_id: str, run_id: str | None) -> dict:
     """What a run actually cost, read off the `calls.jsonl` each run already writes.
@@ -65,7 +74,8 @@ def _spend(map_id: str, run_id: str | None) -> dict:
     """
     if not run_id:
         return {}
-    calls = tokens = extractions = 0
+    calls = tokens = extractions = unpriced = 0
+    cost = 0.0
     for log in sorted(OCR_OUTPUTS.glob(f"{map_id}/runs/{run_id}*/calls.jsonl")):
         for line in log.read_text().splitlines():
             if not line.strip():
@@ -77,10 +87,28 @@ def _spend(map_id: str, run_id: str | None) -> dict:
             calls += 1
             tokens += int(rec.get("total_tokens") or 0)
             extractions += int(rec.get("n_extractions") or 0)
+            # `cost_usd` is written by gemini_client since 2026-09-14. Older
+            # logs predate it and are recomputed from the tokens they do carry,
+            # so a budget works the same against a run from last week.
+            c = rec.get("cost_usd")
+            if c is None and call_cost_usd is not None:
+                c = call_cost_usd(rec.get("model"), rec.get("input_tokens"),
+                                  rec.get("output_tokens"), rec.get("total_tokens"),
+                                  rec.get("cached_tokens"))
+            if c is None:
+                unpriced += 1
+            else:
+                cost += c
     if not calls:
         return {}
-    return {"calls": calls, "tokens": tokens, "extractions": extractions,
-            "per_call": round(extractions / calls, 2)}
+    out = {"calls": calls, "tokens": tokens, "extractions": extractions,
+           "per_call": round(extractions / calls, 2),
+           "cost_usd": round(cost, 4)}
+    # A model with no published rate contributes 0 to the total, which would
+    # make a money budget quietly unenforceable. Name the calls instead.
+    if unpriced:
+        out["unpriced_calls"] = unpriced
+    return out
 
 
 def _config() -> tuple[str, str]:
@@ -276,6 +304,13 @@ def _ocr_batch_argv(job: dict, python_bin: str, run_id: str, db: bool) -> list[s
     # Opt-in: blank water and margin tiles cost the same as dense ones.
     if p.get("skip_sparse"):
         argv.append("--skip-sparse")
+    # Same story as --auto-priority below: the flag existed in ocr.py and no
+    # enqueue path or worker ever passed it, so every queued job ran with full
+    # thinking. Measured on 2026-09-13, thinking was 59% of billed output
+    # tokens and 56% of the day's bill. It changes the answer as well as the
+    # price, so it stays opt-in per job rather than becoming the default.
+    if p.get("low_thinking"):
+        argv.append("--low-thinking")
     # The measured density pass, computed on the grid actually being tiled. It
     # existed in ocr.py all along and no enqueue path or worker ever passed it,
     # so the automated runs paid full price for blank margin tiles. Safe to wire
@@ -507,13 +542,27 @@ def _run_job(job: dict, python_bin: str) -> None:
         # threading a flag through ocr.py. Each step's own rows are already
         # written, so stopping here keeps what was paid for.
         budget = job["payload"].get("max_calls")
+        cost_cap = job["payload"].get("max_cost_usd")
         so_far = _spend(job["map_id"], job["payload"].get("run_id"))
-        if budget and so_far.get("calls", 0) >= int(budget) and step < len(plan):
+        # Two ceilings, either of which stops the plan. `max_calls` came first
+        # and stays, but a call is a poor proxy for money: measured over 1,192
+        # calls on this corpus one ranges $0.0012 to $0.155, a 6x spread around
+        # the median, and the dearest tenth carry 28% of all spend. A run that
+        # is cheap in calls and expensive in thinking looked identical before.
+        reason = None
+        if budget and so_far.get("calls", 0) >= int(budget):
+            reason = f"{so_far['calls']} calls reached the {budget}-call budget"
+        elif cost_cap and so_far.get("cost_usd", 0.0) >= float(cost_cap):
+            reason = (f"${so_far['cost_usd']:.2f} reached the "
+                      f"${float(cost_cap):.2f} budget")
+        if reason and so_far.get("unpriced_calls"):
+            reason += f" ({so_far['unpriced_calls']} call(s) had no published rate)"
+        if reason and step < len(plan):
             finish(job["id"], "done", {"returncode": 0, "budget_stopped": True,
                                        "steps_run": step, "steps_planned": len(plan),
                                        **so_far})
             print(f"[{kind}] {job['id']} stopped after step {step}/{len(plan)}: "
-                  f"{so_far['calls']} calls reached the {budget}-call budget")
+                  f"{reason}")
             return
 
     assert proc is not None
@@ -604,6 +653,14 @@ def _self_check() -> None:
                            "python", "r", db=False)
     assert argv[argv.index("--exclude") + 1] == "8964,7643,5295,2467;4549,8749,2728,3298", argv
 
+    # 5b. --low-thinking rides the payload the way --model does. Unset, the
+    #     flag must be absent entirely rather than passed as a false value.
+    assert "--low-thinking" not in argv, "absent from the payload means absent from argv"
+    lt = _ocr_batch_argv({"id": "j", "map_id": "m",
+                          "payload": {"run_id": "r", "low_thinking": True}},
+                         "python", "r", db=False)
+    assert "--low-thinking" in lt, lt
+
     # 6. What a run cost. The job row used to carry a returncode and a last line,
     #    so a pass that spent sixty calls to find four labels looked exactly like
     #    a cheap one. Asserted against a written log rather than a mock, because
@@ -622,7 +679,26 @@ def _self_check() -> None:
                 '{"total_tokens": 25,\n'  # nor is a half-written one
             )
             got = mod._spend("map-1", "r7")
-            assert got == {"calls": 2, "tokens": 150, "extractions": 4, "per_call": 2.0}, got
+            assert got == {"calls": 2, "tokens": 150, "extractions": 4,
+                           "per_call": 2.0, "cost_usd": 0.0,
+                           "unpriced_calls": 2}, got
+            # A log with no model and no token split cannot be priced. It must
+            # say so rather than report $0.00 as if that were measured — a
+            # silent zero makes `max_cost_usd` unenforceable.
+            assert got["unpriced_calls"] == 2, "an unpriced call must be named"
+
+            # And the priced path, against the real rate table: one call of
+            # 1M fresh input and 1M billed output is $0.75 + $3.75.
+            priced = Path(tmp) / "map-2" / "runs" / "r8-a"
+            priced.mkdir(parents=True)
+            (priced / "calls.jsonl").write_text(json.dumps({
+                "model": "gemini-3.8-flash", "input_tokens": 1_000_000,
+                "output_tokens": 400_000, "total_tokens": 2_000_000,
+                "cached_tokens": 0, "n_extractions": 5,
+            }) + "\n")
+            got2 = mod._spend("map-2", "r8")
+            assert got2["cost_usd"] == 4.5, got2
+            assert "unpriced_calls" not in got2, got2
             assert mod._spend("map-1", "nosuchrun") == {}, "a run with no log reports nothing"
             assert mod._spend("map-1", None) == {}, "no run id, no spend"
         finally:

@@ -1294,6 +1294,50 @@ Flash-tier vision is cheap enough that resolution, not budget, is the binding co
 
 **Correction, 2026-09-10 — every cost figure on this corpus was understated by roughly 4×.** `output_tokens`, as `work/ocr/scripts/gemini_client.py` logs it (`_log_call`, line 384: `getattr(usage, "candidates_token_count", …)`), is the *visible* text a call returned. It is not what Gemini bills. Billed output is `total_tokens − input_tokens` — candidates plus thinking — and on every run measured directly so far that has come to 3.5–4× the visible figure (124k billed against 31k visible on one 1882 pass; 289k against 82k on the 1968 body run). Every cost figure in this file and in `work/ocr/EVAL-BASELINE.md` that predates this date was computed off `output_tokens` alone and should be assumed understated by roughly that factor unless it explicitly says it accounts for thinking tokens. The two measured, corrected anchors are the 1882 gate sheet's two-pass merge (**USD 0.945**, `EVAL-BASELINE.md` §*The recipe of record*) and the 1968 body pass (**USD 1.236**, corrected in place in the same file, §*The 1968 sheet reads a third of its own directory*) — both at the $0.75/$3.75/$0.075 (in/out/cached-read) rate `gemini-3.8-flash` bills at. This is a reporting fix, not a pricing change: nothing about what Gemini actually charges has moved, only what this repo wrote down about it. `gemini_client.py`'s own `DEFAULT_MODEL` comment repeats the old "$0.50 a map" claim; that file is not this note's to fix (see the model paragraph above for the correction), and neither is `docs/ROADMAP.md`'s copy of the same figure — flag both if you touch either.
 
+
+**2026-09-14 — cost is now computed in the code, not in this file.** The rates
+live in `work/ocr/prices.json`, read by `work/ocr/scripts/pricing.py` (Python)
+and `scripts/enqueue_ocr_all.mjs` (the dry-run estimate). One file, two
+languages, no copy to drift. Four things follow:
+
+- **Every logged call carries `cost_usd`.** `gemini_client._log_call` writes it
+  alongside a new `thoughts_tokens` field — the one the API returns and this
+  repo had been dropping, which is why the correction above had to be *inferred*
+  by subtraction rather than read.
+- **Every command that calls the API now logs.** `scout`, `grid`, `legend` and
+  `street-index-fixture` did not, so their spend was invisible to `_spend()`
+  and to every budget: the 72-sheet layout sweep of 2026-09-13 left no token
+  record at all. `numerals` is not in that list — it is a local Tesseract pass
+  and makes no API calls.
+- **`max_cost_usd` joins `max_calls`** in the job payload
+  (`--max-cost USD` on the enqueue script). A call is a poor proxy for money:
+  over 1,192 calls on this corpus one ranges \$0.0012 to \$0.155, a 6x spread
+  around the median, with the dearest tenth carrying 28% of all spend.
+- **`--low-thinking` reaches the worker.** The flag existed in `ocr.py` and no
+  enqueue path ever passed it, so every queued job ran with full thinking —
+  59% of billed output tokens on 2026-09-13. It changes the answer as well as
+  the price, so it stays opt-in per job.
+- **The response cache key now covers the thinking level** on the single-image
+  path, as it already did on the sequence path. It did not before, which was a
+  marked `ponytail:` shortcut reading "set it per run rather than to A/B it —
+  fold it into `schema_version` if that ever has to be an experiment". Making
+  `low_thinking` a per-job payload field is that experiment: two jobs on one
+  sheet can now differ in exactly this and nothing else. Measured on a numeral
+  tile, thinking off took thinking tokens 138 to 67 and cost \$0.001514 to
+  \$0.001247 for the same five numerals read correctly; before the fix the
+  second run was served the first one's answer from cache, with no API call
+  and no log line to show it had happened.
+
+**The 4× correction above is still unverified against an invoice, and this
+plumbing does not settle it** — `cost_usd` is computed on that assumption, so
+if the assumption is wrong every figure it produces is ~2.5x too high. What has
+changed is that settling it now costs no new data collection: compare a billing
+export's output-token SKU quantity against the sum of `output_tokens` versus
+the sum of `total_tokens − input_tokens`. `pricing.call_cost_usd`'s docstring
+carries the same note. A model with no published rate — `gemini-3-flash-preview`
+— logs `cost_usd: null` rather than a guess, and `_spend` reports those as
+`unpriced_calls` so a money budget cannot be silently unenforceable.
+
 ## POC acceptance criteria (historical)
 
 The bar the POC was held to, before `eval.py` and EVAL-BASELINE.md replaced eyeballing: ≥80% of visible toponyms on a manually checked tile matched by an extraction; ≤10% of extractions hallucinated; extracted bbox overlapping the real text region by ≥50%. Superseded — use the eval harness.

@@ -1,0 +1,7 @@
+{
+  "_comment": "USD per 1M tokens. The single source of truth for every rate in this repo: work/ocr/scripts/pricing.py reads it for the Python pipeline, scripts/enqueue_ocr_all.mjs for the dry-run estimate. Two languages needed the same three numbers, and a copy in each would be a duplicated signal needing a parity test to stay honest. A model absent here costs null rather than a plausible wrong number - gemini-3-flash-preview is deliberately absent because Google publishes no rate for it.",
+  "_checked": "2026-09-14",
+  "models": {
+    "gemini-3.8-flash": { "input": 0.75, "output": 3.75, "cached": 0.075 }
+  }
+}
