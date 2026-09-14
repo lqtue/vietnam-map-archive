@@ -6,11 +6,39 @@
   import PageHero from '$lib/ui/PageHero.svelte';
   import CatalogUnifiedSearch from '$lib/features/catalog/CatalogUnifiedSearch.svelte';
   import MapEditModal from '$lib/features/admin/MapEditModal.svelte';
+  import SeriesList from '$lib/features/catalog/SeriesList.svelte';
+  import SeriesDetailDrawer from '$lib/features/catalog/SeriesDetailDrawer.svelte';
   import { fetchMapRow } from '$lib/data/maps/service';
   import type { MapRow } from '$lib/data/admin/adminApi';
+  import type { SeriesIndexEntry } from '$lib/data/maps/seriesIndex';
+  import type { PageData } from './$types';
   import '$styles/layouts/catalog.css';
 
+  export let data: PageData;
+
   $: heroTitle = splitHighlight($t('The **Archive.**'));
+
+  /* The surveys, server-loaded. Two things read them, and they are not the
+     same thing: the band below is a way *out* of this page, into the coverage
+     pages that list every sheet a survey contains including the ones we do not
+     hold; the filter narrows the sheets *on* this page to one survey. A reader
+     who wants "what is missing from L7014" needs the first and would never
+     find it from the second. */
+  $: series = data.series;
+  // The filter matches `maps.collection`; the label is what the reader reads.
+  $: seriesChoices = series.map((s) => ({ value: s.collection, label: s.name }));
+
+  /** True until the reader narrows the list — see `CatalogUnifiedSearch`. */
+  let atRest = true;
+
+  /* The open survey, or null. A row is still a link to the coverage page —
+     the drawer is what an unmodified click gets, the same bargain a map row
+     strikes with its own drawer. */
+  let openedSeries: SeriesIndexEntry | null = null;
+  function filterToSeries(s: SeriesIndexEntry) {
+    openedSeries = null;
+    searchRef?.filterSeries(s.collection);
+  }
 
   const { supabase, session } = getSupabaseContext();
 
@@ -98,12 +126,39 @@
       {/if}
     </label>
 
+    <!-- Above the results, and only at rest. A survey is a coarser thing than a
+         sheet and belongs in front of the list rather than inside it; but once
+         a reader has typed or filtered, it is three cards between them and
+         what they asked for. -->
+    {#if atRest && series.length}
+      <section class="series-band" aria-labelledby="series-band-title">
+        <div class="band-head">
+          <h2 id="series-band-title">{$t('Browse by series')}</h2>
+          <a class="band-all" href="/catalog/series">{$t('All series')} →</a>
+        </div>
+        <p class="band-lead">
+          {$t(
+            'A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not.'
+          )}
+        </p>
+        <SeriesList {series} dense drawer on:open={(e) => (openedSeries = e.detail)} />
+      </section>
+    {/if}
+
     <CatalogUnifiedSearch
       bind:this={searchRef}
       bind:searchQuery
+      bind:atRest
+      {seriesChoices}
       {role}
       on:edit={(e) => openEditor(e.detail)}
     />
+    <SeriesDetailDrawer
+      series={openedSeries}
+      on:close={() => (openedSeries = null)}
+      on:filter={(e) => filterToSeries(e.detail)}
+    />
+
     {#if editError}<div class="edit-error" role="alert">{editError}</div>{/if}
     {#if editingMap}
       <MapEditModal
@@ -127,5 +182,42 @@
     padding: 1.25rem;
     max-width: 1400px;
     margin: 0 auto;
+  }
+
+  /* No card around it: the rows are cards already, and a card of cards is the
+     nesting `.section-card` exists to stop. The rule under it is what separates
+     the band from the search results, at the width the page already uses. */
+  .series-band {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: var(--border-thin);
+  }
+  .band-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .band-head h2 {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-extrabold);
+    font-size: 1.1rem;
+  }
+  .band-all {
+    font-size: 0.82rem;
+    font-weight: var(--font-bold);
+    color: var(--sb-accent);
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+  .band-lead {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+    max-width: 52ch;
   }
 </style>

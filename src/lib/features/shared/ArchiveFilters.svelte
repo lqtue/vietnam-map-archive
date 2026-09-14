@@ -11,11 +11,11 @@
   The bar owns no state: everything it reads and writes lives on the
   `CatalogSearchController` the caller passes in.
 
-  The three facets sit inside one native `<details class="sb-more">` rather
-  than three dropdowns abreast: at a 300px rail's width three selects each got
-  a third of a line and read as three abbreviations. They stay three separate
-  controls — area AND type AND period still combine — the disclosure just
-  folds them out of the way, and its summary carries how many are set.
+  The facets sit inside one native `<details class="sb-more">` rather than
+  abreast: at a 300px rail's width three selects each got a third of a line and
+  read as three abbreviations. They stay separate controls — area AND type AND
+  series AND period still combine — the disclosure just folds them out of the
+  way, and its summary carries how many are set.
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
@@ -27,13 +27,24 @@
   /** Draw the search box. /catalog turns it off: its own field is the page's
    *  `.sb-search.is-page`, at the top of the page above everything. */
   export let showSearch = true;
+  /**
+   * The surveys offerable as a filter, `{ value: maps.collection, label }`.
+   *
+   * Passed in rather than derived from the rows, because which collections are
+   * surveys is `map_series`' decision and only a server load can ask it — so a
+   * caller with no server load (the /explore rail, the /scan picker) passes
+   * none and gets no series control, which is right: /explore has a series
+   * rail of its own, one that puts the survey on the map.
+   */
+  export let seriesChoices: { value: string; label: string }[] = [];
 
   const { query, areaChoices, typeChoices, periodChoices, selected } = search;
 
-  /** How many of the three facets are set — the number on the summary. */
+  /** How many facets are set — the number on the summary. */
   $: activeFacets =
     ($selected.area?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
+    ($selected.collection?.length ? 1 : 0) +
     ($selected.period?.length ? 1 : 0);
 
   $: hasFilters = !!$query.trim() || activeFacets > 0;
@@ -106,6 +117,19 @@
           {/each}
         </select>
       {/if}
+      {#if seriesChoices.length}
+        <select
+          value={$selected.collection?.[0] ?? ''}
+          on:change={(e) =>
+            search.setSingle('collection', (e.currentTarget as HTMLSelectElement).value)}
+          aria-label="Filter by series"
+        >
+          <option value="">{$t('All series')}</option>
+          {#each seriesChoices as s (s.value)}
+            <option value={s.value}>{s.label}</option>
+          {/each}
+        </select>
+      {/if}
       {#if $periodChoices.length}
         <select
           value={$selected.period?.[0] ?? ''}
@@ -142,9 +166,11 @@
     flex-wrap: wrap;
     padding-top: 0.3rem;
   }
-  /* `max-width` because the same three controls now sit on a 1280px page as
-     well as in a 300px rail: without it each one grew to 400px of chrome around
-     two words. The 110px basis is still what makes them wrap in the rail. */
+  /* `max-width` because the same controls sit on a 1280px page as well as in a
+     300px rail: without it each one grew to 400px of chrome around two words.
+     The 110px basis is still what makes them wrap in the rail — and what lets
+     the fourth one (series, /catalog only) wrap rather than squeeze the three
+     beside it. */
   .dropdowns select {
     flex: 1 1 110px;
     max-width: 240px;

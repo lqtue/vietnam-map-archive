@@ -278,6 +278,38 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Available on map | Có sẵn trên bản đồ |
 | Static image only | Chỉ có hình ảnh tĩnh |
 
+### 12b · Series
+
+`catalogued` is deliberately not `xuất bản`: the span is an aggregate over the
+rows we hold, not the survey's own dates. `biên mục` keeps it a statement about
+the catalogue.
+
+| English | Tiếng Việt |
+|---|---|
+| Browse by series | Duyệt theo bộ bản đồ |
+| All series | Tất cả bộ bản đồ |
+| A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not. | Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không. |
+| catalogued {years} | biên mục {years} |
+| {held} of {total} sheets — {pct}% | {held} trên {total} mảnh — {pct}% |
+
+The drawer a series row opens. `Sheets with a catalogue record` is deliberately
+long: it is the count of `maps` rows, which for L7014 is 9 against 461 held, and
+a short label here would read as a contradiction of the bar above it.
+
+| English | Tiếng Việt |
+|---|---|
+| Series details | Thông tin bộ bản đồ |
+| The archive holds {held} of this survey’s {total} sheets — {pct}%. | Kho lưu trữ có {held} trên {total} mảnh của bộ này — {pct}%. |
+| {N} held | {N} mảnh đang có |
+| {N} scan identified, not yet fetched | {N} đã xác định bản quét, chưa tải về |
+| {N} no known scan | {N} chưa rõ bản quét |
+| Catalogued | Biên mục |
+| Sheets with a catalogue record | Số mảnh có hồ sơ biên mục |
+| Sheets in the survey | Tổng số mảnh của bộ |
+| Open in map | Mở trên bản đồ |
+| All sheets | Toàn bộ mảnh |
+| Filter the catalog | Lọc danh mục |
+
 ## 13 · Map share page
 
 | English | Tiếng Việt |

@@ -116,6 +116,24 @@ const passType = (r: Row, sel: Selected) =>
   !sel.type?.length || sel.type.includes(String(r.map_type ?? ''));
 const passStatus = (r: Row, sel: Selected) =>
   !sel.status?.length || sel.status.includes(statusOf(r));
+/**
+ * The series dimension. It matches on `maps.collection` — the column, not a
+ * display name — because that is what makes a series a series (migration 082)
+ * and what a `maps` row actually carries. Which collections are offered as
+ * choices is not decided here: `map_series` decides it, and the caller passes
+ * the list down. A filter that derived "is this collection a survey?" on the
+ * client would be the view's rule spelled a second time, in a place nothing
+ * would notice going stale.
+ *
+ * Note what it does not narrow to: `map_series` counts only georeferenced,
+ * numbered sheets, but this matches every row in the collection. That is
+ * deliberate — a survey's image-only sheets are still sheets of the survey,
+ * and a reader who picks L7014 wants what the archive holds of it, not what
+ * the map can draw. (/explore's copy of the engine drops them anyway, via
+ * `requireGeoref`, because it can only overlay what is warped.)
+ */
+const passSeries = (r: Row, sel: Selected) =>
+  !sel.collection?.length || sel.collection.includes(String(r.collection ?? ''));
 const passPeriod = (r: Row, sel: Selected, defs: PeriodDef[]) => {
   if (!sel.period?.length) return true;
   const p = periodOfYear(r.year, defs);
@@ -245,6 +263,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       (r) =>
         passArea(r, $sel) &&
         passType(r, $sel) &&
+        passSeries(r, $sel) &&
         passPeriod(r, $sel, $periods) &&
         passStatus(r, $sel) &&
         (!requireGeoref || !!r.georef_done)
@@ -267,16 +286,35 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     [rawMaps, rawScout, selected, periods, includeScout],
     ([$maps, $scout, $sel, $periods, $scoutOn]) => {
       const mapsForArea = $maps.filter(
-        (r) => passType(r, $sel) && passPeriod(r, $sel, $periods) && passStatus(r, $sel)
+        (r) =>
+          passType(r, $sel) &&
+          passSeries(r, $sel) &&
+          passPeriod(r, $sel, $periods) &&
+          passStatus(r, $sel)
       );
       const mapsForType = $maps.filter(
-        (r) => passArea(r, $sel) && passPeriod(r, $sel, $periods) && passStatus(r, $sel)
+        (r) =>
+          passArea(r, $sel) &&
+          passSeries(r, $sel) &&
+          passPeriod(r, $sel, $periods) &&
+          passStatus(r, $sel)
+      );
+      const mapsForSeries = $maps.filter(
+        (r) =>
+          passArea(r, $sel) &&
+          passType(r, $sel) &&
+          passPeriod(r, $sel, $periods) &&
+          passStatus(r, $sel)
       );
       const mapsForStatus = $maps.filter(
-        (r) => passArea(r, $sel) && passType(r, $sel) && passPeriod(r, $sel, $periods)
+        (r) =>
+          passArea(r, $sel) &&
+          passType(r, $sel) &&
+          passSeries(r, $sel) &&
+          passPeriod(r, $sel, $periods)
       );
       const mapsForPeriod = $maps.filter(
-        (r) => passArea(r, $sel) && passType(r, $sel) && passStatus(r, $sel)
+        (r) => passArea(r, $sel) && passType(r, $sel) && passSeries(r, $sel) && passStatus(r, $sel)
       );
 
       const periodCounts: Record<string, number> = {};
@@ -299,6 +337,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       return {
         area: tally(mapsForArea, 'location'),
         map_type: tally(mapsForType, 'map_type'),
+        collection: tally(mapsForSeries, 'collection'),
         period: periodCounts,
         status: statusCounts,
         scout_category: $scoutOn ? scoutCatTally : {},

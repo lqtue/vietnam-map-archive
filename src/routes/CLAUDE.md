@@ -27,7 +27,8 @@ and `paletteDestinations.ts`.
 | `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
 | `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
 | `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
-| `/catalog` | Faceted catalog + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
+| `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
+| `/catalog/series` | Every survey, and how much of each is held | `src/routes/(editorial)/catalog/series/` |
 | `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
 | `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
 
@@ -52,6 +53,22 @@ and `paletteDestinations.ts`.
 
 `/api/admin/upload-image` and `/api/admin/labels/*` were deleted (Aug 2026) — do not reintroduce
 references.
+
+## Series on /catalog
+
+`/catalog` has a `+page.server.ts` for one reason: the surveys. The catalogue itself stays a
+client-side search against `/api/search`, but `fetchSeriesIndex` (`$lib/data/maps/seriesIndex.ts`,
+shared with `/catalog/series`) is the same for every anonymous reader and belongs in the HTML a
+crawler gets. It feeds three things:
+
+- the **band** above the results — `SeriesList`, the same rows `/catalog/series` renders, shown only
+  while `atRest` (no query, no facet) is bound back out of `CatalogUnifiedSearch`;
+- the **drawer** a row opens (`SeriesDetailDrawer`) — the row keeps its real `href`, so cmd-click
+  and crawlers still reach the coverage page and only an unmodified left click is taken;
+- the **series facet**, whose choices are passed down to `ArchiveFilters`. Nothing else passes any,
+  so /explore and the /scan picker draw no such control. The filter matches `maps.collection`;
+  which collections count as surveys is `map_series`' decision (mig 082/084) and is never
+  re-derived client-side.
 
 ## Admin tooling
 

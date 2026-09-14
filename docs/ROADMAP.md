@@ -178,6 +178,31 @@ Four lessons, each of which cost real time today:
       a crawl invitation to a 404. Palette ties now break by position in
       `DESTINATIONS` instead of alphabetically: "Map series" had taken `map` off
       "Map viewer" on the strength of an s preceding a v.
+- [x] **Done 2026-09-14. Series reach /catalog, three ways.** The index built the
+      day before had no link from the archive's own front door: a reader who
+      never opened the command palette or a blog post could not find out the
+      archive holds surveys at all. /catalog now server-renders a **band** of
+      survey rows above the results (the crawlable path, and it steps aside the
+      moment a query or a facet is set); a row opens a **drawer** — the
+      counterpart to the map one, opening with the coverage bar rather than a
+      thumbnail, because a survey's picture is the shape of what is missing —
+      whose three actions are Open in map, All sheets and Filter the catalog;
+      and **series is a fourth facet** beside area/type/period, matching
+      `maps.collection` with its choices passed down from `map_series` rather
+      than re-derived on the client. The rows are one component shared with
+      `/catalog/series`, so the fraction cannot differ between them, and the
+      "which surveys qualify" filter is one `fetchSeriesIndex`.
+      Three latent bugs fell out and are fixed: `.page` carried
+      `animation: … both`, and a `forwards` fill keeps an opacity animation
+      applied forever, which kept the stacking context it creates forever —
+      **every fixed drawer and modal on every editorial page was sealed under
+      the nav**, unreachable by any z-index, with the scrim dimming the page but
+      not the bar above it; `--color-text-muted`, `--space-sm/md/lg`,
+      `--space-5` and `--radius-xs` were used in eight files and declared
+      nowhere, so fourteen declarations had been rendering as nothing; and
+      "Open in map" computes its camera from the survey's own bounds via
+      `cellCamera`, which is the ponytail note in `ExploreBrowsePanel` — every
+      other `?series=` link in the repo hand-codes one.
 - [ ] **Sheet titles should come off the sheet, not the catalogue.** CartoMundi's
       spellings are French colonial transcriptions: `Kim Thanh` → `Kim-Thành`
       restores a real diacritic, `Bac Ninh` → `Bac-Ninh` only adds a hyphen, and

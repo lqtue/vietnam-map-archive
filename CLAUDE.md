@@ -25,7 +25,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (304 tests)
+npm run test         # Playwright smoke suite, read-only (326 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (25 tests)
@@ -33,10 +33,10 @@ npm run deploy       # Build + deploy to Cloudflare Pages via wrangler
 npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 ```
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs eleven read-only
-smokes in `tests/smoke.spec.ts` (they hit the real Supabase project but never write) plus 293
-browser-less pure checks riding the same runner. **What each one pins, and why it exists, is
-`docs/testing.md`** — read it before changing a check or adding one, because most of them exist to
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs seventeen read-only
+browser checks — eleven in `tests/smoke.spec.ts`, six in `tests/catalog-series.spec.ts` (they hit
+the real Supabase project but never write) — plus 309 browser-less pure checks riding the same
+runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
 see `supabase/CLAUDE.md`.
 
@@ -89,7 +89,7 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/architecture.md` — **the map runtime**, unabridged: MapShell/ImageShell, the stores, route groups, the /explore rails, the contribute tools, the PMTiles basemap, the series layers
 - `docs/db-guidelines.md` — schema conventions; all migrations must follow these
 - `docs/conventions.md` — the reasoning behind the one-line rules: fonts, the gazetteer key, the generated types, the realtime stub, the component/theme vocabulary
-- `docs/testing.md` — what each of the 304 tests pins, and the failure it exists to catch
+- `docs/testing.md` — what each of the 326 tests pins, and the failure it exists to catch
 - `docs/system-guidelines.md` — layering rule, page structure, component patterns, route map, and §11 the live debt table
 - `docs/design-system.md` — tokens, the CSS file map, the page template
 - `docs/api.md` — every server route, its auth class and its contract

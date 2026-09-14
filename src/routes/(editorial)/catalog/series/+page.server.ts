@@ -7,55 +7,15 @@
  * coverage pages existed and were reachable only by someone who already knew
  * they did.
  *
- * Which surveys qualify is `map_series`'s decision (migration 082/084), not
- * this page's — a numbered sheet, more than one of them, and this reader
- * allowed to see them. Reading it on the service client means its own gate is
- * bypassed, so the anonymous filter is applied here the same way the single
- * series page applies it.
+ * Which surveys qualify, and where the held counts come from, is
+ * `fetchSeriesIndex` — shared with the band at the top of /catalog, which is
+ * now the way in to this page.
  */
 
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
-import { fetchMapSeries } from '$lib/data/maps/service';
+import { fetchSeriesIndex } from '$lib/data/maps/seriesIndex';
 
 export const load: PageServerLoad = async () => {
-  const supabase = adminClient();
-  const all = await fetchMapSeries(supabase);
-  /* A survey whose index was never imported has no coverage page — that route
-     404s on purpose — so it is not offered here either. AMS L909 is the one:
-     three sheets, and nobody has decided what the survey contains. It appears
-     the moment someone imports its index, which is the point of reading this
-     rather than listing surveys by hand. */
-  const series = all.filter((s) => s.publishedSheets > 0 && s.surveySheets != null);
-
-  /* Held counts come from the survey's own index, because a sheet reaches a
-     reader by more than one route: 452 of L7014's 461 are mosaic cells with no
-     `maps` row, and `publishedSheets` cannot see them. Two columns over ~700
-     rows is cheaper than a per-series round trip, and the same read the drift
-     detector makes. `held_by` is the whole test — `sheetStatus` in
-     `seriesSheets.ts` owns the rule and its first line is this one; the rest of
-     what it decides separates two kinds of *unheld*, which this page does not
-     draw. */
-  const { data: cells } = await supabase.from('series_sheets').select('series_key,held_by');
-
-  const held = new Map<string, { held: number; total: number }>();
-  for (const c of cells ?? []) {
-    const k = c.series_key as string;
-    const t = held.get(k) ?? { held: 0, total: 0 };
-    t.total += 1;
-    if (c.held_by) t.held += 1;
-    held.set(k, t);
-  }
-
-  return {
-    series: series.map((s) => ({
-      key: s.key,
-      name: s.name,
-      firstYear: s.firstYear ?? null,
-      lastYear: s.lastYear ?? null,
-      // Always set: the filter above kept only surveys whose index exists, and
-      // `survey_sheets` is a count over the very rows this counts.
-      index: held.get(s.key)!,
-    })),
-  };
+  return { series: await fetchSeriesIndex(adminClient()) };
 };

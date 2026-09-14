@@ -32,6 +32,22 @@
   export let requireGeoref: boolean = false;
   /** Show "+ overlay" and "B base" toggles on each row (only enabled in /view sidebar). */
   export let showLayerActions: boolean = false;
+  /**
+   * The surveys offerable as a filter, `{ value: maps.collection, label }`.
+   * Only /catalog passes any — it is the only caller with a server load to ask
+   * `map_series` which collections are surveys. See `ArchiveFilters`.
+   */
+  export let seriesChoices: { value: string; label: string }[] = [];
+  /**
+   * Bound out: true when nothing is narrowing the list — no query, no facet.
+   *
+   * /catalog reads it to decide whether to draw its series band. The band is a
+   * browse surface for a reader who has not asked for anything yet; once they
+   * have, it is three cards between them and their results. The page cannot
+   * work this out for itself because the facets live in the engine this
+   * component owns, and the query is only half the answer.
+   */
+  export let atRest: boolean = true;
 
   const dispatch = createEventDispatcher<{ pick: any; edit: any }>();
 
@@ -54,6 +70,8 @@
 
   // Mirror the parent's search box into the engine's query store.
   $: query.set(searchQuery);
+
+  $: atRest = !$query.trim() && !Object.values($selected).some((v) => v?.length);
 
   onMount(() => {
     search.start();
@@ -85,6 +103,16 @@
     search.refresh();
   }
 
+  /**
+   * Narrow the list to one survey — what the series drawer's "Filter the
+   * catalog" does. A method rather than a two-way binding on `selected`,
+   * because the engine's state is this component's and the page should be able
+   * to ask for a thing without holding the store that grants it.
+   */
+  export function filterSeries(collection: string) {
+    setSingle('collection', collection);
+  }
+
   function handleRowFacet(e: CustomEvent<{ group: string; value: string }>) {
     const { group, value } = e.detail;
     // Only the area chip is a filter. Other clicks (year, type, etc.) are no-ops.
@@ -100,10 +128,11 @@
 </script>
 
 <div class="cus" class:compact>
-  <!-- The three facets are the same disclosure /explore wears: a page with a
-       left rail of chips put its filters in a column nobody scrolled back up
-       to, and the rail cost the results a third of the page's width. -->
-  <ArchiveFilters {search} showSearch={false} />
+  <!-- The facets are the same disclosure /explore wears: a page with a left
+       rail of chips put its filters in a column nobody scrolled back up to,
+       and the rail cost the results a third of the page's width. /catalog
+       gets a fourth control there, series; nothing else passes choices. -->
+  <ArchiveFilters {search} showSearch={false} {seriesChoices} />
 
   {#if !compact}
     <div class="v2-toolbar">
