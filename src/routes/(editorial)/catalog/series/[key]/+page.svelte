@@ -8,6 +8,8 @@
 <script lang="ts">
   import PageHero from '$lib/ui/PageHero.svelte';
   import DataTable from '$lib/ui/DataTable.svelte';
+  import { matchesAllTerms } from '$lib/core/utils/unaccent';
+  import { applySort, type SortState } from '$lib/core/utils/tableSort';
   import { printing } from '$lib/data/maps/seriesSheets';
   import type { PageData } from './$types';
   import type { SeriesSheetView } from '$lib/data/maps/seriesSheets';
@@ -73,12 +75,56 @@
   };
 
   const COLUMNS = [
-    { key: 'sheet_number', label: 'Sheet', sortable: false },
-    { key: 'name', label: 'Name', sortable: false },
-    { key: 'version', label: 'Version', sortable: false },
-    { key: 'status', label: 'Status', sortable: false },
-    { key: 'source', label: 'Source', sortable: false },
+    { key: 'sheet_number', label: 'Sheet' },
+    { key: 'name', label: 'Name' },
+    { key: 'version', label: 'Version' },
+    { key: 'status', label: 'Status' },
+    { key: 'source', label: 'Source' },
   ];
+
+  /* ── Finding one sheet in 627 ──────────────────────────────────────────
+     The survey index is the one table in the app that ships whole: all 627
+     rows are in the server-rendered HTML, because a sheet the archive does
+     NOT hold still needs a URL and a crawler still needs to read it. So the
+     search and the facets are client-side over an array already in memory —
+     no `/api/search`, no request per keystroke, and the filtered view is a
+     derived value rather than state anyone has to keep in step.
+
+     `matchesAllTerms` is the catalogue's own folding, so "phu ly" finds
+     "Phú Lý" and "quang" narrows rather than matching nothing; `applySort`
+     and `SortHeader` are the same pair the other four tables use. Nothing
+     here is new machinery. */
+  let q = '';
+  let statusFilter: string | null = null;
+  let sort: SortState<string> = { key: 'sheet_number', asc: true };
+
+  /** The cell a sort reads. `version` sorts by year, which is what a reader
+      means by it — the printed edition string sorts "003" before "1-AMS". */
+  const sortCell = (s: SeriesSheetView, key: string) =>
+    key === 'version'
+      ? (s.year ?? null)
+      : ((s as unknown as Record<string, string | null>)[key] ?? null);
+
+  $: byStatus = statusFilter ? sheets.filter((s) => s.status === statusFilter) : sheets;
+  $: found = q.trim()
+    ? byStatus.filter((s) =>
+        matchesAllTerms(`${s.sheet_number} ${s.name ?? ''} ${s.source ?? ''}`, q)
+      )
+    : byStatus;
+  $: visible = applySort(found, sort, sortCell);
+
+  /** Facet counts over the whole survey, so a chip's number does not change
+      as the search narrows — the chip says how big that slice of the survey
+      is, not how much of it survives the current query. */
+  $: statusCounts = {
+    held: counts.held,
+    obtainable: counts.obtainable,
+    no_scan: counts.no_scan,
+  } as Record<string, number>;
+
+  function pickStatus(key: string) {
+    statusFilter = statusFilter === key ? null : key;
+  }
 
   /**
    * One printing of one cell. The shape `$lib/data/maps/sheetSources.ts` will
@@ -235,8 +281,39 @@
     </ul>
   </section>
 
-  <DataTable columns={COLUMNS}>
-    {#each sheets as sheet (sheet.sheet_number)}
+  <div class="sheet-tools">
+    <label class="sb-search is-page">
+      <span class="sr-only">Search this survey</span>
+      <input
+        class="sb-search-input"
+        type="search"
+        bind:value={q}
+        placeholder="Search by sheet number, name or source…"
+      />
+    </label>
+    <div class="facets">
+      {#each ['held', 'obtainable', 'no_scan'] as key (key)}
+        <button
+          type="button"
+          class="badge-chip is-sm {STATUS_CHIP[key]}"
+          class:is-off={statusFilter !== null && statusFilter !== key}
+          aria-pressed={statusFilter === key}
+          on:click={() => pickStatus(key)}
+        >
+          {STATUS_LABEL[key]}
+          <span class="facet-n">{statusCounts[key]}</span>
+        </button>
+      {/each}
+    </div>
+    <p class="found">
+      {visible.length === counts.total
+        ? `${counts.total} sheets`
+        : `${visible.length} of ${counts.total} sheets`}
+    </p>
+  </div>
+
+  <DataTable columns={COLUMNS} bind:sort>
+    {#each visible as sheet (sheet.sheet_number)}
       {@const cell = printings[sheet.sheet_number]}
       {@const count = editions[sheet.sheet_number] ?? 0}
       <tr>
@@ -324,6 +401,11 @@
         <td class="src">{sheet.source ?? '—'}</td>
       </tr>
     {/each}
+    <svelte:fragment slot="after">
+      {#if !visible.length}
+        <p class="table-empty">No sheet in this survey matches.</p>
+      {/if}
+    </svelte:fragment>
   </DataTable>
 </div>
 
@@ -339,6 +421,47 @@
   }
   .about {
     margin-bottom: var(--space-4);
+  }
+  /* Search, facets and count on one row, wrapping to three at phone width.
+     The count sits last so it is next to the table it describes. */
+  .sheet-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .sheet-tools .sb-search {
+    flex: 1 1 18rem;
+  }
+  .facets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  /* A chip is a choice, so these are real buttons — the status column uses the
+     same three tints, which is what ties a chip to the rows it selects. */
+  .facets button {
+    cursor: pointer;
+    border: none;
+    font: inherit;
+  }
+  /* Dimmed, not hidden: the unselected facets still say how big the survey's
+     other slices are, which is the number a reader is comparing against. */
+  .facets button.is-off {
+    opacity: 0.45;
+  }
+  .facet-n {
+    margin-left: 0.3rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+  .found {
+    margin: 0;
+    margin-left: auto;
+    font-size: 0.88rem;
+    color: var(--color-gray-500);
+    font-variant-numeric: tabular-nums;
   }
   .about .lead {
     max-width: 68ch;
