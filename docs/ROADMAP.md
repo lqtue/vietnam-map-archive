@@ -270,12 +270,13 @@ stack replayed from 001, 088 live on production with 0 null slugs.
 
 ### Open after 7.3 (2026-09-15)
 
-- [ ] **Not deployed.** Production runs 7.2 while its database is at 088. That
-      is the safe direction (the column is additive and nothing in 7.2 reads
-      it), but it is also the window where the two disagree: prod still hands
-      out uuid links while the code that 301s them to names sits in `main`.
-      Exit: `npm run deploy`, then a `curl -sI` on one uuid `/catalog/` URL
-      showing `301` to its slug, and one slug URL showing `200`.
+- [x] **Deployed 2026-09-15** (`4d4da6f5`), and verified on the live host rather
+      than on the deploy log: `/catalog/vinh-yen-1906` 200s, the uuid 301s to
+      `/catalog/quang-yen`, a bare `/scan` 302s to `/catalog`, `/scan?map=` 302s
+      carrying the sheet, and `?mode=prepare` still 200s. The sitemap looked
+      wrong for an hour and was not — it is `max-age=3600` at the edge, and the
+      same URL with a cache-buster was already emitting slugs. **Check a cached
+      route with a cache-buster before believing it did not deploy.**
 - [ ] **Five one-off scripts still write unless you pass `--dry`.**
       `backfill_indochine_descriptions`, `fix_l909_series_index`,
       `import_l7014_series_sheets`, `publish_l7014_city_sheets`,
