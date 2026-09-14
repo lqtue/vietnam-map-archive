@@ -24,9 +24,13 @@
  * and 404s every other width including the three its own `info.json` lists. That
  * is a gap in the bucket's data, not a second kind of service.
  *
- * Do not reach for `info.json` to tell these apart: the worker **hardcodes**
- * `profile: 'level2'` on every R2-backed response (index.ts:147, :228).
- * `docs/pipelines.md` §*Reading an R2-hosted map* says so too.
+ * Do not reach for `info.json` to tell these apart — but the reason changed on
+ * 2026-09-14. It used to be that the field lied: the worker hardcoded
+ * `profile: 'level2'` on every R2-backed response. Now it says `level0` and
+ * lists the sizes R2 really holds (`index.ts:269`), so it would answer
+ * truthfully. The reason is now cost: this runs per thumbnail, off a stored URL,
+ * and fetching info.json to place one catalog cell is a round trip per card.
+ * `sizes` also spells its entries `w,h` while `atWidth` asks by width alone.
  *
  * Measured over the 39 sheets /catalog draws: `200,` is refused by 1 and
  * `1200,` (FeaturedSheet's plate) by 3. Asking every sheet for 400 to protect

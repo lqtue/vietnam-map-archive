@@ -3,9 +3,12 @@
  *
  * Our own R2 host renders nothing — it maps a IIIF path onto an R2 key and
  * serves only the tiles `vips dzsave` wrote, so an arbitrary region at an
- * arbitrary scale is a 404. Its `info.json` claims `profile: level2`, which is
- * untrue; do not trust that field. `work/ocr/scripts/iiif_tiles.py` holds the
- * Python twin of these rules — keep the two in step.
+ * arbitrary scale is a 404. Since 2026-09-14 its `info.json` says so — `profile`
+ * is `level0` and `sizes` is listed from what the bucket actually holds, rather
+ * than the synthesised array whose every entry 404'd. The field is now worth
+ * trusting; these rules are still needed, because a truthful advertisement of a
+ * fixed pyramid is still a fixed pyramid. `work/ocr/scripts/iiif_tiles.py` holds
+ * the Python twin of these rules — keep the two in step.
  */
 
 export type Level0Tile = {
