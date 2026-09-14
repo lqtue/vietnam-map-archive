@@ -62,7 +62,19 @@ const HALF_IN_NAME = /\((W|E)\)\s*$/;
  * ingest writes for a demi-format sheet, which is one piece of paper carrying
  * the entire cell.
  */
-function sheetPart(half: unknown, name: string | null): 'whole' | 'W' | 'E' {
+function sheetPart(
+  half: unknown,
+  name: string | null,
+  provenance: unknown
+): 'whole' | 'W' | 'E' | 'assemblage' {
+  // 62 of the Indochine rows are two half-sheets joined by a third party, which
+  // `extra_metadata.scan_provenance` records after matching physical marks on
+  // the paper — cell 36 carries the same blue pencil "36" as IGN's west half.
+  // Calling those a whole sheet is the one answer that is plainly untrue: the
+  // survey never printed a whole sheet for those cells, and the page reading
+  // "Whole sheet · Held" beside IGN's actual west and east halves invites
+  // exactly the wrong conclusion about what the archive is serving.
+  if (typeof provenance === 'string' && /^assembled edition/i.test(provenance)) return 'assemblage';
   if (half === 'W' || half === 'E') return half;
   if (half === 'whole') return 'whole';
   const marked = HALF_IN_NAME.exec(name ?? '');
@@ -153,13 +165,14 @@ export const load: PageServerLoad = async ({ params }) => {
       sheet_number?: string;
       sheet_half?: string;
       edition?: string;
+      scan_provenance?: string;
     };
     if (!meta.sheet_number) continue;
     (printings[meta.sheet_number] ??= []).push({
       institution: null,
       year: row.year,
       edition: meta.edition ?? null,
-      part: sheetPart(meta.sheet_half, row.name),
+      part: sheetPart(meta.sheet_half, row.name, meta.scan_provenance),
       url: `/catalog/${row.id}`,
       rights: null,
       held: true,
