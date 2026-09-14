@@ -35,21 +35,46 @@ export const load: PageServerLoad = async ({ params }) => {
   // A sheet held as a `maps` row has a catalogue record of its own, and that is
   // the better page — this one exists for the cells that do not. Carry enough
   // to link there rather than duplicating it.
-  let map: { id: string; name: string; year: number | null; status: string } | null = null;
-  if (sheet.map_id) {
-    const { data } = await supabase
-      .from('maps')
-      .select('id,name,year,status')
-      .eq('id', sheet.map_id)
-      .in('status', ['public', 'featured'])
-      .maybeSingle();
-    map = data as typeof map;
-  }
+  //
+  // EVERY record for the cell, not the one `series_sheets.map_id` happens to
+  // point at. That column holds a single id, and a cell can be held more than
+  // once for two unrelated reasons: two printings of the same sheet (Indochine
+  // cells 2, 13 and 14, fourteen years apart), or the two half-sheets the
+  // survey cut down the cell's middle meridian (cells 34, 37, 39, 67, 70 and
+  // 73 bis). Following the single id gave every one of those a page that
+  // silently hid its sibling — the west half of a cell, or an entire second
+  // printing, reachable from nothing. The cell is the key here, so the query is
+  // on the cell.
+  // `collection` is the group key the view is built on, so in practice it is
+  // always set — but it is nullable in the schema, and a null would widen the
+  // query to every sheet numbered `number` in the archive rather than narrowing
+  // it to this survey's.
+  const { data: rows } = series.collection
+    ? await supabase
+        .from('maps')
+        .select('id,name,year,status,extra_metadata')
+        .eq('collection', series.collection)
+        .eq('extra_metadata->>sheet_number', number)
+        .in('status', ['public', 'featured'])
+        .order('year', { ascending: true })
+    : { data: [] };
+
+  const maps = (rows ?? []).map((m) => ({
+    id: m.id as string,
+    name: m.name as string,
+    year: m.year as number | null,
+    // What distinguishes this record from its siblings: which half of the cell
+    // it draws, or nothing when the cell is held whole and the year is the only
+    // thing telling two records apart.
+    half: ((m.extra_metadata as { sheet_half?: string } | null)?.sheet_half ?? null) as
+      | string
+      | null,
+  }));
 
   return {
     series,
     sheet,
-    map,
+    maps,
     camera: sheet.bbox ? cellCamera(sheet.bbox) : null,
   };
 };

@@ -47,3 +47,8 @@ work/reports/
 # Bulk-upload run logs — one per run, megabytes of per-sheet output.
 # The record that matters is the maps rows the run created, not the transcript.
 scripts/bulk_upload_*.log
+
+# CartoMundi holdings dumps — 40 MB of upstream catalogue, re-fetched on demand
+# by scripts/oneoff/check_indochine_provenance.py. The reduced index beside them
+# (sources/nakala.json) is small and IS tracked.
+work/tonkin/sources/ign-serie-*.json

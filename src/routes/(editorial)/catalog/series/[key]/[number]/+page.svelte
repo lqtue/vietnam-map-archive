@@ -15,7 +15,7 @@
 
   $: series = data.series as { key: string; name: string };
   $: sheet = data.sheet as SeriesSheetView;
-  $: map = data.map as { id: string; name: string; year: number | null } | null;
+  $: maps = data.maps as { id: string; name: string; year: number | null; half: string | null }[];
   $: camera = data.camera as { lng: number; lat: number; zoom: number } | null;
 
   $: title = sheet.name
@@ -33,8 +33,8 @@
    * mosaic cell has no id to open, so the camera goes in the hash and the
    * reader arrives over the right ground with the mosaic already drawn.
    */
-  $: exploreHref = map
-    ? `/explore?map=${map.id}`
+  $: exploreHref = maps.length
+    ? `/explore?map=${maps[0].id}`
     : camera
       ? `/explore#@${camera.lat.toFixed(5)},${camera.lng.toFixed(5)},${camera.zoom}z,0r`
       : null;
@@ -70,11 +70,30 @@
       <p class="muted">{sheet.note}</p>
     {/if}
 
-    {#if map}
+    {#if maps.length === 1}
       <p>
         This sheet has its own catalogue record:
-        <a href="/catalog/{map.id}">{map.name}{map.year ? ` (${map.year})` : ''}</a>.
+        <a href="/catalog/{maps[0].id}">{maps[0].name}{maps[0].year ? ` (${maps[0].year})` : ''}</a
+        >.
       </p>
+    {:else if maps.length > 1}
+      <!-- A cell held more than once: two printings of the sheet, or the two
+           half-sheets it was cut into. Both are records in their own right and
+           each needs its own link — listing one and calling it "the" record is
+           how the other came to be reachable from nowhere. -->
+      <p>
+        The archive holds {maps.length} records of this sheet:
+      </p>
+      <ul class="records">
+        {#each maps as m (m.id)}
+          <li>
+            <a href="/catalog/{m.id}">{m.name}</a>
+            {#if m.year}<span class="muted">{m.year}</span>{/if}
+            {#if m.half === 'W'}<span class="muted">western half</span>
+            {:else if m.half === 'E'}<span class="muted">eastern half</span>{/if}
+          </li>
+        {/each}
+      </ul>
     {/if}
 
     {#if sheet.status !== 'held' && sheet.source}
@@ -112,6 +131,16 @@
 </div>
 
 <style>
+  .records {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+  }
+  .records li {
+    margin-bottom: 0.2rem;
+  }
+  .records .muted {
+    margin-left: 0.35rem;
+  }
   .page-wrap {
     max-width: 46rem;
     margin: 0 auto;

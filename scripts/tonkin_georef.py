@@ -328,16 +328,106 @@ def cut_side(base, W, H, side, tan, frame):
             "cut": True}, None
 
 
+def detilt(d, tan, step, mids=None):
+    """One strip -> one cross-profile, with the scan's rotation taken out.
+
+    The same averaging `side_line` does in its second pass, but driven by a
+    rotation that is already known instead of one fitted from this strip. That is
+    the whole point: a side whose own per-patch fit failed can still be measured,
+    because the angle is a property of how the scan was laid on the glass and the
+    other sides have already settled it.
+    """
+    n = d.shape[0]
+    edges = np.linspace(0, n, PATCHES + 1).round().astype(int)
+    mids, profiles = [], []
+    for k in range(PATCHES):
+        u, v = edges[k], edges[k + 1]
+        if v - u < 8:
+            continue
+        mids.append((u + v) / 2.0)
+        profiles.append(d[u:v].mean(axis=0))
+    if len(mids) < 6:
+        return None, None, None
+    slope = -tan * step
+    ref = float(np.mean(mids))
+    grid = np.arange(d.shape[1], dtype=float)
+    avg = np.mean([np.interp(grid, grid + slope * (ref - mid), prof)
+                   for mid, prof in zip(mids, profiles)], axis=0)
+    return avg, slope, len(mids)
+
+
+def strongest(avg, skip=12):
+    """The most prominent peak in a profile, and how prominent it is."""
+    best, bestp = None, 0.0
+    for j in range(skip, len(avg) - 1):
+        if not (avg[j] >= avg[j - 1] and avg[j] > avg[j + 1]):
+            continue
+        u, v = max(0, j - 12), min(len(avg), j + 13)
+        prom = avg[j] - max(avg[u:j + 1].min(), avg[j:v].min())
+        if prom > bestp:
+            best, bestp = j, prom
+    return best, bestp
+
+
+def centroid(avg, j, thr):
+    """Sub-pixel position of the line whose peak is at j."""
+    u = v = j
+    while u > 0 and avg[u - 1] > thr and avg[u - 1] <= avg[u]:
+        u -= 1
+    while v < len(avg) - 1 and avg[v + 1] > thr and avg[v + 1] <= avg[v]:
+        v += 1
+    w = avg[u:v + 1] - thr
+    if w.sum() <= 0:
+        return None
+    return u + float((np.arange(len(w)) * w).sum() / w.sum())
+
+
+def salvage_side(base, side, frame, W, H, tan, which):
+    """A framed side whose own per-patch fit fell apart, measured from the others.
+
+    `side_line`'s first pass takes the argmax of each patch, which is safe when
+    the thick neatline is the darkest thing on the strip by a factor of three --
+    and is not, where dense ink runs right up to the frame. On Lach Truong the
+    coastal hatching does exactly that on the east side: three sides fit at 0.46
+    to 0.74 px residual and the fourth scatters to 7.4.
+
+    The side still has a real frame, so unlike a cut edge it gets the full
+    treatment -- strongest peak is the thick line, `rim_in` then finds the rim in
+    from it on the same averaged profile -- only with the rotation supplied
+    rather than fitted. Nothing here is trusted on its own: the result goes
+    through the same aspect, rim-spread and scale gates as every other sheet.
+    """
+    d, origin, step, a0 = strip(base, side, frame, W, H)
+    avg, slope, kept = detilt(d, tan, step)
+    if avg is None:
+        return None, "salvage: too few patches"
+    thick, prom = strongest(avg, skip=4)
+    if thick is None or prom < 8.0:
+        return None, "salvage: no thick line in the averaged profile"
+    r = rim_in(avg, int(round(thick)), which)
+    if r is None:
+        return None, "salvage: no rim found inside the thick line"
+    m = slope * step
+    c = origin + step * r - m * a0
+    mid = (H if side in "LR" else W) * (SPAN[0] + SPAN[1]) / 2
+    return {"m": m, "c": c, "anchor": [mid, m * mid + c], "res": 0.0,
+            "kept": kept, "found": kept, "offset": r - thick,
+            "salvaged": True}, None
+
+
 def detect(base, W, H, which="inner", verbose=False, cut=None):
     frame = rough_frame(base, W, H)
-    lines = {}
+    lines, failed = {}, {}
     for side in "LRTB":
         if side == cut:
             continue
         d, origin, step, a0 = strip(base, side, frame, W, H)
         got, err = side_line(d, which)
         if err:
-            return None, f"{side}: {err}"
+            # One bad side is recoverable from the other three; two is not a
+            # noisy edge, it is the wrong sheet or the wrong frame.
+            failed[side] = err
+            continue
         m = got["m"] * step
         c = origin + step * (got["c"] - got["m"] * a0)
         mid = (H if side in "LR" else W) * (SPAN[0] + SPAN[1]) / 2
@@ -357,9 +447,22 @@ def detect(base, W, H, which="inner", verbose=False, cut=None):
     # enough to trust with it -- so the angle comes from the three real sides and
     # is then handed to the cut side, which is the only reason its single faint
     # line can be found at all.
+    if len(failed) > 1:
+        return None, "; ".join(f"{s}: {e}" for s, e in failed.items())
     tan = float(np.mean([s * lines[k]["m"] for k, s in
                          (("T", 1), ("B", 1), ("L", -1), ("R", -1))
-                         if k != cut]))
+                         if k in lines]))
+    if failed:
+        side, why = next(iter(failed.items()))
+        got, err = salvage_side(base, side, frame, W, H, tan, which)
+        if err:
+            # Hand back the ORIGINAL failure, not the salvage's. A side that
+            # cannot be salvaged either may simply not be a framed side at all,
+            # and `read_sheet` decides that next by retrying it as a cut edge.
+            return None, f"{side}: {why}"
+        if verbose:
+            print(f"  {side}: {why} -- recovered from the other three sides")
+        lines[side] = got
     if cut:
         got, err = cut_side(base, W, H, cut, tan, frame)
         if err:
