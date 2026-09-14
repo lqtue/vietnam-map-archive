@@ -7,6 +7,11 @@
   mode="link" (default) navigates to /explore?map=<id>&at=<lng>,<lat>.
   mode="pick" dispatches `pick` instead, for a caller already on /explore.
 
+  Only `max` rows are drawn at first. /api/search returns up to 60 places, and
+  the list sits *above* the map results in both callers — /catalog's table and
+  the /explore left rail — so a common word ("Saigon") pushed the maps off the
+  bottom of the screen. The rest are one click away.
+
   A label in one of the gazetteer's five categories also gets a link to its
   /place/<slug> page. Those pages are server-rendered so search engines index
   them, and until Sept 2026 the only link to one anywhere in the app sat on
@@ -22,8 +27,17 @@
 
   export let hits: LabelHit[] = [];
   export let mode: 'link' | 'pick' = 'link';
+  /** Rows drawn before the "Show all" line. */
+  export let max = 5;
 
   const dispatch = createEventDispatcher<{ pick: LabelHit }>();
+
+  let expanded = false;
+  // A new result set collapses again — the reader expanded *that* search, and
+  // leaving it open would hand the next query the same wall of rows. The test
+  // reads `hits` and nothing else, so clicking the toggle does not undo itself.
+  $: if (hits) expanded = false;
+  $: shown = expanded ? hits : hits.slice(0, max);
 
   function href(h: LabelHit): string {
     const at = h.lng != null && h.lat != null ? `&at=${h.lng.toFixed(6)},${h.lat.toFixed(6)}` : '';
@@ -35,7 +49,7 @@
   <section class="label-hits" aria-label="Labels found on maps">
     <h3 class="title">{$t('On the map')} <span class="n">{hits.length}</span></h3>
     <ul>
-      {#each hits as h (h.id)}
+      {#each shown as h (h.id)}
         {@const place = placeHrefFor(h.text, h.category)}
         <li>
           <!--
@@ -67,6 +81,11 @@
         </li>
       {/each}
     </ul>
+    {#if hits.length > max}
+      <button class="more-toggle" type="button" on:click={() => (expanded = !expanded)}>
+        {expanded ? $t('Show fewer') : $t('Show all {N}', { N: hits.length })}
+      </button>
+    {/if}
   </section>
 {/if}
 
@@ -116,7 +135,13 @@
   }
   .hit {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    /* The name takes the width it needs and the sheet line gets what is left,
+       ellipsised — the reverse of the obvious `auto 1fr auto`, under which the
+       sheet line (one long nowrap string) sized to its content and left no
+       room for the place name, the one thing the row is for. In the /explore
+       rail at 310px every row read "1882 · Plan Cadastral de la…" and no name
+       at all. Both text tracks floor at 0 so neither can overflow the rail. */
+    grid-template-columns: auto minmax(0, max-content) minmax(0, 1fr);
     align-items: center;
     gap: var(--space-2);
     width: 100%;
@@ -150,7 +175,30 @@
     font-size: var(--text-xs);
     color: var(--color-gray-500);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
   }
+  /* Full width, so it reads as the end of the list rather than as a row in it. */
+  .more-toggle {
+    width: 100%;
+    margin-top: 2px;
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-thin);
+    border-radius: var(--radius-sm);
+    background: var(--color-gray-50);
+    color: var(--color-gray-500);
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    text-align: center;
+    cursor: pointer;
+  }
+  .more-toggle:hover {
+    background: var(--color-gray-100);
+    color: var(--color-text);
+  }
+
   /* The gazetteer door: every map that names this place, on one page. */
   .place-link {
     display: inline-flex;

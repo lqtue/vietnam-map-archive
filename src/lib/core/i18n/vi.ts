@@ -84,6 +84,8 @@ export const vi: Record<string, string> = {
   'Searching…': 'Đang tìm…',
   'Type to search.': 'Nhập để tìm kiếm.',
   'On the map': 'Trên bản đồ',
+  'Show all {N}': 'Xem tất cả {N}',
+  'Show fewer': 'Thu gọn',
   Place: 'Địa điểm',
   move: 'di chuyển',
   open: 'mở',
