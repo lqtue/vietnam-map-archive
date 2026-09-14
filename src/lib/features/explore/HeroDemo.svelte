@@ -233,7 +233,7 @@
     border: var(--border-thin);
     border-radius: var(--radius-pill);
     font-size: 0.66rem;
-    color: var(--color-text-muted);
+    color: var(--color-gray-500);
     white-space: nowrap;
   }
 

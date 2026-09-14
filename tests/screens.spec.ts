@@ -123,3 +123,64 @@ function walk(dir: string): string[] {
     return /\.(svelte|ts|css)$/.test(e.name) ? [full] : [];
   });
 }
+
+/**
+ * Every `var(--token)` a component asks for is one `tokens.css` defines.
+ *
+ * A CSS custom property that was never declared is not an error anywhere: the
+ * declaration using it is simply dropped, and the element renders at the
+ * browser's default. `gap: var(--space-sm)` becomes no gap, `padding-block:
+ * var(--space-lg)` becomes no padding — the page still draws, and what you see
+ * is a plausible-looking layout that is missing exactly the spacing someone
+ * wrote down.
+ *
+ * That is what had happened across the series pages: the spacing scale is
+ * numeric (`--space-2`, `--space-4`, `--space-6`), three files spelled it
+ * `--space-sm/md/lg`, and fourteen declarations had been doing nothing since
+ * September 2026. It only became visible when `/catalog` put one of those rows
+ * on a wider page and two numbers ran together with no space between them.
+ *
+ * No browser, and no allowlist to maintain: the tokens are read from the files
+ * that declare them.
+ */
+test('no stylesheet uses a custom property nothing declares', () => {
+  const files: string[] = [];
+  const walk = (dir: string) => {
+    for (const e of readdirSync(resolve(root, dir), { withFileTypes: true })) {
+      const p = `${dir}/${e.name}`;
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.css') || e.name.endsWith('.svelte')) files.push(p);
+    }
+  };
+  walk('src');
+
+  // Declared anywhere in the tree: `tokens.css` holds the palette and the
+  // scales, but a component may declare its own knob (`--card-pad`) and a
+  // caller may set it. Both count as declared.
+  //
+  // Two declaration sites, not one. A property set from the template —
+  // `style:--cat-color={…}` on an element, which is how OcrFilterBar tints a
+  // chip per category and how PressPanel sizes a sparkline bar — never appears
+  // as `--name:` anywhere. A checker that only knew the CSS form reported both
+  // of those as undeclared, which is the failure mode this whole test exists
+  // to catch, arriving as noise in the test that catches it.
+  const declared = new Set<string>();
+  const used = new Map<string, string[]>();
+  for (const f of files) {
+    const src = readFileSync(resolve(root, f), 'utf8');
+    for (const m of src.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g)) declared.add(m[1]);
+    for (const m of src.matchAll(/\bstyle:(--[a-zA-Z0-9-]+)/g)) declared.add(m[1]);
+    // Only the fallback-less form: `var(--x, 1rem)` degrades to something the
+    // author chose, which is a different decision from a name that does not exist.
+    for (const m of src.matchAll(/var\(\s*(--[a-zA-Z0-9-]+)\s*\)/g)) {
+      if (!used.has(m[1])) used.set(m[1], []);
+      used.get(m[1])!.push(f);
+    }
+  }
+
+  const undeclared = [...used.entries()].filter(([name]) => !declared.has(name));
+  expect(
+    undeclared.map(([name, where]) => `${name} — ${[...new Set(where)].join(', ')}`),
+    'These resolve to nothing, and the declaration using them is silently dropped'
+  ).toEqual([]);
+});

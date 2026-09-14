@@ -144,20 +144,20 @@
   .page-wrap {
     max-width: 46rem;
     margin: 0 auto;
-    padding-block: var(--space-lg);
-    padding-inline: var(--space-md);
+    padding-block: var(--space-6);
+    padding-inline: var(--space-4);
   }
   .crumb {
-    margin: 0 0 var(--space-md);
+    margin: 0 0 var(--space-4);
     font-size: 0.9rem;
   }
   .section-card + .section-card {
-    margin-top: var(--space-md);
+    margin-top: var(--space-4);
   }
   .status {
     font-size: 1.05rem;
     font-weight: 600;
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 var(--space-1);
   }
   .status.is-held {
     color: var(--color-green);
@@ -166,28 +166,28 @@
     color: var(--color-text);
   }
   .status.is-no_scan {
-    color: var(--color-text-muted);
+    color: var(--color-gray-500);
   }
   .muted {
-    color: var(--color-text-muted);
+    color: var(--color-gray-500);
     font-size: 0.9rem;
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 var(--space-1);
   }
   dl {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.35rem var(--space-md);
-    margin: 0 0 var(--space-sm);
+    gap: 0.35rem var(--space-4);
+    margin: 0 0 var(--space-2);
   }
   dt {
     font-weight: 600;
-    color: var(--color-text-muted);
+    color: var(--color-gray-500);
   }
   dd {
     margin: 0;
     font-variant-numeric: tabular-nums;
   }
   .cta {
-    margin-top: var(--space-lg);
+    margin-top: var(--space-6);
   }
 </style>

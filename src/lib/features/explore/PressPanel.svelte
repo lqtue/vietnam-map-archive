@@ -298,13 +298,13 @@
     display: flex;
     align-items: flex-end;
     background: var(--color-gray-100);
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-sm);
   }
   .bar i {
     display: block;
     width: 100%;
     height: var(--h);
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-sm);
     background: var(--color-gray-300);
   }
   /* The decades the clippings below are drawn from, against the whole run. */

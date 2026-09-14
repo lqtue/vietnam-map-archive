@@ -128,7 +128,12 @@
     position: fixed;
     inset: 0;
     background: var(--sb-scrim);
-    z-index: 50;
+    /* Over `.top-nav`, which is sticky at 100 (editorial.css). At 50 the scrim
+       stopped at the nav's bottom edge and left it lit and clickable above an
+       open modal — so the page behind could be navigated away from without the
+       drawer ever closing. Under NavBar's own fixed 299/300, which is its
+       mobile menu and never open at the same time as this. */
+    z-index: 150;
     animation: fade 0.15s ease-out;
   }
   .drawer {
@@ -140,7 +145,7 @@
     background: var(--color-white);
     border-left: 2.5px solid var(--color-border);
     box-shadow: -6px 0 0 var(--color-border);
-    z-index: 51;
+    z-index: 151;
     display: flex;
     flex-direction: column;
     overflow-y: auto;

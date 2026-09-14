@@ -185,9 +185,29 @@
    identical four-line copy of it in their own <style> and five more faded on
    their own page sheet; this is the one definition.
    ---------------------------------------- */
+/* `backwards`, NOT `both`.
+
+   `both` is `backwards` + `forwards`, and only the first half was ever wanted:
+   it applies the `from` opacity before the animation starts, so a page cannot
+   flash in at full opacity and then fade. `forwards` holds the END state after
+   the animation finishes — which here is the element's own `opacity: 1`, so it
+   buys nothing visible at all.
+
+   What it did buy was a bug. An element with an animation that is still being
+   APPLIED to `opacity` has a stacking context, and `forwards` means applied
+   forever. So `.page` was a permanent stacking context, and every
+   `position: fixed` descendant of it was trapped underneath `.top-nav`
+   (z-index 100) no matter what z-index it asked for — the catalog's two
+   drawers, their scrim, and MapEditModal. The symptom is the nav sitting lit
+   and clickable over an open modal whose scrim dims everything else, and it
+   survives any amount of raising the modal's z-index, because the comparison
+   never reaches it.
+
+   `getComputedStyle` reports `opacity: 1` throughout, which is why this reads
+   as impossible from the devtools. */
 .page {
   min-height: 100vh;
-  animation: page-fade-in 0.5s ease both;
+  animation: page-fade-in 0.5s ease backwards;
 }
 
 @keyframes page-fade-in {
