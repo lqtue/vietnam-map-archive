@@ -179,3 +179,7 @@ claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Max retries e
 claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Read timed out. (read timeout=30)
 claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Read timed out. (read timeout=30)
 claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Read timed out. (read timeout=30)
+claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Read timed out. (read timeout=30)
+claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Max retries exceeded with url: /api/pipeline/claim (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x10af77890>: Failed to resolve 'maparchive.vn' (Name or service not known: maparchive.vn using 1 resolver(s))"))
+claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Max retries exceeded with url: /api/pipeline/claim (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x10af77390>: Failed to resolve 'maparchive.vn' (Name or service not known: maparchive.vn using 1 resolver(s))"))
+claim failed: HTTPSConnectionPool(host='maparchive.vn', port=443): Max retries exceeded with url: /api/pipeline/claim (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x10af76d50>: Failed to resolve 'maparchive.vn' (Name or service not known: maparchive.vn using 1 resolver(s))"))
