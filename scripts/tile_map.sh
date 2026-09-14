@@ -103,6 +103,22 @@ mv "$OUTPUT_DIR/source" "$OUTPUT_DIR/$MAP_ID"
 #
 # 1. dzsave lists one more scaleFactor than it emits — the top level's single
 #    tile is never written. Drop any factor whose origin tile is absent.
+#
+#    A level's origin tile has two possible spellings, because dzsave uses two:
+#    a `0,0,w,h` region while the level still takes more than one tile, and
+#    `full/{ceil(W/sf)},{ceil(H/sf)}` for the level that fits in one. Testing
+#    only the region spelling trims the top level of every map whose last level
+#    is a single tile — which is every map — leaving it advertised one level
+#    shallower than it is. 21 Indochine sheets shipped that way: they claimed
+#    [1,2,4,8] while `full/166,235` sat in the bucket answering 200, so the
+#    renderer clamped a level down and pulled a 2x2 grid where one tile would
+#    have done. The same check is spelled again in
+#    `work/ocr/scripts/fix_info_scalefactors.py`; change either and change both.
+#
+#    This runs before the full/200, 400, 800 thumbnails below, but it still
+#    tests the exact `w,h` name rather than `full/` itself — a re-tile over an
+#    existing directory would otherwise find those thumbnails and keep a level
+#    dzsave had not written.
 MAP_DIR="$OUTPUT_DIR/$MAP_ID"
 if [[ -f "$MAP_DIR/info.json" ]]; then
   W=$(jq -r '.width' "$MAP_DIR/info.json")
@@ -110,11 +126,16 @@ if [[ -f "$MAP_DIR/info.json" ]]; then
   KEPT=$(for sf in $(jq -r '.tiles[0].scaleFactors[]' "$MAP_DIR/info.json"); do
            span=$((256 * sf))
            tw=$(( span < W ? span : W )); th=$(( span < H ? span : H ))
-           # `|| true` because the last factor is the one dzsave never writes:
-           # its failing test is the pipeline's exit status under pipefail, so
+           # Sizes round up, per axis, independently — same rule the worker's
+           # `widthOnlySizeToExplicit` has to reproduce.
+           cw=$(( (W + sf - 1) / sf )); ch=$(( (H + sf - 1) / sf ))
+           # `|| true` because a factor genuinely absent is the normal case here
+           # and its failing test is the pipeline's exit status under pipefail:
            # without this the KEPT assignment fails and set -e kills the script
            # right here, silently, on every map.
-           { [[ -d "$MAP_DIR/$tw,$th" || -d "$MAP_DIR/0,0,$tw,$th" ]] && echo "$sf"; } || true
+           { [[ -d "$MAP_DIR/$tw,$th" || -d "$MAP_DIR/0,0,$tw,$th" ]] ||
+             { (( span >= W && span >= H )) && [[ -d "$MAP_DIR/full/$cw,$ch" ]]; }
+           } && echo "$sf" || true
          done | jq -sc '.')
   if [[ "$KEPT" != "[]" ]]; then
     echo "→ Advertised scale factors trimmed to $KEPT"
