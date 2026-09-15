@@ -6,19 +6,34 @@
   The header is now the still frame; this section is where the map actually
   plays, and it costs nothing until the reader scrolls it into view.
 
-  Three gates, cheapest first:
-    1. the still image is the section's own content — it renders with the page,
-    2. `isMeteredConnection()` means the live map is never fetched at all,
-    3. otherwise an IntersectionObserver fetches the chunk 400px early.
+  What plays by default is a **clip**, not the map. The section's claim is a
+  sheet arriving over the city, and a reader who never got OpenLayers — metered,
+  WebGL refused, gone before ~600 kB of map arrived — used to see one frozen
+  frame of the end state and none of the movement. `scripts/gen-hero-video.mjs`
+  records the real section, so the clip is the same four beats: 699 kB at
+  1200px, 298 kB at 800px, against ~179 kB of JavaScript plus ~390 kB of basemap
+  before OL draws a tile. Cheaper than what it stands in for, and it moves.
+
+  The live map is the **upgrade**, behind a button, because the clip cannot do
+  the two things the copy promises — the Today/1882 slider and ⌘-scroll zoom.
+  Ask for it and the section is exactly what it was before.
+
+  Four gates, cheapest first:
+    1. the poster is the section's own content — it renders with the page,
+       and it is frame 0 of the clip, so the two cannot disagree,
+    2. `prefers-reduced-motion` or `isMeteredConnection()` stops at the poster,
+    3. otherwise an IntersectionObserver fetches the clip 400px early,
+    4. the live map is fetched only when the reader asks for it.
 
   **Loading early and playing early are not the same thing**, and they used to
-  share one trigger. The chunk, the basemap tiles and the warped sheet are all
-  worth fetching before the reader arrives — that is the whole point of the
-  400px of lead. The four beats are not: on a laptop the stage was still below
-  the fold while the sequence played to nobody, and the reader scrolled down
-  into a composed frame having missed the sheet coming over the city, which is
-  the one thing the section exists to show. So there are two observers now: one
-  with the lead, for loading, and one at the real viewport edge, for playing.
+  share one trigger. The bytes are worth fetching before the reader arrives —
+  that is the whole point of the 400px of lead. The beats are not: on a laptop
+  the stage was still below the fold while the sequence played to nobody, and
+  the reader scrolled down into a composed frame having missed the sheet coming
+  over the city, which is the one thing the section exists to show. So there are
+  two observers: one with the lead, for loading, and one at the real viewport
+  edge, for playing. The clip is held at frame 0 until the second one fires, for
+  the same reason.
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
@@ -32,40 +47,79 @@
   export let slug: string | null = null;
   /** The sheet's bbox and the angle to hold it at — passed straight to `HeroMap`. */
   export let view: { bbox: [number, number, number, number]; rotation: number };
-  /** The still frame of the same sheet, used as the header image too. */
-  export let still: string;
   /**
-   * Its `srcset`. The header offers the same pair, so a phone that has already
-   * fetched the 800px cut up there reuses it here — without this the poster
-   * asks for the 1600 and the small header image was a saving on paper only.
+   * The clip, wide cut and phone cut, and the poster it opens on. All four come
+   * out of `scripts/gen-hero-video.mjs` in one pass, so the poster is literally
+   * the clip's first frame — which is what keeps the still and the moving
+   * picture on the same camera. The header's own stills are a pinned close-up
+   * kept on purpose and are deliberately not reused here.
    */
-  export let stillSrcset: string | undefined = undefined;
+  export let video: string;
+  export let videoSmall: string;
+  export let poster: string;
+  export let posterSrcset: string | undefined = undefined;
 
   let HeroMap: typeof import('$lib/features/explore/HeroMap.svelte').default | null = null;
   let stage: HTMLElement;
+  let clip: HTMLVideoElement | undefined;
 
   /**
-   * True once the stage is genuinely on screen. The map mounts and warms its
-   * tiles before this; only the beats wait for it.
+   * True once the stage is genuinely on screen. The clip is fetched and the map
+   * warms its tiles before this; only the beats wait for it.
    */
   let playing = false;
 
   /**
    * True once the live map has drawn a complete frame. Until then the poster is
-   * the only thing in the stage; after it, the poster is a second, differently
-   * framed copy of the same survey sitting behind a live one, so it goes.
+   * the only thing in the stage; after it, the poster is a second copy of the
+   * same survey sitting behind a live one, so it goes. Same job as `rolling`
+   * below, for the other of the two things that can fill the stage.
    */
   let painted = false;
+  /** True once the clip has actually put a frame up. */
+  let rolling = false;
+  /** The chosen cut, once the section is near enough to be worth fetching. */
+  let clipSrc = '';
+  /** True once the reader has asked for the map the clip stands in for. */
+  let wantsMap = false;
   /** The sheet's opacity once the reader takes the slider; null until then. */
   let overlayOpacity: number | null = null;
   /** True once the sequence has had its say. The slider waits for it. */
   let settled = false;
 
-  onMount(() => {
-    if (isMeteredConnection()) return;
+  /**
+   * Start the clip once there is both a clip and a reason to.
+   *
+   * The two observers can fire in the same tick — a section already near the
+   * fold on load intersects both — and then `playing` is set before Svelte has
+   * rendered the `<video>` that `bind:this` fills, so calling `play()` from
+   * inside the observer reached `undefined` and the poster sat there over a
+   * loaded, paused clip. Here both are known.
+   *
+   * Muted, `playsinline`, and only after the reader has scrolled to it, so no
+   * autoplay policy has anything to object to. A refusal is not worth
+   * surfacing: the poster is already the composed frame.
+   */
+  $: if (playing && clip && !rolling) clip.play().catch(() => {});
 
+  /** The live map, fetched only on the reader's say-so. */
+  function openMap() {
+    wantsMap = true;
+    import('$lib/features/explore/HeroMap.svelte').then((m) => (HeroMap = m.default));
+  }
+
+  onMount(() => {
+    // Both are reasons to stop at the poster: one is the reader's stated
+    // preference, the other their data plan. Neither wants 300-700 kB of
+    // scenery, and the poster is the composed frame either way.
+    const still =
+      isMeteredConnection() || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) return;
+
+    // `<video>` has no `srcset`, so the cut is chosen here. The breakpoint is
+    // the stage's own: below it the wide cut is pixels the screen cannot draw.
     const load = () => {
-      import('$lib/features/explore/HeroMap.svelte').then((m) => (HeroMap = m.default));
+      clipSrc = window.innerWidth <= 800 ? videoSmall : video;
     };
 
     // 400px of lead, a fixed distance rather than a share of the viewport: at
@@ -114,47 +168,61 @@
   </div>
 
   <div class="hero-demo-stage" bind:this={stage}>
-    <!-- The poster is the header's still: the finished frame, but at the older
-         pinned camera, since the header was left alone when the live map was
-         refitted to the whole sheet. So the map arriving over it is a cut
-         rather than a continuation. It is still what a metered reader keeps,
-         and still the right shape.
-
-         It comes down once the map has painted. It used to stay for good, and
-         because the two cameras disagree that left an enlarged 1882 sheet
-         behind a live map framed on the whole thing — visible through every
-         patch whose basemap tile had not landed yet, which on a slow
-         connection is most of the stage for several seconds. -->
-    {#if !painted}
+    <!-- Frame 0 of the clip, so the wait and the thing waited for are the same
+         picture. It comes down once either the clip or the map has put a frame
+         up; it used to stay for good, and since it was then the header's
+         close-up while this section frames the whole sheet, that left an
+         enlarged 1882 sheet behind a live map, showing through every patch
+         whose basemap tile had not landed. -->
+    {#if !rolling && !painted}
       <img
         class="hero-demo-still"
-        src={still}
-        srcset={stillSrcset}
+        src={poster}
+        srcset={posterSrcset}
         sizes="100vw"
         alt={$t(
           'The 1882 cadastral survey of Saigon laid over the modern city around the Charner canal'
         )}
-        width="1600"
-        height="900"
+        width="1200"
+        height="675"
         loading="lazy"
         decoding="async"
         out:fade={{ duration: 300 }}
       />
     {/if}
 
-    <svelte:component
-      this={HeroMap}
-      {mapId}
-      {view}
-      play={playing}
-      bind:overlayOpacity
-      bind:settled
-      bind:painted
-    />
+    <!-- Decorative: the captions burnt into it are the same four claims the
+         paragraph above makes, so a screen reader that skips this has lost
+         nothing. No `controls` — there is nothing to scrub, and the one real
+         control is the button below, which fetches the map. -->
+    {#if clipSrc && !wantsMap}
+      <video
+        class="hero-demo-clip"
+        bind:this={clip}
+        src={clipSrc}
+        muted
+        playsinline
+        preload="auto"
+        aria-hidden="true"
+        on:playing={() => (rolling = true)}
+      ></video>
+    {/if}
 
-    {#if settled}
-      <div class="hero-controls" transition:fade={{ duration: 400 }}>
-        <label class="hero-fade">
+    {#if wantsMap}
+      <svelte:component
+        this={HeroMap}
+        {mapId}
+        {view}
+        play={playing}
+        bind:overlayOpacity
+        bind:settled
+        bind:painted
+      />
+    {/if}
+
+    <div class="hero-controls">
+      {#if wantsMap && settled}
+        <label class="hero-fade" transition:fade={{ duration: 400 }}>
           <span>{$t('Today')}</span>
           <input
             type="range"
@@ -173,8 +241,13 @@
              `.ol-viewport` sets `touch-action: pan-y` so a swipe scrolls the
              page rather than panning the map. -->
         <p class="hero-hint">{$t('⌘ / Ctrl + scroll to zoom · drag to move')}</p>
-      </div>
-    {/if}
+      {:else if !wantsMap}
+        <!-- The clip's whole cost is that it cannot be touched. This is where
+             the reader buys that back, and it is the only thing on the page
+             that fetches OpenLayers. -->
+        <button class="btn" on:click={openMap}>{$t('Try it yourself')}</button>
+      {/if}
+    </div>
   </div>
 
   <p>
@@ -204,7 +277,11 @@
     background: var(--color-bg);
   }
 
-  .hero-demo-still {
+  /* The clip sits in the same box as the poster it opens on, so the handover
+     is a cross-fade in place rather than a jump. `cover` on both, because the
+     stage turns 3/4 on a phone while the recording stays 16:9. */
+  .hero-demo-still,
+  .hero-demo-clip {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -223,11 +300,18 @@
     bottom: 1rem;
     transform: translateX(-50%);
     z-index: 4;
+    /* Empty between the clip ending and the reader asking for the map, and an
+       empty flex column still takes its gap. */
+    pointer-events: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.35rem;
     max-width: calc(100% - 2rem);
+  }
+
+  .hero-controls > * {
+    pointer-events: auto;
   }
 
   .hero-fade {

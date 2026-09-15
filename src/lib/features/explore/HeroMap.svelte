@@ -173,7 +173,6 @@
   let watchingPaint = false;
   $: if (olMap && !watchingPaint) {
     watchingPaint = true;
-    // eslint-disable-next-line svelte/infinite-reactive-loop
     olMap.once('rendercomplete', () => (painted = true));
   }
 

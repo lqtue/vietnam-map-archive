@@ -99,6 +99,7 @@ export const vi: Record<string, string> = {
   'All sheets in this survey': 'Tất cả bản đồ trong bộ này',
   '⌘ / Ctrl + scroll to zoom · drag to move': '⌘ / Ctrl + lăn chuột để phóng to · kéo để di chuyển',
   'How much of the 1882 sheet to show': 'Tỷ lệ hiển thị bản đồ năm 1882',
+  'Try it yourself': 'Tự trải nghiệm',
   'Imagery © Esri, Maxar, Earthstar Geographics · Sheet: Plan Cadastral de Saïgon, 1882':
     'Hình ảnh © Esri, Maxar, Earthstar Geographics · Bản đồ: Plan Cadastral de Saïgon, 1882',
   'The Catalog': 'Danh mục bản đồ',

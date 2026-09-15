@@ -95,13 +95,31 @@
   const HERO_1882 = '/images/hero-1882.webp';
 
   /**
+   * The demo section's own assets, which are **not** the header's. These come
+   * out of `scripts/gen-hero-video.mjs`, which records the live section — so
+   * they are the wide camera the section actually uses, and the poster is the
+   * clip's own first frame. Handing the section `HERO_1882` instead is what put
+   * an enlarged sheet behind the live map: that still is the pinned close-up,
+   * kept deliberately for the header above and wrong for the section below.
+   */
+  const HERO_CLIP = '/video/hero-demo.mp4';
+  const HERO_CLIP_SMALL = '/video/hero-demo-800.mp4';
+  const HERO_CLIP_POSTER = '/video/hero-demo-poster.webp';
+
+  /**
    * The header image is full-bleed, so a 390px phone was being handed the whole
    * 1600px frame — 331 kB for the pair, a third of the front page at rest, most
    * of it pixels the screen cannot draw. `gen-hero-still.mjs` writes an 800px
    * cut beside each one; this is the naming convention, in the one place that
    * needs to know it.
+   *
+   * `wide` because the two shoots do not agree on it: the stills are 1600 and
+   * the clip's poster is 1200, which is the width its own recording is encoded
+   * at. Declaring the poster as 1600w would have the browser pick it for a
+   * screen it cannot fill.
    */
-  const twoCuts = (src: string) => `${src.replace('.webp', '-800.webp')} 800w, ${src} 1600w`;
+  const twoCuts = (src: string, wide = 1600) =>
+    `${src.replace('.webp', '-800.webp')} 800w, ${src} ${wide}w`;
 
   /**
    * How much of the 1882 sheet the header shows: 1 is the sheet, 0 is the
@@ -560,8 +578,10 @@
       mapId={HERO_SHEET.id}
       slug={HERO_SHEET.slug}
       view={HERO_SHEET.view}
-      still={HERO_1882}
-      stillSrcset={twoCuts(HERO_1882)}
+      video={HERO_CLIP}
+      videoSmall={HERO_CLIP_SMALL}
+      poster={HERO_CLIP_POSTER}
+      posterSrcset={twoCuts(HERO_CLIP_POSTER, 1200)}
     />
 
     <!-- ============ THE BAND ============

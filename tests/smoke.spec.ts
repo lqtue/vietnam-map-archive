@@ -67,19 +67,27 @@ test('the hero field hands its first keystrokes to the palette', async ({ page }
 
 /**
  * Loading the demo and playing it are two different triggers, and they used to
- * be one: the chunk loads 400px early, which meant the four beats also started
- * 400px early — off screen, to nobody, and the reader scrolled down into the
+ * be one: the bytes load 400px early, which meant the four beats also started
+ * 400px early — off screen, to nobody, and the reader scrolled down into a
  * composed frame having missed the sheet coming over the city.
  *
  * So this parks the page inside the preload lead but outside the viewport: the
- * canvas proves the map mounted, and no caption may have been spoken yet.
+ * clip proves the section loaded, and it must not have started.
+ *
+ * The third assertion is the one that keeps the front page cheap. What plays by
+ * default is a recording, not OpenLayers; the live map is fetched only when the
+ * reader asks for it. A canvas before that click means the section has gone
+ * back to shipping ~179 kB of JavaScript and ~390 kB of basemap to everyone who
+ * scrolls past.
  */
-test('the how-it-works demo loads early but plays only when scrolled to', async ({ page }) => {
+test('the how-it-works demo loads early, plays when scrolled to, and mounts no map until asked', async ({
+  page,
+}) => {
   await page.goto('/');
   await hydrated(page);
 
-  const caption = page.locator('.hero-caption p');
   const stage = page.locator('.hero-demo-stage');
+  const clip = page.locator('.hero-demo-clip');
 
   // The catalog above the section renders after its fetch, which moves the
   // stage down the page — scroll before that and the offset means nothing.
@@ -93,16 +101,26 @@ test('the how-it-works demo loads early but plays only when scrolled to', async 
     window.scrollTo(0, top - window.innerHeight - 200);
   });
 
-  // `.first()`: MapShell paints more than one canvas, and a bare locator on
-  // three of them is a strict-mode violation, not a wait.
-  await expect(stage.locator('canvas').first()).toBeAttached({ timeout: 12000 });
-  // Past the annotation load and the 3s paint cap, so a sequence that was
-  // going to start off screen has had every chance to.
-  await page.waitForTimeout(3500);
-  await expect(caption).toHaveCount(0);
+  await expect(clip).toBeAttached({ timeout: 12000 });
+  // Past the point where a clip that was going to start off screen would have.
+  await page.waitForTimeout(2000);
+  expect(await clip.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
 
   await stage.scrollIntoViewIfNeeded();
-  await expect(caption).toBeVisible({ timeout: 12000 });
+  await expect
+    .poll(async () => clip.evaluate((v: HTMLVideoElement) => v.currentTime > 0), {
+      timeout: 12000,
+    })
+    .toBe(true);
+
+  // Nothing has fetched OpenLayers yet.
+  await expect(stage.locator('canvas')).toHaveCount(0);
+
+  await stage.getByRole('button').click();
+  // `.first()`: MapShell paints more than one canvas, and a bare locator on
+  // three of them is a strict-mode violation, not a wait.
+  await expect(stage.locator('canvas').first()).toBeAttached({ timeout: 20000 });
+  await expect(page.locator('.hero-caption p')).toBeVisible({ timeout: 20000 });
 });
 
 test('catalog search returns maps', async ({ page }) => {
