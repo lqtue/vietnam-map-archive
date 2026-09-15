@@ -258,6 +258,22 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
   }
 
   // ── the queue ─────────────────────────────────────────────────────────────
+  // A failed job is only worth a line while its failure still stands. All four
+  // layout jobs that died on 2026-09-13 were re-queued within the hour and
+  // finished; the `failed` rows stay as history, and reporting them forever
+  // trains the reader to scroll past the section. So a failure is spent once a
+  // later job of the same kind on the same map reached `done`.
+  const succeededAfter = new Map();
+  for (const j of jobs) {
+    if (j.status !== 'done') continue;
+    const at = Date.parse(j.finished_at ?? j.updated_at ?? j.created_at);
+    const k = `${j.kind}|${j.map_id}`;
+    if (!(succeededAfter.get(k) >= at)) succeededAfter.set(k, at);
+  }
+  const supersededBy = (j) =>
+    succeededAfter.get(`${j.kind}|${j.map_id}`) >
+    Date.parse(j.finished_at ?? j.updated_at ?? j.created_at);
+
   for (const j of jobs) {
     if (j.map_id && !ids.has(j.map_id))
       say('FAIL', 'jobs', j.id, `job points at missing map ${j.map_id}`);
@@ -269,7 +285,7 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
         `${j.kind} ${j.map_id}`,
         `held in '${j.status}' for ${hours.toFixed(1)} h`
       );
-    if (j.status === 'failed' && j.attempts >= j.max_attempts)
+    if (j.status === 'failed' && j.attempts >= j.max_attempts && !supersededBy(j))
       say(
         'WARN',
         'jobs',
@@ -531,6 +547,54 @@ function selfCheck() {
     ),
     'a job out of retries is flagged'
   );
+
+  // A failure that a later run of the same kind already put right is history,
+  // not a finding. All four layout jobs that died on 2026-09-13 look like this.
+  ok(
+    !has(
+      auditCatalog({
+        maps: [good],
+        jobs: [
+          job({ id: 'j1', status: 'failed', attempts: 3, finished_at: '2026-09-14T10:00:00Z' }),
+          job({ id: 'j2', status: 'done', finished_at: '2026-09-14T12:00:00Z' }),
+        ],
+        now: NOW,
+      }),
+      'jobs',
+      'WARN'
+    ),
+    'a failure a later run put right is not flagged'
+  );
+  ok(
+    has(
+      auditCatalog({
+        maps: [good],
+        jobs: [
+          job({ id: 'j1', status: 'done', finished_at: '2026-09-14T10:00:00Z' }),
+          job({ id: 'j2', status: 'failed', attempts: 3, finished_at: '2026-09-14T12:00:00Z' }),
+        ],
+        now: NOW,
+      }),
+      'jobs',
+      'WARN'
+    ),
+    'a failure AFTER the last success still stands'
+  );
+  ok(
+    has(
+      auditCatalog({
+        maps: [good],
+        jobs: [
+          job({ id: 'j1', status: 'failed', attempts: 3, finished_at: '2026-09-14T10:00:00Z' }),
+          job({ id: 'j2', kind: 'ocr', status: 'done', finished_at: '2026-09-14T12:00:00Z' }),
+        ],
+        now: NOW,
+      }),
+      'jobs',
+      'WARN'
+    ),
+    'a success of a DIFFERENT kind does not clear it'
+  );
   ok(
     has(
       auditCatalog({ maps: [good], jobs: [job({ status: 'running' })], now: NOW }),
@@ -594,7 +658,7 @@ async function main() {
     readAll(
       db,
       'pipeline_jobs',
-      'id,map_id,kind,status,attempts,max_attempts,created_at,updated_at'
+      'id,map_id,kind,status,attempts,max_attempts,created_at,updated_at,finished_at'
     ),
   ]);
 
