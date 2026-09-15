@@ -59,7 +59,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 089** (088 is the last pushed to production; 089 is applied locally only). Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
+- **Migration head is 089**, pushed 2026-09-15. Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
   reason a collision takes the *year* rather than a counter: the header of `088_map_slug.sql`.
