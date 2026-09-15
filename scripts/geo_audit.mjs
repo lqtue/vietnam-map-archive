@@ -42,7 +42,27 @@ const VIETNAM = [100, 5, 112, 25];
 // the lattice is good to ~15 m, so anything in between is a safe line.
 const CELL_TOL = 150;
 // maps.bbox is derived from the annotation, so this is staleness, not truth.
-const BBOX_TOL = 50;
+//
+// Coarse on purpose, and 50 m until 2026-09-15. Two things were wrong with the
+// old number. It was measured against the GCP hull, which `maps.bbox` stopped
+// being in 929ecbf4 -- the column is now the warped extent of the sheet's mask,
+// so the check was comparing the row against a definition it no longer uses and
+// reported 39 sheets adrift by up to 359 km while every one of them was right.
+// And even corrected, the two values are not computed the same way: the backfill
+// pushes the mask through the map's own transform with each edge densified 24x,
+// while this file recovers a plain least-squares affine from the control points.
+// Measured over all 132 georeferenced maps on 2026-09-15, with the backfill
+// reporting `0 differ` -- so every residual below is this file's approximation,
+// not drift -- the gap was median 0.0 km, p90 0.1 km, max 3.8 km.
+//
+// 10 km is that worst case with room, and it still catches a bbox that points at
+// a different place. It cannot catch a subtler staleness and should not pretend
+// to: the exact, idempotent answer is
+//
+//     node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs --dry --force
+//
+// which recomputes every row the way the renderer does and must say `0 differ`.
+const BBOX_TOL = 10_000;
 
 // Lazy: --self-test runs the geometry with no database and no network, and a
 // client built at import time would demand credentials before it got there.
@@ -201,17 +221,19 @@ async function checkAnnotations(maps) {
         );
 
       // Copy against its source, so staleness only — bbox is computed FROM the
-      // annotation (scripts/oneoff/backfill_map_bbox.mjs) and is the GCP hull.
+      // annotation (scripts/oneoff/backfill_map_bbox.mjs) and is the warped
+      // extent of the sheet's mask, which is `drawn`. Comparing it with `hull`
+      // measures the gap between two different quantities and calls it drift.
       if (Array.isArray(m.bbox) && m.bbox.length === 4) {
         const off = Math.max(
-          ...boxCorners(m.bbox).map((p, i) => metres(p, boxCorners(ext.hull)[i]))
+          ...boxCorners(m.bbox).map((p, i) => metres(p, boxCorners(ext.drawn)[i]))
         );
         if (off > BBOX_TOL)
           say(
             'WARN',
             'bbox',
             where,
-            `maps.bbox is ${(off / 1000).toFixed(1)} km from the annotation's control-point hull — re-georeferenced since the backfill?`
+            `maps.bbox is ${(off / 1000).toFixed(1)} km from the sheet's warped extent — re-georeferenced since the backfill?`
           );
       }
     })
@@ -368,6 +390,18 @@ function selfTest() {
   ok(
     ext.hasMask && metres([ext.drawn[0], ext.drawn[1]], [ext.hull[0], ext.hull[1]]) > 1000,
     'the drawn paper is distinguished from the control-point hull'
+  );
+
+  // And which of the two the bbox check measures against. `maps.bbox` is the
+  // warped mask extent, so a correct row must measure ~0 -- against the hull the
+  // same correct row reads kilometres adrift, which is exactly the false alarm
+  // this check raised on 39 sheets until 2026-09-15.
+  const offFrom = (ref) =>
+    Math.max(...boxCorners(ext.drawn).map((p, i) => metres(p, boxCorners(ref)[i])));
+  ok(offFrom(ext.drawn) < BBOX_TOL, 'a bbox equal to the warped extent measures inside tolerance');
+  ok(
+    offFrom(ext.hull) > BBOX_TOL,
+    'the retired GCP-hull yardstick would have called that same bbox adrift'
   );
 
   console.log(`\nself-test: ${failed ? `${failed} failed` : 'all passed'}`);
