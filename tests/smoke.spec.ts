@@ -116,7 +116,15 @@ test('the how-it-works demo loads early, plays when scrolled to, and mounts no m
   // Nothing has fetched OpenLayers yet.
   await expect(stage.locator('canvas')).toHaveCount(0);
 
-  await stage.getByRole('button').click();
+  // The offer of the live map waits for the clip to finish. The clip burns its
+  // own captions along the bottom of the frame and the button sits in that same
+  // slot, so an offer made while it is still playing lands on top of "46 plots
+  // and waterways, traced by hand".
+  const tryIt = stage.getByRole('button', { name: /Try it yourself/ });
+  await expect(tryIt).toBeHidden();
+
+  await expect(tryIt).toBeVisible({ timeout: 20000 });
+  await tryIt.click();
   // `.first()`: MapShell paints more than one canvas, and a bare locator on
   // three of them is a strict-mode violation, not a wait.
   await expect(stage.locator('canvas').first()).toBeAttached({ timeout: 20000 });

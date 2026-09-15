@@ -78,6 +78,20 @@
   let painted = false;
   /** True once the clip has actually put a frame up. */
   let rolling = false;
+  /**
+   * True once the clip has had its say. The offer of the live map waits for it,
+   * for the same reason the slider waits for `settled`: the clip burns its own
+   * captions along the bottom of the frame, and a button in that slot sat on
+   * top of “46 plots and waterways, traced by hand” for the whole middle of
+   * the sequence.
+   */
+  let clipDone = false;
+  /**
+   * True when no clip will be fetched at all — reduced motion, or a metered
+   * connection. The offer cannot wait for a clip that is never coming, or the
+   * readers most likely to want a lighter page lose the only route to the map.
+   */
+  let posterOnly = false;
   /** The chosen cut, once the section is near enough to be worth fetching. */
   let clipSrc = '';
   /** True once the reader has asked for the map the clip stands in for. */
@@ -102,6 +116,9 @@
    */
   $: if (playing && clip && !rolling) clip.play().catch(() => {});
 
+  /** When there is something to offer and nothing already in the way. */
+  $: offerMap = !wantsMap && (clipDone || posterOnly);
+
   /** The live map, fetched only on the reader's say-so. */
   function openMap() {
     wantsMap = true;
@@ -112,9 +129,9 @@
     // Both are reasons to stop at the poster: one is the reader's stated
     // preference, the other their data plan. Neither wants 300-700 kB of
     // scenery, and the poster is the composed frame either way.
-    const still =
+    posterOnly =
       isMeteredConnection() || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (still) return;
+    if (posterOnly) return;
 
     // `<video>` has no `srcset`, so the cut is chosen here. The breakpoint is
     // the stage's own: below it the wide cut is pixels the screen cannot draw.
@@ -205,6 +222,7 @@
         preload="auto"
         aria-hidden="true"
         on:playing={() => (rolling = true)}
+        on:ended={() => (clipDone = true)}
       ></video>
     {/if}
 
@@ -241,11 +259,13 @@
              `.ol-viewport` sets `touch-action: pan-y` so a swipe scrolls the
              page rather than panning the map. -->
         <p class="hero-hint">{$t('⌘ / Ctrl + scroll to zoom · drag to move')}</p>
-      {:else if !wantsMap}
+      {:else if offerMap}
         <!-- The clip's whole cost is that it cannot be touched. This is where
              the reader buys that back, and it is the only thing on the page
              that fetches OpenLayers. -->
-        <button class="btn" on:click={openMap}>{$t('Try it yourself')}</button>
+        <button class="btn" on:click={openMap} transition:fade={{ duration: 400 }}>
+          {$t('Try it yourself')}
+        </button>
       {/if}
     </div>
   </div>
