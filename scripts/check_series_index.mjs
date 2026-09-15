@@ -53,6 +53,7 @@ import { createClient } from '@supabase/supabase-js';
 export function findDrift(sheets, maps, keyOf) {
   const byCell = new Map();
   const unresolved = new Set();
+  const claimed = [];
   for (const m of maps) {
     const n = m.extra_metadata?.sheet_number;
     if (!n || !m.collection) continue;
@@ -62,6 +63,7 @@ export function findDrift(sheets, maps, keyOf) {
       continue;
     }
     byCell.set(`${key}|${String(n)}`, m);
+    claimed.push({ map: m, key, cell: `${key}|${String(n)}`, sheet_number: String(n) });
   }
   const ids = new Set(maps.map((m) => m.id));
   const drift = [];
@@ -75,7 +77,31 @@ export function findDrift(sheets, maps, keyOf) {
     maps.map((m) => m.collection && keyOf(m.collection)).filter((k) => typeof k === 'string')
   );
   const orphanKeys = [...new Set(sheets.map((s) => s.series_key))].filter((k) => !known.has(k));
-  return { drift, dangling, unresolved: [...unresolved], orphanKeys };
+
+  // The typo, seen from the map's side. `sheet_number` is a free-text key in
+  // `extra_metadata` — no column, no index, no vocabulary — and six migrations
+  // plus two route queries join on it. Mistype one and nothing errors: the sheet
+  // drops out of the series page, out of the coverage denominator (mig 084) and
+  // out of `search_vector` (mig 046), while the map itself still looks fine.
+  // `drift` cannot see it, because drift walks the index and a typo is precisely
+  // a cell the index does not contain.
+  //
+  // Only for a survey the index actually covers. A collection whose sheets have
+  // not been imported yet would otherwise report every one of its maps, which is
+  // a loud way of saying nothing.
+  const indexed = new Set(sheets.map((s) => `${s.series_key}|${s.sheet_number}`));
+  const surveyed = new Set(sheets.map((s) => s.series_key));
+  const unindexed = claimed
+    .filter((c) => surveyed.has(c.key) && !indexed.has(c.cell))
+    .map((c) => ({
+      series_key: c.key,
+      sheet_number: c.sheet_number,
+      map: c.map.name,
+      status: c.map.status,
+      id: c.map.id,
+    }));
+
+  return { drift, dangling, unresolved: [...unresolved], orphanKeys, unindexed };
 }
 
 /**
@@ -152,6 +178,39 @@ function selfCheck() {
   const orphan = [{ series_key: 'k', sheet_number: '1', held_by: 'map', map_id: 'gone' }];
   if (findDrift(orphan, maps, keyOf).dangling.length !== 1)
     throw new Error('a map_id with no row must be dangling');
+
+  // ── The typo, from the map's side ────────────────────────────────────────
+  // `m1` claims 6330-4. An index that covers the survey but not that cell means
+  // someone mistyped the sheet number, and every join on it silently misses.
+  const elsewhere = [
+    {
+      series_key: 'series-l7014-vietnam-1-50-000',
+      sheet_number: '6330-1',
+      held_by: 'map',
+      map_id: 'other',
+    },
+  ];
+  if (findDrift(elsewhere, maps, keyOf).unindexed.length !== 1)
+    throw new Error('a sheet_number the index does not contain must be unindexed');
+
+  if (findDrift(fixed, maps, keyOf).unindexed.length !== 0)
+    throw new Error('a sheet_number the index does contain must not be unindexed');
+
+  // A survey with no rows in the index at all is not yet imported. Reporting
+  // every one of its maps would be a loud way of saying nothing.
+  if (findDrift([], maps, keyOf).unindexed.length !== 0)
+    throw new Error('an unimported survey must not report its maps as unindexed');
+
+  // Multiple printings of one cell are correct and must stay silent: a full
+  // sheet and its two halves, and two years of the same sheet, all share a
+  // sheet_number. 70 of the archive's 103 cells look like this.
+  const printings = [
+    { ...maps[0], id: 'p1', extra_metadata: { sheet_number: '6330-4', sheet_half: 'E' } },
+    { ...maps[0], id: 'p2', extra_metadata: { sheet_number: '6330-4', sheet_half: 'W' } },
+    { ...maps[0], id: 'p3', extra_metadata: { sheet_number: '6330-4' } },
+  ];
+  if (findDrift(fixed, printings, keyOf).unindexed.length !== 0)
+    throw new Error('several printings of one indexed cell must not be unindexed');
 
   // ── Parity with the database's own `series_key()` ────────────────────────
   // The bug: this file folded `Thanh Hóa` to `thanh-h-a` while the index was
@@ -248,18 +307,25 @@ async function main() {
     console.log(`${k}: ${rows.filter((r) => r.held_by).length} held / ${rows.length}`);
   }
 
-  const { drift, dangling, unresolved, orphanKeys } = findDrift(sheets, maps, keyOf);
+  const { drift, dangling, unresolved, orphanKeys, unindexed } = findDrift(sheets, maps, keyOf);
   for (const d of drift)
     console.log(`DRIFT   ${d.series_key} ${d.sheet_number} -> ${d.map} [${d.status}]`);
   for (const d of dangling)
     console.log(`DANGLING ${d.series_key} ${d.sheet_number} -> ${d.map_id}`);
   for (const c of unresolved) console.log(`UNRESOLVED collection with sheet numbers: ${c}`);
   for (const k of orphanKeys) console.log(`ORPHAN KEY  ${k} — no maps.collection produces it`);
+  for (const u of unindexed)
+    console.log(
+      `UNINDEXED ${u.series_key} ${u.sheet_number} -> ${u.map} [${u.status}] ${u.id} — ` +
+        'no such cell in the index, so every join on it misses'
+    );
   console.log(
-    `\n${drift.length} adrift, ${dangling.length} dangling, over ${sheets.length} sheets.`
+    `\n${drift.length} adrift, ${dangling.length} dangling, ${unindexed.length} unindexed, ` +
+      `over ${sheets.length} sheets.`
   );
-  if (drift.length || dangling.length || unresolved.length) {
+  if (drift.length || dangling.length || unresolved.length || unindexed.length) {
     console.log('Re-run the survey importer for that series, or mark the cell held by hand.');
+    console.log('An UNINDEXED line is usually a mistyped extra_metadata.sheet_number.');
     process.exit(1);
   }
 }
