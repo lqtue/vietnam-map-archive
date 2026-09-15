@@ -16,7 +16,7 @@ human-reviewed before anything is published.
 
 Version history: **[maparchive.vn/changelog](https://maparchive.vn/changelog)**
 in plain language, [`CHANGELOG.md`](CHANGELOG.md) with the engineering detail.
-Currently **7.0**.
+Currently **7.4**.
 
 ---
 
@@ -25,7 +25,7 @@ Currently **7.0**.
 - **Stack sheets over the modern city** — up to ten georeferenced maps at once, each with its own opacity, in three display modes: Stacked, Lens and Side-by-side.
 - **Search inside the maps** — one search box over the catalogue, the gazetteer of attested place names, and the labels read off the sheets themselves. A label hit opens the map at the spot.
 - **A page per place name** — every spelling a place was printed under, grouped, with the sheets that carry it.
-- **Read the names off a sheet** — a triage pass a person accepts, then Gemini Flash over IIIF tiles, then row-by-row human review. Nothing published is unreviewed.
+- **Read the names off a sheet** — a prepare pass a person accepts, then Gemini Flash over IIIF tiles, then row-by-row human review. Nothing published is unreviewed.
 - **Trace what is drawn on it** — buildings, roads and waterways, by hand or seeded from a fine-tuned SAM2, both ending in the same review queue.
 - **Tell a story on the map** — author a route with stops and text, publish it, play it back at `/trip/<id>` (which is what printed QR codes point at).
 - **Find more maps** — Scout crawls external IIIF collections (BnF Gallica, David Rumsey, Humazur, AGS Library…) and surfaces candidates for one-click import.
@@ -48,7 +48,7 @@ live archive read-only. Writes need the local stack (below).
 ```bash
 npm run check        # type-check — the primary gate, kept at 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
-npm run test         # 169 tests: 10 read-only Playwright smokes + 159 pure checks
+npm run test         # 354 tests: 18 read-only Playwright smokes + 336 pure checks
 npm run db:test      # start a local Supabase stack and seed it
 npm run test:write   # write-path smokes, local stack only — refuses a non-loopback URL
 ```
@@ -66,7 +66,7 @@ to spend money.
 Two map surfaces, and every tool is a mode of one of them:
 
 - **`/explore`** — the geographic surface. One OpenLayers map owned by `MapShell`, warped historical sheets over a self-hosted vector basemap. Modes: `browse`, `studio`, `story`.
-- **`/scan`** — the pixel surface. `ImageShell` over a IIIF canvas, for work in a scan's own coordinates. Modes: `inspect`, `triage`, `trace`, `review`.
+- **`/scan`** — the pixel surface. `ImageShell` over a IIIF canvas, for work in a scan's own coordinates. Modes: `prepare`, `text`, `shapes`, and the unlisted `inspect`. The names they shipped under — `triage`, `ocr`, `trace`, `review` — still resolve, because they are in bookmarks and in links already sent.
 
 Modes are query parameters rather than routes on purpose: the map, the basemap
 and the warped tiles stay loaded across a mode change instead of being torn down
@@ -89,10 +89,11 @@ feature only through a declared seam.
 | --- | --- |
 | `/` | The archive's front page: a slider between 1882 and today, featured sheets, and a live demo of the pipeline further down |
 | `/catalog` | Faceted catalogue with full-text search; inline map editing for staff |
-| `/catalog/[id]` | One sheet's share page, server-rendered for crawlers and link previews |
+| `/catalog/<slug>` | One sheet's record page: the full tiled scan plus its title, date and places, server-rendered for crawlers and link previews. Addressed by name since migration 088; a uuid and every retired slug 301 here |
 | `/catalog/place/[name]` | The gazetteer: one page per attested place name |
-| `/explore` | The map viewer — browse, annotate (Studio), author stories |
-| `/scan` | The scan viewer — inspect, triage, trace, review |
+| `/catalog/series`, `/catalog/series/[key]`, `/catalog/series/[key]/[number]` | A survey as one thing: every series, one series' index, and a page for each sheet it contains — held or not |
+| `/explore` | The map viewer — browse, studio, author stories. `?mode=annotate` is the name Studio shipped under and still resolves |
+| `/scan` | The scan viewer — prepare, text, shapes (and the unlisted inspect) |
 | `/trip/[id]` | Story playback |
 | `/contribute` | How to help |
 | `/contribute/georef` | Georeference a sheet in the Allmaps Editor |
@@ -147,8 +148,8 @@ credentials** — claiming a job and reporting its results both go through
 `/api/pipeline/*`. It takes whatever kinds the machine can run, so a worker left
 running finishes what publishing enqueued.
 
-- **OCR** — `work/ocr/`, its own venv. Gemini Flash over IIIF tiles into `ocr_extractions`, reviewed at `/scan?mode=triage`. Prompt changes are gated on a measured quality baseline, not on how the output looks: `work/ocr/EVAL-BASELINE.md`.
-- **Segmentation** — `work/MapSAM2/`, a fine-tuned SAM2 fork. Runs on Colab, where the GPU is, using the same worker with `--kinds seg`. Polygons land in `footprint_submissions` and are reviewed at `/scan?mode=review`.
+- **OCR** — `work/ocr/`, its own venv. Gemini Flash over IIIF tiles into `ocr_extractions`, proposed and accepted at `/scan?mode=prepare`, then checked row by row at `/scan?mode=text`. Prompt changes are gated on a measured quality baseline, not on how the output looks: `work/ocr/EVAL-BASELINE.md`.
+- **Segmentation** — `work/MapSAM2/`, a fine-tuned SAM2 fork. Runs on Colab, where the GPU is, using the same worker with `--kinds seg`. Polygons land in `footprint_submissions` and are validated at `/scan?mode=shapes`.
 
 The two meet on one full-image pixel grid, which is what lets an OCR label be
 joined to the shape it names.
@@ -195,7 +196,7 @@ written for both people and coding agents. Then:
 | `docs/api.md` | Every server route, its auth class, its contract |
 | `docs/deploy.md` | Cloudflare Pages, and the ten dead builds behind each rule |
 | `docs/design-system.md` | Tokens, the CSS file map, the page template |
-| `docs/digitalize-guide.md` | Operator guide for triage — including the failure modes that return plausible output while dropping data |
+| `docs/digitalize-guide.md` | Operator guide for `/scan?mode=prepare` — including the failure modes that return plausible output while dropping data |
 | `docs/pipelines.md` | OCR + MapSAM2 commands, and what not to re-attempt |
 | `docs/admin-tooling.md` | Map editing, bulk upload, Scout, the R2 worker |
 | `docs/time-machine-plan.md`, `docs/platform-design.md` | The temporal-fabric plan; the shared-platform proposal |

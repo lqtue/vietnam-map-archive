@@ -25,7 +25,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (351 tests)
+npm run test         # Playwright smoke suite, read-only (354 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (31 tests)
@@ -35,7 +35,7 @@ npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 
 `npm run test` starts a dev server on 5173, or reuses one already running. It runs eighteen read-only
 browser checks — twelve in `tests/smoke.spec.ts`, six in `tests/catalog-series.spec.ts` (they hit
-the real Supabase project but never write) — plus 333 browser-less pure checks riding the same
+the real Supabase project but never write) — plus 336 browser-less pure checks riding the same
 runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
 see `supabase/CLAUDE.md`.
@@ -59,7 +59,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 088.** Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
+- **Migration head is 089** (088 is the last pushed to production; 089 is applied locally only). Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
   reason a collision takes the *year* rather than a counter: the header of `088_map_slug.sql`.
@@ -92,7 +92,7 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/architecture.md` — **the map runtime**, unabridged: MapShell/ImageShell, the stores, route groups, the /explore rails, the contribute tools, the PMTiles basemap, the series layers
 - `docs/db-guidelines.md` — schema conventions; all migrations must follow these
 - `docs/conventions.md` — the reasoning behind the one-line rules: fonts, the gazetteer key, the generated types, the realtime stub, the component/theme vocabulary
-- `docs/testing.md` — what each of the 351 tests pins, and the failure it exists to catch
+- `docs/testing.md` — what each of the 354 tests pins, and the failure it exists to catch
 - `docs/system-guidelines.md` — layering rule, page structure, component patterns, route map, and §11 the live debt table
 - `docs/design-system.md` — tokens, the CSS file map, the page template
 - `docs/api.md` — every server route, its auth class and its contract
@@ -105,7 +105,8 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route, warped sheets as a year slider, and the frozen-JSON seam between the two apps
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared and what stays per-app
 - `docs/strategy.md` (funder-facing), `docs/theory.md`, `docs/user-guide.md` — vision and outward-facing prose, not engineering reference. `docs/journals/` holds dated research notes (`YYMMDD-slug.md`)
-- `docs/ponytail-debt.md` — ledger of `ponytail:` shortcut comments. The plugin that generated it is gone (Sept 2026); maintain it by hand or `grep -rn 'ponytail:' src/ work/ scripts/`
+- `docs/allmaps.md` — the Allmaps relationship: findings, and the drafts of everything we send upstream, updated in place
+- `docs/ponytail-debt.md` — ledger of `ponytail:` shortcut comments. The plugin that generated it is gone (Sept 2026); maintain it by hand with the grep at the top of that file (scope: `src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts`)
 - `docs/archive/` — frozen: historical plans, personal application material, the August 2026 cleanup record. Do not cite as current; the live debt table is `docs/system-guidelines.md` §11
 - `contracts/` — JSON Schemas for the shapes VMA shares with other apps (`context`, `label-hit`, `footprint-feature`); checked by `tests/schemaCheck.ts`
-- `CHANGELOG.md` — version history, 1.0 (Apr 2025, one `index.html`) to **7.0** (current). The numbers continue the ones the commits already used, so the SvelteKit rewrite is 3.x; the number moves on a structural change, not a build. **Its public twin is `/changelog`**, whose source is `src/routes/(editorial)/changelog/releases.ts` — plain language, shorter, a different audience. Nothing generates one from the other: add a release to both
+- `CHANGELOG.md` — version history, 1.0 (Apr 2025, one `index.html`) to **7.4** (current). The numbers continue the ones the commits already used, so the SvelteKit rewrite is 3.x; the number moves on a structural change, not a build. **Its public twin is `/changelog`**, whose source is `src/routes/(editorial)/changelog/releases.ts` — plain language, shorter, a different audience. Nothing generates one from the other: add a release to both

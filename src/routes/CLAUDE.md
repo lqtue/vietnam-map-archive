@@ -21,7 +21,7 @@ and `paletteDestinations.ts`.
 |-------|---------|--------|
 | `/explore` | MapShell dispatcher | `src/routes/(app)/explore/` |
 | `/explore?mode=browse` | Browse maps, play stories | `src/lib/features/explore/ExplorePage.svelte` |
-| `/explore?mode=annotate` | Free-form annotation + timeline animation | `src/lib/features/annotate/` |
+| `/explore?mode=studio` | Free-form annotation + timeline animation. `?mode=annotate` is the name it shipped under and is aliased, not redirected (`MODE_ALIASES` in `(app)/explore/+page.svelte`) — the dispatcher only ever matches `studio` | `src/lib/features/annotate/` |
 | `/explore?mode=story` | Author stories | `src/lib/features/stories/editor/` |
 | `/scan` | ImageShell dispatcher | `src/routes/(app)/scan/` |
 | `/scan?mode=inspect` | IIIF viewer, unlisted — the plain look at a **draft** scan | `src/lib/features/contribute/inspect/` |
@@ -31,7 +31,10 @@ and `paletteDestinations.ts`.
 | `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
 | `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
 | `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |
+| `/catalog/place/[name]` | The gazetteer: one page per attested place name | `src/routes/(editorial)/catalog/place/[name]/` |
 | `/catalog/series` | Every survey, and how much of each is held | `src/routes/(editorial)/catalog/series/` |
+| `/catalog/series/[key]` | One survey: its coverage and every sheet it contains, held or not | `src/routes/(editorial)/catalog/series/[key]/` |
+| `/catalog/series/[key]/[number]` | One sheet of a survey — including the ones the archive does not hold | `src/routes/(editorial)/catalog/series/[key]/[number]/` |
 | `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
 | `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
 
