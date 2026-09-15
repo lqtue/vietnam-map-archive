@@ -92,7 +92,7 @@ this whether a row contradicts the rest of its own table.
 
 | check | level |
 |---|---|
-| a georeference that is only a locally-minted `allmaps_id` (`publishTrap`) | FAIL if published, WARN if draft |
+| published but not yet georeferenced — live, and drawing nothing yet | WARN |
 | `status` outside `draft`/`public`/`featured`; published with no annotation or no `iiif_image` | FAIL |
 | published with no bbox, thumbnail, year, `holding_institution` or `source_url` | WARN |
 | empty or duplicate `slug`; a slug that is both canonical and an alias; an alias pointing at a deleted map | FAIL |
@@ -105,15 +105,29 @@ this whether a row contradicts the rest of its own table.
 | a published map with no non-r2 IIIF source, so the Allmaps Editor cannot open it | WARN |
 | a job out of retries, held past 3 h, or pointing at a deleted map | WARN / FAIL |
 
-**`publishTrap` is why this file exists.** `allmaps_id` is a SHA-1 of the
-canonical IIIF URL, minted locally by `bulk_upload_local.sh` — the id the image
-*would* have, computed whether or not a single control point exists. Migration
-062 gates publishing on `annotation_url is not null or allmaps_id is not null`,
-so a bulk-uploaded sheet satisfies the constraint on the strength of a hash of
-its own URL. Twenty-one L7014 drafts are in that state today, every one a 404 at
-Allmaps, each publishable into a map that draws nothing. The database cannot
-tell the difference and neither can the API; this can, because `georef_done` is
-false on all of them.
+**What it deliberately does not report.** A map carrying `allmaps_id` with
+`georef_done` false reads like a fault: the id is a SHA-1 of the canonical IIIF
+URL, minted locally by `bulk_upload_local.sh` whether or not a control point
+exists, and migration 062 gates publishing on `annotation_url is not null or
+allmaps_id is not null` — so on paper a sheet satisfies the gate with a hash of
+its own URL. This file called that a finding, over 21 L7014 drafts, until the
+code that consumes the pair turned up.
+
+It is a **work queue**. `POST /api/admin/maps/sync-georef` selects exactly
+`allmaps_id is not null and georef_done = false`, probes
+annotations.allmaps.org and flips `georef_done` on a hit; the admin *Sync georef
+from Allmaps* button is its trigger. The id is how the archive remembers a sheet
+is uploaded and waiting for someone to place control points. Clearing it, or not
+writing it at upload, would empty the queue — a volunteer's georeference would
+arrive and nothing would ever notice. Publishing on the strength of it is
+deliberate too: mig 080 exists *because* georeferencing usually happens after
+publishing, and `tests/write.spec.ts:596` pins that path.
+
+So the count prints as status, not as a finding, and whether those annotations
+resolve is a network question — `geo_audit.mjs`, which already reports each one
+as `annotation HTTP 404`. The lesson is the general one: a column that looks
+like stale data may be the state another process is waiting on. Find the
+consumer before calling it a fault.
 
 **No bbox size heuristic, on purpose.** A sheet-sized box and a regional one
 differ by three orders of magnitude and both are correct; every threshold tried
@@ -126,11 +140,12 @@ must pass beside it — 28 cases, no database. A checker that only ever runs
 against a healthy archive reports the same thing whether it works or not, which
 is how `check_series_index` once reported clean over 79 sheets it could not see.
 
-**Reading today's run (15 Sept 2026).** 274 maps, 131 published, **0 fail, 74
-warn**: 21 `publishTrap` drafts, 24 published maps the Allmaps Editor cannot be
-opened on, 13 with no `holding_institution` and 3 with no `source_url`, 6 layout
-jobs out of retries, 5 `year`/`year_label` disagreements, one holder spelled two
-ways (Perry-Castañeda, word order), and the duplicate Huế pair.
+**Reading today's run (15 Sept 2026).** 274 maps, 131 published, **0 fail, 53
+warn**: 24 published maps the Allmaps Editor cannot be opened on, 13 with no
+`holding_institution` and 3 with no `source_url`, 6 layout jobs out of retries, 5
+`year`/`year_label` disagreements, one holder spelled two ways (Perry-Castañeda,
+word order), and the duplicate Huế pair. Plus a status line: **21 maps queued for
+georeferencing**, which is the sync button's backlog, not a fault.
 
 **What it does not cover.** The 63 Indochine sheets carry sheet numbers but no
 lattice index, so nothing checks their position; and the "held twice" check

@@ -19,15 +19,24 @@
  * and the first audit it was written for (2026-09-15, 274 maps) found four
  * things no existing check looked at.
  *
- * The one worth stating up front is `publishTrap`. `allmaps_id` is a SHA-1 of
- * the canonical IIIF URL, minted locally by `bulk_upload_local.sh` — it is the
- * id the image *would* have, computed whether or not a single control point
- * exists. Migration 062 gates publishing on `annotation_url is not null or
- * allmaps_id is not null`, so a bulk-uploaded sheet satisfies the constraint on
- * the strength of a hash of its own URL. Twenty-one L7014 drafts were in that
- * state, every one 404 at Allmaps, each one publishable into a map that draws
- * nothing. The database cannot tell the difference and neither can the API;
- * this can, because `georef_done` is false on all of them.
+ * What this deliberately does NOT report: a map carrying `allmaps_id` with
+ * `georef_done` false. It reads like a fault — the id is a SHA-1 of the
+ * canonical IIIF URL, minted locally by `bulk_upload_local.sh` whether or not a
+ * control point exists — and this file called it one, over 21 L7014 drafts,
+ * until the code that consumes it turned up.
+ *
+ * It is a work queue. `POST /api/admin/maps/sync-georef` selects exactly that
+ * pair, probes annotations.allmaps.org and flips `georef_done` on a hit; the
+ * admin "Sync georef from Allmaps" button is its trigger. The id is how the
+ * archive remembers that a sheet is uploaded and waiting for someone to place
+ * control points. Clearing it, or not writing it at upload, would empty that
+ * queue — a volunteer's georeference would arrive and nothing would notice.
+ * Publishing on the strength of it is deliberate too: mig 080 exists precisely
+ * because georeferencing usually happens *after* publishing.
+ *
+ * So the count is printed as status, not as a finding. Whether those
+ * annotations actually resolve is a network question, and that is
+ * `geo_audit.mjs` — which already reports each one as `annotation HTTP 404`.
  *
  * ponytail: joins in JS over one paged read per table. Same trade as
  * check_series_index, same threshold — write the view when a survey makes this
@@ -84,17 +93,6 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (!['draft', 'public', 'featured'].includes(m.status))
       say('FAIL', 'status', who(m), `status '${m.status}' is outside draft/public/featured`);
 
-    // A locally-minted id is not evidence of a georeference. See the header.
-    const hashOnly = !m.annotation_url && m.allmaps_id && !m.georef_done;
-    if (hashOnly)
-      say(
-        published(m) ? 'FAIL' : 'WARN',
-        'publishTrap',
-        who(m),
-        'its only georeference is a locally-minted allmaps_id with georef_done false — ' +
-          'this passes mig 062 and would publish a map that draws nothing'
-      );
-
     if (!published(m)) continue;
     if (!m.annotation_url && !m.allmaps_id)
       say(
@@ -108,8 +106,10 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (!m.bbox)
       say('WARN', 'publish', who(m), 'published with no bbox — invisible to extent queries');
     if (!m.thumbnail) say('WARN', 'publish', who(m), 'published with no thumbnail');
-    if (!m.georef_done && !hashOnly)
-      say('WARN', 'publish', who(m), 'published but georef_done is false');
+    // Legitimate but worth seeing: the map is live and draws nothing until the
+    // georeference lands (mig 080's publish-then-georeference path).
+    if (!m.georef_done)
+      say('WARN', 'publish', who(m), 'published but not yet georeferenced — it draws nothing yet');
     if (!m.year && !m.year_label)
       say('WARN', 'publish', who(m), 'published with no year and no year_label');
     if (!m.holding_institution) say('WARN', 'provenance', who(m), 'no holding_institution');
@@ -324,35 +324,35 @@ function selfCheck() {
 
   ok(run({}).length === 0, 'a healthy published map produces nothing');
 
-  // The fault this file was written for, in both of its states.
+  // The queue, which must stay silent. A draft with a minted allmaps_id and
+  // georef_done false is a sheet waiting for control points, not a fault --
+  // /api/admin/maps/sync-georef selects exactly that pair and flips it on a hit.
   ok(
-    has(
-      run({
-        status: 'draft',
-        annotation_url: null,
-        allmaps_id: '9c3624b9f48a27e0',
-        georef_done: false,
-      }),
-      'publishTrap',
-      'WARN'
-    ),
-    'a draft carrying only a minted allmaps_id is warned about'
-  );
-  ok(
-    has(
-      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', georef_done: false }),
-      'publishTrap',
-      'FAIL'
-    ),
-    'the same map, published, fails'
+    run({
+      status: 'draft',
+      annotation_url: null,
+      allmaps_id: '9c3624b9f48a27e0',
+      georef_done: false,
+    }).length === 0,
+    'a draft queued for georeferencing produces nothing'
   );
   ok(
     !has(
       run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', georef_done: true }),
-      'publishTrap',
-      'FAIL'
+      'publish',
+      'WARN'
     ),
-    'an allmaps_id backed by georef_done is accepted'
+    'a published map on an allmaps_id backed by georef_done produces nothing'
+  );
+  // mig 080's path: published first, georeferenced later. Allowed, but the map
+  // draws nothing meanwhile, so it is worth one line.
+  ok(
+    has(
+      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', georef_done: false }),
+      'publish',
+      'WARN'
+    ),
+    'a published map not yet georeferenced is flagged, not failed'
   );
 
   ok(has(run({ status: 'archived' }), 'status', 'FAIL'), 'a status outside the three is rejected');
@@ -612,6 +612,14 @@ async function main() {
       `${aliases.length} aliases, ${sources.length} IIIF sources, ${jobs.length} jobs`
   );
   console.log(`  ${fails.length} fail, ${findings.length - fails.length} warn`);
+
+  // Status, not a finding. See the header: this pair is the georeference queue,
+  // and `geo_audit.mjs` is what says whether the annotations resolve.
+  const queued = maps.filter((m) => !m.annotation_url && m.allmaps_id && !m.georef_done).length;
+  if (queued)
+    console.log(
+      `  ${queued} maps queued for georeferencing — admin \u2192 "Sync georef from Allmaps" promotes any that landed`
+    );
   if (!fails.length)
     console.log(
       '  position is a separate question: scripts/geo_audit.mjs, and backfill_map_bbox.mjs --dry --force'
