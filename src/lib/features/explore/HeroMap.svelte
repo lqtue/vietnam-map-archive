@@ -149,6 +149,35 @@
   $: if (olMap) fitSheet(olMap);
 
   /**
+   * True once OpenLayers has drawn a complete frame — every tile in view
+   * fetched and painted, not merely "the map exists".
+   *
+   * `HeroDemo` retires its poster on this. The poster is a **close-up**, kept
+   * deliberately for the header (see `HERO_1882` on the home page), while this
+   * section was refitted to frame the whole sheet. So while it is up the reader
+   * is looking at the same survey at roughly twice the size, behind a live map
+   * that has not covered it yet — satellite in the patches whose tiles have
+   * landed, enlarged 1882 sheet everywhere else. It used to stay there for good,
+   * because nothing ever took it down.
+   *
+   * `rendercomplete` rather than a timer: it is the moment the map genuinely has
+   * something to show, so a slow connection keeps its poster exactly as long as
+   * it needs it. If it never fires — no WebGL, tiles refused, a metered reader
+   * whose map was never fetched — the poster stays, which is the right answer
+   * to all three.
+   */
+  export let painted = false;
+  // Not a loop, on the same reasoning as the failsafe below: the block's only
+  // dependencies are `olMap` and `watchingPaint`, and setting the latter closes
+  // it. `once` unregisters itself, so a re-render cannot double-fire.
+  let watchingPaint = false;
+  $: if (olMap && !watchingPaint) {
+    watchingPaint = true;
+    // eslint-disable-next-line svelte/infinite-reactive-loop
+    olMap.once('rendercomplete', () => (painted = true));
+  }
+
+  /**
    * The whole sheet, with a margin, at the stage's own aspect ratio. `fit`
    * works in the view's rotated frame, so holding the sheet at an angle costs
    * nothing here.

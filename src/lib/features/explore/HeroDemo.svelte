@@ -50,6 +50,12 @@
    */
   let playing = false;
 
+  /**
+   * True once the live map has drawn a complete frame. Until then the poster is
+   * the only thing in the stage; after it, the poster is a second, differently
+   * framed copy of the same survey sitting behind a live one, so it goes.
+   */
+  let painted = false;
   /** The sheet's opacity once the reader takes the slider; null until then. */
   let overlayOpacity: number | null = null;
   /** True once the sequence has had its say. The slider waits for it. */
@@ -112,20 +118,29 @@
          pinned camera, since the header was left alone when the live map was
          refitted to the whole sheet. So the map arriving over it is a cut
          rather than a continuation. It is still what a metered reader keeps,
-         and still the right shape. -->
-    <img
-      class="hero-demo-still"
-      src={still}
-      srcset={stillSrcset}
-      sizes="100vw"
-      alt={$t(
-        'The 1882 cadastral survey of Saigon laid over the modern city around the Charner canal'
-      )}
-      width="1600"
-      height="900"
-      loading="lazy"
-      decoding="async"
-    />
+         and still the right shape.
+
+         It comes down once the map has painted. It used to stay for good, and
+         because the two cameras disagree that left an enlarged 1882 sheet
+         behind a live map framed on the whole thing — visible through every
+         patch whose basemap tile had not landed yet, which on a slow
+         connection is most of the stage for several seconds. -->
+    {#if !painted}
+      <img
+        class="hero-demo-still"
+        src={still}
+        srcset={stillSrcset}
+        sizes="100vw"
+        alt={$t(
+          'The 1882 cadastral survey of Saigon laid over the modern city around the Charner canal'
+        )}
+        width="1600"
+        height="900"
+        loading="lazy"
+        decoding="async"
+        out:fade={{ duration: 300 }}
+      />
+    {/if}
 
     <svelte:component
       this={HeroMap}
@@ -134,6 +149,7 @@
       play={playing}
       bind:overlayOpacity
       bind:settled
+      bind:painted
     />
 
     {#if settled}
