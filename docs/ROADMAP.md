@@ -139,10 +139,16 @@ Four lessons, each of which cost real time today:
       and does not close this item:
       `node --env-file=.env scripts/check_series_index.mjs` joins the index to
       `maps` on slugged collection + `sheet_number` and exits 1 on a cell the
-      index calls a gap that a `maps` row claims, or a `map_id` pointing at a
-      row that is gone. Clean on production 2026-09-13: **0 adrift, 0 dangling
-      over 706 sheets**, 461/627 and 59/79 held — the same numbers the two
-      coverage pages print. `--self-check` needs no database and was verified
+      index calls a gap that a `maps` row claims, a `map_id` pointing at a row
+      that is gone, or (since 2026-09-15) a `maps` row whose `sheet_number` the
+      index does not contain at all. That last one is the typo case, and drift
+      could never see it: drift walks the index, and a mistyped sheet number is
+      exactly a cell the index has no row for — the sheet just drops out of the
+      series page, the coverage denominator and `search_vector` while the map
+      itself still looks fine. Reported only for a survey the index already
+      covers, so an unimported one stays quiet. Clean on production 2026-09-15:
+      **0 adrift, 0 dangling, 0 unindexed over 706 sheets**, 461/627 and 75/79
+      held — the same numbers the two coverage pages print. `--self-check` needs no database and was verified
       to fail before it was trusted. Run it after any publish, georeference or
       re-import.
 - [x] **Done 2026-09-13. Six L7014 rows had no `full/400,/` derivative** — Gò

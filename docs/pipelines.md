@@ -24,19 +24,35 @@ at independently**, and none needs a person to say what is true:
 | the drawn sheet lands inside Vietnam | a box round the country | FAIL |
 | the sheet sits on its printed 15′ cell | `work/l7014/lattice.json` | FAIL if published |
 | a cell held twice agrees with itself | the other holding | FAIL |
-| `maps.bbox` still matches its annotation | — (a copy vs its source) | WARN |
+| `maps.bbox` still matches its annotation | — (a copy vs its source) | WARN, coarse — see below |
 
 Two distinctions the script turns on, both of which produce a confident wrong
 answer if collapsed:
 
-- **The drawn paper is not the control-point hull.** `maps.bbox` is the hull, on
-  purpose (`scripts/oneoff/backfill_map_bbox.mjs`), and on a sheet with three
-  interior GCPs it sits kilometres inside the paper while being perfectly
+- **The drawn paper is not the control-point hull.** On a sheet with three
+  interior GCPs the hull sits kilometres inside the paper while being perfectly
   correct — up to 360 km on *Cochinchine Francaise*. The cell check therefore
   uses the georeference **mask**, forward-transformed through the sheet's own
   control points, and **skips a sheet that has no mask** rather than failing it.
-  That backfill script calls the gap "a slight under-estimate"; at three control
-  points it is not slight.
+
+  `maps.bbox` was the hull until 929ecbf4 (15 Sept 2026) and is now the warped
+  mask extent, which is the ground the renderer covers. The bbox check here went
+  on measuring against the hull for a day and so reported **39 sheets adrift by
+  up to 359 km while every one of them was right** — a checker comparing a row
+  against a definition it no longer uses. It now measures against the mask.
+
+  Even so it stays **coarse, at 10 km**. This script recovers a plain
+  least-squares affine from the control points; the backfill pushes the mask
+  through the map's own transform with each edge densified 24×. Measured over
+  all 132 georeferenced maps with the backfill reporting `0 differ`, the
+  remaining gap is median 0.0 km, p90 0.1 km, max 3.8 km — all of it this
+  script's approximation. So the check catches a bbox pointing at a different
+  place and nothing subtler. **The exact answer is the backfill itself**, which
+  is idempotent by construction:
+
+  ```bash
+  node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs --dry --force  # must say "0 differ"
+  ```
 - **The lattice is an artifact, not a formula.** `l7014_mosaic.py corners`
   writes `work/l7014/lattice.json` — 627 cells, four WGS 84 corners each — and
   this script reads it. A JS reimplementation of the Indian 1960 Helmert would
@@ -51,12 +67,70 @@ datum shift skipped (482 m, rejected), collinear control points, an axis swap
 landing off West Africa. A check that cannot fail is not one, and the one this
 replaces returned `2e-12`.
 
-**Reading today's run.** 0 fail, 23 warn — 21 of them the L7014 backdrop drafts
-that carry an `allmaps_id` but no annotation, which is expected and agreed. The
-two real ones: *Đô thành Sài Gòn*'s `bbox` is 3.2 km from its annotation, so it
-was re-georeferenced after the backfill; and the duplicate draft *Huế — Việt Nam
-1:50,000 (Sheet 6541 IV)* sits 5.9 km off cell 6541-4, which the published row
-for the same cell does not.
+**Reading today's run (15 Sept 2026).** 0 fail, 143 warn. Of those, 142 are
+drafts with no resolvable annotation — 121 that carry none at all, and 21 L7014
+backdrop drafts whose `allmaps_id` 404s at Allmaps. That second group is not as
+benign as it reads here; see `catalog_audit.mjs` below. The one substantive
+warning is the duplicate draft *Huế — Việt Nam 1:50,000 (Sheet 6541 IV)*, 5.4 km
+off cell 6541-4 — the published row for the same cell is not, and the two share
+a `source_url`, so one of them should be retired. Zero bbox warnings, which the
+backfill's `0 differ` independently confirms.
+
+## Is a row consistent with its own table? (`scripts/catalog_audit.mjs`)
+
+```bash
+node --env-file=.env scripts/catalog_audit.mjs      # the whole catalogue
+node --env-file=.env scripts/catalog_audit.mjs --quiet
+node scripts/catalog_audit.mjs --self-check         # no database, no network
+```
+
+Exits 1 on any FAIL. Read-only, no network, about a second — so it can run after
+every ingest. Three checkers divide the archive and none should grow into
+another: `geo_audit.mjs` asks whether the paper is where the annotation says,
+`check_series_index.mjs` whether `series_sheets` still agrees with `maps`, and
+this whether a row contradicts the rest of its own table.
+
+| check | level |
+|---|---|
+| a georeference that is only a locally-minted `allmaps_id` (`publishTrap`) | FAIL if published, WARN if draft |
+| `status` outside `draft`/`public`/`featured`; published with no annotation or no `iiif_image` | FAIL |
+| published with no bbox, thumbnail, year, `holding_institution` or `source_url` | WARN |
+| empty or duplicate `slug`; a slug that is both canonical and an alias; an alias pointing at a deleted map | FAIL |
+| bbox malformed, inverted, zero-area, or outside Vietnam | FAIL |
+| one `iiif_image` serving two maps | FAIL |
+| 2–3 maps sharing one `source_url` | WARN |
+| `source_type` outside mig 027/041; an impossible `year` | FAIL |
+| `year` appearing nowhere in `year_label`; one holder spelled two ways | WARN |
+| two primary IIIF sources, none primary, or a primary disagreeing with `maps.iiif_image` | FAIL |
+| a published map with no non-r2 IIIF source, so the Allmaps Editor cannot open it | WARN |
+| a job out of retries, held past 3 h, or pointing at a deleted map | WARN / FAIL |
+
+**`publishTrap` is why this file exists.** `allmaps_id` is a SHA-1 of the
+canonical IIIF URL, minted locally by `bulk_upload_local.sh` — the id the image
+*would* have, computed whether or not a single control point exists. Migration
+062 gates publishing on `annotation_url is not null or allmaps_id is not null`,
+so a bulk-uploaded sheet satisfies the constraint on the strength of a hash of
+its own URL. Twenty-one L7014 drafts are in that state today, every one a 404 at
+Allmaps, each publishable into a map that draws nothing. The database cannot
+tell the difference and neither can the API; this can, because `georef_done` is
+false on all of them.
+
+**No bbox size heuristic, on purpose.** A sheet-sized box and a regional one
+differ by three orders of magnitude and both are correct; every threshold tried
+flagged the three `map_type: regional` sheets and nothing else. Whether a bbox is
+*right* is `geo_audit`'s question, answered exactly by the backfill's `--dry
+--force`.
+
+`--self-check` hands every rule input it must refuse and the healthy row that
+must pass beside it — 28 cases, no database. A checker that only ever runs
+against a healthy archive reports the same thing whether it works or not, which
+is how `check_series_index` once reported clean over 79 sheets it could not see.
+
+**Reading today's run (15 Sept 2026).** 274 maps, 131 published, **0 fail, 74
+warn**: 21 `publishTrap` drafts, 24 published maps the Allmaps Editor cannot be
+opened on, 13 with no `holding_institution` and 3 with no `source_url`, 6 layout
+jobs out of retries, 5 `year`/`year_label` disagreements, one holder spelled two
+ways (Perry-Castañeda, word order), and the duplicate Huế pair.
 
 **What it does not cover.** The 63 Indochine sheets carry sheet numbers but no
 lattice index, so nothing checks their position; and the "held twice" check
