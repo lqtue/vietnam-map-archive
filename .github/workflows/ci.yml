@@ -21,3 +21,22 @@ jobs:
       - run: npm run lint
       - run: npm run check
       - run: npm run build
+      # The suite is 354 checks in two halves. 336 of them are pure — they only
+      # ride the Playwright runner because it is already installed, and need no
+      # server, no network and no database. The other 18 (smoke.spec.ts,
+      # catalog-series.spec.ts) drive a browser against a running dev server and
+      # read the real Supabase project through the PUBLIC_* values.
+      #
+      # Those 18 cannot run here honestly. `cp .env.test .env` above points the
+      # app at http://127.0.0.1:54421, the local Supabase stack, which does not
+      # exist on a CI runner — so every browser check would fail on an empty
+      # database rather than on a regression. Supplying the production values as
+      # secrets would fix the failure and buy a worse problem: a read-only suite
+      # that green-lights a PR only while the live project happens to hold the
+      # rows it expects, and that leaks the project to every fork's PR run. So
+      # CI runs the half that is deterministic, and the browser half stays a
+      # local/preview gate (`npm run test`, or SMOKE_BASE_URL against a deploy).
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test
+        env:
+          PURE_ONLY: '1'
