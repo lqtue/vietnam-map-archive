@@ -40,6 +40,18 @@
 // `maps` row sharing one `sheet_number` -- which is what `map_series` already
 // counts as one cell (mig 084). Twelve cells were issued as a single
 // half-format sheet covering the whole cell; those get one row.
+//
+// --source, AND THE TWO THINGS A YEAR-PINNED SOURCE CHANGES. The default source
+// fills cells the archive does not hold at all, so "one printing per half, the
+// most recent" is the right rule and a cell already held is a cell to skip.
+// `nakala-originals.json` is the other job: the originals behind cells we hold
+// as third-party composites, each pinned at ITS composite's year. A file
+// declaring `_year_pinned: true` switches both rules to include the year, because
+// cells 2, 13 and 14 are each held as two printings and need the halves of both
+// -- keyed on the half alone, the second printing reads as already held and is
+// silently dropped. Such a source may also carry `part` on a record, which is a
+// human's decision about a half the catalogue describes two ways; the guard below
+// stays armed for every record that does not carry one.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -51,7 +63,8 @@ import { willApply, dryNotice } from '../lib/cli.mjs';
 const apply = willApply();
 const COLLECTION = 'Indochine 1:25,000 — Tonkin & Thanh Hóa';
 const SERIES_KEY = 'indochine-1-25-000-tonkin-thanh-hoa';
-const SRC = 'work/tonkin/sources/nakala.json';
+const srcArg = process.argv.indexOf('--source');
+const SRC = srcArg > -1 ? process.argv[srcArg + 1] : 'work/tonkin/sources/nakala.json';
 
 /** Brackets mark the half of the title this half-sheet does not print. */
 function cleanName(t) {
@@ -79,7 +92,11 @@ function cleanName(t) {
  * 11 demi-format and 21 demi-feuille records and no assemblage. Regenerate that
  * file over serie 175, which is ALL assemblages, and it would. So it stops.
  */
-function half(note) {
+function half(note, decided) {
+  // A record whose half a human decided, because the catalogue said two things.
+  // `partFromTitle` disagreeing with the note is what the throw below catches;
+  // this is the only way past it, and it is per record rather than a mode.
+  if (decided === 'W' || decided === 'E') return decided;
   const p = sheetPart(note);
   if (p === 'assemblage') {
     throw new Error(
@@ -93,15 +110,18 @@ function half(note) {
 
 const db = serviceClient();
 
-const { cells } = JSON.parse(readFileSync(SRC, 'utf8'));
+const source = JSON.parse(readFileSync(SRC, 'utf8'));
+const { cells } = source;
+const yearPinned = source._year_pinned === true;
 const { data: held, error } = await db
   .from('maps')
-  .select('id,extra_metadata')
+  .select('id,year,extra_metadata')
   .eq('collection', COLLECTION);
 if (error) throw error;
-const have = new Set(
-  held.map((m) => `${m.extra_metadata?.sheet_number}|${m.extra_metadata?.sheet_half ?? 'whole'}`)
-);
+const heldKey = (m) =>
+  `${m.extra_metadata?.sheet_number}|${m.extra_metadata?.sheet_half ?? 'whole'}` +
+  (yearPinned ? `|${m.year}` : '');
+const have = new Set(held.map(heldKey));
 
 // The series blurb every row in this collection carries.
 const { data: sib } = await db
@@ -116,18 +136,21 @@ const jobs = [];
 for (const cell of Object.keys(cells).sort((a, b) => parseFloat(a) - parseFloat(b))) {
   const byHalf = new Map();
   for (const r of cells[cell]) {
-    const h = half(r.note);
+    const h = half(r.note, r.part);
     const t = partFromTitle(r.title);
-    if (h !== 'whole' && t && t !== h) {
+    if (h !== 'whole' && t && t !== h && !r.part) {
       throw new Error(`cell ${cell} ${r.year}: note says ${h}, title "${r.title}" says ${t}`);
     }
     // One printing per half: the most recent, which is the one whose revision
-    // date the sheet itself is catalogued under.
-    const cur = byHalf.get(h);
-    if (!cur || (r.year || 0) > (cur.year || 0)) byHalf.set(h, r);
+    // date the sheet itself is catalogued under. A year-pinned source has
+    // already chosen, and its cells may legitimately hold two printings of the
+    // same half, so there the year is part of the key rather than a tie-break.
+    const k = yearPinned ? `${h}|${r.year}` : h;
+    const cur = byHalf.get(k);
+    if (!cur || (r.year || 0) > (cur.year || 0)) byHalf.set(k, { h, r });
   }
-  for (const [h, r] of byHalf) {
-    if (have.has(`${cell}|${h}`)) continue;
+  for (const { h, r } of byHalf.values()) {
+    if (have.has(`${cell}|${h}` + (yearPinned ? `|${r.year}` : ''))) continue;
     jobs.push({ cell, h, r });
   }
 }
@@ -175,6 +198,14 @@ for (const { cell, h, r } of jobs) {
       nakala_doi: r.nakala,
       nakala_sha1: r.sha1,
       nakala_iiif: upstream,
+      ...(r.part ? { sheet_half_decided_because: r.part_decided_because ?? null } : {}),
+      ...(r.replaces_map_id
+        ? {
+            mirrors_original_for: r.replaces_map_id,
+            mirrors_original_note:
+              'Mirrored as the IGN original behind a third-party composite this archive already publishes. Nothing about that row is changed by this one.',
+          }
+        : {}),
     },
   };
   const ins = await db.from('maps').insert(row);

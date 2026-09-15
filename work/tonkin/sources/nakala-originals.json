@@ -1,0 +1,1578 @@
+{
+ "_source": "work/tonkin/replacement-audit.json, itself read from CartoMundi serie 243 + live IIIF",
+ "_note": "IGN originals for the cells currently held as third-party composites. One record per half, pinned at the composite's own year. `part` appears only where the catalogue contradicted itself and a human decided; `note` and `title` are untouched. Mirroring these changes nothing public: rows land as drafts.",
+ "_year_pinned": true,
+ "_generated_at": "2026-09-14T17:38:19.070Z",
+ "cells": {
+  "0": [
+   {
+    "title": "[Ha-] Châu",
+    "note": "Demi-feuille Est",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23831,
+    "nakala": "10.34847/nkl.793aor35",
+    "sha1": "nkl.793aor35",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.793aor35/5992c92e0e72ee22217bda6060efa45a50fcf08b/info.json",
+    "replaces_map_id": "d2e230dc-88b1-4069-9f84-304cecb393fa",
+    "replaces_name": "Ha chau"
+   },
+   {
+    "title": "Ha- [Châu]",
+    "note": "Demi-feuille Ouest",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23874,
+    "nakala": "10.34847/nkl.e4ef954e",
+    "sha1": "nkl.e4ef954e",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e4ef954e/1ae64a8bd8b2aee54828524c8f963f545784f78f/info.json",
+    "replaces_map_id": "d2e230dc-88b1-4069-9f84-304cecb393fa",
+    "replaces_name": "Ha chau"
+   }
+  ],
+  "1": [
+   {
+    "title": "[Viêt] -Tri",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23822,
+    "nakala": "10.34847/nkl.18b18848",
+    "sha1": "nkl.18b18848",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.18b18848/5433518069a74032ec4a5e74d7339a466be8970f/info.json",
+    "replaces_map_id": "0e943fca-ea08-4f4b-bb5e-0e80a4888f91",
+    "replaces_name": "Viet Tri"
+   },
+   {
+    "title": "Viêt [-Tri]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23835,
+    "nakala": "10.34847/nkl.d80d3k8q",
+    "sha1": "nkl.d80d3k8q",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d80d3k8q/801c1f599bc5299e328c3340ed8ac86c62e5ac68/info.json",
+    "replaces_map_id": "0e943fca-ea08-4f4b-bb5e-0e80a4888f91",
+    "replaces_name": "Viet Tri"
+   }
+  ],
+  "2": [
+   {
+    "title": "[Vinh] -Yèn",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23844,
+    "nakala": "10.34847/nkl.23e37bxt",
+    "sha1": "nkl.23e37bxt",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.23e37bxt/3ce3413c793e69f30e4b9f8de4f275db358dd32e/info.json",
+    "replaces_map_id": "9c6bdac2-ffab-4803-ae0f-846b51b8009c",
+    "replaces_name": "Vinh Yen"
+   },
+   {
+    "title": "Vinh [-Yèn]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23824,
+    "nakala": "10.34847/nkl.f8abtndy",
+    "sha1": "nkl.f8abtndy",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f8abtndy/0b17d24e56c04981ebc652fc7aa312de591b8ca2/info.json",
+    "replaces_map_id": "9c6bdac2-ffab-4803-ae0f-846b51b8009c",
+    "replaces_name": "Vinh Yen"
+   },
+   {
+    "title": "[Vinh] -Yèn",
+    "note": "Demi-feuille Est",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23845,
+    "nakala": "10.34847/nkl.bffb67v5",
+    "sha1": "nkl.bffb67v5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bffb67v5/7b8594a93467bae9d326e382242ed05935cc132a/info.json",
+    "replaces_map_id": "2bd040e9-68e0-4b98-acbe-fea97a6e3bc2",
+    "replaces_name": "Vinh Yen"
+   },
+   {
+    "title": "Vinh [-Yèn]",
+    "note": "Demi-feuille Ouest",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23825,
+    "nakala": "10.34847/nkl.c6aebn23",
+    "sha1": "nkl.c6aebn23",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c6aebn23/d5e127cf8816e259bfb5fe67ad4d18bd0d309e4d/info.json",
+    "replaces_map_id": "2bd040e9-68e0-4b98-acbe-fea97a6e3bc2",
+    "replaces_name": "Vinh Yen"
+   }
+  ],
+  "3": [
+   {
+    "title": "[Binh-] Xuyên",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23854,
+    "nakala": "10.34847/nkl.36523644",
+    "sha1": "nkl.36523644",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.36523644/916c81c6f8d00be971e142289ff6f125264d5bfd/info.json",
+    "replaces_map_id": "a33ced6f-e106-40f6-9bdc-ab0f92a4882e",
+    "replaces_name": "Binh Xuyen"
+   },
+   {
+    "title": "Binh- [Xuyên]",
+    "note": "Demi-feuille Ouest.",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23827,
+    "nakala": "10.34847/nkl.a67216d9",
+    "sha1": "nkl.a67216d9",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a67216d9/047005c519abfa2a328d4f4a5a26308727593421/info.json",
+    "replaces_map_id": "a33ced6f-e106-40f6-9bdc-ab0f92a4882e",
+    "replaces_name": "Binh Xuyen"
+   }
+  ],
+  "4": [
+   {
+    "title": "[Hiêp] -Hoa",
+    "note": "Demi-feuille Est",
+    "year": 1912,
+    "serie": 243,
+    "fkey": 23828,
+    "nakala": "10.34847/nkl.40167v7n",
+    "sha1": "nkl.40167v7n",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.40167v7n/5ec5303773ba1cb6b78c9c12d23a220fb185f55f/info.json",
+    "replaces_map_id": "71894f3f-c2aa-4133-9c42-4e27941e2969",
+    "replaces_name": "Hiep Hoa"
+   },
+   {
+    "title": "Hiêp [-Hoa]",
+    "note": "Demi-feuille Ouest",
+    "year": 1912,
+    "serie": 243,
+    "fkey": 23873,
+    "nakala": "10.34847/nkl.d7fep775",
+    "sha1": "nkl.d7fep775",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7fep775/fddd991842e96eadb311477310eb20bc65fe8e43/info.json",
+    "replaces_map_id": "71894f3f-c2aa-4133-9c42-4e27941e2969",
+    "replaces_name": "Hiep Hoa"
+   }
+  ],
+  "5": [
+   {
+    "title": "[Phu-Lang] -Thuong",
+    "note": "Demi-feuille Est",
+    "year": 1912,
+    "serie": 243,
+    "fkey": 23829,
+    "nakala": "10.34847/nkl.e51bg9t4",
+    "sha1": "nkl.e51bg9t4",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e51bg9t4/612ec64c6ea6110ae724d20240afaaac50daca7f/info.json",
+    "replaces_map_id": "1707c017-16e3-4c1f-95e7-5a0a685b2e5f",
+    "replaces_name": "Phu Lang Thuong"
+   },
+   {
+    "title": "Phu-Lang [-Thuong]",
+    "note": "Demi-feuille Ouest",
+    "year": 1912,
+    "serie": 243,
+    "fkey": 23895,
+    "nakala": "10.34847/nkl.abc3473f",
+    "sha1": "nkl.abc3473f",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.abc3473f/1a35db15522754533119c292c78c36aa9904ca9d/info.json",
+    "replaces_map_id": "1707c017-16e3-4c1f-95e7-5a0a685b2e5f",
+    "replaces_name": "Phu Lang Thuong"
+   }
+  ],
+  "6": [
+   {
+    "title": "[Phu-Qu]ang-Oai",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23817,
+    "nakala": "10.34847/nkl.fd19go92",
+    "sha1": "nkl.fd19go92",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.fd19go92/1281a08f8bd1c2db5bdda2d0a11d18a92f8a63ca/info.json",
+    "replaces_map_id": "84ef795c-221d-477b-b584-e5ef047ed5ce",
+    "replaces_name": "Quang Oai"
+   },
+   {
+    "title": "Phu-Qu[ang-Oai]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23834,
+    "nakala": "10.34847/nkl.20cao8lt",
+    "sha1": "nkl.20cao8lt",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.20cao8lt/6a50a0ec34b9072de5199fbc064e12b83db7d208/info.json",
+    "replaces_map_id": "84ef795c-221d-477b-b584-e5ef047ed5ce",
+    "replaces_name": "Quang Oai"
+   }
+  ],
+  "10": [
+   {
+    "title": "[Bac-] Ninh",
+    "note": "Demi-feuille Est",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23818,
+    "nakala": "10.34847/nkl.e1adv2lv",
+    "sha1": "nkl.e1adv2lv",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e1adv2lv/8e602d1329907e3ff0add3b35a4f8373ea8d4397/info.json",
+    "replaces_map_id": "1f480a2b-3bbd-44ed-adea-2dad9e24d254",
+    "replaces_name": "Bac Ninh"
+   },
+   {
+    "title": "Bac- [ Ninh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23893,
+    "nakala": "10.34847/nkl.2ff15r39",
+    "sha1": "nkl.2ff15r39",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ff15r39/2b852dafc7c92235921e88f26e66bd7ca741fee1/info.json",
+    "replaces_map_id": "1f480a2b-3bbd-44ed-adea-2dad9e24d254",
+    "replaces_name": "Bac Ninh"
+   }
+  ],
+  "12": [
+   {
+    "title": "[Son-] Tây",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23843,
+    "nakala": "10.34847/nkl.d477hg0z",
+    "sha1": "nkl.d477hg0z",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d477hg0z/09f1ce2f846c43731a50b21710bc0776d3d0544a/info.json",
+    "replaces_map_id": "013daa15-185a-4d59-b854-e581557d65ce",
+    "replaces_name": "Son Tay"
+   },
+   {
+    "title": "Son- [Tây]",
+    "note": "Demi-feuille Ouest",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23807,
+    "nakala": "10.34847/nkl.e9b3fv6b",
+    "sha1": "nkl.e9b3fv6b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e9b3fv6b/d2de59720b73124cf2a7ce4908a1e165cceab6a2/info.json",
+    "replaces_map_id": "013daa15-185a-4d59-b854-e581557d65ce",
+    "replaces_name": "Son Tay"
+   }
+  ],
+  "13": [
+   {
+    "title": "[Hoài-D]uc-Phu",
+    "note": "Demi-feuille Est",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23851,
+    "nakala": "10.34847/nkl.efedbwmi",
+    "sha1": "nkl.efedbwmi",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.efedbwmi/11f41b3a6d7d8d5eef3c846026a5b7e77a8db2d2/info.json",
+    "replaces_map_id": "5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c",
+    "replaces_name": "Hoai Duc Phu"
+   },
+   {
+    "title": "Hoài-D[uc-Phu]",
+    "note": "Demi-feuille Ouest",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23808,
+    "nakala": "10.34847/nkl.f30f9b7g",
+    "sha1": "nkl.f30f9b7g",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f30f9b7g/d54688bb96ccb110b42b79f7aebb9bd6dfb61670/info.json",
+    "replaces_map_id": "5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c",
+    "replaces_name": "Hoai Duc Phu"
+   },
+   {
+    "title": "[Hoài-D]uc-Phu",
+    "note": "Demi-feuille Est",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23852,
+    "nakala": "10.34847/nkl.8acd2812",
+    "sha1": "nkl.8acd2812",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8acd2812/249e798384b1e2b338f88714335ac45cad650ef9/info.json",
+    "replaces_map_id": "a1de9760-8073-4ea1-b7ed-f8f4e2835cd3",
+    "replaces_name": "Hoai Duc Phu"
+   },
+   {
+    "title": "Hoài-D[uc-Phu]",
+    "note": "Demi-feuille Ouest. La partie de la mention de date qui est donnée entre crochets est située sur la demi-feuille Est",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23809,
+    "nakala": "10.34847/nkl.e8f4tn9m",
+    "sha1": "nkl.e8f4tn9m",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e8f4tn9m/a395c01c02df6586c8b24d60276b74656c317a3d/info.json",
+    "replaces_map_id": "a1de9760-8073-4ea1-b7ed-f8f4e2835cd3",
+    "replaces_name": "Hoai Duc Phu"
+   }
+  ],
+  "14": [
+   {
+    "title": "[Phu-T]u-Son",
+    "note": "Demi-feuille Est",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23810,
+    "nakala": "10.34847/nkl.16d09fk0",
+    "sha1": "nkl.16d09fk0",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16d09fk0/0dab9f80627912a075cf650e56f6477159cfaf87/info.json",
+    "replaces_map_id": "19a677af-8d42-4402-9943-1f6608871b6c",
+    "replaces_name": "Phu Tu Son"
+   },
+   {
+    "title": "Phu-T[u-Son]",
+    "note": "Demi-feuille Ouest",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23871,
+    "nakala": "10.34847/nkl.26ad9xl5",
+    "sha1": "nkl.26ad9xl5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.26ad9xl5/e9b8fb803ea67b7381fc61e893457d1a4e1e274e/info.json",
+    "replaces_map_id": "19a677af-8d42-4402-9943-1f6608871b6c",
+    "replaces_name": "Phu Tu Son"
+   },
+   {
+    "title": "[Phu-T]u-Son",
+    "note": "Demi-feuille Est",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23811,
+    "nakala": "10.34847/nkl.eac1nwsd",
+    "sha1": "nkl.eac1nwsd",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eac1nwsd/4da1920a3c1f5fe53b39b881e160dface59d674f/info.json",
+    "replaces_map_id": "d597464d-5e6e-4f66-9805-40dff437b131",
+    "replaces_name": "Phu Tu Son"
+   },
+   {
+    "title": "Phu-T[u-Son]",
+    "note": "Demi-feuille Ouest",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23872,
+    "nakala": "10.34847/nkl.ecbbf9r7",
+    "sha1": "nkl.ecbbf9r7",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ecbbf9r7/45a1ac5f72f60e2d76a43a2c342870968fb9f0cf/info.json",
+    "replaces_map_id": "d597464d-5e6e-4f66-9805-40dff437b131",
+    "replaces_name": "Phu Tu Son"
+   }
+  ],
+  "15": [
+   {
+    "title": "[Gia-] Binh",
+    "note": "Demi-feuille Est",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23812,
+    "nakala": "10.34847/nkl.d7dd1o12",
+    "sha1": "nkl.d7dd1o12",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7dd1o12/44ad4b81c145e85c7911205d7ac6f1965e655f62/info.json",
+    "replaces_map_id": "37f35a63-2841-47d6-bd94-8765dac81387",
+    "replaces_name": "Gia Binh"
+   },
+   {
+    "title": "Gia- [Binh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1911,
+    "serie": 243,
+    "fkey": 23892,
+    "nakala": "10.34847/nkl.5bcb885c",
+    "sha1": "nkl.5bcb885c",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5bcb885c/4323d3dbe94314963fc7e3f60963d91abec65e39/info.json",
+    "replaces_map_id": "37f35a63-2841-47d6-bd94-8765dac81387",
+    "replaces_name": "Gia Binh"
+   }
+  ],
+  "16": [
+   {
+    "title": "[Sept-] Pagodes",
+    "note": "Demi-feuille Est",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23813,
+    "nakala": "10.34847/nkl.02a9w72v",
+    "sha1": "nkl.02a9w72v",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.02a9w72v/c51094aec3f008217cf437e464d56bea2ebc498c/info.json",
+    "replaces_map_id": "6c1c0913-10e0-4e8d-8f18-2200f390231f",
+    "replaces_name": "Sept Pagodes"
+   },
+   {
+    "title": "Sept- [Pagodes]",
+    "note": "Demi-feuille Ouest",
+    "year": 1925,
+    "serie": 243,
+    "fkey": 23909,
+    "nakala": "10.34847/nkl.e27ex60z",
+    "sha1": "nkl.e27ex60z",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e27ex60z/d18c5eedaaebecfe8d3382cf0f2468f8e80bd917/info.json",
+    "replaces_map_id": "6c1c0913-10e0-4e8d-8f18-2200f390231f",
+    "replaces_name": "Sept Pagodes"
+   }
+  ],
+  "17": [
+   {
+    "title": "[Dông-] Triêu",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23815,
+    "nakala": "10.34847/nkl.b1f1cfhx",
+    "sha1": "nkl.b1f1cfhx",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b1f1cfhx/6d23d0ca9dbb715936392c0fb0abf67ab0638c34/info.json",
+    "replaces_map_id": "9a167536-d24d-48a1-b403-91a01acbf6e2",
+    "replaces_name": "Dong Trieu"
+   },
+   {
+    "title": "Dông- [Triêu]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23926,
+    "nakala": "10.34847/nkl.4ed4j7of",
+    "sha1": "nkl.4ed4j7of",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4ed4j7of/2e82cfb81e91719647cfbbe8884e2464b618104a/info.json",
+    "replaces_map_id": "9a167536-d24d-48a1-b403-91a01acbf6e2",
+    "replaces_name": "Dong Trieu"
+   }
+  ],
+  "20": [
+   {
+    "title": "[Hà-] Nôi",
+    "note": "Demi-feuille Est",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23794,
+    "nakala": "10.34847/nkl.c486rj84",
+    "sha1": "nkl.c486rj84",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c486rj84/bad3384d997a115e5ed59a4572fd17b05102a981/info.json",
+    "replaces_map_id": "4f6e91ba-1388-4c7e-9146-89fb324511f1",
+    "replaces_name": "Ha Noi"
+   },
+   {
+    "title": "Hà- [Nôi]",
+    "note": "Demi-feuille Ouest",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23870,
+    "nakala": "10.34847/nkl.6cc6ll3m",
+    "sha1": "nkl.6cc6ll3m",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6cc6ll3m/0df9a5d1650a876b2a710cf607cb082322298651/info.json",
+    "replaces_map_id": "4f6e91ba-1388-4c7e-9146-89fb324511f1",
+    "replaces_name": "Ha Noi"
+   }
+  ],
+  "21": [
+   {
+    "title": "[Ban-Yê]n-Nhân",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23796,
+    "nakala": "10.34847/nkl.e385710d",
+    "sha1": "nkl.e385710d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e385710d/9d306403b3f2de7138ee6f699d7dc200c3636ad1/info.json",
+    "replaces_map_id": "37ba77db-4d55-4fa3-a32b-55a44c9af8b3",
+    "replaces_name": "Ban Yen Nhan"
+   },
+   {
+    "title": "Ban-Yê[n-Nhân]",
+    "note": "Demi-feuille Ouest",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23891,
+    "nakala": "10.34847/nkl.f3ffdd0d",
+    "sha1": "nkl.f3ffdd0d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f3ffdd0d/426e99d077b1077fe763f135ae8cd0a90bc99f50/info.json",
+    "replaces_map_id": "37ba77db-4d55-4fa3-a32b-55a44c9af8b3",
+    "replaces_name": "Ban Yen Nhan"
+   }
+  ],
+  "23": [
+   {
+    "title": "[Yên] -Luu",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23799,
+    "nakala": "10.34847/nkl.5401hhb5",
+    "sha1": "nkl.5401hhb5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5401hhb5/d95ec657622fb8c4fb9af36a272d7433caa401fd/info.json",
+    "replaces_map_id": "54cd94cc-3450-4d57-9909-877b6b389a17",
+    "replaces_name": "Yen Luu"
+   },
+   {
+    "title": "Yên [-Luu]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23924,
+    "nakala": "10.34847/nkl.fd03n646",
+    "sha1": "nkl.fd03n646",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.fd03n646/9a60856c1d37300af2b3ac8c76deb57d9f28b635/info.json",
+    "replaces_map_id": "54cd94cc-3450-4d57-9909-877b6b389a17",
+    "replaces_name": "Yen Luu"
+   }
+  ],
+  "24": [
+   {
+    "title": "[Mai-] Dông",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23801,
+    "nakala": "10.34847/nkl.c6342093",
+    "sha1": "nkl.c6342093",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c6342093/10e268db082da99c4a2c9b1541228fe86a22d965/info.json",
+    "replaces_map_id": "d4ec51b8-a3a1-4414-99c7-2bb46ea851e3",
+    "replaces_name": "Mai Dong"
+   },
+   {
+    "title": "Mai- [Dông]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23932,
+    "nakala": "10.34847/nkl.d8484p6r",
+    "sha1": "nkl.d8484p6r",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d8484p6r/141771d7a5a9f6747817f6f1ec4a09f80e26f5f7/info.json",
+    "replaces_map_id": "d4ec51b8-a3a1-4414-99c7-2bb46ea851e3",
+    "replaces_name": "Mai Dong"
+   }
+  ],
+  "25": [
+   {
+    "title": "[Quang] -Yên",
+    "note": "Demi-feuille Ouest",
+    "part": "E",
+    "part_decided_because": "note says W, title \"[Quang] -Yên\" says E; the brackets mark the half of the title this sheet does not print, and read that way the cell makes a complete pair",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23803,
+    "nakala": "10.34847/nkl.ff6dy302",
+    "sha1": "nkl.ff6dy302",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ff6dy302/e40d53663ca03dd6dbceb969b2b5fab6ba37f63f/info.json",
+    "replaces_map_id": "88437562-9bce-4ffb-b70d-c564d02531fc",
+    "replaces_name": "Quang Yen"
+   },
+   {
+    "title": "Quang [-Yên]",
+    "note": "Demi-feuille Ouest. La partie de la mention de date qui est donnée entre crochets est située sur la demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23936,
+    "nakala": "10.34847/nkl.bb2e29c5",
+    "sha1": "nkl.bb2e29c5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bb2e29c5/f903235a229803cba0f4da3c6efddbde59488971/info.json",
+    "replaces_map_id": "88437562-9bce-4ffb-b70d-c564d02531fc",
+    "replaces_name": "Quang Yen"
+   }
+  ],
+  "27": [
+   {
+    "title": "[Thuong-] Tin-Phu",
+    "note": "Demi-feuille Est. En couleur. Titre de la feuille erroné ([Phu - Th]uong-Tin)",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23785,
+    "nakala": "10.34847/nkl.16dbk9pg",
+    "sha1": "nkl.16dbk9pg",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16dbk9pg/1919fa66c427a438134ed4748ae166dfa51b3e72/info.json",
+    "replaces_map_id": "e8241d5f-f694-45cd-a41a-1f9293ab9a0e",
+    "replaces_name": "Phu Thuong Tin"
+   },
+   {
+    "title": "Thuong- [Tin-Phu]",
+    "note": "Demi-feuille Ouest. Titre de la feuille erroné (Phu - Th|uong-Tin])",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23869,
+    "nakala": "10.34847/nkl.36ad4x53",
+    "sha1": "nkl.36ad4x53",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.36ad4x53/07fc598e3d29a08326ad0e072ff9e2c134b51e20/info.json",
+    "replaces_map_id": "e8241d5f-f694-45cd-a41a-1f9293ab9a0e",
+    "replaces_name": "Phu Thuong Tin"
+   }
+  ],
+  "28": [
+   {
+    "title": "[Ké-] Sat",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23786,
+    "nakala": "10.34847/nkl.28b7t9qj",
+    "sha1": "nkl.28b7t9qj",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.28b7t9qj/91344cf402b3c8abefa1c843962ad6bd68fbad41/info.json",
+    "replaces_map_id": "8d6936ed-55d0-4215-9d39-57b3d8543d3f",
+    "replaces_name": "Ke Sat"
+   },
+   {
+    "title": "Ké- [ Sat]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23890,
+    "nakala": "10.34847/nkl.2e228q5d",
+    "sha1": "nkl.2e228q5d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2e228q5d/4ae4cf033a24563f400546abf9764fc714fe8708/info.json",
+    "replaces_map_id": "8d6936ed-55d0-4215-9d39-57b3d8543d3f",
+    "replaces_name": "Ke Sat"
+   }
+  ],
+  "29": [
+   {
+    "title": "[Gia-] Lôc",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23787,
+    "nakala": "10.34847/nkl.18058t97",
+    "sha1": "nkl.18058t97",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.18058t97/3c42b707b6248130bb341cddfe6899c7df1fd57e/info.json",
+    "replaces_map_id": "c0103a62-d766-44cd-8efc-5e0c9143b093",
+    "replaces_name": "Gia Loc"
+   },
+   {
+    "title": "Gia- [Lôc]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23907,
+    "nakala": "10.34847/nkl.9ae7y0fp",
+    "sha1": "nkl.9ae7y0fp",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9ae7y0fp/d04da559c75b0b5b8a09c77cd3086e0f15fa5bdc/info.json",
+    "replaces_map_id": "c0103a62-d766-44cd-8efc-5e0c9143b093",
+    "replaces_name": "Gia Loc"
+   }
+  ],
+  "30": [
+   {
+    "title": "[Kim-] Thành",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23789,
+    "nakala": "10.34847/nkl.613fozh8",
+    "sha1": "nkl.613fozh8",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.613fozh8/6e18935fcf9cfca703737aaad071883ce1218685/info.json",
+    "replaces_map_id": "f10a84aa-b0a7-47db-af45-e25158f120d0",
+    "replaces_name": "Kim Thanh"
+   },
+   {
+    "title": "Kim- [Thành]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23922,
+    "nakala": "10.34847/nkl.99a39x74",
+    "sha1": "nkl.99a39x74",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.99a39x74/49a1e52ea01f50f5ba2f9afde647d982de506173/info.json",
+    "replaces_map_id": "f10a84aa-b0a7-47db-af45-e25158f120d0",
+    "replaces_name": "Kim Thanh"
+   }
+  ],
+  "31": [
+   {
+    "title": "[Hai-] Phong",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23791,
+    "nakala": "10.34847/nkl.5f26w204",
+    "sha1": "nkl.5f26w204",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5f26w204/c188949f6888912ef6f8771cbdab7bf4ab4bbbe5/info.json",
+    "replaces_map_id": "470c119b-44f1-47ba-9f0e-80dcbb4763f0",
+    "replaces_name": "Hai Phong"
+   },
+   {
+    "title": "Hai- [Phong]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23931,
+    "nakala": "10.34847/nkl.973189kl",
+    "sha1": "nkl.973189kl",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.973189kl/5b81a8e34bc28731168480bfc415b1afa01091fe/info.json",
+    "replaces_map_id": "470c119b-44f1-47ba-9f0e-80dcbb4763f0",
+    "replaces_name": "Hai Phong"
+   }
+  ],
+  "32": [
+   {
+    "title": "[Quang-] Yên (Sud)",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23792,
+    "nakala": "10.34847/nkl.aacb86mz",
+    "sha1": "nkl.aacb86mz",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.aacb86mz/b32a7a37472eee3e4db0bb3af8ae3488cb24f917/info.json",
+    "replaces_map_id": "8bb37c31-67e2-4623-924e-ac6381e94c8e",
+    "replaces_name": "Quang Yen (Sud)"
+   },
+   {
+    "title": "Quang- [Yên (Sud)]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23934,
+    "nakala": "10.34847/nkl.b6e8j50p",
+    "sha1": "nkl.b6e8j50p",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b6e8j50p/fc8439d198db4d1bf48a96efec53af5db377ec94/info.json",
+    "replaces_map_id": "8bb37c31-67e2-4623-924e-ac6381e94c8e",
+    "replaces_name": "Quang Yen (Sud)"
+   }
+  ],
+  "33": [
+   {
+    "title": "[Phu-U]ng-Hoa",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23849,
+    "nakala": "10.34847/nkl.a60f489z",
+    "sha1": "nkl.a60f489z",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a60f489z/22af36fa082b23d6c0df7227ae8b64914e3df9ab/info.json",
+    "replaces_map_id": "6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece",
+    "replaces_name": "Phu Ung Hoa"
+   },
+   {
+    "title": "Phu-U[ng-Hoa]",
+    "note": "Demi-feuille Ouest",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23774,
+    "nakala": "10.34847/nkl.4018l377",
+    "sha1": "nkl.4018l377",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4018l377/cb22b80962f66839e0c495e0612fb828ee373ab3/info.json",
+    "replaces_map_id": "6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece",
+    "replaces_name": "Phu Ung Hoa"
+   }
+  ],
+  "36": [
+   {
+    "title": "[My-] Dông",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23779,
+    "nakala": "10.34847/nkl.531fnj5d",
+    "sha1": "nkl.531fnj5d",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.531fnj5d/1d204dd65a03bb49fa15c54ae2d8a3485d50e733/info.json",
+    "replaces_map_id": "b4cbfd8c-b38b-4270-8ed2-aef05e241a14",
+    "replaces_name": "My Dong"
+   },
+   {
+    "title": "My- [Dông]",
+    "note": "Demi-feuille Ouest",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23906,
+    "nakala": "10.34847/nkl.eeeb00xi",
+    "sha1": "nkl.eeeb00xi",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eeeb00xi/76b6374097d0f7390ae0360f5f6e2c681d832d6e/info.json",
+    "replaces_map_id": "b4cbfd8c-b38b-4270-8ed2-aef05e241a14",
+    "replaces_name": "My Dong"
+   }
+  ],
+  "38": [
+   {
+    "title": "[Kiên] -An",
+    "note": "Demi-feuille Est",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23781,
+    "nakala": "10.34847/nkl.dcda34cd",
+    "sha1": "nkl.dcda34cd",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.dcda34cd/9376c752fe6c1b83770c2713b4f15adfa3c51997/info.json",
+    "replaces_map_id": "0dac511a-dba2-46f5-8177-730371340baa",
+    "replaces_name": "Kien An"
+   },
+   {
+    "title": "Kiên [-An]",
+    "note": "Demi-feuille Ouest",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23929,
+    "nakala": "10.34847/nkl.d7fd5m2b",
+    "sha1": "nkl.d7fd5m2b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7fd5m2b/0467f274e24135dead2bda6edc6fef6041f2fcd9/info.json",
+    "replaces_map_id": "0dac511a-dba2-46f5-8177-730371340baa",
+    "replaces_name": "Kien An"
+   }
+  ],
+  "41": [
+   {
+    "title": "[Dông] -Van",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23764,
+    "nakala": "10.34847/nkl.ece58m5y",
+    "sha1": "nkl.ece58m5y",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ece58m5y/4163dcc39ce75cf3905fa07b113fb5ec9946a1f0/info.json",
+    "replaces_map_id": "1a7e0a67-7a92-465c-93d7-003b8439880f",
+    "replaces_name": "Dong Van"
+   },
+   {
+    "title": "Dông [-Van]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23866,
+    "nakala": "10.34847/nkl.a2e4b20o",
+    "sha1": "nkl.a2e4b20o",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a2e4b20o/f2d1a62a277c2c3eea2d186216b407f9ffc7605e/info.json",
+    "replaces_map_id": "1a7e0a67-7a92-465c-93d7-003b8439880f",
+    "replaces_name": "Dong Van"
+   }
+  ],
+  "42": [
+   {
+    "title": "[Hung] -Yên",
+    "note": "Demi-feuille Est",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23766,
+    "nakala": "10.34847/nkl.74f1aa41",
+    "sha1": "nkl.74f1aa41",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.74f1aa41/ce1116d721440ccafc6f013290f847b207813384/info.json",
+    "replaces_map_id": "c7fe3e9d-d012-4e49-9863-eb863b97978b",
+    "replaces_name": "Hung Yen"
+   },
+   {
+    "title": "Hung [-Yên]",
+    "note": "Demi-feuille Ouest",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23887,
+    "nakala": "10.34847/nkl.6b288v2q",
+    "sha1": "nkl.6b288v2q",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6b288v2q/a952e3a08771b4d671ee8f6c056531f4bf3ff9c4/info.json",
+    "replaces_map_id": "c7fe3e9d-d012-4e49-9863-eb863b97978b",
+    "replaces_name": "Hung Yen"
+   }
+  ],
+  "43": [
+   {
+    "title": "[Quinh] -Côi",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23767,
+    "nakala": "10.34847/nkl.87db334m",
+    "sha1": "nkl.87db334m",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.87db334m/a37c53599c51be4736c29c129d984bc7e904a799/info.json",
+    "replaces_map_id": "27698eaa-e56b-4778-9e61-c66b6bc0cc08",
+    "replaces_name": "Quynh Coi"
+   },
+   {
+    "title": "Quynh [-Côi]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23904,
+    "nakala": "10.34847/nkl.f4adpoik",
+    "sha1": "nkl.f4adpoik",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f4adpoik/4ac3efff94eb29e4d63b958d2221e48e93037f15/info.json",
+    "replaces_map_id": "27698eaa-e56b-4778-9e61-c66b6bc0cc08",
+    "replaces_name": "Quynh Coi"
+   }
+  ],
+  "44": [
+   {
+    "title": "[Phu-] Duc",
+    "note": "Demi-feuille Est",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23769,
+    "nakala": "10.34847/nkl.6ded2ji2",
+    "sha1": "nkl.6ded2ji2",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6ded2ji2/a54647a9642dddce642be2a0953c4c2c56bb228c/info.json",
+    "replaces_map_id": "50ee792d-633c-4c3a-af8e-ab576ce7300b",
+    "replaces_name": "Phu Duc"
+   },
+   {
+    "title": "Phu- [Duc]",
+    "note": "Demi-feuille Ouest",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23920,
+    "nakala": "10.34847/nkl.0bc07p08",
+    "sha1": "nkl.0bc07p08",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0bc07p08/a15a74634683e35b19c9438f76028642c639a42d/info.json",
+    "replaces_map_id": "50ee792d-633c-4c3a-af8e-ab576ce7300b",
+    "replaces_name": "Phu Duc"
+   }
+  ],
+  "45": [
+   {
+    "title": "[Cu'a-Th]ai-Binh",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23770,
+    "nakala": "10.34847/nkl.9659fd00",
+    "sha1": "nkl.9659fd00",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9659fd00/70aca9a444a199b59fad3e4bcc6fc276c4f49f66/info.json",
+    "replaces_map_id": "d2178fe7-c2fa-4ab7-9e48-eb62070ac980",
+    "replaces_name": "Cua Thai Binh"
+   },
+   {
+    "title": "Cu'a-Th[ai-Binh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23928,
+    "nakala": "10.34847/nkl.cda84th3",
+    "sha1": "nkl.cda84th3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.cda84th3/27db52428d36205aee0494ddb7fbdd2bd93df668/info.json",
+    "replaces_map_id": "d2178fe7-c2fa-4ab7-9e48-eb62070ac980",
+    "replaces_name": "Cua Thai Binh"
+   }
+  ],
+  "48": [
+   {
+    "title": "[Phu] -Ly",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23755,
+    "nakala": "10.34847/nkl.44ccxm16",
+    "sha1": "nkl.44ccxm16",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.44ccxm16/0ce4340979cf9f907301551fe4710ca6e3625467/info.json",
+    "replaces_map_id": "02d32cbd-be89-4274-9dff-dc2337b29511",
+    "replaces_name": "Phu Ly"
+   },
+   {
+    "title": "Phu [-Ly]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23864,
+    "nakala": "10.34847/nkl.3e79z73a",
+    "sha1": "nkl.3e79z73a",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.3e79z73a/5f58286a940feadd17c9c3b40c37caac434fc7b2/info.json",
+    "replaces_map_id": "02d32cbd-be89-4274-9dff-dc2337b29511",
+    "replaces_name": "Phu Ly"
+   }
+  ],
+  "49": [
+   {
+    "title": "[Nhu'-] Trac",
+    "note": "Demi-feuille Est",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23756,
+    "nakala": "10.34847/nkl.eff66y19",
+    "sha1": "nkl.eff66y19",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eff66y19/26422316470181ba312ef6dde0ac3b92a468ee5b/info.json",
+    "replaces_map_id": "7a4f8b7d-60fd-4d1a-a07d-19636265f073",
+    "replaces_name": "Nhu Trac"
+   },
+   {
+    "title": "Nhu'- [Trac]",
+    "note": "Demi-feuille Ouest",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23884,
+    "nakala": "10.34847/nkl.e9edmtm9",
+    "sha1": "nkl.e9edmtm9",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e9edmtm9/09e9c0357753f448e4cebd421a891b7875b66a2b/info.json",
+    "replaces_map_id": "7a4f8b7d-60fd-4d1a-a07d-19636265f073",
+    "replaces_name": "Nhu Trac"
+   }
+  ],
+  "50": [
+   {
+    "title": "[Phu-Tiê]n-Hung",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23757,
+    "nakala": "10.34847/nkl.6c35x036",
+    "sha1": "nkl.6c35x036",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6c35x036/1acda02c8d07b6c877001e225595f37f1a0f046b/info.json",
+    "replaces_map_id": "c569cfd2-994d-4a48-819f-8bdba4b3f0bd",
+    "replaces_name": "Phu Tien Hung"
+   },
+   {
+    "title": "Phu-Tiê[n-Hung]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23902,
+    "nakala": "10.34847/nkl.16fe94g2",
+    "sha1": "nkl.16fe94g2",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16fe94g2/9e7b0f141a0dfbfffbb382bd3da3d07771a54136/info.json",
+    "replaces_map_id": "c569cfd2-994d-4a48-819f-8bdba4b3f0bd",
+    "replaces_name": "Phu Tien Hung"
+   }
+  ],
+  "51": [
+   {
+    "title": "[Dông-] Quan",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23759,
+    "nakala": "10.34847/nkl.2ef23u00",
+    "sha1": "nkl.2ef23u00",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ef23u00/fae9fbd3b605a617727a1e9f8d5bcec62be674d9/info.json",
+    "replaces_map_id": "398f3897-75ce-4ea0-be4c-29d28aee7e0e",
+    "replaces_name": "Dong Quan"
+   },
+   {
+    "title": "Dông- [Quan]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23918,
+    "nakala": "10.34847/nkl.2ee68bt3",
+    "sha1": "nkl.2ee68bt3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ee68bt3/030c5a689d58cffc9915e54fb2dc070710769f58/info.json",
+    "replaces_map_id": "398f3897-75ce-4ea0-be4c-29d28aee7e0e",
+    "replaces_name": "Dong Quan"
+   }
+  ],
+  "54": [
+   {
+    "title": "[Y-] Yên",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23750,
+    "nakala": "10.34847/nkl.92d7x94x",
+    "sha1": "nkl.92d7x94x",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.92d7x94x/7bbe836e346b30bc15f8cefd394cc1691f8dd2bd/info.json",
+    "replaces_map_id": "e6c5e467-ae7b-478f-9357-6fe12b8e7361",
+    "replaces_name": "Y Yen"
+   },
+   {
+    "title": "Y- [Yên]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23863,
+    "nakala": "10.34847/nkl.82fdbkjm",
+    "sha1": "nkl.82fdbkjm",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.82fdbkjm/aabce4c587b1ae7e9b93f834bafe520b1a74664c/info.json",
+    "replaces_map_id": "e6c5e467-ae7b-478f-9357-6fe12b8e7361",
+    "replaces_name": "Y Yen"
+   }
+  ],
+  "55": [
+   {
+    "title": "[Nam-] Dinh",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23751,
+    "nakala": "10.34847/nkl.eb4bs3jp",
+    "sha1": "nkl.eb4bs3jp",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eb4bs3jp/2ea6a153d4e8da3c6a0374cb181ec39f6a860640/info.json",
+    "replaces_map_id": "f04311b8-b122-45f7-84a7-19c53638938e",
+    "replaces_name": "Nam Dinh"
+   },
+   {
+    "title": "Nam- [Dinh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23882,
+    "nakala": "10.34847/nkl.e76a1g67",
+    "sha1": "nkl.e76a1g67",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e76a1g67/8b1cf3889bcf987c50cf6a549d6e676c0af3fd76/info.json",
+    "replaces_map_id": "f04311b8-b122-45f7-84a7-19c53638938e",
+    "replaces_name": "Nam Dinh"
+   }
+  ],
+  "56": [
+   {
+    "title": "[Thai-] Binh",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23752,
+    "nakala": "10.34847/nkl.c9d9561g",
+    "sha1": "nkl.c9d9561g",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c9d9561g/8ac6dac38437b962565222b84939dad36deedb68/info.json",
+    "replaces_map_id": "78c507fb-a6a3-457e-ae79-19575d0ff90c",
+    "replaces_name": "Thai Binh"
+   },
+   {
+    "title": "Thai- [Binh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23901,
+    "nakala": "10.34847/nkl.8c2bl018",
+    "sha1": "nkl.8c2bl018",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8c2bl018/836e1627862a2b8c670714bece74ec6ee2d14201/info.json",
+    "replaces_map_id": "78c507fb-a6a3-457e-ae79-19575d0ff90c",
+    "replaces_name": "Thai Binh"
+   }
+  ],
+  "57": [
+   {
+    "title": "[Kièn-] Xuong",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23753,
+    "nakala": "10.34847/nkl.f4ef5gr3",
+    "sha1": "nkl.f4ef5gr3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f4ef5gr3/25d4328f42e47a497d89f0b48d1046ff52154d4c/info.json",
+    "replaces_map_id": "0aef7123-8767-44e0-8687-570878040801",
+    "replaces_name": "Kien Xuong"
+   },
+   {
+    "title": "Kièn- [Xuong]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23917,
+    "nakala": "10.34847/nkl.aa7b97c0",
+    "sha1": "nkl.aa7b97c0",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.aa7b97c0/13abe54f124c349684d2411a9568cf5e2f2566b4/info.json",
+    "replaces_map_id": "0aef7123-8767-44e0-8687-570878040801",
+    "replaces_name": "Kien Xuong"
+   }
+  ],
+  "59": [
+   {
+    "title": "[Ninh] -Binh",
+    "note": "Demi-feuille Est",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23741,
+    "nakala": "10.34847/nkl.19aed4k7",
+    "sha1": "nkl.19aed4k7",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.19aed4k7/165ac6108b7c97f3805e545380982248dc0c2d52/info.json",
+    "replaces_map_id": "4deb3728-bc1e-48f1-9e02-164a95e88326",
+    "replaces_name": "Ninh Binh"
+   },
+   {
+    "title": "Ninh [-Binh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1924,
+    "serie": 243,
+    "fkey": 23861,
+    "nakala": "10.34847/nkl.83b168i3",
+    "sha1": "nkl.83b168i3",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.83b168i3/357b7ff2ebfe223eeb512e54b5ff408bf13b95e9/info.json",
+    "replaces_map_id": "4deb3728-bc1e-48f1-9e02-164a95e88326",
+    "replaces_name": "Ninh Binh"
+   }
+  ],
+  "60": [
+   {
+    "title": "[Phu-Ngh]ia-Hung",
+    "note": "Demi-feuille Est",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23742,
+    "nakala": "10.34847/nkl.bd3f9o9r",
+    "sha1": "nkl.bd3f9o9r",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bd3f9o9r/e72cf5c21832d72f3300fcce711baa5212b66f6e/info.json",
+    "replaces_map_id": "e21f1e1e-a1ce-4633-aae4-82408b7d35bd",
+    "replaces_name": "Phu Nghia Hung"
+   },
+   {
+    "title": "Phu-Ngh[ia-Hung]",
+    "note": "Demi-feuille Ouest",
+    "year": 1903,
+    "serie": 243,
+    "fkey": 23880,
+    "nakala": "10.34847/nkl.8c1fp1wc",
+    "sha1": "nkl.8c1fp1wc",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8c1fp1wc/ef19eac64822a86180ccd7dd71b586cb4254a21e/info.json",
+    "replaces_map_id": "e21f1e1e-a1ce-4633-aae4-82408b7d35bd",
+    "replaces_name": "Phu Nghia Hung"
+   }
+  ],
+  "61": [
+   {
+    "title": "[Phu-Xyân] -Truong",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23744,
+    "nakala": "10.34847/nkl.317dqow6",
+    "sha1": "nkl.317dqow6",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.317dqow6/b60f5585e52e9bf901ef2d1ca79a3624d0c1b46b/info.json",
+    "replaces_map_id": "c5db9be9-d131-45bf-a133-3c4a206207ae",
+    "replaces_name": "Phu Xuan Truong"
+   },
+   {
+    "title": "Phu-Xyân [-Truong]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23900,
+    "nakala": "10.34847/nkl.da57yqdd",
+    "sha1": "nkl.da57yqdd",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da57yqdd/e0dcff17a72b6d821acaca43e663bd40954ca0d8/info.json",
+    "replaces_map_id": "c5db9be9-d131-45bf-a133-3c4a206207ae",
+    "replaces_name": "Phu Xuan Truong"
+   }
+  ],
+  "62": [
+   {
+    "title": "[Cua-B]a-Lat",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23745,
+    "nakala": "10.34847/nkl.2e34q338",
+    "sha1": "nkl.2e34q338",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2e34q338/95d12a86ebeda68a8c13486764303d2e13165f81/info.json",
+    "replaces_map_id": "ef6a439a-ae4d-428f-b0f9-8b37a2852156",
+    "replaces_name": "Cua Ba Lat"
+   },
+   {
+    "title": "Cua-B[a-Lat]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23916,
+    "nakala": "10.34847/nkl.bb47946s",
+    "sha1": "nkl.bb47946s",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bb47946s/d292476df02e694e11041b4122649e868376c514/info.json",
+    "replaces_map_id": "ef6a439a-ae4d-428f-b0f9-8b37a2852156",
+    "replaces_name": "Cua Ba Lat"
+   }
+  ],
+  "64": [
+   {
+    "title": "[Cho-] Ganh",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23734,
+    "nakala": "10.34847/nkl.cfdcp0bc",
+    "sha1": "nkl.cfdcp0bc",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.cfdcp0bc/901d0f38040c2e484dfc47f0cf1e245ba69ad87a/info.json",
+    "replaces_map_id": "dfd7dadd-3841-4cdf-872c-44d55e15bb78",
+    "replaces_name": "Cho Ganh"
+   },
+   {
+    "title": "Cho- [Ganh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23859,
+    "nakala": "10.34847/nkl.9eaf7uj0",
+    "sha1": "nkl.9eaf7uj0",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9eaf7uj0/4a7f9925a57dc432dc77675553d611c15d0643a1/info.json",
+    "replaces_map_id": "dfd7dadd-3841-4cdf-872c-44d55e15bb78",
+    "replaces_name": "Cho Ganh"
+   }
+  ],
+  "65": [
+   {
+    "title": "[Phu] -Nhac",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23735,
+    "nakala": "10.34847/nkl.22617wad",
+    "sha1": "nkl.22617wad",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.22617wad/fc57dd8c00d9698272186a528b79eb9fcb307294/info.json",
+    "replaces_map_id": "10c654fc-9eb8-4a09-90b5-731e1cb72c79",
+    "replaces_name": "Phu Nhac"
+   },
+   {
+    "title": "Phu [-Nhac]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23879,
+    "nakala": "10.34847/nkl.d6353bw0",
+    "sha1": "nkl.d6353bw0",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d6353bw0/59f9d378b854a433f74a6b5f493dfeab3c3bd1f6/info.json",
+    "replaces_map_id": "10c654fc-9eb8-4a09-90b5-731e1cb72c79",
+    "replaces_name": "Phu Nhac"
+   }
+  ],
+  "66": [
+   {
+    "title": "[Quât] -Lâm",
+    "note": "Demi-feuille Est",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23737,
+    "nakala": "10.34847/nkl.beef61e7",
+    "sha1": "nkl.beef61e7",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.beef61e7/5421a6456b4391e2222106ae7812fd60953c5d10/info.json",
+    "replaces_map_id": "56a459b1-8650-49ad-9913-461e6461edc8",
+    "replaces_name": "Quat Lam"
+   },
+   {
+    "title": "Quât [-Lâm]",
+    "note": "Demi-feuille Ouest",
+    "year": 1926,
+    "serie": 243,
+    "fkey": 23899,
+    "nakala": "10.34847/nkl.226ckx58",
+    "sha1": "nkl.226ckx58",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.226ckx58/4c77b0845bab63c7d5f9aa509e446019ec5f9b51/info.json",
+    "replaces_map_id": "56a459b1-8650-49ad-9913-461e6461edc8",
+    "replaces_name": "Quat Lam"
+   }
+  ],
+  "68": [
+   {
+    "title": "[Biên] -Son",
+    "note": "Demi-feuille Est",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23730,
+    "nakala": "10.34847/nkl.da27qot2",
+    "sha1": "nkl.da27qot2",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da27qot2/ad2c8e5bca09b73ad0b698353505208453cc99ea/info.json",
+    "replaces_map_id": "be36fb42-c0dd-4667-9f6e-aefb4f24abb6",
+    "replaces_name": "Bien Son"
+   },
+   {
+    "title": "Biên [-Son]",
+    "note": "Demi-feuille Ouest",
+    "year": 1906,
+    "serie": 243,
+    "fkey": 23858,
+    "nakala": "10.34847/nkl.0a2441p0",
+    "sha1": "nkl.0a2441p0",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0a2441p0/adafddf0a04c7fab5e78c3d19c3cf20816d29728/info.json",
+    "replaces_map_id": "be36fb42-c0dd-4667-9f6e-aefb4f24abb6",
+    "replaces_name": "Bien Son"
+   }
+  ],
+  "69": [
+   {
+    "title": "Phat [-Diêm]",
+    "note": "Demi-feuille Ouest",
+    "year": 1927,
+    "serie": 243,
+    "fkey": 23878,
+    "nakala": "10.34847/nkl.d6b3qay9",
+    "sha1": "nkl.d6b3qay9",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d6b3qay9/25d8c608ace4bdbd94d273bc3e4b393388b449be/info.json",
+    "replaces_map_id": "c2b5360f-024b-4e49-a587-9a2a7d7a3aad",
+    "replaces_name": "Phat Diem"
+   }
+  ],
+  "71": [
+   {
+    "title": "[Yên-] Lang",
+    "note": "Demi-feuille Est",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23841,
+    "nakala": "10.34847/nkl.b13fxng8",
+    "sha1": "nkl.b13fxng8",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b13fxng8/95db695bf538a2483e334537f0b954bdd8c652d1/info.json",
+    "replaces_map_id": "e17b7fe0-6428-4a59-921f-17924273d8de",
+    "replaces_name": "Yen Lang"
+   },
+   {
+    "title": "Yên- [Lang]",
+    "note": "Demi-feuille Ouest",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23725,
+    "nakala": "10.34847/nkl.895ax8g1",
+    "sha1": "nkl.895ax8g1",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.895ax8g1/25b0bbc9725099b0ab2c874d8476110903380ced/info.json",
+    "replaces_map_id": "e17b7fe0-6428-4a59-921f-17924273d8de",
+    "replaces_name": "Yen Lang"
+   }
+  ],
+  "72": [
+   {
+    "title": "[Yên-] Dinh",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23847,
+    "nakala": "10.34847/nkl.5026jrgp",
+    "sha1": "nkl.5026jrgp",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5026jrgp/4bdbc8953df81d7fddd95bee83962fea266ee268/info.json",
+    "replaces_map_id": "dd575794-8ff0-485f-9875-39f697b1b009",
+    "replaces_name": "Yen Dinh"
+   },
+   {
+    "title": "Yên- [Dinh]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23726,
+    "nakala": "10.34847/nkl.90a269cw",
+    "sha1": "nkl.90a269cw",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.90a269cw/0ed35083d2f4c18970fbdfd9f43eecb828279d34/info.json",
+    "replaces_map_id": "dd575794-8ff0-485f-9875-39f697b1b009",
+    "replaces_name": "Yen Dinh"
+   }
+  ],
+  "73": [
+   {
+    "title": "[Sen-] Cù",
+    "note": "Demi-feuille Est",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23727,
+    "nakala": "10.34847/nkl.7d1a0hb7",
+    "sha1": "nkl.7d1a0hb7",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.7d1a0hb7/5ac37f9a09c7c3efc08c43571b781c3b8e7a2c1c/info.json",
+    "replaces_map_id": "a37a985f-d5a5-4674-9b94-5ffa81f0c086",
+    "replaces_name": "Sen Cu"
+   },
+   {
+    "title": "Sen- [Cu]",
+    "note": "Demi-feuille Ouest",
+    "year": 1905,
+    "serie": 243,
+    "fkey": 23857,
+    "nakala": "10.34847/nkl.612cttmw",
+    "sha1": "nkl.612cttmw",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.612cttmw/df93e5c569a0f2b848910820a0c3d0a8a3a78dfb/info.json",
+    "replaces_map_id": "a37a985f-d5a5-4674-9b94-5ffa81f0c086",
+    "replaces_name": "Sen Cu"
+   }
+  ],
+  "74": [
+   {
+    "title": "[Lôi-D]uong",
+    "note": "Demi-feuille Est",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23839,
+    "nakala": "10.34847/nkl.4f0crv1o",
+    "sha1": "nkl.4f0crv1o",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4f0crv1o/480813e884fd143dc0df0fd2bc3e92d5c082686d/info.json",
+    "replaces_map_id": "8d4defb1-f713-4c9f-81fc-7719508b55c2",
+    "replaces_name": "Loi Duong"
+   },
+   {
+    "title": "Lôi- [Duong]",
+    "note": "Demi-feuille Ouest",
+    "year": 1919,
+    "serie": 243,
+    "fkey": 23722,
+    "nakala": "10.34847/nkl.ee2b791x",
+    "sha1": "nkl.ee2b791x",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ee2b791x/e1f56355aeea37e7f0d8839c8f57aebd4b6a4062/info.json",
+    "replaces_map_id": "8d4defb1-f713-4c9f-81fc-7719508b55c2",
+    "replaces_name": "Loi Duong"
+   }
+  ],
+  "75": [
+   {
+    "title": "[Thanh] -Hóa",
+    "note": "Demi-feuille Est",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23846,
+    "nakala": "10.34847/nkl.11edjqd5",
+    "sha1": "nkl.11edjqd5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.11edjqd5/4cb04a4384640a093f5e9b99c26279f86a91b569/info.json",
+    "replaces_map_id": "a90c2464-f6aa-46d2-b167-272214b4545f",
+    "replaces_name": "Thanh Hoa"
+   },
+   {
+    "title": "Thanh [-Hóa]",
+    "note": "Demi-feuille Ouest",
+    "year": 1904,
+    "serie": 243,
+    "fkey": 23723,
+    "nakala": "10.34847/nkl.443c56ug",
+    "sha1": "nkl.443c56ug",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.443c56ug/100a3f3ca53e74f200dd15839d7e355713df753e/info.json",
+    "replaces_map_id": "a90c2464-f6aa-46d2-b167-272214b4545f",
+    "replaces_name": "Thanh Hoa"
+   }
+  ],
+  "0 bis": [
+   {
+    "title": "[Nha] -Nam",
+    "note": "Demi-feuille Est",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23833,
+    "nakala": "10.34847/nkl.6ab6nj9p",
+    "sha1": "nkl.6ab6nj9p",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6ab6nj9p/3a4065a6d73377931d7e8296714f294a4072a7a8/info.json",
+    "replaces_map_id": "91513ec8-4f6f-47bb-a4c7-4abe33d7ff11",
+    "replaces_name": "Nha nam"
+   },
+   {
+    "title": "Nha [-Nam]",
+    "note": "Demi-feuille Ouest",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23896,
+    "nakala": "10.34847/nkl.da0ccgg5",
+    "sha1": "nkl.da0ccgg5",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da0ccgg5/b56d1d2aafae53ea4ddeea0a5c73935871e75459/info.json",
+    "replaces_map_id": "91513ec8-4f6f-47bb-a4c7-4abe33d7ff11",
+    "replaces_name": "Nha nam"
+   }
+  ],
+  "5 bis": [
+   {
+    "title": "[Bao-] Lôc",
+    "note": "Demi-feuille Est",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23830,
+    "nakala": "10.34847/nkl.227840ii",
+    "sha1": "nkl.227840ii",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.227840ii/9da1fd427835372fd916a905d54d3ac94c14cefa/info.json",
+    "replaces_map_id": "8b06f217-d408-4092-8124-becb8cd30cb9",
+    "replaces_name": "Bao Loc"
+   },
+   {
+    "title": "Bao- [Lôc]",
+    "note": "Demi-feuille Ouest",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23913,
+    "nakala": "10.34847/nkl.ff699x98",
+    "sha1": "nkl.ff699x98",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ff699x98/dbc4d10dffd3e2e23d58f85197381bdd535093a8/info.json",
+    "replaces_map_id": "8b06f217-d408-4092-8124-becb8cd30cb9",
+    "replaces_name": "Bao Loc"
+   }
+  ],
+  "10 bis": [
+   {
+    "title": "[Cam] -Ly",
+    "note": "Demi-feuille Est.",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23820,
+    "nakala": "10.34847/nkl.e13d237s",
+    "sha1": "nkl.e13d237s",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e13d237s/6976437bc74ca06cb97720be4d6df99ad2285e00/info.json",
+    "replaces_map_id": "8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5",
+    "replaces_name": "Cam Ly"
+   },
+   {
+    "title": "Cam [-Ly]",
+    "note": "Demi-feuille Ouest",
+    "year": 1907,
+    "serie": 243,
+    "fkey": 23911,
+    "nakala": "10.34847/nkl.dea4za9b",
+    "sha1": "nkl.dea4za9b",
+    "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.dea4za9b/4d53c184d5cf6e892e61bb23c35f7fbfc791d4f3/info.json",
+    "replaces_map_id": "8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5",
+    "replaces_name": "Cam Ly"
+   }
+  ]
+ }
+}

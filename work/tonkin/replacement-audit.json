@@ -1,0 +1,5439 @@
+{
+ "generated_at": "2026-09-14T17:37:18.933Z",
+ "collection": "Indochine 1:25,000 — Tonkin & Thanh Hóa",
+ "series_key": "indochine-1-25-000-tonkin-thanh-hoa",
+ "measured_at": "2026-09-14T17:32:15.094Z",
+ "note": "Read-only audit. Every pixel figure is that sheet's own info.json, not a median.",
+ "totals": {
+  "rows_in_collection": 84,
+  "ign_half_sheets_held": 22,
+  "third_party_composites": 62,
+  "catalogue_cells": 79,
+  "cells_we_hold": 75,
+  "cells_not_held": 4,
+  "serie_243_records": 216,
+  "serie_243_digitised": 212,
+  "serie_175_records": 88,
+  "serie_175_digitised": 0,
+  "composites_clean_swap": 60,
+  "composites_with_issues": 2,
+  "composites_imitating_a_real_ign_assemblage": 9,
+  "replacement_sheets": 122,
+  "mpx_now": 1173.6,
+  "mpx_after": 1392.4,
+  "data_problems": 3,
+  "mpx_gain_pct": 19
+ },
+ "problems": [
+  {
+   "kind": "catalogue",
+   "msg": "cell 25 1904 s243 fkey 23803: note says W, title \"[Quang] -Yên\" says E"
+  },
+  {
+   "kind": "catalogue",
+   "msg": "cell 74 1904 s243 fkey 23838: note says W, title \"[Lôi-] Duong\" says E"
+  },
+  {
+   "kind": "our-rows",
+   "msg": "An Thi (cell 35, ours 1904): serie 243 has no record of that year — it holds 1905, 1924"
+  }
+ ],
+ "composites": [
+  {
+   "map_id": "bdf3936f-4501-4b54-8acd-d80f352f26fa",
+   "slug": "an-thi",
+   "cell": "35",
+   "name": "An Thi",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5089,
+    "h": 3615,
+    "mpx": 18.4
+   },
+   "replacement": {
+    "complete": false,
+    "sheets": [],
+    "mpx_now": 18.4,
+    "mpx_after": null,
+    "gain_pct": null
+   },
+   "notes": [],
+   "issues": [
+    "serie 243 has nothing of 1904 for cell 35"
+   ],
+   "clean": false
+  },
+  {
+   "map_id": "c2b5360f-024b-4e49-a587-9a2a7d7a3aad",
+   "slug": "phat-diem",
+   "cell": "69",
+   "name": "Phat Diem",
+   "our_year": 1927,
+   "status": "public",
+   "ours": {
+    "w": 5001,
+    "h": 3771,
+    "mpx": 18.86
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1927,
+      "title": "[Phat] -Diêm",
+      "fkey": 23732,
+      "dpKey": 58955,
+      "doi": null,
+      "iiif": null,
+      "w": null,
+      "h": null,
+      "mpx": null,
+      "digitised": false,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1927,
+      "title": "Phat [-Diêm]",
+      "fkey": 23878,
+      "dpKey": 58957,
+      "doi": "10.34847/nkl.d6b3qay9",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d6b3qay9/25d8c608ace4bdbd94d273bc3e4b393388b449be/info.json",
+      "w": 2686,
+      "h": 3853,
+      "mpx": 10.35,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.86,
+    "mpx_after": 10.35,
+    "gain_pct": -45
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 69 dated 1927 (serie 175, fkey 16686) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [
+    "1 of the replacement sheets is catalogued but not digitised",
+    "fewer pixels after: 18.86 Mpx now against 10.35 Mpx"
+   ],
+   "clean": false
+  },
+  {
+   "map_id": "d2e230dc-88b1-4069-9f84-304cecb393fa",
+   "slug": "ha-chau",
+   "cell": "0",
+   "name": "Ha chau",
+   "our_year": 1907,
+   "status": "public",
+   "ours": {
+    "w": 4876,
+    "h": 3644,
+    "mpx": 17.77
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1907,
+      "title": "[Ha-] Châu",
+      "fkey": 23831,
+      "dpKey": 58765,
+      "doi": "10.34847/nkl.793aor35",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.793aor35/5992c92e0e72ee22217bda6060efa45a50fcf08b/info.json",
+      "w": 2673,
+      "h": 3772,
+      "mpx": 10.08,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1907,
+      "title": "Ha- [Châu]",
+      "fkey": 23874,
+      "dpKey": 58767,
+      "doi": "10.34847/nkl.e4ef954e",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e4ef954e/1ae64a8bd8b2aee54828524c8f963f545784f78f/info.json",
+      "w": 2542,
+      "h": 3813,
+      "mpx": 9.69,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.77,
+    "mpx_after": 19.77,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "91513ec8-4f6f-47bb-a4c7-4abe33d7ff11",
+   "slug": "nha-nam",
+   "cell": "0 bis",
+   "name": "Nha nam",
+   "our_year": 1907,
+   "status": "public",
+   "ours": {
+    "w": 5064,
+    "h": 3686,
+    "mpx": 18.67
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1907,
+      "title": "[Nha] -Nam",
+      "fkey": 23833,
+      "dpKey": 58763,
+      "doi": "10.34847/nkl.6ab6nj9p",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6ab6nj9p/3a4065a6d73377931d7e8296714f294a4072a7a8/info.json",
+      "w": 2719,
+      "h": 3979,
+      "mpx": 10.82,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1907,
+      "title": "Nha [-Nam]",
+      "fkey": 23896,
+      "dpKey": 58764,
+      "doi": "10.34847/nkl.da0ccgg5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da0ccgg5/b56d1d2aafae53ea4ddeea0a5c73935871e75459/info.json",
+      "w": 2710,
+      "h": 3787,
+      "mpx": 10.26,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.67,
+    "mpx_after": 21.08,
+    "gain_pct": 13
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "0e943fca-ea08-4f4b-bb5e-0e80a4888f91",
+   "slug": "viet-tri",
+   "cell": "1",
+   "name": "Viet Tri",
+   "our_year": 1906,
+   "status": "public",
+   "ours": {
+    "w": 4898,
+    "h": 3681,
+    "mpx": 18.03
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1906,
+      "title": "[Viêt] -Tri",
+      "fkey": 23822,
+      "dpKey": 58769,
+      "doi": "10.34847/nkl.18b18848",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.18b18848/5433518069a74032ec4a5e74d7339a466be8970f/info.json",
+      "w": 2565,
+      "h": 3769,
+      "mpx": 9.67,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1906,
+      "title": "Viêt [-Tri]",
+      "fkey": 23835,
+      "dpKey": 58771,
+      "doi": "10.34847/nkl.d80d3k8q",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d80d3k8q/801c1f599bc5299e328c3340ed8ac86c62e5ac68/info.json",
+      "w": 2536,
+      "h": 3717,
+      "mpx": 9.43,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.03,
+    "mpx_after": 19.1,
+    "gain_pct": 6
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "2bd040e9-68e0-4b98-acbe-fea97a6e3bc2",
+   "slug": "vinh-yen-1919",
+   "cell": "2",
+   "name": "Vinh Yen",
+   "our_year": 1919,
+   "status": "public",
+   "ours": {
+    "w": 4775,
+    "h": 3645,
+    "mpx": 17.4
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1919,
+      "title": "[Vinh] -Yèn",
+      "fkey": 23845,
+      "dpKey": 58775,
+      "doi": "10.34847/nkl.bffb67v5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bffb67v5/7b8594a93467bae9d326e382242ed05935cc132a/info.json",
+      "w": 2584,
+      "h": 3780,
+      "mpx": 9.77,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1919,
+      "title": "Vinh [-Yèn]",
+      "fkey": 23825,
+      "dpKey": 58777,
+      "doi": "10.34847/nkl.c6aebn23",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c6aebn23/d5e127cf8816e259bfb5fe67ad4d18bd0d309e4d/info.json",
+      "w": 2556,
+      "h": 3741,
+      "mpx": 9.56,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.4,
+    "mpx_after": 19.33,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "9c6bdac2-ffab-4803-ae0f-846b51b8009c",
+   "slug": "vinh-yen-1906",
+   "cell": "2",
+   "name": "Vinh Yen",
+   "our_year": 1906,
+   "status": "public",
+   "ours": {
+    "w": 4752,
+    "h": 3652,
+    "mpx": 17.35
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1906,
+      "title": "[Vinh] -Yèn",
+      "fkey": 23844,
+      "dpKey": 58774,
+      "doi": "10.34847/nkl.23e37bxt",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.23e37bxt/3ce3413c793e69f30e4b9f8de4f275db358dd32e/info.json",
+      "w": 2586,
+      "h": 3795,
+      "mpx": 9.81,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1906,
+      "title": "Vinh [-Yèn]",
+      "fkey": 23824,
+      "dpKey": 58776,
+      "doi": "10.34847/nkl.f8abtndy",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f8abtndy/0b17d24e56c04981ebc652fc7aa312de591b8ca2/info.json",
+      "w": 2523,
+      "h": 3747,
+      "mpx": 9.45,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.35,
+    "mpx_after": 19.26,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "a33ced6f-e106-40f6-9bdc-ab0f92a4882e",
+   "slug": "binh-xuyen",
+   "cell": "3",
+   "name": "Binh Xuyen",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 4759,
+    "h": 3663,
+    "mpx": 17.43
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[Binh-] Xuyên",
+      "fkey": 23854,
+      "dpKey": 58779,
+      "doi": "10.34847/nkl.36523644",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.36523644/916c81c6f8d00be971e142289ff6f125264d5bfd/info.json",
+      "w": 2559,
+      "h": 3726,
+      "mpx": 9.53,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest.",
+      "year": 1924,
+      "title": "Binh- [Xuyên]",
+      "fkey": 23827,
+      "dpKey": 58781,
+      "doi": "10.34847/nkl.a67216d9",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a67216d9/047005c519abfa2a328d4f4a5a26308727593421/info.json",
+      "w": 2568,
+      "h": 3751,
+      "mpx": 9.63,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.43,
+    "mpx_after": 19.16,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "71894f3f-c2aa-4133-9c42-4e27941e2969",
+   "slug": "hiep-hoa",
+   "cell": "4",
+   "name": "Hiep Hoa",
+   "our_year": 1912,
+   "status": "public",
+   "ours": {
+    "w": 4890,
+    "h": 3741,
+    "mpx": 18.29
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1912,
+      "title": "[Hiêp] -Hoa",
+      "fkey": 23828,
+      "dpKey": 58782,
+      "doi": "10.34847/nkl.40167v7n",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.40167v7n/5ec5303773ba1cb6b78c9c12d23a220fb185f55f/info.json",
+      "w": 2598,
+      "h": 3855,
+      "mpx": 10.02,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1912,
+      "title": "Hiêp [-Hoa]",
+      "fkey": 23873,
+      "dpKey": 58783,
+      "doi": "10.34847/nkl.d7fep775",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7fep775/fddd991842e96eadb311477310eb20bc65fe8e43/info.json",
+      "w": 2712,
+      "h": 3859,
+      "mpx": 10.47,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.29,
+    "mpx_after": 20.49,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "1707c017-16e3-4c1f-95e7-5a0a685b2e5f",
+   "slug": "phu-lang-thuong",
+   "cell": "5",
+   "name": "Phu Lang Thuong",
+   "our_year": 1912,
+   "status": "public",
+   "ours": {
+    "w": 4995,
+    "h": 3747,
+    "mpx": 18.72
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1912,
+      "title": "[Phu-Lang] -Thuong",
+      "fkey": 23829,
+      "dpKey": 58786,
+      "doi": "10.34847/nkl.e51bg9t4",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e51bg9t4/612ec64c6ea6110ae724d20240afaaac50daca7f/info.json",
+      "w": 2724,
+      "h": 3868,
+      "mpx": 10.54,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1912,
+      "title": "Phu-Lang [-Thuong]",
+      "fkey": 23895,
+      "dpKey": 58787,
+      "doi": "10.34847/nkl.abc3473f",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.abc3473f/1a35db15522754533119c292c78c36aa9904ca9d/info.json",
+      "w": 2715,
+      "h": 3852,
+      "mpx": 10.46,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.72,
+    "mpx_after": 21,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "8b06f217-d408-4092-8124-becb8cd30cb9",
+   "slug": "bao-loc",
+   "cell": "5 bis",
+   "name": "Bao Loc",
+   "our_year": 1907,
+   "status": "public",
+   "ours": {
+    "w": 4813,
+    "h": 3614,
+    "mpx": 17.39
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1907,
+      "title": "[Bao-] Lôc",
+      "fkey": 23830,
+      "dpKey": 58784,
+      "doi": "10.34847/nkl.227840ii",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.227840ii/9da1fd427835372fd916a905d54d3ac94c14cefa/info.json",
+      "w": 2581,
+      "h": 3663,
+      "mpx": 9.45,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1907,
+      "title": "Bao- [Lôc]",
+      "fkey": 23913,
+      "dpKey": 58785,
+      "doi": "10.34847/nkl.ff699x98",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ff699x98/dbc4d10dffd3e2e23d58f85197381bdd535093a8/info.json",
+      "w": 2616,
+      "h": 3826,
+      "mpx": 10.01,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.39,
+    "mpx_after": 19.46,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "84ef795c-221d-477b-b584-e5ef047ed5ce",
+   "slug": "quang-oai",
+   "cell": "6",
+   "name": "Quang Oai",
+   "our_year": 1906,
+   "status": "public",
+   "ours": {
+    "w": 4920,
+    "h": 3632,
+    "mpx": 17.87
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1906,
+      "title": "[Phu-Qu]ang-Oai",
+      "fkey": 23817,
+      "dpKey": 58788,
+      "doi": "10.34847/nkl.fd19go92",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.fd19go92/1281a08f8bd1c2db5bdda2d0a11d18a92f8a63ca/info.json",
+      "w": 2568,
+      "h": 3823,
+      "mpx": 9.82,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1906,
+      "title": "Phu-Qu[ang-Oai]",
+      "fkey": 23834,
+      "dpKey": 58789,
+      "doi": "10.34847/nkl.20cao8lt",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.20cao8lt/6a50a0ec34b9072de5199fbc064e12b83db7d208/info.json",
+      "w": 2685,
+      "h": 3766,
+      "mpx": 10.11,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.87,
+    "mpx_after": 19.93,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "1f480a2b-3bbd-44ed-adea-2dad9e24d254",
+   "slug": "bac-ninh",
+   "cell": "10",
+   "name": "Bac Ninh",
+   "our_year": 1911,
+   "status": "public",
+   "ours": {
+    "w": 4885,
+    "h": 3661,
+    "mpx": 17.88
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1911,
+      "title": "[Bac-] Ninh",
+      "fkey": 23818,
+      "dpKey": 58794,
+      "doi": "10.34847/nkl.e1adv2lv",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e1adv2lv/8e602d1329907e3ff0add3b35a4f8373ea8d4397/info.json",
+      "w": 2560,
+      "h": 3741,
+      "mpx": 9.58,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1911,
+      "title": "Bac- [ Ninh]",
+      "fkey": 23893,
+      "dpKey": 58796,
+      "doi": "10.34847/nkl.2ff15r39",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ff15r39/2b852dafc7c92235921e88f26e66bd7ca741fee1/info.json",
+      "w": 2661,
+      "h": 3790,
+      "mpx": 10.09,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.88,
+    "mpx_after": 19.67,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5",
+   "slug": "cam-ly",
+   "cell": "10 bis",
+   "name": "Cam Ly",
+   "our_year": 1907,
+   "status": "public",
+   "ours": {
+    "w": 5037,
+    "h": 3691,
+    "mpx": 18.59
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est.",
+      "year": 1907,
+      "title": "[Cam] -Ly",
+      "fkey": 23820,
+      "dpKey": 58790,
+      "doi": "10.34847/nkl.e13d237s",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e13d237s/6976437bc74ca06cb97720be4d6df99ad2285e00/info.json",
+      "w": 2539,
+      "h": 3774,
+      "mpx": 9.58,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1907,
+      "title": "Cam [-Ly]",
+      "fkey": 23911,
+      "dpKey": 58793,
+      "doi": "10.34847/nkl.dea4za9b",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.dea4za9b/4d53c184d5cf6e892e61bb23c35f7fbfc791d4f3/info.json",
+      "w": 2734,
+      "h": 3819,
+      "mpx": 10.44,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.59,
+    "mpx_after": 20.02,
+    "gain_pct": 8
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "013daa15-185a-4d59-b854-e581557d65ce",
+   "slug": "son-tay",
+   "cell": "12",
+   "name": "Son Tay",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 4998,
+    "h": 3780,
+    "mpx": 18.89
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[Son-] Tây",
+      "fkey": 23843,
+      "dpKey": 58801,
+      "doi": "10.34847/nkl.d477hg0z",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d477hg0z/09f1ce2f846c43731a50b21710bc0776d3d0544a/info.json",
+      "w": 2686,
+      "h": 3865,
+      "mpx": 10.38,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1924,
+      "title": "Son- [Tây]",
+      "fkey": 23807,
+      "dpKey": 58802,
+      "doi": "10.34847/nkl.e9b3fv6b",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e9b3fv6b/d2de59720b73124cf2a7ce4908a1e165cceab6a2/info.json",
+      "w": 2683,
+      "h": 3865,
+      "mpx": 10.37,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.89,
+    "mpx_after": 20.75,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "a1de9760-8073-4ea1-b7ed-f8f4e2835cd3",
+   "slug": "hoai-duc-phu-1925",
+   "cell": "13",
+   "name": "Hoai Duc Phu",
+   "our_year": 1925,
+   "status": "public",
+   "ours": {
+    "w": 4983,
+    "h": 3786,
+    "mpx": 18.87
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1925,
+      "title": "[Hoài-D]uc-Phu",
+      "fkey": 23852,
+      "dpKey": 58804,
+      "doi": "10.34847/nkl.8acd2812",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8acd2812/249e798384b1e2b338f88714335ac45cad650ef9/info.json",
+      "w": 2676,
+      "h": 3877,
+      "mpx": 10.37,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest. La partie de la mention de date qui est donnée entre crochets est située sur la demi-feuille Est",
+      "year": 1925,
+      "title": "Hoài-D[uc-Phu]",
+      "fkey": 23809,
+      "dpKey": 58806,
+      "doi": "10.34847/nkl.e8f4tn9m",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e8f4tn9m/a395c01c02df6586c8b24d60276b74656c317a3d/info.json",
+      "w": 2682,
+      "h": 3874,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.87,
+    "mpx_after": 20.76,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c",
+   "slug": "hoai-duc-phu-1911",
+   "cell": "13",
+   "name": "Hoai Duc Phu",
+   "our_year": 1911,
+   "status": "public",
+   "ours": {
+    "w": 4890,
+    "h": 3747,
+    "mpx": 18.32
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1911,
+      "title": "[Hoài-D]uc-Phu",
+      "fkey": 23851,
+      "dpKey": 58803,
+      "doi": "10.34847/nkl.efedbwmi",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.efedbwmi/11f41b3a6d7d8d5eef3c846026a5b7e77a8db2d2/info.json",
+      "w": 2721,
+      "h": 3849,
+      "mpx": 10.47,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1911,
+      "title": "Hoài-D[uc-Phu]",
+      "fkey": 23808,
+      "dpKey": 58805,
+      "doi": "10.34847/nkl.f30f9b7g",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f30f9b7g/d54688bb96ccb110b42b79f7aebb9bd6dfb61670/info.json",
+      "w": 2599,
+      "h": 3873,
+      "mpx": 10.07,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.32,
+    "mpx_after": 20.54,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "19a677af-8d42-4402-9943-1f6608871b6c",
+   "slug": "phu-tu-son-1911",
+   "cell": "14",
+   "name": "Phu Tu Son",
+   "our_year": 1911,
+   "status": "public",
+   "ours": {
+    "w": 5048,
+    "h": 3772,
+    "mpx": 19.04
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1911,
+      "title": "[Phu-T]u-Son",
+      "fkey": 23810,
+      "dpKey": 58807,
+      "doi": "10.34847/nkl.16d09fk0",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16d09fk0/0dab9f80627912a075cf650e56f6477159cfaf87/info.json",
+      "w": 2721,
+      "h": 3855,
+      "mpx": 10.49,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1911,
+      "title": "Phu-T[u-Son]",
+      "fkey": 23871,
+      "dpKey": 58809,
+      "doi": "10.34847/nkl.26ad9xl5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.26ad9xl5/e9b8fb803ea67b7381fc61e893457d1a4e1e274e/info.json",
+      "w": 2743,
+      "h": 3856,
+      "mpx": 10.58,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.04,
+    "mpx_after": 21.07,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "d597464d-5e6e-4f66-9805-40dff437b131",
+   "slug": "phu-tu-son-1925",
+   "cell": "14",
+   "name": "Phu Tu Son",
+   "our_year": 1925,
+   "status": "public",
+   "ours": {
+    "w": 5011,
+    "h": 3783,
+    "mpx": 18.96
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1925,
+      "title": "[Phu-T]u-Son",
+      "fkey": 23811,
+      "dpKey": 58808,
+      "doi": "10.34847/nkl.eac1nwsd",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eac1nwsd/4da1920a3c1f5fe53b39b881e160dface59d674f/info.json",
+      "w": 2682,
+      "h": 3873,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1925,
+      "title": "Phu-T[u-Son]",
+      "fkey": 23872,
+      "dpKey": 58810,
+      "doi": "10.34847/nkl.ecbbf9r7",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ecbbf9r7/45a1ac5f72f60e2d76a43a2c342870968fb9f0cf/info.json",
+      "w": 2697,
+      "h": 3886,
+      "mpx": 10.48,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.96,
+    "mpx_after": 20.87,
+    "gain_pct": 10
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 14 dated 1925 (serie 175, fkey 16742) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "37f35a63-2841-47d6-bd94-8765dac81387",
+   "slug": "gia-binh",
+   "cell": "15",
+   "name": "Gia Binh",
+   "our_year": 1911,
+   "status": "public",
+   "ours": {
+    "w": 4902,
+    "h": 3692,
+    "mpx": 18.1
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1911,
+      "title": "[Gia-] Binh",
+      "fkey": 23812,
+      "dpKey": 58811,
+      "doi": "10.34847/nkl.d7dd1o12",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7dd1o12/44ad4b81c145e85c7911205d7ac6f1965e655f62/info.json",
+      "w": 2590,
+      "h": 3847,
+      "mpx": 9.96,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1911,
+      "title": "Gia- [Binh]",
+      "fkey": 23892,
+      "dpKey": 58812,
+      "doi": "10.34847/nkl.5bcb885c",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5bcb885c/4323d3dbe94314963fc7e3f60963d91abec65e39/info.json",
+      "w": 2688,
+      "h": 3790,
+      "mpx": 10.19,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.1,
+    "mpx_after": 20.15,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "6c1c0913-10e0-4e8d-8f18-2200f390231f",
+   "slug": "sept-pagodes",
+   "cell": "16",
+   "name": "Sept Pagodes",
+   "our_year": 1925,
+   "status": "public",
+   "ours": {
+    "w": 5013,
+    "h": 3782,
+    "mpx": 18.96
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1925,
+      "title": "[Sept-] Pagodes",
+      "fkey": 23813,
+      "dpKey": 58814,
+      "doi": "10.34847/nkl.02a9w72v",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.02a9w72v/c51094aec3f008217cf437e464d56bea2ebc498c/info.json",
+      "w": 2683,
+      "h": 3864,
+      "mpx": 10.37,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1925,
+      "title": "Sept- [Pagodes]",
+      "fkey": 23909,
+      "dpKey": 58816,
+      "doi": "10.34847/nkl.e27ex60z",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e27ex60z/d18c5eedaaebecfe8d3382cf0f2468f8e80bd917/info.json",
+      "w": 2683,
+      "h": 3876,
+      "mpx": 10.4,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.96,
+    "mpx_after": 20.77,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "9a167536-d24d-48a1-b403-91a01acbf6e2",
+   "slug": "dong-trieu",
+   "cell": "17",
+   "name": "Dong Trieu",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 4707,
+    "h": 3415,
+    "mpx": 16.07
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Dông-] Triêu",
+      "fkey": 23815,
+      "dpKey": 58817,
+      "doi": "10.34847/nkl.b1f1cfhx",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b1f1cfhx/6d23d0ca9dbb715936392c0fb0abf67ab0638c34/info.json",
+      "w": 2721,
+      "h": 3783,
+      "mpx": 10.29,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Dông- [Triêu]",
+      "fkey": 23926,
+      "dpKey": 58819,
+      "doi": "10.34847/nkl.4ed4j7of",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4ed4j7of/2e82cfb81e91719647cfbbe8884e2464b618104a/info.json",
+      "w": 2695,
+      "h": 3814,
+      "mpx": 10.28,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 16.07,
+    "mpx_after": 20.57,
+    "gain_pct": 28
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "4f6e91ba-1388-4c7e-9146-89fb324511f1",
+   "slug": "ha-noi",
+   "cell": "20",
+   "name": "Ha Noi",
+   "our_year": 1903,
+   "status": "public",
+   "ours": {
+    "w": 5167,
+    "h": 3856,
+    "mpx": 19.92
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1903,
+      "title": "[Hà-] Nôi",
+      "fkey": 23794,
+      "dpKey": 58823,
+      "doi": "10.34847/nkl.c486rj84",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c486rj84/bad3384d997a115e5ed59a4572fd17b05102a981/info.json",
+      "w": 2717,
+      "h": 3869,
+      "mpx": 10.51,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1903,
+      "title": "Hà- [Nôi]",
+      "fkey": 23870,
+      "dpKey": 58824,
+      "doi": "10.34847/nkl.6cc6ll3m",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6cc6ll3m/0df9a5d1650a876b2a710cf607cb082322298651/info.json",
+      "w": 2745,
+      "h": 4084,
+      "mpx": 11.21,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.92,
+    "mpx_after": 21.72,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "37ba77db-4d55-4fa3-a32b-55a44c9af8b3",
+   "slug": "ban-yen-nhan",
+   "cell": "21",
+   "name": "Ban Yen Nhan",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 4886,
+    "h": 3673,
+    "mpx": 17.95
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[Ban-Yê]n-Nhân",
+      "fkey": 23796,
+      "dpKey": 58826,
+      "doi": "10.34847/nkl.e385710d",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e385710d/9d306403b3f2de7138ee6f699d7dc200c3636ad1/info.json",
+      "w": 2574,
+      "h": 3732,
+      "mpx": 9.61,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1924,
+      "title": "Ban-Yê[n-Nhân]",
+      "fkey": 23891,
+      "dpKey": 58827,
+      "doi": "10.34847/nkl.f3ffdd0d",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f3ffdd0d/426e99d077b1077fe763f135ae8cd0a90bc99f50/info.json",
+      "w": 2673,
+      "h": 3873,
+      "mpx": 10.35,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.95,
+    "mpx_after": 19.96,
+    "gain_pct": 11
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 21 dated 1924 (serie 175, fkey 16731) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "54cd94cc-3450-4d57-9909-877b6b389a17",
+   "slug": "yen-luu",
+   "cell": "23",
+   "name": "Yen Luu",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 4751,
+    "h": 3611,
+    "mpx": 17.16
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Yên] -Luu",
+      "fkey": 23799,
+      "dpKey": 58830,
+      "doi": "10.34847/nkl.5401hhb5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5401hhb5/d95ec657622fb8c4fb9af36a272d7433caa401fd/info.json",
+      "w": 2473,
+      "h": 3679,
+      "mpx": 9.1,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Yên [-Luu]",
+      "fkey": 23924,
+      "dpKey": 58832,
+      "doi": "10.34847/nkl.fd03n646",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.fd03n646/9a60856c1d37300af2b3ac8c76deb57d9f28b635/info.json",
+      "w": 2545,
+      "h": 3735,
+      "mpx": 9.51,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.16,
+    "mpx_after": 18.61,
+    "gain_pct": 8
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "d4ec51b8-a3a1-4414-99c7-2bb46ea851e3",
+   "slug": "mai-dong",
+   "cell": "24",
+   "name": "Mai Dong",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5156,
+    "h": 3675,
+    "mpx": 18.95
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Mai-] Dông",
+      "fkey": 23801,
+      "dpKey": 58834,
+      "doi": "10.34847/nkl.c6342093",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c6342093/10e268db082da99c4a2c9b1541228fe86a22d965/info.json",
+      "w": 2727,
+      "h": 3742,
+      "mpx": 10.2,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Mai- [Dông]",
+      "fkey": 23932,
+      "dpKey": 58836,
+      "doi": "10.34847/nkl.d8484p6r",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d8484p6r/141771d7a5a9f6747817f6f1ec4a09f80e26f5f7/info.json",
+      "w": 2716,
+      "h": 3826,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.95,
+    "mpx_after": 20.59,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "88437562-9bce-4ffb-b70d-c564d02531fc",
+   "slug": "quang-yen",
+   "cell": "25",
+   "name": "Quang Yen",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 4789,
+    "h": 3619,
+    "mpx": 17.33
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "[Quang] -Yên",
+      "fkey": 23803,
+      "dpKey": 58837,
+      "doi": "10.34847/nkl.ff6dy302",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ff6dy302/e40d53663ca03dd6dbceb969b2b5fab6ba37f63f/info.json",
+      "w": 2494,
+      "h": 3699,
+      "mpx": 9.23,
+      "digitised": true,
+      "part_disputed": true
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest. La partie de la mention de date qui est donnée entre crochets est située sur la demi-feuille Est",
+      "year": 1904,
+      "title": "Quang [-Yên]",
+      "fkey": 23936,
+      "dpKey": 58838,
+      "doi": "10.34847/nkl.bb2e29c5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bb2e29c5/f903235a229803cba0f4da3c6efddbde59488971/info.json",
+      "w": 2509,
+      "h": 3717,
+      "mpx": 9.33,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 17.33,
+    "mpx_after": 18.56,
+    "gain_pct": 7
+   },
+   "notes": [
+    "the catalogue calls 1 of the 2 sheets of 1904 the wrong half — its notes read west half + west half, while the title brackets read east half + west half. Read off the titles they make a complete pair, which is what this row assumes."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "e8241d5f-f694-45cd-a41a-1f9293ab9a0e",
+   "slug": "phu-thuong-tin",
+   "cell": "27",
+   "name": "Phu Thuong Tin",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5041,
+    "h": 3694,
+    "mpx": 18.62
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est. En couleur. Titre de la feuille erroné ([Phu - Th]uong-Tin)",
+      "year": 1905,
+      "title": "[Thuong-] Tin-Phu",
+      "fkey": 23785,
+      "dpKey": 58841,
+      "doi": "10.34847/nkl.16dbk9pg",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16dbk9pg/1919fa66c427a438134ed4748ae166dfa51b3e72/info.json",
+      "w": 2728,
+      "h": 3922,
+      "mpx": 10.7,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest. Titre de la feuille erroné (Phu - Th|uong-Tin])",
+      "year": 1905,
+      "title": "Thuong- [Tin-Phu]",
+      "fkey": 23869,
+      "dpKey": 58842,
+      "doi": "10.34847/nkl.36ad4x53",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.36ad4x53/07fc598e3d29a08326ad0e072ff9e2c134b51e20/info.json",
+      "w": 2634,
+      "h": 3727,
+      "mpx": 9.82,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.62,
+    "mpx_after": 20.52,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "8d6936ed-55d0-4215-9d39-57b3d8543d3f",
+   "slug": "ke-sat",
+   "cell": "28",
+   "name": "Ke Sat",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5095,
+    "h": 3799,
+    "mpx": 19.36
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Ké-] Sat",
+      "fkey": 23786,
+      "dpKey": 58843,
+      "doi": "10.34847/nkl.28b7t9qj",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.28b7t9qj/91344cf402b3c8abefa1c843962ad6bd68fbad41/info.json",
+      "w": 2721,
+      "h": 3916,
+      "mpx": 10.66,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Ké- [ Sat]",
+      "fkey": 23890,
+      "dpKey": 58844,
+      "doi": "10.34847/nkl.2e228q5d",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2e228q5d/4ae4cf033a24563f400546abf9764fc714fe8708/info.json",
+      "w": 2724,
+      "h": 3918,
+      "mpx": 10.67,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.36,
+    "mpx_after": 21.33,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "c0103a62-d766-44cd-8efc-5e0c9143b093",
+   "slug": "gia-loc",
+   "cell": "29",
+   "name": "Gia Loc",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5141,
+    "h": 3834,
+    "mpx": 19.71
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Gia-] Lôc",
+      "fkey": 23787,
+      "dpKey": 58845,
+      "doi": "10.34847/nkl.18058t97",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.18058t97/3c42b707b6248130bb341cddfe6899c7df1fd57e/info.json",
+      "w": 2784,
+      "h": 3951,
+      "mpx": 11,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Gia- [Lôc]",
+      "fkey": 23907,
+      "dpKey": 58847,
+      "doi": "10.34847/nkl.9ae7y0fp",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9ae7y0fp/d04da559c75b0b5b8a09c77cd3086e0f15fa5bdc/info.json",
+      "w": 2809,
+      "h": 3924,
+      "mpx": 11.02,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.71,
+    "mpx_after": 22.02,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "f10a84aa-b0a7-47db-af45-e25158f120d0",
+   "slug": "kim-thanh",
+   "cell": "30",
+   "name": "Kim Thanh",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5189,
+    "h": 3844,
+    "mpx": 19.95
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Kim-] Thành",
+      "fkey": 23789,
+      "dpKey": 58849,
+      "doi": "10.34847/nkl.613fozh8",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.613fozh8/6e18935fcf9cfca703737aaad071883ce1218685/info.json",
+      "w": 2778,
+      "h": 3928,
+      "mpx": 10.91,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Kim- [Thành]",
+      "fkey": 23922,
+      "dpKey": 58851,
+      "doi": "10.34847/nkl.99a39x74",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.99a39x74/49a1e52ea01f50f5ba2f9afde647d982de506173/info.json",
+      "w": 2767,
+      "h": 3942,
+      "mpx": 10.91,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.95,
+    "mpx_after": 21.82,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "470c119b-44f1-47ba-9f0e-80dcbb4763f0",
+   "slug": "hai-phong",
+   "cell": "31",
+   "name": "Hai Phong",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5080,
+    "h": 3760,
+    "mpx": 19.1
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Hai-] Phong",
+      "fkey": 23791,
+      "dpKey": 58853,
+      "doi": "10.34847/nkl.5f26w204",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5f26w204/c188949f6888912ef6f8771cbdab7bf4ab4bbbe5/info.json",
+      "w": 2746,
+      "h": 3919,
+      "mpx": 10.76,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Hai- [Phong]",
+      "fkey": 23931,
+      "dpKey": 58854,
+      "doi": "10.34847/nkl.973189kl",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.973189kl/5b81a8e34bc28731168480bfc415b1afa01091fe/info.json",
+      "w": 2626,
+      "h": 3763,
+      "mpx": 9.88,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.1,
+    "mpx_after": 20.64,
+    "gain_pct": 8
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "8bb37c31-67e2-4623-924e-ac6381e94c8e",
+   "slug": "quang-yen-sud",
+   "cell": "32",
+   "name": "Quang Yen (Sud)",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5209,
+    "h": 3848,
+    "mpx": 20.04
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Quang-] Yên (Sud)",
+      "fkey": 23792,
+      "dpKey": 58855,
+      "doi": "10.34847/nkl.aacb86mz",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.aacb86mz/b32a7a37472eee3e4db0bb3af8ae3488cb24f917/info.json",
+      "w": 2770,
+      "h": 3930,
+      "mpx": 10.89,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Quang- [Yên (Sud)]",
+      "fkey": 23934,
+      "dpKey": 58856,
+      "doi": "10.34847/nkl.b6e8j50p",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b6e8j50p/fc8439d198db4d1bf48a96efec53af5db377ec94/info.json",
+      "w": 2788,
+      "h": 3967,
+      "mpx": 11.06,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 20.04,
+    "mpx_after": 21.95,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece",
+   "slug": "phu-ung-hoa",
+   "cell": "33",
+   "name": "Phu Ung Hoa",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 5032,
+    "h": 3758,
+    "mpx": 18.91
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[Phu-U]ng-Hoa",
+      "fkey": 23849,
+      "dpKey": 58859,
+      "doi": "10.34847/nkl.a60f489z",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a60f489z/22af36fa082b23d6c0df7227ae8b64914e3df9ab/info.json",
+      "w": 2689,
+      "h": 3886,
+      "mpx": 10.45,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1924,
+      "title": "Phu-U[ng-Hoa]",
+      "fkey": 23774,
+      "dpKey": 58861,
+      "doi": "10.34847/nkl.4018l377",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4018l377/cb22b80962f66839e0c495e0612fb828ee373ab3/info.json",
+      "w": 2688,
+      "h": 3876,
+      "mpx": 10.42,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.91,
+    "mpx_after": 20.87,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "b4cbfd8c-b38b-4270-8ed2-aef05e241a14",
+   "slug": "my-dong",
+   "cell": "36",
+   "name": "My Dong",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 4988,
+    "h": 3797,
+    "mpx": 18.94
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[My-] Dông",
+      "fkey": 23779,
+      "dpKey": 58870,
+      "doi": "10.34847/nkl.531fnj5d",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.531fnj5d/1d204dd65a03bb49fa15c54ae2d8a3485d50e733/info.json",
+      "w": 2679,
+      "h": 3876,
+      "mpx": 10.38,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1924,
+      "title": "My- [Dông]",
+      "fkey": 23906,
+      "dpKey": 58872,
+      "doi": "10.34847/nkl.eeeb00xi",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eeeb00xi/76b6374097d0f7390ae0360f5f6e2c681d832d6e/info.json",
+      "w": 2677,
+      "h": 3871,
+      "mpx": 10.36,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.94,
+    "mpx_after": 20.74,
+    "gain_pct": 10
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 36 dated 1924 (serie 175, fkey 16718) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "0dac511a-dba2-46f5-8177-730371340baa",
+   "slug": "kien-an",
+   "cell": "38",
+   "name": "Kien An",
+   "our_year": 1926,
+   "status": "public",
+   "ours": {
+    "w": 6706,
+    "h": 5021,
+    "mpx": 33.67
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1926,
+      "title": "[Kiên] -An",
+      "fkey": 23781,
+      "dpKey": 58876,
+      "doi": "10.34847/nkl.dcda34cd",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.dcda34cd/9376c752fe6c1b83770c2713b4f15adfa3c51997/info.json",
+      "w": 3611,
+      "h": 5115,
+      "mpx": 18.47,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1926,
+      "title": "Kiên [-An]",
+      "fkey": 23929,
+      "dpKey": 58878,
+      "doi": "10.34847/nkl.d7fd5m2b",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d7fd5m2b/0467f274e24135dead2bda6edc6fef6041f2fcd9/info.json",
+      "w": 3545,
+      "h": 5251,
+      "mpx": 18.61,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 33.67,
+    "mpx_after": 37.08,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "1a7e0a67-7a92-465c-93d7-003b8439880f",
+   "slug": "dong-van",
+   "cell": "41",
+   "name": "Dong Van",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5042,
+    "h": 3720,
+    "mpx": 18.76
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Dông] -Van",
+      "fkey": 23764,
+      "dpKey": 58883,
+      "doi": "10.34847/nkl.ece58m5y",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ece58m5y/4163dcc39ce75cf3905fa07b113fb5ec9946a1f0/info.json",
+      "w": 2717,
+      "h": 3805,
+      "mpx": 10.34,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Dông [-Van]",
+      "fkey": 23866,
+      "dpKey": 58885,
+      "doi": "10.34847/nkl.a2e4b20o",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.a2e4b20o/f2d1a62a277c2c3eea2d186216b407f9ffc7605e/info.json",
+      "w": 2662,
+      "h": 3911,
+      "mpx": 10.41,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.76,
+    "mpx_after": 20.75,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "c7fe3e9d-d012-4e49-9863-eb863b97978b",
+   "slug": "hung-yen",
+   "cell": "42",
+   "name": "Hung Yen",
+   "our_year": 1926,
+   "status": "public",
+   "ours": {
+    "w": 5010,
+    "h": 3787,
+    "mpx": 18.97
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1926,
+      "title": "[Hung] -Yên",
+      "fkey": 23766,
+      "dpKey": 58887,
+      "doi": "10.34847/nkl.74f1aa41",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.74f1aa41/ce1116d721440ccafc6f013290f847b207813384/info.json",
+      "w": 2686,
+      "h": 3884,
+      "mpx": 10.43,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1926,
+      "title": "Hung [-Yên]",
+      "fkey": 23887,
+      "dpKey": 58889,
+      "doi": "10.34847/nkl.6b288v2q",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6b288v2q/a952e3a08771b4d671ee8f6c056531f4bf3ff9c4/info.json",
+      "w": 2695,
+      "h": 3880,
+      "mpx": 10.46,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.97,
+    "mpx_after": 20.89,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "27698eaa-e56b-4778-9e61-c66b6bc0cc08",
+   "slug": "quynh-coi",
+   "cell": "43",
+   "name": "Quynh Coi",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5069,
+    "h": 3768,
+    "mpx": 19.1
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Quinh] -Côi",
+      "fkey": 23767,
+      "dpKey": 58890,
+      "doi": "10.34847/nkl.87db334m",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.87db334m/a37c53599c51be4736c29c129d984bc7e904a799/info.json",
+      "w": 2717,
+      "h": 3873,
+      "mpx": 10.52,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Quynh [-Côi]",
+      "fkey": 23904,
+      "dpKey": 58891,
+      "doi": "10.34847/nkl.f4adpoik",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f4adpoik/4ac3efff94eb29e4d63b958d2221e48e93037f15/info.json",
+      "w": 2698,
+      "h": 3896,
+      "mpx": 10.51,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.1,
+    "mpx_after": 21.03,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "50ee792d-633c-4c3a-af8e-ab576ce7300b",
+   "slug": "phu-duc",
+   "cell": "44",
+   "name": "Phu Duc",
+   "our_year": 1926,
+   "status": "public",
+   "ours": {
+    "w": 5015,
+    "h": 3780,
+    "mpx": 18.96
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1926,
+      "title": "[Phu-] Duc",
+      "fkey": 23769,
+      "dpKey": 58893,
+      "doi": "10.34847/nkl.6ded2ji2",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6ded2ji2/a54647a9642dddce642be2a0953c4c2c56bb228c/info.json",
+      "w": 2677,
+      "h": 3883,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1926,
+      "title": "Phu- [Duc]",
+      "fkey": 23920,
+      "dpKey": 58895,
+      "doi": "10.34847/nkl.0bc07p08",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0bc07p08/a15a74634683e35b19c9438f76028642c639a42d/info.json",
+      "w": 2687,
+      "h": 3882,
+      "mpx": 10.43,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.96,
+    "mpx_after": 20.82,
+    "gain_pct": 10
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 44 dated 1926 (serie 175, fkey 16712) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "d2178fe7-c2fa-4ab7-9e48-eb62070ac980",
+   "slug": "cua-thai-binh",
+   "cell": "45",
+   "name": "Cua Thai Binh",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5020,
+    "h": 3673,
+    "mpx": 18.44
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Cu'a-Th]ai-Binh",
+      "fkey": 23770,
+      "dpKey": 58896,
+      "doi": "10.34847/nkl.9659fd00",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9659fd00/70aca9a444a199b59fad3e4bcc6fc276c4f49f66/info.json",
+      "w": 2666,
+      "h": 3749,
+      "mpx": 9.99,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Cu'a-Th[ai-Binh]",
+      "fkey": 23928,
+      "dpKey": 58897,
+      "doi": "10.34847/nkl.cda84th3",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.cda84th3/27db52428d36205aee0494ddb7fbdd2bd93df668/info.json",
+      "w": 2660,
+      "h": 3729,
+      "mpx": 9.92,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.44,
+    "mpx_after": 19.91,
+    "gain_pct": 8
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "02d32cbd-be89-4274-9dff-dc2337b29511",
+   "slug": "phu-ly",
+   "cell": "48",
+   "name": "Phu Ly",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5083,
+    "h": 3804,
+    "mpx": 19.34
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Phu] -Ly",
+      "fkey": 23755,
+      "dpKey": 58900,
+      "doi": "10.34847/nkl.44ccxm16",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.44ccxm16/0ce4340979cf9f907301551fe4710ca6e3625467/info.json",
+      "w": 2735,
+      "h": 3907,
+      "mpx": 10.69,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Phu [-Ly]",
+      "fkey": 23864,
+      "dpKey": 58901,
+      "doi": "10.34847/nkl.3e79z73a",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.3e79z73a/5f58286a940feadd17c9c3b40c37caac434fc7b2/info.json",
+      "w": 2719,
+      "h": 3904,
+      "mpx": 10.61,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.34,
+    "mpx_after": 21.3,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "7a4f8b7d-60fd-4d1a-a07d-19636265f073",
+   "slug": "nhu-trac",
+   "cell": "49",
+   "name": "Nhu Trac",
+   "our_year": 1903,
+   "status": "public",
+   "ours": {
+    "w": 5232,
+    "h": 3862,
+    "mpx": 20.21
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1903,
+      "title": "[Nhu'-] Trac",
+      "fkey": 23756,
+      "dpKey": 58902,
+      "doi": "10.34847/nkl.eff66y19",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eff66y19/26422316470181ba312ef6dde0ac3b92a468ee5b/info.json",
+      "w": 2797,
+      "h": 3973,
+      "mpx": 11.11,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1903,
+      "title": "Nhu'- [Trac]",
+      "fkey": 23884,
+      "dpKey": 58904,
+      "doi": "10.34847/nkl.e9edmtm9",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e9edmtm9/09e9c0357753f448e4cebd421a891b7875b66a2b/info.json",
+      "w": 2813,
+      "h": 3971,
+      "mpx": 11.17,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 20.21,
+    "mpx_after": 22.28,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "c569cfd2-994d-4a48-819f-8bdba4b3f0bd",
+   "slug": "phu-tien-hung",
+   "cell": "50",
+   "name": "Phu Tien Hung",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5011,
+    "h": 3678,
+    "mpx": 18.43
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Phu-Tiê]n-Hung",
+      "fkey": 23757,
+      "dpKey": 58905,
+      "doi": "10.34847/nkl.6c35x036",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.6c35x036/1acda02c8d07b6c877001e225595f37f1a0f046b/info.json",
+      "w": 2712,
+      "h": 3746,
+      "mpx": 10.16,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Phu-Tiê[n-Hung]",
+      "fkey": 23902,
+      "dpKey": 58907,
+      "doi": "10.34847/nkl.16fe94g2",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.16fe94g2/9e7b0f141a0dfbfffbb382bd3da3d07771a54136/info.json",
+      "w": 2711,
+      "h": 3904,
+      "mpx": 10.58,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.43,
+    "mpx_after": 20.74,
+    "gain_pct": 13
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "398f3897-75ce-4ea0-be4c-29d28aee7e0e",
+   "slug": "dong-quan",
+   "cell": "51",
+   "name": "Dong Quan",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5045,
+    "h": 3677,
+    "mpx": 18.55
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Dông-] Quan",
+      "fkey": 23759,
+      "dpKey": 58909,
+      "doi": "10.34847/nkl.2ef23u00",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ef23u00/fae9fbd3b605a617727a1e9f8d5bcec62be674d9/info.json",
+      "w": 2718,
+      "h": 3930,
+      "mpx": 10.68,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Dông- [Quan]",
+      "fkey": 23918,
+      "dpKey": 58910,
+      "doi": "10.34847/nkl.2ee68bt3",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2ee68bt3/030c5a689d58cffc9915e54fb2dc070710769f58/info.json",
+      "w": 2665,
+      "h": 3746,
+      "mpx": 9.98,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.55,
+    "mpx_after": 20.66,
+    "gain_pct": 11
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 51 dated 1905 (serie 175, fkey 16705) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "e6c5e467-ae7b-478f-9357-6fe12b8e7361",
+   "slug": "y-yen",
+   "cell": "54",
+   "name": "Y Yen",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5117,
+    "h": 3718,
+    "mpx": 19.03
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Y-] Yên",
+      "fkey": 23750,
+      "dpKey": 58914,
+      "doi": "10.34847/nkl.92d7x94x",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.92d7x94x/7bbe836e346b30bc15f8cefd394cc1691f8dd2bd/info.json",
+      "w": 2711,
+      "h": 3789,
+      "mpx": 10.27,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Y- [Yên]",
+      "fkey": 23863,
+      "dpKey": 58916,
+      "doi": "10.34847/nkl.82fdbkjm",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.82fdbkjm/aabce4c587b1ae7e9b93f834bafe520b1a74664c/info.json",
+      "w": 2708,
+      "h": 3928,
+      "mpx": 10.64,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.03,
+    "mpx_after": 20.91,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "f04311b8-b122-45f7-84a7-19c53638938e",
+   "slug": "nam-dinh",
+   "cell": "55",
+   "name": "Nam Dinh",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 4939,
+    "h": 3718,
+    "mpx": 18.36
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Nam-] Dinh",
+      "fkey": 23751,
+      "dpKey": 58917,
+      "doi": "10.34847/nkl.eb4bs3jp",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.eb4bs3jp/2ea6a153d4e8da3c6a0374cb181ec39f6a860640/info.json",
+      "w": 2719,
+      "h": 3801,
+      "mpx": 10.33,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Nam- [Dinh]",
+      "fkey": 23882,
+      "dpKey": 58918,
+      "doi": "10.34847/nkl.e76a1g67",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.e76a1g67/8b1cf3889bcf987c50cf6a549d6e676c0af3fd76/info.json",
+      "w": 2571,
+      "h": 3781,
+      "mpx": 9.72,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.36,
+    "mpx_after": 20.05,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "78c507fb-a6a3-457e-ae79-19575d0ff90c",
+   "slug": "thai-binh",
+   "cell": "56",
+   "name": "Thai Binh",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5050,
+    "h": 3728,
+    "mpx": 18.83
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Thai-] Binh",
+      "fkey": 23752,
+      "dpKey": 58920,
+      "doi": "10.34847/nkl.c9d9561g",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.c9d9561g/8ac6dac38437b962565222b84939dad36deedb68/info.json",
+      "w": 2702,
+      "h": 3886,
+      "mpx": 10.5,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Thai- [Binh]",
+      "fkey": 23901,
+      "dpKey": 58921,
+      "doi": "10.34847/nkl.8c2bl018",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8c2bl018/836e1627862a2b8c670714bece74ec6ee2d14201/info.json",
+      "w": 2718,
+      "h": 3823,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.83,
+    "mpx_after": 20.89,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "0aef7123-8767-44e0-8687-570878040801",
+   "slug": "kien-xuong",
+   "cell": "57",
+   "name": "Kien Xuong",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5083,
+    "h": 3853,
+    "mpx": 19.58
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Kièn-] Xuong",
+      "fkey": 23753,
+      "dpKey": 58922,
+      "doi": "10.34847/nkl.f4ef5gr3",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.f4ef5gr3/25d4328f42e47a497d89f0b48d1046ff52154d4c/info.json",
+      "w": 2737,
+      "h": 3948,
+      "mpx": 10.81,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Kièn- [Xuong]",
+      "fkey": 23917,
+      "dpKey": 58923,
+      "doi": "10.34847/nkl.aa7b97c0",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.aa7b97c0/13abe54f124c349684d2411a9568cf5e2f2566b4/info.json",
+      "w": 2720,
+      "h": 3991,
+      "mpx": 10.86,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.58,
+    "mpx_after": 21.67,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "4deb3728-bc1e-48f1-9e02-164a95e88326",
+   "slug": "ninh-binh",
+   "cell": "59",
+   "name": "Ninh Binh",
+   "our_year": 1924,
+   "status": "public",
+   "ours": {
+    "w": 5023,
+    "h": 3773,
+    "mpx": 18.95
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1924,
+      "title": "[Ninh] -Binh",
+      "fkey": 23741,
+      "dpKey": 58926,
+      "doi": "10.34847/nkl.19aed4k7",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.19aed4k7/165ac6108b7c97f3805e545380982248dc0c2d52/info.json",
+      "w": 2690,
+      "h": 3870,
+      "mpx": 10.41,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1924,
+      "title": "Ninh [-Binh]",
+      "fkey": 23861,
+      "dpKey": 58928,
+      "doi": "10.34847/nkl.83b168i3",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.83b168i3/357b7ff2ebfe223eeb512e54b5ff408bf13b95e9/info.json",
+      "w": 2690,
+      "h": 3862,
+      "mpx": 10.39,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.95,
+    "mpx_after": 20.8,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "e21f1e1e-a1ce-4633-aae4-82408b7d35bd",
+   "slug": "phu-nghia-hung",
+   "cell": "60",
+   "name": "Phu Nghia Hung",
+   "our_year": 1903,
+   "status": "public",
+   "ours": {
+    "w": 5216,
+    "h": 3783,
+    "mpx": 19.73
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1903,
+      "title": "[Phu-Ngh]ia-Hung",
+      "fkey": 23742,
+      "dpKey": 58929,
+      "doi": "10.34847/nkl.bd3f9o9r",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bd3f9o9r/e72cf5c21832d72f3300fcce711baa5212b66f6e/info.json",
+      "w": 2799,
+      "h": 3862,
+      "mpx": 10.81,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1903,
+      "title": "Phu-Ngh[ia-Hung]",
+      "fkey": 23880,
+      "dpKey": 58931,
+      "doi": "10.34847/nkl.8c1fp1wc",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.8c1fp1wc/ef19eac64822a86180ccd7dd71b586cb4254a21e/info.json",
+      "w": 2804,
+      "h": 3979,
+      "mpx": 11.16,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.73,
+    "mpx_after": 21.97,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "c5db9be9-d131-45bf-a133-3c4a206207ae",
+   "slug": "phu-xuan-truong",
+   "cell": "61",
+   "name": "Phu Xuan Truong",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5134,
+    "h": 3695,
+    "mpx": 18.97
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Phu-Xyân] -Truong",
+      "fkey": 23744,
+      "dpKey": 58933,
+      "doi": "10.34847/nkl.317dqow6",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.317dqow6/b60f5585e52e9bf901ef2d1ca79a3624d0c1b46b/info.json",
+      "w": 2789,
+      "h": 3806,
+      "mpx": 10.61,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Phu-Xyân [-Truong]",
+      "fkey": 23900,
+      "dpKey": 58934,
+      "doi": "10.34847/nkl.da57yqdd",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da57yqdd/e0dcff17a72b6d821acaca43e663bd40954ca0d8/info.json",
+      "w": 2773,
+      "h": 3814,
+      "mpx": 10.58,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.97,
+    "mpx_after": 21.19,
+    "gain_pct": 12
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "ef6a439a-ae4d-428f-b0f9-8b37a2852156",
+   "slug": "cua-ba-lat",
+   "cell": "62",
+   "name": "Cua Ba Lat",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5160,
+    "h": 3695,
+    "mpx": 19.07
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Cua-B]a-Lat",
+      "fkey": 23745,
+      "dpKey": 58935,
+      "doi": "10.34847/nkl.2e34q338",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.2e34q338/95d12a86ebeda68a8c13486764303d2e13165f81/info.json",
+      "w": 2784,
+      "h": 3809,
+      "mpx": 10.6,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Cua-B[a-Lat]",
+      "fkey": 23916,
+      "dpKey": 58937,
+      "doi": "10.34847/nkl.bb47946s",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.bb47946s/d292476df02e694e11041b4122649e868376c514/info.json",
+      "w": 2758,
+      "h": 3844,
+      "mpx": 10.6,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.07,
+    "mpx_after": 21.2,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "dfd7dadd-3841-4cdf-872c-44d55e15bb78",
+   "slug": "cho-ganh",
+   "cell": "64",
+   "name": "Cho Ganh",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5069,
+    "h": 3732,
+    "mpx": 18.92
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Cho-] Ganh",
+      "fkey": 23734,
+      "dpKey": 58940,
+      "doi": "10.34847/nkl.cfdcp0bc",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.cfdcp0bc/901d0f38040c2e484dfc47f0cf1e245ba69ad87a/info.json",
+      "w": 2665,
+      "h": 3782,
+      "mpx": 10.08,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Cho- [Ganh]",
+      "fkey": 23859,
+      "dpKey": 58941,
+      "doi": "10.34847/nkl.9eaf7uj0",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.9eaf7uj0/4a7f9925a57dc432dc77675553d611c15d0643a1/info.json",
+      "w": 2728,
+      "h": 3840,
+      "mpx": 10.48,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.92,
+    "mpx_after": 20.56,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "10c654fc-9eb8-4a09-90b5-731e1cb72c79",
+   "slug": "phu-nhac",
+   "cell": "65",
+   "name": "Phu Nhac",
+   "our_year": 1906,
+   "status": "public",
+   "ours": {
+    "w": 5111,
+    "h": 3678,
+    "mpx": 18.8
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1906,
+      "title": "[Phu] -Nhac",
+      "fkey": 23735,
+      "dpKey": 58942,
+      "doi": "10.34847/nkl.22617wad",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.22617wad/fc57dd8c00d9698272186a528b79eb9fcb307294/info.json",
+      "w": 5504,
+      "h": 7734,
+      "mpx": 42.57,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1906,
+      "title": "Phu [-Nhac]",
+      "fkey": 23879,
+      "dpKey": 58943,
+      "doi": "10.34847/nkl.d6353bw0",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.d6353bw0/59f9d378b854a433f74a6b5f493dfeab3c3bd1f6/info.json",
+      "w": 5426,
+      "h": 7548,
+      "mpx": 40.96,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.8,
+    "mpx_after": 83.53,
+    "gain_pct": 344
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "56a459b1-8650-49ad-9913-461e6461edc8",
+   "slug": "quat-lam",
+   "cell": "66",
+   "name": "Quat Lam",
+   "our_year": 1926,
+   "status": "public",
+   "ours": {
+    "w": 5012,
+    "h": 3783,
+    "mpx": 18.96
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1926,
+      "title": "[Quât] -Lâm",
+      "fkey": 23737,
+      "dpKey": 58945,
+      "doi": "10.34847/nkl.beef61e7",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.beef61e7/5421a6456b4391e2222106ae7812fd60953c5d10/info.json",
+      "w": 5446,
+      "h": 7808,
+      "mpx": 42.52,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1926,
+      "title": "Quât [-Lâm]",
+      "fkey": 23899,
+      "dpKey": 58947,
+      "doi": "10.34847/nkl.226ckx58",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.226ckx58/4c77b0845bab63c7d5f9aa509e446019ec5f9b51/info.json",
+      "w": 5400,
+      "h": 7798,
+      "mpx": 42.11,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.96,
+    "mpx_after": 84.63,
+    "gain_pct": 346
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 66 dated 1926 (serie 175, fkey 16690) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "be36fb42-c0dd-4667-9f6e-aefb4f24abb6",
+   "slug": "bien-son",
+   "cell": "68",
+   "name": "Bien Son",
+   "our_year": 1906,
+   "status": "public",
+   "ours": {
+    "w": 4993,
+    "h": 3791,
+    "mpx": 18.93
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1906,
+      "title": "[Biên] -Son",
+      "fkey": 23730,
+      "dpKey": 58952,
+      "doi": "10.34847/nkl.da27qot2",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.da27qot2/ad2c8e5bca09b73ad0b698353505208453cc99ea/info.json",
+      "w": 2750,
+      "h": 3944,
+      "mpx": 10.85,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1906,
+      "title": "Biên [-Son]",
+      "fkey": 23858,
+      "dpKey": 58954,
+      "doi": "10.34847/nkl.0a2441p0",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.0a2441p0/adafddf0a04c7fab5e78c3d19c3cf20816d29728/info.json",
+      "w": 2732,
+      "h": 3959,
+      "mpx": 10.82,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.93,
+    "mpx_after": 21.67,
+    "gain_pct": 14
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "e17b7fe0-6428-4a59-921f-17924273d8de",
+   "slug": "yen-lang",
+   "cell": "71",
+   "name": "Yen Lang",
+   "our_year": 1919,
+   "status": "public",
+   "ours": {
+    "w": 5039,
+    "h": 3655,
+    "mpx": 18.42
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1919,
+      "title": "[Yên-] Lang",
+      "fkey": 23841,
+      "dpKey": 58961,
+      "doi": "10.34847/nkl.b13fxng8",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.b13fxng8/95db695bf538a2483e334537f0b954bdd8c652d1/info.json",
+      "w": 2689,
+      "h": 3685,
+      "mpx": 9.91,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1919,
+      "title": "Yên- [Lang]",
+      "fkey": 23725,
+      "dpKey": 58963,
+      "doi": "10.34847/nkl.895ax8g1",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.895ax8g1/25b0bbc9725099b0ab2c874d8476110903380ced/info.json",
+      "w": 2690,
+      "h": 3844,
+      "mpx": 10.34,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.42,
+    "mpx_after": 20.25,
+    "gain_pct": 10
+   },
+   "notes": [
+    "IGN catalogues its own assemblage of cell 71 dated 1919 (serie 175, fkey 16681) — the sheet this composite imitates. Not digitised, so it cannot be the source of our file and cannot be fetched."
+   ],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "dd575794-8ff0-485f-9875-39f697b1b009",
+   "slug": "yen-dinh",
+   "cell": "72",
+   "name": "Yen Dinh",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5085,
+    "h": 3795,
+    "mpx": 19.3
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Yên-] Dinh",
+      "fkey": 23847,
+      "dpKey": 58964,
+      "doi": "10.34847/nkl.5026jrgp",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.5026jrgp/4bdbc8953df81d7fddd95bee83962fea266ee268/info.json",
+      "w": 2710,
+      "h": 3902,
+      "mpx": 10.57,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Yên- [Dinh]",
+      "fkey": 23726,
+      "dpKey": 58965,
+      "doi": "10.34847/nkl.90a269cw",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.90a269cw/0ed35083d2f4c18970fbdfd9f43eecb828279d34/info.json",
+      "w": 2714,
+      "h": 3904,
+      "mpx": 10.6,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.3,
+    "mpx_after": 21.17,
+    "gain_pct": 10
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "a37a985f-d5a5-4674-9b94-5ffa81f0c086",
+   "slug": "sen-cu",
+   "cell": "73",
+   "name": "Sen Cu",
+   "our_year": 1905,
+   "status": "public",
+   "ours": {
+    "w": 5074,
+    "h": 3773,
+    "mpx": 19.14
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1905,
+      "title": "[Sen-] Cù",
+      "fkey": 23727,
+      "dpKey": 58969,
+      "doi": "10.34847/nkl.7d1a0hb7",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.7d1a0hb7/5ac37f9a09c7c3efc08c43571b781c3b8e7a2c1c/info.json",
+      "w": 2712,
+      "h": 3992,
+      "mpx": 10.83,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1905,
+      "title": "Sen- [Cu]",
+      "fkey": 23857,
+      "dpKey": 58970,
+      "doi": "10.34847/nkl.612cttmw",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.612cttmw/df93e5c569a0f2b848910820a0c3d0a8a3a78dfb/info.json",
+      "w": 2702,
+      "h": 3849,
+      "mpx": 10.4,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.14,
+    "mpx_after": 21.23,
+    "gain_pct": 11
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "8d4defb1-f713-4c9f-81fc-7719508b55c2",
+   "slug": "loi-duong",
+   "cell": "74",
+   "name": "Loi Duong",
+   "our_year": 1919,
+   "status": "public",
+   "ours": {
+    "w": 5052,
+    "h": 3711,
+    "mpx": 18.75
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1919,
+      "title": "[Lôi-D]uong",
+      "fkey": 23839,
+      "dpKey": 58972,
+      "doi": "10.34847/nkl.4f0crv1o",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.4f0crv1o/480813e884fd143dc0df0fd2bc3e92d5c082686d/info.json",
+      "w": 2701,
+      "h": 3799,
+      "mpx": 10.26,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1919,
+      "title": "Lôi- [Duong]",
+      "fkey": 23722,
+      "dpKey": 58974,
+      "doi": "10.34847/nkl.ee2b791x",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.ee2b791x/e1f56355aeea37e7f0d8839c8f57aebd4b6a4062/info.json",
+      "w": 2696,
+      "h": 3802,
+      "mpx": 10.25,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 18.75,
+    "mpx_after": 20.51,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  },
+  {
+   "map_id": "a90c2464-f6aa-46d2-b167-272214b4545f",
+   "slug": "thanh-hoa",
+   "cell": "75",
+   "name": "Thanh Hoa",
+   "our_year": 1904,
+   "status": "public",
+   "ours": {
+    "w": 5116,
+    "h": 3831,
+    "mpx": 19.6
+   },
+   "replacement": {
+    "complete": true,
+    "sheets": [
+     {
+      "part": "E",
+      "part_label": "east half",
+      "part_per_note": "E",
+      "note": "Demi-feuille Est",
+      "year": 1904,
+      "title": "[Thanh] -Hóa",
+      "fkey": 23846,
+      "dpKey": 58975,
+      "doi": "10.34847/nkl.11edjqd5",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.11edjqd5/4cb04a4384640a093f5e9b99c26279f86a91b569/info.json",
+      "w": 2724,
+      "h": 3916,
+      "mpx": 10.67,
+      "digitised": true,
+      "part_disputed": false
+     },
+     {
+      "part": "W",
+      "part_label": "west half",
+      "part_per_note": "W",
+      "note": "Demi-feuille Ouest",
+      "year": 1904,
+      "title": "Thanh [-Hóa]",
+      "fkey": 23723,
+      "dpKey": 58976,
+      "doi": "10.34847/nkl.443c56ug",
+      "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.443c56ug/100a3f3ca53e74f200dd15839d7e355713df753e/info.json",
+      "w": 2703,
+      "h": 3930,
+      "mpx": 10.62,
+      "digitised": true,
+      "part_disputed": false
+     }
+    ],
+    "mpx_now": 19.6,
+    "mpx_after": 21.29,
+    "gain_pct": 9
+   },
+   "notes": [],
+   "issues": [],
+   "clean": true
+  }
+ ],
+ "held_rows": [
+  {
+   "map_id": "88437562-9bce-4ffb-b70d-c564d02531fc",
+   "slug": "quang-yen",
+   "name": "Quang Yen",
+   "cell": "25",
+   "sheet_number_as_stored": "25",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4789,
+    "h": 3619,
+    "mpx": 17.33
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "1f480a2b-3bbd-44ed-adea-2dad9e24d254",
+   "slug": "bac-ninh",
+   "name": "Bac Ninh",
+   "cell": "10",
+   "sheet_number_as_stored": "10",
+   "sheet_half": null,
+   "year": 1911,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4885,
+    "h": 3661,
+    "mpx": 17.88
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "37ba77db-4d55-4fa3-a32b-55a44c9af8b3",
+   "slug": "ban-yen-nhan",
+   "name": "Ban Yen Nhan",
+   "cell": "21",
+   "sheet_number_as_stored": "21",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4886,
+    "h": 3673,
+    "mpx": 17.95
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8bb37c31-67e2-4623-924e-ac6381e94c8e",
+   "slug": "quang-yen-sud",
+   "name": "Quang Yen (Sud)",
+   "cell": "32",
+   "sheet_number_as_stored": "32",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5209,
+    "h": 3848,
+    "mpx": 20.04
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "aa921556-5ad3-42dc-8040-f9307ac4ee30",
+   "slug": "cua-day-w",
+   "name": "Cua Day (W)",
+   "cell": "73 bis",
+   "sheet_number_as_stored": "73 bis",
+   "sheet_half": "W",
+   "year": 1905,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2725,
+    "h": 3926,
+    "mpx": 10.7
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23876,
+    "year": 1905,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "96408f51-0b57-47a3-9c8b-4299beee9f88",
+   "slug": "cua-tra-ly",
+   "name": "Cua Tra Ly",
+   "cell": "58",
+   "sheet_number_as_stored": "58",
+   "sheet_half": null,
+   "year": 1926,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2749,
+    "h": 3737,
+    "mpx": 10.27
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23754,
+    "year": 1926,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "470c119b-44f1-47ba-9f0e-80dcbb4763f0",
+   "slug": "hai-phong",
+   "name": "Hai Phong",
+   "cell": "31",
+   "sheet_number_as_stored": "31",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5080,
+    "h": 3760,
+    "mpx": 19.1
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "bdf3936f-4501-4b54-8acd-d80f352f26fa",
+   "slug": "an-thi",
+   "name": "An Thi",
+   "cell": "35",
+   "sheet_number_as_stored": "35",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5089,
+    "h": 3615,
+    "mpx": 18.4
+   },
+   "matched": null
+  },
+  {
+   "map_id": "a1de9760-8073-4ea1-b7ed-f8f4e2835cd3",
+   "slug": "hoai-duc-phu-1925",
+   "name": "Hoai Duc Phu",
+   "cell": "13",
+   "sheet_number_as_stored": "13",
+   "sheet_half": null,
+   "year": 1925,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4983,
+    "h": 3786,
+    "mpx": 18.87
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8baf9b22-530a-42dd-a1a5-cc3e8bd76ac5",
+   "slug": "cam-ly",
+   "name": "Cam Ly",
+   "cell": "10 bis",
+   "sheet_number_as_stored": "10 bis",
+   "sheet_half": null,
+   "year": 1907,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5037,
+    "h": 3691,
+    "mpx": 18.59
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "be36fb42-c0dd-4667-9f6e-aefb4f24abb6",
+   "slug": "bien-son",
+   "name": "Bien Son",
+   "cell": "68",
+   "sheet_number_as_stored": "68",
+   "sheet_half": null,
+   "year": 1906,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4993,
+    "h": 3791,
+    "mpx": 18.93
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "1a7e0a67-7a92-465c-93d7-003b8439880f",
+   "slug": "dong-van",
+   "name": "Dong Van",
+   "cell": "41",
+   "sheet_number_as_stored": "41",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5042,
+    "h": 3720,
+    "mpx": 18.76
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "ef6a439a-ae4d-428f-b0f9-8b37a2852156",
+   "slug": "cua-ba-lat",
+   "name": "Cua Ba Lat",
+   "cell": "62",
+   "sheet_number_as_stored": "62",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5160,
+    "h": 3695,
+    "mpx": 19.07
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "c7fe3e9d-d012-4e49-9863-eb863b97978b",
+   "slug": "hung-yen",
+   "name": "Hung Yen",
+   "cell": "42",
+   "sheet_number_as_stored": "42",
+   "sheet_half": null,
+   "year": 1926,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5010,
+    "h": 3787,
+    "mpx": 18.97
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "a2680483-2f77-4fe1-bcf9-393b100bc318",
+   "slug": "kien-hanh-e",
+   "name": "Kien Hanh (E)",
+   "cell": "67",
+   "sheet_number_as_stored": "67",
+   "sheet_half": "E",
+   "year": 1926,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2721,
+    "h": 3874,
+    "mpx": 10.54
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23739,
+    "year": 1926,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "fb6ed962-ad9f-4829-bb7b-a5e0c885f11f",
+   "slug": "kien-hanh-w",
+   "name": "Kien Hanh (W)",
+   "cell": "67",
+   "sheet_number_as_stored": "67",
+   "sheet_half": "W",
+   "year": 1926,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2721,
+    "h": 3866,
+    "mpx": 10.52
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23915,
+    "year": 1926,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "0aef7123-8767-44e0-8687-570878040801",
+   "slug": "kien-xuong",
+   "name": "Kien Xuong",
+   "cell": "57",
+   "sheet_number_as_stored": "57",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5083,
+    "h": 3853,
+    "mpx": 19.58
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8d6936ed-55d0-4215-9d39-57b3d8543d3f",
+   "slug": "ke-sat",
+   "name": "Ke Sat",
+   "cell": "28",
+   "sheet_number_as_stored": "28",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5095,
+    "h": 3799,
+    "mpx": 19.36
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "f10a84aa-b0a7-47db-af45-e25158f120d0",
+   "slug": "kim-thanh",
+   "name": "Kim Thanh",
+   "cell": "30",
+   "sheet_number_as_stored": "30",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5189,
+    "h": 3844,
+    "mpx": 19.95
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8b06f217-d408-4092-8124-becb8cd30cb9",
+   "slug": "bao-loc",
+   "name": "Bao Loc",
+   "cell": "5 bis",
+   "sheet_number_as_stored": "5 bis",
+   "sheet_half": null,
+   "year": 1907,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4813,
+    "h": 3614,
+    "mpx": 17.39
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8d4defb1-f713-4c9f-81fc-7719508b55c2",
+   "slug": "loi-duong",
+   "name": "Loi Duong",
+   "cell": "74",
+   "sheet_number_as_stored": "74",
+   "sheet_half": null,
+   "year": 1919,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5052,
+    "h": 3711,
+    "mpx": 18.75
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "d2178fe7-c2fa-4ab7-9e48-eb62070ac980",
+   "slug": "cua-thai-binh",
+   "name": "Cua Thai Binh",
+   "cell": "45",
+   "sheet_number_as_stored": "45",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5020,
+    "h": 3673,
+    "mpx": 18.44
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "d4ec51b8-a3a1-4414-99c7-2bb46ea851e3",
+   "slug": "mai-dong",
+   "name": "Mai Dong",
+   "cell": "24",
+   "sheet_number_as_stored": "24",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5156,
+    "h": 3675,
+    "mpx": 18.95
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "b4cbfd8c-b38b-4270-8ed2-aef05e241a14",
+   "slug": "my-dong",
+   "name": "My Dong",
+   "cell": "36",
+   "sheet_number_as_stored": "36",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4988,
+    "h": 3797,
+    "mpx": 18.94
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "f04311b8-b122-45f7-84a7-19c53638938e",
+   "slug": "nam-dinh",
+   "name": "Nam Dinh",
+   "cell": "55",
+   "sheet_number_as_stored": "55",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4939,
+    "h": 3718,
+    "mpx": 18.36
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "a33ced6f-e106-40f6-9bdc-ab0f92a4882e",
+   "slug": "binh-xuyen",
+   "name": "Binh Xuyen",
+   "cell": "3",
+   "sheet_number_as_stored": "3",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4759,
+    "h": 3663,
+    "mpx": 17.43
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "56a459b1-8650-49ad-9913-461e6461edc8",
+   "slug": "quat-lam",
+   "name": "Quat Lam",
+   "cell": "66",
+   "sheet_number_as_stored": "66",
+   "sheet_half": null,
+   "year": 1926,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5012,
+    "h": 3783,
+    "mpx": 18.96
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "71894f3f-c2aa-4133-9c42-4e27941e2969",
+   "slug": "hiep-hoa",
+   "name": "Hiep Hoa",
+   "cell": "4",
+   "sheet_number_as_stored": "4",
+   "sheet_half": null,
+   "year": 1912,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4890,
+    "h": 3741,
+    "mpx": 18.29
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "7ee0ac7d-0026-4358-adfa-9963d82aa973",
+   "slug": "nam-dong",
+   "name": "Nam Dong",
+   "cell": "63",
+   "sheet_number_as_stored": "63",
+   "sheet_half": "whole",
+   "year": 1926,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2668,
+    "h": 3678,
+    "mpx": 9.81
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23748,
+    "year": 1926,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "c0103a62-d766-44cd-8efc-5e0c9143b093",
+   "slug": "gia-loc",
+   "name": "Gia Loc",
+   "cell": "29",
+   "sheet_number_as_stored": "29",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5141,
+    "h": 3834,
+    "mpx": 19.71
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "7a4f8b7d-60fd-4d1a-a07d-19636265f073",
+   "slug": "nhu-trac",
+   "name": "Nhu Trac",
+   "cell": "49",
+   "sheet_number_as_stored": "49",
+   "sheet_half": null,
+   "year": 1903,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5232,
+    "h": 3862,
+    "mpx": 20.21
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "4deb3728-bc1e-48f1-9e02-164a95e88326",
+   "slug": "ninh-binh",
+   "name": "Ninh Binh",
+   "cell": "59",
+   "sheet_number_as_stored": "59",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5023,
+    "h": 3773,
+    "mpx": 18.95
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "c2b5360f-024b-4e49-a587-9a2a7d7a3aad",
+   "slug": "phat-diem",
+   "name": "Phat Diem",
+   "cell": "69",
+   "sheet_number_as_stored": "69",
+   "sheet_half": null,
+   "year": 1927,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5001,
+    "h": 3771,
+    "mpx": 18.86
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "50ee792d-633c-4c3a-af8e-ab576ce7300b",
+   "slug": "phu-duc",
+   "name": "Phu Duc",
+   "cell": "44",
+   "sheet_number_as_stored": "44",
+   "sheet_half": null,
+   "year": 1926,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5015,
+    "h": 3780,
+    "mpx": 18.96
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "5f9d4d1b-5a8b-40ca-98da-6222c73b2e6c",
+   "slug": "hoai-duc-phu-1911",
+   "name": "Hoai Duc Phu",
+   "cell": "13",
+   "sheet_number_as_stored": "13",
+   "sheet_half": null,
+   "year": 1911,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4890,
+    "h": 3747,
+    "mpx": 18.32
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "1707c017-16e3-4c1f-95e7-5a0a685b2e5f",
+   "slug": "phu-lang-thuong",
+   "name": "Phu Lang Thuong",
+   "cell": "5",
+   "sheet_number_as_stored": "5",
+   "sheet_half": null,
+   "year": 1912,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4995,
+    "h": 3747,
+    "mpx": 18.72
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "dfd7dadd-3841-4cdf-872c-44d55e15bb78",
+   "slug": "cho-ganh",
+   "name": "Cho Ganh",
+   "cell": "64",
+   "sheet_number_as_stored": "64",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5069,
+    "h": 3732,
+    "mpx": 18.92
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "91513ec8-4f6f-47bb-a4c7-4abe33d7ff11",
+   "slug": "nha-nam",
+   "name": "Nha nam",
+   "cell": "0 bis",
+   "sheet_number_as_stored": "0 bis",
+   "sheet_half": null,
+   "year": 1907,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5064,
+    "h": 3686,
+    "mpx": 18.67
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "02d32cbd-be89-4274-9dff-dc2337b29511",
+   "slug": "phu-ly",
+   "name": "Phu Ly",
+   "cell": "48",
+   "sheet_number_as_stored": "48",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5083,
+    "h": 3804,
+    "mpx": 19.34
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "398f3897-75ce-4ea0-be4c-29d28aee7e0e",
+   "slug": "dong-quan",
+   "name": "Dong Quan",
+   "cell": "51",
+   "sheet_number_as_stored": "51",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5045,
+    "h": 3677,
+    "mpx": 18.55
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "9a167536-d24d-48a1-b403-91a01acbf6e2",
+   "slug": "dong-trieu",
+   "name": "Dong Trieu",
+   "cell": "17",
+   "sheet_number_as_stored": "17",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4707,
+    "h": 3415,
+    "mpx": 16.07
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "e21f1e1e-a1ce-4633-aae4-82408b7d35bd",
+   "slug": "phu-nghia-hung",
+   "name": "Phu Nghia Hung",
+   "cell": "60",
+   "sheet_number_as_stored": "60",
+   "sheet_half": null,
+   "year": 1903,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5216,
+    "h": 3783,
+    "mpx": 19.73
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "0dac511a-dba2-46f5-8177-730371340baa",
+   "slug": "kien-an",
+   "name": "Kien An",
+   "cell": "38",
+   "sheet_number_as_stored": "38",
+   "sheet_half": null,
+   "year": 1926,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 6706,
+    "h": 5021,
+    "mpx": 33.67
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "d2e230dc-88b1-4069-9f84-304cecb393fa",
+   "slug": "ha-chau",
+   "name": "Ha chau",
+   "cell": "0",
+   "sheet_number_as_stored": "0",
+   "sheet_half": null,
+   "year": 1907,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4876,
+    "h": 3644,
+    "mpx": 17.77
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "1ae3f781-cabb-4bc9-9804-577c6447a00b",
+   "slug": "phu-ninh-giang-e",
+   "name": "Phu Ninh Giang (E)",
+   "cell": "37",
+   "sheet_number_as_stored": "37",
+   "sheet_half": "E",
+   "year": 1904,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2728,
+    "h": 3868,
+    "mpx": 10.55
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23780,
+    "year": 1904,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "0775a31e-7dd8-470a-8b06-67bb8707275f",
+   "slug": "phu-ninh-giang-w",
+   "name": "Phu Ninh Giang (W)",
+   "cell": "37",
+   "sheet_number_as_stored": "37",
+   "sheet_half": "W",
+   "year": 1904,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2652,
+    "h": 3753,
+    "mpx": 9.95
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23921,
+    "year": 1904,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "189aaeae-77a1-4002-8690-c44cfd1d0ab7",
+   "slug": "hon-dau",
+   "name": "Hon Dau",
+   "cell": "46",
+   "sheet_number_as_stored": "46",
+   "sheet_half": "whole",
+   "year": 1924,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2745,
+    "h": 3880,
+    "mpx": 10.65
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23772,
+    "year": 1924,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "37f35a63-2841-47d6-bd94-8765dac81387",
+   "slug": "gia-binh",
+   "name": "Gia Binh",
+   "cell": "15",
+   "sheet_number_as_stored": "15",
+   "sheet_half": null,
+   "year": 1911,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4902,
+    "h": 3692,
+    "mpx": 18.1
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "e8241d5f-f694-45cd-a41a-1f9293ab9a0e",
+   "slug": "phu-thuong-tin",
+   "name": "Phu Thuong Tin",
+   "cell": "27",
+   "sheet_number_as_stored": "27",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5041,
+    "h": 3694,
+    "mpx": 18.62
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "c569cfd2-994d-4a48-819f-8bdba4b3f0bd",
+   "slug": "phu-tien-hung",
+   "name": "Phu Tien Hung",
+   "cell": "50",
+   "sheet_number_as_stored": "50",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5011,
+    "h": 3678,
+    "mpx": 18.43
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "b1f15654-3ef5-4557-a34d-dbc8afcf0803",
+   "slug": "lach-truong",
+   "name": "Lach Truong",
+   "cell": "76",
+   "sheet_number_as_stored": "76",
+   "sheet_half": "whole",
+   "year": 1943,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 3440,
+    "h": 3744,
+    "mpx": 12.88
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23856,
+    "year": 1943,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "19a677af-8d42-4402-9943-1f6608871b6c",
+   "slug": "phu-tu-son-1911",
+   "name": "Phu Tu Son",
+   "cell": "14",
+   "sheet_number_as_stored": "14",
+   "sheet_half": null,
+   "year": 1911,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5048,
+    "h": 3772,
+    "mpx": 19.04
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "d597464d-5e6e-4f66-9805-40dff437b131",
+   "slug": "phu-tu-son-1925",
+   "name": "Phu Tu Son",
+   "cell": "14",
+   "sheet_number_as_stored": "14",
+   "sheet_half": null,
+   "year": 1925,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5011,
+    "h": 3783,
+    "mpx": 18.96
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "6b5d8f92-fba2-4d31-b4e2-ae4a6dfb3ece",
+   "slug": "phu-ung-hoa",
+   "name": "Phu Ung Hoa",
+   "cell": "33",
+   "sheet_number_as_stored": "33",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5032,
+    "h": 3758,
+    "mpx": 18.91
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "c5db9be9-d131-45bf-a133-3c4a206207ae",
+   "slug": "phu-xuan-truong",
+   "name": "Phu Xuan Truong",
+   "cell": "61",
+   "sheet_number_as_stored": "61",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5134,
+    "h": 3695,
+    "mpx": 18.97
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "4f6e91ba-1388-4c7e-9146-89fb324511f1",
+   "slug": "ha-noi",
+   "name": "Ha Noi",
+   "cell": "20",
+   "sheet_number_as_stored": "20",
+   "sheet_half": null,
+   "year": 1903,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5167,
+    "h": 3856,
+    "mpx": 19.92
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "10c654fc-9eb8-4a09-90b5-731e1cb72c79",
+   "slug": "phu-nhac",
+   "name": "Phu Nhac",
+   "cell": "65",
+   "sheet_number_as_stored": "65",
+   "sheet_half": null,
+   "year": 1906,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5111,
+    "h": 3678,
+    "mpx": 18.8
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "b526d180-d21d-46bc-883e-7a645dbb4d17",
+   "slug": "phu-xuyen-w",
+   "name": "Phu Xuyen (W)",
+   "cell": "34",
+   "sheet_number_as_stored": "34",
+   "sheet_half": "W",
+   "year": 1917,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2700,
+    "h": 3801,
+    "mpx": 10.26
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23868,
+    "year": 1917,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "fdfb961d-de66-4b0c-8c78-f90114811bda",
+   "slug": "phu-xuyen-e",
+   "name": "Phu Xuyen (E)",
+   "cell": "34",
+   "sheet_number_as_stored": "34",
+   "sheet_half": "E",
+   "year": 1903,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2746,
+    "h": 3919,
+    "mpx": 10.76
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23775,
+    "year": 1903,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "e8187c2b-7e2d-4476-a911-870b22cd0bb0",
+   "slug": "cua-day-e",
+   "name": "Cua Day (E)",
+   "cell": "73 bis",
+   "sheet_number_as_stored": "73 bis",
+   "sheet_half": "E",
+   "year": 1927,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2710,
+    "h": 3890,
+    "mpx": 10.54
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23729,
+    "year": 1927,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "2d55aed7-a7e9-4d84-b8e0-0ffa95f04e79",
+   "slug": "nhan-ly",
+   "name": "Nhan Ly",
+   "cell": "11",
+   "sheet_number_as_stored": "11",
+   "sheet_half": "whole",
+   "year": 1924,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2611,
+    "h": 3756,
+    "mpx": 9.81
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23806,
+    "year": 1924,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "c8dcff3d-250b-406d-bac8-a7255c5b6f95",
+   "slug": "do-son-e",
+   "name": "Do Son (E)",
+   "cell": "39",
+   "sheet_number_as_stored": "39",
+   "sheet_half": "E",
+   "year": 1904,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2652,
+    "h": 3768,
+    "mpx": 9.99
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23783,
+    "year": 1904,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "cbceebb3-76cb-4e92-8928-1b0856654ae1",
+   "slug": "hai-duong-e",
+   "name": "Hai Duong (E)",
+   "cell": "22",
+   "sheet_number_as_stored": "22",
+   "sheet_half": "E",
+   "year": 1925,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2568,
+    "h": 3828,
+    "mpx": 9.83
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23798,
+    "year": 1925,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "1589e6c8-3bd0-4960-9505-05e39eb97d2c",
+   "slug": "phu-quoc-oai-e",
+   "name": "Phu Quoc Oai (E)",
+   "cell": "18",
+   "sheet_number_as_stored": "18",
+   "sheet_half": "E",
+   "year": 1906,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2523,
+    "h": 3673,
+    "mpx": 9.27
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23842,
+    "year": 1906,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "49851c38-7608-44f5-9459-a6c67f7d6aab",
+   "slug": "do-son-w",
+   "name": "Do Son (W)",
+   "cell": "39",
+   "sheet_number_as_stored": "39",
+   "sheet_half": "W",
+   "year": 1923,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2689,
+    "h": 3883,
+    "mpx": 10.44
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23933,
+    "year": 1923,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "84ef795c-221d-477b-b584-e5ef047ed5ce",
+   "slug": "quang-oai",
+   "name": "Quang Oai",
+   "cell": "6",
+   "sheet_number_as_stored": "6",
+   "sheet_half": null,
+   "year": 1906,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4920,
+    "h": 3632,
+    "mpx": 17.87
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "8b2378cd-1674-46a1-a085-5d914df97c21",
+   "slug": "quang-thua-w",
+   "name": "Quang Thua (W)",
+   "cell": "40",
+   "sheet_number_as_stored": "40",
+   "sheet_half": "W",
+   "year": 1906,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2734,
+    "h": 3895,
+    "mpx": 10.65
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23762,
+    "year": 1906,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "27698eaa-e56b-4778-9e61-c66b6bc0cc08",
+   "slug": "quynh-coi",
+   "name": "Quynh Coi",
+   "cell": "43",
+   "sheet_number_as_stored": "43",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5069,
+    "h": 3768,
+    "mpx": 19.1
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "6c1c0913-10e0-4e8d-8f18-2200f390231f",
+   "slug": "sept-pagodes",
+   "name": "Sept Pagodes",
+   "cell": "16",
+   "sheet_number_as_stored": "16",
+   "sheet_half": null,
+   "year": 1925,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5013,
+    "h": 3782,
+    "mpx": 18.96
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "a37a985f-d5a5-4674-9b94-5ffa81f0c086",
+   "slug": "sen-cu",
+   "name": "Sen Cu",
+   "cell": "73",
+   "sheet_number_as_stored": "73",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5074,
+    "h": 3773,
+    "mpx": 19.14
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "013daa15-185a-4d59-b854-e581557d65ce",
+   "slug": "son-tay",
+   "name": "Son Tay",
+   "cell": "12",
+   "sheet_number_as_stored": "12",
+   "sheet_half": null,
+   "year": 1924,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4998,
+    "h": 3780,
+    "mpx": 18.89
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "78c507fb-a6a3-457e-ae79-19575d0ff90c",
+   "slug": "thai-binh",
+   "name": "Thai Binh",
+   "cell": "56",
+   "sheet_number_as_stored": "56",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5050,
+    "h": 3728,
+    "mpx": 18.83
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "a90c2464-f6aa-46d2-b167-272214b4545f",
+   "slug": "thanh-hoa",
+   "name": "Thanh Hoa",
+   "cell": "75",
+   "sheet_number_as_stored": "75",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5116,
+    "h": 3831,
+    "mpx": 19.6
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "a484611b-c756-4e62-8a77-1d7f4748a250",
+   "slug": "thanh-oai-w",
+   "name": "Thanh Oai (W)",
+   "cell": "26",
+   "sheet_number_as_stored": "26",
+   "sheet_half": "W",
+   "year": 1925,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2676,
+    "h": 3879,
+    "mpx": 10.38
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23784,
+    "year": 1925,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "2bd040e9-68e0-4b98-acbe-fea97a6e3bc2",
+   "slug": "vinh-yen-1919",
+   "name": "Vinh Yen",
+   "cell": "2",
+   "sheet_number_as_stored": "2",
+   "sheet_half": null,
+   "year": 1919,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4775,
+    "h": 3645,
+    "mpx": 17.4
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "caa5df25-1f6f-4fe2-99d5-a2a0679cdb97",
+   "slug": "thuy-anh",
+   "name": "Thuy Anh",
+   "cell": "52",
+   "sheet_number_as_stored": "52",
+   "sheet_half": "whole",
+   "year": 1926,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2755,
+    "h": 3890,
+    "mpx": 10.72
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23761,
+    "year": 1926,
+    "part": "demi-format"
+   }
+  },
+  {
+   "map_id": "c34745b7-c4c2-4770-86b9-2de2ed769dbb",
+   "slug": "van-ly-e",
+   "name": "Van Ly (E)",
+   "cell": "70",
+   "sheet_number_as_stored": "70",
+   "sheet_half": "E",
+   "year": 1905,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2722,
+    "h": 3908,
+    "mpx": 10.64
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23733,
+    "year": 1905,
+    "part": "E"
+   }
+  },
+  {
+   "map_id": "33fd891c-b383-42b1-8aee-cc270be9862c",
+   "slug": "van-ly-w",
+   "name": "Van Ly (W)",
+   "cell": "70",
+   "sheet_number_as_stored": "70",
+   "sheet_half": "W",
+   "year": 1905,
+   "status": "public",
+   "kind": "ign-half-sheet",
+   "pixels": {
+    "w": 2673,
+    "h": 3914,
+    "mpx": 10.46
+   },
+   "matched": {
+    "by": "doi",
+    "serie": 243,
+    "fkey": 23897,
+    "year": 1905,
+    "part": "W"
+   }
+  },
+  {
+   "map_id": "0e943fca-ea08-4f4b-bb5e-0e80a4888f91",
+   "slug": "viet-tri",
+   "name": "Viet Tri",
+   "cell": "1",
+   "sheet_number_as_stored": "1",
+   "sheet_half": null,
+   "year": 1906,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4898,
+    "h": 3681,
+    "mpx": 18.03
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "9c6bdac2-ffab-4803-ae0f-846b51b8009c",
+   "slug": "vinh-yen-1906",
+   "name": "Vinh Yen",
+   "cell": "2",
+   "sheet_number_as_stored": "2",
+   "sheet_half": null,
+   "year": 1906,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4752,
+    "h": 3652,
+    "mpx": 17.35
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "e6c5e467-ae7b-478f-9357-6fe12b8e7361",
+   "slug": "y-yen",
+   "name": "Y Yen",
+   "cell": "54",
+   "sheet_number_as_stored": "54",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5117,
+    "h": 3718,
+    "mpx": 19.03
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "dd575794-8ff0-485f-9875-39f697b1b009",
+   "slug": "yen-dinh",
+   "name": "Yen Dinh",
+   "cell": "72",
+   "sheet_number_as_stored": "72",
+   "sheet_half": null,
+   "year": 1905,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5085,
+    "h": 3795,
+    "mpx": 19.3
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "e17b7fe0-6428-4a59-921f-17924273d8de",
+   "slug": "yen-lang",
+   "name": "Yen Lang",
+   "cell": "71",
+   "sheet_number_as_stored": "71",
+   "sheet_half": null,
+   "year": 1919,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 5039,
+    "h": 3655,
+    "mpx": 18.42
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  },
+  {
+   "map_id": "54cd94cc-3450-4d57-9909-877b6b389a17",
+   "slug": "yen-luu",
+   "name": "Yen Luu",
+   "cell": "23",
+   "sheet_number_as_stored": "23",
+   "sheet_half": null,
+   "year": 1904,
+   "status": "public",
+   "kind": "third-party-composite",
+   "pixels": {
+    "w": 4751,
+    "h": 3611,
+    "mpx": 17.16
+   },
+   "matched": {
+    "by": "cell+year",
+    "serie": 243,
+    "records": 2
+   }
+  }
+ ],
+ "cells_not_held": [
+  "7",
+  "8",
+  "9",
+  "19"
+ ]
+}
