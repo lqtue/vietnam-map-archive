@@ -20,6 +20,7 @@
   import { jsonLd } from '$lib/core/utils/jsonLd';
 
   import SheetZoom from '$lib/features/catalog/SheetZoom.svelte';
+  import SupersededSheet from '$lib/features/catalog/SupersededSheet.svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole, type UserRole } from '$lib/data/supabase/role';
 
@@ -29,6 +30,8 @@
      `!== false` so an older cached payload without the field reads as published
      rather than banner-ing every sheet. */
   $: published = data.published !== false;
+  /** IGN's own half-sheets, when this row is a third party's join of them. */
+  $: originals = data.originals ?? [];
   /** Places this sheet names, from the gazetteer. Empty until the map is OCR'd. */
   $: places = (data.places ?? []) as Array<{
     name_key: string;
@@ -264,6 +267,8 @@
         <code class="share-tile-url">{tileUrl}</code>
       </section>
     {/if}
+
+    <SupersededSheet {originals} />
 
     {#if places.length}
       <section class="share-places">

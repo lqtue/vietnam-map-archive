@@ -238,6 +238,21 @@ export async function fetchSheetEditions(
  * for a signed-in reader and to nothing at all for an anonymous one — which
  * draws an empty layer rather than an error, so the caller is the one that has
  * to decide whether to offer the row.
+ *
+ * A SHEET WE HOLD TWICE IS DRAWN ONCE. 58 cells of the Indochine 1:25,000 are
+ * held both as a third-party join of the whole cell and as IGN's two original
+ * halves, and drawing both stacks one atop the other: the opacity slider stops
+ * meaning anything and every such cell costs two annotation fetches to draw one
+ * square of ground. The originals win, which is why they were fetched.
+ *
+ * Supersession is read off the rows rather than worked out. Each mirrored half
+ * carries `mirrors_original_for` — the id of the sheet it was fetched as the
+ * original of — so nothing here has to reason about cell numbers, halves or
+ * years, and no second copy of that grammar can drift from the one on the series
+ * page. What it does check is COVER: a composite gives way only to a pair that
+ * replaces all of it. Four cells have one half placed and the other unavailable
+ * or unplaceable, and retiring the join for half a cell would quietly delete
+ * ground from the layer.
  */
 export async function fetchSeriesSheets(
   supabase: SupabaseClient<Database>,
@@ -245,7 +260,7 @@ export async function fetchSeriesSheets(
 ): Promise<{ id: string; source: string; bbox?: [number, number, number, number] }[]> {
   const { data, error } = await supabase
     .from('maps')
-    .select('id, allmaps_id, annotation_url, bbox')
+    .select('id, allmaps_id, annotation_url, bbox, extra_metadata')
     .eq('collection', collection)
     .eq('georef_done', true)
     .order('year', { ascending: true });
@@ -255,10 +270,29 @@ export async function fetchSeriesSheets(
     return [];
   }
 
+  // Which halves have been placed for each superseded sheet, by the part of the
+  // cell they cover. A half with no `sheet_half` covers the whole cell on one
+  // piece of paper (the demi-format sheets), so it replaces the join on its own.
+  const replacing = new Map<string, Set<string>>();
+  for (const row of data) {
+    const meta = (row.extra_metadata ?? {}) as Record<string, unknown>;
+    const supersedes = meta.mirrors_original_for;
+    if (typeof supersedes !== 'string') continue;
+    const part = typeof meta.sheet_half === 'string' ? meta.sheet_half : 'whole';
+    if (!replacing.has(supersedes)) replacing.set(supersedes, new Set());
+    replacing.get(supersedes)?.add(part);
+  }
+  const superseded = new Set(
+    [...replacing.entries()]
+      .filter(([, parts]) => (parts.has('W') && parts.has('E')) || parts.has('whole'))
+      .map(([id]) => id)
+  );
+
   // `bbox` comes along because it is what lets the layer fetch the annotations
   // of the sheets on screen and no others. It is four numbers in a row already
   // being read; without it a 56-sheet series costs 56 round trips to draw four.
   return data
+    .filter((row) => !superseded.has(row.id))
     .map((row) => ({
       id: row.id,
       source: row.annotation_url ?? row.allmaps_id ?? '',

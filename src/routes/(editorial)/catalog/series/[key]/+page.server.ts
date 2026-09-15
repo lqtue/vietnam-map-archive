@@ -109,12 +109,26 @@ function distinctPrintings(printings: SheetPrinting[]): number {
   let whole = 0;
   let west = 0;
   let east = 0;
+  let assembled = 0;
   for (const p of printings) {
     if (p.part === 'W') west++;
     else if (p.part === 'E') east++;
+    else if (p.part === 'assemblage') assembled++;
     else whole++;
   }
-  return whole + Math.max(west, east);
+  const pairs = Math.max(west, east);
+  // An assemblage is not a third piece of paper. It is this cell's two halves
+  // joined by someone else, so once the archive holds halves to have joined it
+  // adds nothing to count -- and 58 of these cells hold both, which without
+  // this reads "2 editions" for one printing the moment the originals are
+  // published. Where no half is held the assemblage is the only record of its
+  // printing and counts as one, which is what keeps cells 2, 13 and 14 at the
+  // two they have always had.
+  //
+  // The case this does not distinguish -- an assemblage of one year beside a
+  // pair from another -- does not occur here, because each mirrored pair was
+  // chosen at its own composite's year. It would undercount if it ever did.
+  return whole + pairs + (pairs ? 0 : assembled);
 }
 
 export const load: PageServerLoad = async ({ params }) => {

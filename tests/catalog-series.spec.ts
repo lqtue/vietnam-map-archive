@@ -46,9 +46,15 @@ test('the band is in the HTML, with a link to every coverage page', async ({ pag
  * satisfied by the server's HTML and clicked a row whose handler did not exist
  * yet — so it navigated, which is exactly what a row is supposed to do before
  * JavaScript arrives.
+ *
+ * ANCHORED, because a substring is not a number. This waited on the text not
+ * CONTAINING "0 in archive", which every count ending in a zero also contains:
+ * the archive reached 250 sheets and five tests began failing on a page that
+ * was working perfectly. The zero being waited out is the whole count, so the
+ * pattern says so.
  */
 async function ready(page: import('@playwright/test').Page) {
-  await expect(page.locator('.v2-count')).not.toContainText('0 in archive');
+  await expect(page.locator('.v2-count')).not.toHaveText(/^\s*0\s+in archive/);
   await expect(page.locator('.series-band a.section-card').first()).toBeVisible();
 }
 

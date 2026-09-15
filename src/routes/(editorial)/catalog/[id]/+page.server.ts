@@ -83,5 +83,21 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     .order('mentions', { ascending: false })
     .limit(40);
 
-  return { map, places: places ?? [], published };
+  // IGN's own half-sheets, when this row is a third party's join of them.
+  // `mirrors_original_for` is written by the mirroring script and points the
+  // other way — from each original to the join it was fetched as the original
+  // of — so this is the reverse read, and it is empty for all but the 58 cells
+  // that have one.
+  //
+  // RLS carries the disclosure: while the originals are drafts, an anonymous
+  // reader gets none and the page says nothing. It starts telling readers the
+  // moment the halves are published, which is exactly when the claim becomes
+  // true for them.
+  const { data: originals } = await supabase
+    .from('maps')
+    .select('id, slug, name, year, georef_done, extra_metadata')
+    .eq('extra_metadata->>mirrors_original_for', map.id)
+    .order('extra_metadata->>sheet_half');
+
+  return { map, places: places ?? [], published, originals: originals ?? [] };
 };

@@ -270,6 +270,9 @@ export const vi: Record<string, string> = {
   'The sheet is served as warped map tiles, so it can sit under the OpenHistoricalMap editor while you draw. The button opens the editor with it already set as the background; if the editor does not pick it up, add it by hand under Background → Custom with this URL.':
     'Bản đồ được cung cấp dưới dạng các ô lưới biến dạng làm nền trong trình soạn thảo OpenHistoricalMap. Nếu trình soạn thảo không nhận diện tự động, hãy thêm thủ công vào phần Background → Custom bằng đường dẫn này.',
   'Open in OpenHistoricalMap': 'Mở trong OpenHistoricalMap',
+  'This scan is an assemblage': 'Bản quét này là bản ghép',
+  'The sheet was printed as two halves and never as one. This scan is a third party’s join of them, reduced in the joining. The archive now holds the original half-sheets from IGN, at full resolution and unaltered.':
+    'Tờ bản đồ này được in thành hai nửa, chưa bao giờ in liền một tờ. Bản quét này do một bên thứ ba ghép lại và đã bị giảm độ phân giải khi ghép. Kho lưu trữ hiện giữ hai nửa tờ gốc của IGN, ở độ phân giải đầy đủ và không chỉnh sửa.',
   'Places named on this sheet': 'Địa danh được ghi trên bản đồ này',
   'Read by optical character recognition from the sheet itself, then corrected by hand where a reviewer has reached it.':
     'Trích xuất tự động qua nhận dạng ký tự quang học (OCR) và được kiểm duyệt thủ công.',
