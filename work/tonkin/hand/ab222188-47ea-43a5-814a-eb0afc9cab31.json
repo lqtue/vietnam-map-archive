@@ -1,0 +1,28 @@
+{
+  "corners": {
+    "NW": [
+      634.6,
+      647.23
+    ],
+    "NE": [
+      5149.54,
+      645.18
+    ],
+    "SE": [
+      5150.03,
+      6635.85
+    ],
+    "SW": [
+      639.83,
+      6644.32
+    ]
+  },
+  "offset": 94.87,
+  "edges": {
+    "west": 115.19997615199419,
+    "east": 115.29996966664946,
+    "north": 22.500013202756936,
+    "south": 22.374998983115038
+  },
+  "note": "Phuc Nhac (65), west half, 1906. CORNERS ONLY \u2014 the coordinates are the catalogue's, as for every other mirrored original. This is the sheet `place` already names as a later edition with a thin ruled frame instead of the heavy neatline the detector anchors on, and it fails before it ever looks for the rim: 43-47 px residuals fitting the THICK line on L and T. The rim is there and straight; what was missing was a window narrow enough to hold one line, because the graticule band between the thick line and the rim carries several and an argmax over all of them hops. The east half of this same cell supplies the window \u2014 same print run, same scan session, placed cleanly, rim 100.1/96.0/92.7 px inside its thick line, which scaled by the two scans' widths is 94.9 px here. Searched +/-45 px around that, the four sides fit at 7.0/0.9/7.3/6.2 px RMS \u2014 worse than the detector's usual sub-pixel, so about 15 m, and the reason this is corners-by-hand rather than a detector fix. The result is checkable and was checked: the quad comes out 4512.6 x 5993.9 against the east half's 4509.8 x 6004.6, which is what the two halves of one cell should be, and the aspect and scale gates still judge it against the catalogue's ground."
+}

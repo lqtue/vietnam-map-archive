@@ -1,0 +1,28 @@
+{
+  "corners": {
+    "NW": [
+      323.63,
+      440.04
+    ],
+    "NE": [
+      2530.42,
+      437.3
+    ],
+    "SE": [
+      2534.04,
+      3359.9
+    ],
+    "SW": [
+      327.26,
+      3362.64
+    ]
+  },
+  "offset": 85.65,
+  "edges": {
+    "west": 114.80001296280426,
+    "east": 114.90002719555838,
+    "north": 23.500009846083053,
+    "south": 23.37499538048594
+  },
+  "note": "Hoai Duc Phu (13), west half, 1925. CORNERS ONLY \u2014 the coordinates are the catalogue's, as for every other mirrored original. The detector fits this frame well (0.47-0.68 px residual on all four sides) but its TOP and BOTTOM lock onto the wrong line: their rim offsets read 47.7 and 46.5 px where the left side of this same scan reads 85.7. Across 204 placed sheets the rim offset is 83.9 px (sd 4.4) and the four sides of a sheet agree to 2.4% at the median; this sheet's 65.4% is the worst in the corpus and its top and bottom are the only two sides anywhere near 46 px. So they are moved in to the offset the left side measured on this scan, along the frame's own tilt. Nothing here is a coordinate: the aspect and scale gates still judge the result against the catalogue's ground, and they are the reason this is checkable rather than asserted."
+}
