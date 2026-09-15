@@ -1,0 +1,124 @@
+119 sheet(s) to place from the catalogue  -- DRY RUN, nothing is written
+
+  Bac Ninh (E) 1911            clear  4.24/4.26 m/px  aspect off 0.33%
+  Bac Ninh (W) 1911            clear  4.24/4.25 m/px  aspect off 0.27%
+  Ban Yen Nhan (E) 1924        clear  4.25/4.25 m/px  aspect off 0.00%
+  Ban Yen Nhan (W) 1924        clear  4.24/4.26 m/px  aspect off 0.45%
+  Bao Loc (E) 1907             clear  4.24/4.24 m/px  aspect off 0.01%
+  Bao Loc (W) 1907             clear  4.24/4.24 m/px  aspect off 0.09%
+  Bien Son (E) 1906            clear  4.25/4.25 m/px  aspect off 0.17%
+  Bien Son (W) 1906            clear  4.26/4.25 m/px  aspect off 0.08%
+  Binh Xuyen (E) 1924          clear  4.22/4.25 m/px  aspect off 0.65%
+  Binh Xuyen (W) 1924          clear  4.25/4.25 m/px  aspect off 0.04%
+  Cam Ly (E) 1907              clear  4.23/4.24 m/px  aspect off 0.29%
+  Cam Ly (W) 1907              clear  4.24/4.24 m/px  aspect off 0.00%
+  Cho Ganh (E) 1905            clear  4.24/4.26 m/px  aspect off 0.43%
+  Cho Ganh (W) 1905            clear  4.26/4.26 m/px  aspect off 0.02%
+  Cua Ba Lat (E) 1905          clear  4.26/4.25 m/px  aspect off 0.12%
+  Cua Ba Lat (W) 1905          clear  4.25/4.25 m/px  aspect off 0.05%
+  Cua Thai Binh (E) 1905       clear  4.24/4.26 m/px  aspect off 0.30%
+  Cua Thai Binh (W) 1905       clear  4.24/4.26 m/px  aspect off 0.30%
+  Dong Quan (E) 1905           clear  4.24/4.26 m/px  aspect off 0.49%
+  Dong Quan (W) 1905           clear  4.26/4.26 m/px  aspect off 0.01%
+  Dong Trieu (E) 1905          clear  4.23/4.26 m/px  aspect off 0.62%
+  Dong Trieu (W) 1905          clear  4.26/4.25 m/px  aspect off 0.24%
+  Dong Van (E) 1905            clear  4.25/4.26 m/px  aspect off 0.31%
+  Dong Van (W) 1905            clear  4.24/4.25 m/px  aspect off 0.31%
+  Gia Binh (E) 1911            clear  4.25/4.26 m/px  aspect off 0.28%
+  Gia Binh (W) 1911            clear  4.23/4.26 m/px  aspect off 0.59%
+  Gia Loc (E) 1904             clear  4.26/4.26 m/px  aspect off 0.04%
+  Gia Loc (W) 1904             clear  4.24/4.26 m/px  aspect off 0.41%
+  Ha Noi (E) 1903              clear  4.27/4.25 m/px  aspect off 0.40%
+  Ha Noi (W) 1903              clear  4.27/4.26 m/px  aspect off 0.23%
+  Hai Phong (E) 1904           clear  4.25/4.25 m/px  aspect off 0.02%
+  Hai Phong (W) 1904           clear  4.25/4.25 m/px  aspect off 0.00%
+  Hiep Hoa (E) 1912            clear  4.25/4.26 m/px  aspect off 0.12%
+  Hiep Hoa (W) 1912            clear  4.24/4.26 m/px  aspect off 0.36%
+  Hoai Duc Phu (E) 1925        clear  4.26/4.26 m/px  aspect off 0.15%
+  Hoai Duc Phu (E) 1911        clear  4.24/4.26 m/px  aspect off 0.37%
+  Hoai Duc Phu (W) 1925        HOLD  rim offsets spread 65%; axes disagree 2.0%
+  Hoai Duc Phu (W) 1911        clear  4.24/4.26 m/px  aspect off 0.49%
+  Hung Yen (E) 1926            clear  4.24/4.25 m/px  aspect off 0.16%
+  Hung Yen (W) 1926            clear  4.24/4.25 m/px  aspect off 0.44%
+  Ke Sat (E) 1905              clear  4.24/4.28 m/px  aspect off 0.73%
+  Ke Sat (W) 1905              clear  4.26/4.27 m/px  aspect off 0.03%
+  Kien An (E) 1926             clear  3.18/3.19 m/px  aspect off 0.45%
+  Kien An (W) 1926             clear  3.21/3.19 m/px  aspect off 0.44%
+  Kien Xuong (E) 1905          clear  4.26/4.27 m/px  aspect off 0.27%
+  Kien Xuong (W) 1905          clear  4.26/4.28 m/px  aspect off 0.36%
+  Kim Thanh (E) 1904           clear  4.23/4.25 m/px  aspect off 0.68%
+  Kim Thanh (W) 1904           clear  4.23/4.26 m/px  aspect off 0.72%
+  Loi Duong (E) 1919           clear  4.25/4.26 m/px  aspect off 0.19%
+  Loi Duong (W) 1919           clear  4.25/4.26 m/px  aspect off 0.16%
+  Mai Dong (E) 1904            clear  4.26/4.26 m/px  aspect off 0.03%
+  Mai Dong (W) 1904            clear  4.24/4.26 m/px  aspect off 0.50%
+  My Dong (E) 1924             clear  4.25/4.26 m/px  aspect off 0.06%
+  My Dong (W) 1924             clear  4.25/4.25 m/px  aspect off 0.18%
+  Nam Dinh (E) 1905            clear  4.24/4.26 m/px  aspect off 0.47%
+  Nam Dinh (W) 1905            clear  4.24/4.26 m/px  aspect off 0.48%
+  Nha Nam (E) 1907             clear  4.24/4.24 m/px  aspect off 0.01%
+  Nha Nam (W) 1907             clear  4.24/4.25 m/px  aspect off 0.21%
+  Nhu Trac (E) 1903            clear  4.27/4.25 m/px  aspect off 0.45%
+  Nhu Trac (W) 1903            clear  4.25/4.25 m/px  aspect off 0.05%
+  Ninh Binh (E) 1924           clear  4.25/4.26 m/px  aspect off 0.22%
+  Ninh Binh (W) 1924           clear  4.25/4.27 m/px  aspect off 0.41%
+  Phat Diem (W) 1927           clear  4.26/4.27 m/px  aspect off 0.32%
+  Phu Duc (E) 1926             clear  4.25/4.25 m/px  aspect off 0.13%
+  Phu Duc (W) 1926             clear  4.24/4.25 m/px  aspect off 0.25%
+  Phu Lang Thuong (E) 1912     clear  4.25/4.26 m/px  aspect off 0.32%
+  Phu Lang Thuong (W) 1912     clear  4.26/4.26 m/px  aspect off 0.21%
+  Phu Ly (E) 1905              clear  4.23/4.26 m/px  aspect off 0.58%
+  Phu Ly (W) 1905              clear  4.24/4.27 m/px  aspect off 0.64%
+  Phu Nghia Hung (E) 1903      clear  4.27/4.26 m/px  aspect off 0.07%
+  Phu Nghia Hung (W) 1903      clear  4.26/4.25 m/px  aspect off 0.37%
+  Phu Nhac (E) 1906            clear  2.09/2.07 m/px  aspect off 0.58%
+  Phu Nhac (W) 1906            FAIL  detect: L: thick line residual 47.4px; T: thick line residual 32.3px
+  Phu Quang Oai (E) 1906       clear  4.25/4.25 m/px  aspect off 0.04%
+  Phu Quang Oai (W) 1906       clear  4.25/4.26 m/px  aspect off 0.44%
+  Phu Tien Hung (E) 1904       clear  4.24/4.25 m/px  aspect off 0.28%
+  Phu Tien Hung (W) 1904       clear  4.25/4.27 m/px  aspect off 0.33%
+  Phu Tu Son (E) 1911          clear  4.24/4.25 m/px  aspect off 0.34%
+  Phu Tu Son (E) 1925          clear  4.24/4.26 m/px  aspect off 0.43%
+  Phu Tu Son (W) 1925          clear  4.23/4.26 m/px  aspect off 0.66%
+  Phu Tu Son (W) 1911          clear  4.23/4.25 m/px  aspect off 0.39%
+  Phu Ung Hoa (E) 1924         clear  4.24/4.26 m/px  aspect off 0.43%
+  Phu Ung Hoa (W) 1924         clear  4.24/4.25 m/px  aspect off 0.33%
+  Phu Xyan Truong (E) 1905     clear  4.24/4.25 m/px  aspect off 0.32%
+  Phu Xyan Truong (W) 1905     clear  4.24/4.25 m/px  aspect off 0.19%
+  Quang Yen (E) 1904           clear  4.25/4.26 m/px  aspect off 0.16%
+  Quang Yen (Sud) (E) 1904     clear  4.24/4.25 m/px  aspect off 0.35%
+  Quang Yen (Sud) (W) 1904     clear  4.26/4.26 m/px  aspect off 0.08%
+  Quang Yen (W) 1904           clear  4.23/4.26 m/px  aspect off 0.65%
+  Quat Lam (E) 1926            clear  2.09/2.08 m/px  aspect off 0.23%
+  Quat Lam (W) 1926            clear  2.09/2.08 m/px  aspect off 0.43%
+  Quinh Coi (E) 1905           clear  4.25/4.27 m/px  aspect off 0.45%
+  Quynh Coi (W) 1905           clear  4.25/4.26 m/px  aspect off 0.37%
+  Sen Cu (E) 1905              clear  4.24/4.27 m/px  aspect off 0.69%
+  Sen Cu (W) 1905              clear  4.25/4.26 m/px  aspect off 0.11%
+  Sept Pagodes (E) 1925        clear  4.26/4.25 m/px  aspect off 0.08%
+  Sept Pagodes (W) 1925        clear  4.27/4.26 m/px  aspect off 0.30%
+  Son Tay (E) 1924             clear  4.24/4.27 m/px  aspect off 0.62%
+  Son Tay (W) 1924             clear  4.23/4.27 m/px  aspect off 1.00%
+  Thai Binh (E) 1905           clear  4.22/4.26 m/px  aspect off 1.03%
+  Thai Binh (W) 1905           clear  4.27/4.25 m/px  aspect off 0.41%
+  Thanh Hoa (E) 1904           clear  4.25/4.25 m/px  aspect off 0.20%
+  Thanh Hoa (W) 1904           clear  4.26/4.26 m/px  aspect off 0.11%
+  Thuong Tin Phu (E) 1905      clear  4.25/4.27 m/px  aspect off 0.29%
+  Thuong Tin Phu (W) 1905      clear  4.25/4.26 m/px  aspect off 0.33%
+  Viet Tri (E) 1906            clear  4.26/4.24 m/px  aspect off 0.35%
+  Viet Tri (W) 1906            clear  4.26/4.26 m/px  aspect off 0.01%
+  Vinh Yen (E) 1919            clear  4.23/4.25 m/px  aspect off 0.40%
+  Vinh Yen (E) 1906            clear  4.25/4.26 m/px  aspect off 0.40%
+  Vinh Yen (W) 1906            clear  4.24/4.26 m/px  aspect off 0.57%
+  Vinh Yen (W) 1919            clear  4.25/4.25 m/px  aspect off 0.20%
+  Y Yen (E) 1905               clear  4.25/4.27 m/px  aspect off 0.28%
+  Y Yen (W) 1905               clear  4.26/4.26 m/px  aspect off 0.03%
+  Yen Dinh (E) 1905            clear  4.23/4.26 m/px  aspect off 0.56%
+  Yen Dinh (W) 1905            clear  4.24/4.26 m/px  aspect off 0.37%
+  Yen Lang (E) 1919            clear  4.24/4.26 m/px  aspect off 0.45%
+  Yen Lang (W) 1919            clear  4.26/4.25 m/px  aspect off 0.18%
+  Yen Luu (E) 1904             clear  4.25/4.27 m/px  aspect off 0.43%
+  Yen Luu (W) 1904             clear  4.24/4.27 m/px  aspect off 0.64%
+
+117 clear, 1 held, 1 could not be placed
+Dry run. Re-run with --write to keep these placements.

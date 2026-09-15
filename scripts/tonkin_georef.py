@@ -1140,6 +1140,351 @@ def place(map_id):
                            "HOLD -- " + "; ".join(got["verdict"])))
 
 
+# ── Placing a sheet from the catalogue instead of from its printed corners ───
+
+CATALOGUE = [WORK / "sources" / "ign-serie-243.json", WORK / "sources" / "ign-serie-175.json"]
+OFFSET_FILE = WORK / "catalogue-offset.json"
+
+
+def catalogue_boxes():
+    """Every sheet's ground extent, as CartoMundi publishes it, keyed `C_20E`.
+
+    The catalogue carries a polygon per sheet -- not per cell -- so a half-sheet
+    has its own, and `f118IdCm` spells the key the same way this series numbers
+    its paper: two digits, `b` for a bis cell, then the half. `C_00bW` is the
+    west half of cell 0 bis. That is the whole lookup: sheet number and half are
+    exactly the two things needed, which is why this works at all.
+    """
+    out = {}
+    for path in CATALOGUE:
+        for r in json.loads(path.read_text()):
+            ge = r.get("geometrieEmprise") or {}
+            wkt, key = ge.get("wkt"), ge.get("f118IdCm")
+            if not wkt or not key or key in out:
+                continue
+            pts = [(float(a), float(b)) for a, b in
+                   re.findall(r"(-?\d+\.\d+)\s+(-?\d+\.\d+)", wkt)]
+            if not pts:
+                continue
+            lon = [q[0] for q in pts]
+            lat = [q[1] for q in pts]
+            out[key] = {"west": min(lon), "east": max(lon),
+                        "south": min(lat), "north": max(lat),
+                        "note": r.get("f101Note"), "serie": r.get("serieId")}
+    return out
+
+
+def catalogue_key(meta):
+    """`C_20E` out of a row's `extra_metadata`, or None if it does not name a cell."""
+    cell = str((meta or {}).get("sheet_number") or "").strip().lower()
+    if not cell:
+        return None
+    m = re.match(r"\[?(\d+)\s*(bis)?", cell)
+    if not m:
+        return None
+    half = (meta or {}).get("sheet_half")
+    return "C_%02d%s%s" % (int(m.group(1)), "b" if m.group(2) else "",
+                           half if half in ("W", "E") else "")
+
+
+def _geod():
+    from pyproj import Geod
+    return Geod(ellps="WGS84")
+
+
+def calibrate(write=True):
+    """Measure the catalogue's offset from the printed graticule, on sheets we did both ways.
+
+    THE CATALOGUE IS NOT WRONG, IT IS SOMEWHERE ELSE. Compared against the sheets
+    already placed from their printed corners, CartoMundi's polygons cover exactly
+    the right amount of ground -- width error 0.0 m, height -0.1 m, across 77
+    sheets -- and sit about 169 m west and 521 m south of it. That is a datum
+    shift, not error: the polygons come from a modern shapefile, the figures on the
+    paper are grades from the Paris meridian on the survey's own 1903 datum.
+
+    Two parameters, because that is what the data supports. East-west is a constant
+    (sd 1.7 m and no correlation with longitude). North-south runs with latitude
+    at -7.45 m per degree, which is small -- twelve metres across the whole series
+    -- but it is real: it survives being measured on the ellipsoid rather than with
+    a flat degree, where a spurious version of it would not.
+
+    What is left after both is 1.6 m mean and 3.4 m worst, on scans whose pixel is
+    4.3 m. So this is not an approximation of the printed corners, it is a
+    reproduction of them to better than the paper can be measured.
+
+    It stays a measurement rather than a constant in the source because it is one:
+    re-run it when more sheets are placed and it will tighten or it will move, and
+    either of those is worth seeing.
+    """
+    g = _geod()
+    boxes = catalogue_boxes()
+    rows = {}
+    for r in all_sheets():
+        rows[r["id"]] = r
+    obs = []
+    for f in sorted(WORK.glob("*.json")):
+        if len(f.stem) != 36:
+            continue
+        got = json.loads(f.read_text())
+        if "wgs84" not in got:
+            continue
+        row = rows.get(got.get("id"))
+        if not row:
+            continue
+        key = catalogue_key(row.get("extra_metadata"))
+        box = boxes.get(key) if key else None
+        if not box:
+            continue
+        w = got["wgs84"]
+        pw, pe = min(w["NW"][0], w["SW"][0]), max(w["NE"][0], w["SE"][0])
+        ps, pn = min(w["SW"][1], w["SE"][1]), max(w["NW"][1], w["NE"][1])
+        # A polygon that covers different ground is not a shifted one. Cell 76 is
+        # the case: a demi-format sheet whose catalogue polygon is the whole cell.
+        if abs((box["east"] - box["west"]) - (pe - pw)) > 0.01:
+            continue
+        mid_lat, mid_lon = (pn + ps) / 2, (pw + pe) / 2
+        dx = g.inv(pw, mid_lat, box["west"], mid_lat)[2] * (1 if box["west"] > pw else -1)
+        dy = g.inv(mid_lon, ps, mid_lon, box["south"])[2] * (1 if box["south"] > ps else -1)
+        obs.append({"lat": mid_lat, "dx": dx, "dy": dy, "key": key, "name": row.get("name")})
+
+    if len(obs) < 20:
+        sys.exit(f"calibrate: only {len(obs)} sheets placed from their printed corners -- too few")
+    n = len(obs)
+    mean = lambda a: sum(a) / len(a)
+    dxs = [o["dx"] for o in obs]
+    lats = [o["lat"] for o in obs]
+    dys = [o["dy"] for o in obs]
+    ml, md = mean(lats), mean(dys)
+    slope = sum((l - ml) * (y - md) for l, y in zip(lats, dys)) / sum((l - ml) ** 2 for l in lats)
+    icpt = md - slope * ml
+    east = mean(dxs)
+    res = [((o["dx"] - east) ** 2 + (o["dy"] - (icpt + slope * o["lat"])) ** 2) ** 0.5 for o in obs]
+    cal = {"n": n, "east_m": east, "north_intercept_m": icpt, "north_slope_m_per_deg": slope,
+           "residual_mean_m": mean(res), "residual_max_m": max(res),
+           "note": "catalogue minus printed. Add the negation to move a catalogue "
+                   "polygon onto the sheet's own printed frame. See calibrate()."}
+    print(f"calibrated on {n} sheets placed from their printed corners")
+    print(f"  east-west   {east:8.1f} m (constant)")
+    print(f"  north-south {icpt:8.1f} {slope:+.2f} * lat  m")
+    print(f"  residual    mean {mean(res):.2f} m, max {max(res):.2f} m   (a pixel is ~4.3 m)")
+    if write:
+        OFFSET_FILE.write_text(json.dumps(cal, indent=1))
+        print(f"  wrote {OFFSET_FILE}")
+    return cal
+
+
+def catalogue_edges(meta, boxes=None, cal=None):
+    """The four edges in grades, from the catalogue polygon, corrected onto the paper.
+
+    Returns what `finish(given=...)` wants, so everything downstream -- the aspect
+    check against the measured quad, the scale check, the gate -- is the same code
+    that judges a sheet read off its own corners. Nothing here is exempt from any
+    of it.
+    """
+    if boxes is None:
+        boxes = catalogue_boxes()
+    if cal is None:
+        if not OFFSET_FILE.exists():
+            sys.exit(f"no {OFFSET_FILE} -- run `tonkin_georef.py calibrate` first")
+        cal = json.loads(OFFSET_FILE.read_text())
+    key = catalogue_key(meta)
+    if not key:
+        return None, "row names no sheet number"
+    box = boxes.get(key)
+    if not box:
+        return None, f"no catalogue polygon for {key}"
+    # A demi-format sheet is titled as a whole cell and catalogued as one, while
+    # the paper covers half of it. The note is the only thing that says so, and
+    # taking the polygon at face value would stretch the sheet over ground it
+    # does not show.
+    if box["note"] and "demi-format" in box["note"].lower():
+        return None, f"{key} is a demi-format sheet -- its polygon is the whole cell, not the paper"
+    g = _geod()
+    mid_lat = (box["north"] + box["south"]) / 2
+    mid_lon = (box["east"] + box["west"]) / 2
+    east_m = -cal["east_m"]
+    north_m = -(cal["north_intercept_m"] + cal["north_slope_m_per_deg"] * mid_lat)
+    west = g.fwd(box["west"], mid_lat, 90.0, east_m)[0]
+    east = g.fwd(box["east"], mid_lat, 90.0, east_m)[0]
+    north = g.fwd(mid_lon, box["north"], 0.0, north_m)[1]
+    south = g.fwd(mid_lon, box["south"], 0.0, north_m)[1]
+    return {"west": (west - PARIS) / GRADE, "east": (east - PARIS) / GRADE,
+            "north": north / GRADE, "south": south / GRADE}, None
+
+
+def all_sheets():
+    """Every sheet in the series, georeferenced or not -- `sheets()` returns only the pending."""
+    import requests
+    from dotenv import load_dotenv
+    import os
+    load_dotenv(Path(".env"))
+    url, key = os.environ["PUBLIC_SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"]
+    r = requests.get(f"{url}/rest/v1/maps", timeout=30,
+                     headers={"apikey": key, "Authorization": f"Bearer {key}"},
+                     params={"select": "id,name,year,year_label,status,extra_metadata",
+                             "collection": f"eq.{COLLECTION}", "order": "name"})
+    r.raise_for_status()
+    return r.json()
+
+
+def cell_footprints():
+    """Where each cell already sits, from the sheets that are placed.
+
+    THE CHECK THAT REPLACES THE ONE WE GIVE UP. Reading the printed corners is
+    also how a misplacement is caught -- the code below says it plainly, a sheet
+    14 km out of place still lies flat on the basemap and still looks like a map.
+    Placing from the catalogue trusts `sheet_number` and `sheet_half` instead, and
+    those have been wrong: CartoMundi labels both 1904 records of cells 25 and 74
+    "Demi-feuille Ouest" and one of each is the east half.
+
+    So the placement is checked against evidence that did not come from the
+    catalogue: this archive already holds a georeferenced sheet for every one of
+    these cells -- the third-party composite of the whole cell -- and a half that
+    claims to be part of a cell has to land inside it, on the side it says. A
+    wrong cell is 12.5 km out and a swapped half is half a cell out; neither
+    survives this, and it costs nothing.
+    """
+    rows = {r["id"]: r for r in all_sheets()}
+    out = {}
+    for f in sorted(WORK.glob("*.json")):
+        if len(f.stem) != 36:
+            continue
+        got = json.loads(f.read_text())
+        if "wgs84" not in got:
+            continue
+        row = rows.get(got.get("id"))
+        if not row:
+            continue
+        meta = row.get("extra_metadata") or {}
+        # Only whole-cell sheets define a cell's footprint; a half would define
+        # half of one and then vouch for itself.
+        if meta.get("sheet_half") in ("W", "E"):
+            continue
+        cell = str(meta.get("sheet_number") or "").strip()
+        if not cell:
+            continue
+        w = got["wgs84"]
+        out.setdefault(cell, {
+            "west": min(w["NW"][0], w["SW"][0]), "east": max(w["NE"][0], w["SE"][0]),
+            "south": min(w["SW"][1], w["SE"][1]), "north": max(w["NW"][1], w["NE"][1]),
+            "from": row.get("name"), "id": got["id"]})
+    return out
+
+
+# How far outside its cell a half may land before it is not that half. The cell
+# is 0.18 deg across, so half is 0.09: a swapped half misses by 0.09 and a wrong
+# cell by 0.18, while honest disagreement between two digitisations of the same
+# paper is a few metres. 0.01 deg is about 1 km -- far outside the second, far
+# inside the first.
+FOOTPRINT_SLOP = 0.01
+
+
+def footprint_check(meta, wgs84, cells=None):
+    cell = str((meta or {}).get("sheet_number") or "").strip()
+    half = (meta or {}).get("sheet_half")
+    box = (cells or {}).get(cell)
+    if not box:
+        return [f"no placed whole-cell sheet for cell {cell} to check against"]
+    w = wgs84
+    got = {"west": min(w["NW"][0], w["SW"][0]), "east": max(w["NE"][0], w["SE"][0]),
+           "south": min(w["SW"][1], w["SE"][1]), "north": max(w["NW"][1], w["NE"][1])}
+    bad = []
+    if (got["west"] < box["west"] - FOOTPRINT_SLOP or got["east"] > box["east"] + FOOTPRINT_SLOP
+            or got["south"] < box["south"] - FOOTPRINT_SLOP or got["north"] > box["north"] + FOOTPRINT_SLOP):
+        bad.append(f"lands outside cell {cell} as placed from {box['from']}")
+    if half in ("W", "E"):
+        mid = (box["west"] + box["east"]) / 2
+        centre = (got["west"] + got["east"]) / 2
+        side = "W" if centre < mid else "E"
+        if side != half:
+            bad.append(f"row says the {half} half but it lands on the {side} side of cell {cell}")
+    return bad
+
+
+def from_catalogue(map_id=None, write=False):
+    """Place sheets from the catalogue: detect the frame, take the edges from CartoMundi.
+
+    `detect` is unchanged and still does the only thing that has to look at the
+    scan. What goes away is the corner reading -- two model calls a sheet -- and
+    what replaces it is a lookup on the sheet number and half, which is what the
+    catalogue is keyed on.
+    """
+    boxes = catalogue_boxes()
+    cal = json.loads(OFFSET_FILE.read_text()) if OFFSET_FILE.exists() else calibrate(write=True)
+    cells = cell_footprints()
+    rows = [r for r in all_sheets() if map_id is None or r["id"] == map_id]
+    if map_id and not rows:
+        sys.exit(f"{map_id} is not in this collection")
+    if map_id is None:
+        rows = [r for r in rows if not (WORK / f"{r['id']}.json").exists()
+                or "wgs84" not in json.loads((WORK / f"{r['id']}.json").read_text())]
+    print(f"{len(rows)} sheet(s) to place from the catalogue"
+          f"{'' if write else '  -- DRY RUN, nothing is written'}\n")
+    ok = held = failed = 0
+    for row in rows:
+        meta = row.get("extra_metadata") or {}
+        name = f"{row['name']} {row.get('year') or ''}".strip()
+        given, err = catalogue_edges(meta, boxes, cal)
+        if err:
+            print(f"  {name:28} SKIP  {err}")
+            failed += 1
+            continue
+        # WHICH EDGE IS CUT IS NOT GUESSWORK HERE. A half-sheet's inner edge is
+        # where the cell was split, so it carries no neatline and the detector
+        # cannot fit one -- which is why `read_sheet` discovers the cut by trying
+        # and failing. The half tells us directly: the east half is cut on its
+        # left, the west half on its right. Passing it saves the failed pass, and
+        # buys a check the footprint cannot: if a sheet will only detect with the
+        # OTHER edge cut, then the half it claims to be is the wrong one, and that
+        # is exactly the error CartoMundi makes on cells 25 and 74.
+        half = meta.get("sheet_half")
+        want_cut = {"E": "L", "W": "R"}.get(half)
+        base = f"https://iiif.maparchive.vn/iiif/{row['id']}"
+        try:
+            info = T.get_image_info(base)
+            got, derr = detect(base, info["width"], info["height"], cut=want_cut)
+            if derr and want_cut:
+                other = "R" if want_cut == "L" else "L"
+                alt, aerr = detect(base, info["width"], info["height"], cut=other)
+                if not aerr:
+                    print(f"  {name:28} FAIL  row says the {half} half, but the frame "
+                          f"only fits with its {'left' if other == 'L' else 'right'} "
+                          f"edge cut -- the half label is wrong")
+                    failed += 1
+                    continue
+            if derr:
+                print(f"  {name:28} FAIL  detect: {derr}")
+                failed += 1
+                continue
+            got, derr = finish(base, info["width"], info["height"], got, given=given)
+            if derr:
+                print(f"  {name:28} FAIL  {derr}")
+                failed += 1
+                continue
+        except Exception as e:                                    # noqa: BLE001
+            print(f"  {name:28} FAIL  {type(e).__name__}: {str(e)[:70]}")
+            failed += 1
+            continue
+        got["id"], got["name"] = row["id"], row["name"]
+        got["placed_from"] = "catalogue"
+        got["catalogue_key"] = catalogue_key(meta)
+        outside = footprint_check(meta, got["wgs84"], cells)
+        got["verdict"] = got.get("verdict", []) + outside
+        mx, my = got["m_per_px"]
+        if got["verdict"]:
+            print(f"  {name:28} HOLD  {'; '.join(got['verdict'])}")
+            held += 1
+        else:
+            print(f"  {name:28} clear  {mx:.2f}/{my:.2f} m/px  "
+                  f"aspect off {got['aspect_err']*100:.2f}%")
+            ok += 1
+        if write:
+            (WORK / f"{row['id']}.json").write_text(json.dumps(got, indent=1))
+    print(f"\n{ok} clear, {held} held, {failed} could not be placed")
+    if not write:
+        print("Dry run. Re-run with --write to keep these placements.")
+
+
 def selfcheck():
     """The two pieces whose failure is silent, on numbers small enough to read.
 
@@ -1180,12 +1525,14 @@ def selfcheck():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("phase", choices=["detect", "read", "all", "annotate", "check", "selfcheck", "place"])
+    ap.add_argument("phase", choices=["detect", "read", "all", "annotate", "check", "selfcheck",
+                                  "place", "calibrate", "catalogue"])
     ap.add_argument("map_id", nargs="?")
     ap.add_argument("--which", default="inner", choices=["inner", "outer"])
     ap.add_argument("--shard", help="all: run every n-th sheet, as i/n")
     ap.add_argument("--write", action="store_true",
-                    help="annotate: upload and point the rows at it")
+                    help="annotate: upload and point the rows at it; "
+                         "catalogue: keep the placements")
     args = ap.parse_args()
 
     if args.phase == "all":
@@ -1202,6 +1549,12 @@ def main():
         return
     if args.phase == "place":
         place(args.map_id)
+        return
+    if args.phase == "calibrate":
+        calibrate()
+        return
+    if args.phase == "catalogue":
+        from_catalogue(args.map_id, args.write)
         return
 
     base = T.get_iiif_base_from_supabase(args.map_id)

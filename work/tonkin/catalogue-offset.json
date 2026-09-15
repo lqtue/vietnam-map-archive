@@ -1,0 +1,9 @@
+{
+ "n": 77,
+ "east_m": -168.9652240267851,
+ "north_intercept_m": -367.1235841659292,
+ "north_slope_m_per_deg": -7.445266330924767,
+ "residual_mean_m": 1.5787156816596437,
+ "residual_max_m": 3.370843500830957,
+ "note": "catalogue minus printed. Add the negation to move a catalogue polygon onto the sheet's own printed frame. See calibrate()."
+}
