@@ -52,3 +52,9 @@ scripts/bulk_upload_*.log
 # by scripts/oneoff/check_indochine_provenance.py. The reduced index beside them
 # (sources/nakala.json) is small and IS tracked.
 work/tonkin/sources/ign-serie-*.json
+
+# Worker and pipeline run logs — one per run, and a long-running batch keeps
+# appending to its file. Same rule as the bulk-upload logs above: the record is
+# the rows the run wrote to the database, not the transcript of it writing them.
+work/ocr/logs/
+work/tonkin/*.log
