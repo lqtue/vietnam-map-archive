@@ -1,0 +1,50 @@
+-- Migration 089 — two INSERT policies that were never service-role-only
+--
+-- Both were written as "the pipeline needs to insert", and both were named as
+-- if the name were the guard: "footprints_service_insert", "Service role can
+-- insert". Postgres does not read policy names. RLS is not consulted at all for
+-- `service_role` — it bypasses row security outright — so a policy can never
+-- *be* the service role's permission. What these two actually did was hand the
+-- permission to every other role the table is granted to, `anon` included.
+--
+-- Permissive policies OR together, which is why neither showed up as a hole
+-- until now: the tightened policy sitting beside each one looks correct on its
+-- own, and the loose one quietly widens the union.
+--
+--   1. footprint_submissions — `footprints_service_insert` (mig 018) is
+--      `WITH CHECK (user_id IS NULL)`. Migration 079 §3 rewrote
+--      `footprints_insert` to `user_id = auth.uid() and status in ('draft',
+--      'submitted')` and stopped there, so the hole it was closing stayed open
+--      through the other door: the publishable key, which ships in the client
+--      bundle, could POST a row with `user_id: null` and `status: 'approved'`
+--      and land it straight in the public /api/export/footprints feed, past the
+--      review queue and past the route's rate limit.
+--
+--   2. scout_candidates — `Service role can insert` (mig 045) is
+--      `with check (true)`. Unqualified: anyone holding the publishable key
+--      could fill the moderation queue that /admin?tab=scout reads.
+--
+-- ── nothing legitimate loses a write ────────────────────────────────────────
+--
+-- Checked across src/, scripts/, worker/ and work/ on 2026-09-15. Every insert
+-- into either table is made with the service key, which never consulted these
+-- policies in the first place:
+--
+--   • /api/contribute/footprints  → adminClient() (service key). It stamps
+--     `user_id` from the session and applies the rate limit, which is the
+--     reason the write is a route and not a browser insert at all.
+--   • /api/admin/scout            → adminClient() (service key).
+--   • scripts/oneoff/scout_cartomundi_series.mjs → createClient(..., SERVICE_KEY).
+--   • work/MapSAM2/inference_tiles_as_video.py   → SUPABASE_SERVICE_KEY.
+--
+-- No browser code inserts into either table. Should a signed-in user ever write
+-- a footprint directly, `footprints_insert` (mig 079) still covers exactly the
+-- honest case — own row, status draft or submitted — and that policy is left
+-- alone here.
+--
+-- Policies only. No table, column or type changes, so the generated types in
+-- src/lib/data/supabase/types.ts are unaffected.
+
+drop policy if exists "footprints_service_insert" on public.footprint_submissions;
+
+drop policy if exists "Service role can insert" on public.scout_candidates;

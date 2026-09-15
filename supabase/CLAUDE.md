@@ -26,8 +26,11 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **088**, pushed 2026-09-14. Drop a new `supabase/migrations/NNN_*.sql` incrementing from it,
-`supabase db push`, then regenerate types:
+Head is **089**. **088 is the last one pushed to production (2026-09-14); 089 is applied locally
+only** — it drops two INSERT policies that let the publishable key write rows
+(`footprints_service_insert` on `footprint_submissions`, `Service role can insert` on
+`scout_candidates`), and it has not been `db push`ed yet. Drop a new `supabase/migrations/NNN_*.sql`
+incrementing from head, `supabase db push`, then regenerate types:
 
 ```bash
 supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
@@ -43,7 +46,7 @@ password; use the Dashboard SQL Editor or `db push` instead of pulling. Repair m
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 25 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 31 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done
