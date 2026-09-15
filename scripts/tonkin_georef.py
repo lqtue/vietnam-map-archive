@@ -911,7 +911,7 @@ def annotation(iiif, w, h, got):
     }
 
 
-def annotate(write=False):
+def annotate(write=False, only_new=False):
     """Write an annotation per sheet that cleared the gate; optionally publish it.
 
     `georef_done` goes true and `status` is left alone. Every one of these rows is
@@ -919,6 +919,13 @@ def annotate(write=False):
     reviewer and nowhere else -- which is the point: the last step of this pipeline
     is a person looking at all of them, and they cannot look at what the viewer
     will not list.
+
+    `only_new` skips any sheet whose row is already georeferenced. Without it this
+    rewrites every annotation it can see, which is right after a re-place and
+    wrong the rest of the time: the bboxes stored before this pipeline existed are
+    rounded to five decimals, so re-deriving them moves 46 rows by 0.00001 degrees
+    -- about a metre, nothing on a sheet whose pixel is 4.3 m, but 46 writes to
+    published rows to achieve it. Do that when something has actually changed.
     """
     import os
     import requests
@@ -928,8 +935,21 @@ def annotate(write=False):
     H = {"apikey": key, "Authorization": f"Bearer {key}"}
     outdir = WORK / "annotations"
     outdir.mkdir(parents=True, exist_ok=True)
-    files = sorted(WORK.glob("*.json"))
+    # A sheet record is named for its map id. `work/tonkin` also holds reports --
+    # shape-audit, the migration plan, the catalogue offset -- and globbing every
+    # json here walked into them and died on the first one with no "id", or on
+    # shape-audit.json, which is an array and has no .get at all. The 36-char
+    # stem is the same test `calibrate` and `cell_footprints` use.
+    files = sorted(f for f in WORK.glob("*.json") if len(f.stem) == 36)
     done = skipped = 0
+    if only_new:
+        r = requests.get(f"{url}/rest/v1/maps", headers=H, timeout=60,
+                         params={"select": "id", "georef_done": "is.true",
+                                 "collection": f"eq.{COLLECTION}"})
+        r.raise_for_status()
+        already = {m["id"] for m in r.json()}
+        files = [f for f in files if f.stem not in already]
+        print(f"  {len(files)} sheet(s) not yet georeferenced")
     for f in files:
         got = json.loads(f.read_text())
         if got.get("verdict"):
@@ -978,10 +998,15 @@ def check():
     neighbours -- and it is otherwise invisible: a sheet 14 km from where it belongs
     still lies flat on the basemap and still looks like a map.
     """
-    rows = {r["id"]: r for r in sheets()}
+    # `all_sheets`, not `sheets`: the latter returns only what is still pending,
+    # so once a sheet is annotated it drops out and the lattice below loses the
+    # cell number it is checked by -- the check quietly degrades to "??" for
+    # exactly the sheets that have just been placed, which is when it matters.
+    rows = {r["id"]: r for r in all_sheets()}
     cells, bad, rims = {}, [], []
     whole_lons, half_lons = set(), set()
-    for f in sorted(WORK.glob("*.json")):
+    # Sheet records are named for a map id; the reports beside them are not.
+    for f in sorted(f for f in WORK.glob("*.json") if len(f.stem) == 36):
         got = json.loads(f.read_text())
         if got.get("verdict"):
             continue
@@ -1533,13 +1558,15 @@ def main():
     ap.add_argument("--write", action="store_true",
                     help="annotate: upload and point the rows at it; "
                          "catalogue: keep the placements")
+    ap.add_argument("--new", action="store_true",
+                    help="annotate: skip sheets whose row is already georeferenced")
     args = ap.parse_args()
 
     if args.phase == "all":
         run_all(args.which, args.shard)
         return
     if args.phase == "annotate":
-        annotate(args.write)
+        annotate(args.write, args.new)
         return
     if args.phase == "check":
         check()

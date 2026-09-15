@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/d8478e07-9147-4275-83e3-0b8dfbe29998/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/d8478e07-9147-4275-83e3-0b8dfbe29998",
+     "type": "ImageService3",
+     "width": 2719,
+     "height": 3904
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"2719\" height=\"3904\"><polygon points=\"360,459 2572,458 2574,3375 362,3377\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        360,
+        459
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.8372518,
+        20.58751
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2572,
+        458
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.92722,
+        20.58751
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2574,
+        3375
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.92722,
+        20.4749971
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        362,
+        3377
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.8372518,
+        20.4749971
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

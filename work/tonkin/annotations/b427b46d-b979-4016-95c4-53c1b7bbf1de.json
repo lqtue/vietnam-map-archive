@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/b427b46d-b979-4016-95c4-53c1b7bbf1de/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/b427b46d-b979-4016-95c4-53c1b7bbf1de",
+     "type": "ImageService3",
+     "width": 2661,
+     "height": 3790
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"2661\" height=\"3790\"><polygon points=\"324,335 2527,329 2535,3257 333,3264\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        324,
+        335
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.0172071,
+        21.2625128
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2527,
+        329
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.1072,
+        21.2625128
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2535,
+        3257
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.1072,
+        21.1499997
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        333,
+        3264
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.0172071,
+        21.1499997
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

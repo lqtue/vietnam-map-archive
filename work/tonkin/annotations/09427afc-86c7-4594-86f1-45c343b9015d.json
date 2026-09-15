@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/09427afc-86c7-4594-86f1-45c343b9015d/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/09427afc-86c7-4594-86f1-45c343b9015d",
+     "type": "ImageService3",
+     "width": 2715,
+     "height": 3852
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"2715\" height=\"3852\"><polygon points=\"340,410 2534,415 2528,3336 334,3332\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        340,
+        410
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.017207,
+        21.3750131
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2534,
+        415
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.1072056,
+        21.3750131
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        2528,
+        3336
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.1072056,
+        21.2625
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        334,
+        3332
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.017207,
+        21.2625
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}
