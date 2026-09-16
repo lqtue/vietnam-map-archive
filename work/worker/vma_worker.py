@@ -479,6 +479,50 @@ def run_job(job: dict, python_bin: str) -> None:
         _IN_FLIGHT.clear()
 
 
+def _run_streaming(cmd: list[str], env: dict, timeout_s: int) -> subprocess.CompletedProcess:
+    """Run a step, echoing its output as it arrives, and keep the tail.
+
+    `subprocess.run(capture_output=True)` reads nothing until the child exits,
+    so a forty-minute seg pass printed a command line and then nothing at all —
+    an operator could not tell a working run from a wedged one, and killed a
+    healthy one for looking dead. Echoing is not a nicety on this pipeline:
+    every defect it has had looked like success or like silence.
+
+    stderr is merged into stdout because the two are interleaved progress and
+    the caller only ever wants the tail of whichever came last. The tail is
+    capped so a chatty run cannot put megabytes in a jsonb column.
+
+    ponytail: one blocking readline loop, no threads. The child writes to one
+    pipe and nobody else is waiting on this worker.
+    """
+    from collections import deque
+
+    deadline = time.monotonic() + timeout_s
+    tail: deque[str] = deque(maxlen=200)
+    proc = subprocess.Popen(cmd, cwd=REPO_ROOT, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, env=env, bufsize=1)
+    assert proc.stdout is not None
+    try:
+        for line in proc.stdout:
+            line = line.rstrip("\n")
+            print(f"    {line}", flush=True)
+            tail.append(line)
+            if time.monotonic() > deadline:
+                proc.kill()
+                proc.wait()
+                raise subprocess.TimeoutExpired(cmd, timeout_s)
+        proc.wait(timeout=max(1.0, deadline - time.monotonic()))
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait()
+        raise
+    finally:
+        proc.stdout.close()
+    out = "\n".join(tail)
+    # Same shape subprocess.run returned, so every caller below is unchanged.
+    return subprocess.CompletedProcess(cmd, proc.returncode, stdout=out, stderr="")
+
+
 def _run_job(job: dict, python_bin: str) -> None:
     kind = job["kind"]
     if kind in SERVER_KINDS:
@@ -512,14 +556,18 @@ def _run_job(job: dict, python_bin: str) -> None:
 
     # The pipeline scripts write through the same endpoint with the same key.
     api_url, api_key = _config()
-    env = {**os.environ, "VMA_API_URL": api_url, "VMA_WORKER_KEY": api_key}
+    # PYTHONUNBUFFERED because capture_output makes the child's stdout a pipe,
+    # and Python block-buffers to a pipe. Without it a 40-minute seg run prints
+    # nothing at all until it exits — the operator cannot tell a working run
+    # from a wedged one, which is the whole reason the last one was killed.
+    env = {**os.environ, "VMA_API_URL": api_url, "VMA_WORKER_KEY": api_key,
+           "PYTHONUNBUFFERED": "1"}
 
     proc = None
     for step, cmd in enumerate(plan, 1):
         print(f"[{kind}] {job['id']} running {step}/{len(plan)}: {' '.join(cmd)}")
         try:
-            proc = subprocess.run(cmd, cwd=REPO_ROOT, capture_output=True, text=True, env=env,
-                                  timeout=STEP_TIMEOUT_S)
+            proc = _run_streaming(cmd, env, STEP_TIMEOUT_S)
         except subprocess.TimeoutExpired:
             # Without this the worker blocked forever on a wedged child and the
             # job sat in 'running' with nobody able to queue that map again.
@@ -722,6 +770,19 @@ def _self_check() -> None:
     argv = _ocr_batch_argv({"id": "j", "map_id": "m",
                             "payload": {"run_id": "r", "prompt": "v8"}}, "python", "r", db=False)
     assert argv[argv.index("--prompt") + 1] == "v8", "an explicit prompt wins"
+
+    # 7. The streaming runner must still hand back what the callers read: a
+    #    returncode, and stdout carrying the tail. A step that failed reports
+    #    through `proc.stderr or proc.stdout`, which is now always the latter.
+    ok = _run_streaming([sys.executable, "-c", "print('first'); print('last')"],
+                        dict(os.environ), 30)
+    assert ok.returncode == 0, ok
+    assert ok.stdout.splitlines()[-1] == "last", ok.stdout
+    bad = _run_streaming([sys.executable, "-c",
+                          "import sys; print('why it died', file=sys.stderr); sys.exit(3)"],
+                         dict(os.environ), 30)
+    assert bad.returncode == 3, bad
+    assert "why it died" in (bad.stderr or bad.stdout), "stderr must survive the merge"
 
     print("[ok] vma_worker self-check passed")
 

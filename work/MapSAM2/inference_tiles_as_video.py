@@ -307,6 +307,14 @@ def _run_prompted(predictor, tile_img: np.ndarray,
     Defaults preserve the old behaviour for `box` and pick `largest` otherwise.
     """
     import torch
+    # No prompts, no inference. set_image() is the ViT encoder forward pass —
+    # the most expensive operation in the run — and it used to happen before
+    # anyone checked whether there was anything to ask it about. On a sheet with
+    # 84 seeds across 154 tiles that is most of the GPU time spent encoding
+    # tiles that then loop over an empty list.
+    if not seeds:
+        return []
+
     predictor.set_image(tile_img)
     if pick is None:
         pick = "score" if prompt == "box" else "largest"
@@ -352,6 +360,12 @@ def infer_tile(
     Fetch one IIIF tile, run inference, return polygons in full-image pixel coords.
     """
     tx, ty, tw, th = tile_region
+
+    # Cheaper than the guard in _run_prompted, and the one that matters: this
+    # skips the IIIF fetch too. A seedless tile in prompted mode has nothing to
+    # contribute, so downloading it is pure latency.
+    if mode == "prompted" and not seeds:
+        return []
 
     pil = fetch_crop(iiif_base, tx, ty, tw, th, size=RENDER_SIZE)
     render_w, render_h = pil.size   # should be RENDER_SIZE × (RENDER_SIZE or smaller)
@@ -896,9 +910,13 @@ def main() -> None:
     all_polys: list[PolygonResult] = []
     t0 = time.time()
 
+    skipped = 0
     for i, tile in enumerate(tiles):
         tx, ty, tw, th = tile
         seeds = ocr_seeds_by_tile.get(tile, [])
+        if args.mode == "prompted" and not seeds:
+            skipped += 1
+            continue
         print(f"  Tile {i+1}/{len(tiles)}: ({tx},{ty},{tw},{th})  seeds={len(seeds)}", end=" ")
         try:
             polys = infer_tile(model, iiif_base, tile, seeds, args.mode,
@@ -909,6 +927,8 @@ def main() -> None:
             print(f"→ ERROR: {e}")
 
     elapsed = time.time() - t0
+    if skipped:
+        print(f"  {skipped}/{len(tiles)} tiles skipped: no seeds to prompt with")
     print(f"\nRaw polygons: {len(all_polys)}  ({elapsed:.1f}s)")
 
     # ── global dedup ──────────────────────────────────────────────────────────
