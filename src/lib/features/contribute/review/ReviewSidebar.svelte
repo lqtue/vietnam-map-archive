@@ -1,6 +1,13 @@
 <!--
-  ReviewSidebar.svelte — Scrollable list of needs_review footprints with
-  approve / reject actions. Emits 'select', 'approve', 'reject'.
+  ReviewSidebar.svelte — the review queue for one sheet: every polygon awaiting
+  a verdict, with approve / reject.
+
+  Selection is the ordinary list convention — click replaces, ctrl/cmd toggles,
+  shift extends from the anchor — because a sheet's polygons usually deserve the
+  same verdict and deciding 46 of them one at a time is the reason nobody did.
+  The parent owns the selection; this only reports the click and its modifier.
+
+  Emits 'select', 'approve', 'reject', 'approveSelected', 'rejectSelected'.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
@@ -9,6 +16,8 @@
 
   export let footprints: SamFootprint[] = [];
   export let selectedId: string | null = null;
+  /** Every row in the selection. `selectedId` is the anchor and the open editor. */
+  export let selectedIds: string[] = [];
   export let total = 0;
   export let reviewed = 0;
   export let approving: string | null = null; // id currently being saved
@@ -17,12 +26,27 @@
   export let markReviewedError = '';
 
   const dispatch = createEventDispatcher<{
-    select: { id: string };
+    select: { id: string; mode: 'replace' | 'toggle' | 'range' };
     approve: { id: string };
     reject: { id: string };
+    approveSelected: void;
+    rejectSelected: void;
+    selectAll: void;
+    clearSelection: void;
     retype: { id: string; featureType: string };
     markReviewed: void;
   }>();
+
+  /** metaKey so this reads the same on a Mac as ctrl does elsewhere. */
+  function clickMode(e: MouseEvent): 'replace' | 'toggle' | 'range' {
+    if (e.shiftKey) return 'range';
+    if (e.ctrlKey || e.metaKey) return 'toggle';
+    return 'replace';
+  }
+
+  $: selected = new Set(selectedIds);
+  $: multiple = selectedIds.length > 1;
+  $: busy = approving !== null;
 
   /** The cadastral classes this queue also sees, on top of the feature types.
       Swatches are data, not theme: they identify a class on the canvas. */
@@ -55,6 +79,32 @@
     <span class="progress-pill">{reviewed} / {total} done</span>
   </div>
 
+  {#if multiple}
+    <div class="sb-row is-strip bulk-bar">
+      <span class="sb-grow bulk-count">{selectedIds.length} selected</span>
+      <button class="link-btn" type="button" on:click={() => dispatch('selectAll')}>All</button>
+      <button class="link-btn" type="button" on:click={() => dispatch('clearSelection')}
+        >None</button
+      >
+    </div>
+    <div class="bulk-actions">
+      <button
+        class="sb-btn is-success is-sm"
+        disabled={busy}
+        on:click={() => dispatch('approveSelected')}
+      >
+        {busy ? 'Saving…' : `✓ Approve ${selectedIds.length}`}
+      </button>
+      <button
+        class="sb-btn is-danger is-sm"
+        disabled={busy}
+        on:click={() => dispatch('rejectSelected')}
+      >
+        ✕ Reject {selectedIds.length}
+      </button>
+    </div>
+  {/if}
+
   {#if footprints.length === 0}
     <p class="empty-state is-block">All done for this map.</p>
     {#if total > 0}
@@ -74,14 +124,25 @@
   {:else}
     <ul class="fp-list">
       {#each footprints as fp (fp.id)}
-        <li class="fp-item" class:selected={fp.id === selectedId}>
+        <li
+          class="fp-item"
+          class:selected={selected.has(fp.id)}
+          class:anchor={fp.id === selectedId}
+        >
           <!-- The row itself is the select control, so it is a real button. -->
-          <button type="button" class="fp-main" on:click={() => dispatch('select', { id: fp.id })}>
+          <button
+            type="button"
+            class="fp-main"
+            aria-pressed={selected.has(fp.id)}
+            on:click={(e) => dispatch('select', { id: fp.id, mode: clickMode(e) })}
+          >
             <span class="swatch" style="background:{classColor(fp.featureType)}"></span>
             <span class="fp-class">{fp.featureType}</span>
           </button>
 
-          {#if fp.id === selectedId}
+          <!-- The editor belongs to the anchor alone: retyping is per-row, and a
+               bulk selection has no single type to show. -->
+          {#if fp.id === selectedId && !multiple}
             <div class="fp-extra">
               <select
                 class="type-select"
@@ -163,6 +224,37 @@
   }
   .fp-item.selected {
     background: var(--tone-blue-wash);
+  }
+
+  /* The anchor is what shift extends from and what the editor belongs to, so it
+     stays distinguishable inside a selection rather than merging into it. */
+  .fp-item.anchor {
+    box-shadow: inset 2px 0 0 var(--color-orange);
+  }
+
+  .bulk-count {
+    font-size: 0.72rem;
+    font-weight: var(--font-semibold);
+    color: var(--sb-text-meta);
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0 0.3rem;
+    font: inherit;
+    font-size: 0.72rem;
+    color: var(--color-orange);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .bulk-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem 0.625rem;
+    border-bottom: 1px solid var(--color-gray-300);
   }
 
   .fp-main {

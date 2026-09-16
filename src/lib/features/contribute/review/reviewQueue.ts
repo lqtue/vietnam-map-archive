@@ -23,6 +23,11 @@ import type { FeatureType } from '$lib/data/maps/footprintTypes';
 
 export type QueueRow = Awaited<ReturnType<typeof fetchMapsWithSubmittedFootprints>>[number];
 
+/** What a reviewer can decide. `submitted` is an inbox, not a verdict — sending
+    it here left the row exactly as it was and never reached `approved`, which
+    is the state /api/export/footprints filters on (migration 090). */
+export type Verdict = 'approved' | 'rejected';
+
 export type ReviewQueueState = {
   /** Sheets with shapes waiting, newest count first. */
   queue: QueueRow[];
@@ -30,6 +35,9 @@ export type ReviewQueueState = {
   /** The open sheet's waiting shapes. */
   footprints: SamFootprint[];
   selectedId: string | null;
+  /** Every row in the current selection, `selectedId` included. Multi-select is
+      the common case on a sheet whose polygons are all the same verdict. */
+  selectedIds: string[];
   /** How many were waiting when the sheet opened — the denominator of the progress pill. */
   total: number;
   loading: boolean;
@@ -43,6 +51,7 @@ const EMPTY: ReviewQueueState = {
   queueError: '',
   footprints: [],
   selectedId: null,
+  selectedIds: [],
   total: 0,
   loading: false,
   error: '',
@@ -82,6 +91,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
         footprints,
         total: footprints.length,
         selectedId: footprints[0]?.id ?? null,
+        selectedIds: footprints[0] ? [footprints[0].id] : [],
       }));
     } catch (e: any) {
       update((s) => ({ ...s, error: e.message }));
@@ -90,8 +100,49 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }
   }
 
-  function select(id: string | null) {
-    update((s) => ({ ...s, selectedId: id }));
+  /**
+   * Plain click replaces the selection, ctrl/cmd toggles one row, shift extends
+   * from the last anchor — the list convention everywhere else, so nobody has
+   * to be told. The anchor is `selectedId`, which stays the row whose editor is
+   * open.
+   */
+  function select(id: string | null, mode: 'replace' | 'toggle' | 'range' = 'replace') {
+    update((s) => {
+      if (id === null) return { ...s, selectedId: null, selectedIds: [] };
+
+      if (mode === 'toggle') {
+        const has = s.selectedIds.includes(id);
+        const selectedIds = has ? s.selectedIds.filter((x) => x !== id) : [...s.selectedIds, id];
+        // Deselecting the anchor hands the anchor to whatever is still selected.
+        const selectedId = has && s.selectedId === id ? (selectedIds[0] ?? null) : id;
+        return { ...s, selectedId, selectedIds };
+      }
+
+      if (mode === 'range' && s.selectedId) {
+        const from = s.footprints.findIndex((f) => f.id === s.selectedId);
+        const to = s.footprints.findIndex((f) => f.id === id);
+        if (from !== -1 && to !== -1) {
+          const [lo, hi] = from < to ? [from, to] : [to, from];
+          // The anchor does not move on a shift-click, so the next one extends
+          // from the same place rather than walking down the list.
+          return { ...s, selectedIds: s.footprints.slice(lo, hi + 1).map((f) => f.id) };
+        }
+      }
+
+      return { ...s, selectedId: id, selectedIds: [id] };
+    });
+  }
+
+  function selectAll() {
+    update((s) => ({
+      ...s,
+      selectedIds: s.footprints.map((f) => f.id),
+      selectedId: s.selectedId ?? s.footprints[0]?.id ?? null,
+    }));
+  }
+
+  function clearSelection() {
+    update((s) => ({ ...s, selectedIds: s.selectedId ? [s.selectedId] : [] }));
   }
 
   function edit(id: string, pixelPolygon: [number, number][]) {
@@ -109,45 +160,108 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }));
   }
 
-  async function decide(mapId: string, id: string, status: 'submitted' | 'rejected') {
+  /** One PATCH. Returns the server's message on failure, null on success. */
+  async function writeVerdict(id: string, status: Verdict): Promise<string | null> {
+    const edits = pendingEdits[id];
+    const body: Record<string, any> = { id, status };
+    if (edits?.pixelPolygon) body.pixel_polygon = edits.pixelPolygon;
+    if (edits?.featureType) body.feature_type = edits.featureType;
+
+    const res = await fetch('/api/admin/footprints', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const { message } = await res.json().catch(() => ({ message: res.statusText }));
+      return message as string;
+    }
+    delete pendingEdits[id];
+    return null;
+  }
+
+  /** Drop decided rows from the list, the selection and the rail's count. */
+  function forget(mapId: string, ids: string[]) {
+    const gone = new Set(ids);
+    update((s) => {
+      const idx = s.footprints.findIndex((f) => gone.has(f.id));
+      const footprints = s.footprints.filter((f) => !gone.has(f.id));
+      const selectedId =
+        s.footprints[idx] && gone.has(s.footprints[idx].id)
+          ? (footprints[idx]?.id ?? footprints[idx - 1]?.id ?? null)
+          : s.selectedId;
+      return {
+        ...s,
+        footprints,
+        selectedId,
+        selectedIds: selectedId ? [selectedId] : [],
+        // Keep the rail's count honest without re-querying the whole queue.
+        queue: s.queue.map((m) =>
+          m.id === mapId ? { ...m, pendingCount: Math.max(0, m.pendingCount - ids.length) } : m
+        ),
+      };
+    });
+  }
+
+  async function decide(mapId: string, id: string, status: Verdict) {
     update((s) => ({ ...s, deciding: id, error: '' }));
     try {
-      const edits = pendingEdits[id];
-      const body: Record<string, any> = { id, status };
-      if (edits?.pixelPolygon) body.pixel_polygon = edits.pixelPolygon;
-      if (edits?.featureType) body.feature_type = edits.featureType;
-
-      const res = await fetch('/api/admin/footprints', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const { message } = await res.json().catch(() => ({ message: res.statusText }));
+      const message = await writeVerdict(id, status);
+      if (message) {
         update((s) => ({
           ...s,
           error: `Could not ${status === 'rejected' ? 'reject' : 'approve'}: ${message}`,
         }));
         return;
       }
-      delete pendingEdits[id];
-      update((s) => {
-        const idx = s.footprints.findIndex((f) => f.id === id);
-        const footprints = s.footprints.filter((f) => f.id !== id);
-        return {
-          ...s,
-          footprints,
-          selectedId: footprints[idx]?.id ?? footprints[idx - 1]?.id ?? null,
-          // Keep the rail's count honest without re-querying the whole queue.
-          queue: s.queue.map((m) =>
-            m.id === mapId ? { ...m, pendingCount: Math.max(0, m.pendingCount - 1) } : m
-          ),
-        };
-      });
+      forget(mapId, [id]);
     } finally {
       update((s) => ({ ...s, deciding: null }));
     }
   }
 
-  return { subscribe, loadQueue, reset, open, select, edit, retype, decide };
+  /**
+   * The same verdict over the whole selection. Sequential on purpose: each row
+   * is one PATCH and one RPC, the counts stay legible while it runs, and a
+   * sheet's queue is tens of rows rather than thousands.
+   *
+   * ponytail: serial writes, batch the ids into one endpoint if a sheet ever
+   * arrives with thousands of polygons.
+   */
+  async function decideMany(mapId: string, ids: string[], status: Verdict) {
+    if (!ids.length) return;
+    const done: string[] = [];
+    const failures: string[] = [];
+    update((s) => ({ ...s, error: '' }));
+    for (const id of ids) {
+      update((s) => ({ ...s, deciding: id }));
+      const message = await writeVerdict(id, status);
+      if (message) failures.push(message);
+      else done.push(id);
+    }
+    // Whatever succeeded leaves the queue even when a later row failed, so a
+    // retry is over the remainder rather than over everything again.
+    if (done.length) forget(mapId, done);
+    update((s) => ({
+      ...s,
+      deciding: null,
+      error: failures.length
+        ? `${done.length} of ${ids.length} saved; ${failures.length} failed: ${failures[0]}`
+        : '',
+    }));
+  }
+
+  return {
+    subscribe,
+    loadQueue,
+    reset,
+    open,
+    select,
+    selectAll,
+    clearSelection,
+    edit,
+    retype,
+    decide,
+    decideMany,
+  };
 }

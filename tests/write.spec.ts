@@ -501,7 +501,7 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
   const approve = await staffRequest.patch('/api/admin/footprints', {
     data: {
       id: fp!.id,
-      status: 'submitted',
+      status: 'approved',
       pixel_polygon: [
         [0, 0],
         [12, 0],
@@ -516,16 +516,84 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
     .select('status, source')
     .eq('id', fp!.id)
     .single();
-  expect(reviewed!.status).toBe('submitted');
+  // `approved` is what /api/export/footprints filters on. This used to assert
+  // `submitted`, which is the inbox the row was already in — so nothing in the
+  // archive could ever reach the state the export reads (migration 090).
+  expect(reviewed!.status).toBe('approved');
   // An edited polygon is machine output a human fixed, and exports care.
   expect(reviewed!.source).toBe('sam-corrected');
 
-  // set_footprint_status only moves rows out of needs_review, so a second
-  // decision on the same row is refused rather than silently applied.
+  // A decided row leaves the queue exactly once: a second verdict is refused
+  // rather than silently applied.
   const again = await staffRequest.patch('/api/admin/footprints', {
     data: { id: fp!.id, status: 'rejected' },
   });
   expect(again.status()).toBe(409);
+});
+
+test('a volunteer trace is reviewable, not only machine output', async () => {
+  // The review queue is two states. `submitted` is where /contribute/trace puts
+  // a hand-drawn polygon, and set_footprint_status used to match `needs_review`
+  // alone — so every volunteer trace in the archive was permanently unreviewable
+  // and the panel answered 409 on a row it had just listed. 46 of them sat on
+  // the 1882 cadastral like that.
+  const { data: fp, error: fpErr } = await admin
+    .from('footprint_submissions')
+    .insert({
+      map_id: mapId,
+      user_id: session.user.id,
+      pixel_polygon: [
+        [0, 0],
+        [8, 0],
+        [8, 8],
+      ],
+      feature_type: 'building',
+      status: 'submitted',
+      source: 'volunteer',
+    })
+    .select('id')
+    .single();
+  expect(fpErr, fpErr?.message).toBeNull();
+  created.footprintIds.push(fp!.id);
+
+  const approve = await staffRequest.patch('/api/admin/footprints', {
+    data: { id: fp!.id, status: 'approved' },
+  });
+  expect(approve.ok(), await approve.text()).toBe(true);
+
+  const { data: reviewed } = await admin
+    .from('footprint_submissions')
+    .select('status, source')
+    .eq('id', fp!.id)
+    .single();
+  expect(reviewed!.status).toBe('approved');
+  // Untouched geometry stays a volunteer trace rather than becoming corrected.
+  expect(reviewed!.source).toBe('volunteer');
+});
+
+test('submitted is an inbox, not a verdict', async () => {
+  const { data: fp } = await admin
+    .from('footprint_submissions')
+    .insert({
+      map_id: mapId,
+      user_id: session.user.id,
+      pixel_polygon: [
+        [0, 0],
+        [4, 0],
+        [4, 4],
+      ],
+      feature_type: 'building',
+      status: 'needs_review',
+      source: 'sam-auto',
+    })
+    .select('id')
+    .single();
+  created.footprintIds.push(fp!.id);
+
+  const res = await staffRequest.patch('/api/admin/footprints', {
+    data: { id: fp!.id, status: 'submitted' },
+  });
+  expect(res.status()).toBe(400);
 });
 
 test('publishing a map queues its hosting jobs, once', async () => {

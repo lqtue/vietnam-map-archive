@@ -4,12 +4,22 @@ import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
 
-/** GET /api/admin/footprints?map_id=&status= */
+/**
+ * GET /api/admin/footprints?map_id=&status=
+ *
+ * `status` takes a comma-separated list. The default is the whole review queue,
+ * which is two states and not one: MapSAM2 writes `needs_review`, a volunteer's
+ * trace lands in `submitted`, and a reviewer has to see both.
+ */
 export const GET: RequestHandler = async ({ locals, url }) => {
   await requireRole(locals);
 
   const mapId = assertUuid(url.searchParams.get('map_id') ?? undefined, 'map_id');
-  const status = url.searchParams.get('status') ?? 'needs_review';
+  const statuses = (url.searchParams.get('status') ?? 'needs_review,submitted')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!statuses.length) throw error(400, 'status must name at least one state');
 
   const { data, error: err } = await adminClient()
     .from('footprint_submissions')
@@ -17,7 +27,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       'id, map_id, iiif_canvas, pixel_polygon, feature_type, name, category, confidence, status, created_at'
     )
     .eq('map_id', mapId)
-    .eq('status', status)
+    .in('status', statuses)
     .order('confidence', { ascending: false });
 
   if (err) dbError(err, 'Could not list footprints');
@@ -25,10 +35,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 };
 
 /**
- * PATCH /api/admin/footprints  { id, status: 'submitted' | 'rejected' }
+ * PATCH /api/admin/footprints  { id, status: 'approved' | 'rejected' }
  *
  * The transition (and the `sam-corrected` marking that comes with an edited
- * polygon) lives in the `set_footprint_status` RPC — migration 054.
+ * polygon) lives in the `set_footprint_status` RPC — migrations 054 and 090.
+ *
+ * `submitted` used to be accepted here as the approving verdict, which left
+ * a row in the state it was already in and meant nothing could ever reach
+ * `approved` — the state /api/export/footprints filters on by default.
  */
 export const PATCH: RequestHandler = async ({ locals, request }) => {
   const { user } = await requireRole(locals);
@@ -44,8 +58,8 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
   };
 
   if (!id || !status) throw error(400, 'id and status are required');
-  if (!['submitted', 'rejected'].includes(status)) {
-    throw error(400, 'status must be submitted or rejected');
+  if (!['approved', 'rejected'].includes(status)) {
+    throw error(400, 'status must be approved or rejected');
   }
 
   const { data, error: err } = await adminClient().rpc('set_footprint_status', {

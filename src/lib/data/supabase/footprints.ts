@@ -208,6 +208,13 @@ interface MapJoinRow {
 
 // ── Review helpers ────────────────────────────────────────────────────────────
 
+// The review queue is two states, not one: MapSAM2 writes `needs_review`
+// (inference_tiles_as_video.py) and a volunteer's trace lands in `submitted`.
+// Selecting only one of them hid the other half of the queue from the reviewer
+// — and since no seg job had ever completed, the half that was hidden was the
+// machine's. Kept here so the list and the count cannot drift apart.
+export const REVIEW_QUEUE_STATUSES = ['submitted', 'needs_review'] as const;
+
 // SamFootprint = FootprintSubmission; kept for backward compat with ReviewTool/ReviewSidebar
 export type SamFootprint = FootprintSubmission;
 
@@ -219,7 +226,7 @@ export async function fetchSubmittedFootprints(
 		.from('footprint_submissions')
 		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, status')
 		.eq('map_id', mapId)
-		.eq('status', 'submitted')
+		.in('status', REVIEW_QUEUE_STATUSES)
 		.order('created_at', { ascending: true });
 
 	if (error) throw new Error(error.message);
@@ -232,7 +239,7 @@ export async function fetchMapsWithSubmittedFootprints(
 	const { data, error } = await supabase
 		.from('footprint_submissions')
 		.select('map_id, maps!inner(id, name, allmaps_id, iiif_image)')
-		.eq('status', 'submitted');
+		.in('status', REVIEW_QUEUE_STATUSES);
 
 	if (error) throw new Error(error.message);
 

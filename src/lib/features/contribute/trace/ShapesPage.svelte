@@ -37,7 +37,7 @@
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
   import { createTrace } from './traceData';
-  import { createReviewQueue } from '$lib/features/contribute/review/reviewQueue';
+  import { createReviewQueue, type Verdict } from '$lib/features/contribute/review/reviewQueue';
   import { DEFAULT_SEG_CONFIG, loadSegConfig, saveSegConfig, type SegConfig } from './segCommand';
   import {
     fetchPipelineStatus,
@@ -173,8 +173,12 @@
       .catch((e) => (pipeline.error = e.message));
   }
 
-  function decideFootprint(id: string, status: 'submitted' | 'rejected') {
+  function decideFootprint(id: string, status: Verdict) {
     if (currentMap) queue.decide(currentMap.id, id, status);
+  }
+
+  function decideSelected(status: Verdict) {
+    if (currentMap) queue.decideMany(currentMap.id, $queue.selectedIds, status);
   }
 
   async function markReviewed() {
@@ -270,14 +274,19 @@
             <ReviewSidebar
               footprints={$queue.footprints}
               selectedId={$queue.selectedId}
+              selectedIds={$queue.selectedIds}
               total={$queue.total}
               {reviewed}
               approving={$queue.deciding}
               {markingReviewed}
               {markReviewedError}
-              on:select={(e) => queue.select(e.detail.id)}
-              on:approve={(e) => decideFootprint(e.detail.id, 'submitted')}
+              on:select={(e) => queue.select(e.detail.id, e.detail.mode)}
+              on:approve={(e) => decideFootprint(e.detail.id, 'approved')}
               on:reject={(e) => decideFootprint(e.detail.id, 'rejected')}
+              on:approveSelected={() => decideSelected('approved')}
+              on:rejectSelected={() => decideSelected('rejected')}
+              on:selectAll={queue.selectAll}
+              on:clearSelection={queue.clearSelection}
               on:retype={(e) => queue.retype(e.detail.id, e.detail.featureType)}
               on:markReviewed={markReviewed}
             />
