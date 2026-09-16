@@ -650,16 +650,30 @@ def write_to_supabase(
     api_key = os.environ.get("VMA_WORKER_KEY", "")
     if api_url and api_key:
         # MAX_ROWS on the endpoint is 500.
+        written = 0
         for i in range(0, len(rows), 500):
+            chunk = rows[i:i + 500]
             resp = requests.post(
                 f"{api_url}/api/pipeline/results",
                 headers={"Authorization": f"Bearer {api_key}",
                          "Content-Type": "application/json"},
-                json={"footprints": rows[i:i + 500]},
+                json={"footprints": chunk},
                 timeout=120,
             )
             resp.raise_for_status()
-        return len(rows)
+            # Count what the server says it applied, not what we sent. An
+            # endpoint that predates the `footprints` branch ignores the key and
+            # answers 200 {"ok":true,"applied":{}} — a whole GPU run reporting
+            # success with nothing written. Fail loudly instead.
+            applied = (resp.json() or {}).get("applied", {})
+            if "footprints" not in applied:
+                raise RuntimeError(
+                    f"{api_url}/api/pipeline/results accepted the request but did not "
+                    "apply any footprints — that build predates the footprints branch. "
+                    "Deploy it before running seg, or the polygons are silently dropped."
+                )
+            written += int(applied["footprints"])
+        return written
 
     if not key:
         raise EnvironmentError(
