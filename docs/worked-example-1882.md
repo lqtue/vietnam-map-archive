@@ -24,7 +24,7 @@ stage already had material:
   what a footprint pass is for
 - the only sheet in the archive carrying polygons at all (46, hand-traced by a
   volunteer in April 2026)
-- the most-reviewed sheet: 94 of its OCR labels have a human verdict
+- the most-reviewed sheet: 152 of its 177 `v1b` labels have a human verdict
 - the anchor year of the District 4 series (1882 · 1895 · 1923 · 1942 · 1959 ·
   1968)
 
@@ -85,11 +85,19 @@ between them. The layout pass returned 6 regions — `sheet`, `main_map`,
 
 Three runs exist on this sheet and **they are not equivalent**:
 
-| run | rows | human-validated | date |
+| run | rows | human verdict | date |
 |---|---|---|---|
 | `post0910` | 287 | **0** | 2026-09-10 |
 | `2026-09-04T0527` | 35 | 1 | 2026-09-04 |
-| `v1b` | 177 | **94** | 2026-05-03 |
+| `v1b` | 177 | **84 validated · 68 rejected · 25 pending** | 2026-05-03 |
+
+A trap worth naming, because it produced a wrong number in the first draft of
+this file: **`ocr_extractions.text_validated` is a text column, not a boolean.**
+It holds the human's corrected string, and is null when nobody retyped the text.
+Counting `text_validated is not null` therefore counts *corrections*, not
+verdicts. The verdict is `status` — `validated | rejected | pending`. The seed
+loader for segmentation takes `status neq.rejected`, which is why 109 seeds
+reach SAM2 rather than 84.
 
 `v1b` is canonical for this sheet: it is the only one anybody has checked.
 Every later stage is pinned to it explicitly, because nothing derives that by
@@ -154,6 +162,63 @@ Three observations worth carrying:
    and `CHAMP DE MANOEUVRES` all land in one `Citadelle` plot. Correct
    containment; no finer polygon exists yet.
 
+### Segment — `seg`
+
+```bash
+node --env-file=.env scripts/enqueue_seg.mjs --map-id 0e02b9d9-…   # seeds off v1b
+# a Colab T4 running work/MapSAM2/vma_seg_worker.ipynb claims it
+```
+
+**72 polygons in 10 min 31 s** — the first `seg` job ever to complete in this
+project. Prompted mode off `v1b`, LoRA checkpoint `epoch_010.pth`, written
+through `/api/pipeline/results` on a worker token with no service key on the GPU
+machine.
+
+**All 72 carry a name.** A seeded polygon knows its own toponym at birth, which
+is the entire reason for running OCR before segmentation rather than after. It
+also found features no volunteer had traced: `MARCHÉ DE CẦU ÔNG LÃNH`,
+`COLLÈGE CHASSELOUP LAUBAT`, `Vge de Vĩnh Hội` — that last one in District 4,
+the series this sheet anchors.
+
+Confidence (SAM2 predicted IoU) has a median of 0.946 and a long bad tail:
+`CIMETIÈRE EUROPÉEN` 0.0027, `NOUVEAU PALAIS DE JUSTICE` 0.0054,
+`JARDIN DE LA VILLE` 0.0109. Areas run 95 – 7,766 m², median 2,036 — these are
+blocks and plots, not buildings, though every row is written
+`feature_type: building` because the seed's category never reaches the row.
+
+### Join, again — and why the bigger number is the weaker one
+
+```bash
+python3 work/ocr/scripts/join_labels.py 0e02b9d9-… v1b seg-20260916T1632-0e02b9d9
+```
+
+**68 of 177**, against 19 before. The rate went 11% → 38%. That is the number
+not to quote on its own.
+
+```
+68 links = 60 to sam-auto polygons + 8 to volunteer polygons
+63 of 68 have label text identical to polygon name
+```
+
+**The 63 is circular.** The polygon's name came *from* the label, through the
+seed that prompted it; the same string is round-tripping. It is not two sources
+agreeing.
+
+And the number that carried the evidence went **down**. The 19 earlier links
+were all to independently hand-traced polygons. Only **8** still are: the
+machine polygons are tighter (median 2,036 m² against the volunteer land plots),
+so `join_labels`' smallest-containing rule prefers them, and 11 labels that used
+to corroborate a human's tracing now corroborate a machine's own seed.
+
+Nor does containment test the mask much. `_run_prompted`'s own docstring records
+that a box-prompted mask tends to redraw its prompt box — median IoU 0.87
+against the seed in the 0.90–1.00 band. A mask that reproduces its prompt always
+contains the label's centre.
+
+So the honest reading of the two runs together: **the archive gained 49 links and
+lost 11 pieces of independent evidence.** Both are true and only one is visible
+in the headline.
+
 ### Export
 
 ```
@@ -200,7 +265,32 @@ Three faults in one path:
 - The list showed one inbox, not the queue. MapSAM2 writes `needs_review`, so
   the first seg run's output would have been invisible there too.
 
-**4. The existing write smoke asserted the bug.** It approved a footprint and
+**4. Seedless tiles were fetched and encoded anyway.** `_run_prompted` called
+`predictor.set_image()` — the ViT image-encoder forward pass, the most expensive
+operation in a run — before checking whether it had any seeds, and `infer_tile`
+had already fetched the IIIF crop by then. With 109 seeds spread over 154 tiles,
+most of the run was downloading and encoding tiles it would never prompt. The
+pass is I/O bound, not GPU bound: 4.1 s per tile, of which roughly 0.2 s is the
+GPU. Guarded in both places; 59 of 154 tiles carry a seed, so the next run on
+this sheet should take about 4 minutes rather than 10.5.
+
+**5. A run printed nothing for ten minutes.** The worker used
+`subprocess.run(capture_output=True)`, which reads nothing until the child exits,
+so a long pass showed its command line and then silence — indistinguishable from
+a wedged process, and one healthy run was nearly killed for looking dead. It
+streams now, keeping the last 200 lines for the job row.
+
+**6. A job that exhausts `attempts` while `running` becomes unclaimable, and
+blocks its sheet forever.** `claim_job`'s stale-reclaim branch requires
+`attempts < max_attempts`, and `idx_pipeline_jobs_one_live` makes
+`(kind, map_id)` unique across queued/claimed/running — so the sheet can never be
+re-queued, with no error anywhere and `/admin?tab=status` showing it in flight
+indefinitely. Recovered by hand with a
+`POST /api/pipeline/results {job_id, status:"failed"}`. Migration 077's own
+header records this happening once before to an OCR job, which makes it a
+pattern rather than an incident. **Still open.**
+
+**7. The existing write smoke asserted the bug.** It approved a footprint and
 checked `status === 'submitted'` — exactly the no-op. A green gate over a
 feature that could not work, for the fourth time this month.
 
@@ -208,12 +298,16 @@ feature that could not work, for the fourth time this month.
 
 ## What this does *not* establish
 
-- **Volume.** 46 polygons over a 12102 × 8982 sheet. The chain is proven; its
-  yield is not. `join` is capped by polygon count, not by the join.
+- **Volume.** 118 polygons over a 12102 × 8982 sheet is still thin, and the
+  machine's 72 came from 109 seeds — so the ceiling is the OCR pass, not the
+  segmenter. A sheet is only as segmentable as it is readable.
 - **Segmentation quality.** The LoRA checkpoint was fine-tuned on *these* 46
   polygons on *this* sheet. Running it back on 1882 legitimately produces
   polygons for this example, but measures nothing. An honest number needs a
   different sheet — 1923 or 1942, both already OCR'd.
+- **Independence.** The archive has more links than it did and less independent
+  evidence: 19 corroborations by an unrelated human tracing became 8. Any future
+  claim about agreement has to count only the volunteer polygons.
 - **Generality.** One sheet, and an unusually good one: undistorted, finest
   scan in the corpus, no printed name index. A sheet with a street directory
   (1942 contributed 719 `street` rows from its printed index alone) behaves
