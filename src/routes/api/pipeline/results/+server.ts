@@ -5,6 +5,7 @@
  *   extractions:     ocr_extractions rows to upsert (max 500 per request)
  *   map_id + triage_regions: the layout pass's answer, merged into maps.triage
  *   map_id + triage_grid:    the sheet's printed reference grid, likewise merged
+ *   footprints:      footprint_submissions rows to insert (max 500 per request)
  *   job_id + status: closes the job out via finish_job (done | failed | running)
  *
  * Bundling them means a worker can report "rows written, job done" in one round
@@ -178,6 +179,51 @@ export const POST: RequestHandler = async ({ request }) => {
       p_value: new Date().toISOString(),
     });
     applied.grid = `${grid.columns.length}x${grid.rows.length}`;
+  }
+
+  // MapSAM2's polygons. They used to go straight to PostgREST from the GPU
+  // machine, which meant a Colab session needed SUPABASE_SERVICE_KEY — the one
+  // thing this endpoint exists so a worker never holds. Migration 089 had
+  // already dropped the publishable key's INSERT policy, so the anon key cannot
+  // stand in: without this branch the seg path had no key it was allowed to use.
+  if (Array.isArray(body.footprints) && body.footprints.length) {
+    const rows = body.footprints;
+    if (rows.length > MAX_ROWS) throw error(413, `At most ${MAX_ROWS} footprints per request`);
+
+    const insert = rows.map((row: Record<string, unknown>) => {
+      assertUuid(row.map_id as string, 'footprint map_id');
+      const ring = row.pixel_polygon;
+      if (!Array.isArray(ring) || ring.length < 3) {
+        throw error(400, 'pixel_polygon must be a ring of at least three points');
+      }
+      for (const pt of ring) {
+        if (!Array.isArray(pt) || pt.length < 2 || !pt.slice(0, 2).every(Number.isFinite)) {
+          throw error(400, 'pixel_polygon points must be [x, y] numbers');
+        }
+      }
+      return {
+        map_id: row.map_id as string,
+        pixel_polygon: ring,
+        feature_type: (row.feature_type as string) ?? 'building',
+        source: (row.source as string) ?? 'sam-auto',
+        // Not the worker's to choose. A machine's output enters the review
+        // queue; letting a job name its own status would let it write straight
+        // to `approved` and skip the person the queue exists for.
+        status: 'needs_review',
+        confidence: typeof row.confidence === 'number' ? row.confidence : null,
+        run_id: (row.run_id as string) ?? null,
+        name: (row.name as string) ?? null,
+        category: (row.category as string) ?? null,
+      };
+    });
+
+    // `geom` is deliberately left null: warping a ring is the `warp` job's
+    // work, and it already does footprints (migration 066). Publishing a
+    // polygon here with no ground geometry is the same state the 46 volunteer
+    // traces were in before their warp ran.
+    const { error: err } = await supabase.from('footprint_submissions').insert(insert);
+    if (err) dbError(err, 'Could not write the footprints');
+    applied.footprints = insert.length;
   }
 
   if (body.job_id) {

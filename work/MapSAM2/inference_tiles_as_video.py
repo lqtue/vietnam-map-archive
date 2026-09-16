@@ -605,7 +605,7 @@ def write_to_supabase(
     import os
     import requests
 
-    url  = os.environ["PUBLIC_SUPABASE_URL"]
+    url  = os.environ.get("PUBLIC_SUPABASE_URL", "").rstrip("/")
     key  = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("PUBLIC_SUPABASE_ANON_KEY")
     hdrs = {
         "apikey": key,
@@ -640,6 +640,32 @@ def write_to_supabase(
                 row["category"] = p.seed["category"]
         rows.append(row)
 
+    # The GPU machine is normally a Colab session holding a `worker_keys` token
+    # and nothing else. Since migration 089 the publishable key may not INSERT
+    # here, so a direct PostgREST write needs SUPABASE_SERVICE_KEY — full
+    # database access, on a runtime we do not own. Prefer the worker API, which
+    # is the surface /api/pipeline/results exists to be; fall back to PostgREST
+    # for a hand-run on a machine that already has the service key.
+    api_url = os.environ.get("VMA_API_URL", "").rstrip("/")
+    api_key = os.environ.get("VMA_WORKER_KEY", "")
+    if api_url and api_key:
+        # MAX_ROWS on the endpoint is 500.
+        for i in range(0, len(rows), 500):
+            resp = requests.post(
+                f"{api_url}/api/pipeline/results",
+                headers={"Authorization": f"Bearer {api_key}",
+                         "Content-Type": "application/json"},
+                json={"footprints": rows[i:i + 500]},
+                timeout=120,
+            )
+            resp.raise_for_status()
+        return len(rows)
+
+    if not key:
+        raise EnvironmentError(
+            "No way to write footprints: set VMA_API_URL + VMA_WORKER_KEY (the "
+            "worker path), or SUPABASE_SERVICE_KEY for a direct write."
+        )
     resp = requests.post(endpoint, headers=hdrs, json=rows)
     resp.raise_for_status()
     return len(rows)
@@ -725,8 +751,16 @@ def self_check(device: str, encoder: str, mapsam2_dir: str | None) -> None:
 def resolve_iiif_base(map_id: str) -> str:
     """Fetch iiif_image URL from Supabase maps table."""
     import os, requests
-    url = os.environ["PUBLIC_SUPABASE_URL"]
+    url = os.environ.get("PUBLIC_SUPABASE_URL", "").rstrip("/")
     key = os.environ.get("PUBLIC_SUPABASE_ANON_KEY", "")
+    if not url or not key:
+        # Both are public values, so this is a setup omission rather than a
+        # secret problem — say which two names, since a bare KeyError on
+        # PUBLIC_SUPABASE_URL reads like the worker needs database credentials.
+        raise EnvironmentError(
+            "Reading the sheet needs PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY. "
+            "Both are public; the worker token is separate and only writes."
+        )
     r = requests.get(
         f"{url}/rest/v1/maps",
         params={"id": f"eq.{map_id}", "select": "iiif_image"},
