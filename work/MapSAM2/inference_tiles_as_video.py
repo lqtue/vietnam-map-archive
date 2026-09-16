@@ -663,6 +663,9 @@ def parse_args() -> argparse.Namespace:
                    choices=["automatic", "prompted"],
                    help="automatic=grid-scan, prompted=OCR-seeded")
     p.add_argument("--ocr-run-id",  help="ocr_extractions run_id for seed bboxes (prompted mode)")
+    p.add_argument("--run-id",      help="run_id stamped on every footprint_submissions row. The "
+                                         "worker always passes one (enqueue_seg.mjs mints it), and "
+                                         "without this argparse rejected the whole job.")
     p.add_argument("--prior",       help="modern_prior.py blocks.geojson to prompt from as well as "
                                          "(or instead of) OCR. Nameless, so its polygons carry no label")
     p.add_argument("--region",      help="x,y,w,h crop in full-image pixels (default: full image)")
@@ -904,7 +907,10 @@ def main() -> None:
     # ── Supabase writeback ────────────────────────────────────────────────────
     if args.write_supabase:
         from datetime import datetime, timezone
-        seg_run_id = out.stem  # e.g. "footprints" or timestamped name
+        # The job's own run id when it has one; the output stem is the fallback for
+        # a hand-run pass. Deriving it from the filename alone labelled every run
+        # "footprints", which made join_labels' seg-run pinning meaningless.
+        seg_run_id = args.run_id or out.stem
 
         update_pipeline_status(args.map_id, "seg_queued",
                                seg_started_at=datetime.now(timezone.utc).isoformat())
