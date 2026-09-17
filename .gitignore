@@ -61,3 +61,6 @@ work/tonkin/*.log
 
 # outreach ledger + personal application material — never publish
 docs/private/
+
+# Vectorize previews are local render artifacts, same as work/ocr/outputs
+work/vectorize/
