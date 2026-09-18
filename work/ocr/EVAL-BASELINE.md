@@ -15,15 +15,27 @@ Regenerate: `eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --run-id 
 >
 > **Measured 2026-09-08 — and the prompt the fix delivers fails the gate. See below.**
 
-> **The segmentation rows in this file are scored against two different truth sets, and
-> the older ones do not say so.** Every segmentation row written before 2026-09-18 is
-> scored against **46** hand traces on the 1882 sheet; every row from 2026-09-18 onward is
-> scored against **118** (`footprint_submissions`: building 89 · land_plot 24 · road 3 ·
-> waterway 2), and the newer rows are reported per `feature_type` because pooling the two
-> granularities is what made the first reading of these numbers wrong. **A 46-row figure
-> and a 118-row figure are not comparable and neither should be quoted outward without
-> saying which.** The earlier numbers are left as measured rather than restated, because
-> they were the gate at the time; what was missing was the label, not the arithmetic.
+> **The 118-row trace set was never a ground truth. Corrected 2026-09-18.**
+> `load_gt` selected on `map_id` alone, and `footprint_submissions` holds predictions as
+> well as traces: run `seg-20260916T1632` wrote 72 `sam-auto` rows typed `building` back
+> into it. So every segmentation row measured between 2026-09-16 and this correction was
+> scored against 46 hand traces **plus 72 pieces of model output**. The sheet has 46
+> traces — building 17 · land_plot 24 · road 3 · waterway 2 — and it always did; the jump
+> to 118 was not new tracing.
+>
+> The 72 are worse than model output: median IoU **0.83** to their own prompt box in
+> `ocr_extractions`, 60 of 72 above 0.5, each carrying the label text as `name`. SAM2
+> segmented the lettering's background from OCR seeds — the failure C4 predicted for line
+> features. They are label boxes typed as buildings. Control: the 17 volunteer buildings
+> score 0.054 on the same measure.
+>
+> **What this does and does not touch.** `land_plot` is 24/24 volunteer, so every
+> `land_plot` figure in this file stands exactly as printed. Every `building` figure at
+> **n=89** is 81% scored against label boxes and is void; the ones that have been
+> re-measured against the 17 real traces are marked below. `road` and `waterway` are
+> volunteer-only and unaffected.
+>
+> `load_gt` now filters `source=eq.volunteer` (`seg_eval.py`), so n=89 cannot recur.
 > `docs/worked-example-1882.md` counts 118 in a third sense — polygons produced, not
 > traces scored against — so check the sentence, not the number.
 
@@ -1536,11 +1548,11 @@ cached full scan, `--render 6051` (2x), `--close 5`, splits found by vote:
 `r - g` +0.0725 from 20/64 crops, `r - b` +0.072 from 32/64. **189 blocks, 124
 salmon + 65 blue-grey, 5.9 s of CPU** — no GPU, no checkpoint, no network.
 
-Scored against the sheet's hand traces with `seg_eval.py`. **The ground truth
-has grown since the September runs above: `load_gt` now returns 118 rows —
-building 89 · land_plot 24 · road 3 · waterway 2 — where this file's earlier
-sections say 46.** Anything comparing against those sections is comparing
-against a different truth set.
+Scored against the sheet's hand traces with `seg_eval.py`. **The 118-row count
+recorded here was contamination, not growth** — see the correction at the head
+of this file. `load_gt` was returning 46 traces plus 72 `sam-auto` label boxes;
+it now filters on `source`. The `land_plot` figures below are unaffected (24/24
+volunteer); any `building` figure at n=89 is void.
 
 | land_plot (n=24) | mean | med | @.5 | @.3 | cover |
 |---|---|---|---|---|---|
@@ -1675,37 +1687,48 @@ within-block split — exists for.
 `building` itself is unchanged by any of this, as expected for a coarse pass:
 0.093 mean, cover 0.97.
 
-## 2026-09-18 — P3: the two reds do not exist, and the hatch closes off morphology
+## 2026-09-18 — P3: the null was measured on lettering. RETRACTED the same day.
 
 P3 was "the two-reds within-block split", on the hypothesis that the pale
 salmon wash is the plot and the darker red-brown fills inside it are the
 buildings, so the subdivision would be a second threshold rather than a
-segmenter. **Its stated exit was a `building` IoU beating 0.160 or a recorded
-null. This is the null, and it is a firm one.**
+segmenter. It was recorded as a firm null. **The null was measured against 89
+`building` traces, 72 of which are OCR label boxes** — see the correction at the
+head of this file. A label box sits on open wash by construction, so it is
+indistinguishable from the plot around it, and 72 of them dragged every axis to
+chance. The reading below replaces it.
 
-**No colour axis separates a building from the plot it stands on.** Scored the
-same way the green axis was found, but against the 89 `building` traces and the
-plot area with no building on it — share of building pixels inside the plot's
-10-90 range, lower is better:
+**Re-measured against the 17 real traces, a colour axis does separate a
+building from the plot it stands on.** Same measure as the green axis: share of
+building pixels inside the open plot's 10-90 range, lower is better.
 
-| axis | building p50 | plot p50 | overlap |
-|---|---|---|---|
-| r - g | 0.043 | 0.027 | **0.64** |
-| r - b | 0.118 | 0.098 | 0.65 |
-| S | 0.145 | 0.122 | 0.67 |
-| V | 0.847 | 0.824 | 0.72 |
-| g - b | 0.071 | 0.063 | 0.90 |
+| axis | building p50 | plot p50 | overlap (17 real) | overlap (89 contaminated) |
+|---|---|---|---|---|
+| r - g | 0.098 | 0.027 | **0.23** | 0.65 |
+| r - b | 0.176 | 0.094 | 0.30 | 0.67 |
+| S | 0.231 | 0.125 | 0.29 | 0.68 |
+| V | 0.745 | 0.827 | 0.49 | 0.65 |
+| g - b | 0.075 | 0.059 | 0.94 | 0.87 |
 
-Compare the green/cream pair at **0.17** on the same measure. 0.64 is not a
-separation. Value within each class is unimodal with a long dark tail and
-`find_split` returns None for salmon, green and blue alike; the one candidate
-that does fire — `r - g` within salmon at 0.1325 — is the ratio test latching
-onto a 2.6% bump against a 15.1% mode, which is tail noise, not a class.
+The green/cream pair scores **0.17** on this measure and was accepted as
+separable. `r - g` at 0.23 is in that neighbourhood; 0.65 was not.
 
-**What actually differs is ink, not colour**: 0.182 of a building trace is ink
-against 0.067 of open plot. Buildings on this sheet are drawn as outlines over
-the same wash, not as a second fill. That is a line-geometry problem, which is
-what SAM2 is for and where this file already measures it earning its place —
+**And it is the wash, not the outlines.** A building trace holds 0.257 ink
+against open plot's 0.091, so the whole shift could have been the printed
+outlines inside the polygon rather than a second fill. Excluding every ink pixel
+(V < 0.55) from both sides and re-running, the separation does not weaken — it
+**sharpens to 0.18 on `r - g`** (building p50 0.098 vs plot 0.027), 0.23 on
+`r - b`, 0.25 on `S`. The paper inside a building outline really is redder and
+more saturated than the paper beside it. There are two reds.
+
+**What this does not yet establish.** n=17, 0.13 Mpx of building against 6.8 Mpx
+of open plot, all traced by one person on one sheet. It says an axis exists, not
+that a threshold on it beats 0.160 — that is a run, and it has not been made.
+The recorded exit condition stands unmet in both directions: not a null any
+more, not a cleared gate either.
+
+The rest of P3's finding is unaffected, because it was never measured against
+the building traces: the hatch arithmetic below, and SAM2 earning its place at
 0.249 against 0.161 for the same boxes used raw.
 
 ### Isotropic morphology cannot cut the parcel dividers either
@@ -1760,7 +1783,9 @@ That run is the real test of the within-block split, and it needs a GPU.
 ## Colour blocks + cream parcels (2026-09-18)
 
 `colour_blocks.py --render 6051 --cream --drop-furniture`, whole 1882 sheet,
-8.6 s of CPU, no GPU and no checkpoint. Scored against the 118-row trace set.
+8.6 s of CPU, no GPU and no checkpoint. Scored against the 46 hand traces
+(re-scored 2026-09-18 after `load_gt` was found to be returning model output
+alongside them — see the correction at the head of this file).
 
 | run | n | @.5 | @.3 | mean | med | cover |
 |---|---|---|---|---|---|---|
@@ -1771,9 +1796,15 @@ That run is the real test of the within-block split, and it needs a GPU.
 | + cream hulls cut off the blocks | 1044 | 7 | 8 | **0.350** | 0.218 | 1.00 |
 | + `--recut` oversized blocks | 1296 | 7 | 8 | 0.358 | 0.232 | 1.00 |
 | `modern_prior --blocks-from-roads` | — | — | — | 0.262 | — | 0.87 |
-| **building (n=89)** | | | | | | |
-| blocks only | 253 | 3 | 7 | 0.093 | 0.048 | 0.97 |
-| + cream parcels | 1082 | 3 | 10 | 0.114 | 0.064 | 1.00 |
+| **building (n=17, re-scored)** | | | | | | |
+| + cream hulls cut off the blocks | 1044 | 1 | 3 | **0.122** | 0.050 | 1.00 |
+| ~~building (n=89)~~ | ~~1082~~ | ~~3~~ | ~~10~~ | ~~0.114~~ | ~~0.064~~ | ~~1.00~~ |
+
+The struck row is the contaminated one, kept so the correction is legible: 72
+of its 89 "traces" were OCR label boxes. Scoring against them *depressed* the
+figure, because a block prior cannot match a word of lettering — the honest
+number is higher than the one it replaces, not lower. It is still the ceiling
+the block prior hits, and still what P3 exists to lift.
 
 The cream pass is a second componenting of the *cream* class at its own ink
 threshold and with no closing — `cream_ink` sweeps V up to the sheet's paper
@@ -1786,6 +1817,81 @@ corrects: `docs/journals/260918-colour-blocks.md` § P2b.
 The defensible claims are the ones that do not depend on n: missed land_plot
 traces 2 → 0, @0.5 4 → 7, and claimed area 14.4% → 32.9% of the scan.
 
-A repeat pass of the identical command produced a byte-for-byte identical
-`blocks.run.json`, so the 0.035 repeat-variation recorded for the Gemini
-sections does not apply here — a swept threshold is still deterministic.
+**Repeatability holds only when the input image is pinned, and that turned out
+to matter more than any knob in this table.** Two runs of the identical command
+on 2026-09-18, minutes apart, both fetching over IIIF, returned 1109 and 1314
+features and scored `land_plot` **0.375 and 0.243** — a 0.13 spread, wider than
+every improvement this section records. `fetch_crop` falls back to stitching the
+tile pyramid when the region endpoint is slow, and `fetch_crop_level0`
+deliberately refuses to cache a stitch with a hole in it, so a run can silently
+work from a differently-complete image; a hole reads as blank paper, which moves
+the swept splits, which moves every class.
+
+Run with `--local-image` against the cached full scan and it is exact: two runs
+byte-for-byte identical, 1044 features, blue 41 · cream 802 · green 106 ·
+salmon 95, reproducing this table's committed row. **Every figure in this
+section is the pinned run.** Score over the network and you are measuring the
+fetch as much as the threshold.
+
+
+## 2026-09-18 — the legend key, and the first check that can see a class label
+
+Reported from the rendered layers, not from a number: blue misses blocks, salmon
+claims white plots with red buildings, and there is a grey class nobody handles.
+All three trace to the legend, which defines **five** classes where `classify`
+implements four. Swatches sampled from the `legend` triage region, median
+(r - g, r - b) and ink share:
+
+| legend class | r - g | r - b | ink% |
+|---|---|---|---|
+| ...aux services militaire et de la marine | 0.000 | 0.008 | 21.6 |
+| **...au service local** | 0.039 | **0.067** | **59.6** |
+| ...non affectées | 0.059 | 0.149 | 8.5 |
+| propriétés communales | 0.016 | 0.122 | 2.0 |
+| propriétés particulières | 0.165 | 0.263 | 10.6 |
+
+*Service local* is a hatch, not a tint, and its `r - b` band straddles the cool
+split at 0.073 — so it lands on both sides pixel by pixel and welds the military
+blocks to the administrative ones. Communales and service local also **swap order
+between the two axes**, which no cascade of 1-D cuts with a fixed precedence can
+separate. Full reasoning: `docs/journals/260918-colour-blocks.md`.
+
+**`--swatch-labels`** names each finished polygon against those swatches, diluted
+by one fitted scalar (**alpha 0.52**, fitted on the pigmented blocks only —
+including the ~800 bare-paper cream parcels drags it to 0.38 and costs a point on
+the check below). It runs after the geometry is fixed, so it is label-only:
+
+| | n | land_plot mean | med | building mean | med |
+|---|---|---|---|---|---|
+| pinned baseline | 1044 | 0.350 | 0.218 | 0.122 | 0.050 |
+| `--swatch-labels` | 1044 | 0.350 | 0.218 | 0.122 | 0.050 |
+
+Identical, as intended — **and that is the problem with scoring it here.**
+`seg_eval` scores geometry against `land_plot`/`building` and never reads
+`feature_type`, so every number in this file is blind to classification. The
+check is ten blocks named on the sheet, located by their OCR label, verified by
+hand: **4/10 → 6/10**, with *Magasins des Travaux Publics* and *Nouveau Palais de
+Justice* newly correct as `admin`.
+
+The key cannot hold the cream/green boundary on its own — the two sit 0.043 apart
+on `r - g` and dilution closes that further, and green came back 470 times. The
+pass's own voted `green_split` is fitted from the sheet's pixels and is better
+for that one cut, so the two sources are used where each is stronger:
+
+| | green | cream | admin | blue | salmon | named |
+|---|---|---|---|---|---|---|
+| before | 106 | 802 | — | 41 | 95 | 4/10 |
+| legend key alone | 470 | 261 | 233 | 42 | 38 | 6/10 |
+| key + voted trough | **53** | **678** | 233 | 42 | 38 | **6/10** |
+
+The 53 are the Jardin de la Ville, the Cimetière Européen and the Château d'Eau.
+The two measures are not interchangeable — a swatch is an all-pixel median (two
+classes *are* ink) and the trough is paper-only — so `wash_points` returns both
+and the arbitration compares paper to paper. Known-wrong after all of it:
+`admin` takes tree stipple in both gardens and part of the Champ de Manœuvres.
+
+Two nulls on the way, both reverted, neither to be re-attempted as stated:
+**ink density** as the hatch detector (land_plot 0.247 → 0.242, legend agreement
+42.7% → 30.7%) and **thin-ink density** (→ 0.244). A densely built block carries
+as much ink as a hatched one; the distinguishing property is orientation, which
+is priced in the journal.

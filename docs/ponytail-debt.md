@@ -15,7 +15,7 @@ this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-09-15**. **66 markers, 14 with no trigger.** Against the
+Scanned **2026-09-15**, three rows added by hand 2026-09-18. **69 markers, 14 with no trigger.** Against the
 2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
 the ledger had gone stale in both directions, so this is a full rewrite rather
 than a patch. See *What changed since 2026-09-10* at the foot.
@@ -227,6 +227,29 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 ## work/ocr/scripts/colour_blocks.py
 
 - **:84** — a block's ring is a concave hull over its boundary pixels, not a trace. ceiling: a block with a genuine notch comes back filled, and `blocks_to_seeds` reads only the bounds anyway. upgrade: marching squares on the component mask; the signal to do it is `seg_eval` cover running high while IoU stays flat, which is what over-coverage looks like.
+
+## work/ocr/scripts/seg_eval.py
+
+- **:88** — the ground truth is filtered on `source=volunteer` alone, not on
+  `status`. ceiling: a volunteer trace counts the moment it is submitted, so a
+  careless or mid-edit trace is ground truth until someone deletes it. upgrade:
+  add `status=eq.approved` if volunteer tracing ever gets a review queue worth
+  gating on — today all 46 approved rows are also all the volunteer rows, so the
+  two filters select the same set and the weaker one fails safe. Added
+  2026-09-18 after `load_gt` was found returning 72 `sam-auto` rows as truth.
+
+## work/ocr/scripts/colour_blocks.py — legend key
+
+- **`LEGEND_SWATCHES`** — the five legend swatches of the 1882 sheet, hard-coded
+  as measured. ceiling: every other sheet; a second polychrome map gets the wrong
+  key silently, because nothing checks that the numbers belong to the sheet being
+  read. upgrade: read them off the `legend` triage region directly — they are the
+  saturated rectangles in it — and it is worth building the moment a second
+  polychrome sheet arrives.
+- **`fit_dilution`** — one global alpha for every class. ceiling: a sheet whose
+  printer laid one tint heavier than another; per-class alphas are five scalars
+  fitted the same way, and the trigger is a class that is systematically
+  mis-assigned in one direction while the others are right.
 
 ## work/ocr/scripts/modern_prior.py
 

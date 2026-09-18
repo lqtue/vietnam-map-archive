@@ -122,6 +122,7 @@ from typing import Any
 
 import numpy as np
 import shapely
+from PIL import Image, ImageDraw
 from scipy import ndimage
 
 _HERE = Path(__file__).resolve().parent
@@ -755,6 +756,149 @@ def furniture_mask(map_id: str, pad: float = 200.0):
 
 # ── output ───────────────────────────────────────────────────────────────────
 
+# The sheet's own colour key: median (r - g, r - b) inside each legend swatch on
+# the 1882 Plan Cadastral, sampled from the `legend` triage region at
+# [9681, 6961, 1754, 988]. Five classes, where `classify` knows four — the one
+# it has never had is *service local*, which the sheet draws as a black diagonal
+# hatch rather than a tint (59.6% ink in its swatch against 21.6% for the next
+# densest), so no trough on either axis has ever found it.
+#
+# ponytail: one sheet's swatches, hard-coded. Ceiling: every other sheet. The
+# upgrade is to read them off the `legend` region directly — they are the
+# saturated rectangles in it — and it is worth building the moment a second
+# polychrome sheet arrives.
+LEGEND_SWATCHES = {
+    "blue": (0.000, 0.008),      # domaniales affectees aux services militaire et marine
+    "admin": (0.039, 0.067),     # domaniales affectees au service local  (a hatch)
+    "cream": (0.059, 0.149),     # domaniales non affectees  — this is bare paper
+    "green": (0.016, 0.122),     # proprietes communales
+    "salmon": (0.165, 0.263),    # proprietes particulieres
+}
+PAPER_CLASS = "cream"
+
+
+def fit_dilution(points: list[tuple[float, float]],
+                 swatches: dict[str, tuple[float, float]] = LEGEND_SWATCHES,
+                 lo: float = 0.15, hi: float = 1.0, steps: int = 35) -> tuple[float, float]:
+    """One scalar: how dilute the printed wash is against the legend's full ink.
+
+    A legend swatch is the tint at full strength; the same tint laid over a block
+    is thinner, so the swatches sit further out than any wash on the sheet and
+    matching a block straight against them drops everything to the nearest pale
+    class. Measured here: a salmon block's wash is r - g 0.086 where its swatch
+    is 0.165, which is why an unfitted match collapsed salmon from 95 blocks to 8.
+
+    The model is one global alpha along each swatch's own direction away from
+    bare paper, `paper + alpha * (swatch - paper)`. Alpha is chosen to minimise
+    the total distance from each block's wash to its nearest prototype — the
+    sheet's own components vote for it, nothing is scored against ground truth,
+    and the paper class is a fixed point at any alpha.
+    """
+    P = swatches[PAPER_CLASS]
+    best_a, best_cost = 1.0, float("inf")
+    for a in np.linspace(lo, hi, steps):
+        protos = [(P[0] + a * (v[0] - P[0]), P[1] + a * (v[1] - P[1])) for v in swatches.values()]
+        cost = 0.0
+        for px, py in points:
+            cost += min((px - qx) ** 2 + (py - qy) ** 2 for qx, qy in protos)
+        if cost < best_cost:
+            best_a, best_cost = float(a), cost
+    return best_a, best_cost
+
+
+def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
+                ink_v: float = INK_V) -> list[tuple[float, float, float]]:
+    """Per polygon: median (r - g, r - b) over every pixel, and r - g over paper.
+
+    Two measures because the sheet's two kinds of evidence are measured on
+    different pixels and are not interchangeable. The legend swatches are
+    all-pixel medians, ink included, because two of the five classes *are* ink —
+    measure only the paper between a hatch and you throw away what defines it.
+    `green_split`, by contrast, is a trough in the paper-only histogram
+    (`live = max >= ink_v`), so arbitrating with it means comparing paper to
+    paper. Mixing the two silently is how a diluted swatch ends up overruling a
+    boundary the sheet itself voted for.
+    """
+    a = rgb.astype(np.float32) / 255.0
+    rg, rb = a[..., 0] - a[..., 1], a[..., 0] - a[..., 2]
+    paper = a.max(axis=2) >= ink_v
+    out: list[tuple[float, float, float]] = []
+    for f in feats:
+        ring = [(x / scale, y / scale) for x, y in f["geom"].exterior.coords]
+        xs = [q[0] for q in ring]
+        ys = [q[1] for q in ring]
+        x0, y0 = max(0, int(min(xs))), max(0, int(min(ys)))
+        x1 = min(rgb.shape[1], int(max(xs)) + 1)
+        y1 = min(rgb.shape[0], int(max(ys)) + 1)
+        if x1 - x0 < 2 or y1 - y0 < 2:
+            out.append((float("nan"), float("nan"), float("nan")))
+            continue
+        m = Image.new("L", (x1 - x0, y1 - y0), 0)
+        ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
+        sel = np.asarray(m) > 0
+        if sel.sum() < 25:
+            out.append((float("nan"), float("nan"), float("nan")))
+            continue
+        pap = sel & paper[y0:y1, x0:x1]
+        out.append((float(np.median(rg[y0:y1, x0:x1][sel])),
+                    float(np.median(rb[y0:y1, x0:x1][sel])),
+                    float(np.median(rg[y0:y1, x0:x1][pap])) if pap.sum() >= 25
+                    else float(np.median(rg[y0:y1, x0:x1][sel]))))
+    return out
+
+
+def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
+                      alpha: float | None = None, green: float | None = None,
+                      ink_v: float = INK_V) -> tuple[list[dict], int, float]:
+    """Name each finished polygon by the wash it holds, against the fitted key.
+
+    Runs after the geometry is fixed, which is the whole difference from the
+    per-pixel nearest-swatch pass rejected on 2026-09-18: that one interleaved
+    two classes inside one block and fragmented it (land_plot 0.346 -> 0.307).
+    This cannot move a boundary, only the name on it.
+
+    It exists because `dominant_class` structurally cannot answer *cream*: it
+    votes over PIGMENT_CLASSES, of which cream is not one, so a *non affectee*
+    plot with red buildings drawn on it has no cream pixels among the candidates
+    and comes back salmon every time.
+
+    `green`, when given, is the sheet's own voted `r - g` trough and **overrules
+    the key on the cream/green boundary alone**. Each source of evidence is used
+    where it is the stronger one: the swatches order classes the troughs cannot
+    (communales and service local swap between the axes, so no cascade of 1-D
+    cuts separates them), while cream and green sit 0.043 apart on `r - g` and
+    the diluted prototypes land closer still — matched against them alone, green
+    claimed 470 polygons on a sheet with nothing like 470 communal parcels. The
+    trough is fitted from this sheet's own pixels and is simply better for that
+    one cut.
+    """
+    pts = wash_points(feats, rgb, scale, ink_v=ink_v)
+    if alpha is None:
+        # Fit on the pigmented blocks only. A cream parcel is bare paper by
+        # definition, so it carries no tint and cannot say how strongly a tint
+        # prints; including the ~800 of them drags the fit toward the paper
+        # prototype and every class collapses inward (alpha 0.38 against 0.52,
+        # and the named-block check falls from 6/8 to 5/8).
+        tinted = [(q[0], q[1]) for f, q in zip(feats, pts)
+                  if q[0] == q[0] and f["feature_type"] != PAPER_CLASS]
+        alpha, _ = fit_dilution(tinted or [(q[0], q[1]) for q in pts if q[0] == q[0]])
+    P = LEGEND_SWATCHES[PAPER_CLASS]
+    protos = {k: (P[0] + alpha * (v[0] - P[0]), P[1] + alpha * (v[1] - P[1]))
+              for k, v in LEGEND_SWATCHES.items()}
+    changed = 0
+    for f, q in zip(feats, pts):
+        if q[0] != q[0]:
+            continue
+        near = min(protos, key=lambda k: (protos[k][0] - q[0]) ** 2 + (protos[k][1] - q[1]) ** 2)
+        if green is not None and near in ("green", PAPER_CLASS):
+            # Paper measure against a paper-measured trough — see `wash_points`.
+            near = "green" if q[2] <= green else PAPER_CLASS
+        if near != f["feature_type"]:
+            f["feature_type"] = near
+            changed += 1
+    return feats, changed, alpha
+
+
 def write_outputs(out_dir: Path, feats: list[dict], extra: dict[str, Any]) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -973,6 +1117,14 @@ def main() -> int:
                    help="rescue components over --max-m2 by re-cutting them at a higher "
                         "ink threshold instead of dropping them. Recovers the naval quarter "
                         "(blue 41 -> 216 blocks) and costs ~60 s and river false positives")
+    p.add_argument("--swatch-labels", action="store_true",
+                   help="name each finished polygon against the legend's own five "
+                        "swatches, diluted to the strength the sheet actually prints "
+                        "them at, instead of by a pixel vote over the pigment classes. "
+                        "Adds the *service local* class and lets a block be cream. "
+                        "Changes no geometry")
+    p.add_argument("--dilution", type=float,
+                   help="override the fitted wash strength (0-1) for --swatch-labels")
     p.add_argument("--cream", action="store_true",
                    help="also emit the cream parcels — the unassigned domain land the "
                         "block pass leaves blank. Its own ink threshold, no closing")
@@ -1117,6 +1269,12 @@ def main() -> int:
                 before = len(feats)
                 feats = [f for f in feats if not shapely.centroid(f["geom"]).within(furn)]
                 print(f"  dropped {before - len(feats)} inside the title or legend box")
+
+    if args.swatch_labels:
+        feats, changed, alpha = relabel_by_swatch(feats, rgb, scale, alpha=args.dilution,
+                                                  green=green, ink_v=args.ink)
+        print(f"  legend key fitted at alpha {alpha:.2f} of full ink; "
+              f"re-labelled {changed} of {len(feats)} polygons")
 
     kinds: dict[str, int] = {}
     for f in feats:

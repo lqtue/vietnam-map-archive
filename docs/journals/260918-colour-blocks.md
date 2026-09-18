@@ -289,10 +289,15 @@ block-prior runs already hit at `building` 0.160.
 
 Two smaller findings from the same run:
 
-- **The ground truth has grown to 118 rows** — building 89 · land_plot 24 ·
-  road 3 · waterway 2 — where `EVAL-BASELINE.md` and
-  `docs/worked-example-1882.md` both say 46. Those sections are comparing
-  against a different truth set than anything measured today.
+- ~~**The ground truth has grown to 118 rows**~~ — **wrong, corrected later the
+  same day.** It had not grown. `load_gt` filtered on `map_id` alone, and the
+  `seg` run of 2026-09-16 wrote 72 of its own outputs back into
+  `footprint_submissions` typed `building`. The sheet has 46 traces. Worse, the
+  72 are OCR label boxes (median IoU 0.83 to their own prompt box), so they are
+  not buildings in any sense. `seg_eval.load_gt` now filters
+  `source=eq.volunteer`. `land_plot` numbers here are unaffected — 24/24
+  volunteer — but everything this journal says about `building`, **including
+  P3's null, was measured against lettering**. See the end of this file.
 - **The split has to be voted, not pooled.** Run on the whole sheet the `r − g`
   histogram is unimodal and `find_split` correctly refuses it: salmon is ~6% of
   the paper and decays monotonically off the cream peak, because most of the
@@ -610,3 +615,207 @@ So the sentence that is currently true: **a CPU-only colour pass, calibrated fro
 the sheet itself and trained on nothing, produces a block-and-parcel prior for a
 polychrome cadastral sheet in about nine seconds, and on the one sheet measured
 it covers every hand-traced land plot.** Everything stronger needs item 1.
+
+
+## The 118-row trace set was 46 traces and 72 label boxes (2026-09-18, found while rendering an overlay)
+
+Drawing the predictions over the sheet to look at them, the ground-truth rows
+rendered too, and 72 of them sat squarely on the map's *lettering* — a cyan box
+around `HÔPITAL MARITIME`, around `MESSAGERIES MARITIMES`, around `Vge de Vĩnh
+Hội`. They came from the `seg-20260916T1632` run, which wrote its output back to
+`footprint_submissions` with `source='sam-auto'`, into the same table `load_gt`
+reads with no filter but `map_id`.
+
+Measured: median IoU from each `sam-auto` polygon to its nearest
+`ocr_extractions` box is **0.829**, with 60 of 72 above 0.5, and each carries the
+label text as `name`. They are the prompt box, barely moved — SAM2 segmenting the
+lettering's background from OCR seeds, which is exactly what C4 predicted would
+happen if a line feature's box were used as a prompt. The control is the 17
+volunteer buildings at **0.054** on the same measure.
+
+What it cost, by class:
+
+| feature_type | volunteer | sam-auto | effect |
+|---|---:|---:|---|
+| land_plot | 24 | 0 | none — every headline number stands |
+| building | 17 | 72 | every n=89 figure void |
+| road / waterway | 5 | 0 | none |
+
+So the whole cream-parcel result — 0.247 → 0.350, cover 1.00, missed traces
+2 → 0 — is untouched, because `land_plot` was never contaminated. And `building`
+re-scores *upward*, 0.114 → **0.122**, because a block prior cannot match a word
+of lettering and 72 words were dragging it down.
+
+**The expensive part was P3.** Its null — "there are no two reds" — is the reason
+this track was written up as *colour exhausted, hand it to the GPU*. It was
+measured against the 89. Re-measured against the 17, `r - g` overlap is 0.23
+rather than 0.64, and with ink excluded from both sides it sharpens to 0.18
+against the 0.17 that made green separable. The null is retracted; the table is
+in `EVAL-BASELINE.md`.
+
+### Two process notes, because neither is about this sheet
+
+**A results table that a pipeline writes into is not a ground truth.** The bug is
+one missing query parameter, and it was introduced by nothing — `load_gt` was
+always written that way, and it was correct until the day something started
+writing predictions into the table it reads. Nothing failed, no test broke, and
+the number moved in the direction that looks like progress: 46 → 118 reads as
+more tracing, and it was reported that way in three documents.
+
+**The picture caught it and the metric could not.** That is now three times on
+this track — the missing green class, the cream hulls closing over their own
+blocks, and this. `seg_eval` takes the best match per trace, so it is structurally
+incapable of seeing a prediction that matched nothing, and equally incapable of
+seeing a *truth row* that should never have been there. Rendering the run over
+the sheet costs about forty lines and has beaten the metric every time.
+
+
+## The sheet has five classes and the pass had four (2026-09-18, found by looking at the legend)
+
+Reported from the rendered layers: blue misses the river and many blocks, salmon
+claims white plots that merely have red buildings on them, some salmon blocks are
+missed, "and there's green and grey — check that."
+
+All three are one finding. **The legend is the sheet's own class definition and
+nobody had read it into the code.** Sampled from the `legend` triage region at
+[9681, 6961, 1754, 988], median (r - g, r - b) and ink share inside each swatch:
+
+| legend class | r - g | r - b | ink% | the pass calls it |
+|---|---|---|---|---|
+| domaniales affectées aux services militaire et de la marine | 0.000 | 0.008 | 21.6 | blue ✓ |
+| **domaniales affectées au service local** | 0.039 | **0.067** | **59.6** | **blue ✗** |
+| domaniales non affectées | 0.059 | 0.149 | 8.5 | cream ✓ |
+| propriétés communales | 0.016 | 0.122 | 2.0 | green ✓ |
+| propriétés particulières | 0.165 | 0.263 | 10.6 | salmon ✓ |
+
+**The grey is a whole class, and it is a hatch rather than a tint** — 59.6% ink
+where nothing else reaches 22%. No trough on `r - g` or `r - b` can find a class
+that has no hue of its own, which is why five months of threshold work never
+turned it up. Its `r - b` band is 0.047-0.078 against a cool split of 0.073, so
+it falls on *both sides* pixel by pixel, welding the military blocks to the
+administrative ones into components the area cap then drops whole. That is why
+blue returns 41 blocks on a sheet that plainly has more.
+
+**And no cascade of 1-D cuts can fix it, whatever the order.** Communales and
+service local *swap* between the axes — on `r - g`, communales 0.016 < service
+local 0.039; on `r - b`, service local 0.067 < communales 0.122. A precedence
+rule picks one axis per class and cannot separate a pair that reverses. This is
+the same shape as the note already in `classify` about green-first taking blue
+from 65 blocks to 1, and it says that note was a symptom rather than a quirk.
+
+### Salmon claiming white plots is a different bug, and it is structural
+
+`dominant_class` votes over `PIGMENT_CLASSES = (salmon, green, blue)`. Cream is
+deliberately not a candidate — "a block is a component *of* the pigment union, so
+cream is not an answer here" — which is right for *finding* blocks and wrong for
+*naming* them. A *non affectée* plot with red buildings drawn on it has no cream
+pixels among the candidates, so it comes back salmon every time. It cannot do
+anything else. Measured: 88 of 99 salmon blocks have a wash nearer the cream
+swatch than the salmon one.
+
+### Two nulls before the thing that worked
+
+**Ink density does not isolate the hatch.** The obvious read of 59.6% is a
+density threshold, and it fails because a densely built block carries just as
+much ink as a hatched one. Added as a fifth class behind `--admin`, swept:
+
+| | land_plot | legend agreement |
+|---|---|---|
+| baseline blocks | 0.247 | 42.7% |
+| density 0.30 | 0.242 | 30.7% |
+| density 0.45 | 0.243 | — |
+
+**Nor does the density of *thin* ink**, which should have been better — a hatch
+line is 2 source px where a building fill is not, so the ink that vanishes under
+a 3x3 opening ought to be hatch and little else. 0.244 at t=0.20, 0.242 at 0.30,
+0.124 at 0.10. Both reverted. The remaining route is orientation, which this
+journal has already measured and priced.
+
+### What worked: the legend key, diluted, applied per component
+
+A swatch is the tint at full strength and a block is that tint laid thin, so
+matching a block straight against the legend drops everything to the palest
+class — salmon collapsed 95 → 8 on the first try. Fitting one global scalar
+along each swatch's own direction away from bare paper, `paper + alpha * (swatch
+- paper)`, chosen to minimise total distance from each block's wash to its
+nearest prototype:
+
+**alpha = 0.52** — the printed wash is about half the legend's ink. The fit has
+one trap worth recording: fitted over all 1044 polygons it returns 0.38, because
+~800 of them are cream parcels that are bare paper by definition, carry no tint,
+and drag every prototype inward. Fitted over the pigmented blocks only it returns
+0.52, and the hand check below moves 5/10 → 6/10 on that difference alone.
+
+Applied **per finished component**, which is the whole difference from the
+per-pixel nearest-swatch pass rejected earlier the same day: that one interleaved
+two classes inside one block and fragmented it, 0.346 → 0.307. Per component it
+cannot move a boundary — `land_plot` is 0.350 and `building` 0.122 before and
+after, identically — only the name on it.
+
+`colour_blocks.py --swatch-labels`, off by default.
+
+### Scored on ten named blocks, because nothing else can see a label
+
+`seg_eval` scores geometry against `land_plot`/`building` and never reads
+`feature_type`. **There is no measurement in this repo for the thing that was
+reported**, and the swatch-distance figure quoted above cannot referee it either,
+since it is the same rule the classifier minimises. So: ten blocks named on the
+sheet whose class is unambiguous, located by their OCR label, checked by hand.
+
+| block | expected | before | after |
+|---|---|---|---|
+| Hôpital Maritime | blue | blue ✓ | blue ✓ |
+| Caserne et Ateliers de l'Artillerie | blue | blue ✓ | blue ✓ |
+| Hôtel du Directeur de l'Arsenal | blue | blue ✓ | blue ✓ |
+| Manutention et Boucherie de la Marine | blue | blue ✓ | blue ✓ |
+| Champ de Manœuvres | blue | cream ✗ | admin ✗ |
+| Magasins des Travaux Publics | admin | green ✗ | **admin ✓** |
+| Nouveau Palais de Justice | admin | green ✗ | **admin ✓** |
+| Jardin Botanique | green | cream ✗ | admin ✗ |
+| Prisons | admin | (no polygon) | (no polygon) |
+| Jardin de la Ville | green | (no polygon) | (no polygon) |
+| | | **4/10** | **6/10** |
+
+**Where it is still wrong, and visibly so.** `admin` over-claims onto tree
+stipple — it takes both the Jardin Botanique and the Jardin du Gouverneur's
+grounds, which are dense fine ink and not a hatch — and it bleeds into the
+Champ de Manœuvres.
+
+### Each source of evidence where it is the stronger one
+
+`green` first came back **470 times** on a sheet with nothing like 470 communal
+parcels. Green and cream sit 0.043 apart on `r - g`, and diluting the swatches to
+alpha 0.52 brings the prototypes closer still, so the key cannot hold that one
+boundary. But the pass already computes a better boundary for exactly this pair:
+`green_split`, the `r - g` trough voted from the sheet's own pixels, found at
+`RG_FINE_BINS` precisely because the two modes are two bins apart at normal
+resolution.
+
+So the two are used where each is stronger — the swatches order the classes the
+troughs *cannot* (communales and service local swap between the axes), the trough
+cuts cream from green:
+
+| | green | cream | admin | blue | salmon | named check |
+|---|---|---|---|---|---|---|
+| before any of this | 106 | 802 | — | 41 | 95 | 4/10 |
+| legend key alone | 470 | 261 | 233 | 42 | 38 | 6/10 |
+| key + voted trough | **53** | **678** | 233 | 42 | 38 | **6/10** |
+
+The 53 are the Jardin de la Ville, the Cimetière Européen, the Château d'Eau and
+a handful of small parcels — communal property, which is what the legend says.
+Nothing else moved: the two administrative blocks stay correct, and geometry is
+untouched at 0.350 / 0.122 throughout.
+
+**The trap this closes, and it is subtle.** The two measures are not
+interchangeable and mixing them silently is how the key ends up overruling a
+better boundary. A legend swatch is an *all-pixel* median, ink included, because
+two of the five classes *are* ink — measure only the paper between a hatch and
+you throw away what defines it. `green_split` is a trough in the *paper-only*
+histogram. `wash_points` therefore returns both per polygon, and the arbitration
+compares paper to paper.
+
+So: the class the sheet has and the code did not now exists and hits its named
+targets, three classes are better, none is worse, and for the first time there is
+a check that can tell. What remains wrong is `admin` on tree stipple, which is
+the same dense-fine-ink confusion the two density nulls above ran into, and the
+same place orientation is the only measured route left.

@@ -59,7 +59,21 @@ def iou(a, b) -> float:
 
 
 def load_gt(map_id: str) -> list[tuple[str, object]]:
-    """(feature_type, geometry) for every usable hand trace on a sheet."""
+    """(feature_type, geometry) for every usable hand trace on a sheet.
+
+    **`source=volunteer` is the whole point of this function.**
+    `footprint_submissions` holds predictions as well as traces — a `seg` run
+    writes its output back with `source='sam-auto'`, into the same table this
+    reads. Without the filter the table is not a ground truth, it is a mixture,
+    and a model scored against it is partly scored against itself.
+
+    That is not hypothetical: on the 1882 sheet, run `seg-20260916T1632` added
+    72 `sam-auto` rows typed `building`, so this function returned 118 rows
+    where the sheet has 46 traces, and every `building` number measured between
+    2026-09-16 and this fix was 81% scored against model output. Worse, those
+    72 are OCR label boxes — median IoU 0.83 to their own prompt box from
+    `ocr_extractions` — so they are not buildings at all.
+    """
     import requests
     from shapely.geometry import Polygon
     from shapely.validation import make_valid
@@ -68,7 +82,14 @@ def load_gt(map_id: str) -> list[tuple[str, object]]:
     key = os.environ["SUPABASE_SERVICE_KEY"]
     rows = requests.get(
         f"{url}/rest/v1/footprint_submissions",
-        params={"select": "pixel_polygon,feature_type", "map_id": f"eq.{map_id}"},
+        params={
+            "select": "pixel_polygon,feature_type",
+            "map_id": f"eq.{map_id}",
+            # ponytail: source is the trustworthy axis, status is not — a trace
+            # sits at 'submitted' until someone reviews it. Add `status` here
+            # only if volunteer tracing ever needs a quality gate of its own.
+            "source": "eq.volunteer",
+        },
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
         timeout=30,
     ).json()
