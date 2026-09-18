@@ -1,0 +1,551 @@
+/* VMA Deck — editorial dark navy theme
+   Built on top of reveal.js black theme; override selectively.
+   Design language: archival, journal-page typography, hairline rules,
+   warm-amber accents, serif numerals as decorative anchors. */
+
+:root {
+  /* Palette */
+  --vma-navy:        #0e1a36;
+  --vma-navy-deep:   #07112a;
+  --vma-navy-soft:   #142547;
+  --vma-cream:       #f5f1e6;
+  --vma-cream-dim:   #d9d3c2;
+  --vma-amber:       #f6c66b;
+  --vma-rust:        #c9744a;
+  --vma-muted:       #8390ac;
+  --vma-rule:        rgba(245, 241, 230, 0.18);
+  --vma-rule-strong: rgba(245, 241, 230, 0.45);
+  --vma-ink-shadow:  0 1px 0 rgba(0,0,0,0.4);
+
+  /* Type */
+  --vma-serif: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+  --vma-sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vma-mono:  "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Base canvas — subtle radial texture for depth
+   ────────────────────────────────────────────────────────────── */
+
+html, body, .reveal-viewport {
+  background: var(--vma-navy-deep);
+}
+
+.reveal {
+  font-family: var(--vma-sans);
+  color: var(--vma-cream);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides > section,
+.reveal .slides > section > section {
+  background:
+    radial-gradient(ellipse at top left, rgba(246, 198, 107, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(201, 116, 74, 0.04) 0%, transparent 60%),
+    var(--vma-navy);
+  padding: 60px 80px !important;
+  box-sizing: border-box;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Typography
+   ────────────────────────────────────────────────────────────── */
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  color: var(--vma-cream);
+  font-family: var(--vma-sans);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-transform: none;
+  text-shadow: var(--vma-ink-shadow);
+  margin-bottom: 0.5em;
+}
+
+.reveal h1 { font-size: 2.6em; line-height: 1.05; }
+.reveal h2 {
+  font-size: 1.7em;
+  line-height: 1.15;
+  position: relative;
+  padding-bottom: 0.35em;
+  margin-bottom: 0.7em;
+}
+.reveal h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 56px;
+  height: 2px;
+  background: var(--vma-amber);
+}
+.reveal h3 {
+  font-size: 0.95em;
+  color: var(--vma-amber);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.4em;
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-family: var(--vma-sans);
+  font-size: 0.65em;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--vma-amber);
+  display: inline-block;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--vma-rule-strong);
+  margin-bottom: 1.4em;
+}
+
+/* Body */
+.reveal p,
+.reveal li {
+  font-size: 0.92em;
+  line-height: 1.55;
+  color: var(--vma-cream);
+  font-weight: 300;
+}
+
+.reveal ul, .reveal ol { margin-left: 1em; }
+.reveal li { margin-bottom: 0.5em; }
+.reveal li::marker { color: var(--vma-amber); }
+
+.reveal .muted  { color: var(--vma-muted); font-weight: 300; }
+.reveal .accent { color: var(--vma-amber); }
+.reveal .rust   { color: var(--vma-rust); }
+.reveal strong  { color: var(--vma-cream); font-weight: 600; }
+.reveal em      { color: var(--vma-cream-dim); font-style: italic; }
+
+/* ──────────────────────────────────────────────────────────────
+   Title slides — display serif with decorative rule
+   ────────────────────────────────────────────────────────────── */
+
+.reveal section.title {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.reveal section.title h1,
+.reveal section.title h2 {
+  font-family: var(--vma-serif);
+  font-weight: 500;
+  text-align: center;
+  font-size: 4.2em;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0;
+  padding: 0;
+}
+
+.reveal section.title h2::after { display: none; }
+
+.reveal section.title h3 {
+  text-align: center;
+  font-family: var(--vma-sans);
+  font-size: 0.85em;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vma-cream-dim);
+  margin-top: 2em;
+  position: relative;
+}
+
+.reveal section.title h3::before,
+.reveal section.title h3::after {
+  content: "";
+  display: inline-block;
+  width: 40px;
+  height: 1px;
+  background: var(--vma-amber);
+  vertical-align: middle;
+  margin: 0 1em;
+}
+
+/* Chapter marker (section dividers) */
+.chapter-num {
+  font-family: var(--vma-serif);
+  font-style: italic;
+  font-size: 0.55em;
+  color: var(--vma-amber);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 1.5em;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Quote / blockquote — pull-quote treatment
+   ────────────────────────────────────────────────────────────── */
+
+.reveal blockquote {
+  border-left: none;
+  position: relative;
+  padding: 0.6em 0 0.6em 2em;
+  font-family: var(--vma-serif);
+  font-size: 1.4em;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--vma-cream);
+  background: transparent;
+  box-shadow: none;
+  margin: 1em 0;
+  max-width: 90%;
+}
+
+.reveal blockquote::before {
+  content: "\201C";
+  position: absolute;
+  left: -0.15em;
+  top: -0.4em;
+  font-family: var(--vma-serif);
+  font-size: 3em;
+  color: var(--vma-amber);
+  line-height: 1;
+  font-style: normal;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tables — journal page rhythm
+   ────────────────────────────────────────────────────────────── */
+
+.reveal table {
+  font-size: 0.62em;
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--vma-sans);
+}
+
+.reveal table th {
+  background: transparent;
+  color: var(--vma-amber);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.7em 0.9em;
+  border-top: 2px solid var(--vma-amber);
+  border-bottom: 1px solid var(--vma-rule-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.85em;
+}
+
+.reveal table td {
+  padding: 0.75em 0.9em;
+  border-bottom: 1px solid var(--vma-rule);
+  color: var(--vma-cream);
+  vertical-align: top;
+}
+
+.reveal table tbody tr:hover td {
+  background: rgba(246, 198, 107, 0.04);
+}
+
+.reveal table td strong { color: var(--vma-cream); }
+
+/* ──────────────────────────────────────────────────────────────
+   Code
+   ────────────────────────────────────────────────────────────── */
+
+.reveal code {
+  font-family: var(--vma-mono);
+  background: rgba(246, 198, 107, 0.10);
+  padding: 0.1em 0.4em;
+  border-radius: 2px;
+  font-size: 0.85em;
+  color: var(--vma-amber);
+  letter-spacing: -0.01em;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Layout primitives
+   ────────────────────────────────────────────────────────────── */
+
+.cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.4em;
+  align-items: start;
+}
+
+.cols-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.8em;
+}
+
+.cols-3.with-dividers > div {
+  padding: 0 1.2em;
+  border-left: 1px solid var(--vma-rule);
+}
+.cols-3.with-dividers > div:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+/* Big-number cell — for stats grids */
+.big-number {
+  font-family: var(--vma-serif);
+  font-size: 4.2em;
+  line-height: 0.95;
+  color: var(--vma-amber);
+  font-weight: 500;
+  font-feature-settings: "lnum";
+  letter-spacing: -0.02em;
+}
+
+.stat-cell {
+  padding: 1em 0.3em;
+  border-top: 1px solid var(--vma-rule);
+}
+
+.stat-cell .caption {
+  margin-top: 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.6em;
+  color: var(--vma-cream-dim);
+}
+
+/* Caption */
+.caption {
+  font-family: var(--vma-sans);
+  font-size: 0.7em;
+  color: var(--vma-muted);
+  margin-top: 0.5em;
+  letter-spacing: 0.02em;
+}
+
+/* Citation — small italic bottom-right */
+.cite {
+  position: absolute;
+  bottom: 30px;
+  right: 60px;
+  font-family: var(--vma-serif);
+  font-size: 0.65em;
+  color: var(--vma-cream-dim);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+/* Footer mark — small VMA chip at top-right of content slides */
+.slide-mark {
+  position: absolute;
+  top: 32px;
+  right: 60px;
+  font-family: var(--vma-sans);
+  font-size: 0.5em;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--vma-muted);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Image slide variant
+   ────────────────────────────────────────────────────────────── */
+
+section.image-full {
+  padding: 0 !important;
+  position: relative;
+}
+
+section.image-full img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+}
+
+section.image-full::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 17, 42, 0.75) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+section.image-full .caption,
+section.image-full .cite {
+  z-index: 2;
+  color: var(--vma-cream);
+}
+
+/* Image placeholder — for stub slots */
+.img-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(245, 241, 230, 0.02),
+      rgba(245, 241, 230, 0.02) 12px,
+      rgba(245, 241, 230, 0.05) 12px,
+      rgba(245, 241, 230, 0.05) 24px
+    );
+  border: 1px solid var(--vma-rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vma-muted);
+  font-size: 0.7em;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   QR slides
+   ────────────────────────────────────────────────────────────── */
+
+.qr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5em;
+  align-items: center;
+  text-align: center;
+  margin-top: 1em;
+}
+
+.qr-grid img {
+  width: 280px;
+  height: 280px;
+  background: var(--vma-cream);
+  padding: 14px;
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.qr-grid h3 {
+  color: var(--vma-cream) !important;
+  margin-bottom: 1.2em;
+  font-size: 0.85em;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Pipeline diagram — Stage chips
+   ────────────────────────────────────────────────────────────── */
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  margin: 2em 0;
+  flex-wrap: wrap;
+}
+
+.pipeline .stage {
+  font-family: var(--vma-serif);
+  font-style: italic;
+  font-size: 1.4em;
+  color: var(--vma-cream);
+  padding: 0.5em 1em;
+  border: 1px solid var(--vma-rule-strong);
+  border-radius: 2px;
+  background: rgba(245, 241, 230, 0.03);
+}
+
+.pipeline .arrow {
+  color: var(--vma-amber);
+  font-size: 1.2em;
+  font-weight: 300;
+}
+
+/* Stage badge (for deep-dive slides) */
+.stage-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.7em;
+  margin-bottom: 1em;
+}
+.stage-badge .num {
+  font-family: var(--vma-serif);
+  font-size: 2.2em;
+  font-style: italic;
+  color: var(--vma-amber);
+  line-height: 1;
+}
+.stage-badge .label {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.6em;
+  color: var(--vma-cream-dim);
+  font-weight: 600;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Section dividers (TOC slide)
+   ────────────────────────────────────────────────────────────── */
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  font-size: 1.4em;
+  font-family: var(--vma-serif);
+}
+
+.toc-list li {
+  padding: 0.4em 0;
+  color: var(--vma-muted);
+  border-bottom: 1px solid var(--vma-rule);
+}
+
+.toc-list li.active {
+  color: var(--vma-cream);
+  font-weight: 700;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Reveal.js chrome
+   ────────────────────────────────────────────────────────────── */
+
+.reveal .progress {
+  color: var(--vma-amber);
+  height: 3px;
+}
+
+.reveal .slide-number {
+  font-family: var(--vma-mono);
+  font-size: 11px;
+  background: transparent;
+  color: var(--vma-muted);
+  letter-spacing: 0.1em;
+  right: 24px;
+  bottom: 18px;
+}
+
+.reveal .controls {
+  color: var(--vma-amber);
+}
+
+/* Fragment style: subtle fade + slight rise */
+.reveal .fragment {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.reveal .fragment.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

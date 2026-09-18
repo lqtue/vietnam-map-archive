@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VMA — Deconstructing the World, Reconstructing the Past</title>
+
+  <!-- reveal.js core + theme (black base, we override with vma.css) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- VMA overrides (load AFTER theme) -->
+  <link rel="stylesheet" href="css/vma.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ================================================================
+           SECTION 0 — OPEN
+           ================================================================ -->
+
+      <!-- 0.1 Title -->
+      <section class="title">
+        <span class="chapter-num">The Vietnam Map Archive · 2026</span>
+        <h1>Deconstructing the World,<br/>Reconstructing the Past</h1>
+        <h3>A method for historical maps</h3>
+        <p class="muted" style="margin-top: 3.5em; font-size: 0.75em; letter-spacing: 0.18em; text-transform: uppercase;">
+          Lê Quang Tuệ · VnExpress · Fulbright MPP
+        </p>
+      </section>
+
+      <!-- 0.2 QR codes -->
+      <section>
+        <span class="slide-mark">Try it now</span>
+        <h2>Open the archive</h2>
+        <div class="qr-grid">
+          <div>
+            <h3>PC · stable</h3>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://vietnammaparchive.github.io/v3-beta/" alt="PC QR" />
+            <p class="caption">vietnammaparchive.github.io/v3-beta/</p>
+          </div>
+          <div>
+            <h3>Mobile · experimental</h3>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://vmabeta.pages.dev/" alt="Mobile QR" />
+            <p class="caption">vmabeta.pages.dev</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 0.3 Speaker -->
+      <section>
+        <span class="slide-mark">Speaker</span>
+        <h2>Who I am</h2>
+        <div class="cols-2" style="margin-top: 2em;">
+          <div>
+            <p><strong>Data journalist</strong> — VnExpress, national daily, ~30M monthly readers.</p>
+            <p><strong>Fulbright MPP</strong> — ten years of editorial mapping, statistics, urban data.</p>
+            <p class="muted" style="font-size: 0.85em; margin-top: 2em;">
+              VMA started as a side project. It is now the research infrastructure
+              for a longer arc — a spatial history of Saigon.
+            </p>
+          </div>
+          <div>
+            <div class="img-placeholder">VTV / VnExpress headshot</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 1 — PREMISE: THE WORLD AS DATA
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">I · Premise</span>
+        <h2>The world has become <span class="accent">data</span>.</h2>
+      </section>
+
+      <section>
+        <span class="slide-mark">I · Premise</span>
+        <span class="eyebrow">Continuous deconstruction</span>
+        <h2>Any place, any moment, can be queried</h2>
+        <div class="cols-3 with-dividers" style="margin-top: 2em;">
+          <div>
+            <h3>Sensing</h3>
+            <p>Satellites · LiDAR · IoT · phones in every pocket.</p>
+          </div>
+          <div>
+            <h3>Mapping</h3>
+            <p>OSM · Street View · cadastres · live traffic feeds.</p>
+          </div>
+          <div>
+            <h3>Modelling</h3>
+            <p>Foundation models compress the world into latent space.</p>
+          </div>
+        </div>
+        <p class="muted" style="margin-top: 2.5em;">
+          A six-layer stack — from orbit down to the human story.
+        </p>
+      </section>
+
+      <section>
+        <span class="slide-mark">I · Premise</span>
+        <span class="eyebrow">Evidence — from my desk</span>
+        <h2>Even daily journalism runs on this</h2>
+        <div class="cols-2">
+          <div>
+            <div class="img-placeholder">Population density · 2025</div>
+            <p class="caption">Vietnam population density · VnExpress, 2025</p>
+          </div>
+          <div>
+            <div class="img-placeholder">Cầu river flood viz</div>
+            <p class="caption">Thái Nguyên flood basin · VnExpress, 2025</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 2 — PROBLEM: THE PAST IS NOT
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">II · Problem</span>
+        <h2>But the past is <span class="accent">not</span>.</h2>
+      </section>
+
+      <section>
+        <span class="slide-mark">II · Problem</span>
+        <span class="eyebrow">A boundary in time</span>
+        <h2>Maps are what we have</h2>
+        <p>Pre-satellite era — the densest spatial record of past worlds.</p>
+        <p class="muted">Sputnik launched 4 October 1957, 7:28 PM.</p>
+        <p>Everything before that — and much after, in places without coverage — survives only as paper.</p>
+      </section>
+
+      <section>
+        <span class="slide-mark">II · Problem</span>
+        <blockquote>
+          Historians by definition focus on time. Chronology will always remain
+          at the heart of a discipline that seeks to explain change over time,
+          but this has left historians open to the charge from geographers that
+          they write history as if it took place <em>on the head of a pin</em>.
+        </blockquote>
+        <p class="cite">— Ian Gregory &amp; Paul S. Ell, paraphrased; White (2010)</p>
+      </section>
+
+      <section>
+        <span class="slide-mark">II · Problem</span>
+        <span class="eyebrow">The latent gap</span>
+        <h2>Yet historical maps are…</h2>
+        <div class="cols-2" style="margin-top: 1.5em;">
+          <ul style="list-style: none; padding: 0; font-size: 1.4em; font-family: var(--vma-serif); font-style: italic;">
+            <li class="fragment">— not <span class="accent">queryable</span></li>
+            <li class="fragment">— not <span class="accent">readable</span></li>
+            <li class="fragment">— not <span class="accent">analysable</span></li>
+            <li class="fragment">— not <span class="accent">enrichable</span></li>
+          </ul>
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center;">
+              <p style="font-family: var(--vma-serif); font-size: 1.8em; line-height: 1.2;">
+                <span class="muted">Digitized</span><br/>
+                <span style="font-size: 0.55em; color: var(--vma-amber); letter-spacing: 0.2em;">≠</span><br/>
+                <span class="accent">Digitalized</span>
+              </p>
+              <p class="caption" style="margin-top: 1em;">Pixels are not knowledge.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 3 — QUESTION
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">III · Question</span>
+        <h2 style="font-size: 2.8em; max-width: 22ch;">
+          Can we retroactively <span class="accent">deconstruct</span> the past
+          the way we deconstruct the present —
+          and make the result <span class="accent">open</span> and
+          <span class="accent">crowdsourceable</span>?
+        </h2>
+      </section>
+
+      <!-- ================================================================
+           SECTION 4 — LIT REVIEW
+           ================================================================ -->
+
+      <section>
+        <span class="slide-mark">IV · Lit Review</span>
+        <span class="eyebrow">Who has tried</span>
+        <h2>Adjacent projects</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Where</th>
+              <th>Solves</th>
+              <th>Doesn't</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Allmaps</strong> · Spaan et al.</td><td>Global</td><td>Georef standard + viewer</td><td>No content extraction</td></tr>
+            <tr><td><strong>SODUCO</strong> · ANR</td><td>Paris 1789–1950</td><td>OCR + directories KG</td><td>Paris-specific; not SE Asia</td></tr>
+            <tr><td><strong>NYPL Building Inspector</strong></td><td>NYC 1850s</td><td>Crowd footprint trace</td><td>One layer; no enrichment</td></tr>
+            <tr><td><strong>histo3d</strong> · Morlighem, TU Delft</td><td>NL</td><td>LoD2 3D (>84/89/99%)</td><td>Needs georef; strict symbology</td></tr>
+            <tr><td><strong>ETH IKG</strong> · Hurni / Wu / Chen</td><td>Switzerland</td><td>Synthetic data, RDF ontology</td><td>Swiss style; not colonial</td></tr>
+            <tr><td><strong>CHGIS</strong> · Bol, Harvard</td><td>China</td><td>Long-term historical GIS</td><td>Admin units; not built form</td></tr>
+            <tr><td><strong>MapSAM2</strong></td><td>Generic</td><td>Segmentation foundation model</td><td>Needs per-tradition adaptation</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <span class="slide-mark">IV · Lit Review</span>
+        <span class="eyebrow">The gaps</span>
+        <h2>What is still missing</h2>
+        <div class="cols-3" style="margin-top: 2em;">
+          <div>
+            <div class="stage-badge"><span class="num">i.</span></div>
+            <h3>No end-to-end pipeline</h3>
+            <p>Each project solves one stage. No public stack runs all four on the same corpus.</p>
+          </div>
+          <div>
+            <div class="stage-badge"><span class="num">ii.</span></div>
+            <h3>No Indochina calibration</h3>
+            <p>The cartographic tradition that produced Saigon's densest record has no published baseline.</p>
+          </div>
+          <div>
+            <div class="stage-badge"><span class="num">iii.</span></div>
+            <h3>No crowdsourcing-as-method</h3>
+            <p>HITL is private QA — not a public participation layer that doubles as a community archive.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 5 — METHOD: 4 STAGES
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">V · Method</span>
+        <h2>Four stages</h2>
+        <div class="pipeline" style="margin-top: 2em;">
+          <span class="stage">Input</span>
+          <span class="arrow">→</span>
+          <span class="stage">Vectorize</span>
+          <span class="arrow">→</span>
+          <span class="stage">Georectify</span>
+          <span class="arrow">→</span>
+          <span class="stage">Enrich</span>
+        </div>
+        <p class="muted" style="margin-top: 2.5em; font-size: 0.75em; letter-spacing: 0.1em;">
+          Built on Allmaps · MapSAM2 · IIIF
+        </p>
+      </section>
+
+      <!-- 5.1 Stage 1: Input -->
+      <section>
+        <section>
+          <span class="slide-mark">V · Method</span>
+          <div class="stage-badge"><span class="num">i.</span><span class="label">Stage one</span></div>
+          <h2>Input</h2>
+          <p style="font-size: 1.1em;">An <strong>open framework</strong> (IIIF) joined with <strong>crowdsourced materials</strong>.</p>
+          <p class="muted" style="margin-top: 1.5em;">manhhai · Stanford · BnF Gallica · Internet Archive · David Rumsey · VVA Texas Tech · UT Austin</p>
+        </section>
+        <section>
+          <span class="slide-mark">V · Method · Stage one · deep-dive</span>
+          <div class="stage-badge"><span class="num">i.</span><span class="label">Deep-dive</span></div>
+          <h2>Self-hosted IIIF</h2>
+          <p><code>iiif.maparchive.vn</code> — R2 storage + Cloudflare Worker.</p>
+          <p>On-the-fly <code>info.json</code> patching for <code>vips dzsave</code> output.</p>
+          <p class="accent" style="margin-top: 1.5em;">Used to ingest 62 Service Géographique de l'Indochine cadastres.</p>
+        </section>
+      </section>
+
+      <!-- 5.2 Stage 2: Vectorize -->
+      <section>
+        <section>
+          <span class="slide-mark">V · Method</span>
+          <div class="stage-badge"><span class="num">ii.</span><span class="label">Stage two</span></div>
+          <h2>Vectorize</h2>
+          <p style="font-size: 1.1em;">Pixels become <strong>polygons</strong>.</p>
+          <p class="muted" style="margin-top: 1.5em;">Segmentation foundation model, fine-tuned on colonial cartographic style.</p>
+        </section>
+        <section>
+          <span class="slide-mark">V · Method · Stage two · deep-dive</span>
+          <div class="stage-badge"><span class="num">ii.</span><span class="label">Deep-dive</span></div>
+          <h2>MapSAM2 + HITL</h2>
+          <p>LoRA fine-tune · OCR-seeded prompting · watershed post-processing.</p>
+          <p>Human review at <code>/contribute/review</code> — approve, reject, mark seg-reviewed.</p>
+        </section>
+      </section>
+
+      <!-- 5.3 Stage 3: Georectify -->
+      <section>
+        <section>
+          <span class="slide-mark">V · Method</span>
+          <div class="stage-badge"><span class="num">iii.</span><span class="label">Stage three</span></div>
+          <h2>Georectify</h2>
+          <p style="font-size: 1.1em;">Place each map in <strong>modern coordinates</strong>.</p>
+          <p class="muted" style="margin-top: 1.5em;">Allmaps editor for manual GCPs; sheet-grid propagation for uniform series.</p>
+        </section>
+        <section>
+          <span class="slide-mark">V · Method · Stage three · deep-dive</span>
+          <div class="stage-badge"><span class="num">iii.</span><span class="label">Deep-dive</span></div>
+          <h2>L7014 propagation</h2>
+          <p>Extrapolate from neighbour seeds across a regular military grid.</p>
+          <p>No feature matching — exploits sheet Δlon/Δlat geometry.</p>
+          <p class="muted" style="font-size: 0.85em; margin-top: 1.5em;">Vector-to-vector alignment + wide-baseline matching for irregular sheets.</p>
+        </section>
+      </section>
+
+      <!-- 5.4 Stage 4: Enrich -->
+      <section>
+        <section>
+          <span class="slide-mark">V · Method</span>
+          <div class="stage-badge"><span class="num">iv.</span><span class="label">Stage four</span></div>
+          <h2>Enrich</h2>
+          <p style="font-size: 1.1em;">Stack <strong>materials</strong> onto the georeferenced base.</p>
+          <p class="muted" style="margin-top: 1.5em;">Knowledge graph entries · period photographs · oral histories · administrative records.</p>
+        </section>
+        <section>
+          <span class="slide-mark">V · Method · Stage four · deep-dive</span>
+          <div class="stage-badge"><span class="num">iv.</span><span class="label">Deep-dive</span></div>
+          <h2>Provenance-aware KG</h2>
+          <p>Every entity, relation, date carries its sources.</p>
+          <p>Temporal encoding — ISO 8601 partials (<code>1905</code>, <code>1905-03</code>).</p>
+          <p>Named periods — pre-colonial → reunification (9 eras).</p>
+        </section>
+      </section>
+
+      <!-- ================================================================
+           SECTION 6 — DEMONSTRATION: CHỢ CŨ
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">VI · Demonstration</span>
+        <h2>Chợ Cũ</h2>
+        <h3>One place · four stages</h3>
+      </section>
+
+      <section class="image-full">
+        <div class="img-placeholder" style="height: 100%; aspect-ratio: auto; border: none;">Plan Cadastral · 1893</div>
+        <p class="caption" style="position: absolute; bottom: 30px; left: 60px;">Plan Cadastral de la Ville de Saigon · 1893 · BnF Gallica</p>
+      </section>
+
+      <section>
+        <span class="slide-mark">VI · Demonstration</span>
+        <h2>Marché Central — cadastre ↔ bird's-eye view</h2>
+        <div class="cols-2">
+          <div>
+            <div class="img-placeholder">1893 cadastre, zoomed</div>
+            <p class="caption">Cadastre · 1893</p>
+          </div>
+          <div>
+            <div class="img-placeholder">Aerial perspective, c. 1898</div>
+            <p class="caption">Aerial perspective · c. 1898</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="slide-mark">VI · Demonstration</span>
+        <h2>Materials embedded</h2>
+        <div class="cols-2">
+          <div>
+            <div class="img-placeholder">Chợ Cũ · 1880s</div>
+            <p class="caption">Period photograph · Chợ Cũ · 1880s</p>
+          </div>
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <blockquote style="font-size: 1.15em;">
+              Con bắt đầu nếm mùi cháo cá Chợ Cũ, hủ tíu Chợ Mới…
+            </blockquote>
+            <p class="caption" style="margin-top: 1em;">— Vương Hồng Sển, on the old market district</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="slide-mark">VI · Demonstration</span>
+        <h2>Then ↔ now</h2>
+        <p class="muted">Hôtel de Ville · 1908 ↔ HCMC People's Committee · 2026</p>
+        <div class="img-placeholder" style="margin-top: 1.5em; aspect-ratio: 16/7;">Then/now slider</div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 7 — CROWDSOURCING
+           ================================================================ -->
+
+      <section>
+        <span class="slide-mark">VII · Community</span>
+        <span class="eyebrow">Crowdsourcing as method</span>
+        <h2>Three contributor roles</h2>
+        <div class="cols-3 with-dividers" style="margin-top: 2em;">
+          <div>
+            <h3>Cartographer</h3>
+            <p>Trace building outlines on georeferenced maps.</p>
+            <p class="muted" style="font-size: 0.78em; margin-top: 1em;">Target — OSM mappers</p>
+          </div>
+          <div>
+            <h3>Architect</h3>
+            <p>Adopt a building. Run SfM photogrammetry. Submit a 3D mesh.</p>
+            <p class="muted" style="font-size: 0.78em; margin-top: 1em;">Target — architecture students</p>
+          </div>
+          <div>
+            <h3>Historian</h3>
+            <p>Add KG entities, citations, family histories, oral records.</p>
+            <p class="muted" style="font-size: 0.78em; margin-top: 1em;">Target — diaspora, journalists, families</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="slide-mark">VII · Community</span>
+        <h2>Live contribute tools</h2>
+        <div class="cols-2" style="margin-top: 1.5em;">
+          <ul style="font-family: var(--vma-mono); font-size: 0.85em; list-style: none; padding: 0;">
+            <li style="margin-bottom: 1em;"><code>/contribute/georef</code><br/><span class="muted" style="font-family: var(--vma-sans); font-size: 0.85em;">Allmaps editor</span></li>
+            <li style="margin-bottom: 1em;"><code>/contribute/digitalize</code><br/><span class="muted" style="font-family: var(--vma-sans); font-size: 0.85em;">Triage · neatline + tile grid + OCR review</span></li>
+            <li style="margin-bottom: 1em;"><code>/contribute/trace</code><br/><span class="muted" style="font-family: var(--vma-sans); font-size: 0.85em;">Polygon &amp; line tracing</span></li>
+            <li><code>/contribute/review</code><br/><span class="muted" style="font-family: var(--vma-sans); font-size: 0.85em;">SAM2 footprint approval</span></li>
+          </ul>
+          <div class="img-placeholder">Tool screenshot</div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 8 — RESULTS
+           ================================================================ -->
+
+      <section>
+        <span class="slide-mark">VIII · Results</span>
+        <h2>The corpus</h2>
+        <div class="img-placeholder" style="margin-top: 1em; aspect-ratio: 16/7;">100+ maps · grid screenshot</div>
+        <p class="muted" style="margin-top: 1em; font-size: 0.8em;">
+          BnF Gallica · David Rumsey · Internet Archive · Stanford · SGI cadastres (self-hosted)
+        </p>
+      </section>
+
+      <section>
+        <span class="slide-mark">VIII · Results</span>
+        <span class="eyebrow">By the numbers · May 2026</span>
+        <h2>State of the archive</h2>
+        <div class="cols-3" style="margin-top: 2em;">
+          <div class="stat-cell"><div class="big-number">100+</div><p class="caption">maps ingested</p></div>
+          <div class="stat-cell"><div class="big-number">38</div><p class="caption">georeferenced</p></div>
+          <div class="stat-cell"><div class="big-number">62</div><p class="caption">self-hosted SGI cadastres</p></div>
+          <div class="stat-cell"><div class="big-number">1,028</div><p class="caption">OCR extractions</p></div>
+          <div class="stat-cell"><div class="big-number">46</div><p class="caption">SAM2 footprints reviewed</p></div>
+          <div class="stat-cell"><div class="big-number">~10</div><p class="caption">active volunteers</p></div>
+        </div>
+        <p class="muted" style="margin-top: 2em; font-size: 0.65em; text-align: center; letter-spacing: 0.15em; text-transform: uppercase;">
+          Refresh before each talk
+        </p>
+      </section>
+
+      <!-- Mid-deck QR -->
+      <section>
+        <span class="slide-mark">Try it now</span>
+        <h2 style="text-align: center;">On your phone</h2>
+        <div class="qr-grid">
+          <div>
+            <h3>PC</h3>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://vietnammaparchive.github.io/v3-beta/" alt="QR" />
+          </div>
+          <div>
+            <h3>Mobile</h3>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://vmabeta.pages.dev/" alt="QR" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 9 — RECONSTRUCTION: 4-PHASE ROADMAP
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">IX · Reconstruction</span>
+        <h2>The four stages,<br/>at city scale.</h2>
+      </section>
+
+      <section>
+        <span class="slide-mark">IX · Reconstruction</span>
+        <h2>From one map to a 4D past</h2>
+        <table style="margin-top: 1em;">
+          <thead>
+            <tr><th>Phase</th><th>What</th><th>Output</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>I · Geometric Foundation</strong></td><td>The map</td><td>Georeferenced corpus</td></tr>
+            <tr><td><strong>II · Semantic Core</strong></td><td>The knowledge graph</td><td>Entities + relations + sources</td></tr>
+            <tr><td><strong>III · Visual Validation</strong></td><td>The photographs</td><td>Re-projected imagery (SemPinPnP)</td></tr>
+            <tr><td><strong>IV · Neural Reconstruction</strong></td><td>The 3D world</td><td>4D digital twin</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <span class="slide-mark">IX · Reconstruction</span>
+        <span class="eyebrow">Portability</span>
+        <h2>The method generalises</h2>
+        <p style="font-family: var(--vma-serif); font-size: 1.7em; line-height: 1.4; margin-top: 0.8em;">
+          Saigon today.<br/>
+          <span class="muted">Hanoi tomorrow.</span><br/>
+          <span class="muted">Angkor next.</span>
+        </p>
+        <p class="muted" style="margin-top: 2em;">Any place with a paper trail. Any scale. Any cartographic tradition — once calibrated.</p>
+      </section>
+
+      <!-- ================================================================
+           SECTION 10 — DISCUSSION
+           ================================================================ -->
+
+      <section>
+        <span class="slide-mark">X · Discussion</span>
+        <span class="eyebrow">Contributions</span>
+        <h2>What this leaves behind</h2>
+        <div class="cols-2" style="margin-top: 2em;">
+          <div>
+            <h3>Technical</h3>
+            <p>An open, end-to-end pipeline.</p>
+            <p>First calibration for French colonial Indochina symbology.</p>
+            <p>Crowdsourcing as a native participation layer.</p>
+          </div>
+          <div>
+            <h3>Epistemological</h3>
+            <p>"Ground truth" is not given — it is <em>negotiated</em>.</p>
+            <p>Every reconstructed past inherits a perception of space.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <span class="slide-mark">X · Discussion</span>
+        <h2>Whose space?</h2>
+        <div class="cols-2" style="margin-top: 1.5em;">
+          <div class="img-placeholder">Sinitic landscape map</div>
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <p>Colonial cadastres encode <strong>absolute</strong> space — Cartesian, metric, owned.</p>
+            <p>Sinitic landscape maps encode <strong>relative</strong> space — relational, narrative, embodied.</p>
+            <p class="accent" style="margin-top: 1em; font-family: var(--vma-serif); font-style: italic; font-size: 1.2em;">
+              The reconstructed past will inherit whichever we choose.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           SECTION 11 — CLOSE
+           ================================================================ -->
+
+      <section class="title">
+        <span class="chapter-num">XI · Close</span>
+        <h2>Thank you</h2>
+      </section>
+
+      <section class="title">
+        <span class="chapter-num">Contact</span>
+        <h2 style="font-size: 2.4em;">Lê Quang Tuệ</h2>
+        <h3>VnExpress · the Vietnam Map Archive project</h3>
+        <p style="margin-top: 3em; font-family: var(--vma-mono); font-size: 0.85em; letter-spacing: 0.05em;">
+          <span class="muted">fb</span> &nbsp; facebook.com/deartue<br/>
+          <span class="muted">@&nbsp;</span> &nbsp; lqtue.vn@gmail.com<br/>
+          <span class="muted">·&nbsp;</span> &nbsp; vietnammaparchive.github.io/v3-beta/
+        </p>
+      </section>
+
+      <!-- ================================================================
+           MODULAR APPENDICES — uncomment per venue
+           ================================================================ -->
+
+      <!--
+      Appendix A — Funders: comparables, budget, asks
+      Appendix B — Allmaps / IIIF community: extensions + collaboration asks
+      Appendix C — PhD / GSAPP: spatial-history framing, long arc, field positioning
+      Appendix D — OSM / crowdsourcing: Cartographer deep-dive + CTA
+      Appendix E — Optional 6-layer data stack frame
+      -->
+
+    </div>
+  </div>
+
+  <!-- reveal.js core -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade',
+      width: 1600,
+      height: 900,
+      margin: 0.06,
+      controls: true,
+      progress: true,
+      center: false,
+      pdfSeparateFragments: false,
+    });
+  </script>
+</body>
+</html>

@@ -64,3 +64,6 @@ docs/private/
 
 # Vectorize previews are local render artifacts, same as work/ocr/outputs
 work/vectorize/
+
+# One-off pipeline run dumps from the 2026-05 deck/KG work
+work/deck-and-kg-2026-05/script-outputs/

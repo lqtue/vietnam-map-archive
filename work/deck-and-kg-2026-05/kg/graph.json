@@ -1,0 +1,5548 @@
+{
+  "meta": {
+    "title": "VMA Knowledge Graph",
+    "description": "Single source of truth for the VMA knowledge graph. Project realm = the live system (routes, components, stores, modules, DB tables, API routes, pipelines, scripts, external services), built from docs/kg/SYSTEM.md and verified against live code. Field realm = the domain (literature, people, methods, gaps). Bridge edges connect project nodes to the field they sit in (uses/instanceOf/runs/implements/feeds/peerOf/inheritsFrom/addresses).",
+    "stage": "4 — bridge edges + viewer (project + field + cross-realm bridges)",
+    "built": "2026-06-04",
+    "sources": {
+      "SYSTEM.md": "docs/kg/SYSTEM.md (verified vs live code 2026-06-04)",
+      "knowledge-graph.html": "docs/knowledge-graph.html (prior graph, migrated + corrected)",
+      "supabase": "maps table, queried 2026-06-04 (corrects the '~20+ Saigon maps' estimate)",
+      "field-knowledge-graph.md": "docs/field-knowledge-graph.md (field landscape: persons, institutions, projects, methods, gaps)",
+      "theory.md": "docs/theory.md (VMA theoretical framework: data stack, Lefebvre triad, HITL, body/soul)",
+      "Urbanism library": "~/Downloads/Urbanism (167-PDF reading library, 7 folders) — see docs/kg/AUDIT.md"
+    },
+    "corpus": {
+      "asOf": "2026-06-04",
+      "totalMaps": 101,
+      "byStatus": {
+        "public": 37,
+        "draft": 64,
+        "featured": 0
+      },
+      "georefDone": 39,
+      "byCollection": {
+        "Indochine 1:25,000 — Tonkin & Thanh Hóa": 62,
+        "Vietnam Map Archive (Saigon-focused)": 35,
+        "AMS L909 — Việt Nam City Maps 1:12,500": 3,
+        "AMS L7014 — Việt Nam 1:50,000": 1
+      },
+      "topHoldingInstitutions": {
+        "Cartomundi (Aix-Marseille / CNRS)": 62,
+        "Bibliothèque nationale de France": 16,
+        "Humazur (Université Côte d'Azur)": 4,
+        "UT Austin (Perry-Castañeda)": 3
+      },
+      "note": "Corpus is country-wide, not Saigon-only; largest block is northern Vietnam (Tonkin & Thanh Hóa)."
+    },
+    "schema": {
+      "node": "{ id, label, realm, kind, detail, status, source:[{ref,date}], deck:[] }",
+      "edge": "{ from, to, rel }",
+      "kinds": [
+        "route",
+        "component",
+        "store",
+        "module",
+        "table",
+        "api",
+        "pipeline",
+        "script",
+        "external",
+        "person",
+        "institution",
+        "fieldproject",
+        "method",
+        "concept",
+        "gap",
+        "work",
+        "venue",
+        "funder"
+      ],
+      "rels": [
+        "uses",
+        "reads",
+        "writes",
+        "syncs",
+        "triggers",
+        "calls",
+        "renders",
+        "redirects",
+        "advances",
+        "ingests",
+        "deployed",
+        "affiliated",
+        "supervises",
+        "built",
+        "spawned",
+        "partOf",
+        "authored",
+        "proposes",
+        "influences",
+        "adjacent",
+        "publishesIn",
+        "funds",
+        "instanceOf",
+        "implements",
+        "feeds",
+        "addresses",
+        "runs",
+        "peerOf",
+        "inheritsFrom"
+      ],
+      "statuses": [
+        "current",
+        "redirect-stub",
+        "removed",
+        "legacy",
+        "gap"
+      ],
+      "deck": "Tags for deck derivation (stage 5): 'seminar' | 'ewv'. Empty until populated.",
+      "realms": "project (the live system) | field (the domain: literature, people, methods, gaps)"
+    },
+    "kindColors": {
+      "route": "#ffd166",
+      "component": "#06d6a0",
+      "store": "#ef476f",
+      "module": "#7ee787",
+      "table": "#118ab2",
+      "api": "#f78c6b",
+      "pipeline": "#c792ea",
+      "script": "#a0a0a8",
+      "external": "#9d4edd",
+      "person": "#ff8fab",
+      "institution": "#9d8df1",
+      "fieldproject": "#4cc9a0",
+      "method": "#5aa9e6",
+      "concept": "#22c1c3",
+      "gap": "#ff5d5d",
+      "work": "#b0b0b8",
+      "venue": "#d4a5e8",
+      "funder": "#ffc94d"
+    },
+    "statusNote": "'gap' = an identified absence: research-contribution gaps (kind:gap) and canonical works missing from the library (kind:work)."
+  },
+  "nodes": [
+    {
+      "id": "r:/",
+      "label": "/",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Home (editorial). Featured maps + project intro.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/+page.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/catalog",
+      "label": "/catalog",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Full searchable/filterable map catalogue. Admins & moderators get inline editing tools (Edit Meta) and unified search UI.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/catalog/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/about",
+      "label": "/about",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Project info.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/about/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/blog",
+      "label": "/blog",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Articles. Also /blog/[slug].",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/blog/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/profile",
+      "label": "/profile",
+      "realm": "project",
+      "kind": "route",
+      "detail": "User account. Redirects to /login when signed out.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/profile/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/login",
+      "label": "/login",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Sign in / sign up.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/login/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute",
+      "label": "/contribute",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Hub page explaining the ways to help; content adapts to user role.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/contribute/+page.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/explore",
+      "label": "/explore",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Canonical map viewer. Modern basemap + historical overlays; one-time location chooser, first-visit guided tour, GPS coverage lookup, story playback. Honors ?map=, ?story= and the URL hash.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/explore/+page.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/studio",
+      "label": "/studio",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Canonical drawing/annotation surface (StudioMode). Points, lines, polygons; drives an animation/keyframe timeline for animated story scenes.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/studio/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/create",
+      "label": "/create",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Build stories and adventures (guided point-to-point tours) — CreateMode.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/create/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/trip/[id]",
+      "label": "/trip/[id]",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Tourist-grade mobile story player: GPS walks the user stop-to-stop, no account needed. Built for QR-code scanning in the field.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/trip/[id]/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/image",
+      "label": "/image",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Inspector for a single IIIF image in pixel coordinates.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/image/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute/georef",
+      "label": "/contribute/georef",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Georeference a map via the Allmaps editor — pin matching points between the old map and the real world.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/contribute/georef/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute/trace",
+      "label": "/contribute/trace",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Trace building footprints (polygons) and roads/rivers (lines) on a fixed map image. Persists to footprint_submissions.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/contribute/trace/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute/review",
+      "label": "/contribute/review",
+      "realm": "project",
+      "kind": "route",
+      "detail": "HITL review of MapSAM2 'submitted'/'needs_review' building polygons — approve/reject + mark seg reviewed.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/contribute/review/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute/digitalize",
+      "label": "/contribute/digitalize",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Two-phase HITL: Triage (neatline rect + tile priority grid) → OCR Review (correct text/category/position). Owns the OCR review flow.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(app)/contribute/digitalize/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/admin/bulk",
+      "label": "/admin/bulk",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Admin-only: batch-create draft maps rows; outputs tile commands.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/admin/bulk/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/admin/scout",
+      "label": "/admin/scout",
+      "realm": "project",
+      "kind": "route",
+      "detail": "Admin-only: reviewable grid of scout_candidates auto-discovered from Gallica/Humazur/Rumsey/LoC.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/(editorial)/admin/scout/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/view",
+      "label": "/view → /explore",
+      "realm": "project",
+      "kind": "route",
+      "detail": "301 redirect to /explore (the viewer was folded into Explore). Query strings preserved.",
+      "status": "redirect-stub",
+      "source": [
+        {
+          "ref": "src/routes/(app)/view/+page.server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/annotate",
+      "label": "/annotate → /studio",
+      "realm": "project",
+      "kind": "route",
+      "detail": "301 redirect to /studio (drawing moved to Studio). Query strings preserved. NOTE: older docs claim /studio → /annotate — that is reversed and wrong.",
+      "status": "redirect-stub",
+      "source": [
+        {
+          "ref": "src/routes/(app)/annotate/+page.server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "r:/contribute/label",
+      "label": "/contribute/label → /contribute/digitalize",
+      "realm": "project",
+      "kind": "route",
+      "detail": "301 redirect to /contribute/digitalize (labeling absorbed into Digitalize). Query strings preserved.",
+      "status": "redirect-stub",
+      "source": [
+        {
+          "ref": "src/routes/(app)/contribute/label/+page.server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:MapShell",
+      "label": "MapShell",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Owns the single OpenLayers Map; entry point for all geo-map pages. Mounts basemap tile layers, exposes everything via Svelte context (getShellContext). Children never create a second OL map.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/MapShell.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:ImageShell",
+      "label": "ImageShell",
+      "realm": "project",
+      "kind": "component",
+      "detail": "IIIF-canvas counterpart to MapShell for pixel-coordinate work. Static image extent, getImageShellStore(). Used by /contribute/digitalize, /contribute/trace, /contribute/review — does NOT use MapShell or global stores.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/ImageShell.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:LayerRenderer",
+      "label": "LayerRenderer",
+      "realm": "project",
+      "kind": "component",
+      "detail": "The single component that renders ALL map layers — base (modern tile OR historical warped) and overlays — by subscribing to layersStore. Owns basemap visibility. Replaces the removed HistoricalOverlay/HistoricalBaseLayer/StackedOverlay trio.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/LayerRenderer.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:DualMapPane",
+      "label": "DualMapPane",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Side-by-side view mode. Independently renders overlays[1] in the right pane.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/DualMapPane.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:MapWorkspace",
+      "label": "MapWorkspace",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Shared map chrome (panels, mobile drawers) wrapped around the map by both /explore and /trip.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/MapWorkspace.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:MapModeOverlays",
+      "label": "MapModeOverlays",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Shared shell piece for mode-specific map overlay UI.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/MapModeOverlays.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:DrawTool",
+      "label": "DrawTool",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Shared OL drawing tool used by the Studio annotation surface.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/DrawTool.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:GpsTracker",
+      "label": "GpsTracker",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Shared GPS/geolocation tracker (used by /explore coverage lookup and /trip story player).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/shell/GpsTracker.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:HistoricalOverlay",
+      "label": "HistoricalOverlay (removed)",
+      "realm": "project",
+      "kind": "component",
+      "detail": "REMOVED. Was a headless overlay reacting to activeAllmapsId + layerStore. Replaced by LayerRenderer + layersStore. Kept as a tombstone node because stale docs (knowledge-graph.html) still reference it.",
+      "status": "removed",
+      "source": [
+        {
+          "ref": "SYSTEM.md §4 (trio removed)",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:CreateMode",
+      "label": "CreateMode",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Root component for /create (story/adventure builder).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/create/CreateMode.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:StudioMode",
+      "label": "StudioMode",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Root component for /studio drawing surface. Carries an animation/ keyframe system (playback + timelineStore). Replaces the removed AnnotateMode.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/studio/StudioMode.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:ReviewMode",
+      "label": "ReviewMode",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Root component for /contribute/review footprint HITL.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/review/ReviewMode.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:TraceTool",
+      "label": "TraceTool",
+      "realm": "project",
+      "kind": "component",
+      "detail": "OL Draw + Select + Modify for polygon (footprints) / line (roads, waterways) tracing on /contribute/trace.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/trace/TraceTool.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:TraceSidebar",
+      "label": "TraceSidebar",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Shapes table with category/type filtering for /contribute/trace.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/trace/TraceSidebar.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:TriageTool",
+      "label": "TriageTool",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Neatline rect + tile priority grid (digitalize Triage phase). Click cycles tile: normal → low-res → skip → normal.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/digitalize/TriageTool.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:TriageSidebar",
+      "label": "TriageSidebar",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Tile params + Run OCR controls for digitalize Triage.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/digitalize/TriageSidebar.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:OcrBboxTool",
+      "label": "OcrBboxTool",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Renders + edits ocr_extractions bboxes; drawMode for manual bboxes (POSTs model:'manual'). Reused verbatim by digitalize OCR Review.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/ocr/OcrBboxTool.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:OcrSidebar",
+      "label": "OcrSidebar",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Filterable table with inline text/category edit + auto-save on blur.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/ocr/OcrSidebar.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:ReviewCanvas",
+      "label": "ReviewCanvas",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Canvas for SAM2 footprint review on ImageShell.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/review/ReviewCanvas.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:ReviewSidebar",
+      "label": "ReviewSidebar",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Approve/reject + 'Mark seg reviewed' (PATCHes pipeline → seg_reviewed).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/review/ReviewSidebar.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:MapEditModal",
+      "label": "MapEditModal",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Multi-tab admin modal: Metadata · Hosting · Pipeline · GCPs. Inline in /catalog for admin/mod.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/admin/MapEditModal.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:FacetRail",
+      "label": "FacetRail",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Multi-select facet chips with 'all-but-this-dimension' tallies for unified search.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/ui/FacetRail.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:SearchResultCard",
+      "label": "SearchResultCard",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Result card for unified maps + scout search.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/ui/SearchResultCard.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:bboxHandles",
+      "label": "bboxHandles.ts",
+      "realm": "project",
+      "kind": "component",
+      "detail": "Centralised handle features + IIIF y-flip for all bbox-editing tools.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/shared/bboxHandles.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "s:layersStore",
+      "label": "layersStore",
+      "realm": "project",
+      "kind": "store",
+      "detail": "Single source of truth for what the map renders: { base: LayerRef, overlays: OverlayLayer[] }. base = basemap key OR historical map; overlays top-of-stack-first, each with own opacity/visible/id (max 10). Persists to localStorage (vma-layers-v1).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/stores/layersStore.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "s:mapStore",
+      "label": "mapStore",
+      "realm": "project",
+      "kind": "store",
+      "detail": "{ lng, lat, zoom, rotation, activeMapId, activeAllmapsId }. Default Saigon (106.70098, 10.77653) zoom 14. activeMapId is now a one-way mirror of layersStore.overlays[0] (kept for legacy callers).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/stores/mapStore.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "s:layerStore",
+      "label": "layerStore (legacy)",
+      "realm": "project",
+      "kind": "store",
+      "detail": "{ basemap, overlayOpacity, overlayVisible, viewMode, sideRatio, lensRadius }. Only viewMode/sideRatio/lensRadius still matter; basemap/opacity/visible are legacy — layersStore owns rendering now.",
+      "status": "legacy",
+      "source": [
+        {
+          "ref": "src/lib/stores/layerStore.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "s:urlStore",
+      "label": "urlStore",
+      "realm": "project",
+      "kind": "store",
+      "detail": "Bidirectional URL hash ↔ stores sync. Hash: #@lat,lng,zoomz,rotationr&map=id&base=key.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/stores/urlStore.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "s:annotation",
+      "label": "annotationState",
+      "realm": "project",
+      "kind": "store",
+      "detail": "Annotation list + selection + undo/redo history (GeoJSON snapshots, 100-entry limit). Used by StudioMode.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/map/annotationState.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:maps",
+      "label": "lib/maps/",
+      "realm": "project",
+      "kind": "module",
+      "detail": "Data layer for the maps table; canonical home for shared types. types, service, iiifManifest, adminApi.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/maps/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:iiif",
+      "label": "lib/iiif/",
+      "realm": "project",
+      "kind": "module",
+      "detail": "buildAnnotation, fetchIiifInfoWithRetry, fetchIIIFImageInfo.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/iiif/iiifImageInfo.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:supabase",
+      "label": "lib/supabase/",
+      "realm": "project",
+      "kind": "module",
+      "detail": "Browser + SSR clients, auth context, data-layer modules (annotations, stories, labels, georef). labels.ts has SAM2 review entry points.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/supabase/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:shared",
+      "label": "contribute/shared/",
+      "realm": "project",
+      "kind": "module",
+      "detail": "Shared contribute UI: ToolPanelHeader, EmptyPanel, SidebarToggleButton, bboxHandles (y-flip).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/contribute/shared/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:maps",
+      "label": "maps",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Map catalogue. id (uuid), allmaps_id (16-char hex), annotation_url (mig 047 override), iiif_image, source_type, holding_institution, collection, map_type, bbox, status (draft/public/featured), thumbnail, full DC fields. 101 rows as of 2026-06-04 (37 public / 64 draft; 39 georef_done) — country-wide, not Saigon-only.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/ (head 048)",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:map_iiif_sources",
+      "label": "map_iiif_sources",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Multiple IIIF sources per map. Partial unique index = one primary. Trigger syncs primary to maps.iiif_image.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:scout_candidates",
+      "label": "scout_candidates",
+      "realm": "project",
+      "kind": "table",
+      "detail": "External discoveries (mig 045). (source, external_id) unique. status: pending → approved/rejected → ingested; map_id set on ingest.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/045",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:label_tasks",
+      "label": "label_tasks",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Per-map point-labeling tasks. map_id → maps.id (join through maps; no allmaps_id).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/008",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:label_pins",
+      "label": "label_pins",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Point annotations, pixel coords. task_id → label_tasks.id.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/008",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:footprint_submissions",
+      "label": "footprint_submissions",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Polygon/line traces (human + MapSAM2). map_id → maps.id. Status: needs_review → submitted/rejected.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/018",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:annotation_sets",
+      "label": "annotation_sets",
+      "realm": "project",
+      "kind": "table",
+      "detail": "User-drawn GeoJSON. map_id nullable, user_id → auth.users.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/007",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:ocr_extractions",
+      "label": "ocr_extractions",
+      "realm": "project",
+      "kind": "table",
+      "detail": "OCR bbox results. (map_id, run_id, tile_x, tile_y, text) unique; global_* full-image px; status ∈ pending/validated/rejected.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:map_pipeline_status",
+      "label": "map_pipeline_status",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Per-map pipeline state. map_id PK, stage (8-value enum: idle → ocr_queued → ocr_done → reviewed → seg_queued → seg_done → seg_reviewed → exported), ocr_run_id, seg_run_id, timestamps. Auto-updated by OCR --db and SAM2 --write-supabase.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "supabase/migrations/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:hunts",
+      "label": "hunts",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Stories/tours (legacy table name; Story types alias these).",
+      "status": "legacy",
+      "source": [
+        {
+          "ref": "supabase/migrations/001-006",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "t:hunt_stops",
+      "label": "hunt_stops",
+      "realm": "project",
+      "kind": "table",
+      "detail": "Story waypoints (legacy table name).",
+      "status": "legacy",
+      "source": [
+        {
+          "ref": "supabase/migrations/001-006",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:/api/admin/maps",
+      "label": "/api/admin/maps",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET list, POST create (accepts all new DC columns).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/+server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:/api/admin/maps/[id]",
+      "label": "/api/admin/maps/[id]",
+      "realm": "project",
+      "kind": "api",
+      "detail": "PATCH update, DELETE.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/+server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:mirror-r2",
+      "label": ".../mirror-r2",
+      "realm": "project",
+      "kind": "api",
+      "detail": "POST: fetch Allmaps annotation → rewrite source URL to R2 → Supabase Storage → upsert R2 row as primary → return tile_command.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/mirror-r2/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:ocr",
+      "label": ".../ocr",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET run summaries; POST trigger batch (local only; CF returns cli_only + cli_command).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/ocr/+server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:ocr/apply",
+      "label": ".../ocr/apply",
+      "realm": "project",
+      "kind": "api",
+      "detail": "Apply OCR run results to extractions (new since last doc sweep).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/ocr/apply/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:ocr-review",
+      "label": ".../ocr-review",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET extractions + runs; POST manual bbox; PATCH update text/category/status/coords; PUT batch status.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/ocr-review/+server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:ocr-review/revert-recent",
+      "label": ".../ocr-review/revert-recent",
+      "realm": "project",
+      "kind": "api",
+      "detail": "Revert the most recent OCR-review changes (new since last doc sweep).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/ocr-review/revert-recent/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:pipeline",
+      "label": ".../pipeline",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET stage + timestamps; PATCH advance. 8-stage track.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/[id]/pipeline/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:footprints",
+      "label": "/api/admin/footprints",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET/PATCH SAM2 review (service key required).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/footprints/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:scout",
+      "label": "/api/admin/scout",
+      "realm": "project",
+      "kind": "api",
+      "detail": "GET list + facets; PATCH approve/reject/revert; bulk-ingest → maps rows.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/scout/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:search",
+      "label": "/api/search",
+      "realm": "project",
+      "kind": "api",
+      "detail": "Unified GET over maps + (admin/mod) scout_candidates. tsvector with 'simple' config; 'all-but-this-dimension' facets. Public users get status IN (public,featured) server-enforced.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/search/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:lookup-allmaps-id",
+      "label": ".../lookup-allmaps-id",
+      "realm": "project",
+      "kind": "api",
+      "detail": "POST { iiifImage } → derive Allmaps image ID + probe.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/lookup-allmaps-id/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:fetch-iiif-metadata",
+      "label": ".../fetch-iiif-metadata",
+      "realm": "project",
+      "kind": "api",
+      "detail": "POST { manifestUrl } → parsed IIIF metadata + Allmaps probe.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/fetch-iiif-metadata/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:sync-georef",
+      "label": "/api/admin/maps/sync-georef",
+      "realm": "project",
+      "kind": "api",
+      "detail": "Sync georeference state for maps (new since last doc sweep). Lives at maps/sync-georef, not under [id].",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/maps/sync-georef/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "a:upload-image",
+      "label": "/api/admin/upload-image",
+      "realm": "project",
+      "kind": "api",
+      "detail": "POST image upload (new since last doc sweep).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/routes/api/admin/upload-image/+server.ts",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:OCR",
+      "label": "OCR (Gemini)",
+      "realm": "project",
+      "kind": "pipeline",
+      "detail": "work/ocr/. Gemini Flash reads text off map tiles → ocr_extractions; --db advances pipeline. Heavy job; in CF a copy-paste CLI command is returned instead.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "work/ocr/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:MapSAM2",
+      "label": "MapSAM2",
+      "realm": "project",
+      "kind": "pipeline",
+      "detail": "work/MapSAM2/. Fine-tuned SAM2 (LoRA): IIIF tiles → masks → polygons → footprint_submissions; --write-supabase advances pipeline stage. Supersedes the removed scripts/vectorize.py.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "work/MapSAM2/CLAUDE.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:tile_map",
+      "label": "tile_map.sh",
+      "realm": "project",
+      "kind": "script",
+      "detail": "vips dzsave → R2 upload. Runs locally (vips constraint).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:bulk_upload",
+      "label": "bulk_upload_local.sh",
+      "realm": "project",
+      "kind": "script",
+      "detail": "CLI bulk: tiles + inserts maps + map_iiif_sources rows.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:scout_all",
+      "label": "scout_all_sources.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "Gallica SRU + Rumsey Luna + LoC JSON; Vietnam place keywords.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:scout_humazur",
+      "label": "scout_humazur.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "Humazur Omeka S API directly.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:load_scout",
+      "label": "load_scout_to_db.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "Loads merged scout JSON → scout_candidates. Fixes Humazur manifest URLs.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:audit_metadata",
+      "label": "audit_map_metadata.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "DB-only field-coverage audit.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:fetch_hosted",
+      "label": "fetch_hosted_metadata.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "Online: BnF/Humazur/UT Austin → diff vs DB.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "k:apply_backfill",
+      "label": "apply_metadata_backfill.mjs",
+      "realm": "project",
+      "kind": "script",
+      "detail": "Consumes diff + SGI constants; PATCHes maps. Fills empty fields only.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Allmaps",
+      "label": "Allmaps",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Annotation server, editor, OL/MapLibre warping libs. Stores georeferencing as open W3C annotations; warps IIIF live in browser.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "SYSTEM.md §2",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Supabase",
+      "label": "Supabase",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Postgres + Storage + Auth. Project ref trioykjhhwrruwjsklfo (Sydney).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "CLAUDE.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:R2Worker",
+      "label": "Cloudflare R2 + Worker",
+      "realm": "project",
+      "kind": "external",
+      "detail": "iiif.maparchive.vn. Mirrors map tiles; a Worker patches vips info.json on the fly.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "SYSTEM.md §4",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:CFPages",
+      "label": "Cloudflare Pages",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Production host. Build output: .svelte-kit/cloudflare.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "CLAUDE.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:IA",
+      "label": "Internet Archive",
+      "realm": "project",
+      "kind": "external",
+      "detail": "S3 upload for original scans (IA_S3_*).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "CLAUDE.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Gallica",
+      "label": "Gallica (BnF) SRU",
+      "realm": "project",
+      "kind": "external",
+      "detail": "BnF digital library; scout source via SRU.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Humazur",
+      "label": "Humazur (Omeka S)",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Université Côte d'Azur archive; scout source via Omeka S API.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Rumsey",
+      "label": "David Rumsey Luna",
+      "realm": "project",
+      "kind": "external",
+      "detail": "David Rumsey Map Collection; scout source via Luna.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:LoC",
+      "label": "Library of Congress",
+      "realm": "project",
+      "kind": "external",
+      "detail": "LoC JSON API; scout source.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/admin-tooling.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:Gemini",
+      "label": "Gemini Flash API",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Google Gemini Flash — OCR text extraction model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "work/ocr/",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:OpenLayers",
+      "label": "OpenLayers",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Primary map engine (MapShell + ImageShell). @allmaps/openlayers warps historical tiles.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "CLAUDE.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "x:MapLibre",
+      "label": "MapLibre GL",
+      "realm": "project",
+      "kind": "external",
+      "detail": "Lightweight embed-only map (src/lib/Map.svelte) via @allmaps/maplibre.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "src/lib/Map.svelte",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:spaan",
+      "label": "Bert Spaan",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Built Allmaps — IIIF-native client-side WebGL warping; co-authored the IIIF Georeference Extension. The field’s current georef standard, which VMA runs on.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:schoonman",
+      "label": "Jules Schoonman",
+      "realm": "field",
+      "kind": "person",
+      "detail": "TU Delft Library; co-founder + institutional face of Allmaps. Bridges the library world to the technical pipeline.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:claeys",
+      "label": "Manuel Claeys Bouuaert",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Allmaps core team; the geometric/transformation math + benchmark tooling.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:spangler",
+      "label": "Ian Spangler",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Leventhal Map Center (Boston PL). Ran Allmaps at scale for Atlascope (145+ Boston atlases) — the production exemplar.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:waters",
+      "label": "Tim Waters",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Built MapWarper (Ruby/PostGIS/GDAL) — the pre-Allmaps workhorse, still core to the Wikimedia/Wikidata map ecosystem.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:meijers",
+      "label": "Martijn Meijers",
+      "realm": "field",
+      "kind": "person",
+      "detail": "TU Delft; semi-automatic georeferencing of rectangular map series — directly relevant to VMA’s uniform L7014 grid.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:morlighem",
+      "label": "Camille Morlighem",
+      "realm": "field",
+      "kind": "person",
+      "detail": "TU Delft (MSc 2021). Built histo3d: historical map → OBIA → polygonize → LoD2 CityJSON. >84% plots, >99% valid geometry — but only under strict symbology (the central risk).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:ledoux",
+      "label": "Hugo Ledoux",
+      "realm": "field",
+      "kind": "person",
+      "detail": "TU Delft 3D Geoinformation; creator of CityJSON (cjio, val3dity, City4CFD). Co-supervised Morlighem. VMA’s strongest technical-PhD supervisor target.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:labetski",
+      "label": "Anna Labetski",
+      "realm": "field",
+      "kind": "person",
+      "detail": "TU Delft 3D Geoinformation; co-supervised Morlighem; 3D urban modelling + historical reconstruction.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:hurni",
+      "label": "Lorenz Hurni",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Head of ETH IKG; founded ETH’s historical-map vectorization + generative-cartography research; supervises Wu and Chen.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:wu-sidi",
+      "label": "Sidi Wu",
+      "realm": "field",
+      "kind": "person",
+      "detail": "ETH IKG. Cross-attention spatio-temporal transformer for segmentation across map editions; unsupervised historical-map registration via deformation nets.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:chen-yizi",
+      "label": "Yizi Chen",
+      "realm": "field",
+      "kind": "person",
+      "detail": "ETH IKG / LRDE-EPITA (two people share the name). Lead author of the 2024 PLoS ONE vectorization benchmark — the field’s first systematic method comparison.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:schindler",
+      "label": "Konrad Schindler",
+      "realm": "field",
+      "kind": "person",
+      "detail": "ETH Zurich Photogrammetry; co-supervises Wu/Chen; the CV-on-historical-imagery bridge.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:perret",
+      "label": "Julien Perret",
+      "realm": "field",
+      "kind": "person",
+      "detail": "IGN France; PI on SODUCO — deep-learning pipelines for historical Paris maps. SODUCO is VMA’s closest methodological peer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:chiang",
+      "label": "Yao-Yi Chiang",
+      "realm": "field",
+      "kind": "person",
+      "detail": "USC/UMN; long line of work using historical maps as scientific data; contributor to Machines Reading Maps. (Library: “using historical maps in scientific…”)",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/04-vma-pipeline/yao-yi-chiang-using-historical-maps-in-scientific.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:giraldo",
+      "label": "Mauricio Giraldo Arteaga",
+      "realm": "field",
+      "kind": "person",
+      "detail": "NYPL Labs; built Building Inspector + Map Vectorizer — the canonical HITL (auto + crowd) precedent VMA’s loop inherits.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:dilenardo",
+      "label": "Isabella Di Lenardo",
+      "realm": "field",
+      "kind": "person",
+      "detail": "EPFL DH Lab; bridges Venice Time Machine + SODUCO; spatial urban history + archival document processing.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:petitpierre",
+      "label": "Rémi Petitpierre",
+      "realm": "field",
+      "kind": "person",
+      "detail": "EPFL DH Lab; automatic feature extraction from historical maps; effective annotation for cadastral-map vectorization (in library).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/04-vma-pipeline/Petitpierre 2023 Effective annotation for the automatic vectorization of cadastral maps.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:vanwissen",
+      "label": "Leon van Wissen",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Amsterdam / KNAW; geotemporal KG for historical cities (Amsterdam Time Machine, GLOBALISE). VMA’s most direct KG peer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:mcdonough",
+      "label": "Katherine McDonough",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Lancaster + Alan Turing Institute; PI of Machines Reading Maps; built MapReader (AHA Roy Rosenzweig Prize 2023). The clearest bridge-figure career model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:kaplan",
+      "label": "Frédéric Kaplan",
+      "realm": "field",
+      "kind": "person",
+      "detail": "EPFL; founded Venice Time Machine → Time Machine Europe. Shows one city-history project becoming massive institutional infrastructure — VMA’s aspirational scaling model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:verbruggen",
+      "label": "Christophe Verbruggen",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Ghent University; DH; Artemis (Scheldt-valley environmental history via historical maps).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:knowles",
+      "label": "Anne Kelly Knowles",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Maine; defined HGIS in the English-speaking world (Past Time Past Place; Placing History). Model of the geographer-historian who learned GIS as method.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:gregory",
+      "label": "Ian Gregory",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Lancaster; coined “spatial humanities”; geographical text analysis on historical corpora (incl. colonial Mexico). Closest method + career fit for VMA’s KG/text pipeline.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:bol",
+      "label": "Peter Bol",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Harvard (emeritus); built CHGIS — the infrastructure template for HGIS. A Song historian who learned spatial analysis mid-career: the closest career analogy to VMA’s founder.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:southall",
+      "label": "Humphrey Southall",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Portsmouth; built Great Britain Historical GIS / A Vision of Britain Through Time — the scalability-engineering model for queryable historical boundaries.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:mostern",
+      "label": "Ruth Mostern",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Pittsburgh (ISHI); World Historical Gazetteer → The Yellow River (Levenson Prize). The full infrastructure→prize-winning-scholarship arc VMA aspires to.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:white",
+      "label": "Richard White",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Stanford (emeritus); founded the Spatial History Lab; “What is Spatial History?” — spatial visualization as argument, not illustration.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/02-hgis-methodology/what is spatial history pub 020110 richard white.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:meeks",
+      "label": "Elijah Meeks",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Built ORBIS (Roman-world geospatial network) at Stanford; co-edited Toward Spatial Humanities. Shows tool-builders can produce real scholarship (and that the skill has industry value).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:conzen",
+      "label": "M.R.G. Conzen",
+      "realm": "field",
+      "kind": "person",
+      "detail": "German émigré geographer (Newcastle); founded the Conzenian school — street systems / plot patterns / building fabric → “plan units.” The analytical vocabulary for historical urban morphology.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:whitehand",
+      "label": "J.W.R. Whitehand",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Birmingham (Urban Morphology Research Group); disseminated the Conzenian tradition; founded the journal Urban Morphology.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:muratori",
+      "label": "Saverio Muratori",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Founded the Italian school of “operational history” (1940s–60s); the city read through building-type evolution.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:caniggia",
+      "label": "Gianfranco Caniggia",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Extended Muratori into “procedural typology” — conceptual base for Morlighem’s procedural LoD2 modelling.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:wright",
+      "label": "Gwendolyn Wright",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Columbia GSAPP; The Politics of Design in French Colonial Urbanism (1991) — the founding text; colonies as planning laboratories. Required reading for colonial Saigon.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/01-phd-priority/Wright - Politics of Design in French Colonial Urbanism (1991).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:jennings",
+      "label": "Eric T. Jennings",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Toronto; most prolific current scholar of French Indochina urban history (Imperial Heights: Dalat); co-translated Brocheux & Hémery.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:cherry",
+      "label": "Haydon Cherry",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Northwestern; Down and Out in Saigon (2019) — the most-cited recent social history of colonial Saigon, from the underclass. Deep archival, no spatial methods.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:cooper",
+      "label": "Nicola Cooper",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Bristol; foundational article on urban planning + architecture in colonial Indochina; France in Indochina.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:njoh",
+      "label": "Ambe J. Njoh",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. South Florida; French Urbanism in Foreign Lands; Saigon + Dakar street naming. Publishes in Planning Perspectives — the right venue for VMA’s planning-framed paper.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:brocheux",
+      "label": "Brocheux & Hémery",
+      "realm": "field",
+      "kind": "person",
+      "detail": "CNRS/Paris; Indochina: An Ambiguous Colonization 1858–1954 — the standard comprehensive synthesis.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:rabinow",
+      "label": "Paul Rabinow",
+      "realm": "field",
+      "kind": "person",
+      "detail": "French Modern (1989) — norms + forms of the social environment; the genealogy of French planning rationality that produced colonial urbanism.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/01-phd-priority/Rabinow - French Modern (1989).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:harms",
+      "label": "Erik Harms",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Yale anthropologist; Saigon’s Edge (2011) + Luxury and Rubble (2016) — ethnography of HCMC’s expanding edges and eviction. VMA’s contemporary-Saigon ethnographic anchor.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/01-phd-priority/Harms - Saigon’s Edge Univ Minnesota Press (2011).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:huynh-thedu",
+      "label": "Huỳnh Thế Du",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Fulbright/policy economist; Quy hoạch Sài Gòn–TPHCM 1858–2024; “Misuse of Urban Planning in HCMC.” A VMA letter writer — positions the work as policy-grounded.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/03-vietnam-indochina/Huynh The Du - Quy hoach Sai Gon - TPHCM 1858-2024 (2024).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:labbe",
+      "label": "Danielle Labbé",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Univ. Montreal; Land Politics and Livelihoods on the Margins of Hanoi — peri-urban land conversion under market socialism.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/01-phd-priority/Labbe - Land Politics and Livelihoods on the Margins of Hanoi (2014).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:pincus",
+      "label": "Jonathan Pincus",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Development economist (Fulbright); a VMA letter writer. With Huỳnh Thế Du, frames the application as a policy-grounded Vietnam specialist.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:lefebvre",
+      "label": "Henri Lefebvre",
+      "realm": "field",
+      "kind": "person",
+      "detail": "The Production of Space (1974) + Le Droit à la ville (1968). The triad (conçu/perçu/vécu) is VMA’s organizing frame for the data stack.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Lefebvre - The Production of Space (1991).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:harvey",
+      "label": "David Harvey",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Social Justice and the City; The Right to the City — urbanization as capital accumulation; the political-economy lens on who the city is built for.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Harvey - Social Justice and the City (1973).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:scott-james",
+      "label": "James C. Scott",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Seeing Like a State (1998) — legibility, high-modernist planning, the map/cadastre as instruments of state simplification. Core critique for reading colonial surveys.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Scott - Seeing Like a State (1998).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:harley",
+      "label": "J.B. Harley",
+      "realm": "field",
+      "kind": "person",
+      "detail": "“Deconstructing the Map” (1989) — maps as rhetoric + power, never neutral. The critical-cartography foundation for treating colonial maps as arguments.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/02-hgis-methodology/Harley - Deconstructing the Map (1989).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:jacobs",
+      "label": "Jane Jacobs",
+      "realm": "field",
+      "kind": "person",
+      "detail": "The Death and Life of Great American Cities (1961) — street-level urban vitality; the anti-high-modernist counterweight.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Jacobs - The Death and Life of Great American Cities (1961).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:lynch",
+      "label": "Kevin Lynch",
+      "realm": "field",
+      "kind": "person",
+      "detail": "The Image of the City (1960) — legibility, mental maps (paths/edges/districts/nodes/landmarks). Vocabulary for the perceived-space layer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Lynch - The Image of the City (1960).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:mumford",
+      "label": "Lewis Mumford",
+      "realm": "field",
+      "kind": "person",
+      "detail": "The City in History (1961) — the long-durée of urban form + power; the deep-time framing.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Mumford - The City in History (1961).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:foucault",
+      "label": "Michel Foucault",
+      "realm": "field",
+      "kind": "person",
+      "detail": "“Of Other Spaces / Heterotopias” (1984) — space as ordered by power; the colonial city as a disciplinary spatial order.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Foucault - Of Other Spaces Heterotopias (1984).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:soja",
+      "label": "Edward Soja",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Postmodern Geographies (1989) — the “spatial turn”; reasserting space as constitutive of social theory.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Soja - Postmodern Geographies (1989).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:roy",
+      "label": "Ananya Roy",
+      "realm": "field",
+      "kind": "person",
+      "detail": "“Slumdog Cities: Rethinking Subaltern Urbanism” — theorizing the Global-South city on its own terms; informality as a mode of urbanization.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Roy - Slumdog Cities Rethinking Subaltern Urbanism IJURR (2011).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:simone",
+      "label": "AbdouMaliq Simone",
+      "realm": "field",
+      "kind": "person",
+      "detail": "“People as Infrastructure” (Johannesburg, 2004) — social practice as urban infrastructure; the lens for the lived/memory layer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Simone - People as Infrastructure Johannesburg (2004).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:peterhall",
+      "label": "Peter Hall",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Cities of Tomorrow / Urban Future 21 — the standard history of 20th-c planning thought; situates colonial + modernist planning in the global story.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/07-general-theory/Hall - Cities of Tomorrow (2014).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:scott-felicity",
+      "label": "Felicity Scott",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Columbia GSAPP (Architecture PhD). Active project on Cambodia/Indochina post-colonial modernism; teaches “Documenting the Colonial Archive.” Closest intellectual match to VMA’s EFEO/BnF + spatial work.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:bouakar",
+      "label": "Hiba Bou Akar",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Columbia GSAPP (Urban Planning PhD); For the War Yet to Come (Beirut). Decolonial/post-conflict planning; directs the Post-Conflict Cities Lab; takes students. Her theory, VMA’s city.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:kurgan",
+      "label": "Laura Kurgan",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Columbia GSAPP; directs the Center for Spatial Research; Close Up at a Distance (2013). The spatial-methods co-advisor (with Bou Akar).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/02-hgis-methodology/Close Up at a Distance- Mapping, Technology, and Politics -- Kurgan, Laura -- Princeton University Press, Brooklyn, NY, 2013 -- Brooklyn, NY - Zone -- 9781935408284 -- c4878ed89cfd3146ab6b34b44f66c096 -- Anna’s Archive.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:weiping-wu",
+      "label": "Weiping Wu",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Columbia GSAPP; directs the MS Urban Planning program; East/SE-Asian urban expertise. Likely too administratively occupied for primary supervision — verify.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:sanyal",
+      "label": "Bish Sanyal",
+      "realm": "field",
+      "kind": "person",
+      "detail": "MIT DUSP; history of planning ideas, planning in newly industrializing nations, Global-South housing. The closest DUSP comes to a colonial/postcolonial planning historian.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:vale",
+      "label": "Lawrence Vale",
+      "realm": "field",
+      "kind": "person",
+      "detail": "MIT DUSP; urban design + capital-city planning; decolonization + spatial politics of monuments. Useful committee member (Saigon as “Paris of the East”).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:davis",
+      "label": "Diane Davis",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Harvard GSD; Latin America, post-conflict cities, urban governance — but sociological/political-science methods, not spatial. Not a strong supervisor match.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "p:mehrotra",
+      "label": "Rahul Mehrotra",
+      "realm": "field",
+      "kind": "person",
+      "detail": "Harvard GSD; Asian urbanism, informal/scarcity urbanism. Better as committee/secondary advisor than primary.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:tudelft",
+      "label": "TU Delft 3D Geoinformation",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Ledoux + Labetski; CityJSON home; histo3d’s lab; Allmaps Library co-founder (Schoonman). VMA’s strongest technical-PhD target — the georef pipeline is the input histo3d needs.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:eth-ikg",
+      "label": "ETH IKG",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Institute of Cartography & Geoinformation (Hurni, Wu, Chen, Schindler). State-of-the-art map-vectorization + cross-edition change detection. Swiss-style focus → Indochina is genuinely new to them.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:epfl-dhlab",
+      "label": "EPFL Digital Humanities Lab",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Kaplan, Di Lenardo, Petitpierre. Venice Time Machine + historical-document digitization at scale; SODUCO ties.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:turing",
+      "label": "Alan Turing Institute",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "UK national ML+humanities institute; Living with Machines / Machines Reading Maps / MapReader. The DH-postdoc bridge model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:leventhal",
+      "label": "Leventhal Map & Education Center (Boston PL)",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Allmaps-at-scale via Atlascope (Spangler). The production-deployment exemplar.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:knaw",
+      "label": "KNAW Humanities Cluster",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Dutch national humanities cluster; HisGIS (Stapel), Amsterdam Time Machine / GLOBALISE (van Wissen). KG + cadastral-vectorization peer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:ign",
+      "label": "IGN / ENSG France",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "French national mapping agency; SODUCO co-lead (Perret). Series-georef + historical-map DL.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:epita",
+      "label": "EPITA / LRDE (Paris)",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Image-processing lab; SODUCO partner; home of the vectorization benchmark (Y. Chen, LRDE).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:gsapp",
+      "label": "Columbia GSAPP",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Architecture + Urban Planning PhDs. Wright’s legacy of colonial-urbanism scholarship; current targets Scott, Bou Akar, Kurgan. A top VMA PhD destination.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:mit-dusp",
+      "label": "MIT DUSP",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Dept. of Urban Studies & Planning; Sanyal, Vale. Planning history + Global-South development; policy-grounded fit.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:gsd",
+      "label": "Harvard GSD",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Graduate School of Design; Davis, Mehrotra. Strong design/theory; weaker on historical spatial methods.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:lancaster",
+      "label": "Lancaster University (DH / History)",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Gregory + McDonough; HGIS, spatial humanities, geographical text analysis. Home of the Spatial Humanities conference. Best fit for VMA’s Phase-2 humanities pivot.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:harvard-cga",
+      "label": "Harvard CGA",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Center for Geographic Analysis; CHGIS + geospatial infrastructure (Bol legacy).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:stanford-cesta",
+      "label": "Stanford CESTA",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Center for Spatial & Textual Analysis; Spatial History Lab, ORBIS (White/Meeks legacy).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:ishi",
+      "label": "Univ. Pittsburgh ISHI",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Institute for Spatial History Innovation (Mostern); World Historical Gazetteer — global linked-places HGIS infrastructure.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:bnf",
+      "label": "BnF / Gallica",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "10M+ items; France–Vietnam Digital Library; IIIF-native (Gallica manifests load straight into Allmaps). VMA’s primary source archive.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:efeo",
+      "label": "EFEO",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "École française d’Extrême-Orient (founded 1898, Saigon); Indochina heritage inventory; active Hanoi + HCMC centers. Essential French partner for archives + ANR co-application.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:utaustin",
+      "label": "Perry-Castañeda Library (UT Austin)",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Holds US Army L7014 1:50,000 Vietnam topos as GeoPDF — VMA’s pipeline source for the L7014 series.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:texastech",
+      "label": "Texas Tech Vietnam Center",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "1,500+ Vietnam maps (mostly AMS), incl. L7014 — the JPEG source VMA streams to Internet Archive.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:rumsey",
+      "label": "David Rumsey Map Collection",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "150k+ maps, 56k+ georeferenced via a proprietary Georeferencer. Not IIIF-native; a separate ecosystem. One of VMA’s catalogue sources.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:fulbright",
+      "label": "Fulbright University Vietnam",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "VMA founder’s institution; Digitizing Việt Nam (Luce-funded, textual). Letter-writer base (Huỳnh Thế Du, Pincus).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:nypl-labs",
+      "label": "NYPL Labs",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Built Building Inspector + Map Vectorizer (Giraldo) — the canonical HITL map-vectorization program.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:meta",
+      "label": "Meta AI",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Built RapiD — AI-proposed road features confirmed by OSM volunteers; the industrial-scale HITL model VMA’s loop mirrors.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:hot",
+      "label": "HOT (Humanitarian OpenStreetMap Team)",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Tasking Manager tile decomposition + Missing Maps. The volunteer task-decomposition model for VMA’s footprint tracing; OSM-Vietnam outreach channel.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:zooniverse",
+      "label": "Zooniverse",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "People-powered research platform (1.6M+ volunteers); Project Builder for custom workflows. A possible HITL platform reference.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:cornell-seap",
+      "label": "Cornell SEAP",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Southeast Asia Program (founded 1950); unmatched Vietnam-studies prestige + archive. No spatial-methods group — better as affiliate than primary program.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:soas",
+      "label": "SOAS London",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Strong SE-Asian studies + colonial-archive collections; key UK area-studies relationship.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:nls",
+      "label": "National Library of Scotland",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "60k Ordnance Survey maps processed by MapReader — the at-scale MRM application reference.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:yale-nus",
+      "label": "Yale-NUS / SE Asia historical maps",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "1,400+ pre-1900 digitized maps (NLB Singapore, Beinecke, Bodleian, Leiden); Dutch-colonial-Indonesia emphasis.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "i:kitlv",
+      "label": "KITLV Leiden",
+      "realm": "field",
+      "kind": "institution",
+      "detail": "Royal Institute for Linguistics, Land & Ethnology; SE-Asia maps, Dutch-colonial focus.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:allmaps",
+      "label": "Allmaps",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "The field’s IIIF-native georef standard; W3C Georeference Annotations; partners TU Delft, Leventhal, LoC, AGSL; funded by Pica. VMA is built on it.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:mapwarper",
+      "label": "MapWarper",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Open-source Ruby/PostGIS/GDAL georectifier (Waters) — the pre-Allmaps workhorse, still core to Wikimedia/Wikidata.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:atlascope",
+      "label": "Atlascope",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Leventhal/BPL — 145+ Massachusetts urban atlases georeferenced + served as overlays. Full-Allmaps-pipeline-at-scale exemplar.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:hisgis",
+      "label": "HisGIS",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "KNAW/Fryske Akademy — vectorizes 17k Dutch cadastral maps (3M+ parcels); adopted Allmaps for the georef phase.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:histo3d",
+      "label": "histo3d",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Morlighem/TU Delft — raster → OBIA → polygonize → height inference → Blender BCGA → LoD2 CityJSON. Open (CC-BY); Delft + Brussels. The 3D pipeline VMA’s georef feeds.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:soduco",
+      "label": "SODUCO",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "ANR, Paris 1789–1950 — reference atlases + 113 digitized trade directories → urban-history KG; all open science. VMA’s closest methodological peer (same loop, different city).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:benchmark",
+      "label": "Vectorization Benchmark (Chen 2024)",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "First systematic comparison of historical-map vectorization methods (PLoS ONE). Finding: ViT/PVT for large objects, U-Net for small. Code + data open.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/04-vma-pipeline/Chen et al (2024) Automatic vectorization of historical maps A benchmark.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:mapreader",
+      "label": "MapReader / Machines Reading Maps",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "McDonough/Turing+USC+UMN — open Python CV library; 60k OS maps → 1.76M building + 487k railway records. AHA Roy Rosenzweig Prize 2023.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:vtm",
+      "label": "Venice Time Machine",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "EPFL + Ca’ Foscari (since 2012) — 80km of archives, IIIF server + HTR pipelines. Seed of Time Machine Europe.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:tme",
+      "label": "Time Machine Europe",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "EU H2020 flagship, 200+ institutions; 20+ Local Time Machines; goal: a 4D simulator of European history. The institutional scaling VMA models.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:urbanhistory4d",
+      "label": "UrbanHistory4D",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "TU Dresden + Würzburg — 4D browser of 3,600 Dresden historical photos in a 3D city model + AR. A Local Time Machine instance.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:nypl-bi",
+      "label": "NYPL Building Inspector + Map Vectorizer",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Auto-detect building polygons from fire-insurance atlases + crowd verification (170k polygons in 24h). VMA’s direct HITL precedent.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:rapid",
+      "label": "RapiD (Meta)",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "AI predicts roads from imagery → OSM volunteers confirm/adjust; 300k+ miles of Thailand roads in 18 months. The industrial HITL model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:ohm",
+      "label": "OpenHistoricalMap",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "OSM fork with a time dimension (dated features, not deletions); temporal vector tiles + iD fork. A data destination for VMA’s vectorized footprints.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:chgis",
+      "label": "CHGIS",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "China Historical GIS (Bol, Harvard + Fudan) — place names + admin units 222 BCE–1911 CE. The infrastructure template for every later large-scale HGIS.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:gbhgis",
+      "label": "GB Historical GIS",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Southall/Portsmouth — all censuses + admin geographies 1801–present (A Vision of Britain Through Time). The scalability-engineering model.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:whg",
+      "label": "World Historical Gazetteer",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Mostern/ISHI — global infrastructure linking historical place-name datasets (uses Linked Places). The standard VMA’s KG should align to.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:orbis",
+      "label": "ORBIS",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Stanford (Meeks + Scheidel) — geospatial network model of the Roman world. Canonical humanist + tool-builder collaboration that produced real scholarship.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:pelagios",
+      "label": "Pelagios / Linked Places",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Open standard + infrastructure for linking historical place datasets across projects. VMA’s KG should be Linked-Places-compatible.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:globalise",
+      "label": "GLOBALISE / Necessary Reunions",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "KNAW — integrates VOC archives with historical maps of Kerala + SE Asia via KG linking. Textual + cartographic fusion peer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:viennawiki",
+      "label": "Vienna History Wiki",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Large collaborative KG of Vienna’s history, linked to Wikidata. The closest published comparison for VMA’s KG layer.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "f:mapsam2",
+      "label": "MapSAM2 (Xia 2025)",
+      "realm": "field",
+      "kind": "fieldproject",
+      "detail": "Fine-tuned SAM2 for historical-map segmentation; 10-shot viable. VMA runs a LoRA fork (work/MapSAM2) for footprint inference.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/04-vma-pipeline/Xia - MapSAM2 (2025).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:obia",
+      "label": "OBIA vectorization",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Object-Based Image Analysis: segment a raster into homogeneous regions → classify by symbology → polygonize. Morlighem/histo3d + ETH IKG core method. Fragile to inconsistent symbology.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:gcp-propagation",
+      "label": "GCP grid propagation",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Fit an affine model to a seed sheet’s GCPs, project neatline corners to WGS84, then extrapolate adjacent sheets via the series’ Δlon/Δlat. Exploits uniform military-grid geometry — no feature matching. VMA’s novel L7014 method.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:datum-helmert",
+      "label": "Helmert datum correction",
+      "realm": "field",
+      "kind": "method",
+      "detail": "3-parameter geocentric shift Indian 1960 (Everest 1830, towgs84 +198,+881,+317) → WGS84. Required for L7014; a known PROJ pitfall (EPSG:3148 may drop towgs84).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:hitl",
+      "label": "Human-in-the-loop (HITL)",
+      "realm": "field",
+      "kind": "method",
+      "detail": "AI proposes → humans verify/correct/enrich → corrections retrain the model. Both a CV method and a community model. Inherited from NYPL Building Inspector + RapiD.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:geotext",
+      "label": "Geographical text analysis",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Geo-parsing + NER + relation extraction over historical corpora (Gregory). Applied to Annuaires de l’Indochine + colonial press, this populates VMA’s KG semi-automatically (SODUCO did this for Paris).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:dl-featurematch",
+      "label": "DL feature matching georef",
+      "realm": "field",
+      "kind": "method",
+      "detail": "SIFT/SuperGlue-family transfer from known maps; RMSE <1% of diagonal on 83% of 86 Jerusalem maps. An automated-georef frontier — adjacent to, not covering, VMA’s series case.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:ocr-geocode",
+      "label": "OCR + geocoding georef",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Read place text on a map → geocode → derive control points (~316 m avg error). Cheap but coarse automated georef.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:procedural-3d",
+      "label": "Procedural 3D / LoD2",
+      "realm": "field",
+      "kind": "method",
+      "detail": "2D footprints + probabilistic roof-type / height inference → procedural extrusion (Blender BCGA / GIS) → LoD2 CityJSON. No LiDAR needed. The histo3d back half.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:transformer-seg",
+      "label": "Cross-edition transformer segmentation",
+      "realm": "field",
+      "kind": "method",
+      "detail": "ETH IKG cross-attention spatio-temporal transformer that segments across multiple map editions → urban change detection over time, not just single-map vectorization.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:conzenian",
+      "label": "Conzenian morphological analysis",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Decompose urban form into street system / plot pattern / building fabric → “plan units” marking growth phases. The vocabulary for VMA’s morphology reading.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "m:muratorian",
+      "label": "Muratorian procedural typology",
+      "realm": "field",
+      "kind": "method",
+      "detail": "Read the city as the organic result of building-type evolution. Conceptual base for procedural LoD2 modelling.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:datastack",
+      "label": "6-layer world-as-data-stack",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "The city as ascending layers L1 map raster → L2 3D → L3 road/facade → L4 fabric → L5 POI/economic → L6 memory. Dependency rule: layer N needs N-1. VMA’s build sequence.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/theory.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:lefebvre-triad",
+      "label": "Lefebvre’s triad",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Conçu (conceived: maps/plans → L1+L4), perçu (perceived: practice → L3+L5), vécu (lived: memory → L6). VMA maps the triad onto the data stack.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/theory.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:body-soul",
+      "label": "Body and soul",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Body = physical geometry (L1–L4); soul = sensory/social/economic/narrative meaning (L5–L6). The gap between them is what VMA exists to fill (after the Saigoneer framing).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/theory.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:progression",
+      "label": "digitized → digitalized → reconstructed",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Most archives stop at “digitized” (a scan exists). VMA targets “digitally reconstructed” (meaning + memory restored).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/theory.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:production-of-space",
+      "label": "The production of space",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Lefebvre: space is socially produced, not a neutral container. The root claim under VMA’s whole interpretive frame.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:right-to-city",
+      "label": "The right to the city",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Lefebvre → Harvey: the claim of inhabitants to shape urbanization. Frames the “for whom was the city built?” question VMA poses of each regime.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:critical-cartography",
+      "label": "Critical cartography",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Harley: maps are rhetoric + power, never neutral mirrors. The stance for reading colonial surveys as arguments, not facts.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:seeing-like-state",
+      "label": "Legibility / seeing like a state",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Scott: states simplify territory into maps + cadastres to make it governable. Explains why colonial Saigon was surveyed the way it was.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:spatial-humanities",
+      "label": "Spatial humanities",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "Gregory’s deliberate expansion of HGIS-as-tool into a humanistic mode of argument. The disciplinary home for VMA’s method.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "c:hgis",
+      "label": "Historical GIS (HGIS)",
+      "realm": "field",
+      "kind": "concept",
+      "detail": "GIS with time as a first-class dimension: changing boundaries, shifting place names, uncertain sources. The technical genus VMA belongs to.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "g:obia-indochina",
+      "label": "GAP: OBIA calibration for French colonial Indochina symbology",
+      "realm": "field",
+      "kind": "gap",
+      "detail": "Nobody has published a color/line/hatching calibration for Indochina maps. SODUCO (Paris), ETH (Swiss), Morlighem (Dutch) are adjacent, not this. VMA’s first publishable contribution.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "g:georef-indian1960",
+      "label": "GAP: automated georef of Indian-1960 military series",
+      "realm": "field",
+      "kind": "gap",
+      "detail": "No published GCP-propagation + Helmert-correction method for Indian-1960 datum series. DL feature-matching (Jerusalem) + OCR+geocode (Sanborn) are adjacent. The L7014 pipeline is novel.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "g:kg-sea-colonial",
+      "label": "GAP: geotemporal KG for a SE-Asian colonial city",
+      "realm": "field",
+      "kind": "gap",
+      "detail": "Amsterdam TM, Vienna Wiki, GLOBALISE exist for other regions; no street/building-level KG for any colonial Asian city. The Saigon 1880–1930 KG would be first.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "g:spatial-saigon",
+      "label": "GAP: spatial/GIS methods × colonial Saigon",
+      "realm": "field",
+      "kind": "gap",
+      "detail": "No published work combines GIS methods with French colonial Saigon. Closest analog: a Shanghai French Concession cadastral-GIS paper (Transactions in GIS, 2012) — the precursor VMA should cite.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:thongchai",
+      "label": "Thongchai — Siam Mapped (1994)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "Geo-body theory: how mapping produced the modern Thai nation. Essential for critiquing SE-Asian colonial cartography. NOT in the library — acquire.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:anderson",
+      "label": "Anderson — Imagined Communities (1983)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "Census, map, and museum as the institutions of colonial nation-making. NOT in the library — acquire.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:cherry-2019",
+      "label": "Cherry — Down and Out in Saigon (2019)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "The key recent social history of colonial Saigon. Cited but NOT in the library — acquire.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:brocheux-2009",
+      "label": "Brocheux & Hémery — Indochina (2009)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "The standard synthesis of Indochinese colonization 1858–1954. Cited but NOT in the library — acquire.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:mostern-yellowriver",
+      "label": "Mostern — The Yellow River (2021)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "Levenson-Prize monograph that grew out of World Historical Gazetteer infrastructure. The career-model output VMA aspires to. NOT in library.",
+      "status": "gap",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:morlighem-2021",
+      "label": "Morlighem — histo3d thesis (2021)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "The reference end-to-end map→LoD2 pipeline + its strict-symbology caveat.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/04-vma-pipeline/Camille_Morlighem_p5_thesis Automatic reconstruction of 3D city models from historical maps.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:annuaire",
+      "label": "Annuaire général de l’Indochine",
+      "realm": "field",
+      "kind": "work",
+      "detail": "Colonial trade directory (merchants, addresses, business types) — the primary corpus for VMA’s geographical-text-analysis → KG pipeline (the Annuaire is VMA’s equivalent of SODUCO’s Paris directories).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/03-vietnam-indochina/Annuaire_général_de_l'Indo-Chine_Indochine_française_bpt6k5696645f.pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:huynh-2024",
+      "label": "Huỳnh Thế Du — Quy hoạch Sài Gòn–TPHCM 1858–2024",
+      "realm": "field",
+      "kind": "work",
+      "detail": "A planning-history synthesis of Saigon/HCMC across regimes — the Vietnamese-language backbone for the dissertation’s long arc.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "~/Downloads/Urbanism/03-vietnam-indochina/Huynh The Du - Quy hoach Sai Gon - TPHCM 1858-2024 (2024).pdf",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "w:bouakar-2018",
+      "label": "Bou Akar — For the War Yet to Come (2018)",
+      "realm": "field",
+      "kind": "work",
+      "detail": "Decolonial post-conflict planning theory (Beirut). The supervisor framework VMA would apply to Saigon’s regime-layered arc.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:imagomundi",
+      "label": "Imago Mundi",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "The only English-language journal devoted to the history of pre-modern maps. VMA’s venue for L7014 cartographic history + georef methodology.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:planningperspectives",
+      "label": "Planning Perspectives",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Urban-planning history; explicitly covers colonial urbanism. The venue for the OBIA paper framed as planning history (and Njoh’s home journal).",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:ijgis",
+      "label": "Int. J. of Geographical Information Science",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Methods venue for the OBIA-calibration contribution.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:isprs",
+      "label": "ISPRS Annals",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Photogrammetry/remote-sensing venue for the georef-propagation pipeline.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:chr",
+      "label": "CHR (Computational Humanities Research)",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Receptive to tool/pipeline papers; target for the L7014 + KG methods.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:dh",
+      "label": "DH (ADHO Annual)",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "The DH flagship conference; Spatial Humanities SIG. 2026 South Korea suits SE-Asian work.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:spatialhum",
+      "label": "Spatial Humanities (conference)",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Biennial; both Gregory + McDonough present here. The most directly relevant venue for VMA’s first paper.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:dsh",
+      "label": "Digital Scholarship in the Humanities",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "European DH flagship journal; target for the geographical-text-analysis → KG paper.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:jvs",
+      "label": "Journal of Vietnamese Studies",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Premier English-language Vietnamese-studies venue; the home for VMA’s humanistic Saigon results.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:jseas",
+      "label": "Journal of Southeast Asian Studies",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Flagship regional journal; comparative colonial history.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:urbanhistory",
+      "label": "Urban History",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Cambridge; international interdisciplinary urban-history flagship — target for the spatial-history-of-Saigon paper.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "v:dhq",
+      "label": "Digital Humanities Quarterly",
+      "realm": "field",
+      "kind": "venue",
+      "detail": "Open-access DH field journal.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:pica",
+      "label": "Pica Foundation",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "Funds Allmaps — the infrastructure VMA depends on.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:neh-odh",
+      "label": "NEH Office of Digital Humanities",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "DH Advancement Grant (Exploration ~$50K): lowest-barrier funder for tools + data infrastructure; US-applicant advantage.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:mellon",
+      "label": "Mellon Foundation",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "Digital Humanities Asia (Stanford Sawyer Seminar precedent) — highest relevance to SE-Asia specifically.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:anr",
+      "label": "ANR (France)",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "Funded SODUCO; requires a French academic co-PI — unlockable via EFEO / Sciences Po.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:horizon",
+      "label": "Horizon Europe",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "European Collaborative Cloud for Cultural Heritage; needs an EU consortium — a TU Delft partnership opens it. Funded Time Machine Europe.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    },
+    {
+      "id": "$:luce",
+      "label": "Henry Luce Foundation",
+      "realm": "field",
+      "kind": "funder",
+      "detail": "Funds Fulbright’s Digitizing Việt Nam (textual). Regional-heritage funder worth monitoring.",
+      "status": "current",
+      "source": [
+        {
+          "ref": "docs/field-knowledge-graph.md",
+          "date": "2026-06-04"
+        }
+      ],
+      "deck": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "r:/view",
+      "to": "r:/explore",
+      "rel": "redirects"
+    },
+    {
+      "from": "r:/annotate",
+      "to": "r:/studio",
+      "rel": "redirects"
+    },
+    {
+      "from": "r:/contribute/label",
+      "to": "r:/contribute/digitalize",
+      "rel": "redirects"
+    },
+    {
+      "from": "r:/explore",
+      "to": "c:MapWorkspace",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/trip/[id]",
+      "to": "c:MapWorkspace",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/explore",
+      "to": "c:GpsTracker",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/trip/[id]",
+      "to": "c:GpsTracker",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/explore",
+      "to": "c:DualMapPane",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/studio",
+      "to": "c:StudioMode",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/create",
+      "to": "c:CreateMode",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/trace",
+      "to": "c:TraceTool",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/trace",
+      "to": "c:TraceSidebar",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/review",
+      "to": "c:ReviewMode",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "c:TriageTool",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "c:TriageSidebar",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "c:OcrBboxTool",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "c:OcrSidebar",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/catalog",
+      "to": "c:MapEditModal",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/catalog",
+      "to": "c:FacetRail",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/catalog",
+      "to": "c:SearchResultCard",
+      "rel": "uses"
+    },
+    {
+      "from": "c:MapWorkspace",
+      "to": "c:MapShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:MapShell",
+      "to": "c:LayerRenderer",
+      "rel": "renders"
+    },
+    {
+      "from": "c:MapShell",
+      "to": "c:MapModeOverlays",
+      "rel": "renders"
+    },
+    {
+      "from": "c:MapModeOverlays",
+      "to": "c:DrawTool",
+      "rel": "uses"
+    },
+    {
+      "from": "c:StudioMode",
+      "to": "c:MapShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:StudioMode",
+      "to": "c:DrawTool",
+      "rel": "uses"
+    },
+    {
+      "from": "c:CreateMode",
+      "to": "c:MapShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:ReviewMode",
+      "to": "c:ReviewCanvas",
+      "rel": "uses"
+    },
+    {
+      "from": "c:ReviewMode",
+      "to": "c:ReviewSidebar",
+      "rel": "uses"
+    },
+    {
+      "from": "c:ReviewCanvas",
+      "to": "c:ImageShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:TraceTool",
+      "to": "c:ImageShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:TriageTool",
+      "to": "c:ImageShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:OcrBboxTool",
+      "to": "c:ImageShell",
+      "rel": "uses"
+    },
+    {
+      "from": "c:TriageTool",
+      "to": "c:bboxHandles",
+      "rel": "uses"
+    },
+    {
+      "from": "c:OcrBboxTool",
+      "to": "c:bboxHandles",
+      "rel": "uses"
+    },
+    {
+      "from": "c:bboxHandles",
+      "to": "m:shared",
+      "rel": "uses"
+    },
+    {
+      "from": "c:LayerRenderer",
+      "to": "s:layersStore",
+      "rel": "reads"
+    },
+    {
+      "from": "c:DualMapPane",
+      "to": "s:layersStore",
+      "rel": "reads"
+    },
+    {
+      "from": "c:DualMapPane",
+      "to": "s:layerStore",
+      "rel": "reads"
+    },
+    {
+      "from": "c:LayerRenderer",
+      "to": "x:Allmaps",
+      "rel": "uses"
+    },
+    {
+      "from": "c:MapShell",
+      "to": "s:mapStore",
+      "rel": "syncs"
+    },
+    {
+      "from": "c:MapShell",
+      "to": "x:OpenLayers",
+      "rel": "uses"
+    },
+    {
+      "from": "c:ImageShell",
+      "to": "x:OpenLayers",
+      "rel": "uses"
+    },
+    {
+      "from": "s:mapStore",
+      "to": "s:layersStore",
+      "rel": "syncs"
+    },
+    {
+      "from": "s:urlStore",
+      "to": "s:mapStore",
+      "rel": "syncs"
+    },
+    {
+      "from": "s:urlStore",
+      "to": "s:layersStore",
+      "rel": "syncs"
+    },
+    {
+      "from": "s:urlStore",
+      "to": "s:layerStore",
+      "rel": "syncs"
+    },
+    {
+      "from": "c:StudioMode",
+      "to": "s:annotation",
+      "rel": "uses"
+    },
+    {
+      "from": "m:maps",
+      "to": "t:maps",
+      "rel": "reads"
+    },
+    {
+      "from": "m:maps",
+      "to": "t:map_iiif_sources",
+      "rel": "reads"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:label_tasks",
+      "rel": "writes"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:label_pins",
+      "rel": "writes"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:annotation_sets",
+      "rel": "writes"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:footprint_submissions",
+      "rel": "reads"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:hunts",
+      "rel": "writes"
+    },
+    {
+      "from": "m:supabase",
+      "to": "t:hunt_stops",
+      "rel": "writes"
+    },
+    {
+      "from": "c:MapEditModal",
+      "to": "m:maps",
+      "rel": "uses"
+    },
+    {
+      "from": "c:TraceTool",
+      "to": "t:footprint_submissions",
+      "rel": "writes"
+    },
+    {
+      "from": "c:OcrBboxTool",
+      "to": "t:ocr_extractions",
+      "rel": "writes"
+    },
+    {
+      "from": "m:iiif",
+      "to": "x:Allmaps",
+      "rel": "calls"
+    },
+    {
+      "from": "a:/api/admin/maps",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "a:/api/admin/maps/[id]",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "a:mirror-r2",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "a:mirror-r2",
+      "to": "t:map_iiif_sources",
+      "rel": "writes"
+    },
+    {
+      "from": "a:mirror-r2",
+      "to": "x:R2Worker",
+      "rel": "writes"
+    },
+    {
+      "from": "a:mirror-r2",
+      "to": "x:Supabase",
+      "rel": "writes"
+    },
+    {
+      "from": "a:ocr",
+      "to": "t:map_pipeline_status",
+      "rel": "writes"
+    },
+    {
+      "from": "a:ocr/apply",
+      "to": "t:ocr_extractions",
+      "rel": "writes"
+    },
+    {
+      "from": "a:ocr-review",
+      "to": "t:ocr_extractions",
+      "rel": "writes"
+    },
+    {
+      "from": "a:ocr-review/revert-recent",
+      "to": "t:ocr_extractions",
+      "rel": "writes"
+    },
+    {
+      "from": "a:pipeline",
+      "to": "t:map_pipeline_status",
+      "rel": "writes"
+    },
+    {
+      "from": "a:footprints",
+      "to": "t:footprint_submissions",
+      "rel": "writes"
+    },
+    {
+      "from": "a:scout",
+      "to": "t:scout_candidates",
+      "rel": "writes"
+    },
+    {
+      "from": "a:scout",
+      "to": "t:maps",
+      "rel": "ingests"
+    },
+    {
+      "from": "a:search",
+      "to": "t:maps",
+      "rel": "reads"
+    },
+    {
+      "from": "a:search",
+      "to": "t:scout_candidates",
+      "rel": "reads"
+    },
+    {
+      "from": "a:lookup-allmaps-id",
+      "to": "x:Allmaps",
+      "rel": "calls"
+    },
+    {
+      "from": "a:fetch-iiif-metadata",
+      "to": "x:Allmaps",
+      "rel": "calls"
+    },
+    {
+      "from": "a:sync-georef",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "a:upload-image",
+      "to": "x:IA",
+      "rel": "writes"
+    },
+    {
+      "from": "c:MapEditModal",
+      "to": "a:/api/admin/maps/[id]",
+      "rel": "calls"
+    },
+    {
+      "from": "c:MapEditModal",
+      "to": "a:mirror-r2",
+      "rel": "calls"
+    },
+    {
+      "from": "c:MapEditModal",
+      "to": "a:lookup-allmaps-id",
+      "rel": "calls"
+    },
+    {
+      "from": "c:MapEditModal",
+      "to": "a:fetch-iiif-metadata",
+      "rel": "calls"
+    },
+    {
+      "from": "c:TriageTool",
+      "to": "a:ocr",
+      "rel": "calls"
+    },
+    {
+      "from": "c:OcrBboxTool",
+      "to": "a:ocr-review",
+      "rel": "calls"
+    },
+    {
+      "from": "c:OcrSidebar",
+      "to": "a:ocr-review",
+      "rel": "calls"
+    },
+    {
+      "from": "c:ReviewSidebar",
+      "to": "a:footprints",
+      "rel": "calls"
+    },
+    {
+      "from": "c:ReviewSidebar",
+      "to": "a:pipeline",
+      "rel": "calls"
+    },
+    {
+      "from": "r:/admin/scout",
+      "to": "a:scout",
+      "rel": "calls"
+    },
+    {
+      "from": "r:/catalog",
+      "to": "a:search",
+      "rel": "calls"
+    },
+    {
+      "from": "r:/admin/bulk",
+      "to": "a:/api/admin/maps",
+      "rel": "calls"
+    },
+    {
+      "from": "p:OCR",
+      "to": "t:ocr_extractions",
+      "rel": "writes"
+    },
+    {
+      "from": "p:OCR",
+      "to": "t:map_pipeline_status",
+      "rel": "advances"
+    },
+    {
+      "from": "p:OCR",
+      "to": "x:Gemini",
+      "rel": "calls"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "t:footprint_submissions",
+      "rel": "writes"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "t:map_pipeline_status",
+      "rel": "advances"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "t:ocr_extractions",
+      "rel": "reads"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "p:OCR",
+      "rel": "triggers"
+    },
+    {
+      "from": "r:/contribute/digitalize",
+      "to": "p:MapSAM2",
+      "rel": "triggers"
+    },
+    {
+      "from": "k:tile_map",
+      "to": "x:R2Worker",
+      "rel": "writes"
+    },
+    {
+      "from": "k:bulk_upload",
+      "to": "k:tile_map",
+      "rel": "calls"
+    },
+    {
+      "from": "k:bulk_upload",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "k:bulk_upload",
+      "to": "t:map_iiif_sources",
+      "rel": "writes"
+    },
+    {
+      "from": "k:scout_all",
+      "to": "x:Gallica",
+      "rel": "calls"
+    },
+    {
+      "from": "k:scout_all",
+      "to": "x:Rumsey",
+      "rel": "calls"
+    },
+    {
+      "from": "k:scout_all",
+      "to": "x:LoC",
+      "rel": "calls"
+    },
+    {
+      "from": "k:scout_humazur",
+      "to": "x:Humazur",
+      "rel": "calls"
+    },
+    {
+      "from": "k:load_scout",
+      "to": "t:scout_candidates",
+      "rel": "writes"
+    },
+    {
+      "from": "k:audit_metadata",
+      "to": "t:maps",
+      "rel": "reads"
+    },
+    {
+      "from": "k:fetch_hosted",
+      "to": "t:maps",
+      "rel": "reads"
+    },
+    {
+      "from": "k:fetch_hosted",
+      "to": "x:Gallica",
+      "rel": "calls"
+    },
+    {
+      "from": "k:fetch_hosted",
+      "to": "x:Humazur",
+      "rel": "calls"
+    },
+    {
+      "from": "k:apply_backfill",
+      "to": "t:maps",
+      "rel": "writes"
+    },
+    {
+      "from": "r:/",
+      "to": "x:CFPages",
+      "rel": "deployed"
+    },
+    {
+      "from": "x:R2Worker",
+      "to": "x:CFPages",
+      "rel": "deployed"
+    },
+    {
+      "from": "p:schoonman",
+      "to": "i:tudelft",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:morlighem",
+      "to": "i:tudelft",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:ledoux",
+      "to": "i:tudelft",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:labetski",
+      "to": "i:tudelft",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:meijers",
+      "to": "i:tudelft",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:hurni",
+      "to": "i:eth-ikg",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:wu-sidi",
+      "to": "i:eth-ikg",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:chen-yizi",
+      "to": "i:eth-ikg",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:schindler",
+      "to": "i:eth-ikg",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:kaplan",
+      "to": "i:epfl-dhlab",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:dilenardo",
+      "to": "i:epfl-dhlab",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:petitpierre",
+      "to": "i:epfl-dhlab",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:mcdonough",
+      "to": "i:turing",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:mcdonough",
+      "to": "i:lancaster",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:gregory",
+      "to": "i:lancaster",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:spangler",
+      "to": "i:leventhal",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:vanwissen",
+      "to": "i:knaw",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:perret",
+      "to": "i:ign",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:chen-yizi",
+      "to": "i:epita",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:bol",
+      "to": "i:harvard-cga",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:white",
+      "to": "i:stanford-cesta",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:meeks",
+      "to": "i:stanford-cesta",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:mostern",
+      "to": "i:ishi",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:giraldo",
+      "to": "i:nypl-labs",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:wright",
+      "to": "i:gsapp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:scott-felicity",
+      "to": "i:gsapp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:bouakar",
+      "to": "i:gsapp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:kurgan",
+      "to": "i:gsapp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:weiping-wu",
+      "to": "i:gsapp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:sanyal",
+      "to": "i:mit-dusp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:vale",
+      "to": "i:mit-dusp",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:davis",
+      "to": "i:gsd",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:mehrotra",
+      "to": "i:gsd",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:huynh-thedu",
+      "to": "i:fulbright",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:pincus",
+      "to": "i:fulbright",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:jennings",
+      "to": "i:cornell-seap",
+      "rel": "affiliated"
+    },
+    {
+      "from": "p:ledoux",
+      "to": "p:morlighem",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:labetski",
+      "to": "p:morlighem",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:hurni",
+      "to": "p:wu-sidi",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:hurni",
+      "to": "p:chen-yizi",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:schindler",
+      "to": "p:wu-sidi",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:schindler",
+      "to": "p:chen-yizi",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:gregory",
+      "to": "p:mcdonough",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:bouakar",
+      "to": "p:kurgan",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:conzen",
+      "to": "p:whitehand",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:muratori",
+      "to": "p:caniggia",
+      "rel": "supervises"
+    },
+    {
+      "from": "p:spaan",
+      "to": "f:allmaps",
+      "rel": "built"
+    },
+    {
+      "from": "p:schoonman",
+      "to": "f:allmaps",
+      "rel": "built"
+    },
+    {
+      "from": "p:claeys",
+      "to": "f:allmaps",
+      "rel": "built"
+    },
+    {
+      "from": "p:waters",
+      "to": "f:mapwarper",
+      "rel": "built"
+    },
+    {
+      "from": "p:spangler",
+      "to": "f:atlascope",
+      "rel": "built"
+    },
+    {
+      "from": "p:morlighem",
+      "to": "f:histo3d",
+      "rel": "built"
+    },
+    {
+      "from": "p:perret",
+      "to": "f:soduco",
+      "rel": "built"
+    },
+    {
+      "from": "p:chen-yizi",
+      "to": "f:benchmark",
+      "rel": "built"
+    },
+    {
+      "from": "p:mcdonough",
+      "to": "f:mapreader",
+      "rel": "built"
+    },
+    {
+      "from": "p:kaplan",
+      "to": "f:vtm",
+      "rel": "built"
+    },
+    {
+      "from": "p:giraldo",
+      "to": "f:nypl-bi",
+      "rel": "built"
+    },
+    {
+      "from": "p:bol",
+      "to": "f:chgis",
+      "rel": "built"
+    },
+    {
+      "from": "p:southall",
+      "to": "f:gbhgis",
+      "rel": "built"
+    },
+    {
+      "from": "p:mostern",
+      "to": "f:whg",
+      "rel": "built"
+    },
+    {
+      "from": "p:meeks",
+      "to": "f:orbis",
+      "rel": "built"
+    },
+    {
+      "from": "p:vanwissen",
+      "to": "f:globalise",
+      "rel": "built"
+    },
+    {
+      "from": "i:knaw",
+      "to": "f:hisgis",
+      "rel": "built"
+    },
+    {
+      "from": "i:meta",
+      "to": "f:rapid",
+      "rel": "built"
+    },
+    {
+      "from": "f:atlascope",
+      "to": "f:allmaps",
+      "rel": "uses"
+    },
+    {
+      "from": "f:hisgis",
+      "to": "f:allmaps",
+      "rel": "uses"
+    },
+    {
+      "from": "f:histo3d",
+      "to": "m:obia",
+      "rel": "uses"
+    },
+    {
+      "from": "f:histo3d",
+      "to": "m:procedural-3d",
+      "rel": "uses"
+    },
+    {
+      "from": "f:soduco",
+      "to": "m:obia",
+      "rel": "uses"
+    },
+    {
+      "from": "f:soduco",
+      "to": "m:geotext",
+      "rel": "uses"
+    },
+    {
+      "from": "f:nypl-bi",
+      "to": "m:hitl",
+      "rel": "uses"
+    },
+    {
+      "from": "f:rapid",
+      "to": "m:hitl",
+      "rel": "uses"
+    },
+    {
+      "from": "f:mapreader",
+      "to": "m:geotext",
+      "rel": "uses"
+    },
+    {
+      "from": "f:whg",
+      "to": "f:pelagios",
+      "rel": "uses"
+    },
+    {
+      "from": "f:globalise",
+      "to": "f:pelagios",
+      "rel": "uses"
+    },
+    {
+      "from": "f:benchmark",
+      "to": "m:obia",
+      "rel": "uses"
+    },
+    {
+      "from": "f:mapsam2",
+      "to": "m:obia",
+      "rel": "uses"
+    },
+    {
+      "from": "i:eth-ikg",
+      "to": "m:transformer-seg",
+      "rel": "uses"
+    },
+    {
+      "from": "f:vtm",
+      "to": "f:tme",
+      "rel": "spawned"
+    },
+    {
+      "from": "f:urbanhistory4d",
+      "to": "f:tme",
+      "rel": "partOf"
+    },
+    {
+      "from": "f:nypl-bi",
+      "to": "f:rapid",
+      "rel": "spawned"
+    },
+    {
+      "from": "f:chgis",
+      "to": "f:gbhgis",
+      "rel": "influences"
+    },
+    {
+      "from": "f:chgis",
+      "to": "f:whg",
+      "rel": "influences"
+    },
+    {
+      "from": "p:morlighem",
+      "to": "w:morlighem-2021",
+      "rel": "authored"
+    },
+    {
+      "from": "p:huynh-thedu",
+      "to": "w:huynh-2024",
+      "rel": "authored"
+    },
+    {
+      "from": "p:bouakar",
+      "to": "w:bouakar-2018",
+      "rel": "authored"
+    },
+    {
+      "from": "p:cherry",
+      "to": "w:cherry-2019",
+      "rel": "authored"
+    },
+    {
+      "from": "p:brocheux",
+      "to": "w:brocheux-2009",
+      "rel": "authored"
+    },
+    {
+      "from": "p:mostern",
+      "to": "w:mostern-yellowriver",
+      "rel": "authored"
+    },
+    {
+      "from": "p:lefebvre",
+      "to": "c:production-of-space",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:lefebvre",
+      "to": "c:lefebvre-triad",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:harvey",
+      "to": "c:right-to-city",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:lefebvre",
+      "to": "c:right-to-city",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:harley",
+      "to": "c:critical-cartography",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:scott-james",
+      "to": "c:seeing-like-state",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:gregory",
+      "to": "c:spatial-humanities",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:gregory",
+      "to": "m:geotext",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:conzen",
+      "to": "m:conzenian",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:muratori",
+      "to": "m:muratorian",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:white",
+      "to": "c:spatial-humanities",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:knowles",
+      "to": "c:hgis",
+      "rel": "proposes"
+    },
+    {
+      "from": "p:bol",
+      "to": "c:hgis",
+      "rel": "proposes"
+    },
+    {
+      "from": "c:production-of-space",
+      "to": "c:lefebvre-triad",
+      "rel": "influences"
+    },
+    {
+      "from": "c:lefebvre-triad",
+      "to": "c:datastack",
+      "rel": "influences"
+    },
+    {
+      "from": "c:datastack",
+      "to": "c:body-soul",
+      "rel": "influences"
+    },
+    {
+      "from": "c:datastack",
+      "to": "c:progression",
+      "rel": "influences"
+    },
+    {
+      "from": "c:hgis",
+      "to": "c:spatial-humanities",
+      "rel": "influences"
+    },
+    {
+      "from": "c:critical-cartography",
+      "to": "c:spatial-humanities",
+      "rel": "influences"
+    },
+    {
+      "from": "w:thongchai",
+      "to": "c:critical-cartography",
+      "rel": "influences"
+    },
+    {
+      "from": "w:anderson",
+      "to": "c:critical-cartography",
+      "rel": "influences"
+    },
+    {
+      "from": "c:seeing-like-state",
+      "to": "c:critical-cartography",
+      "rel": "influences"
+    },
+    {
+      "from": "f:soduco",
+      "to": "g:obia-indochina",
+      "rel": "adjacent"
+    },
+    {
+      "from": "f:histo3d",
+      "to": "g:obia-indochina",
+      "rel": "adjacent"
+    },
+    {
+      "from": "i:eth-ikg",
+      "to": "g:obia-indochina",
+      "rel": "adjacent"
+    },
+    {
+      "from": "m:dl-featurematch",
+      "to": "g:georef-indian1960",
+      "rel": "adjacent"
+    },
+    {
+      "from": "m:ocr-geocode",
+      "to": "g:georef-indian1960",
+      "rel": "adjacent"
+    },
+    {
+      "from": "f:globalise",
+      "to": "g:kg-sea-colonial",
+      "rel": "adjacent"
+    },
+    {
+      "from": "f:viennawiki",
+      "to": "g:kg-sea-colonial",
+      "rel": "adjacent"
+    },
+    {
+      "from": "f:whg",
+      "to": "g:kg-sea-colonial",
+      "rel": "adjacent"
+    },
+    {
+      "from": "f:soduco",
+      "to": "g:spatial-saigon",
+      "rel": "adjacent"
+    },
+    {
+      "from": "g:obia-indochina",
+      "to": "v:imagomundi",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:obia-indochina",
+      "to": "v:ijgis",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:georef-indian1960",
+      "to": "v:isprs",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:georef-indian1960",
+      "to": "v:chr",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:kg-sea-colonial",
+      "to": "v:dsh",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:kg-sea-colonial",
+      "to": "v:dh",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:spatial-saigon",
+      "to": "v:planningperspectives",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "g:spatial-saigon",
+      "to": "v:urbanhistory",
+      "rel": "publishesIn"
+    },
+    {
+      "from": "$:pica",
+      "to": "f:allmaps",
+      "rel": "funds"
+    },
+    {
+      "from": "$:anr",
+      "to": "f:soduco",
+      "rel": "funds"
+    },
+    {
+      "from": "$:horizon",
+      "to": "f:tme",
+      "rel": "funds"
+    },
+    {
+      "from": "$:luce",
+      "to": "i:fulbright",
+      "rel": "funds"
+    },
+    {
+      "from": "m:gcp-propagation",
+      "to": "m:datum-helmert",
+      "rel": "uses"
+    },
+    {
+      "from": "m:transformer-seg",
+      "to": "m:obia",
+      "rel": "advances"
+    },
+    {
+      "from": "m:muratorian",
+      "to": "m:procedural-3d",
+      "rel": "influences"
+    },
+    {
+      "from": "x:Allmaps",
+      "to": "f:allmaps",
+      "rel": "instanceOf"
+    },
+    {
+      "from": "x:Gallica",
+      "to": "i:bnf",
+      "rel": "instanceOf"
+    },
+    {
+      "from": "x:Rumsey",
+      "to": "i:rumsey",
+      "rel": "instanceOf"
+    },
+    {
+      "from": "r:/contribute/georef",
+      "to": "f:allmaps",
+      "rel": "uses"
+    },
+    {
+      "from": "r:/contribute/georef",
+      "to": "m:gcp-propagation",
+      "rel": "implements"
+    },
+    {
+      "from": "r:/contribute/georef",
+      "to": "m:datum-helmert",
+      "rel": "implements"
+    },
+    {
+      "from": "r:/contribute/georef",
+      "to": "f:histo3d",
+      "rel": "feeds"
+    },
+    {
+      "from": "r:/contribute/georef",
+      "to": "g:georef-indian1960",
+      "rel": "addresses"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "f:mapsam2",
+      "rel": "runs"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "m:transformer-seg",
+      "rel": "implements"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "m:hitl",
+      "rel": "implements"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "f:soduco",
+      "rel": "peerOf"
+    },
+    {
+      "from": "p:MapSAM2",
+      "to": "g:obia-indochina",
+      "rel": "addresses"
+    },
+    {
+      "from": "t:footprint_submissions",
+      "to": "f:histo3d",
+      "rel": "feeds"
+    },
+    {
+      "from": "t:footprint_submissions",
+      "to": "f:ohm",
+      "rel": "feeds"
+    },
+    {
+      "from": "r:/contribute/review",
+      "to": "f:nypl-bi",
+      "rel": "inheritsFrom"
+    },
+    {
+      "from": "r:/contribute/review",
+      "to": "f:rapid",
+      "rel": "inheritsFrom"
+    },
+    {
+      "from": "r:/contribute/trace",
+      "to": "i:hot",
+      "rel": "inheritsFrom"
+    },
+    {
+      "from": "t:ocr_extractions",
+      "to": "m:geotext",
+      "rel": "implements"
+    },
+    {
+      "from": "t:ocr_extractions",
+      "to": "f:globalise",
+      "rel": "peerOf"
+    },
+    {
+      "from": "t:ocr_extractions",
+      "to": "f:whg",
+      "rel": "feeds"
+    },
+    {
+      "from": "t:ocr_extractions",
+      "to": "g:kg-sea-colonial",
+      "rel": "addresses"
+    },
+    {
+      "from": "t:maps",
+      "to": "g:spatial-saigon",
+      "rel": "addresses"
+    }
+  ]
+}
