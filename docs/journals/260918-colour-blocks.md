@@ -323,3 +323,290 @@ IoU 0.5 on a single one of the 12 scored plots today, from any model. It also
 solves a problem the archive no longer has — 132 maps are georeferenced, and
 1898 is out of the D4 series because its georeference puts it wholly north of
 the Bến Nghé canal.
+
+## P2b — the cream parcels, and the constant that was hiding them (2026-09-18, same day)
+
+The recorded dead end above says adding cream to the mask gives one component of
+11.91 km², 100% of the mask, 0 blocks in the band, because the street network
+welds every cream parcel to every other. That measurement is real and it is also
+an artefact of a number: it was taken at `INK_V = 0.55`, the block pass's
+threshold. At 0.55 a 2 px cadastral divider is grey rather than ink, so the
+parcels leak into the street through their own boundaries.
+
+Swept instead, on a quarter-scale probe, counting banded area:
+
+```
+ ink_v   ink%   comps   biggest%   in-band   band-area(m²)
+ 0.50     5.9   15404      97.9        0             0      ← everything welded
+ 0.65    11.2   20267      79.9       18         33954
+ 0.75    17.5   24939      35.8       70        218069      ← argmax
+ 0.85    26.2   29652      21.9       98        206038
+ 0.90    81.1   85337       0.1        0             0      ← paper becomes ink
+```
+
+The cliff at 0.90 is the sheet's own paper tone: V peaks there, so above it the
+paper classifies as ink and there is nothing left to component. That is why
+`cream_ink` bounds its sweep at `paper_peak(rgb) - 0.03` and takes the argmax of
+banded *area* — the threshold is read off the sheet rather than carried between
+sheets, which is the mistake this whole section is about.
+
+The invariant that makes it measurable without ground truth: **a street network
+is one component and parcels are many.** The street survives as the single
+oversized component the area band already drops (6.19 km² on this sheet).
+
+Whole sheet, `--render 6051 --cream`, 850 parcels, +4 s:
+
+| run | n | @.5 | @.3 | mean | med | cover |
+|---|---|---|---|---|---|---|
+| blocks only | 253 | 4 | 5 | 0.247 | 0.161 | 0.98 |
+| + cream | 1103 | 7 | 8 | **0.346** | 0.218 | 1.00 |
+| + furniture drop | 1082 | 7 | 8 | 0.346 | 0.218 | 1.00 |
+
+Target was 0.262. Missed land_plot traces go 2 → **0**; claimed area goes 14.4%
+→ 32.9% of the scan.
+
+**Read the n column before quoting the mean.** `seg_eval` takes the best match
+per trace, so 4× the predictions can only raise it; the run prints that warning
+itself. What the picture adds, and the metric cannot: the Batavia/Hamelin grid,
+blank under the block pass, comes out as individual plots respecting the printed
+dividers.
+
+The two passes must not share knobs. At 0.80 the salmon class shatters into
+10,078 components (20 in band) and the hatched green vanishes, because hatching
+*is* ink at that threshold. Cream is the only class clean enough to read this
+way, and that is a property of the class, not of the sheet.
+
+**1:1 is not required, and I thought it was.** The plateau survives downscale to
+1.37 m/px on the test crop; at `--render 6051` the pass scores 0.346 against
+0.342 at full resolution. One fetch, one render, two passes.
+
+### Map furniture, from the sheet's own labels
+
+`furniture_mask` unions the padded `title` and `legend` OCR label boxes: 8
+regions, 7.4% of the sheet, dropping 21 polygons (11 of the 253 blocks, 10 cream
+parcels). The journal counted 10 furniture blocks by hand; the labels find 11.
+The score does not move, which is the point — it drops things that were never
+scoreable.
+
+A convex *hull* of those boxes is wrong and was tried first: `legend` also tags
+the boundary annotations strung along the neatline, so the hull spans
+(349, 372)–(11655, 8525), very nearly the whole sheet. Per-label boxes, unioned.
+
+### Still open
+
+- **Water.** The river stipple fragments into in-band components along the whole
+  bank. The 16 `hydrology` labels locate it but do not fence it — only 4 parcels
+  hold a label centre, because the fragments are smaller than the lettering. A
+  flood-fill from the labelled parcels through their neighbours is the obvious
+  next primitive, unbuilt.
+- **The green conflation, now with a measured cause.** Sampling the legend
+  swatches at their caption rows gives the sheet's own key: *particulières*
+  r−g +0.149, *non affectées* +0.059/r−b +0.149, *communales* +0.016/+0.122,
+  *militaire et marine* +0.000/+0.008, and *service local* **r−b +0.075** against
+  a detected cool split of **+0.073**. That class sits exactly on the boundary,
+  so it is sliced between blue and cream by local paper tone. The fix is to
+  classify by nearest swatch in (r−g, r−b) rather than by ordered 1-D troughs,
+  which also deletes the precedence rule that currently has to be defended in a
+  comment. Swatch V is printed ink (0.76–0.85) where the body is ink over paper,
+  so the centroids need normalising against the cream swatch — cream being the
+  one class whose on-sheet value is already known, because it is the paper.
+
+## Nearest-legend-swatch classification — tried, measured, rejected (2026-09-18)
+
+Prompted by Giraldo Arteaga, *Historical map polygon and feature extractor*
+(NYPL Labs, MAPINTERACT '13), whose §3.2 calibration is a hand-enumerated list
+of `basecolors` including the paper, and whose §3.6 assigns each polygon a class
+by Euclidean distance from its average colour to that list. The paper even
+records "there are two shades of red and two shades of blue" — the same problem
+as this sheet's two blues. We have the list for free: the five legend captions
+come out of the OCR with their y positions, and sampling the strip right of each
+caption (taking the decile furthest from the local median, so the paper the
+swatch sits on does not dominate) recovers the key automatically:
+
+| caption | r−g | r−b |
+|---|---|---|
+| domaniales militaire et marine | +0.000 | +0.000 |
+| domaniales service local | +0.039 | +0.067 |
+| domaniales non affectées | +0.051 | +0.129 |
+| communales | +0.016 | +0.122 |
+| particulières | +0.153 | +0.255 |
+
+Within 0.008 of a hand sample, and no hardcoded swatch column.
+
+**A swatch is solid ink and a wash is that ink diluted over paper**, so the
+swatches cannot be used as centroids directly: raw nearest-swatch puts 3.00M px
+in *service local* and only 0.46M in *particulières*, where the trough
+classifier finds 3.00M blue and 1.70M salmon. Classifying by *bearing* from the
+paper swatch, which is scale-free and therefore immune to dilution, is worse
+still — 44% of the sheet comes back *particulières*, because near the paper
+point the bearing is noise.
+
+Scaling the swatches toward paper by a dilution factor α does work, and α is
+fittable without ground truth by agreeing with the trough classifier — a single
+clean peak, 91.03% at **α = 0.60**, which reproduces the four known shares
+(militaire 2.99M vs blue 3.00M, non affectées 17.78M vs cream 18.80M,
+communales 0.93M vs green 1.00M, particulières 1.37M vs salmon 1.70M) and adds
+*service local* as a fifth class at 1.38M px. Estimating α from the sheet's own
+saturation tail instead does not work: p98–p99.9 of body chroma over the
+strongest swatch gives 0.82–1.75, because the tail is the boundary crosses, the
+seal and the dark building fills rather than wash.
+
+**Scored at its own best α it is a regression, so it is not landed:**
+
+| run | n | @.5 | @.3 | mean | med |
+|---|---|---|---|---|---|
+| troughs + cream (landed) | 1082 | 7 | 8 | **0.346** | 0.218 |
+| nearest swatch, α = 0.60 | 1222 | 6 | 7 | 0.307 | 0.179 |
+
+Building goes 0.114 → 0.081 as well, and it loses *with more predictions*, which
+under a best-match-per-trace metric makes it unambiguous.
+
+The likely mechanism, unverified: a fifth class interleaved with the fourth cuts
+the pigment union differently, so blocks that were one component under four
+classes fragment under five — the run labels 192 blocks *service local* against
+8 *militaire*, which is not a plausible reading of the sheet and is the same
+blue confusion arriving from the other side.
+
+**So the precedence rule stays and is earning its keep.** What the swatches are
+good for is naming and diagnosis, not boundaries: the boundary that matters is
+where the *data* is sparse, which is what a trough is and what a swatch cannot
+know. The diagnosis stands — *service local* at r−b +0.067 against a cool split
+of +0.073 is genuinely on the line — but the fix is not this.
+
+## The hull closing over the block it surrounds (2026-09-18, found by eye)
+
+A cream component is very often the paper *around* a block — a street corner, a
+margin, an L. `component_polygon` returns a concave hull, and the hull of a ring
+is a disc, so that component came back as a polygon lying on top of the block it
+surrounds. In an overlay it reads as the wrong class: a salmon block outlined in
+cream.
+
+Measured after it was spotted in a crop: **188 of 840 cream polygons were more
+than a quarter pigment inside their own outline**, 22.1 Mpx in total. My earlier
+check missed it because I measured polygon area ÷ *mask* area (median 1.02) —
+these rings have large masks too. The diagnostic that finds it is pigment inside
+the outline, not inflation over the mask.
+
+Two fixes measured. Dropping the offenders outright is nearly free but treats the
+symptom (t = 0.4: −72 polygons, 0.346 → 0.345). Subtracting the block polygons —
+already in hand from the first pass, so no new geometry and no new dependency —
+is better on both axes:
+
+| run | n | @.5 | mean | med |
+|---|---|---|---|---|
+| before | 1082 | 7 | 0.346 | 0.218 |
+| `subtract_blocks` | 1044 | 7 | **0.350** | 0.218 |
+
+156 hulls cut back, 40 dropped as a block with a rim. A better score with fewer
+predictions is an improvement twice over under a best-match metric.
+
+It leans on the block hulls being roughly right, since it subtracts hull from
+hull. The clean version is a raster trace of both — `rasterio.features.shapes`,
+which is installed in this environment but is a GDAL dependency the script does
+not declare, so it is not used.
+
+### Still visible after the fix
+
+- **Hatched areas emit sliver parcels.** Inside the *Prisons* block and other
+  hatched administrative land, the cream pass finds the paper *between* the
+  hatch lines and returns it as thin parcels. They survive `subtract_blocks`
+  when the hatched area was not itself claimed as a block.
+- **The blue wash keeps its internal lines, and could stop.** Swept on the
+  Parc du Génie quarter at 1:1, the blue class has its own plateau and it is not
+  cream's: in-band components go 19 at V<0.55 → 23 at 0.65 → **58 at 0.75** →
+  1 at 0.80 → 0 at 0.85. So the parcel dividers inside blue *are* recoverable,
+  at a threshold of blue's own, and the pass collapses a step earlier than
+  cream's because the blue-grey is itself a hatch. The generalisation is a
+  per-class sweep rather than one cream-only threshold — unbuilt.
+
+## The blue quarter was never a classification problem (2026-09-18, found by eye)
+
+Reported as "fails to detect the edge on blue": in the Arsenal / Casernes
+quarter the blue-grey wash came back unclaimed and the cream pass drew ragged
+orange around it. Neither the cool split nor the closing is at fault — blue is
+20.5% of that crop either way. **The naval quarter is one blue component of
+397,560 m² against a `MAX_AREA_M2` of 120,000, so it was dropped whole**, every
+run, and the line `dropped 1 as too large` was it.
+
+The cap is right about a merge failure and wrong about this. A legitimate
+single-tint domain — a naval arsenal washed across many blocks *and the streets
+between them* — trips it honestly. Re-cutting that blob at a higher ink
+threshold, by the same banded-area sweep the cream pass uses, recovers it:
+
+```
+V≥0.55:  10 in band, largest 304,911 m²,  62,491 m² banded   ← today
+V≥0.65:  37 in band, largest  79,620 m², 295,678 m² banded   ← argmax
+V≥0.70:  81 in band, largest  43,288 m², 228,120 m²
+V≥0.75: 115 in band, largest   4,669 m²,  81,906 m²          ← fragmenting
+```
+
+Three quarters of the blob comes back, and the largest piece now fits under the
+cap. Sheet-wide: **blue 41 → 216 blocks, green 106 → 178, salmon 95 → 141**, and
+land_plot 0.350 → 0.358 / median 0.218 → 0.232.
+
+**It is behind `--recut` and off by default**, for two measured reasons.
+
+1. **It costs ~60 s** against the 8.6 s default — the sweep re-labels a very
+   large mask several times.
+2. **It rescues the river too.** The water tint is blue-grey, so with the cap
+   lifted the Rivière de Saigon comes back as dozens of blue "blocks". The
+   `hydrology` labels ought to fence it and *cannot*: the arsenal's wash touches
+   the river along the quay, so parent and river are the same component, and
+   testing the parent drops the arsenal with the water — measured, blue 216 → 41.
+   Moving the test onto the re-cut parts keeps the arsenal but stops catching
+   the river, because 16 labels do not land in dozens of pieces. Sparse labels
+   fence a region only when the region is already one blob.
+
+Never on cream: an oversized cream component is the street network, one
+connected surface by construction, and its oversize is the guard rather than a
+failure. Re-cutting it returns ~240 street fragments and costs another 40 s.
+
+### A contract bug found on the way
+
+`write_outputs` built `blocks.run.json` from `shapely.get_coordinates(geom)`,
+which returns *every* ring. `subtract_blocks` can leave a cream polygon with a
+hole — a rim around a block — and flattening exterior and interior into one
+coordinate list builds a self-crossing polygon: seg_eval rebuilt a true 0.20 Mpx
+rim as 0.64 Mpx, and it cost land_plot 0.350 → 0.337 across 36 of 1044 polygons.
+The run file now carries the exterior ring only, which is what its one-ring
+contract can express; `blocks.geojson` beside it keeps the true geometry.
+
+## What it would take to claim "no GPU" in public
+
+Asked from the outreach side, where "a CPU threshold does this in 8.6 s" is the
+part that travels further than the IoU. The claim is true of the run and not yet
+defensible as a result. Four things stand between.
+
+**1. There is no precision number, and the metric cannot produce one.**
+`seg_eval` takes the best-matching prediction per trace. It never looks at a
+prediction that matched nothing, so 1,044 polygons against 113 traces score
+exactly as well as 113 good ones would, and every false positive in this journal
+— the river ribbons, the hatch slivers — is invisible to it. Recall-flavoured
+numbers are the only ones this pass has. A public claim needs precision, and
+precision needs a sheet where *every* parcel is traced, not 118 of roughly a
+thousand. That is a tracing job, not a code job, and it is the real blocker.
+
+**2. One sheet, one era, one style.** Every number here is the 1882 Plan
+Cadastral. The knobs are self-calibrating by design — the colour troughs vote,
+the ink threshold sweeps against the paper peak, the area band is in metres — but
+self-calibrating is a claim about the method, and it has been run on exactly one
+sheet. Two more, from different decades and different printers, is the minimum.
+
+**3. The comparison would be apples to oranges unless stated.** The SAM2 rows in
+`EVAL-BASELINE.md` are scored against traces the LoRA was fine-tuned on — train
+-set scores, flattered by an unknown amount, as that file says itself. A colour
+threshold is trained on nothing, which is the honest strength here and is worth
+saying plainly; it is also why "beats SAM2" would be a misleading sentence. The
+defensible form is narrower: *this is the first segmentation number on this sheet
+that is not a train-set score.*
+
+**4. What the pass actually produces is a prior, not footprints.** 1,044 blocks
+and parcels are prompts for the within-block split, and that split still needs
+SAM2 and a GPU. "No GPU" is true of the prior; it is not true of the pipeline,
+and the 3.9× merge measured at the top of this journal is exactly the part the
+GPU is still for.
+
+So the sentence that is currently true: **a CPU-only colour pass, calibrated from
+the sheet itself and trained on nothing, produces a block-and-parcel prior for a
+polychrome cadastral sheet in about nine seconds, and on the one sheet measured
+it covers every hand-traced land plot.** Everything stronger needs item 1.

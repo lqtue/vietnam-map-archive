@@ -3,6 +3,7 @@
 
     python work/ocr/scripts/colour_blocks.py --map-id <uuid> --census
     python work/ocr/scripts/colour_blocks.py --map-id <uuid> --out work/ocr/outputs/<uuid>/colour
+    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --cream --drop-furniture --out <dir>
     python work/ocr/scripts/colour_blocks.py --self-check          # no network, no data
 
 Why this exists: `modern_prior.py` builds the block prior from 2023 geodata —
@@ -40,12 +41,22 @@ green on `r - g` again, below the cream peak. The order is not cosmetic: blue
 and green both sit low on `r - g`, so claiming green first swallows the
 military parcels whole (65 blocks to 1, measured).
 
-**Cream is still not a block.** Street surface and unassigned *non affectées*
-land are the same tone and are separated by name, not palette — the
-`street_name` extractions `to_sam2_seeds.py` discards. Adding cream to the mask
-does not work and was measured: the street network welds every cream parcel to
-every other, giving one component of 11.91 km², 100% of the mask, 0 blocks in
-the area band.
+**Cream is a parcel, not a block, and needs `--cream` and its own threshold.**
+Street surface and unassigned *non affectées* land are the same tone, so cream
+cannot be componented the way a block is. The recorded reason it "does not
+work" — one component of 11.91 km², 100% of the mask, 0 blocks in the band —
+was measured at `INK_V = 0.55`, and that turned out to be the whole of the
+problem: at 0.55 a 2 px cadastral divider is grey rather than ink, so every
+parcel leaks into the street. Swept up to the sheet's own paper tone
+(`cream_ink`) the mask falls apart into parcels instead, with the street left
+as the one oversized component the area band already drops. On the 1882 sheet
+that is 850 parcels at V < 0.80, and it takes land_plot IoU from 0.247 to
+0.346 against a 0.262 target. The pass runs at the same render as the block
+pass and adds about 4 s.
+
+The two passes are not the same measurement and must not share knobs: at 0.80
+the salmon class shatters into 10,078 components (20 in band) and the hatched
+green vanishes entirely, because hatching *is* ink at that threshold.
 
 Two designs were measured and rejected before this one, both on the 1882 tile
 `4142_4032`, and both are recorded so they are not re-attempted:
@@ -76,6 +87,9 @@ Two knobs that decide whether a run means anything, both reported:
               streets. Measured on the 1882 tile, the block count is flat from
               1:1 to about 4x and the pigment is intact; past 6x the classes
               start bleeding into each other.
+  --cream-ink the cream pass's own ink threshold, swept by default rather than
+              fixed — see `cream_ink`, and CREAM_INK_RANGE for why a constant
+              carried between sheets is the failure mode this pass was hiding.
   --close     morphological closing before componenting, in render px. It
               rejoins a wash across the printed lines drawn on top of it; the
               street is far too wide to bridge. Swept against the 24 land_plot
@@ -124,10 +138,22 @@ PRIOR_CRS = "source-pixels-y-down"
 # lettering. Measured on the 1882 sheet, where ink comes to 10.2% of the paper.
 INK_V = 0.55
 
-# The classes a block can be made of. Cream is not among them: it is the
-# street surface and the unassigned domain land at once, and separating those
-# needs the OCR street names rather than the palette (P2).
+# The classes a block can be made of. Cream is not among them: a block is a
+# component *of* the pigment, and cream is street surface and unassigned domain
+# land at once. The cream pass below finds those separately, and at a threshold
+# of its own — see CREAM_INK_RANGE.
 PIGMENT_CLASSES = ("salmon", "green", "blue")
+
+# The cream pass sweeps its ink threshold over this range and keeps the value
+# that puts the most *area* in the band. Sweeping rather than fixing is the
+# lesson of the pass itself: INK_V = 0.55 was carried over from another sheet
+# and is exactly what made cream look unsplittable. At 0.55 the 1882 sheet
+# returns one component holding 98% of the mask; at 0.75-0.85 it returns 660-820
+# parcels, and above the paper's own V peak (0.90 here) the paper becomes ink
+# and the band empties. The upper bound is therefore read off the sheet, not
+# written down.
+CREAM_INK_RANGE = (0.55, 0.05)      # (start, step); the stop is the paper peak
+CREAM_INK_MARGIN = 0.03             # keep clear of the peak itself
 
 # Closing kernel, render px. Load-bearing — see the module docstring for the
 # plateau this sits in the middle of.
@@ -326,6 +352,14 @@ def classify(rgb: np.ndarray, split: float, ink_v: float = INK_V,
     ink = a.max(axis=2) < ink_v
     live = ~ink
     salmon = live & (rg > split)
+    # Replacing this precedence with nearest-legend-swatch classification, the
+    # way NYPL's map vectorizer does it, was tried on 2026-09-18 and scored
+    # worse — land_plot 0.346 -> 0.307 with *more* predictions. A swatch is
+    # solid ink and a wash is that ink diluted, and even with the dilution
+    # fitted (alpha 0.60, 91% agreement with these troughs) a fifth class
+    # interleaved with the fourth fragments the blocks. Journal: § Nearest-
+    # legend-swatch. Do not re-attempt without a different mechanism.
+    #
     # Precedence matters and is not arbitrary: the blue-grey military wash and
     # the hatched administrative wash *both* sit low on `r - g` (0.024 and
     # 0.027), so a green-first order swallows the military parcels whole — it
@@ -359,7 +393,8 @@ def classify(rgb: np.ndarray, split: float, ink_v: float = INK_V,
 
 
 def dominant_class(masks: dict[str, np.ndarray], sel: np.ndarray,
-                   sl: tuple | None = None) -> str:
+                   sl: tuple | None = None,
+                   classes: tuple[str, ...] = PIGMENT_CLASSES) -> str:
     """The pigment covering most of one component.
 
     Only the pigmented classes are candidates: a block is a component *of* the
@@ -370,8 +405,8 @@ def dominant_class(masks: dict[str, np.ndarray], sel: np.ndarray,
     rather than a full-frame array being allocated per component — at a few
     thousand components on a 4096 px sheet that difference is the run.
     """
-    best, share = "salmon", -1.0
-    for name in PIGMENT_CLASSES:
+    best, share = classes[0], -1.0
+    for name in classes:
         m = masks[name][sl] if sl is not None else masks[name]
         n = float((m & sel).sum())
         if n > share:
@@ -420,7 +455,11 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
                        max_area_m2: float = MAX_AREA_M2,
                        ink_v: float = INK_V,
                        cool: float | None = None,
-                       green: float | None = None) -> tuple[list[dict], dict[str, int]]:
+                       green: float | None = None,
+                       classes: tuple[str, ...] = PIGMENT_CLASSES,
+                       recut: bool = False,
+                       water: list[tuple[float, float]] | None = None,
+                       ) -> tuple[list[dict], dict[str, int]]:
     """Pigment → close → connected components → polygons, classified and banded.
 
     Returns (features, dropped) where a feature is {geom, feature_type,
@@ -432,12 +471,13 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
     """
     masks = classify(rgb, split, ink_v, cool, green)
     pigment = np.zeros(rgb.shape[:2], bool)
-    for name in PIGMENT_CLASSES:
+    for name in classes:
         pigment |= masks[name]
     if close > 0:
         pigment = ndimage.binary_closing(pigment, np.ones((close, close), bool))
 
     labels, n = ndimage.label(pigment)
+    vmax = rgb.astype(np.float32).max(axis=2) / 255.0
     dropped: dict[str, int] = {"too small": 0, "too large": 0, "no ring": 0}
     out: list[dict] = []
     if n == 0:
@@ -457,7 +497,43 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
                 dropped["too small"] += 1
                 continue
             if area_m2 > max_area_m2:
-                dropped["too large"] += 1
+                # Never on cream. An oversized cream component is the street
+                # network — one connected surface by construction — and its
+                # being over the cap is the guard that drops it, not a merge
+                # failure to be rescued. Re-cutting it returns 240 street
+                # fragments and costs 100 s.
+                # Water is the other honest oversize, and unlike a merge it can
+                # be named: the sheet labels its own river. An oversized
+                # component holding a `hydrology` label is the Rivière de Saigon
+                # or an arroyo, and the cap was right about it — re-cutting it
+                # returns the water tint as dozens of blue "blocks". This is the
+                # one place a sparse label fences a region instead of merely
+                # locating it: the component *is* the fence.
+                parts = (recut_oversized(sub, vmax[sl], px_area_m2, min_area_m2, max_area_m2)
+                         if recut else [])
+                if not parts:
+                    dropped["too large"] += 1
+                    continue
+                for part in parts:
+                    # The water test goes on the *parts*, not the parent. On this
+                    # sheet the naval quarter's blue-grey is the same tint as the
+                    # river and touches it along the quay, so parent and river are
+                    # one 397,560 m² component: testing the parent drops the
+                    # arsenal with the water (blue 218 -> 41, measured). After the
+                    # re-cut they are separate pieces and the label lands in one.
+                    if water and _holds_point(part, sl, scale, water):
+                        dropped["water"] = dropped.get("water", 0) + 1
+                        continue
+                    geom = component_polygon(part, sl[1].start, sl[0].start, scale)
+                    if geom is None:
+                        dropped["no ring"] += 1
+                        continue
+                    out.append({
+                        "geom": geom,
+                        "feature_type": dominant_class(masks, part, sl, classes),
+                        "area_px": round(float(geom.area), 1),
+                    })
+                dropped["recut"] = dropped.get("recut", 0) + 1
                 continue
         elif n_px < MIN_AREA_PX:
             dropped["too small"] += 1
@@ -469,10 +545,212 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
             continue
         out.append({
             "geom": geom,
-            "feature_type": dominant_class(masks, sub, sl),
+            "feature_type": dominant_class(masks, sub, sl, classes),
             "area_px": round(float(geom.area), 1),
         })
     return out, dropped
+
+
+
+def _holds_point(mask: np.ndarray, sl: tuple, scale: float,
+                 pts: list[tuple[float, float]]) -> bool:
+    """Does this component mask contain any of `pts`, given in source pixels?"""
+    for x, y in pts:
+        r, c = int(y / scale) - sl[0].start, int(x / scale) - sl[1].start
+        if 0 <= r < mask.shape[0] and 0 <= c < mask.shape[1] and mask[r, c]:
+            return True
+    return False
+
+
+def recut_oversized(sub: np.ndarray, v: np.ndarray, px_area_m2: float | None,
+                    min_area_m2: float, max_area_m2: float,
+                    probe_range: tuple[float, float] = CREAM_INK_RANGE):
+    """A component over the area cap, re-cut at a higher ink threshold.
+
+    The cap exists to catch a merge failure — an outline the closing bridged, or
+    a wash that never closed. But a *legitimate* single-tint domain also trips
+    it: the naval quarter on the 1882 sheet is one continuous blue-grey wash
+    across many blocks and the streets between them, 397,560 m² against a
+    120,000 cap, and until now the run dropped it whole. What the reader then
+    sees is the cream pass claiming the leftovers, so the quarter comes back
+    outlined in the wrong class with ragged edges.
+
+    Dropping it is throwing away the sheet's own answer. The lines inside it are
+    printed, they are simply lighter than the block outlines the low threshold
+    is tuned for, so the same sweep that splits cream splits this: on that
+    quarter, V ≥ 0.65 gives 37 banded components holding 295,678 m² of the
+    397,560 — three quarters of it recovered, with the largest now under the cap.
+
+    Returns a list of masks, empty when no threshold rescues it (then the caller
+    drops it as before, and that is still the honest answer for a real merge).
+    """
+    if px_area_m2 is None:
+        return []
+    best, best_area = None, 0.0
+    start, step = probe_range
+    stop = float(v[sub].max()) - CREAM_INK_MARGIN if sub.any() else start
+    t = start
+    while t < stop:
+        lab, n = ndimage.label(sub & (v >= t))
+        if n:
+            sizes = np.bincount(lab.ravel())
+            sizes[0] = 0
+            areas = sizes * px_area_m2
+            sel = (areas >= min_area_m2) & (areas <= max_area_m2)
+            area = float(areas[sel].sum())
+            if area > best_area:
+                best, best_area = (lab, np.where(sel)[0]), area
+        t += step
+    if best is None:
+        return []
+    lab, keep = best
+    return [lab == i for i in keep]
+
+
+# ── cream ────────────────────────────────────────────────────────────────────
+
+def paper_peak(rgb: np.ndarray) -> float:
+    """The sheet's own paper tone, as the mode of V. The ceiling on the ink sweep.
+
+    An ink threshold at or above this calls the paper ink: on the 1882 sheet
+    V=0.90 takes the ink fraction from 26% to 81% and the band empties. Reading
+    it off the sheet is what makes the sweep survive a darker scan, browner
+    paper or a different JPEG — which is most of what "another era" means at
+    the pixel level.
+    """
+    hist, edges = np.histogram(rgb.max(axis=2) / 255.0, bins=100, range=(0.0, 1.0))
+    return float(edges[int(hist.argmax())])
+
+
+def cream_ink(rgb: np.ndarray, split: float, *, cool: float | None, green: float | None,
+              px_area_m2: float | None, min_area_m2: float, max_area_m2: float,
+              probe: int = 4) -> tuple[float, list[tuple[float, int]]]:
+    """The ink threshold that splits cream into the most banded parcel area.
+
+    The invariant the sheet supplies, and the whole reason this can be measured
+    without ground truth: a street network is *one* component and parcels are
+    many. Too low a threshold and the dividers are grey, so every parcel welds
+    to the street; too high and the paper joins the ink and there is nothing
+    left. In between is a plateau, and its argmax is the answer.
+
+    Swept on a `probe`-times downscaled copy — a dozen `classify` calls on a
+    quarter-scale sheet, well under a second. Returns (threshold, curve).
+    """
+    small = rgb[::probe, ::probe]
+    cell = (px_area_m2 * probe * probe) if px_area_m2 else None
+    stop = paper_peak(small) - CREAM_INK_MARGIN
+    start, step = CREAM_INK_RANGE
+    best, best_area, curve = start, -1.0, []
+    v = start
+    while v < stop:
+        masks = classify(small, split, v, cool, green)
+        labels, n = ndimage.label(masks["cream"])
+        if n:
+            sizes = np.bincount(labels.ravel())
+            sizes[0] = 0
+            areas = sizes * cell if cell else sizes * (probe * probe)
+            lo = min_area_m2 if cell else MIN_AREA_PX
+            hi = max_area_m2 if cell else float("inf")
+            sel = (areas >= lo) & (areas <= hi)
+            area = float(areas[sel].sum())
+            curve.append((round(v, 2), int(sel.sum())))
+            if area > best_area:
+                best, best_area = v, area
+        else:
+            curve.append((round(v, 2), 0))
+        v += step
+    return best, curve
+
+
+
+def subtract_blocks(feats: list[dict], min_keep: float = 0.15) -> tuple[list[dict], int, int]:
+    """Cut the pigmented blocks out of the cream hulls that closed over them.
+
+    A cream component is often the paper *around* a block — a street corner, a
+    margin, an L. `component_polygon` returns a concave hull, and the hull of a
+    ring is a disc, so that component comes back as a polygon lying on top of
+    the block it surrounds. Measured on the 1882 sheet: 188 of 840 cream
+    polygons were more than a quarter pigment inside their own outline, and it
+    is the first thing a reader notices in an overlay.
+
+    The blocks are already in hand from the first pass, so the fix needs no new
+    geometry: subtract their union. A cream polygon reduced to almost nothing
+    was a block with a rim, not a parcel, and is dropped. Scored: land_plot
+    0.346 → 0.350 with 38 fewer predictions, which under a best-match metric is
+    an improvement twice over.
+
+    ponytail: this leans on the block hulls being roughly right, because it
+    subtracts hull from hull. A true raster trace of both would not need it —
+    that is `rasterio.features.shapes`, and it is a GDAL dependency this script
+    does not have.
+    """
+    blocks = [f["geom"] for f in feats if f["feature_type"] != "cream"]
+    if not blocks:
+        return feats, 0, 0
+    union = shapely.union_all([shapely.make_valid(g) for g in blocks])
+    out, cut, dropped = [], 0, 0
+    for f in feats:
+        g = f["geom"]
+        if f["feature_type"] != "cream" or not shapely.intersects(g, union):
+            out.append(f)
+            continue
+        d = shapely.difference(shapely.make_valid(g), union)
+        if d.is_empty or d.area < min_keep * g.area:
+            dropped += 1
+            continue
+        if d.geom_type == "MultiPolygon":
+            d = max(d.geoms, key=lambda q: q.area)      # a ring cut into arms
+        if d.geom_type != "Polygon":
+            out.append(f)
+            continue
+        if d.area < 0.98 * g.area:
+            cut += 1
+        out.append({**f, "geom": d, "area_px": round(float(d.area), 1)})
+    return out, cut, dropped
+
+
+# ── map furniture ────────────────────────────────────────────────────────────
+
+def water_points(map_id: str) -> list[tuple[float, float]]:
+    """Centres of the sheet's `hydrology` labels, in source pixels.
+
+    Sixteen of them on the 1882 sheet — far too sparse to outline the water, and
+    an earlier attempt to use them that way found only 4 of 840 cream parcels.
+    They are exactly enough for the oversized-component test, though, because
+    there the region is already one connected blob and the label only has to
+    land inside it.
+    """
+    from supabase_client import fetch_ocr_extractions
+
+    return [(r["global_x"] + (r["global_w"] or 0) / 2.0,
+             r["global_y"] + (r["global_h"] or 0) / 2.0)
+            for r in fetch_ocr_extractions(map_id)
+            if r.get("category") == "hydrology" and r.get("global_x") is not None]
+
+
+def furniture_mask(map_id: str, pad: float = 200.0):
+    """The title cartouche and the legend box, from the sheet's own OCR labels.
+
+    Both are printed rectangles full of text, which is the one thing the OCR
+    pass is reliably good at, so they need no geometry of their own. The union
+    of the padded `title` and `legend` label boxes drops 11 of the 1882 sheet's
+    253 blocks — the same furniture counted by hand in the journal.
+
+    A *hull* of those boxes is wrong and was tried: `legend` also tags the
+    boundary annotations strung along the neatline, so their convex hull is
+    very nearly the whole sheet. Per-label boxes, unioned.
+    """
+    from supabase_client import fetch_ocr_extractions
+
+    rows = [r for r in fetch_ocr_extractions(map_id)
+            if r.get("category") in ("title", "legend") and r.get("global_x") is not None]
+    if not rows:
+        return None
+    boxes = [shapely.box(r["global_x"], r["global_y"],
+                         r["global_x"] + (r["global_w"] or 1.0),
+                         r["global_y"] + (r["global_h"] or 1.0)).buffer(pad)
+             for r in rows]
+    return shapely.union_all(boxes)
 
 
 # ── output ───────────────────────────────────────────────────────────────────
@@ -500,10 +778,16 @@ def write_outputs(out_dir: Path, feats: list[dict], extra: dict[str, Any]) -> No
     run = {
         "source": "colour-blocks",
         **extra,
+        # Exterior ring only. `subtract_blocks` can leave a cream polygon with a
+        # hole in it — a rim around a block — and this contract is one ring:
+        # seg_eval does `Polygon(coords)`. Flattening exterior *and* interior into
+        # a single list builds a self-crossing polygon, which scored worse than
+        # either honest reading (land_plot 0.350 -> 0.337 on 36 of 1044). The
+        # GeoJSON beside this keeps the true geometry, holes and all.
         "polygons": [
             {
                 "coords": [[round(x, 1), round(y, 1)]
-                           for x, y in shapely.get_coordinates(f["geom"]).tolist()],
+                           for x, y in f["geom"].exterior.coords],
                 "feature_type": f["feature_type"],
             }
             for f in feats
@@ -634,6 +918,26 @@ def _self_check() -> None:
     apart, _ = blocks_from_colour(alley, 0.08, scale=1.0, mpp=None, close=3)
     assert len(apart) == 2, f"a 4 px alley should survive close=3; got {len(apart)}"
 
+    # The cream pass finds what the block pass is built to leave out. In the
+    # fixture the streets and the cream parcel are the same tone, so with the
+    # ink lines read as boundaries the surrounding street is one component and
+    # the quarters of each parcel are their own — which is the mechanism, and
+    # what fails first if the class set stops being honoured.
+    cfeats, _ = blocks_from_colour(img, split, scale=1.0, mpp=None, close=0,
+                                   ink_v=0.75, cool=cool, green=gsplit,
+                                   classes=("cream",))
+    assert cfeats, "the cream pass must find the cream the block pass drops"
+    assert all(f["feature_type"] == "cream" for f in cfeats), \
+        f"cream pass must not label a parcel with a pigment class: {cfeats[0]}"
+
+    # The sweep must refuse to climb into the paper: every candidate it returns
+    # is below the sheet's own V mode, or the whole sheet reads as ink.
+    peak = paper_peak(img)
+    chosen, curve = cream_ink(img, split, cool=cool, green=gsplit, px_area_m2=None,
+                              min_area_m2=MIN_AREA_M2, max_area_m2=MAX_AREA_M2, probe=1)
+    assert chosen < peak, f"cream ink {chosen} must stay under the paper peak {peak}"
+    assert curve, "the sweep must report its curve"
+
     # Areas are filtered in m² when the sheet's scale is known.
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
     assert len(f3) == 0 and d3["too small"] == 4, f"m² band not applied: {d3}"
@@ -665,6 +969,18 @@ def main() -> int:
     p.add_argument("--min-m2", type=float, default=MIN_AREA_M2)
     p.add_argument("--max-m2", type=float, default=MAX_AREA_M2)
     p.add_argument("--mpp", type=float, help="metres per source pixel; read from the annotation if omitted")
+    p.add_argument("--recut", action="store_true",
+                   help="rescue components over --max-m2 by re-cutting them at a higher "
+                        "ink threshold instead of dropping them. Recovers the naval quarter "
+                        "(blue 41 -> 216 blocks) and costs ~60 s and river false positives")
+    p.add_argument("--cream", action="store_true",
+                   help="also emit the cream parcels — the unassigned domain land the "
+                        "block pass leaves blank. Its own ink threshold, no closing")
+    p.add_argument("--cream-ink", type=float,
+                   help="override the swept cream ink threshold")
+    p.add_argument("--drop-furniture", action="store_true",
+                   help="drop polygons inside the title or legend box, located from the "
+                        "sheet's OCR labels (needs --map-id and Supabase credentials)")
     p.add_argument("--census", action="store_true", help="print the histogram and stop")
     p.add_argument("--out", help="output directory for blocks.geojson + blocks.run.json")
     p.add_argument("--self-check", action="store_true")
@@ -745,18 +1061,68 @@ def main() -> int:
     if mpp is None:
         print(f"  no sheet scale — filtering at {MIN_AREA_PX} render px² instead of m²")
 
+    wet: list[tuple[float, float]] = []
+    if args.map_id:
+        try:
+            wet = water_points(args.map_id)
+            print(f"{len(wet)} hydrology labels — oversized components holding one stay dropped")
+        except Exception as exc:                                  # noqa: BLE001
+            print(f"  (no hydrology labels: {exc})")
+
     feats, dropped = blocks_from_colour(
         rgb, split, scale, mpp=mpp, close=args.close,
         min_area_m2=args.min_m2, max_area_m2=args.max_m2, ink_v=args.ink, cool=cool,
-        green=green,
+        green=green, water=wet, recut=args.recut,
     )
     for reason, n in sorted(dropped.items()):
         if n:
             print(f"  dropped {n} as {reason}")
+    cream_ink_v = None
+    if args.cream:
+        px_area_m2 = (mpp * scale) ** 2 if mpp else None
+        if args.cream_ink is not None:
+            cream_ink_v = args.cream_ink
+        else:
+            cream_ink_v, curve = cream_ink(
+                rgb, split, cool=cool, green=green, px_area_m2=px_area_m2,
+                min_area_m2=args.min_m2, max_area_m2=args.max_m2)
+            print(f"cream ink swept to V < {cream_ink_v:.2f} "
+                  f"(paper peak {paper_peak(rgb):.2f}); in-band by threshold: {curve}")
+        # No closing: the closing is what rejoins a *block* across the lines drawn
+        # on it, and here those same lines are the parcel boundaries being read.
+        cfeats, cdropped = blocks_from_colour(
+            rgb, split, scale, mpp=mpp, close=0,
+            min_area_m2=args.min_m2, max_area_m2=args.max_m2, ink_v=cream_ink_v,
+            cool=cool, green=green, classes=("cream",), recut=False)
+        print(f"  cream pass: {len(cfeats)} parcels, dropped "
+              + ", ".join(f"{n} {r}" for r, n in sorted(cdropped.items()) if n))
+        feats = feats + cfeats
+        feats, cut, mostly_block = subtract_blocks(feats)
+        if cut or mostly_block:
+            print(f"  cut {cut} cream hulls back off the blocks they closed over, "
+                  f"dropped {mostly_block} that were a block with a rim")
+
+    if args.drop_furniture:
+        if not args.map_id:
+            print("  --drop-furniture needs --map-id; skipped", file=sys.stderr)
+        else:
+            try:
+                furn = furniture_mask(args.map_id)
+            except Exception as exc:                              # noqa: BLE001
+                furn = None
+                print(f"  (no furniture mask: {exc})")
+            if furn is None or furn.is_empty:
+                print("  no title/legend labels on this sheet — nothing dropped")
+            else:
+                before = len(feats)
+                feats = [f for f in feats if not shapely.centroid(f["geom"]).within(furn)]
+                print(f"  dropped {before - len(feats)} inside the title or legend box")
+
     kinds: dict[str, int] = {}
     for f in feats:
         kinds[f["feature_type"]] = kinds.get(f["feature_type"], 0) + 1
-    print(f"{len(feats)} blocks: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items())))
+    label = "blocks + parcels" if args.cream else "blocks"
+    print(f"{len(feats)} {label}: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items())))
 
     if args.out:
         write_outputs(Path(args.out), feats, {
@@ -766,6 +1132,7 @@ def main() -> int:
             "green_split": round(green, 4) if green is not None else None,
             "render": int(rgb.shape[1]),
             "ink_fraction": round(ink_fraction, 4),
+            "cream_ink": round(cream_ink_v, 3) if cream_ink_v is not None else None,
             "block_area_m2": [args.min_m2, args.max_m2] if mpp else None,
         })
     else:

@@ -15,6 +15,18 @@ Regenerate: `eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --run-id 
 >
 > **Measured 2026-09-08 — and the prompt the fix delivers fails the gate. See below.**
 
+> **The segmentation rows in this file are scored against two different truth sets, and
+> the older ones do not say so.** Every segmentation row written before 2026-09-18 is
+> scored against **46** hand traces on the 1882 sheet; every row from 2026-09-18 onward is
+> scored against **118** (`footprint_submissions`: building 89 · land_plot 24 · road 3 ·
+> waterway 2), and the newer rows are reported per `feature_type` because pooling the two
+> granularities is what made the first reading of these numbers wrong. **A 46-row figure
+> and a 118-row figure are not comparable and neither should be quoted outward without
+> saying which.** The earlier numbers are left as measured rather than restated, because
+> they were the gate at the time; what was missing was the label, not the arithmetic.
+> `docs/worked-example-1882.md` counts 118 in a third sense — polygons produced, not
+> traces scored against — so check the sentence, not the number.
+
 ## Baseline — run `baseline` (current default row-sequence batch), IoU ≥ 0.5
 
 | metric | value | trust |
@@ -1744,3 +1756,36 @@ RMSE and 141 years away from it.
       --prior <out>/blocks.geojson --mode prompted --lora ...
 
 That run is the real test of the within-block split, and it needs a GPU.
+
+## Colour blocks + cream parcels (2026-09-18)
+
+`colour_blocks.py --render 6051 --cream --drop-furniture`, whole 1882 sheet,
+8.6 s of CPU, no GPU and no checkpoint. Scored against the 118-row trace set.
+
+| run | n | @.5 | @.3 | mean | med | cover |
+|---|---|---|---|---|---|---|
+| **land_plot (n=24)** | | | | | | |
+| blocks only | 253 | 4 | 5 | 0.247 | 0.161 | 0.98 |
+| + cream parcels | 1103 | 7 | 8 | **0.346** | 0.218 | 1.00 |
+| + furniture drop | 1082 | 7 | 8 | 0.346 | 0.218 | 1.00 |
+| + cream hulls cut off the blocks | 1044 | 7 | 8 | **0.350** | 0.218 | 1.00 |
+| + `--recut` oversized blocks | 1296 | 7 | 8 | 0.358 | 0.232 | 1.00 |
+| `modern_prior --blocks-from-roads` | — | — | — | 0.262 | — | 0.87 |
+| **building (n=89)** | | | | | | |
+| blocks only | 253 | 3 | 7 | 0.093 | 0.048 | 0.97 |
+| + cream parcels | 1082 | 3 | 10 | 0.114 | 0.064 | 1.00 |
+
+The cream pass is a second componenting of the *cream* class at its own ink
+threshold and with no closing — `cream_ink` sweeps V up to the sheet's paper
+peak and keeps the value that puts the most banded area in the band (0.80 here;
+the block pass stays at 0.55). Rationale, the sweep table and the failure it
+corrects: `docs/journals/260918-colour-blocks.md` § P2b.
+
+**The n column is not decoration.** These runs are 253 vs ~1100 predictions and
+`score()` takes the best match per trace, so the mean can only rise with count.
+The defensible claims are the ones that do not depend on n: missed land_plot
+traces 2 → 0, @0.5 4 → 7, and claimed area 14.4% → 32.9% of the scan.
+
+A repeat pass of the identical command produced a byte-for-byte identical
+`blocks.run.json`, so the 0.035 repeat-variation recorded for the Gemini
+sections does not apply here — a swept threshold is still deterministic.
