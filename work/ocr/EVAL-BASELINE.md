@@ -1986,3 +1986,49 @@ the Arroyo de l'Avalanche, the Arroyo Chinois and the scan margin.
 **This is the first change on this track that makes the run smaller, and no
 number in this file rewards that.** A recall-flavoured score is indifferent to
 55 fewer false positives. Report it as the count and the area.
+
+**Superseded the same day by the region test below** — the per-polygon version
+abstains on the polygons that sit *between* the ripple lines, which is most of
+them, and its unique contribution over the region is 21 polygons and 0.06 km².
+
+
+
+## 2026-09-18 — water as a region, and a shape filter: 1044 -> 832, scores flat
+
+The per-polygon water test left the river visibly half-claimed. The diagnosis is
+not a threshold: of 48 polygons in one river window, **38 contain 0-17 pixels of
+ink**, because they sit in the gaps *between* the ruled ripple lines. The thing
+that makes them water is outside them. Water is a region.
+
+Rejected first, in one command: flood the `hydrology` labels through the blue
+ink. At `V < 0.80, r - b < 0.060` that mask is **12.25% of the sheet and one
+component** — black ink is neutral, so a threshold loose enough for a pale
+ripple takes every printed line.
+
+What holds is `ink_coherence` on a **grid**: 64 px cells whose line work runs
+one way (coherence > 0.45), with no wash (`r - b` > 0.100) and sparse ink
+(< 25%); component them; keep the components holding a `hydrology` label; drop
+any polygon more than a third inside. The labels are the safety — the same
+cell signature also describes the ruled neatline margin, which is furniture and
+fine to lose. Only 1 of 16 labels seeds anything, enough because the river is
+one component.
+
+Plus `--drop-slivers`, a different claim: a parcel is compact (`4piA/P^2`
+above 0.2 here) and a ripple is not (under 0.1).
+
+| | polygons | ribbons | claimed area | land_plot | med | building | med | road cover |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `--swatch-labels` | 1044 | 110 | 4.85 km² | 0.350 | 0.218 | 0.122 | 0.050 | 0.68 |
+| `--drop-water` | 892 | — | — | 0.350 | 0.218 | 0.122 | 0.050 | — |
+| + `--drop-slivers` | **832** | **0** | **3.51 km²** | 0.350 | 0.218 | 0.122 | 0.050 | 0.59 |
+
+**212 polygons and 28% of the claimed area leave, and the areal scores do not
+move at all** — `land_plot` cover slips 1.00 → 0.99, `waterway` is untouched,
+and the only real change is `road` cover 0.68 → 0.59, because some dropped
+ribbons had been lying across the quay roads. Named check 6/10 throughout.
+
+Sweeps: the overlap share at 0.50 / 0.35 / 0.25 drops 121 / 152 / 163 with
+identical scores at every setting, and the sliver threshold at 0.15 is where
+`land_plot` finally breaks (0.326). **Both sweeps are bounded by the picture,
+not by a number in this file** — which is the precision blind spot, stated
+again: nothing here rewards a smaller, cleaner run.

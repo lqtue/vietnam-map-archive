@@ -975,8 +975,100 @@ to claim "no GPU"* describes. The honest way to state it is as the count and
 the area, not as a score that moved.
 
 It also does not find the whole river: 76 ribbons remain, and the pass only ever
-sees water where the cream pass already drew a polygon. The upgrade, if the
-river ever needs to be a *thing* rather than an absence, is to flood the 16
-`hydrology` labels through the blue-ink mask and take the component — the same
-move `--recut` makes, and it needs each label to sit inside one blob, which on
-open water it does.
+sees water where the cream pass already drew a polygon.
+
+**Superseded the same day — see the next section.** Looking at the rendered
+zoom, the surviving ribbons are as plainly on the water as the dropped ones, and
+the reason the test abstained on them turns out to be structural rather than a
+threshold that needs loosening.
+
+
+
+## Water is a region, and a polygon inside it holds no evidence at all (2026-09-18)
+
+Reported a third time, with the zoom: orange ribbons still lying across the
+river beside the blue ones that had gone. The per-polygon test above was not
+too strict, it was **reading the wrong thing** — and the diagnostic says so
+immediately. Of the 48 polygons in that window south of the quay:
+
+| why it survived | how many | what it looks like |
+|---|---:|---|
+| **too little ink to judge** — 0 to 17 pixels | 38 | it sits *between* the ripple lines |
+| ink not blue | 6 | it clips the lettering RIVIÈRE or a quay line |
+| has a wash | 3 | it is up against the bank |
+
+Thirty-eight of forty-eight contain no evidence whatsoever. A polygon drawn in
+the gap between two ruled lines is bare paper and nothing else, and no
+per-polygon measure can ever call it water, because the thing that makes it
+water is *outside* it. Water is a region.
+
+### The obvious region fails, and it fails big
+
+Flood the `hydrology` labels through the blue ink, which is what this journal
+had proposed two sections earlier: at `V < 0.80` and `r - b < 0.060` the blue
+ink mask is **12.25% of the whole sheet** and closes into **one component** that
+covers everything. Black ink is neutral, so `r - b` near zero does not mean blue
+— it means *dark*, and at a threshold loose enough to catch a pale ripple line
+it catches every printed line on the sheet. Rejected in one command.
+
+### What is true of water and of nowhere else
+
+Not colour, and not per polygon: over a **cell** of a few dozen pixels, the
+water's line work all runs one way, there is no wash, and the ink is sparse.
+That is `ink_coherence` again, from the hatch test, measured on a grid instead
+of on a polygon:
+
+- 64 render px cells, coherence > **0.45**, wash `r - b` > 0.100, ink < 25%
+- component the passing cells, keep the components holding one of the sheet's
+  16 `hydrology` labels
+- drop any polygon more than a **third** inside the result
+
+The label seeding is the whole safety of it. Ruled, washless, sparsely inked
+cells describe the river, the two arroyos **and the ruled neatline margin** —
+and the labels are what say which of those to believe. (Dropping the margin is a
+bonus: it is furniture.) The wash test is what keeps the naval quarter, which is
+ruled too but at `r - b` +0.067 against bare paper's +0.133.
+
+Only **1 of the 16 labels** actually seeds anything — the rest land on mixed
+cells along the narrow arroyos — and it is enough here because the main river is
+one component. On a sheet of many small ponds it would not be.
+
+### And a shape filter, which is a different claim
+
+A parcel is compact and a ripple is not: `4πA/P²` is 1 for a circle, above 0.2
+for a cadastral parcel on this sheet, and under 0.1 for what the cream pass
+traces between ripple lines. `--drop-slivers` at **0.10**. Swept: at 0.10 it
+drops 110 and both scores hold to the digit; at **0.15 land_plot falls to
+0.326**, so the ceiling is measured two steps away. It is not a water
+detector — it takes a sliver wherever one is, including the rims
+`subtract_blocks` leaves — but on this sheet the slivers are the river.
+
+### Together
+
+| | polygons | ribbons (circ < 0.10) | claimed area | land_plot | building | named |
+|---|---:|---:|---:|---:|---:|---:|
+| the legend key alone | 1044 | 110 | 4.85 km² | 0.350 | 0.122 | 6/10 |
+| `--drop-water` (region) | 892 | — | — | 0.350 | 0.122 | 6/10 |
+| + `--drop-slivers` | **832** | **0** | **3.51 km²** | **0.350** | **0.122** | **6/10** |
+
+212 polygons and 1.34 km² leave — **28% of the claimed area** — and `land_plot`
+0.350 / 0.218 and `building` 0.122 / 0.050 do not move at all. The only number
+that does is `road` cover, 0.68 → 0.59: some of the dropped ribbons lay across
+the quay roads, and covering a road with a false parcel was never worth
+anything. Ribbons reach zero.
+
+The overlap `share` was swept at 0.50, 0.35 and 0.25 — 121, 152 and 163
+polygons dropped, and `land_plot` 0.350 / cover 1.00 at every one. **The sweep
+is bounded by the picture, not by a score**, which is the same blind spot as
+before: nothing in `seg_eval` rewards a smaller run, so the stopping rule was
+"open the zoom". 0.35 is the setting where the river reads clean and four small
+fragments remain at the region's square edge.
+
+### Three mechanisms for one problem, and why two stayed
+
+The per-polygon colour test is now **subsumed**: measured against the region, its
+unique contribution was 21 polygons and 0.06 km², so it is gone and its
+constants with it. What remains is one region test and one shape test, which
+make different claims — *this is water* and *this is not a parcel* — and the
+second is the one that generalises, being a single line with no threshold
+fitted to this sheet's ink.

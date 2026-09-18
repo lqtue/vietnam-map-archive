@@ -116,6 +116,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -812,54 +813,126 @@ def fit_dilution(points: list[tuple[float, float]],
     return best_a, best_cost
 
 
-# Water is the one thing on this sheet that is drawn rather than washed. The
-# open river is bare paper to three decimals — (r - g, r - b) of +0.059, +0.141
-# mid-channel against +0.047, +0.133 over dry land — and what makes it read blue
-# to the eye is the engraved ripple, which *is* blue ink (r - b +0.031, next to
-# the military class's +0.024) laid over 0.3-4% of the surface. So no threshold
-# on the wash can find it: `classify` reads the wash per pixel and the river is
-# cream everywhere except on the lines themselves. It takes all three.
+# Water is the one thing on this sheet that is drawn rather than washed, and it
+# is a *region* rather than a property a polygon carries. Three measurements say
+# so. The open river is bare paper — (r - g, r - b) of +0.059, +0.141
+# mid-channel against +0.047, +0.133 over dry land, the same tone to three
+# decimals. Its ink is the engraved ripple, which is pale blue in places
+# (r - b +0.031) and neutral in others, so no ink colour holds across the whole
+# river. And most of the polygons the cream pass traces there sit *between* the
+# ripple lines and contain no ink at all — 0 to 17 pixels of it — so a
+# per-polygon test has nothing to read in exactly the places it is needed.
 #
-# The paper test is what keeps the naval quarter: a military block's ink is blue
-# too (r - b +0.024 at Hopital Maritime) and sparse too (5.1%), and the only
-# thing that differs is that it has a wash at all — r - b +0.067 against bare
-# paper's +0.133.
+# What is true of every part of the water and of nowhere else on the sheet: over
+# a cell of a few dozen pixels, all the line work runs one way (the ripple is
+# ruled), there is no wash, and the ink is sparse. That is `ink_coherence` again,
+# measured on a grid rather than on a polygon. The cells that pass, componented,
+# and the components holding one of the sheet's 16 `hydrology` labels, are the
+# river, the two arroyos and — harmlessly — the ruled neatline margin.
 #
-# ponytail: three constants, measured on one sheet, and a polygon is water or it
-# is not — no score. Ceiling: it finds 55 of the ~110 ribbon-shaped polygons, so
-# it is a precision improvement rather than a water mask. Upgrade: flood the
-# hydrology labels through the blue-ink mask and take the component, which is
-# the same move `--recut` makes and needs the labels to be inside one blob.
-WATER_INK_RB = 0.060        # the ripple is blue ink
-WATER_INK_MAX = 0.15        # and there is very little of it
+# The wash test is what keeps the naval quarter, whose blocks are ruled too:
+# theirs is a wash at r - b +0.067 against bare paper's +0.133.
+#
+# ponytail: a 64 px grid and four constants, one sheet. Ceiling: the seeds. A
+# hydrology label that lands on a mixed cell seeds nothing, and on this sheet 1
+# of 16 does the work — enough here because the main river is one component, and
+# not enough on a sheet of many small ponds. Upgrade: seed from the label's
+# neighbourhood rather than its own cell.
+WATER_CELL = 64             # render px; a few ripple periods across
+WATER_COHERENCE = 0.45      # its line work runs one way
 WATER_PAPER_RB = 0.100      # over paper that carries no wash at all
+WATER_INK_MAX = 0.25        # and the ink on it is sparse
+WATER_SHARE = 0.35          # a polygon this far into the region is water
 
 
-def water_mask(feats: list[dict], rgb: np.ndarray, scale: float,
-               ink_v: float = INK_V) -> list[bool]:
-    """True for each polygon that is river surface rather than land.
+def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tuple[float, float]],
+               ink_v: float = INK_V, share: float = WATER_SHARE) -> list[bool]:
+    """True for each polygon lying mostly inside the sheet's water.
 
-    A false positive here deletes a real parcel, so all three conditions must
-    hold at once and each one alone is known to be wrong: sparse blue ink is
-    also a military block, and bare paper is also every *non affectee* plot.
+    `water` is the hydrology labels, in source px — the same 16 points the
+    oversized-component test uses. They are what stops this dropping land: a
+    region of ruled, washless, sparsely inked cells is water *or* the neatline
+    margin, and only the labels say which regions to believe.
+
+    `share` is a third rather than a half because the region is a grid and its
+    edge is therefore square: a ribbon lying along the bank can have a third of
+    itself in the last water cell and the rest under the cell boundary. Swept
+    against the traces at 0.50, 0.35 and 0.25 — 121, 152 and 163 polygons
+    dropped, and land_plot 0.350 / building 0.122 / cover 1.00 at every one of
+    them, so the sweep is bounded by the picture rather than by a score.
     """
-    a = rgb.astype(np.float32) / 255.0
-    rb = a[..., 0] - a[..., 2]
-    ink = a.max(axis=2) < ink_v
+    if not water:
+        return [False] * len(feats)
+    v = rgb.astype(np.float32).max(axis=2) / 255.0
+    rb = rgb[..., 0].astype(np.float32) / 255.0 - rgb[..., 2].astype(np.float32) / 255.0
+    gy, gx = np.gradient(v)
+    ink = v < ink_v
+    h, w = v.shape
+    ny, nx = h // WATER_CELL, w // WATER_CELL
+    cand = np.zeros((ny, nx), bool)
+    for r in range(ny):
+        for c in range(nx):
+            sl = (slice(r * WATER_CELL, (r + 1) * WATER_CELL),
+                  slice(c * WATER_CELL, (c + 1) * WATER_CELL))
+            if np.median(rb[sl]) <= WATER_PAPER_RB or ink[sl].mean() >= WATER_INK_MAX:
+                continue
+            a, b = gx[sl], gy[sl]
+            use = np.hypot(a, b) > 0.02
+            if use.sum() < 50:
+                continue
+            u, q = a[use], b[use]
+            jxx, jyy, jxy = float((u * u).sum()), float((q * q).sum()), float((u * q).sum())
+            tr = jxx + jyy
+            if tr > 0 and ((jxx - jyy) ** 2 + 4 * jxy ** 2) ** 0.5 / tr > WATER_COHERENCE:
+                cand[r, c] = True
+    lab, _ = ndimage.label(cand, structure=np.ones((3, 3)))
+    seeded = {lab[int(y / scale) // WATER_CELL, int(x / scale) // WATER_CELL]
+              for x, y in water
+              if 0 <= int(y / scale) // WATER_CELL < ny and 0 <= int(x / scale) // WATER_CELL < nx}
+    seeded.discard(0)
+    if not seeded:
+        return [False] * len(feats)
+    cells = np.isin(lab, list(seeded))
+    full = np.zeros((h, w), bool)
+    full[:ny * WATER_CELL, :nx * WATER_CELL] = np.kron(cells, np.ones((WATER_CELL, WATER_CELL), bool))
     out: list[bool] = []
     for f in feats:
-        win = _poly_window(f["geom"], rgb.shape[:2], scale)
+        win = _poly_window(f["geom"], (h, w), scale)
         if win is None:
             out.append(False)
             continue
         sel, x0, y0, x1, y1 = win
-        lines = sel & ink[y0:y1, x0:x1]
-        if sel.sum() < 50 or lines.sum() < 30:
+        if sel.sum() < 10:
             out.append(False)
             continue
-        out.append(bool(np.median(rb[y0:y1, x0:x1][lines]) < WATER_INK_RB
-                        and lines.sum() / sel.sum() < WATER_INK_MAX
-                        and np.median(rb[y0:y1, x0:x1][sel]) > WATER_PAPER_RB))
+        out.append(bool((sel & full[y0:y1, x0:x1]).sum() / sel.sum() > share))
+    return out
+
+
+# A parcel is compact and a ripple is not. `4*pi*A / P^2` is 1 for a circle and
+# falls as a polygon gets stringy; a cadastral parcel on this sheet sits well
+# above 0.2 and the shapes the cream pass traces between the river's ripple
+# lines sit under 0.1. It is not a water detector — it removes a sliver wherever
+# one is, including the rims `subtract_blocks` leaves behind — but on this sheet
+# the slivers are overwhelmingly the river.
+#
+# Swept against the traces: at 0.10 it drops 110 polygons (0.48 km²) and
+# land_plot holds at 0.350 with building at 0.122, both to the digit. At 0.15 it
+# drops 142 and land_plot falls to 0.326, so it has started eating real parcels.
+#
+# ponytail: one constant with its ceiling measured two steps away. Upgrade: none
+# needed on this sheet; on a sheet with genuinely long thin parcels — a canal
+# frontage, a rice-field strip — lower it or turn the flag off, because the
+# shape prior is simply false there.
+MIN_CIRCULARITY = 0.10
+
+
+def sliver_mask(feats: list[dict], min_circ: float = MIN_CIRCULARITY) -> list[bool]:
+    """True for each polygon too stringy to be a parcel."""
+    out = []
+    for f in feats:
+        g = f["geom"]
+        out.append(bool(g.length and 4 * math.pi * g.area / (g.length ** 2) < min_circ))
     return out
 
 
@@ -1256,6 +1329,11 @@ def _self_check() -> None:
     assert c_rule > HATCH_COHERENCE > c_dots, \
         f"the hatch test must split a ruling from stipple: {c_rule:.3f} vs {c_dots:.3f}"
 
+    # The sliver filter keeps a block and drops a ribbon of the same area.
+    block = {"geom": shapely.box(0, 0, 100, 100)}
+    ribbon = {"geom": shapely.box(0, 0, 1000, 10)}
+    assert sliver_mask([block, ribbon]) == [False, True], "sliver filter must split 1:1 from 100:1"
+
     # Areas are filtered in m² when the sheet's scale is known.
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
     assert len(f3) == 0 and d3["too small"] == 4, f"m² band not applied: {d3}"
@@ -1317,6 +1395,11 @@ def main() -> int:
                         "over with sparse blue ripple, which the cream pass otherwise "
                         "traces into long thin parcels across the whole river. Unlike "
                         "every other flag here this one removes geometry")
+    p.add_argument("--drop-slivers", action="store_true",
+                   help="drop polygons too stringy to be a parcel (circularity below "
+                        f"{MIN_CIRCULARITY}). On the 1882 sheet these are the shapes the "
+                        "cream pass traces between the river's ripple lines. Removes "
+                        "geometry; swept, and the traces do not notice")
     p.add_argument("--census", action="store_true", help="print the histogram and stop")
     p.add_argument("--out", help="output directory for blocks.geojson + blocks.run.json")
     p.add_argument("--self-check", action="store_true")
@@ -1455,12 +1538,19 @@ def main() -> int:
                 print(f"  dropped {before - len(feats)} inside the title or legend box")
 
     if args.drop_water:
-        wet_mask = water_mask(feats, rgb, scale, ink_v=args.ink)
+        wet_mask = water_mask(feats, rgb, scale, wet, ink_v=args.ink)
         kept = [f for f, w in zip(feats, wet_mask) if not w]
         km2 = sum(f["geom"].area for f, w in zip(feats, wet_mask) if w) * ((mpp or 0) ** 2) / 1e6
         print(f"  dropped {len(feats) - len(kept)} as river surface"
               + (f" ({km2:.2f} km²)" if mpp else ""))
         feats = kept
+
+    if args.drop_slivers:
+        thin = sliver_mask(feats)
+        km2 = sum(f["geom"].area for f, w in zip(feats, thin) if w) * ((mpp or 0) ** 2) / 1e6
+        feats = [f for f, w in zip(feats, thin) if not w]
+        print(f"  dropped {sum(thin)} as slivers, too stringy to be a parcel"
+              + (f" ({km2:.2f} km²)" if mpp else ""))
 
     if args.swatch_labels:
         feats, changed, alpha, demoted = relabel_by_swatch(
