@@ -101,6 +101,117 @@ def load_gt(map_id: str) -> list[tuple[str, object]]:
     return out
 
 
+# The categories that name something a polygon predictor should have found,
+# and the one that names something it should have left alone. A street is the
+# gap between blocks by construction, so a block covering a street label is a
+# merge failure — which is the only signal in this file that points at a
+# *prediction* rather than at a trace.
+AREAL_LABELS = ("institution", "place", "building")
+NEGATIVE_LABELS = ("street",)
+
+
+def load_labels(map_id: str) -> list[dict]:
+    """(text, category, x, y) for every placed OCR label on a sheet.
+
+    The 1882 sheet has 499 of these against 46 hand traces, and they cost
+    nothing: OCR has already run on every sheet that reaches this pass. They
+    cannot score a polygon's *shape* — that is what `load_gt` is for — but they
+    answer the question that keeps coming back, which is whether the pass
+    emitted anything at all where the sheet says there is something.
+    """
+    import requests
+
+    url = os.environ["PUBLIC_SUPABASE_URL"]
+    key = os.environ["SUPABASE_SERVICE_KEY"]
+    rows = requests.get(
+        f"{url}/rest/v1/ocr_extractions",
+        params={"select": "text,category,global_x,global_y,global_w,global_h",
+                "map_id": f"eq.{map_id}"},
+        headers={"apikey": key, "Authorization": f"Bearer {key}"},
+        timeout=30,
+    ).json()
+    return [{"text": r.get("text") or "", "category": r.get("category") or "?",
+             "x": r["global_x"] + (r["global_w"] or 0) / 2.0,
+             "y": r["global_y"] + (r["global_h"] or 0) / 2.0}
+            for r in rows if r.get("global_x") is not None]
+
+
+def label_cover(polys: list, labels: list[dict], probe: float = 120.0) -> list[float]:
+    """Covered share of a `probe`-px box around each label, 0 to 1.
+
+    A point-in-polygon test is not enough and the Arsenal de la Marine is why:
+    its label sits on the *edge* of the block above the boulevard, so the point
+    test calls it covered while the dockyard apron it names has nothing on it.
+    The box reads 0.74 there and 1.00 on a block that really is covered.
+    """
+    from shapely.geometry import Point
+    from shapely.strtree import STRtree
+
+    if not polys:
+        return [0.0] * len(labels)
+    tree = STRtree(polys)
+    half = probe / 2.0
+    offs = [(half * i / 5.0, half * j / 5.0) for i in range(-5, 6) for j in range(-5, 6)]
+    out = []
+    for lab in labels:
+        n = 0
+        for dx, dy in offs:
+            p = Point(lab["x"] + dx, lab["y"] + dy)
+            if any(polys[i].contains(p) for i in tree.query(p)):
+                n += 1
+        out.append(n / len(offs))
+    return out
+
+
+def report_labels(map_id: str, runs: dict[str, list], found: float = 0.5) -> None:
+    """Recall over the named areal features, and leak over the street names."""
+    labels = load_labels(map_id)
+    if not labels:
+        print(f"No placed OCR labels on {map_id}", file=sys.stderr)
+        return
+    counts: dict[str, int] = {}
+    for lab in labels:
+        counts[lab["category"]] = counts.get(lab["category"], 0) + 1
+    print("named labels: " + " · ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+    areal = [l for l in labels if l["category"] in AREAL_LABELS]
+    street = [l for l in labels if l["category"] in NEGATIVE_LABELS]
+    print(f"\n== named-label coverage (areal {len(areal)} · street {len(street)}); "
+          f"areal at {found:.0%} of a 120 px box, street on the centre pixel")
+    print(f"{'run':<28}{'n':>6}{'areal':>8}{'recall':>8}{'street':>8}{'leak':>7}")
+    missing: dict[str, list] = {}
+    for name, polys in runs.items():
+        ac = label_cover(polys, areal)
+        # The street test is the *centre pixel*, not a box: a 120 px box around
+        # a street name overlaps the blocks on either side of the street by
+        # construction, so the box reads 0.60 where the point reads 0.39 and
+        # the difference is geometry, not error. The two categories are asking
+        # opposite questions and get the probe each one needs.
+        sc = label_cover(polys, street, probe=0.0)
+        a = sum(1 for v in ac if v >= found)
+        t = sum(1 for v in sc if v >= found)
+        print(f"{name:<28}{len(polys):>6}{a:>8}{a / len(areal):>8.2f}"
+              f"{t:>8}{t / len(street):>7.2f}")
+        missing[name] = sorted(((v, l) for v, l in zip(ac, areal) if v < found),
+                               key=lambda kv: kv[0])
+    print("\n  recall is the honest headline: a named institution, place or "
+          "building with nothing under it is a miss whatever the IoU tables say.")
+    print("  leak is a *direction*, not a precision figure — map typography "
+          "legitimately sets a street name across a block, so compare it\n"
+          "  between runs rather than reading it as a rate.")
+    if len(runs) == 1:
+        name, rows = next(iter(missing.items()))
+        print(f"\n  {len(rows)} areal labels under {found:.0%} in {name}, emptiest first."
+              f"\n  A worklist, not a defect count: `place` also tags the villages out on "
+              f"open country\n  and the river's own lettering, and neither is a parcel "
+              f"anyone failed to find.")
+        for v, lab in rows[:20]:
+            print(f"    {v:4.0%}  {lab['category']:<12} {lab['text'][:44]:<44} "
+                  f"({lab['x']:.0f}, {lab['y']:.0f})")
+        if len(rows) > 20:
+            print(f"    ... and {len(rows) - 20} more")
+        print("\n  colour_blocks.py --explain '<text>' says which filter dropped each.")
+
+
 def called_area(path: str):
     """Union of the crops a run actually sent to the model, if it recorded them.
 
@@ -173,6 +284,9 @@ def _report(groups: dict[str, list], runs: dict[str, list]) -> None:
 
 
 def run(args: argparse.Namespace) -> int:
+    if args.labels:
+        report_labels(args.map_id, {Path(p).stem: load_run(p) for p in args.runs})
+        return 0
     gt = load_gt(args.map_id)
     if not gt:
         print(f"No hand traces on {args.map_id}", file=sys.stderr)
@@ -257,6 +371,16 @@ def _self_check() -> None:
     bowtie = make_valid(Polygon([(0, 0), (10, 10), (10, 0), (0, 10)]))
     assert 0.0 <= score([unit], [bowtie])["mean"] <= 1.0
 
+    # The label probe: a box, not a point, because a label on a block's edge is
+    # the failure it exists to catch (the Arsenal reads 0.74 that way).
+    lab = [{"text": "X", "category": "institution", "x": 50.0, "y": 50.0}]
+    block = make_valid(Polygon([(0, 0), (100, 0), (100, 100), (0, 100)]))
+    edge = make_valid(Polygon([(50, 0), (100, 0), (100, 100), (50, 100)]))
+    assert label_cover([block], lab, probe=40.0)[0] == 1.0
+    assert label_cover([far], lab, probe=40.0)[0] == 0.0
+    half = label_cover([edge], lab, probe=40.0)[0]
+    assert 0.3 < half < 0.7, f"a label on a block's edge must read as partial: {half}"
+
     print("[ok] seg_eval self-check passed")
 
 
@@ -268,6 +392,11 @@ def main() -> int:
     p.add_argument("--types", help="comma-separated feature_types to report")
     p.add_argument("--in-frame", metavar="RUN.json",
                    help="score only the traces this run's crops actually covered")
+    p.add_argument("--labels", action="store_true",
+                   help="score against the sheet's own OCR labels instead of the hand "
+                        "traces: recall over the named areal features, and leak over "
+                        "the street names. 499 labels against 46 traces on the 1882 "
+                        "sheet, and they cost nothing — OCR has already run")
     p.add_argument("--pooled", action="store_true",
                    help="also print the pooled row, for comparison with older numbers")
     p.add_argument("--self-check", action="store_true")

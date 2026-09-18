@@ -564,6 +564,119 @@ def _holds_point(mask: np.ndarray, sl: tuple, scale: float,
     return False
 
 
+def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, float],
+               feats: list[dict], *, mpp: float | None, close: int = CLOSE_PX,
+               min_area_m2: float = MIN_AREA_M2, max_area_m2: float = MAX_AREA_M2,
+               ink_v: float = INK_V, cool: float | None = None,
+               green: float | None = None, probe: float = 120.0,
+               classes: tuple[str, ...] = PIGMENT_CLASSES) -> list[str]:
+    """Why is there (or isn't there) a polygon around this source pixel?
+
+    Three sessions in a row have opened with "X has no polygon" — the Arsenal's
+    dockyard apron, `Prisons`, `Nouveau Palais de Justice` — and each time the
+    answer was reached by hand: classify the pixel, find its component, measure
+    it, read it against the band. That is mechanical, so it is a flag.
+
+    It reports a *neighbourhood*, `probe` source px a side, not a pixel, and
+    both halves of that are load-bearing:
+
+    - A label's centre usually lands on the label's own lettering, which is
+      ink and belongs to no component at all. `Prisons` reads exactly that way.
+    - A single containing polygon is not coverage. The `ARSENAL DE LA MARINE`
+      label sits on the *edge* of the block above the boulevard, so a
+      point-in-polygon test calls it covered while the yard it names is empty.
+      The covered share of the probe box is what tells those two apart.
+
+    The covered share is answered from `feats`, the run's real output, so it
+    can never disagree with the run. Only the verdicts on the components
+    re-derive anything, and they re-derive it from the same `classify`,
+    closing and labelling the pass uses. A filter added to `blocks_from_colour`
+    and not named here shows up as a component that looks in-band and still has
+    no polygon, which is the honest failure for a stale explainer.
+    """
+    x, y = pt
+    out = [f"at source px ({x:.0f}, {y:.0f}), probing {probe:.0f} px around it:"]
+    r, c = int(y / scale), int(x / scale)
+    if not (0 <= r < rgb.shape[0] and 0 <= c < rgb.shape[1]):
+        return out + ["  off the sheet"]
+
+    # Covered share of the probe box: an 11x11 grid of source-px samples.
+    half = probe / 2.0
+    grid = [(x + half * i / 5.0, y + half * j / 5.0)
+            for i in range(-5, 6) for j in range(-5, 6)]
+    tree = shapely.STRtree([f["geom"] for f in feats]) if feats else None
+    covered, owners = 0, {}
+    for gx, gy in grid:
+        p = shapely.Point(gx, gy)
+        for i in (tree.query(p) if tree is not None else []):
+            if shapely.contains_xy(feats[i]["geom"], gx, gy):
+                covered += 1
+                owners[i] = owners.get(i, 0) + 1
+                break
+    share = covered / len(grid)
+    out.append(f"  {share:.0%} of that box is covered by {len(owners)} polygon(s)")
+    for i, n in sorted(owners.items(), key=lambda kv: -kv[1])[:3]:
+        g = feats[i]["geom"]
+        a = f"{g.area * mpp ** 2:,.0f} m²" if mpp else f"{g.area:,.0f} px²"
+        out.append(f"    {n * 100 // len(grid):3d}%  {feats[i]['feature_type']}, {a}, "
+                   f"outline circularity {outline_circularity(g):.3f}")
+    if share > 0.95:
+        return out
+
+    masks = classify(rgb, split, ink_v, cool, green)
+    here = [n for n in masks if masks[n][r, c]]
+    out.append(f"  the centre pixel is {', '.join(here) or 'nothing'}"
+               + ("" if set(here) & set(classes)
+                  else f" — not one of {classes}, so the block pass never sees it"))
+    pigment = np.zeros(rgb.shape[:2], bool)
+    for name in classes:
+        pigment |= masks[name]
+    if close > 0:
+        pigment = ndimage.binary_closing(pigment, np.ones((close, close), bool))
+    labels, _ = ndimage.label(pigment)
+    win = labels[max(0, int((y - half) / scale)):int((y + half) / scale) + 1,
+                 max(0, int((x - half) / scale)):int((x + half) / scale) + 1]
+    ids = [i for i in np.unique(win) if i]
+    if not ids:
+        return out + ["  no pigment component anywhere in the box, even after the closing"]
+    sizes = np.bincount(labels.ravel())
+    out.append(f"  {len(ids)} pigment component(s) in the box:")
+    for idx in sorted(ids, key=lambda i: -sizes[i])[:4]:
+        n_px = int(sizes[idx])
+        if mpp is None:
+            verdict = ("DROPPED too small" if n_px < MIN_AREA_PX else "in band")
+            out.append(f"    {idx}: {n_px:,} px  {verdict} (no sheet scale)")
+            continue
+        area = n_px * (mpp * scale) ** 2
+        if area < min_area_m2:
+            verdict = f"DROPPED too small, < {min_area_m2:,.0f} m²"
+        elif area > max_area_m2:
+            verdict = f"DROPPED too large, > {max_area_m2:,.0f} m² — --recut re-cuts it"
+        else:
+            verdict = ("in band — dropped later: no ring, the furniture box, "
+                       "the water test or the sliver filter")
+        out.append(f"    {idx}: {n_px:,} px = {area:,.0f} m²  {verdict}")
+    return out
+
+
+def labels_matching(map_id: str, needle: str) -> list[tuple[str, str, float, float]]:
+    """(text, category, x, y) for every OCR label whose text contains `needle`.
+
+    Every match, deliberately. Several labels on the 1882 sheet have duplicate
+    `ocr_extractions` rows at different positions, and which one you take
+    changes the verdict — a check built on "the first row" is not reproducible
+    and the journal has a 6/10-against-7/10 to prove it.
+    """
+    from supabase_client import fetch_ocr_extractions
+
+    low = needle.lower()
+    return [(r["text"], r.get("category") or "?",
+             r["global_x"] + (r["global_w"] or 0) / 2.0,
+             r["global_y"] + (r["global_h"] or 0) / 2.0)
+            for r in fetch_ocr_extractions(map_id)
+            if r.get("global_x") is not None and low in (r.get("text") or "").lower()]
+
+
 def recut_oversized(sub: np.ndarray, v: np.ndarray, px_area_m2: float | None,
                     min_area_m2: float, max_area_m2: float,
                     probe_range: tuple[float, float] = CREAM_INK_RANGE):
@@ -1459,6 +1572,17 @@ def _self_check() -> None:
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
     assert len(f3) == 0 and d3["too small"] == 4, f"m² band not applied: {d3}"
 
+    # ...and --explain must name the filter that did it, on the same fixture.
+    why = "\n".join(explain_at(img, split, 1.0, (50.0, 50.0), [], mpp=1.0,
+                                min_area_m2=100_000, cool=cool, green=gsplit, probe=20.0))
+    assert "0% of that box" in why and "too small" in why, f"--explain must name the band: {why}"
+    # A polygon over the probe box is the other answer, and it comes from the
+    # run's own output rather than from a re-derivation.
+    covered = explain_at(img, split, 1.0, (50.0, 50.0),
+                         [{"geom": shapely.box(0, 0, 100, 100), "feature_type": "salmon"}],
+                         mpp=1.0, cool=cool, green=gsplit, probe=20.0)
+    assert "100% of that box" in covered[1], f"--explain must read the run first: {covered}"
+
     # The GeoJSON must carry the token to_sam2_seeds refuses on.
     assert PRIOR_CRS == "source-pixels-y-down"
     print("colour_blocks self-check OK")
@@ -1525,6 +1649,13 @@ def main() -> int:
                         f"{MIN_CIRCULARITY}). On the 1882 sheet these are the shapes the "
                         "cream pass traces between the river's ripple lines. Removes "
                         "geometry; swept, and the traces do not notice")
+    p.add_argument("--explain", metavar="X,Y|TEXT",
+                   help="after the run, say what happened at a point — either source "
+                        "pixels as X,Y or a substring of an OCR label ('Prisons'), in "
+                        "which case every matching row is explained, because duplicate "
+                        "rows at different positions are what makes a named check "
+                        "irreproducible. Answers KEPT from the run's own output and "
+                        "re-derives the component only when nothing covers the point")
     p.add_argument("--census", action="store_true", help="print the histogram and stop")
     p.add_argument("--out", help="output directory for blocks.geojson + blocks.run.json")
     p.add_argument("--self-check", action="store_true")
@@ -1692,6 +1823,27 @@ def main() -> int:
         kinds[f["feature_type"]] = kinds.get(f["feature_type"], 0) + 1
     label = "blocks + parcels" if args.cream else "blocks"
     print(f"{len(feats)} {label}: " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items())))
+
+    if args.explain:
+        try:
+            x, y = (float(v) for v in args.explain.split(","))
+            targets = [(args.explain, "point", x, y)]
+        except ValueError:
+            if not args.map_id:
+                print("  --explain by label needs --map-id", file=sys.stderr)
+                targets = []
+            else:
+                targets = labels_matching(args.map_id, args.explain)
+                if not targets:
+                    print(f"  no OCR label contains {args.explain!r}")
+        for text, cat, x, y in targets:
+            print(f"\n{text}  [{cat}]")
+            for line in explain_at(rgb, split, scale, (x, y), feats, mpp=mpp,
+                                   close=args.close, min_area_m2=args.min_m2,
+                                   max_area_m2=args.max_m2, ink_v=args.ink,
+                                   cool=cool, green=green):
+                print(line)
+        print()
 
     if args.out:
         write_outputs(Path(args.out), feats, {

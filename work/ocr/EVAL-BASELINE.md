@@ -2148,3 +2148,56 @@ hydrology label**, and `blocks.geojson` md5 is unchanged against `9a2fe561`.
 `--recut` stays opt-in: 25 s -> 80 s, and `land_plot` -0.019. Whether the yard,
 the Abattoir grounds and the quay roads are worth that is a call for the
 operator, not a default.
+
+## 2026-09-18 — the sheet's own labels as an eval set: `seg_eval --labels`
+
+46 hand traces against **499 placed OCR labels** on the 1882 sheet (street 216,
+institution 119, place 51, legend 46, building 25, hydrology 16, other 14,
+title 12). The labels cost nothing — OCR has already run on every sheet that
+reaches this pass — and they answer the question `seg_eval` structurally
+cannot: not how well a polygon fits, but whether the pass emitted anything at
+all where the sheet says there is something.
+
+| run | n | areal found | recall | street hit | leak |
+|---|---:|---:|---:|---:|---:|
+| default | 798 | 145/195 | **0.74** | 85/216 | 0.39 |
+| `--recut` | 888 | 153/195 | **0.78** | 80/216 | 0.37 |
+
+- **recall** — a named institution, place or building with nothing under it is
+  a miss whatever the IoU tables say. Scored on the covered share of a 120 px
+  box, ≥ 50% counts as found.
+- **leak** — a block covering a *street* label's centre pixel is a merge
+  failure. It is the only signal in this file that points at a prediction
+  rather than at a trace, so it is a precision *direction*. It is not a
+  precision figure: map typography legitimately sets a street name across a
+  block. Compare it between runs.
+
+**The probe has to be a box, and the Arsenal is why.** A point-in-polygon test
+calls `ARSENAL DE LA MARINE` covered, because its label sits on the *edge* of
+the block above the boulevard while the dockyard apron it names has nothing on
+it. The box reads 0.74 there against 1.00 on a block that really is covered.
+The point test is right for streets and wrong for areas; each category gets the
+probe it needs.
+
+The missing list is a **worklist, not a defect count**: `place` also tags the
+villages out on open country and the river's own lettering, and neither is a
+parcel anyone failed to find.
+
+### `colour_blocks --explain`, and two corrections it made immediately
+
+`--explain 'X,Y'` or `--explain '<label text>'` reports the covered share of a
+box around the point, then — only when that share is short — re-derives the
+component and names the filter. Every matching OCR row is explained, because
+duplicate rows at different positions are exactly what made the old named check
+irreproducible.
+
+- **`Nouveau Palais de Justice` is not missing.** It reads 98–99% covered by an
+  11,489 m² `admin` polygon. The queued item was stale.
+- **`Prisons` really is missing**, and the filter is now named: its label
+  centre lands on its own lettering (ink, which the block pass never sees), and
+  the largest component in the box is 7,200 px = **3,385 m², squarely in
+  band** — so it is dropped *after* the area test, by the ring, the furniture
+  box, the water test or the sliver filter. Not the area band, which is what
+  the queue assumed.
+- **The Arsenal** reads 74%, the partial signature above, with component 1544
+  at 1.77 km² named as `DROPPED too large`.
