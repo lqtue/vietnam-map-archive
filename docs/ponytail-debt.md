@@ -257,10 +257,30 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 - **`WATER_CELL` / `WATER_COHERENCE` / `WATER_PAPER_RB` / `WATER_INK_MAX` /
   `WATER_SHARE`** — a 64 px grid and four constants for the water region, one
   sheet. ceiling: the seeds. A `hydrology` label that lands on a mixed cell
-  seeds nothing, and here 1 of 16 does all the work — enough because the main
-  river is one component, and not enough on a sheet of many small ponds.
+  seeds nothing, and here 3 of 16 land on a cell, all in the same component —
+  enough because the main river is that component, and not enough on a sheet of many small ponds.
   upgrade: seed from the label's neighbourhood rather than its own cell.
   Trigger: a sheet whose water is several disconnected bodies.
+  **Second ceiling, measured 2026-09-18: the cell test does not describe water,
+  it describes bare paper with ruled lines, which is also most of the city.**
+  What keeps it off the city is that the city's cells do not connect to the
+  river's, not the labels; every loosening of the wash test floods to 31% of the
+  sheet and eats 15-21 of the 46 hand traces. upgrade: a real water signature,
+  or a barrier that is not connectivity.
+- **`WATER_LINE_V` / `WATER_LINE_RB` / `WATER_LINE_W` / `WATER_CLOSE` /
+  `WATER_OPEN` / `WATER_MIN_PX` / `WATER_HOLE_PX`** — the blue-line water test,
+  one sheet. `WATER_LINE_RB` = 0.07 is the load-bearing one: the gap between
+  this sheet's blue (+0.031 to +0.051 over the dark pixels) and its black
+  (+0.086, lettering +0.169). ceiling: a sheet that draws water in black, or
+  one whose ink has aged to the same hue. upgrade: fit the cut from the sheet's
+  own dark-pixel histogram, the way `cream_ink` sweeps its threshold. Trigger:
+  the first sheet that is not the 1882 Plan Cadastral.
+- **`WATER_HOLE` / `WATER_RIPPLE_CIRC`** — 12 cells and 0.25, patching the two
+  ways the region misses river it is sitting next to. ceiling: the ripple rule
+  is safe only because no hand trace touches the region on this sheet (max
+  share 0.000, measured); on a sheet with a traced quay or a canal frontage that
+  does touch it, it would reach a real parcel. Trigger: any sheet where a trace
+  overlaps the water region at all — check before trusting it.
 - **`MIN_CIRCULARITY`** — 0.10, one shape prior for every parcel. ceiling: a
   sheet with genuinely long thin parcels — a canal frontage, a rice-field
   strip — where the prior is simply false; measured here, 0.15 already breaks

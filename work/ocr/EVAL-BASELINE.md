@@ -2010,8 +2010,8 @@ one way (coherence > 0.45), with no wash (`r - b` > 0.100) and sparse ink
 (< 25%); component them; keep the components holding a `hydrology` label; drop
 any polygon more than a third inside. The labels are the safety — the same
 cell signature also describes the ruled neatline margin, which is furniture and
-fine to lose. Only 1 of 16 labels seeds anything, enough because the river is
-one component.
+fine to lose. Only 3 of 16 labels seed anything and all three seed the same
+component, enough because the river is that component.
 
 Plus `--drop-slivers`, a different claim: a parcel is compact (`4piA/P^2`
 above 0.2 here) and a ripple is not (under 0.1).
@@ -2032,3 +2032,76 @@ identical scores at every setting, and the sliver threshold at 0.15 is where
 `land_plot` finally breaks (0.326). **Both sweeps are bounded by the picture,
 not by a number in this file** — which is the precision blind spot, stated
 again: nothing here rewards a smaller, cleaner run.
+
+## 2026-09-18 — the region was not the river: 832 -> 811, scores flat again
+
+The section above is wrong where it says the river reads clean. It does not, and
+the cause is structural rather than a fragment at an edge: the seeded component
+is mostly the **neatline margin** (the frame and the river are one component),
+and inside the river the region is a checkerboard. Over one window, 225 cells,
+77 pass; of the 148 rejected, **65 are rejected as "having a wash" while running
+one way at coherence 0.861** — the all-pixel median `r - b` is pulled under
+0.100 by the ripple ink itself, so the denser the ripple the more certainly the
+cell is discarded.
+
+Loosening the wash test is not available. A 90th-percentile or low-gradient
+measure separates river from wash cell by cell, but admits every bare-paper city
+block with a ruled street grid; the region then runs to 31% of the sheet and
+eats 15-21 of the 46 hand traces. **What keeps the region off the city today is
+not the labels, it is that the city's cells do not connect to the river's.**
+
+Shipped instead, both leaving the cell test alone: `WATER_HOLE = 12` cells (fill
+the holes the lettering and the open channel punch through the region; the
+sheet's holes are eighteen of 1-3 cells and one of 384) and
+`WATER_RIPPLE_CIRC = 0.25` (a polygon touching the region at all and too stringy
+to be a parcel is ripple — the staircase edge means a bank ribbon keeps most of
+its area outside the region however good the region is).
+
+| | polygons | water | slivers | land_plot | med | building | med | road cover |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| share test only | 832 | 152 | 60 | 0.350 | 0.218 | 0.122 | 0.050 | 0.59 |
+| + holes + ripple | **811** | **179** | 54 | 0.350 | 0.218 | 0.122 | 0.050 | 0.59 |
+
+Safe for a measured reason: **no hand trace overlaps the region by a single
+pixel** (max share 0.000), so the ripple rule cannot reach one. All 21 new drops
+were checked by eye. Default path still byte-identical to `a41134eb`.
+
+Still open: the Arroyo Chinois mouth, too narrow for the region to reach. And
+the ten-named-block check is not reproducible from its description — several
+labels have duplicate `ocr_extractions` rows and which one is taken changes the
+score (a rebuild lands 7/10 against the journal's 6/10). It is unchanged by this
+fix on either reading.
+
+## 2026-09-18 — the water is a blue line: 811 -> 798, the grid is gone
+
+Both sections above are superseded. The 64 px cell grid could not follow a quay,
+and it had no barrier: what kept it off the city was only that the city's cells
+did not happen to *connect* to the river's.
+
+The water is now found the way the sheet draws it — a blue line. Not blue as
+`b > r` (nothing here is) but *less red than black ink*: over the dark pixels
+the ripple reads `r - b` +0.031 to +0.051 against a city block's +0.086 and
+lettering's +0.169. Threshold it, exclude what survives an erosion (a wash
+survives, a ruling does not — that is what stopped it eating the Arsenal
+quarter), close the gaps between the lines, subtract **land** (any polygon
+compact enough to be a parcel, measured on its outline), keep the components a
+`hydrology` label seeds, fill the holes the lettering punches.
+
+| | polygons | water | slivers | land_plot | med | building | road cover | waterway |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| cell grid | 832 | 152 | 60 | 0.350 | 0.218 | 0.122 | 0.59 | 0.64 |
+| + holes + ripple rule | 811 | 179 | 54 | 0.350 | 0.218 | 0.122 | 0.59 | 0.64 |
+| + land bound | 783 | 224 | 37 | 0.350 | 0.218 | 0.122 | 0.59 | **0.51** |
+| blue line, no wash filter | 792 | 209 | 43 | **0.326** | **0.191** | 0.122 | **0.14** | 0.51 |
+| **blue line, shipped** | **798** | **203** | 43 | 0.350 | 0.218 | 0.122 | **0.52** | 0.64 |
+
+`road` cover 0.59 -> 0.52 is the only number that moved: the quay roads losing
+the false ribbons that lay across them. Two intermediate builds were rejected on
+the numbers rather than the picture and are tabulated in the journal so they are
+not retried.
+
+Known and unfixed: the Arsenal's dockyard apron is claimed at 1.00. It is not
+separable by colour, line, black-ink density or by cutting at every black line —
+the slipways run into the water, so on the paper the yard is continuous with the
+river. No polygon covers it, so the land bound has nothing to hold. The fix
+belongs to the block pass.

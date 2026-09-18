@@ -1029,9 +1029,10 @@ and the labels are what say which of those to believe. (Dropping the margin is a
 bonus: it is furniture.) The wash test is what keeps the naval quarter, which is
 ruled too but at `r - b` +0.067 against bare paper's +0.133.
 
-Only **1 of the 16 labels** actually seeds anything — the rest land on mixed
-cells along the narrow arroyos — and it is enough here because the main river is
-one component. On a sheet of many small ponds it would not be.
+Only **3 of the 16 labels** actually seed anything, and all three seed the *same*
+component — the other thirteen land on mixed cells along the narrow arroyos — so
+it is one seed's worth of evidence, enough here because the main river is that
+component. On a sheet of many small ponds it would not be.
 
 ### And a shape filter, which is a different claim
 
@@ -1072,3 +1073,181 @@ constants with it. What remains is one region test and one shape test, which
 make different claims — *this is water* and *this is not a parcel* — and the
 second is the one that generalises, being a single line with no threshold
 fitted to this sheet's ink.
+
+## The region was not the river — reopened the same day
+
+The claim above, that "the river reads clean and four small fragments remain at
+the region's square edge", does not survive looking at the rendered layer. The
+river is still full of kept ribbons. Shading the region itself over the sheet
+says why, and it is not a fragment at an edge.
+
+**The region is mostly the neatline margin.** Its component's bounding box is
+x 128–5888, y 128–4352 of a 6051 × 4491 render, because the ruled frame around
+the sheet and the river are one connected component. The docstring's safety
+argument — the labels say which regions to believe — is weaker than it reads: a
+label only has to seed one cell of something that already spans the sheet.
+
+**And inside the river it is a checkerboard.** Per cell over the Messageries
+Maritimes window, 225 cells, of which 77 pass:
+
+| rejected on | cells | median `r − b` | ink | coherence |
+|---|---:|---:|---:|---:|
+| **no wash (`r − b` ≤ 0.100)** | **65** | **+0.071** | 0.029 | **0.861** |
+| coherence ≤ 0.45 | 53 | +0.133 | 0.047 | 0.189 |
+| too little gradient | 30 | +0.141 | 0.000 | — |
+| *passed* | 77 | +0.125 | 0.009 | 0.849 |
+
+The first row is this note's own headline contradicting itself. Those cells are
+ruled better than the ones that pass and their ink is sparse; they fail only
+because the **all-pixel** median is dragged under the threshold by the ripple
+ink itself. The denser the ripple, the more certainly the cell is thrown away —
+and the dense ripple is the band along the bank, exactly where the cream pass
+fragments worst. The other two rows are the sheet's own lettering across the
+water, and open channel with nothing drawn on it to measure.
+
+### What was tried on the wash test, and why none of it is in the code
+
+Every attempt to loosen the wash test floods, because the safety was never the
+labels — it was that the city's cells happen not to *connect* to the river's.
+
+| | cells | region | drops | traces eaten |
+|---|---:|---:|---:|---:|
+| median `r − b` (as shipped) | 1910 | 10.4% | 152 | 0/46 |
+| paper-only median (ink masked) | 1929 | 10.6% | 157 | 0/46 |
+| 90th percentile of `r − b` | — | 31.7% | 563 | **21/46** |
+| median over low-gradient pixels only | — | 31.2% | 547 | **15/46** |
+| strict seed, grown through the loose test | — | 31.2% | 547 | **15/46** |
+
+Masking the ink does nothing because the ripple is blue at `V ≈ 0.6` and `INK_V`
+is 0.55 — the lines are not in the ink mask at all. The percentile and
+low-gradient measures do separate river from wash cell by cell (63 of the 65
+recover; the Arsenal blocks stay at +0.047…+0.059), but they also admit every
+bare-paper city block with a ruled street grid, and once those are candidates
+the whole sheet is one component. **The cell test does not describe water. It
+describes bare paper with ruled lines, which is also most of the city.**
+
+### What is in the code instead
+
+Two changes that leave the region test alone:
+
+- `WATER_HOLE = 12` cells. Fill the holes the lettering and the open channel
+  punch through the region. The sheet's region has 19 holes: eighteen of 1–3
+  cells, then one of 384. Any cut between 3 and 384 is the same cut.
+- `WATER_RIPPLE_CIRC = 0.25`. A polygon that touches the region **at all** and
+  is too stringy to be a parcel is ripple. The region's edge is a 64 px
+  staircase, so a ribbon along the bank keeps most of its area outside it
+  however good the region is — the share test can never reach those.
+
+The second is safe for a measured reason rather than an assumed one: **not one
+of the 46 hand traces overlaps the region by a single pixel** (max share 0.000),
+so it cannot reach a trace.
+
+| | polygons | water | slivers | land_plot | med | building | med | road cover |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| share test only | 832 | 152 | 60 | 0.350 | 0.218 | 0.122 | 0.050 | 0.59 |
+| + holes + ripple | **811** | **179** | 54 | 0.350 | 0.218 | 0.122 | 0.050 | 0.59 |
+
+All 21 newly dropped polygons were checked by eye: twelve are ripple ribbons
+off the Dock Flottant, the rest lie along the bank. The default path is still
+byte-for-byte identical to `a41134eb`. The self-check now carries a water
+fixture — ruled bare paper over blank paper, one cell scribbled out to punch a
+hole — and it fails if either new constant is disabled.
+
+**Still wrong:** the ribbons at the mouth of the Arroyo Chinois. The region does
+not reach into a channel that narrow, so their share is zero and neither test
+applies.
+
+**And the named check is not reproducible.** Ten labels, resolved against
+`ocr_extractions`, is ambiguous — several of the ten have duplicate rows at
+different positions, and which one you take changes the answer. A rebuild of
+the check scores 7/10 where this note records 6/10, on the same polygons. It is
+unchanged by this fix either way, which is all it can honestly be used for
+until the script is committed.
+
+## The water is a blue line, and the grid is gone
+
+Two further rounds, both driven by looking at the rendered layer.
+
+**The region walked up a canal.** At Vge de Tam Hoi it had claimed whole
+cadastral parcels on dry land. The cause was not a threshold: the region had
+**no barrier at all**. What kept it off the city was only that the city's cells
+did not happen to *connect* to the river's, which is why every loosening of the
+wash test in the table above floods.
+
+So land bounds it, taken from the pass's own output: any polygon compact enough
+to be a parcel, since the cream pass fragments water into ribbons and nothing
+else on the sheet is a ribbon. With a real barrier the wash test could finally
+be measured between the lines rather than over all of a cell's pixels — but
+that was still a 64 px grid, and a grid cannot follow a quay.
+
+**Then: the water is a blue line.** Not blue as `b > r` — nothing on this sheet
+is, the ripple's own `b - r` is −0.051 — but *less red than black ink*. Over the
+dark pixels:
+
+| | `r − b` of the dark pixels |
+|---|---:|
+| river ripple, mid-channel | **+0.051** |
+| river ripple at the quay | **+0.031** |
+| the Tam Hoi canal | **+0.035** |
+| black ink, a city block | +0.086 |
+| lettering | +0.169 |
+
+Threshold that, close the gaps between the lines, subtract land, keep the
+components a `hydrology` label seeds, fill the holes the sheet's own lettering
+punches: the result is the water's shape to the pixel. The whole cell grid —
+`WATER_CELL`, `WATER_COHERENCE`, `WATER_PAPER_RB`, `WATER_INK_MAX` — is gone,
+and with it the staircase edge along every bank.
+
+**Hue alone is not enough, and the trap was expensive.** The military class's
+wash is blue-grey too. It ran down the streets of the Arsenal quarter, joined
+the river, and took the Jardin Botanique and 0.14 km² of the Magasins de la
+Marine: `land_plot` **0.350 → 0.326**, `road` cover **0.59 → 0.14**. The water
+is a *line*. Erode by a line's own width and a wash survives while a ruling
+disappears, so what survives is exactly what to exclude.
+
+**And one measurement was wrong everywhere it was used.** `4πA/P²` taken on a
+polygon with holes loses the courtyard from `area` and gains its ring in
+`length`, so an ordinary city block scores below a ribbon. That is how a
+0.14 km² piece of the Jardin Botanique came to be called ripple. Circularity is
+now taken on the outline (`outline_circularity`), for both the land mask and
+the stringiness test.
+
+| | polygons | water | slivers | land_plot | med | building | road cover | waterway |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| the cell grid | 832 | 152 | 60 | 0.350 | 0.218 | 0.122 | 0.59 | 0.64 |
+| + holes + ripple rule | 811 | 179 | 54 | 0.350 | 0.218 | 0.122 | 0.59 | 0.64 |
+| + land bound, wash between the lines | 783 | 224 | 37 | 0.350 | 0.218 | 0.122 | 0.59 | **0.51** |
+| blue line, before the wash filter | 792 | 209 | 43 | **0.326** | **0.191** | 0.122 | **0.14** | 0.51 |
+| **blue line, wash filtered, outline circularity** | **798** | **203** | 43 | 0.350 | 0.218 | 0.122 | **0.52** | 0.64 |
+
+The last row is what is in the code. `road` cover 0.59 → 0.52 is the only number
+that moved, and it is the quay roads losing the false ribbons that lay across
+them. Default path still byte-identical to `a41134eb`. The self-check carries a
+blue-line fixture and fails if any of the six mechanisms is switched off.
+
+### What is still wrong: the Arsenal's dockyard apron
+
+The region runs past the Quai into the Arsenal de la Marine's yard — the strip
+of slipways, sheds and the dry dock between the quay line and the water. It is
+claimed at 1.00.
+
+Nothing separates it, and that was measured rather than assumed:
+
+- **Not colour or line.** It is bare paper ruled in the same fine blue-grey as
+  the river, because a dockyard apron and a tidal foreshore are drawn the same
+  way on this sheet.
+- **Not black ink.** The yard has buildings on it, but its black-ink density is
+  2.91–4.84% against the river's 2.31–4.77%. They overlap.
+- **Not a wall.** Cutting the region at every black line (`V < 0.55` and
+  `V < 0.65`, dilated 0, 1 and 2 px) leaves the yard claimed at 1.00 in every
+  one. The quay line does not disconnect it, and it should not: the slipways
+  run into the water, so on the paper the yard *is* continuous with the river.
+- **Not the land bound**, because the land bound is polygons and **no polygon
+  covers the yard**. The block pass emits nothing there, so the barrier has
+  nothing to work with. That is visible directly in the layer: the land mask
+  stops dead at the quay line.
+
+So the fix is not in the water test. It is that `Arsenal de la Marine` should
+be a block — it is a named military parcel, and the pass already calls its
+neighbours blue — and once it is, the land bound removes the yard for free.
+Filed against the block pass, not this one.

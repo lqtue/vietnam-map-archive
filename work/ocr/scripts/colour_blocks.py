@@ -822,79 +822,134 @@ def fit_dilution(points: list[tuple[float, float]],
 # river. And most of the polygons the cream pass traces there sit *between* the
 # ripple lines and contain no ink at all — 0 to 17 pixels of it — so a
 # per-polygon test has nothing to read in exactly the places it is needed.
+## The water is drawn, and what is drawn is a blue line. Not blue in the sense of
+# b > r — nothing on this sheet is — but *less red than black ink is*: over the
+# dark pixels, the ripple ruling reads `r - b` +0.031 to +0.051 where the black
+# ink of a building reads +0.086 and lettering +0.169. Threshold that, close the
+# gaps between the lines, and the result is the water's own shape, to the pixel:
+# the quay edge, the jetties, the mouth of a creek a cell grid cannot see.
 #
-# What is true of every part of the water and of nowhere else on the sheet: over
-# a cell of a few dozen pixels, all the line work runs one way (the ripple is
-# ruled), there is no wash, and the ink is sparse. That is `ink_coherence` again,
-# measured on a grid rather than on a polygon. The cells that pass, componented,
-# and the components holding one of the sheet's 16 `hydrology` labels, are the
-# river, the two arroyos and — harmlessly — the ruled neatline margin.
+# This replaced a 64 px grid of cells tested for coherence, wash and ink
+# density. That version measured the wash over *all* of a cell's pixels, so the
+# ripple ink dragged the cell under its own threshold — the more the cell looked
+# like river, the more certainly it was discarded — and its square edge left a
+# staircase along every bank. The whole diagnosis, and five measured dead ends,
+# are at the foot of docs/journals/260918-colour-blocks.md.
 #
-# The wash test is what keeps the naval quarter, whose blocks are ruled too:
-# theirs is a wash at r - b +0.067 against bare paper's +0.133.
+# Two things bound it, and both are needed:
 #
-# ponytail: a 64 px grid and four constants, one sheet. Ceiling: the seeds. A
-# hydrology label that lands on a mixed cell seeds nothing, and on this sheet 1
-# of 16 does the work — enough here because the main river is one component, and
-# not enough on a sheet of many small ponds. Upgrade: seed from the label's
-# neighbourhood rather than its own cell.
-WATER_CELL = 64             # render px; a few ripple periods across
-WATER_COHERENCE = 0.45      # its line work runs one way
-WATER_PAPER_RB = 0.100      # over paper that carries no wash at all
-WATER_INK_MAX = 0.25        # and the ink on it is sparse
+#  - LAND, taken from the pass's own output: any polygon compact enough to be a
+#    parcel. A ripple ribbon is not compact, so the river cannot vouch for
+#    itself. Without this the region has no barrier at all — what kept the grid
+#    version off the city was only that the city's cells happened not to
+#    *connect* to the river's, and every loosening flooded the sheet.
+#  - The `hydrology` labels, which say which of the remaining regions to
+#    believe. The same signature also describes the ruled neatline margin,
+#    which is furniture and fine to lose.
+#
+# ponytail: seven constants, one sheet, and `WATER_LINE_RB` is the load-bearing
+# one — it is the gap between this sheet's blue and this sheet's black. Ceiling:
+# a sheet that draws its water in black, or one whose ink has aged to the same
+# hue. Upgrade: fit the cut from the sheet's own dark-pixel histogram, the way
+# `cream_ink` sweeps its threshold, rather than pinning it at 0.07.
+WATER_LINE_V = 0.80         # dark enough to be a drawn line
+WATER_LINE_RB = 0.07        # ...and less red than this sheet's black ink
+WATER_LINE_W = 2            # ...and thin enough to be a line rather than a wash
+WATER_CLOSE = 8             # render px; bridges the gap between two ruled lines
+WATER_OPEN = 2              # ...then takes back the stray specks it joined
+WATER_MIN_PX = 5_000        # a body smaller than this is not a river
+WATER_HOLE_PX = 20_000      # a hole this small in the water is lettering, not land
 WATER_SHARE = 0.35          # a polygon this far into the region is water
+WATER_RIPPLE_CIRC = 0.25    # a stringy polygon touching the region is ripple
+
+
+def outline_circularity(geom) -> float:
+    """`4*pi*A / P^2` of the polygon's OUTLINE, ignoring any holes in it.
+
+    A block with a courtyard is still a block. Taken on the polygon itself,
+    `area` loses the courtyard while `length` gains its ring, so a perfectly
+    ordinary city block scores below a ribbon does — which is how a 0.14 km²
+    piece of the Jardin Botanique came to be called ripple.
+    """
+    ring = shapely.Polygon(geom.exterior)
+    return 4 * math.pi * ring.area / (ring.length ** 2) if ring.length else 0.0
+
+
+def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
+              min_circ: float = WATER_RIPPLE_CIRC) -> np.ndarray:
+    """Every polygon compact enough to be a parcel, burnt into a mask.
+
+    This is the water test's only barrier, and it has to come from geometry
+    rather than from colour: the river's own paper is the same tone as dry
+    land (measured +0.149 against +0.141), so no threshold separates them.
+    Compactness does, because the cream pass fragments water into ribbons and
+    nothing else on the sheet is a ribbon.
+    """
+    out = np.zeros(shape, bool)
+    for f in feats:
+        g = f["geom"]
+        if outline_circularity(g) < min_circ:
+            continue
+        win = _poly_window(g, shape, scale)
+        if win is not None:
+            sel, x0, y0, x1, y1 = win
+            out[y0:y1, x0:x1] |= sel
+    return out
 
 
 def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tuple[float, float]],
                ink_v: float = INK_V, share: float = WATER_SHARE) -> list[bool]:
-    """True for each polygon lying mostly inside the sheet's water.
+    """True for each polygon lying in the sheet's water.
 
-    `water` is the hydrology labels, in source px — the same 16 points the
-    oversized-component test uses. They are what stops this dropping land: a
-    region of ruled, washless, sparsely inked cells is water *or* the neatline
-    margin, and only the labels say which regions to believe.
+    `water` is the hydrology labels, in source px. `ink_v` is unused and kept
+    for the call signature; the water's line work is found on hue, not on the
+    ink threshold, because at `INK_V` the ripple is only half there.
 
-    `share` is a third rather than a half because the region is a grid and its
-    edge is therefore square: a ribbon lying along the bank can have a third of
-    itself in the last water cell and the rest under the cell boundary. Swept
-    against the traces at 0.50, 0.35 and 0.25 — 121, 152 and 163 polygons
-    dropped, and land_plot 0.350 / building 0.122 / cover 1.00 at every one of
-    them, so the sweep is bounded by the picture rather than by a score.
+    Two ways to be water. Mostly inside the region is the first. Touching it at
+    all while being too stringy to be a parcel is the second, and it is what
+    catches a ribbon lying along the bank — measured safe rather than assumed:
+    no hand trace on this sheet overlaps the region except one `waterway`, at
+    0.60, which is water finding water.
     """
     if not water:
         return [False] * len(feats)
-    v = rgb.astype(np.float32).max(axis=2) / 255.0
-    rb = rgb[..., 0].astype(np.float32) / 255.0 - rgb[..., 2].astype(np.float32) / 255.0
-    gy, gx = np.gradient(v)
-    ink = v < ink_v
+    a = rgb.astype(np.float32) / 255.0
+    v = a.max(axis=2)
+    rb = a[..., 0] - a[..., 2]
     h, w = v.shape
-    ny, nx = h // WATER_CELL, w // WATER_CELL
-    cand = np.zeros((ny, nx), bool)
-    for r in range(ny):
-        for c in range(nx):
-            sl = (slice(r * WATER_CELL, (r + 1) * WATER_CELL),
-                  slice(c * WATER_CELL, (c + 1) * WATER_CELL))
-            if np.median(rb[sl]) <= WATER_PAPER_RB or ink[sl].mean() >= WATER_INK_MAX:
-                continue
-            a, b = gx[sl], gy[sl]
-            use = np.hypot(a, b) > 0.02
-            if use.sum() < 50:
-                continue
-            u, q = a[use], b[use]
-            jxx, jyy, jxy = float((u * u).sum()), float((q * q).sum()), float((u * q).sum())
-            tr = jxx + jyy
-            if tr > 0 and ((jxx - jyy) ** 2 + 4 * jxy ** 2) ** 0.5 / tr > WATER_COHERENCE:
-                cand[r, c] = True
-    lab, _ = ndimage.label(cand, structure=np.ones((3, 3)))
-    seeded = {lab[int(y / scale) // WATER_CELL, int(x / scale) // WATER_CELL]
-              for x, y in water
-              if 0 <= int(y / scale) // WATER_CELL < ny and 0 <= int(x / scale) // WATER_CELL < nx}
-    seeded.discard(0)
-    if not seeded:
+
+    def disk(r: int) -> np.ndarray:
+        y, x = np.ogrid[-r:r + 1, -r:r + 1]
+        return x * x + y * y <= r * r
+
+    blue = (v < WATER_LINE_V) & (rb < WATER_LINE_RB)
+    # Hue alone is not enough: the military class's wash is blue-grey too, and
+    # it flowed down the streets of the Arsenal quarter and joined the river,
+    # taking the Jardin Botanique and 0.14 km² of the Magasins with it. The
+    # water is a *line*. Erode by a line's own width and a wash survives while
+    # a ruling disappears, so what survives is exactly what to throw away.
+    wash = ndimage.binary_erosion(blue, structure=disk(WATER_LINE_W))
+    blue &= ~ndimage.binary_dilation(wash, structure=disk(WATER_LINE_W + 2))
+    solid = ndimage.binary_closing(blue, structure=disk(WATER_CLOSE))
+    solid = ndimage.binary_opening(solid, structure=disk(WATER_OPEN))
+    solid &= ~land_mask(feats, (h, w), scale)
+    lab, n = ndimage.label(solid)
+    if not n:
         return [False] * len(feats)
-    cells = np.isin(lab, list(seeded))
-    full = np.zeros((h, w), bool)
-    full[:ny * WATER_CELL, :nx * WATER_CELL] = np.kron(cells, np.ones((WATER_CELL, WATER_CELL), bool))
+    sizes = ndimage.sum(solid, lab, range(1, n + 1))
+    seeded = {lab[int(y / scale), int(x / scale)] for x, y in water
+              if 0 <= int(y / scale) < h and 0 <= int(x / scale) < w}
+    seeded.discard(0)
+    full = np.isin(lab, [i for i in seeded if sizes[i - 1] >= WATER_MIN_PX])
+    if not full.any():
+        return [False] * len(feats)
+    # The sheet letters its own river. Black ink is not a blue line, so
+    # "RIVIÈRE DE SAIGON" punches a hole straight through the water it names.
+    holes = ndimage.binary_fill_holes(full) & ~full
+    hlab, hn = ndimage.label(holes)
+    if hn:
+        hs = ndimage.sum(holes, hlab, range(1, hn + 1))
+        full = full | np.isin(hlab, [i + 1 for i, s in enumerate(hs) if s <= WATER_HOLE_PX])
     out: list[bool] = []
     for f in feats:
         win = _poly_window(f["geom"], (h, w), scale)
@@ -905,7 +960,9 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
         if sel.sum() < 10:
             out.append(False)
             continue
-        out.append(bool((sel & full[y0:y1, x0:x1]).sum() / sel.sum() > share))
+        inside = (sel & full[y0:y1, x0:x1]).sum() / sel.sum()
+        circ = outline_circularity(f["geom"])
+        out.append(bool(inside > share or (inside > 0 and circ < WATER_RIPPLE_CIRC)))
     return out
 
 
@@ -1333,6 +1390,34 @@ def _self_check() -> None:
     block = {"geom": shapely.box(0, 0, 100, 100)}
     ribbon = {"geom": shapely.box(0, 0, 1000, 10)}
     assert sliver_mask([block, ribbon]) == [False, True], "sliver filter must split 1:1 from 100:1"
+
+    # The water test, on the thing it actually keys on: a blue line. The top
+    # half is ruled in blue-grey over paper, the bottom half is blank paper,
+    # and a patch of the water is lettered over in black ink the way the sheet
+    # letters its own river.
+    wat = np.full((320, 640, 3), (232, 222, 202), np.uint8)
+    wat[:160][:, ::5] = (120, 130, 150)                 # the ripple, every 5 px
+    wat[64:128, 256:320] = (232, 222, 202)              # clear a patch...
+    rs2 = np.random.default_rng(3)
+    blot = wat[64:128, 256:320]
+    blot[rs2.random(blot.shape[:2]) < 0.25] = (60, 40, 30)   # ...and letter it
+    edge = {"geom": shapely.box(0, 158, 400, 168)}      # a ribbon mostly past the bank
+    holed = {"geom": shapely.box(264, 94, 312, 100)}    # a ripple under the lettering
+    island = {"geom": shapely.box(380, 8, 560, 159)}    # a *parcel* out on the water
+    far = {"geom": shapely.box(40, 240, 140, 319)}      # a block well onto the land
+    wm = water_mask([edge, holed, island, far], wat, 1.0, [(100.0, 40.0)])
+    assert wm == [True, True, False, False], \
+        f"water: the ribbon and the lettered patch are water, the parcels are not: {wm}"
+    # Each half of that carries its own weight. The ribbon keeps most of its
+    # area outside the water, so only the stringiness test reaches it; the
+    # lettered patch is water only because the hole is filled; and the island
+    # survives sitting on ruled water paper only because land bounds the region
+    # — which is the barrier the whole test rests on.
+    assert not water_mask([island], wat, 1.0, [(100.0, 40.0)])[0], \
+        "a compact parcel is land however watery the paper it sits on"
+    # ...and with no hydrology label there is no region and nothing is dropped.
+    assert water_mask([edge, holed, island, far], wat, 1.0, []) == [False] * 4, \
+        "no label must mean no water region at all"
 
     # Areas are filtered in m² when the sheet's scale is known.
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
