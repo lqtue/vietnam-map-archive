@@ -1516,3 +1516,66 @@ Less than half the cost and half the time, for one numeral. Three sheets now say
 low thinking is free or better (1923 and 1942 numerals, 1878 body); none says it
 costs recall. It stays opt-in until a fourth agrees — score any run against the
 sheet's printed index before trusting it.
+
+## 2026-09-18 — colour blocks: the gate is not cleared, and the metric says why
+
+`work/ocr/scripts/colour_blocks.py` on the whole 1882 Plan Cadastral, from the
+cached full scan, `--render 6051` (2x), `--close 5`, splits found by vote:
+`r - g` +0.0725 from 20/64 crops, `r - b` +0.072 from 32/64. **189 blocks, 124
+salmon + 65 blue-grey, 5.9 s of CPU** — no GPU, no checkpoint, no network.
+
+Scored against the sheet's hand traces with `seg_eval.py`. **The ground truth
+has grown since the September runs above: `load_gt` now returns 118 rows —
+building 89 · land_plot 24 · road 3 · waterway 2 — where this file's earlier
+sections say 46.** Anything comparing against those sections is comparing
+against a different truth set.
+
+| land_plot (n=24) | mean | med | @.5 | @.3 | cover |
+|---|---|---|---|---|---|
+| **as `seg_eval` prints it** | 0.124 | 0.003 | 2 | 4 | **0.01** |
+| the 8 pigmented plots | **0.352** | 0.295 | 2 | 4 | **0.97** |
+| the 16 cream plots | 0.010 | 0.000 | 0 | 0 | 0.00 |
+
+**The gate was "beat `--blocks-from-roads` at 0.262 / 0.87 on the 24 land_plot
+traces". It is not cleared, and not for a reason a threshold can fix.** This
+pass emits only the pigmented classes; cream *non affectées* parcels are
+excluded by design. The plan assumed from the deleted pipeline's tally that
+cream was about a quarter of the blocks. In the actual ground truth it is
+**16 of 24 land_plots — two thirds** — so the metric is dominated by the one
+class the method cannot see, and the pooled 0.124 pools 16 structural zeros
+with 8 real answers.
+
+Measured, not inferred: splitting the 24 by the pigment share inside each
+traced polygon gives 15 uncovered plots at **82% cream, 3% salmon** and 7
+covered ones at **44% salmon, 22% blue**. The bimodality in the per-plot
+coverage — plots at 0.000 and plots at 0.99, spatially interleaved — is that
+split and nothing else.
+
+**Read the 0.352 with the caveat it deserves.** n=8, and the subset was chosen
+by the classifier under test, which is the same selection bias the `--near-gt`
+Gemini run carries three sections up. It is a reason to finish P2, not a number
+to pin.
+
+### Why cream cannot simply be added, measured
+
+Including cream in the componented mask collapses the sheet:
+
+| mask | components | in the 200-120,000 m² band | largest |
+|---|---|---|---|
+| pigment only | 14,052 | **189** | 0.99 km² (36% of the mask) |
+| pigment + cream | 362 | **0** | **11.91 km² (100% of the mask)** |
+
+The street network welds every cream parcel to every other one, so there is no
+band, no block and no polygon. **P2 is therefore a prerequisite for P1's own
+score, not a follow-on** — the plan in `docs/journals/260918-colour-blocks.md`
+had the order wrong, and the order is now P2 before any re-score.
+
+Two other readings worth keeping:
+
+- **`building` is capped as expected and for the known reason** — 0.057 pooled,
+  0.088 over the 36 pigmented ones, cover 1.00. A block-level prediction
+  against a building-level truth; the ink is found and the subdivision is not,
+  which is the same ceiling the block-prior runs hit at 0.160.
+- **`waterway` scores 0.432, the highest of any class here, by accident.** The
+  Genouilly canal is blue-grey, so it lands in the cool class and comes back as
+  a "block". Correctly coloured, wrongly typed.
