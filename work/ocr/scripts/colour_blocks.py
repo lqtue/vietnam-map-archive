@@ -338,8 +338,14 @@ def classify(rgb: np.ndarray, split: float, ink_v: float = INK_V,
     warm = rest & ~blue & ~greenm
     return {
         "ink": ink,
-        # Warm and pigmented: the salmon *particulières* wash, and the darker
-        # red-brown building fill inside it (see P3 — they are not split here).
+        # Warm and pigmented: the salmon *particulières* wash. The darker
+        # red-brown building fills sit inside this class and stay there —
+        # measured against the 89 building traces, no colour axis separates a
+        # building from the plot it stands on (best is r - g at 0.64 overlap,
+        # against 0.17 for the green/cream pair). Buildings on this sheet are
+        # outlines, not fills: the only thing that moves is ink density, 0.182
+        # inside a building trace against 0.067 on open plot. Splitting them is
+        # SAM2's job, not a threshold's.
         "salmon": salmon,
         "blue": blue,
         # The hatched administrative parcels, found on the left of the cream

@@ -1,6 +1,6 @@
 # 260918 — the sheet knows where its own blocks are
 
-**Date:** 2026-09-18 · **Severity:** medium · **Component:** seg / Track C · **Status:** plan, one tile measured, nothing built
+**Date:** 2026-09-18 · **Severity:** medium · **Component:** seg / Track C · **Status:** P1 + P2 built and scored, P3 a recorded null, P4 open
 
 ## The goal
 
@@ -105,10 +105,13 @@ That split is precisely what the seg side is capped on — `building` IoU 0.160
 against `land_plot` 0.249, recorded as "the ink is found, the subdivision is
 not", with a within-block split named as the next piece of work.
 
-**Not established.** The value-split probe run today was confounded: the dark
-tail of the red family mixes building fill with the black outlines and the
-lettering, so `V < T` selected all three. It needs a test that removes ink
-first, and it has not had one.
+**Not established — and later disproved.** The value-split probe run that
+morning was confounded: the dark tail of the red family mixes building fill
+with the black outlines and the lettering, so `V < T` selected all three. The
+clean test, with ink excluded and scored against the 89 building traces, is
+P3 below: **there are no two reds.** V is unimodal in every class, and no
+colour axis separates a building from its plot (best 0.64 overlap against the
+green pair's 0.17). Buildings are outlines over the same wash.
 
 ## Failure modes already visible
 
@@ -149,8 +152,28 @@ Each step is gated on the one before it producing a number.
   centroids; unlabelled cream components stay `non affectées`.
   **Exit:** a count of named streets on the sheet, and the fraction of cream
   area that a street name claims.
-- **P3 — the two-reds test**, ink removed first. **Exit:** either a `building`
-  IoU against the 17 building traces that beats 0.160, or a recorded null.
+- **P3 — the two-reds test**, ink removed first. **Done 2026-09-18: the null.**
+  No colour axis separates a building from the plot it stands on — best is
+  `r − g` at **0.64 overlap** against the 89 building traces, where the
+  green/cream pair scores 0.17 on the same measure. V is unimodal in every
+  class. What differs is ink, not colour: 0.182 of a building trace is ink
+  against 0.067 of open plot, so buildings here are **outlines over the same
+  wash**, not a second fill.
+
+  The parcel half is closed off too, by arithmetic rather than tuning: a
+  divider is one ink run (2 source px, 1 at `--render 6051`) while the hatch
+  *period* is 8 source px (4 render px), so any closing that rejoins a block
+  across its hatching necessarily bridges a divider. Orientation is the one
+  route left — and the hatch angle is **per block, not per sheet** (40° and
+  140° in one crop), retaining only ~11% of ink, the rest being outlines and
+  lettering. Recorded, not built.
+
+  **So the within-block split is not a colour problem, and colour is now
+  exhausted at the block level.** It is ink geometry, which is what SAM2 is
+  for and where EVAL-BASELINE measures it earning its place (0.249 against
+  0.161 for the same boxes raw). The blocks hand off unchanged: 253 → **246
+  SAM2 seeds** after `main_map` clipping, against the modern prior's 950
+  prompts on the same sheet, and on the ink instead of 11.3 m away from it.
 - **P4 — write-back**, only if P1 clears: blocks as `footprint_submissions` with
   `feature_type` carrying the cadastral class, which is the half of the old
   pipeline's design worth keeping.

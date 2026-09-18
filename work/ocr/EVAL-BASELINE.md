@@ -1662,3 +1662,85 @@ within-block split — exists for.
 
 `building` itself is unchanged by any of this, as expected for a coarse pass:
 0.093 mean, cover 0.97.
+
+## 2026-09-18 — P3: the two reds do not exist, and the hatch closes off morphology
+
+P3 was "the two-reds within-block split", on the hypothesis that the pale
+salmon wash is the plot and the darker red-brown fills inside it are the
+buildings, so the subdivision would be a second threshold rather than a
+segmenter. **Its stated exit was a `building` IoU beating 0.160 or a recorded
+null. This is the null, and it is a firm one.**
+
+**No colour axis separates a building from the plot it stands on.** Scored the
+same way the green axis was found, but against the 89 `building` traces and the
+plot area with no building on it — share of building pixels inside the plot's
+10-90 range, lower is better:
+
+| axis | building p50 | plot p50 | overlap |
+|---|---|---|---|
+| r - g | 0.043 | 0.027 | **0.64** |
+| r - b | 0.118 | 0.098 | 0.65 |
+| S | 0.145 | 0.122 | 0.67 |
+| V | 0.847 | 0.824 | 0.72 |
+| g - b | 0.071 | 0.063 | 0.90 |
+
+Compare the green/cream pair at **0.17** on the same measure. 0.64 is not a
+separation. Value within each class is unimodal with a long dark tail and
+`find_split` returns None for salmon, green and blue alike; the one candidate
+that does fire — `r - g` within salmon at 0.1325 — is the ratio test latching
+onto a 2.6% bump against a 15.1% mode, which is tail noise, not a class.
+
+**What actually differs is ink, not colour**: 0.182 of a building trace is ink
+against 0.067 of open plot. Buildings on this sheet are drawn as outlines over
+the same wash, not as a second fill. That is a line-geometry problem, which is
+what SAM2 is for and where this file already measures it earning its place —
+0.249 against 0.161 for the same boxes used raw.
+
+### Isotropic morphology cannot cut the parcel dividers either
+
+The other half of the granularity gap is `land_plot`: a matched block is 3.72x
+the traced plot, because the hatched quarter returns as one block where the
+survey drew four or five parcels. Measured on the admin quarter at native
+resolution, scanning horizontally across the hatching:
+
+| | source px | at `--render 6051` |
+|---|---|---|
+| ink run width (= a divider) | p50 **2** | **1** |
+| gap between ink runs | p50 6 | 3 |
+| hatch period | **8** | **4** |
+
+A closing that rejoins a block across its hatching must span the *period*; a
+divider is one ink run, which is **narrower**. So no isotropic kernel can
+bridge the first and not the second — it is not a tuning problem, it is
+arithmetic. That is also why the `--close` sweep trades land_plot against blue
+fragmentation rather than finding a setting that wins both.
+
+### Orientation: the one route left, and why it was not built
+
+The hatch is directional and a divider generally is not parallel to it, so an
+opening with a line at the hatch angle should keep hatch and drop dividers.
+Measured on the admin quarter, ink retained by a length-15 line opening peaks
+twice — **40° at 11.2% and 140° at 11.4%** — because two adjacent blocks hatch
+in different directions. So the angle is **per block, not per sheet**, and the
+peak retains only ~11% of the ink: the other 89% is building outlines, block
+outlines and lettering, which such a filter would hand back mixed together.
+
+A working version therefore needs per-block angle estimation *and* a way to
+tell a divider from a building outline from a letter. That is a large build
+with no measured promise behind it, so it is recorded rather than attempted.
+**Revisit only if SAM2 on colour-block prompts leaves parcel granularity as the
+top remaining error.**
+
+### What P3 hands to the GPU instead
+
+The colour blocks load as a SAM2 prior unchanged — `load_seeds_from_prior`
+clips 253 blocks to 246 seeds inside `main_map`, median box 265 x 227 source
+px. Against the modern-geodata prior's **950 prompts** on the same sheet that
+is ~4x fewer encoder-bound prompts, and they sit on the ink rather than 11.3 m
+RMSE and 141 years away from it.
+
+    python work/MapSAM2/inference_tiles_as_video.py \
+      --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
+      --prior <out>/blocks.geojson --mode prompted --lora ...
+
+That run is the real test of the within-block split, and it needs a GPU.
