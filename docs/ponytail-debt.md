@@ -15,7 +15,7 @@ this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-09-15**, four rows added by hand 2026-09-18. **70 markers, 14 with no trigger.** Against the
+Scanned **2026-09-15**, five rows added by hand 2026-09-18. **71 markers, 14 with no trigger.** Against the
 2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
 the ledger had gone stale in both directions, so this is a full rewrite rather
 than a patch. See *What changed since 2026-09-10* at the foot.
@@ -254,6 +254,14 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   threshold fitted elsewhere. upgrade: sweep it against banded counts the way
   `cream_ink` sweeps its ink threshold, or re-measure per render; the trigger is
   the first run at a render other than 6051.
+- **`WATER_INK_RB` / `WATER_INK_MAX` / `WATER_PAPER_RB`** — three constants for
+  the water test, measured on one sheet, and a polygon is water or it is not —
+  no score, no sweep. ceiling: it drops 55 of the ~110 ribbon-shaped polygons,
+  so it raises precision without being a water mask; and a sheet that tints its
+  water rather than engraving it fails the third condition and keeps every
+  ribbon. upgrade: flood the `hydrology` labels through the blue-ink mask and
+  take the component, the same move `--recut` makes. Trigger: the first sheet
+  whose water is a wash.
 - **`fit_dilution`** — one global alpha for every class. ceiling: a sheet whose
   printer laid one tint heavier than another; per-class alphas are five scalars
   fitted the same way, and the trigger is a class that is systematically

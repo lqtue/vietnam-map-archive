@@ -916,3 +916,67 @@ the paper it is drawn on, and its density is a built block's density. Naming
 them needs a measure of *how the ink is laid down*, and orientation is the
 cheapest one that exists. Colour was not exhausted at the block level; it was
 being asked a question that is not about colour.
+
+
+## The river is not blue, and that is why blue never found it (2026-09-18)
+
+Reported from the layers for the second time — "blue still not able to
+correctly find the river". It cannot, and the measurement says why in one line:
+**the open river is bare paper.**
+
+| patch | wash (r − g, r − b) | ink (r − g, r − b) | ink % |
+|---|---|---|---:|
+| open river, mid-channel | +0.059, +0.141 | — | 0.3 |
+| river ripple, off the quay | +0.051, +0.125 | +0.020, **+0.031** | 3.7 |
+| dry land, NW quarter | +0.047, +0.133 | +0.035, +0.102 | 8.9 |
+| Hôpital Maritime (the blue class) | +0.027, **+0.067** | +0.016, +0.024 | 5.1 |
+
+Mid-channel the water is the same tone as dry land to three decimals. What
+makes it read blue to the eye is the engraved ripple, which genuinely is blue
+ink — r − b +0.031, next door to the military class's +0.024 — laid over 0.3 to
+4% of the surface. `classify` reads the *wash*, per pixel, so the river comes
+back cream everywhere except on the lines themselves. No threshold on a wash can
+find a thing that has none. The blue along the quay in the reported crop is the
+*Arsenal de la Marine*, which is military property and correctly blue.
+
+So water is the one feature on this sheet that is **drawn rather than washed**,
+and finding it takes all three of its parts at once:
+
+- its ink is blue — `r - b < 0.060` over the ink pixels
+- there is very little of it — under 15% of the polygon
+- and the paper underneath carries no wash at all — `r - b > 0.100`
+
+Each condition alone is wrong. Sparse blue ink is also a military block; bare
+paper is also every *non affectée* plot. **The paper test is the one that keeps
+the naval quarter**: Hôpital Maritime's ink is blue too (+0.024) and sparse too
+(5.1%), and the only thing that differs is that it has a wash at all.
+
+`--drop-water`, off by default and **the only flag here that removes geometry**.
+It drops 55 of 1044 polygons, 0.75 km²:
+
+| | polygons | ribbons (circ < 0.10) | ribbon area | land_plot | building |
+|---|---:|---:|---:|---:|---:|
+| before | 1044 | 110 | 1.17 km² | 0.350 | 0.122 |
+| `--drop-water` | 989 | **76** | **0.48 km²** | 0.350 | 0.122 |
+
+**Nothing is lost, and that is the whole result.** `seg_eval` takes the best
+match per trace, so a drop that touched a real parcel would show up immediately
+as a fall in `land_plot`; 55 polygons leave and both scores hold to the digit,
+cover stays 1.00 and the named check stays 6/10. Every one of the 55 was a false
+positive. Rendered, they are the Rivière de Saigon, the Arroyo de l'Avalanche,
+the Arroyo Chinois at Tam Hội and the scan margin outside the neatline —
+`10_dropped_as_water_55.png`.
+
+**It is a precision improvement and the metric still cannot see it.** This is
+the first change on the track that makes the run *smaller*, and the file has no
+number that rewards that — a recall-flavoured score is indifferent to 55 fewer
+false positives, which is exactly the blind spot item 1 of *what it would take
+to claim "no GPU"* describes. The honest way to state it is as the count and
+the area, not as a score that moved.
+
+It also does not find the whole river: 76 ribbons remain, and the pass only ever
+sees water where the cream pass already drew a polygon. The upgrade, if the
+river ever needs to be a *thing* rather than an absence, is to flood the 16
+`hydrology` labels through the blue-ink mask and take the component — the same
+move `--recut` makes, and it needs each label to sit inside one blob, which on
+open water it does.

@@ -812,6 +812,81 @@ def fit_dilution(points: list[tuple[float, float]],
     return best_a, best_cost
 
 
+# Water is the one thing on this sheet that is drawn rather than washed. The
+# open river is bare paper to three decimals — (r - g, r - b) of +0.059, +0.141
+# mid-channel against +0.047, +0.133 over dry land — and what makes it read blue
+# to the eye is the engraved ripple, which *is* blue ink (r - b +0.031, next to
+# the military class's +0.024) laid over 0.3-4% of the surface. So no threshold
+# on the wash can find it: `classify` reads the wash per pixel and the river is
+# cream everywhere except on the lines themselves. It takes all three.
+#
+# The paper test is what keeps the naval quarter: a military block's ink is blue
+# too (r - b +0.024 at Hopital Maritime) and sparse too (5.1%), and the only
+# thing that differs is that it has a wash at all — r - b +0.067 against bare
+# paper's +0.133.
+#
+# ponytail: three constants, measured on one sheet, and a polygon is water or it
+# is not — no score. Ceiling: it finds 55 of the ~110 ribbon-shaped polygons, so
+# it is a precision improvement rather than a water mask. Upgrade: flood the
+# hydrology labels through the blue-ink mask and take the component, which is
+# the same move `--recut` makes and needs the labels to be inside one blob.
+WATER_INK_RB = 0.060        # the ripple is blue ink
+WATER_INK_MAX = 0.15        # and there is very little of it
+WATER_PAPER_RB = 0.100      # over paper that carries no wash at all
+
+
+def water_mask(feats: list[dict], rgb: np.ndarray, scale: float,
+               ink_v: float = INK_V) -> list[bool]:
+    """True for each polygon that is river surface rather than land.
+
+    A false positive here deletes a real parcel, so all three conditions must
+    hold at once and each one alone is known to be wrong: sparse blue ink is
+    also a military block, and bare paper is also every *non affectee* plot.
+    """
+    a = rgb.astype(np.float32) / 255.0
+    rb = a[..., 0] - a[..., 2]
+    ink = a.max(axis=2) < ink_v
+    out: list[bool] = []
+    for f in feats:
+        win = _poly_window(f["geom"], rgb.shape[:2], scale)
+        if win is None:
+            out.append(False)
+            continue
+        sel, x0, y0, x1, y1 = win
+        lines = sel & ink[y0:y1, x0:x1]
+        if sel.sum() < 50 or lines.sum() < 30:
+            out.append(False)
+            continue
+        out.append(bool(np.median(rb[y0:y1, x0:x1][lines]) < WATER_INK_RB
+                        and lines.sum() / sel.sum() < WATER_INK_MAX
+                        and np.median(rb[y0:y1, x0:x1][sel]) > WATER_PAPER_RB))
+    return out
+
+
+def _poly_window(geom, shape: tuple[int, int], scale: float, inset: int = 0):
+    """The polygon's bounding window in render px, and its mask inside it.
+
+    Returns `(sel, x0, y0, x1, y1)` or None if the window is degenerate. `inset`
+    blanks that many pixels of the mask's own border, for a measure that would
+    otherwise read the polygon's outline as if it were content.
+    """
+    ring = [(x / scale, y / scale) for x, y in geom.exterior.coords]
+    xs = [q[0] for q in ring]
+    ys = [q[1] for q in ring]
+    x0, y0 = max(0, int(min(xs))), max(0, int(min(ys)))
+    x1, y1 = min(shape[1], int(max(xs)) + 1), min(shape[0], int(max(ys)) + 1)
+    if x1 - x0 < max(2, 2 * inset + 2) or y1 - y0 < max(2, 2 * inset + 2):
+        return None
+    m = Image.new("L", (x1 - x0, y1 - y0), 0)
+    ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
+    sel = np.asarray(m) > 0
+    if inset:
+        sel = sel.copy()
+        sel[:inset] = sel[-inset:] = False
+        sel[:, :inset] = sel[:, -inset:] = False
+    return sel, x0, y0, x1, y1
+
+
 def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
                 ink_v: float = INK_V) -> list[tuple[float, float, float, float]]:
     """Per polygon: median (r - g, r - b) over every pixel, and again over paper.
@@ -834,20 +909,13 @@ def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
     a = rgb.astype(np.float32) / 255.0
     rg, rb = a[..., 0] - a[..., 1], a[..., 0] - a[..., 2]
     paper = a.max(axis=2) >= ink_v
-    out: list[tuple[float, float, float]] = []
+    out: list[tuple[float, float, float, float]] = []
     for f in feats:
-        ring = [(x / scale, y / scale) for x, y in f["geom"].exterior.coords]
-        xs = [q[0] for q in ring]
-        ys = [q[1] for q in ring]
-        x0, y0 = max(0, int(min(xs))), max(0, int(min(ys)))
-        x1 = min(rgb.shape[1], int(max(xs)) + 1)
-        y1 = min(rgb.shape[0], int(max(ys)) + 1)
-        if x1 - x0 < 2 or y1 - y0 < 2:
+        win = _poly_window(f["geom"], rgb.shape[:2], scale)
+        if win is None:
             out.append((float("nan"),) * 4)
             continue
-        m = Image.new("L", (x1 - x0, y1 - y0), 0)
-        ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
-        sel = np.asarray(m) > 0
+        sel, x0, y0, x1, y1 = win
         if sel.sum() < 25:
             out.append((float("nan"),) * 4)
             continue
@@ -896,19 +964,11 @@ def ink_coherence(geom, grad: tuple[np.ndarray, np.ndarray], scale: float,
     two ways at once and cancels, while a garden's runs every way.
     """
     gy, gx = grad
-    ring = [(x / scale, y / scale) for x, y in geom.exterior.coords]
-    xs = [q[0] for q in ring]
-    ys = [q[1] for q in ring]
-    x0, y0 = max(0, int(min(xs))), max(0, int(min(ys)))
-    x1, y1 = min(gx.shape[1], int(max(xs)) + 1), min(gx.shape[0], int(max(ys)) + 1)
-    if x1 - x0 < 8 or y1 - y0 < 8:
-        return float("nan")
-    m = Image.new("L", (x1 - x0, y1 - y0), 0)
-    ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
-    sel = np.asarray(m) > 0
     # The polygon's own edge is a line, and a strong one. Three pixels in.
-    sel[:3] = sel[-3:] = False
-    sel[:, :3] = sel[:, -3:] = False
+    win = _poly_window(geom, gx.shape[:2], scale, inset=3)
+    if win is None or min(win[3] - win[1], win[4] - win[2]) < 8:
+        return float("nan")
+    sel, x0, y0, x1, y1 = win
     a, b = gx[y0:y1, x0:x1], gy[y0:y1, x0:x1]
     use = sel & (np.hypot(a, b) > min_grad)     # paper is flat; skip it
     if use.sum() < 200:
@@ -1252,6 +1312,11 @@ def main() -> int:
     p.add_argument("--drop-furniture", action="store_true",
                    help="drop polygons inside the title or legend box, located from the "
                         "sheet's OCR labels (needs --map-id and Supabase credentials)")
+    p.add_argument("--drop-water", action="store_true",
+                   help="drop the polygons that are river surface: bare paper drawn "
+                        "over with sparse blue ripple, which the cream pass otherwise "
+                        "traces into long thin parcels across the whole river. Unlike "
+                        "every other flag here this one removes geometry")
     p.add_argument("--census", action="store_true", help="print the histogram and stop")
     p.add_argument("--out", help="output directory for blocks.geojson + blocks.run.json")
     p.add_argument("--self-check", action="store_true")
@@ -1388,6 +1453,14 @@ def main() -> int:
                 before = len(feats)
                 feats = [f for f in feats if not shapely.centroid(f["geom"]).within(furn)]
                 print(f"  dropped {before - len(feats)} inside the title or legend box")
+
+    if args.drop_water:
+        wet_mask = water_mask(feats, rgb, scale, ink_v=args.ink)
+        kept = [f for f, w in zip(feats, wet_mask) if not w]
+        km2 = sum(f["geom"].area for f, w in zip(feats, wet_mask) if w) * ((mpp or 0) ** 2) / 1e6
+        print(f"  dropped {len(feats) - len(kept)} as river surface"
+              + (f" ({km2:.2f} km²)" if mpp else ""))
+        feats = kept
 
     if args.swatch_labels:
         feats, changed, alpha, demoted = relabel_by_swatch(

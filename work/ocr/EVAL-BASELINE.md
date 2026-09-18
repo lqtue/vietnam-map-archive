@@ -1955,3 +1955,34 @@ that one error is not being laundered into another.
 
 Cost: about +1.5 s on the whole sheet. Geometry untouched by construction, and
 the default path without `--swatch-labels` is byte-for-byte identical.
+
+
+## 2026-09-18 — the river is bare paper, and dropping it costs nothing
+
+Reported twice from the rendered layers as "blue cannot find the river". It
+cannot: **mid-channel the water is the same tone as dry land**, +0.059/+0.141
+against +0.047/+0.133, and what reads blue is the engraved ripple — blue ink
+(r − b +0.031) over 0.3–4% of the surface. `classify` thresholds the wash, and
+the river has none.
+
+Water therefore takes three conditions at once: blue ink (`r - b < 0.060`),
+sparse (< 15% of the polygon), over paper with no wash (`r - b > 0.100`). The
+third is what keeps the naval quarter — Hôpital Maritime's ink is blue (+0.024)
+and sparse (5.1%) too, and differs only in having a wash (+0.067).
+
+`--drop-water`, off by default, the only flag in this pass that removes geometry:
+
+| | polygons | ribbons (circ < 0.10) | ribbon area | land_plot | med | building | med |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `--swatch-labels` | 1044 | 110 | 1.17 km² | 0.350 | 0.218 | 0.122 | 0.050 |
+| + `--drop-water` | **989** | **76** | **0.48 km²** | 0.350 | 0.218 | 0.122 | 0.050 |
+
+55 polygons and 0.75 km² leave; both scores hold to the digit, cover stays 1.00,
+named check stays 6/10. **`seg_eval` takes the best match per trace, so a drop
+that touched a real parcel would fall out of `land_plot` immediately** — it does
+not, so all 55 were false positives. Rendered they are the Rivière de Saigon,
+the Arroyo de l'Avalanche, the Arroyo Chinois and the scan margin.
+
+**This is the first change on this track that makes the run smaller, and no
+number in this file rewards that.** A recall-flavoured score is indifferent to
+55 fewer false positives. Report it as the count and the area.
