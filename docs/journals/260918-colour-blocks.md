@@ -230,6 +230,40 @@ ground truth reachable at all, and therefore what makes P1 scoreable.
 
 **Revised order: P2, then re-score P1, then P3.**
 
+### P2, done 2026-09-18 — and the diagnosis above was wrong
+
+"Separate the street ribbon from the cream parcel" is not what was missing.
+Cropping the sheet around the uncovered traces and drawing them shows they sit
+on the pale grey-green **administrative parcels under diagonal hatching** —
+*Direction des Travaux Publics*, *Hôtel du Procureur Général*, *Conseil de
+Guerre*. Not unassigned land, not street. The picture said so before any metric
+did, which is twice now on this track.
+
+Two attempts on the wrong diagnosis died first: erosion (cream is 72.9% of the
+sheet, mostly open country, so the mass survives at 8.86 km² at every radius
+and "street" is 2% of cream) and local ink density (real at 0.120 against
+0.000, but built-up areas score the same, so cover 1.00 at IoU 0.137).
+
+The axis turned out to be the one already in use. Of six candidates scored
+against the traced pixels, `r − g` separates best at 17% overlap — and the
+hatched class sits *below* cream on it, where `find_split` never looked. At 48
+bins the structure is plain: green +0.025, valley +0.030, cream +0.045. Same
+primitive, mirrored, as `cool_split` already does.
+
+**land_plot: 0.124 → 0.247 mean, 0.003 → 0.161 median, cover 0.01 → 0.98**
+against `--blocks-from-roads` at 0.262 / 0.87. The `--close` sweep straddles
+the target (0.273 at k=0, 0.247 at k=5) but the spread is 0.027 at n=24 —
+noise, and the ends trade blue fragmentation against building cover, so the
+default stays 5.
+
+Full numbers, the axis table and the precedence finding: `work/ocr/EVAL-BASELINE.md`.
+
+**What remains is P3.** Matched predictions are 3.72x the traced plot's area:
+the hatched quarter returns as one block where the survey drew four or five
+parcels, divided by the same 1-2 px lines that divide buildings inside a salmon
+block. Coverage is solved; granularity is not — which is the ceiling the
+block-prior runs already hit at `building` 0.160.
+
 Two smaller findings from the same run:
 
 - **The ground truth has grown to 118 rows** — building 89 · land_plot 24 ·

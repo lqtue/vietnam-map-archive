@@ -34,12 +34,18 @@ The method, in the order the code runs it:
   4. Each component becomes a polygon via a concave hull over its boundary
      pixels, scaled back to full-image source pixels.
 
-**Cream parcels are not in this output.** The unassigned *non affectées* land
-is the same tone as the street it fronts, so it cannot be separated by colour
-alone — that is P2's job, using the `street_name` extractions to tell a ribbon
-from a parcel. On the 1882 sheet the deleted pipeline's own tally puts this at
-67 pigmented blocks of 91, so P1 reaches about three quarters of the sheet and
-the missing quarter is a known, named gap rather than a silent one.
+Three classes are emitted, found on two axes and claimed in a fixed order —
+salmon on `r - g`, then blue-grey on `r - b`, then the hatched administrative
+green on `r - g` again, below the cream peak. The order is not cosmetic: blue
+and green both sit low on `r - g`, so claiming green first swallows the
+military parcels whole (65 blocks to 1, measured).
+
+**Cream is still not a block.** Street surface and unassigned *non affectées*
+land are the same tone and are separated by name, not palette — the
+`street_name` extractions `to_sam2_seeds.py` discards. Adding cream to the mask
+does not work and was measured: the street network welds every cream parcel to
+every other, giving one component of 11.91 km², 100% of the mask, 0 blocks in
+the area band.
 
 Two designs were measured and rejected before this one, both on the 1882 tile
 `4142_4032`, and both are recorded so they are not re-attempted:
@@ -70,12 +76,17 @@ Two knobs that decide whether a run means anything, both reported:
               streets. Measured on the 1882 tile, the block count is flat from
               1:1 to about 4x and the pigment is intact; past 6x the classes
               start bleeding into each other.
-  --close     morphological closing before componenting, in render px. This is
-              load-bearing, not optional: without it the 1882 tile's pigment
-              breaks into 1,674 fragments, and at k=3 it is 208. The band is
-              then flat from k=3 to k=15 (29-31 blocks, median ~4,700 m²),
-              which is the sign the knob is not doing the work — the street is
-              simply too wide to bridge. Default 5, mid-plateau.
+  --close     morphological closing before componenting, in render px. It
+              rejoins a wash across the printed lines drawn on top of it; the
+              street is far too wide to bridge. Swept against the 24 land_plot
+              traces: k=0 scores 0.273 / cover 0.90, k=3 0.253 / 0.94, k=5
+              0.247 / 0.98, k=9 0.125 / 0.97. **Read that spread as noise, not
+              as a ranking** — 0.027 across k=0..5 at n=24 is the same
+              magnitude as the repeat-pass variation this file's Gemini section
+              records, and the two ends trade against each other anyway (k=0
+              fragments the blue class into 188 components where k=5 gives 44,
+              and building cover falls 0.97 to 0.66). Default 5, which holds
+              coverage; do not tune it on 24 polygons.
 
 The merge guard is the area band, not a line-width heuristic: a kernel that
 did bridge a street would show up as the largest component running past
@@ -152,6 +163,12 @@ VOTE_GRID = 8
 
 RG_BINS = 24
 RG_RANGE = (-0.10, 0.26)
+
+# The green/cream pair needs finer bins over a narrower window than the
+# cream/salmon pair: those two modes are 0.032 apart, which is two bins at
+# RG_BINS and invisible.
+RG_FINE_BINS = 48
+RG_FINE_RANGE = (-0.05, 0.19)
 HULL_RATIO = 0.4
 MAX_HULL_POINTS = 600
 
@@ -226,6 +243,40 @@ def cool_split(rgb: np.ndarray, split: float, ink_v: float = INK_V) -> float | N
     return None if trough is None else -trough
 
 
+def green_split(rgb: np.ndarray, ink_v: float = INK_V) -> float | None:
+    """The `r - g` trough on the *left* of the cream peak: the hatched class.
+
+    The 1882 sheet's administrative parcels — *Direction des Travaux Publics*,
+    *Hôtel du Procureur Général*, *Conseil de Guerre* — are a pale grey-green
+    under fine diagonal hatching, and they are **16 of the 24 `land_plot`
+    traces**, so nothing that misses them can score. They were missed at first
+    for two compounding reasons:
+
+      - they sit *below* cream on `r - g` (0.027 against 0.059, measured
+        against the traces themselves), and `find_split` only ever searches to
+        the right of the global peak, which is where salmon is;
+      - at `RG_BINS` the two modes are two bins apart and invisible. At
+        `RG_FINE_BINS` over the narrower `RG_FINE_RANGE` the structure is
+        plain: a green peak at +0.025 (13.4%), a valley at +0.030 (5.0%), the
+        cream peak at +0.045 (15.5%).
+
+    Of six candidate axes scored against the traced pixels — `r-g`, `r-b`,
+    `g-b`, V, S and local ink density — `r - g` separates best, with 17% of
+    hatched pixels inside cream's 10-90 range against 42% for ink density. So
+    this is the same axis and the same primitive as everything else here, just
+    mirrored: negate, and the left mode becomes a right one for `find_split`.
+    """
+    a = rgb.astype(np.float32) / 255.0
+    live = a.max(axis=2) >= ink_v
+    if not live.any():
+        return None
+    rg = (a[..., 0] - a[..., 1])[live]
+    lo, hi = RG_FINE_RANGE
+    counts, edges = np.histogram(-rg, bins=RG_FINE_BINS, range=(-hi, -lo))
+    trough = find_split(counts, edges)
+    return None if trough is None else -trough
+
+
 def split_by_vote(rgb: np.ndarray, grid: int = VOTE_GRID,
                   axis: str = "rg", ink_v: float = INK_V,
                   rg_split: float | None = None) -> tuple[float | None, int, int]:
@@ -255,6 +306,8 @@ def split_by_vote(rgb: np.ndarray, grid: int = VOTE_GRID,
             total += 1
             if axis == "rg":
                 v = find_split(*rg_histogram(crop))
+            elif axis == "green":
+                v = green_split(crop, ink_v)
             else:
                 v = cool_split(crop, rg_split if rg_split is not None else 0.0, ink_v)
             if v is not None:
@@ -265,7 +318,7 @@ def split_by_vote(rgb: np.ndarray, grid: int = VOTE_GRID,
 
 
 def classify(rgb: np.ndarray, split: float, ink_v: float = INK_V,
-             cool: float | None = None) -> dict[str, np.ndarray]:
+             cool: float | None = None, green: float | None = None) -> dict[str, np.ndarray]:
     """Per-pixel class masks. `ink` is taken out first and is not a wash."""
     a = rgb.astype(np.float32) / 255.0
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
@@ -273,26 +326,29 @@ def classify(rgb: np.ndarray, split: float, ink_v: float = INK_V,
     ink = a.max(axis=2) < ink_v
     live = ~ink
     salmon = live & (rg > split)
-    warm = live & ~salmon
-    # Cooler than the paper: the blue-grey military wash. Without a measured
-    # trough there is no cool class at all, rather than one drawn at a guess.
-    blue = warm & (rb < cool) if cool is not None else np.zeros_like(salmon)
+    # Precedence matters and is not arbitrary: the blue-grey military wash and
+    # the hatched administrative wash *both* sit low on `r - g` (0.024 and
+    # 0.027), so a green-first order swallows the military parcels whole — it
+    # took blue from 65 blocks to 1 on this sheet. Blue is claimed first
+    # because it is identified on the other axis, `r - b`, where it is distinct
+    # (0.052 against cream's 0.123) and green is not.
+    rest = live & ~salmon
+    blue = rest & (rb < cool) if cool is not None else np.zeros_like(salmon)
+    greenm = rest & ~blue & (rg <= green) if green is not None else np.zeros_like(salmon)
+    warm = rest & ~blue & ~greenm
     return {
         "ink": ink,
         # Warm and pigmented: the salmon *particulières* wash, and the darker
         # red-brown building fill inside it (see P3 — they are not split here).
         "salmon": salmon,
         "blue": blue,
-        # ponytail: no green class. The communal wash measures rgb(0.776,
-        # 0.748, 0.666) against the street's (0.816, 0.768, 0.693) — it differs
-        # from cream mostly in *value*, not hue, and a V threshold that caught
-        # it would also catch every shadowed corner of the paper. It needs its
-        # own measurement, and until then those parcels are missing rather than
-        # mislabelled. On the 1882 sheet that is the 14 communal blocks.
-        "green": np.zeros_like(salmon),
+        # The hatched administrative parcels, found on the left of the cream
+        # peak — see `green_split`. Absent, not guessed, when no trough is
+        # measured on a sheet.
+        "green": greenm,
         # Everything else warm: street surface and unassigned domain land at
         # once, separated by name in P2 rather than by palette here.
-        "cream": warm & ~blue,
+        "cream": warm,
     }
 
 
@@ -357,7 +413,8 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
                        min_area_m2: float = MIN_AREA_M2,
                        max_area_m2: float = MAX_AREA_M2,
                        ink_v: float = INK_V,
-                       cool: float | None = None) -> tuple[list[dict], dict[str, int]]:
+                       cool: float | None = None,
+                       green: float | None = None) -> tuple[list[dict], dict[str, int]]:
     """Pigment → close → connected components → polygons, classified and banded.
 
     Returns (features, dropped) where a feature is {geom, feature_type,
@@ -367,7 +424,7 @@ def blocks_from_colour(rgb: np.ndarray, split: float, scale: float,
     and leaves the street alone. Cream parcels are deliberately absent — see
     the module docstring, and P2.
     """
-    masks = classify(rgb, split, ink_v, cool)
+    masks = classify(rgb, split, ink_v, cool, green)
     pigment = np.zeros(rgb.shape[:2], bool)
     for name in PIGMENT_CLASSES:
         pigment |= masks[name]
@@ -474,6 +531,7 @@ def print_census(counts: np.ndarray, edges: np.ndarray, split: float | None) -> 
 CREAM = (208, 196, 177)      # r-g +0.047  r-b +0.122
 SALMON = (195, 169, 149)     # r-g +0.102  r-b +0.180
 BLUEGREY = (188, 182, 175)   # r-g +0.024  r-b +0.051
+HATCHED = (198, 191, 170)    # r-g +0.027  r-b +0.110 — the administrative wash
 INK = (50, 46, 42)
 
 
@@ -493,7 +551,7 @@ def _synthetic() -> np.ndarray:
     for x0, x1, y0, y1, col in [
         (10, 90, 10, 90, SALMON),
         (110, 190, 10, 90, SALMON),
-        (10, 90, 110, 190, CREAM),      # unassigned parcel — invisible to P1
+        (10, 90, 110, 190, HATCHED),    # administrative parcel
         (110, 190, 110, 190, BLUEGREY),
     ]:
         img[y0:y1, x0:x1] = col
@@ -515,14 +573,24 @@ def _self_check() -> None:
     assert cool is not None, "blue-grey vs cream is separable on r - b and was not found"
     assert 0.05 < cool < 0.12, f"cool split {cool} outside the blue-grey/cream gap"
 
-    feats, dropped = blocks_from_colour(img, split, scale=1.0, mpp=None, cool=cool)
+    gsplit = green_split(img)
+    assert gsplit is not None, "the hatched wash sits left of cream and was not found"
+
+    feats, dropped = blocks_from_colour(img, split, scale=1.0, mpp=None, cool=cool, green=gsplit)
     kinds = sorted(f["feature_type"] for f in feats)
-    # Three pigmented parcels, each whole. The cream parcel is absent by
-    # design and the street is never a block.
-    assert len(feats) == 3, f"expected 3 pigmented parcels, got {len(feats)}: {kinds} {dropped}"
+    # Four parcels, each whole. The street is never a block.
+    assert len(feats) == 4, f"expected 4 parcels, got {len(feats)}: {kinds} {dropped}"
     assert kinds.count("salmon") == 2, f"expected 2 salmon, got {kinds}"
     assert kinds.count("blue") == 1, f"blue-grey not recovered on r - b: {kinds}"
-    assert "cream" not in kinds, f"cream is P2's, not P1's: {kinds}"
+    assert kinds.count("green") == 1, f"hatched parcel not recovered on r - g: {kinds}"
+    assert "cream" not in kinds, f"cream is not a block: {kinds}"
+
+    # Precedence, pinned: blue-grey and the hatched wash both sit low on r - g,
+    # so a green-first order eats the military parcel. On the real sheet that
+    # took blue from 65 blocks to 1.
+    m = classify(img, split, cool=cool, green=gsplit)
+    assert not (m["green"] & m["blue"]).any(), "green and blue must not overlap"
+    assert m["blue"].sum() > 0, "green claimed the blue-grey parcel"
 
     # Without the cool split there is no blue class at all — the documented
     # decline, not a silent reclassification of the wash as cream.
@@ -532,12 +600,12 @@ def _self_check() -> None:
     # The mechanism, pinned from the other side: without the closing, the ink
     # lines cut each parcel into four. If this ever stops failing, --close has
     # stopped being what rejoins a block and the default is measuring nothing.
-    frag, _ = blocks_from_colour(img, split, scale=1.0, mpp=None, close=0, cool=cool)
-    assert len(frag) == 12, f"expected 4 quarters x 3 parcels without closing, got {len(frag)}"
+    frag, _ = blocks_from_colour(img, split, scale=1.0, mpp=None, close=0, cool=cool, green=gsplit)
+    assert len(frag) == 16, f"expected 4 quarters x 4 parcels without closing, got {len(frag)}"
 
     # ...and the street survives a closing far wider than the building lines.
-    wide, _ = blocks_from_colour(img, split, scale=1.0, mpp=None, close=15, cool=cool)
-    assert len(wide) == 3, f"close=15 bridged a 20 px street: {len(wide)} blocks"
+    wide, _ = blocks_from_colour(img, split, scale=1.0, mpp=None, close=15, cool=cool, green=gsplit)
+    assert len(wide) == 4, f"close=15 bridged a 20 px street: {len(wide)} blocks"
 
     # A monochrome scan must decline, not return noise.
     grey = np.full((200, 200, 3), 210, np.uint8)
@@ -545,6 +613,7 @@ def _self_check() -> None:
     assert find_split(*rg_histogram(grey)) is None, "monochrome sheet must refuse"
     # ...on the cool axis too, at its looser ratio.
     assert cool_split(grey, 0.072) is None, "monochrome sheet must refuse the cool split"
+    assert green_split(grey) is None, "monochrome sheet must refuse the green split"
 
     # The ceiling of the whole method, pinned rather than left to be
     # rediscovered: two parcels separated by an alley *narrower* than the
@@ -560,8 +629,8 @@ def _self_check() -> None:
     assert len(apart) == 2, f"a 4 px alley should survive close=3; got {len(apart)}"
 
     # Areas are filtered in m² when the sheet's scale is known.
-    f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool)
-    assert len(f3) == 0 and d3["too small"] == 3, f"m² band not applied: {d3}"
+    f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
+    assert len(f3) == 0 and d3["too small"] == 4, f"m² band not applied: {d3}"
 
     # The GeoJSON must carry the token to_sam2_seeds refuses on.
     assert PRIOR_CRS == "source-pixels-y-down"
@@ -641,6 +710,12 @@ def main() -> int:
 
     ink_fraction = float((rgb.astype(np.float32).max(axis=2) / 255.0 < args.ink).mean())
     print(f"ink {100 * ink_fraction:.1f}% of the paper")
+    green, gvoted, gtotal = split_by_vote(rgb, axis="green", ink_v=args.ink)
+    if gtotal:
+        print(f"green split by vote: {gvoted}/{gtotal} crops trimodal")
+    print(f"green split r - g = {green:+.3f}" if green is not None
+          else "no separable hatched/green wash on this sheet")
+
     if args.cool_split is not None:
         cool = args.cool_split
     else:
@@ -667,6 +742,7 @@ def main() -> int:
     feats, dropped = blocks_from_colour(
         rgb, split, scale, mpp=mpp, close=args.close,
         min_area_m2=args.min_m2, max_area_m2=args.max_m2, ink_v=args.ink, cool=cool,
+        green=green,
     )
     for reason, n in sorted(dropped.items()):
         if n:
@@ -681,6 +757,7 @@ def main() -> int:
             "source": "colour-blocks",
             "rg_split": round(split, 4),
             "cool_split": round(cool, 4) if cool is not None else None,
+            "green_split": round(green, 4) if green is not None else None,
             "render": int(rgb.shape[1]),
             "ink_fraction": round(ink_fraction, 4),
             "block_area_m2": [args.min_m2, args.max_m2] if mpp else None,

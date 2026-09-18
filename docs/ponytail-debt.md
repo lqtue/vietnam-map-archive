@@ -227,7 +227,6 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 ## work/ocr/scripts/colour_blocks.py
 
 - **:84** — a block's ring is a concave hull over its boundary pixels, not a trace. ceiling: a block with a genuine notch comes back filled, and `blocks_to_seeds` reads only the bounds anyway. upgrade: marching squares on the component mask; the signal to do it is `seg_eval` cover running high while IoU stays flat, which is what over-coverage looks like.
-- **:242** — no green class. ceiling: the communal wash measures rgb(0.776, 0.748, 0.666) against the street's (0.816, 0.768, 0.693), so it differs from cream in *value* rather than hue and a V threshold catching it would catch every shadowed corner of the paper. On the 1882 sheet that is the 14 communal blocks, missing rather than mislabelled. upgrade: its own measured axis, the way `cool_split` did it for blue-grey on `r - b`.
 
 ## work/ocr/scripts/modern_prior.py
 

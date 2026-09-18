@@ -1579,3 +1579,86 @@ Two other readings worth keeping:
 - **`waterway` scores 0.432, the highest of any class here, by accident.** The
   Genouilly canal is blue-grey, so it lands in the cool class and comes back as
   a "block". Correctly coloured, wrongly typed.
+
+## 2026-09-18 — P2: the missing class was green, not the street
+
+The section above closed on "P2 is a prerequisite: separate the street ribbon
+from the cream parcel." **That was the wrong diagnosis, and the picture said so
+before any metric did.** Cropping the sheet around the uncovered `land_plot`
+traces and drawing them shows what they actually sit on: *Direction des Travaux
+Publics*, *Hôtel du Procureur Général*, *Direction de l'Intérieur*, *Conseil de
+Guerre* — the pale grey-green **administrative parcels under fine diagonal
+hatching**. Not unassigned land, and not street.
+
+Two attempts on the wrong diagnosis, both rejected by measurement:
+
+- **Erosion to separate ribbon from parcel.** Cream is 72.9% of this sheet — it
+  is mostly open country, not a street network — so the mass survives erosion
+  at 8.86 km² at every radius from 6 to 24 px, and "street" comes to 2% of
+  cream. There is no ribbon to peel.
+- **Local ink density as the hatching signal.** Real but not specific: hatched
+  parcels read 0.120 against open cream's 0.000, yet built-up areas score just
+  as high, so `cream & density > t` reaches cover 1.00 at IoU 0.137 — it finds
+  the right places with the wrong extents.
+
+**The axis was the one already in use.** Scoring six candidates against the
+traced pixels themselves — the share of hatched pixels falling inside cream's
+10-90 range, lower is better:
+
+| axis | hatched p50 | cream p50 | overlap |
+|---|---|---|---|
+| **r - g** | 0.027 | 0.059 | **0.17** |
+| r - b | 0.094 | 0.149 | 0.22 |
+| g - b | 0.059 | 0.090 | 0.29 |
+| S | 0.119 | 0.169 | 0.28 |
+| V | 0.824 | 0.875 | 0.37 |
+| local ink | 0.013 | 0.000 | 0.42 |
+
+The hatched class sits *below* cream on `r - g`, and `find_split` only ever
+searches right of the global peak, which is where salmon is. At `RG_BINS` the
+two modes are two bins apart and invisible; at 48 bins over (-0.05, 0.19) the
+structure is plain — green peak +0.025 (13.4%), valley +0.030 (5.0%), cream
+peak +0.045 (15.5%). So the fix is the same primitive mirrored, exactly as
+`cool_split` does it: negate, and the left mode becomes a right one.
+`green_split` votes +0.032 on **53 of 64 crops**.
+
+| land_plot (n=24) | n | @.5 | @.3 | mean | med | cover |
+|---|---|---|---|---|---|---|
+| P1, pigment only | 189 | 2 | 4 | 0.124 | 0.003 | 0.01 |
+| **P2, + green** | 253 | 4 | 5 | **0.247** | 0.161 | **0.98** |
+| `--blocks-from-roads` | 1184 | — | — | 0.262 | — | 0.87 |
+
+**Class precedence is load-bearing.** Blue-grey (r-g 0.024) and hatched green
+(0.027) both sit low on the same axis, so claiming green first swallows the
+military parcels: blue went from 65 blocks to **1**. Blue is claimed first
+because `r - b` distinguishes it and `r - g` does not. `--self-check` pins that
+the two masks never overlap.
+
+### The closing sweep, and why it is not a result
+
+| `--close` | blocks | land_plot mean | med | cover | building cover | blue blocks |
+|---|---|---|---|---|---|---|
+| 0 | 424 | **0.273** | 0.207 | 0.90 | 0.66 | 188 |
+| 2 | 401 | 0.246 | 0.169 | 0.87 | — | — |
+| 3 | 353 | 0.253 | 0.181 | 0.94 | 0.92 | 97 |
+| 5 (default) | 253 | 0.247 | 0.161 | **0.98** | **0.97** | 44 |
+| 9 | 175 | 0.125 | 0.086 | 0.97 | — | — |
+
+k=0 clears 0.262 and k=5 does not. **Do not read that as a ranking.** The
+spread across k=0..5 is 0.027 at n=24, the same magnitude as the 0.035 this
+file records between two *identical* repeat passes of the Gemini run, and the
+ends trade against each other: k=0 fragments blue into 188 components where
+k=5 gives 44, and building cover falls 0.97 to 0.66. The default stays 5.
+Tuning a knob on 24 polygons is how the pooled 0.194 happened.
+
+### What is left, and it is P3
+
+The predictions that match a traced plot are **3.72x its area**: the hatched
+quarter comes back as one block where the survey drew four or five parcels
+inside it, divided by the same 1-2 px lines that divide buildings inside a
+salmon block. Coverage is solved (0.98); granularity is not. That is the same
+ceiling the block-prior runs hit at `building` 0.160, and it is what P3 — the
+within-block split — exists for.
+
+`building` itself is unchanged by any of this, as expected for a coarse pass:
+0.093 mean, cover 0.97.
