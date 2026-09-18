@@ -101,6 +101,7 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/admin-tooling.md` — MapEditModal, Bulk Upload, Scout, R2 worker, holding-institution model
 - `docs/digitalize-guide.md` — **operator guide** for `/scan?mode=prepare`: propose-then-accept, the layout categories, the ground-per-call target, and the failure modes that return plausible output while dropping data
 - `docs/worked-example-1882.md` — **one sheet all the way through**, with the number each stage produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one counts, the first `join` and the first `approved` footprints in the archive's history, and the four defects that only surfaced by running the chain
+- `docs/network.md` — **who is out there**: the Allmaps thread, the cold-but-matched research groups, the archives that hold our sources, and the five drafted-but-unsent messages
 - `docs/ROADMAP.md` — **the one tracker**: ship/harden · architecture steps · OCR↔SAM2 product · burn-down
 - `docs/time-machine-plan.md` — label search · temporal fabric · period sources (Track E detail)
 - `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route, warped sheets as a year slider, and the frozen-JSON seam between the two apps
