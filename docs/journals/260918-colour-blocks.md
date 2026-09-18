@@ -1251,3 +1251,84 @@ So the fix is not in the water test. It is that `Arsenal de la Marine` should
 be a block — it is a named military parcel, and the pass already calls its
 neighbours blue — and once it is, the land bound removes the yard for free.
 Filed against the block pass, not this one.
+
+## The Arsenal yard was never a filter's fault — the block pass drops it whole (2026-09-18)
+
+Picking up the item above. The yard is claimed as water because no polygon
+covers it; the question was which of the block pass's filters drops the
+component that should.
+
+**It is the area cap, and it is the only one.** On the 1882 sheet at
+`--render 6051`, `blocks_from_colour` drops exactly one component as
+`too large`: 3,769,338 render px, **1.77 km²** against the 120,000 m² cap. Its
+bbox is y 287–4120, x 296–5544 — most of the sheet. It is the naval quarter's
+blue-grey wash welded to the river's ripple band, the Arroyo Chinois, the
+Magasins and the citadel blocks, all one connected blue component. The Arsenal
+label at source px (7517, 6749) sits inside it. Nothing else touches it: the
+closing is not involved, and neither bound of the area band is near.
+
+Two things were measured and are not the answer:
+
+- **Opening the blue class before the closing**, to strip the ripple back to
+  lines and leave the washes solid — disks of radius 1, 2 and 3. The component
+  shrinks (3.77 → 3.46 → 3.04 → 2.03 M px) and **never disconnects**. At render
+  6051 the river's ripple band is not stripes in the blue class, it is solid:
+  the class picks up the paper between the lines as readily as the lines.
+- **Subtracting the pixel water region from the pigment** before componenting.
+  The region claims the yard at 1.00 — that is the defect — so this deletes the
+  yard instead of rescuing it.
+
+### `--recut` already does it, and the water test paid off its old cost
+
+`--recut` is the existing rescue for an oversized component: re-cut it at a
+higher ink threshold and keep the pieces that land in the band. Its help text
+warned it "costs ~60 s and river false positives", which is why the previous
+sessions left it off. With `--drop-water` in the tree that warning is stale —
+the pieces that land on the river are dropped by the water test, and the pieces
+that land on the Arsenal are kept, because a piece *is* a compact polygon and
+`land_mask` bounds the region at it. The yard comes out as an **81,764 m² blue
+block**, the region stops at the shoreline, and the river beside it is untouched.
+
+| | polygons | water | slivers | land_plot | med | building | road cover | waterway |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| shipped (`9a2fe561`) | 798 | 203 | 43 | 0.350 | 0.218 | 0.122 | 0.52 | 0.64 |
+| `--recut`, as it stood | 892 | 348 | 56 | 0.331 | 0.218 | 0.122 | **0.14** | 0.99 |
+| **`--recut`, named-label rule** | **888** | **352** | 56 | 0.331 | 0.218 | 0.122 | **0.14** | 0.99 |
+
+`road` cover 0.52 → 0.14 is the re-cut taking the quay roads back out of the
+blocks that lay across them, and it is the largest single move that number has
+made. `land_plot` mean 0.350 → 0.331 (@.5 7 → 6) is the real price: the re-cut's
+new blue blocks make `subtract_blocks` cut 259 cream hulls rather than 156, and
+one traced plot loses its match. `waterway` cover 0.64 → 0.99 is **not** the
+river — it is the Abattoir's grounds, correctly claimed as one parcel, with a
+small traced ditch inside them.
+
+### The one thing the re-cut did break, and the one line that fixes it
+
+The re-cut emits a 28,000 m² polygon over the **Arroyo Chinois** at 0.315
+outline circularity — compact enough for `land_mask` to call it a parcel. So it
+enters the land bound, carves itself out of the water region, and vouches for
+itself. Circularity cannot separate it: the arroyo polygon scores **0.415** and
+the Arsenal yard **0.363**, the wrong way round.
+
+What separates them is that **the sheet names one of them**. The arroyo polygon
+holds a `hydrology` label at source px (1353, 3740); the Arsenal polygon holds
+none, and on the whole 798-polygon shipped run *no* polygon holds one. So:
+
+> A polygon that holds a `hydrology` label is water, and is never land.
+
+Same evidence the oversize path has always used (`_holds_point` at
+`colour_blocks.py:526`), now read on the polygon side too. It removes exactly
+the arroyo polygon and the three it was shielding (348 → 352 dropped as river
+surface, 892 → 888 kept), changes nothing on the shipped run — `blocks.geojson`
+md5 unchanged against `9a2fe561` — and costs no new constant.
+
+### Still open
+
+- **`--recut` stays opt-in.** It is 25 s → 80 s and it costs `land_plot` 0.019.
+  Whether the Arsenal yard, the Abattoir grounds and the quay roads are worth
+  that is the user's call, not the script's default.
+- One small admin ribbon survives on the arroyo's near bank under `--recut`.
+- `Prisons` and `Nouveau Palais de Justice` still have no polygon. They are
+  *not* this problem — the oversize component is the only one dropped that way,
+  so whatever drops those two is a different filter.

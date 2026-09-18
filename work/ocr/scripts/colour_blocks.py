@@ -585,6 +585,15 @@ def recut_oversized(sub: np.ndarray, v: np.ndarray, px_area_m2: float | None,
 
     Returns a list of masks, empty when no threshold rescues it (then the caller
     drops it as before, and that is still the honest answer for a real merge).
+
+    The cost this used to carry — "river false positives" — was paid off by the
+    pixel water test: the parts that land on the river are dropped by
+    `--drop-water`, and the parts that land on the Arsenal are kept because a
+    part *is* a compact polygon and `land_mask` bounds the region at it. That
+    is what finally covers the dockyard apron, which had no polygon at all and
+    so was claimed as water at 1.00. What the re-cut still costs is one green
+    block over the Abattoir's grounds catching a `waterway` trace inside them
+    (cover 0.64 -> 0.99) and land_plot mean 0.350 -> 0.331.
     """
     if px_area_m2 is None:
         return []
@@ -847,6 +856,12 @@ def fit_dilution(points: list[tuple[float, float]],
 #    believe. The same signature also describes the ruled neatline margin,
 #    which is furniture and fine to lose.
 #
+# The labels do a second job on the land side, and it is the one that makes the
+# two bounds safe together: a polygon that *holds* a hydrology label is water,
+# and never land. Compactness is a guess and the sheet's lettering is not, so
+# without this an arroyo reach that came out compact — which `--recut` produces,
+# at 0.315 circularity — is admitted to `land_mask` and shields itself.
+#
 # ponytail: seven constants, one sheet, and `WATER_LINE_RB` is the load-bearing
 # one — it is the gap between this sheet's blue and this sheet's black. Ceiling:
 # a sheet that draws its water in black, or one whose ink has aged to the same
@@ -876,7 +891,8 @@ def outline_circularity(geom) -> float:
 
 
 def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
-              min_circ: float = WATER_RIPPLE_CIRC) -> np.ndarray:
+              min_circ: float = WATER_RIPPLE_CIRC,
+              named: list[bool] | None = None) -> np.ndarray:
     """Every polygon compact enough to be a parcel, burnt into a mask.
 
     This is the water test's only barrier, and it has to come from geometry
@@ -884,10 +900,17 @@ def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
     land (measured +0.149 against +0.141), so no threshold separates them.
     Compactness does, because the cream pass fragments water into ribbons and
     nothing else on the sheet is a ribbon.
+
+    `named` marks the polygons that hold a `hydrology` label. Compactness is a
+    guess and the sheet's own lettering is not, so a named polygon is never
+    land — otherwise an arroyo that came out compact vouches for itself and
+    the region stops at its own bank.
     """
     out = np.zeros(shape, bool)
-    for f in feats:
+    for i, f in enumerate(feats):
         g = f["geom"]
+        if named and named[i]:
+            continue
         if outline_circularity(g) < min_circ:
             continue
         win = _poly_window(g, shape, scale)
@@ -905,11 +928,13 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
     for the call signature; the water's line work is found on hue, not on the
     ink threshold, because at `INK_V` the ripple is only half there.
 
-    Two ways to be water. Mostly inside the region is the first. Touching it at
-    all while being too stringy to be a parcel is the second, and it is what
-    catches a ribbon lying along the bank — measured safe rather than assumed:
-    no hand trace on this sheet overlaps the region except one `waterway`, at
-    0.60, which is water finding water.
+    Three ways to be water. Holding a `hydrology` label is the first and the
+    only one that is evidence rather than inference — the same evidence the
+    oversize path already fences a component with. Mostly inside the region is
+    the second. Touching it at all while being too stringy to be a parcel is
+    the third, and it is what catches a ribbon lying along the bank — measured
+    safe rather than assumed: no hand trace on this sheet overlaps the region
+    except one `waterway`, at 0.60, which is water finding water.
     """
     if not water:
         return [False] * len(feats)
@@ -932,17 +957,19 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
     blue &= ~ndimage.binary_dilation(wash, structure=disk(WATER_LINE_W + 2))
     solid = ndimage.binary_closing(blue, structure=disk(WATER_CLOSE))
     solid = ndimage.binary_opening(solid, structure=disk(WATER_OPEN))
-    solid &= ~land_mask(feats, (h, w), scale)
+    # The sheet names its own water, so read the name before guessing at shape.
+    named = [any(shapely.contains_xy(f["geom"], x, y) for x, y in water) for f in feats]
+    solid &= ~land_mask(feats, (h, w), scale, named=named)
     lab, n = ndimage.label(solid)
     if not n:
-        return [False] * len(feats)
+        return named
     sizes = ndimage.sum(solid, lab, range(1, n + 1))
     seeded = {lab[int(y / scale), int(x / scale)] for x, y in water
               if 0 <= int(y / scale) < h and 0 <= int(x / scale) < w}
     seeded.discard(0)
     full = np.isin(lab, [i for i in seeded if sizes[i - 1] >= WATER_MIN_PX])
     if not full.any():
-        return [False] * len(feats)
+        return named
     # The sheet letters its own river. Black ink is not a blue line, so
     # "RIVIÈRE DE SAIGON" punches a hole straight through the water it names.
     holes = ndimage.binary_fill_holes(full) & ~full
@@ -951,7 +978,10 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
         hs = ndimage.sum(holes, hlab, range(1, hn + 1))
         full = full | np.isin(hlab, [i + 1 for i, s in enumerate(hs) if s <= WATER_HOLE_PX])
     out: list[bool] = []
-    for f in feats:
+    for f, is_named in zip(feats, named):
+        if is_named:
+            out.append(True)
+            continue
         win = _poly_window(f["geom"], (h, w), scale)
         if win is None:
             out.append(False)
@@ -1418,6 +1448,12 @@ def _self_check() -> None:
     # ...and with no hydrology label there is no region and nothing is dropped.
     assert water_mask([edge, holed, island, far], wat, 1.0, []) == [False] * 4, \
         "no label must mean no water region at all"
+    # The sheet's own lettering outranks the shape guess. Drop a hydrology
+    # label inside that same compact island and it is the water it names —
+    # and it stops shielding the region, which is the half that matters: an
+    # arroyo that came out compact would otherwise vouch for itself.
+    lbl = water_mask([island, far], wat, 1.0, [(100.0, 40.0), (400.0, 40.0)])
+    assert lbl == [True, False], f"a named polygon is water however compact: {lbl}"
 
     # Areas are filtered in m² when the sheet's scale is known.
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
@@ -1452,8 +1488,12 @@ def main() -> int:
     p.add_argument("--mpp", type=float, help="metres per source pixel; read from the annotation if omitted")
     p.add_argument("--recut", action="store_true",
                    help="rescue components over --max-m2 by re-cutting them at a higher "
-                        "ink threshold instead of dropping them. Recovers the naval quarter "
-                        "(blue 41 -> 216 blocks) and costs ~60 s and river false positives")
+                        "ink threshold instead of dropping them. On the 1882 sheet there is "
+                        "exactly one such component, 1.77 km² of naval quarter welded to the "
+                        "river's ripple band, and re-cutting it is the only thing that puts a "
+                        "block over the Arsenal de la Marine's dockyard apron (81,764 m²). "
+                        "With --drop-water: 798 -> 888 polygons, blue 35 -> 82, land_plot mean "
+                        "0.350 -> 0.331, and ~55 s")
     p.add_argument("--swatch-labels", action="store_true",
                    help="name each finished polygon against the legend's own five "
                         "swatches, diluted to the strength the sheet actually prints "

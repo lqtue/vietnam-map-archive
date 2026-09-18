@@ -2105,3 +2105,46 @@ separable by colour, line, black-ink density or by cutting at every black line �
 the slipways run into the water, so on the paper the yard is continuous with the
 river. No polygon covers it, so the land bound has nothing to hold. The fix
 belongs to the block pass.
+
+## 2026-09-18 — the Arsenal yard: the area cap drops it, and `--recut` is the fix
+
+Which filter drops the component that should cover the yard: **the area cap,
+and only it**. `blocks_from_colour` drops exactly one component as `too large`
+on this sheet — 3,769,338 render px, **1.77 km²** against the 120,000 m² cap —
+and the Arsenal label at source px (7517, 6749) is inside it. It is the naval
+quarter welded to the river's ripple band, the arroyo and the citadel blocks:
+one blue component covering most of the sheet. Not the closing, not the lower
+bound.
+
+`--recut`, which already existed, re-cuts that component at a higher ink
+threshold. Its stated cost — "river false positives" — was paid off by the
+pixel water test that shipped earlier today: the pieces that land on the river
+are dropped by `--drop-water`, and the pieces that land on the Arsenal are kept
+because a piece is a compact polygon and `land_mask` bounds the region at it.
+The yard comes out as an **81,764 m² blue block** and the region stops at the
+shoreline.
+
+| | polygons | water | slivers | land_plot | med | building | road cover | waterway |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **shipped default** | **798** | **203** | 43 | **0.350** | 0.218 | 0.122 | 0.52 | 0.64 |
+| `--recut`, as it stood | 892 | 348 | 56 | 0.331 | 0.218 | 0.122 | **0.14** | 0.99 |
+| **`--recut` + named-label rule** | **888** | **352** | 56 | 0.331 | 0.218 | 0.122 | **0.14** | 0.99 |
+
+`road` cover 0.52 -> 0.14 is the quay roads coming back out of the blocks that
+lay across them. `land_plot` 0.350 -> 0.331 (@.5 7 -> 6) is the price: the
+re-cut's new blue blocks make `subtract_blocks` cut 259 cream hulls rather than
+156. `waterway` 0.64 -> 0.99 is the Abattoir's grounds, correctly claimed, with
+a traced ditch inside them — not the river.
+
+**One line of new logic, no new constant: a polygon that holds a `hydrology`
+label is water, and is never land.** Without it the re-cut's Arroyo Chinois
+polygon (0.315 outline circularity, compact enough for `land_mask`) shields
+itself from the water region. Circularity cannot separate it — arroyo 0.415
+against the Arsenal yard's 0.363, the wrong way round — but the sheet names one
+of the two. The rule removes exactly that polygon and the three it shielded,
+and changes nothing on the shipped run: **no polygon in the 798 holds a
+hydrology label**, and `blocks.geojson` md5 is unchanged against `9a2fe561`.
+
+`--recut` stays opt-in: 25 s -> 80 s, and `land_plot` -0.019. Whether the yard,
+the Abattoir grounds and the quay roads are worth that is a call for the
+operator, not a default.
