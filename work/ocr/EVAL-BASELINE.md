@@ -1895,3 +1895,63 @@ Two nulls on the way, both reverted, neither to be re-attempted as stated:
 42.7% → 30.7%) and **thin-ink density** (→ 0.244). A densely built block carries
 as much ink as a hatched one; the distinguishing property is orientation, which
 is priced in the journal.
+
+
+## 2026-09-18 — orientation: the class the sheet draws as ink, not as colour
+
+The last known-wrong thing in the row above — `admin` taking tree stipple in
+both gardens and part of the Champ de Manœuvres — closed on the only route the
+journal had left. A hatch is directional and stipple is not.
+
+**Measured as the structure tensor of the greyscale gradient**, per finished
+polygon, `sqrt((Jxx - Jyy)² + 4Jxy²) / (Jxx + Jyy)`:
+
+| block | what it is | coherence |
+|---|---|---:|
+| Magasins des Travaux Publics | black hatch | 0.738 |
+| Nouveau Palais de Justice | black hatch | 0.589 |
+| Champ de Manœuvres | faint blue ruling | 0.118 |
+| Jardin Botanique | tree stipple | 0.036 |
+| Cimetière Européen | tree stipple | 0.029 |
+
+`--hatch-coherence`, default 0.30, applied only to polygons the legend key has
+already called `admin`; 61 of 233 fail it and fall back to the nearest of the
+three *tint* classes, matched on their paper.
+
+| | n | land_plot mean | med | building mean | med |
+|---|---|---|---|---|---|
+| `--swatch-labels` | 1044 | 0.350 | 0.218 | 0.122 | 0.050 |
+| + hatch test | 1044 | 0.350 | 0.218 | 0.122 | 0.050 |
+
+| | admin | cream | green | blue | salmon | named |
+|---|---:|---:|---:|---:|---:|---:|
+| key + voted trough | 233 | 678 | 53 | 42 | 38 | 6/10 |
+| + hatch test | **172** | 735 | 57 | **42** | 38 | **6/10** |
+
+**The named check does not move and that is the honest headline.** What moves is
+the rendered layer: `admin` no longer claims either garden or the Champ, and
+both genuinely hatched blocks keep it. The Champ and the Botanique go from
+`admin ✗` to `cream ✗`; the Botanique misses `green` by 0.007 on the voted
+trough, which is the trough's resolution and not this test's to fix. Blue stays
+at exactly 42 — no block *gains* a class from the fallback, which is the check
+that one error is not being laundered into another.
+
+**Three measurements rejected on the way, none to be re-attempted as stated:**
+
+- **Directional line opening** — the route this journal had priced. Swept over
+  12 angles at 7 / 11 / 15 render px, the Jardin Botanique's stipple survives
+  *better* than the *Magasins* hatch at every length (0.118/0.042/0.032 against
+  0.108/0.030/0.017). A hatch line is one source pixel of grey, so at `INK_V` it
+  is already broken and has no length to open along.
+- **Coherence on the thresholded ink mask** rather than on the gradient, for the
+  same reason: 0.215 for *Magasins* against 0.064 for *Palais de Justice*, both
+  hatched. No separation.
+- **Falling back on the all-pixel median.** Scores *better* on the named check
+  (7/10) and paints both gardens military, because a dense black stipple's
+  median (0.039, 0.078) *is* the diluted blue prototype (0.030, 0.079). Blue
+  42 → 73. Rejected on the picture; the extra point was luck, the Champ's
+  polygon being indistinguishable from the garden's on every colour axis
+  measured.
+
+Cost: about +1.5 s on the whole sheet. Geometry untouched by construction, and
+the default path without `--swatch-labels` is byte-for-byte identical.

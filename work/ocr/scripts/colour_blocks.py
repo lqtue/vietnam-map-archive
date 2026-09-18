@@ -775,6 +775,12 @@ LEGEND_SWATCHES = {
     "salmon": (0.165, 0.263),    # proprietes particulieres
 }
 PAPER_CLASS = "cream"
+# The two classes the legend draws as ink rather than as a tint: *service local*
+# is a black hatch at 59.6% ink and the military class a blue ruling at 21.6%,
+# against 10.6% for the densest of the three tints. A block whose ink turns out
+# not to be a ruling cannot be either of them, whatever colour that ink is.
+HATCH_CLASS = "admin"
+INK_CLASSES = (HATCH_CLASS, "blue")
 
 
 def fit_dilution(points: list[tuple[float, float]],
@@ -807,8 +813,8 @@ def fit_dilution(points: list[tuple[float, float]],
 
 
 def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
-                ink_v: float = INK_V) -> list[tuple[float, float, float]]:
-    """Per polygon: median (r - g, r - b) over every pixel, and r - g over paper.
+                ink_v: float = INK_V) -> list[tuple[float, float, float, float]]:
+    """Per polygon: median (r - g, r - b) over every pixel, and again over paper.
 
     Two measures because the sheet's two kinds of evidence are measured on
     different pixels and are not interchangeable. The legend swatches are
@@ -818,6 +824,12 @@ def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
     (`live = max >= ink_v`), so arbitrating with it means comparing paper to
     paper. Mixing the two silently is how a diluted swatch ends up overruling a
     boundary the sheet itself voted for.
+
+    The paper-only pair is also what names a block once the hatch test has said
+    its ink is *not* the class: a garden's stipple is dark and neutral, so its
+    all-pixel median sits on the blue prototype whatever wash is underneath, and
+    the Jardin Botanique came back blue. For a block whose ink is line work over
+    a tint, the tint is the evidence and it is between the lines.
     """
     a = rgb.astype(np.float32) / 255.0
     rg, rb = a[..., 0] - a[..., 1], a[..., 0] - a[..., 2]
@@ -831,25 +843,88 @@ def wash_points(feats: list[dict], rgb: np.ndarray, scale: float,
         x1 = min(rgb.shape[1], int(max(xs)) + 1)
         y1 = min(rgb.shape[0], int(max(ys)) + 1)
         if x1 - x0 < 2 or y1 - y0 < 2:
-            out.append((float("nan"), float("nan"), float("nan")))
+            out.append((float("nan"),) * 4)
             continue
         m = Image.new("L", (x1 - x0, y1 - y0), 0)
         ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
         sel = np.asarray(m) > 0
         if sel.sum() < 25:
-            out.append((float("nan"), float("nan"), float("nan")))
+            out.append((float("nan"),) * 4)
             continue
         pap = sel & paper[y0:y1, x0:x1]
+        if pap.sum() < 25:
+            pap = sel                       # all ink: the paper measure is the same one
         out.append((float(np.median(rg[y0:y1, x0:x1][sel])),
                     float(np.median(rb[y0:y1, x0:x1][sel])),
-                    float(np.median(rg[y0:y1, x0:x1][pap])) if pap.sum() >= 25
-                    else float(np.median(rg[y0:y1, x0:x1][sel]))))
+                    float(np.median(rg[y0:y1, x0:x1][pap])),
+                    float(np.median(rb[y0:y1, x0:x1][pap]))))
     return out
+
+
+# A hatch runs one way and tree stipple runs none. Measured at --render 6051 on
+# the 1882 sheet: the two hatched administrative blocks score 0.74 and 0.59,
+# while the Jardin Botanique's stipple scores 0.036 and the Cimetiere's 0.029 —
+# two clusters an order of magnitude apart, with the Champ de Manoeuvres' much
+# finer blue ruling between them at 0.118.
+#
+# ponytail: one constant, not a voted trough. Ceiling: the number scales with
+# --render, because a hatch aliases away as the sheet is shrunk (the same two
+# blocks score 0.81 and 0.75 at full source resolution). Re-measure, or sweep it
+# the way `cream_ink` sweeps its threshold, before trusting it at another render.
+HATCH_COHERENCE = 0.30
+
+
+def ink_coherence(geom, grad: tuple[np.ndarray, np.ndarray], scale: float,
+                  min_grad: float = 0.02) -> float:
+    """How much of a polygon's line work runs at one angle, 0 (none) to 1 (all).
+
+    The structure tensor of the greyscale gradient, summed over the polygon:
+    `sqrt((Jxx - Jyy)^2 + 4 Jxy^2) / (Jxx + Jyy)`. One number, no angle needed,
+    and the doubled-angle algebra makes it blind to a line's sign, so a ruling
+    reads the same whichever way it is drawn.
+
+    It is measured on the *gradient*, not on the ink mask, and that is the whole
+    difference from the two density nulls recorded in the journal. Thresholding
+    first throws away the hatch on this sheet — its lines are one source pixel
+    of grey, so at `INK_V` they come back broken, and a broken line has no
+    direction left to measure: the same two blocks score 0.215 and 0.064 that
+    way, which is no separation at all.
+
+    Being a ratio of the tensor's eigenvalue gap to its trace, it is also blind
+    to how *much* ink there is, which is what ink density could never get past —
+    a densely built block carries as much ink as a hatched one, but its ink runs
+    two ways at once and cancels, while a garden's runs every way.
+    """
+    gy, gx = grad
+    ring = [(x / scale, y / scale) for x, y in geom.exterior.coords]
+    xs = [q[0] for q in ring]
+    ys = [q[1] for q in ring]
+    x0, y0 = max(0, int(min(xs))), max(0, int(min(ys)))
+    x1, y1 = min(gx.shape[1], int(max(xs)) + 1), min(gx.shape[0], int(max(ys)) + 1)
+    if x1 - x0 < 8 or y1 - y0 < 8:
+        return float("nan")
+    m = Image.new("L", (x1 - x0, y1 - y0), 0)
+    ImageDraw.Draw(m).polygon([(q[0] - x0, q[1] - y0) for q in ring], fill=255)
+    sel = np.asarray(m) > 0
+    # The polygon's own edge is a line, and a strong one. Three pixels in.
+    sel[:3] = sel[-3:] = False
+    sel[:, :3] = sel[:, -3:] = False
+    a, b = gx[y0:y1, x0:x1], gy[y0:y1, x0:x1]
+    use = sel & (np.hypot(a, b) > min_grad)     # paper is flat; skip it
+    if use.sum() < 200:
+        return float("nan")
+    u, v = a[use], b[use]
+    jxx, jyy, jxy = float((u * u).sum()), float((v * v).sum()), float((u * v).sum())
+    tr = jxx + jyy
+    if tr <= 0:
+        return float("nan")
+    return float(((jxx - jyy) ** 2 + 4 * jxy ** 2) ** 0.5 / tr)
 
 
 def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
                       alpha: float | None = None, green: float | None = None,
-                      ink_v: float = INK_V) -> tuple[list[dict], int, float]:
+                      ink_v: float = INK_V,
+                      hatch: float | None = None) -> tuple[list[dict], int, float, int]:
     """Name each finished polygon by the wash it holds, against the fitted key.
 
     Runs after the geometry is fixed, which is the whole difference from the
@@ -871,6 +946,16 @@ def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
     claimed 470 polygons on a sheet with nothing like 470 communal parcels. The
     trough is fitted from this sheet's own pixels and is simply better for that
     one cut.
+
+    `hatch`, when given, is the coherence a block's line work must reach to be
+    called *service local*, which the legend draws as a hatch. The key cannot
+    hold that one either, for the reason the colour axes never could: the class
+    has no hue, only ink, so anything densely inked lands near its prototype —
+    and the densest ink on this sheet is tree stipple, which took both gardens
+    and bled into the Champ de Manoeuvres. A hatch is directional and stipple is
+    not, so the block that fails the test falls back to its nearest prototype
+    among the three classes that *are* a tint, matched on its paper. Colour
+    names a tint; only geometry can name a ruling.
     """
     pts = wash_points(feats, rgb, scale, ink_v=ink_v)
     if alpha is None:
@@ -885,18 +970,31 @@ def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
     P = LEGEND_SWATCHES[PAPER_CLASS]
     protos = {k: (P[0] + alpha * (v[0] - P[0]), P[1] + alpha * (v[1] - P[1]))
               for k, v in LEGEND_SWATCHES.items()}
-    changed = 0
+    grad = None
+    if hatch is not None:
+        v = rgb.astype(np.float32).max(axis=2) / 255.0
+        grad = np.gradient(v)
+    changed = demoted = 0
     for f, q in zip(feats, pts):
         if q[0] != q[0]:
             continue
         near = min(protos, key=lambda k: (protos[k][0] - q[0]) ** 2 + (protos[k][1] - q[1]) ** 2)
+        if near == HATCH_CLASS and grad is not None:
+            coh = ink_coherence(f["geom"], grad, scale)
+            if coh == coh and coh < hatch:
+                # Paper, not ink, and the two ink classes are not on the ballot
+                # — see `wash_points` and INK_CLASSES. The stipple that just
+                # failed the test is the thing being ignored.
+                tints = [k for k in protos if k not in INK_CLASSES]
+                near = min(tints, key=lambda k: (protos[k][0] - q[2]) ** 2 + (protos[k][1] - q[3]) ** 2)
+                demoted += 1
         if green is not None and near in ("green", PAPER_CLASS):
             # Paper measure against a paper-measured trough — see `wash_points`.
             near = "green" if q[2] <= green else PAPER_CLASS
         if near != f["feature_type"]:
             f["feature_type"] = near
             changed += 1
-    return feats, changed, alpha
+    return feats, changed, alpha, demoted
 
 
 def write_outputs(out_dir: Path, feats: list[dict], extra: dict[str, Any]) -> None:
@@ -1082,6 +1180,22 @@ def _self_check() -> None:
     assert chosen < peak, f"cream ink {chosen} must stay under the paper peak {peak}"
     assert curve, "the sweep must report its curve"
 
+    # A ruling reads as one direction and stipple as none. Two patches of the
+    # same ink density, so the thing being measured is direction and nothing
+    # else — which is exactly what the two density nulls could not do.
+    rule = np.full((160, 160, 3), 235, np.uint8)
+    rule[:, ::4] = 60                                   # a ruling, every 4 px
+    dots = np.full((160, 160, 3), 235, np.uint8)
+    rs = np.random.default_rng(7)
+    dots[rs.random((160, 160)) < 0.25] = 60             # the same ink, scattered
+    square = shapely.box(8, 8, 152, 152)
+    grad_r = np.gradient(rule.astype(np.float32).max(axis=2) / 255.0)
+    grad_d = np.gradient(dots.astype(np.float32).max(axis=2) / 255.0)
+    c_rule = ink_coherence(square, grad_r, 1.0)
+    c_dots = ink_coherence(square, grad_d, 1.0)
+    assert c_rule > HATCH_COHERENCE > c_dots, \
+        f"the hatch test must split a ruling from stipple: {c_rule:.3f} vs {c_dots:.3f}"
+
     # Areas are filtered in m² when the sheet's scale is known.
     f3, d3 = blocks_from_colour(img, split, scale=1.0, mpp=1.0, min_area_m2=100_000, cool=cool, green=gsplit)
     assert len(f3) == 0 and d3["too small"] == 4, f"m² band not applied: {d3}"
@@ -1123,6 +1237,11 @@ def main() -> int:
                         "them at, instead of by a pixel vote over the pigment classes. "
                         "Adds the *service local* class and lets a block be cream. "
                         "Changes no geometry")
+    p.add_argument("--hatch-coherence", type=float, default=HATCH_COHERENCE,
+                   help="with --swatch-labels, the share of a block's line work that "
+                        "must run at one angle for it to be called the hatched "
+                        "administrative class. Tree stipple runs every way and fails "
+                        f"it (default {HATCH_COHERENCE}); 0 disables the test")
     p.add_argument("--dilution", type=float,
                    help="override the fitted wash strength (0-1) for --swatch-labels")
     p.add_argument("--cream", action="store_true",
@@ -1271,10 +1390,14 @@ def main() -> int:
                 print(f"  dropped {before - len(feats)} inside the title or legend box")
 
     if args.swatch_labels:
-        feats, changed, alpha = relabel_by_swatch(feats, rgb, scale, alpha=args.dilution,
-                                                  green=green, ink_v=args.ink)
+        feats, changed, alpha, demoted = relabel_by_swatch(
+            feats, rgb, scale, alpha=args.dilution, green=green, ink_v=args.ink,
+            hatch=args.hatch_coherence or None)
         print(f"  legend key fitted at alpha {alpha:.2f} of full ink; "
               f"re-labelled {changed} of {len(feats)} polygons")
+        if demoted:
+            print(f"  {demoted} of them held ink that runs no one way — stipple, "
+                  f"not a hatch — and took the nearest tint instead")
 
     kinds: dict[str, int] = {}
     for f in feats:

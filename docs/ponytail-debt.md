@@ -15,7 +15,7 @@ this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-09-15**, three rows added by hand 2026-09-18. **69 markers, 14 with no trigger.** Against the
+Scanned **2026-09-15**, four rows added by hand 2026-09-18. **70 markers, 14 with no trigger.** Against the
 2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
 the ledger had gone stale in both directions, so this is a full rewrite rather
 than a patch. See *What changed since 2026-09-10* at the foot.
@@ -246,6 +246,14 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   read. upgrade: read them off the `legend` triage region directly — they are the
   saturated rectangles in it — and it is worth building the moment a second
   polychrome sheet arrives.
+- **`HATCH_COHERENCE` (:870)** — one constant, 0.30, for the hatch test, not a
+  trough voted from the sheet the way every other knob in this file is. ceiling:
+  the number scales with `--render`, because a hatch aliases away as the sheet is
+  shrunk — the same two blocks score 0.74/0.59 at `--render 6051` and 0.81/0.75
+  at full source resolution, so a run at another render is measuring against a
+  threshold fitted elsewhere. upgrade: sweep it against banded counts the way
+  `cream_ink` sweeps its ink threshold, or re-measure per render; the trigger is
+  the first run at a render other than 6051.
 - **`fit_dilution`** — one global alpha for every class. ceiling: a sheet whose
   printer laid one tint heavier than another; per-class alphas are five scalars
   fitted the same way, and the trigger is a class that is systematically

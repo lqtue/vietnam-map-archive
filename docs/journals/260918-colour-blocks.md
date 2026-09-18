@@ -819,3 +819,100 @@ targets, three classes are better, none is worse, and for the first time there i
 a check that can tell. What remains wrong is `admin` on tree stipple, which is
 the same dense-fine-ink confusion the two density nulls above ran into, and the
 same place orientation is the only measured route left.
+
+
+## Orientation, and the two ways of measuring it that do not work (2026-09-18)
+
+The one route left on `admin` over-claiming tree stipple, priced twice in this
+journal and now built. A hatch runs one way and stipple runs none, so the
+question is only how to measure "one way" on a block that also holds building
+outlines, lettering and a printed border.
+
+**The route this journal priced is the one that fails.** A length-15 line
+opening swept over 12 angles, at the render the pass works in: the *Magasins*
+hatch keeps 0.017 of its ink at its best angle and the Jardin Botanique's
+stipple keeps 0.032 — the garden survives a line opening **better** than the
+hatch does. Same at 11 px (0.030 against 0.042) and at 7 px (0.108 against
+0.118). The cause is the same one behind both density nulls: the hatch line is
+one source pixel of grey, so at `INK_V` it comes back broken, and a broken line
+has no length to open along. Measuring coherence on that same thresholded mask
+fails identically — *Magasins* 0.215 against *Palais de Justice* 0.064, which is
+not a separation at all, since the second is a hatched block too.
+
+**What works is to stop thresholding.** The structure tensor of the greyscale
+gradient, summed over the polygon and read as `sqrt((Jxx - Jyy)² + 4Jxy²) /
+(Jxx + Jyy)`:
+
+| block | what it is | coherence | at full source res |
+|---|---|---:|---:|
+| Magasins des Travaux Publics | black hatch | **0.738** | 0.809 |
+| Nouveau Palais de Justice | black hatch | **0.589** | 0.753 |
+| Champ de Manœuvres | faint blue ruling, 2.9% ink | 0.118 | 0.269 |
+| Jardin Botanique | tree stipple | **0.036** | 0.070 |
+| Cimetière Européen | tree stipple | **0.029** | 0.087 |
+
+An order of magnitude, where every density measure tried got a few percent. It
+is a ratio of the tensor's eigenvalue gap to its trace, so it is blind to *how
+much* ink a block holds — which is exactly what ink density could never get
+past, a densely built block carrying as much ink as a hatched one. Its ink runs
+two ways at once and cancels; a garden's runs every way; only a ruling runs one.
+
+`--hatch-coherence`, default **0.30**, applied to the polygons the key has
+already called `admin`. 61 of 233 fail it.
+
+### Where a demoted block goes, which took three tries
+
+**Nearest tint on the all-pixel median: rejected on the picture.** It scores
+*better* on the named check — 7/10, because the Champ de Manœuvres lands on blue
+— and it paints both gardens military. A dense black stipple's all-pixel median
+is (0.039, 0.078) and the diluted blue prototype is (0.030, 0.079): they are the
+same point, so **any** heavily stippled block goes blue whatever wash is under
+it. Blue 42 → 73. The extra point was luck, not signal: the Champ's polygon and
+the garden's are indistinguishable on every colour measure taken — ink (0.035,
+0.082) against (0.039, 0.078), paper (0.035, 0.110) against (0.039, 0.110).
+Getting the Champ right required calling the Jardin Botanique military.
+
+**Nearest tint on the paper median, blue still on the ballot: also rejected.**
+It fixes the Botanique and still sends the Jardin du Gouverneur's grounds to
+blue, at blue 63.
+
+**The rule that holds** drops both ink classes from the ballot. The legend draws
+two of its five classes as ink rather than as tint — *service local* at 59.6%
+and the military class at 21.6%, against 10.6% for the densest tint — so a block
+whose ink has just been shown **not** to be a ruling cannot be either of them,
+whatever colour that ink is. It falls back to the nearest of the three tints,
+matched on its paper. Blue then stays at exactly **42**: not one block gains the
+class, which is the check that the fallback is not laundering one error into
+another.
+
+| | admin | cream | green | blue | salmon | named |
+|---|---:|---:|---:|---:|---:|---:|
+| key + voted trough | 233 | 678 | 53 | 42 | 38 | 6/10 |
+| + hatch test | **172** | 735 | 57 | **42** | 38 | **6/10** |
+
+### The named check does not move, and the layer does
+
+This is the honest result: 6/10 before and 6/10 after. What changed is which
+rows are wrong and what the rendered layer looks like. `admin` no longer claims
+the Jardin Botanique, the Jardin du Gouverneur's grounds or the Champ de
+Manœuvres — the three failures this was built for, all visible in
+`06_admin_service_local.png` and all gone — while both genuinely hatched blocks
+keep the class. The Champ moves from `admin ✗` to `cream ✗` and the Botanique
+from `admin ✗` to `cream ✗`.
+
+The Botanique misses `green` by 0.007: its paper `r - g` is 0.039 against the
+sheet's voted trough at 0.032. That is the trough's own resolution and not
+something the hatch test can reach — it is the same cream/green pair that needed
+the trough in the first place.
+
+Geometry is untouched by construction, `land_plot` 0.350 and `building` 0.122 to
+the digit, and the default path without `--swatch-labels` is byte-for-byte
+identical. About +1.5 s on the whole sheet.
+
+**What it says about the method.** Three of the five legend classes are a tint
+and colour names them. Two are ink, and no amount of colour work was ever going
+to name those — the r − b band of a hatch straddles the cool split, its wash is
+the paper it is drawn on, and its density is a built block's density. Naming
+them needs a measure of *how the ink is laid down*, and orientation is the
+cheapest one that exists. Colour was not exhausted at the block level; it was
+being asked a question that is not about colour.
