@@ -42,14 +42,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import colour_blocks as cb  # noqa: E402
 
 MAP = "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b"          # 1882 Plan Cadastral
-IMG = ".tile_cache/ocr/full_c03b7f44a1d8d455c2b476d248651265.jpg"
 RENDER = 6051
 
-# Source-px windows on the 12102 x 8982 sheet, each named for what it is
-# evidence of. A window ending _BEFORE/_AFTER is rendered from both runs.
+# Source-px windows on the 1882 sheet (12102 x 8982), each named for what it is
+# evidence of. A window ending _BEFORE/_AFTER is rendered from both runs. These
+# are place names on THAT sheet only -- `windows_for` keeps them off every other.
 WINDOWS = [
     # (figure name, box, which runs, note)
-    ("whole_sheet",        (0, 0, 12102, 8982),          ("after",),  "the run at a glance"),
     ("creek_khanh_hoi",    (630, 4050, 1830, 5100),      ("before", "after"),
      "Rach Cau Chong: the packed ripple the wash cut used to eat"),
     ("inlet_hoi_an",       (9300, 2650, 11100, 3750),    ("before", "after"),
@@ -68,14 +67,53 @@ WINDOWS = [
 ]
 
 
-def load(image: str, render: int):
-    """(rgb, pil, scale) at `render` px wide, scale = source px per render px."""
+def windows_for(map_id: str, w: int, h: int):
+    """The whole sheet at its real size, then windows that mean something on it.
+
+    The whole-sheet box used to be the 1882 sheet's literal pixel size, so on
+    any larger sheet `00_whole_sheet.png` showed a corner of it and said it was
+    the whole thing -- on 1898 (16267 x 14859) that is the top-left 74% x 60%.
+    """
+    whole = [("whole_sheet", (0, 0, w, h), ("after",), "the run at a glance")]
+    if map_id == MAP:
+        return whole + WINDOWS
+    # ponytail: a sheet nobody has read yet gets a 3x3 grid, not borrowed place
+    # names. Upgrade path is a WINDOWS list of its own once someone reads it.
+    return whole + [
+        (f"grid_r{r + 1}c{c + 1}",
+         (c * w // 3, r * h // 3, (c + 1) * w // 3, (r + 1) * h // 3),
+         ("after",), "grid cell -- no place names read on this sheet yet")
+        for r in range(3) for c in range(3)]
+
+
+def load(map_id: str, image: str | None, render: int):
+    """(rgb, pil, scale, source size) at `render` px wide; scale = source px per render px.
+
+    Fetched by map id the way `colour_blocks.main` does it, so the pixels and
+    the annotation always come from the same sheet. There used to be a default
+    `--image` pointing at the 1882 tile cache: `--map-id <anything>` then
+    rendered 1882 pixels under another map's scale, water and labels, silently.
+
+    `--image` still overrides, and must be the sheet at FULL resolution -- a
+    cached render would make `scale` too small and shrink every area threshold.
+    """
     Image.MAX_IMAGE_PIXELS = None
-    pil = Image.open(image).convert("RGB")
-    source_w = pil.width
-    pil = pil.resize((render, round(pil.height * render / pil.width)))
+    if image:
+        pil = Image.open(image).convert("RGB")
+        source_w, source_h = pil.size
+    else:
+        from iiif_tiles import fetch_crop, get_image_info, get_iiif_base_from_supabase
+        base = get_iiif_base_from_supabase(map_id)
+        if not base:
+            raise SystemExit(f"no IIIF base for {map_id}")
+        info = get_image_info(base)
+        source_w, source_h = int(info["width"]), int(info["height"])
+        pil = fetch_crop(base, 0, 0, source_w, source_h, size=render, fit=True)
+    print(f"sheet {source_w} x {source_h}, rendering to {render}")
+    if pil.width != render:
+        pil = pil.resize((render, round(pil.height * render / pil.width)))
     rgb = np.asarray(pil, dtype=np.uint8)[..., :3]
-    return rgb, pil, source_w / rgb.shape[1]
+    return rgb, pil, source_w / rgb.shape[1], (source_w, source_h)
 
 
 def splits(rgb: np.ndarray):
@@ -90,7 +128,7 @@ def splits(rgb: np.ndarray):
     return split, cool, green
 
 
-def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, recut: bool,
+def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, frame, recut: bool,
              split_buildings: bool = True):
     """main()'s order, with the full flag set. Returns (kept, drowned, slivers, all)."""
     px_area_m2 = (mpp * scale) ** 2
@@ -101,6 +139,8 @@ def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, recut: bool,
     cfeats, _ = cb.blocks_from_colour(rgb, split, scale, mpp=mpp, close=0, ink_v=ink_v,
                                       cool=cool, green=green, classes=("cream",))
     feats, _, _ = cb.subtract_blocks(feats + cfeats)
+    if frame is not None:
+        feats = [f for f in feats if shapely.centroid(f["geom"]).within(frame)]
     if furn is not None and not furn.is_empty:
         feats = [f for f in feats if not shapely.centroid(f["geom"]).within(furn)]
     wm = cb.water_mask(feats, rgb, scale, wet)
@@ -156,7 +196,7 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--map-id", default=MAP, help=f"maps.id UUID (default {MAP[:8]}, the 1882 sheet)")
-    p.add_argument("--image", default=IMG, help="local sheet to render from (default the tile cache)")
+    p.add_argument("--image", help="full-resolution local sheet instead of the IIIF fetch")
     p.add_argument("--render", type=int, default=RENDER)
     p.add_argument("--out", type=Path, default=Path.home() / "Desktop" / "vma-colour-pass",
                    help="folder for the PNGs (default ~/Desktop/vma-colour-pass)")
@@ -168,13 +208,12 @@ def main() -> int:
                         "thing being checked. Turn them on to audit a drop, not to read a run")
     args = p.parse_args()
 
-    if not Path(args.image).exists():
-        print(f"no such image: {args.image} — run colour_blocks once to fill the tile cache",
-              file=sys.stderr)
+    if args.image and not Path(args.image).exists():
+        print(f"no such image: {args.image}", file=sys.stderr)
         return 1
     args.out.mkdir(parents=True, exist_ok=True)
 
-    rgb, pil, scale = load(args.image, args.render)
+    rgb, pil, scale, (source_w, source_h) = load(args.map_id, args.image, args.render)
     split, cool, green = splits(rgb)
     print(f"splits: r-g {split:+.3f}  r-b {cool:+.3f}  green {green:+.3f}")
 
@@ -183,6 +222,7 @@ def main() -> int:
     mpp = (fit.mx + fit.my) / 2.0
     wet = cb.water_points(args.map_id)
     furn = cb.furniture_mask(args.map_id)
+    frame = cb.main_map_frame(args.map_id)
     print(f"{mpp:.4f} m per source px, {len(wet)} hydrology labels")
 
     # "before" is the run as it shipped at 9a2fe561: no re-cut, and the wash cut
@@ -196,7 +236,7 @@ def main() -> int:
             cb.WATER_WASH_MIN_PX = wash
             kept, drowned, slivers, allf = pipeline(
                 rgb, scale, split=split, cool=cool, green=green, mpp=mpp,
-                wet=wet, furn=furn, recut=recut, split_buildings=sb)
+                wet=wet, furn=furn, frame=frame, recut=recut, split_buildings=sb)
             counts[tag] = (len(kept), len(drowned), len(slivers))
             runs[tag] = (kept, drowned, slivers, region_masks(allf, rgb, scale, wet))
             print(f"{tag:6s}: {len(kept)} kept, {len(drowned)} water, {len(slivers)} slivers")
@@ -205,7 +245,7 @@ def main() -> int:
 
     print(f"writing to {args.out}")
     n, manifest = 0, []
-    for name, box, tags, note in WINDOWS:
+    for name, box, tags, note in windows_for(args.map_id, source_w, source_h):
         for tag in tags:
             suffix = f"_{tag.upper()}" if len(tags) > 1 else ""
             out = args.out / f"{n:02d}_{name}{suffix}.png"
@@ -218,7 +258,7 @@ def main() -> int:
                  dropped=(drowned + slivers) if args.dropped else (), size=args.size)
 
     (args.out / "README.txt").write_text(
-        "THE COLOUR PASS — 1882 Plan Cadastral, map {m}\n"
+        "THE COLOUR PASS — map {m}, {w} x {h} px\n"
         "Regenerated by work/ocr/scripts/review_figs.py. Findings: "
         "docs/journals/260918-colour-blocks.md\n\n"
         "TWO RUNS\n"
@@ -227,7 +267,8 @@ def main() -> int:
         "{b[0]} kept, {b[1]} water, {b[2]} slivers\n\n"
         "COLOURS  orange = kept - blue tint = the water region - green tint = the land\n"
         "         mask that bounds it. Dropped polygons are off; --dropped draws them.\n\n"
-        "FIGURES\n".format(m=args.map_id[:8], a=counts["after"], b=counts["before"])
+        "FIGURES\n".format(m=args.map_id[:8], w=source_w, h=source_h,
+                a=counts["after"], b=counts["before"])
         + "".join(f"  {fn:<38s} {note}\n" for fn, note in manifest))
     print(f"  README.txt\n{n} figures")
     return 0

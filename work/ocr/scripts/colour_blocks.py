@@ -121,6 +121,7 @@ flat — that is over-coverage, which is what a hull does.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -925,6 +926,16 @@ def furniture_rows(map_id: str, run_id: str | None = None):
     """One OCR read shared by the furniture mask and the unpadded legend crop."""
     return [r for r in ocr_rows(map_id, run_id)
             if r.get("category") in ("title", "legend") and r.get("global_x") is not None]
+
+
+def main_map_frame(map_id: str):
+    """The printed border as a box, or None when the sheet has no `main_map`."""
+    from supabase_client import fetch_triage_regions
+    crop = (fetch_triage_regions(map_id, ["main_map"]) or [None])[0]
+    if crop is None:
+        return None
+    x, y, w, h = crop
+    return shapely.box(x, y, x + w, y + h)
 
 
 def furniture_mask(map_id: str, pad: float = 200.0, *, rows=None, run_id: str | None = None):
@@ -2018,7 +2029,15 @@ def main() -> int:
     # from anyone who had not read the journal. `--recut` set the precedent for
     # the `--no-...` escape and the others now follow it.
     p.set_defaults(recut=True, cream=True, drop_furniture=True, drop_water=True,
-                   drop_slivers=True, swatch_labels=True, split_buildings=True)
+                   drop_slivers=True, swatch_labels=True, split_buildings=True,
+                   clip_main_map=True)
+    p.add_argument("--no-clip-main-map", dest="clip_main_map", action="store_false",
+                   help="keep the polygons outside the printed border. The paper "
+                        "margin, the mount and the scanner surround are tinted and "
+                        "componented like anything else, and their concave hulls run "
+                        "diagonally across the sheet; the 1898 sheet showed both. The "
+                        "rectangle is the sheet's own `main_map` triage region, so "
+                        "this needs --map-id and is a no-op on a sheet not yet triaged")
     p.add_argument("--no-swatch-labels", dest="swatch_labels", action="store_false",
                    help="name each polygon by a pixel vote over the pigment classes "
                         "instead of against the legend's own five swatches. The "
@@ -2232,6 +2251,28 @@ def main() -> int:
             print(f"  cut {cut} cream hulls back off the blocks they closed over, "
                   f"dropped {mostly_block} that were a block with a rim")
 
+    if args.clip_main_map and args.map_id:
+        # The neatline is not a colour boundary, so nothing upstream of here can
+        # see it: the margin, the mount and the scanner surround carry tone and
+        # component exactly like a block. Their hulls are worse than the
+        # polygons — a stringy margin strip hulls into a diagonal across the
+        # sheet. The rectangle is already in the database (`main_map`, the same
+        # crop `to_sam2_seeds.load_seeds_from_prior` clips against); this pass
+        # was the only consumer that never read it.
+        try:
+            frame = main_map_frame(args.map_id)
+        except Exception as exc:                                  # noqa: BLE001
+            frame = None
+            print(f"  (no main_map crop: {exc})")
+        if frame is None:
+            print("  no main_map region on this sheet — nothing clipped")
+        else:
+            x, y, x1, y1 = (int(v) for v in frame.bounds)
+            before = len(feats)
+            feats = [f for f in feats if shapely.centroid(f["geom"]).within(frame)]
+            print(f"  dropped {before - len(feats)} outside the printed border "
+                  f"[{x} {y} {x1 - x} {y1 - y}]")
+
     if args.drop_furniture:
         if not args.map_id:
             print("  --drop-furniture needs --map-id; skipped", file=sys.stderr)
@@ -2313,6 +2354,17 @@ def main() -> int:
             "cool_split": round(cool, 4) if cool is not None else None,
             "green_split": round(green, 4) if green is not None else None,
             "render": int(rgb.shape[1]),
+            # The working image itself, not the request that produced it. Two
+            # fetches of `--map-id X --render 6144` are not the same pixels:
+            # `fetch_crop` can answer from the region URL, from a composed tile
+            # pyramid or from a full download, and each resamples differently.
+            # Measured on 20ec4f9a: two runs at this render split the green axis
+            # at +0.0125 and +0.0075, and the class mix inside the same frame
+            # went salmon 284 -> 671, green 106 -> 11 on 3,185 vs 3,177 polygons.
+            # The geometry was stable and the labels were not. Every threshold
+            # below is derived from these bytes, so without this the manifest
+            # cannot tell a real change from a different JPEG.
+            "image_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(),
             "ink_fraction": round(ink_fraction, 4),
             "cream_ink": round(cream_ink_v, 3) if cream_ink_v is not None else None,
             "block_area_m2": [args.min_m2, args.max_m2] if mpp else None,
