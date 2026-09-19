@@ -132,3 +132,11 @@ are 0.3396 and 0.3445, **1.4% apart**. That is not "no differential scale".
 - 1895 and 1923 remain unmeasured, per above.
 - The conversion is a local tangent plane, good to ~0.01 m against UTM here; do not carry it to a
   sheet spanning degrees.
+
+## Archive-wide
+
+This six-sheet result is extended to all 274 sheets in `maps`, same code path, in
+`work/analysis/georef_coverage.md` (2026-09-19). Headline: 65.0% of the archive's `ocr_extractions`
+rows sit on a sheet with no stated georeference limit or a bad one, and 1942 is not even the worst
+case — eight sheets score worse, one of them (1922, 456.9 m RMSE) the archive's third
+most-extracted sheet.

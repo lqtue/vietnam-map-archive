@@ -360,6 +360,13 @@ def main() -> None:
                     help="run the synthetic checks and exit; no network")
     ap.add_argument("--maps", nargs="*", default=None,
                     help="map ids (default: work/analysis/district4/maps.txt)")
+    # ponytail: archive-wide coverage run (274 maps) needs a durable record per
+    # batch rather than only a stdout table, and needs to run in batches rather
+    # than one process holding 274 in-flight HTTP calls. --csv appends one row
+    # per measured (or skipped) sheet; safe to call once per batch of ids.
+    ap.add_argument("--csv", default=None,
+                    help="append one row per sheet to this CSV (creates with "
+                         "header if absent)")
     args = ap.parse_args()
 
     if args.self_check:
@@ -368,6 +375,50 @@ def main() -> None:
 
     ids = args.maps or [s for s in MAPS_TXT.read_text().strip().split(",") if s]
     results = [measure(i) for i in ids]
+
+    if args.csv:
+        import csv as _csv
+        path = Path(args.csv)
+        is_new = not path.exists()
+        try:
+            csv_rows = map_rows(ids)
+        except Exception:  # noqa: BLE001
+            csv_rows = {}
+        fields = ["id", "year", "name", "slug", "skipped", "n_gcps", "declared",
+                  "condition", "width", "height", "size_src",
+                  "helmert_rmse_m", "helmert_worst_m", "helmert_scale_mpp",
+                  "helmert_rotation_deg", "noflip_rmse_m",
+                  "affine_rmse_m", "affine_worst_m",
+                  "affine_scale_x_mpp", "affine_scale_y_mpp"]
+        with path.open("a", newline="") as f:
+            w = _csv.DictWriter(f, fieldnames=fields)
+            if is_new:
+                w.writeheader()
+            for r in results:
+                meta = csv_rows.get(r["id"], {})
+                row = {"id": r["id"], "year": meta.get("year"),
+                       "name": meta.get("name"), "slug": meta.get("slug"),
+                       "skipped": r.get("skipped", "")}
+                if not r.get("skipped"):
+                    h, a = r["helmert"], r["affine"]
+                    row.update({
+                        "n_gcps": r["n_gcps"], "declared": r["declared"],
+                        "condition": f"{r['condition']:.4f}",
+                        "width": r["width"], "height": r["height"],
+                        "size_src": r["size_src"],
+                        "helmert_rmse_m": f"{h.rmse_m:.2f}",
+                        "helmert_worst_m": f"{h.worst_m:.2f}",
+                        "helmert_scale_mpp": f"{h.scale_x:.4f}",
+                        "helmert_rotation_deg": f"{h.rotation_deg:.2f}",
+                        "noflip_rmse_m": f"{r['noflip'].rmse_m:.2f}",
+                        "affine_rmse_m": f"{a.rmse_m:.2f}",
+                        "affine_worst_m": f"{a.worst_m:.2f}",
+                        "affine_scale_x_mpp": f"{a.scale_x:.4f}",
+                        "affine_scale_y_mpp": f"{a.scale_y:.4f}",
+                    })
+                else:
+                    row["n_gcps"] = r.get("n_gcps", "")
+                w.writerow(row)
     try:
         rows = map_rows(ids)
     except Exception as exc:  # noqa: BLE001
