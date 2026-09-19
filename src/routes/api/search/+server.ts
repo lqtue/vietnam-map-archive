@@ -421,6 +421,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   // Shape rows for the client. Use the MapListItem shape so the result card can render both.
   const mapsOut = filteredMaps.slice(offset, offset + limit).map((r) => ({
     id: r.id,
+    slug: r.slug,
     name: r.name,
     location: r.location,
     map_type: r.map_type,

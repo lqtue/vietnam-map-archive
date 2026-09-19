@@ -76,6 +76,29 @@ function retiredScanTarget(url: URL): string | null {
   return mapId && isMapRef(mapId) ? `${prefix}/catalog/${mapId}` : `${prefix}/catalog`;
 }
 
+/**
+ * Link-preview bots fetch a URL once, with no JS — so `/explore?map=`
+ * (`ssr = false`, no per-sheet meta) unfurls as the bare site title and no
+ * image. `/catalog/[id]` already builds the real og:title/description/image
+ * for the same sheet, so a bot that asked for `/explore?map=<ref>` is sent
+ * there instead. A human on the same URL is untouched — this only matches
+ * known crawler user agents, and only `mode=browse` (or no mode), so Studio
+ * and story deep links are left alone.
+ */
+const PREVIEW_BOT_RE =
+  /facebookexternalhit|Facebot|Twitterbot|Slackbot|TelegramBot|WhatsApp|LinkedInBot|Discordbot|SkypeUriPreview|redditbot|Pinterest|vkShare|Viber/i;
+
+function explorePreviewTarget(url: URL, userAgent: string | null): string | null {
+  if (!userAgent || !PREVIEW_BOT_RE.test(userAgent)) return null;
+  if (stripLocale(url.pathname) !== '/explore') return null;
+  const mode = url.searchParams.get('mode');
+  if (mode && mode !== 'browse') return null;
+  const mapId = url.searchParams.get('map');
+  if (!mapId || !isMapRef(mapId)) return null;
+  const prefix = localeFromPath(url.pathname) ? '/vi' : '';
+  return `${prefix}/catalog/${mapId}`;
+}
+
 function legacyTarget(pathname: string): string | null {
   const exact = LEGACY_REDIRECTS[pathname];
   if (exact) return exact;
@@ -150,6 +173,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const scanTarget = retiredScanTarget(event.url);
   if (scanTarget) throw redirect(302, scanTarget);
+
+  const previewTarget = explorePreviewTarget(
+    event.url,
+    event.request.headers.get('user-agent')
+  );
+  if (previewTarget) throw redirect(302, previewTarget);
 
   // Read before anything renders, so a server-rendered page is already in the
   // reader's language rather than flipping after hydration.
