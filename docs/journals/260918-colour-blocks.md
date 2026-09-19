@@ -614,7 +614,11 @@ GPU is still for.
 So the sentence that is currently true: **a CPU-only colour pass, calibrated from
 the sheet itself and trained on nothing, produces a block-and-parcel prior for a
 polychrome cadastral sheet in about nine seconds, and on the one sheet measured
-it covers every hand-traced land plot.** Everything stronger needs item 1.
+it covers every hand-traced land plot.**
+
+> **Timing superseded 2026-09-19.** 8.6 s was the pre-`--recut` default. `--recut` became
+> the default in `d1da01f1` and the reference run is **80 s** (25 s with `--no-recut`).
+> The rest of the sentence stands. Everything stronger needs item 1.
 
 
 ## The 118-row trace set was 46 traces and 72 label boxes (2026-09-18, found while rendering an overlay)

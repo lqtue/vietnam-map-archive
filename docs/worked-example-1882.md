@@ -301,6 +301,11 @@ feature that could not work, for the fourth time this month.
 - **Volume.** 118 polygons over a 12102 × 8982 sheet is still thin, and the
   machine's 72 came from 109 seeds — so the ceiling is the OCR pass, not the
   segmenter. A sheet is only as segmentable as it is readable.
+
+  *(**Read that 118 carefully — clarified 2026-09-19.** Here it means polygons this run
+  **produced**. It is not the "118-row trace set" `work/ocr/EVAL-BASELINE.md` retracted, which
+  was 46 volunteer traces plus 72 machine rows mistaken for ground truth. Three senses of 118
+  have circulated in these docs; check the sentence, not the number.)*
 - **Segmentation quality.** The LoRA checkpoint was fine-tuned on *these* 46
   polygons on *this* sheet. Running it back on 1882 legitimately produces
   polygons for this example, but measures nothing. An honest number needs a

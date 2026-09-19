@@ -2,8 +2,15 @@
 
 *Plain-language system reference. Written so a non-technical reader can follow it, but precise
 enough to rebuild the system from. Verified against the live code on 2026-06-04 (route list,
-stores, shell components, migration head). This is the canonical "current status" doc — when
-other docs disagree with it, this one wins.*
+stores, shell components, migration head).*
+
+> **FROZEN — this is a 2026-06-04 snapshot, not the current state.** It was written as the
+> plain-language reference behind the May 2026 deck and the knowledge graph, and it says so in
+> numbers that have since moved: migration head **048** (the head is 091), **101 map records**, no
+> series layer, no `/catalog/[id]` page, no OCR gate. It previously claimed to be the canonical
+> current-status doc that wins when others disagree; that claim is withdrawn — it is a dated
+> artefact of the deck work. For current state read `/CLAUDE.md` and the tree-local `CLAUDE.md`
+> files, which are maintained against the code. Do not cite this file for a figure.
 
 ---
 
