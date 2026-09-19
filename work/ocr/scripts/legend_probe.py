@@ -51,16 +51,18 @@ is the whole check: the medians are known, so they prove the five rectangles
 were found and ordered correctly before any texture number is believed.
 
 ponytail: one sheet's legend box, and the five class names in source order.
-Ceiling: every other sheet. Reading the region off the `legend` triage box and
-the names off the adjacent lettering is the upgrade, and it is worth building
-the moment a second polychrome sheet arrives — same trigger as the
-`LEGEND_SWATCHES` note it was meant to retire.
+Ceiling: every other sheet. The run now reads the largest `legend` triage box under
+`--legend-swatches auto`; this standalone texture probe still takes a crop.
+Reading class names off the adjacent lettering remains unbuilt, so both paths
+still assume the 1882 class order and reject colours outside its fixed-key gate.
 """
 import sys
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
+
+from colour_blocks import find_swatches, groups, longest_run
 
 # Source order, top to bottom, in the 1882 legend box.
 NAMES = ["blue", "admin", "cream", "green", "salmon"]
@@ -69,17 +71,6 @@ KNOWN = np.array([(0.000, 0.008), (0.039, 0.067), (0.059, 0.149),
                   (0.016, 0.122), (0.165, 0.263)])
 INK_V = 0.55        # colour_blocks.INK_V
 MIN_GRAD = 0.02     # colour_blocks.ink_coherence
-
-
-def groups(values):
-    """Inclusive runs of consecutive sorted integer values."""
-    cuts = np.flatnonzero(np.diff(values) > 1) + 1
-    return [(a[0], a[-1]) for a in np.split(values, cuts) if len(a)]
-
-
-def longest_run(mask):
-    ends = np.flatnonzero(np.diff(np.r_[False, mask, False]))
-    return max((b - a for a, b in zip(ends[::2], ends[1::2])), default=0)
 
 
 def coherence(rgb):
@@ -99,36 +90,6 @@ def coherence(rgb):
     jxx, jyy = (gx[use] ** 2).sum(), (gy[use] ** 2).sum()
     jxy = (gx[use] * gy[use]).sum()
     return float(np.hypot(jxx - jyy, 2 * jxy) / (jxx + jyy)), int(use.sum())
-
-
-def find_swatches(rgb):
-    """The five outlined rectangles down the right-hand side, top to bottom."""
-    h, w = rgb.shape[:2]
-    x0 = 2 * w // 3                             # the key is a column on the right
-    dark = rgb.max(axis=2) <= int(0.45 * 255)
-    rows = np.array([longest_run(dark[y, x0:]) >= 0.045 * w for y in range(h)])
-    lines = groups(np.flatnonzero(rows))
-    if len(lines) != 2 * len(NAMES):
-        raise RuntimeError(f"expected {2 * len(NAMES)} horizontal swatch borders, "
-                           f"found {len(lines)}")
-    boxes = []
-    for top, bottom in zip(lines[::2], lines[1::2]):
-        t, b = top[0], bottom[1]
-        cols = np.array([longest_run(dark[t:b + 1, x]) >= 0.5 * (b - t)
-                         for x in range(x0, w)])
-        sides = [(a + x0, z + x0) for a, z in groups(np.flatnonzero(cols))]
-        border = np.r_[np.arange(top[0], top[1] + 1), np.arange(bottom[0], bottom[1] + 1)]
-        # Of every candidate left/right pair wide enough to be a swatch, take the
-        # one whose top and bottom edges are actually drawn between them.
-        choices = [(dark[border, left:right + 1].mean(), left, right)
-                   for i, (left, _) in enumerate(sides)
-                   for _, right in sides[i + 1:]
-                   if right - left >= 2 * (b - t)]
-        if not choices:
-            raise RuntimeError("could not match vertical sides to a horizontal outline")
-        _, left, right = max(choices)
-        boxes.append((t, b, left, right))
-    return boxes
 
 
 def main(path):

@@ -392,8 +392,8 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
 
     The flag set mirrors `src/lib/features/contribute/digitalize/segCommand.ts`,
     which is what that panel shows a human — keep the two in step. With a
-    validated OCR run the model runs LoRA-prompted off those toponyms; without
-    one it falls back to automatic mode, exactly as the panel does.
+    validated OCR run or a colour-block prior makes the model run LoRA-prompted;
+    without either it falls back to automatic mode, exactly as the panel does.
 
     ponytail: checkpoint and MapSAM2 directory come from the environment, since
     they are properties of the machine rather than of the job. A job may still
@@ -409,6 +409,7 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
         "/content/drive/MyDrive/vma_mapsam2_cache/models/epoch_010.pth",
     )
     ocr_run_id = p.get("ocr_run_id")
+    prior = p.get("prior")
 
     argv = [
         python_bin,
@@ -417,9 +418,12 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
         "--checkpoint", checkpoint,
         "--encoder", str(p.get("encoder", "vit_s")),
     ]
-    if ocr_run_id:
-        argv += ["--lora", "--mapsam2-dir", mapsam2_dir,
-                 "--mode", "prompted", "--ocr-run-id", str(ocr_run_id)]
+    if ocr_run_id or prior:
+        argv += ["--lora", "--mapsam2-dir", mapsam2_dir, "--mode", "prompted"]
+        if ocr_run_id:
+            argv += ["--ocr-run-id", str(ocr_run_id)]
+        if prior:
+            argv += ["--prior", str(prior)]
     else:
         argv += ["--mode", "automatic"]
     argv += [
@@ -429,8 +433,11 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
         "--out-json", "footprints.json",
         "--write-supabase",
     ]
-    if p.get("text_mask", True):
+    # Measured on 1882 label prompts: text masking mean IoU 0.062 vs 0.089
+    # without it, because flat paper tone creates a rectangle at the prompt.
+    if p.get("text_mask", False):
         argv.append("--text-mask")
+    # Watershed is unmeasured: EVAL-BASELINE.md records no watershed run.
     if p.get("watershed", True):
         argv.append("--watershed")
     if p.get("run_id"):

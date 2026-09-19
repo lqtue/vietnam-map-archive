@@ -241,11 +241,19 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 ## work/ocr/scripts/colour_blocks.py — legend key
 
 - **`LEGEND_SWATCHES`** — the five legend swatches of the 1882 sheet, hard-coded
-  as measured. ceiling: every other sheet; a second polychrome map gets the wrong
-  key silently, because nothing checks that the numbers belong to the sheet being
-  read. upgrade: read them off the `legend` triage region directly — they are the
-  saturated rectangles in it — and it is worth building the moment a second
-  polychrome sheet arrives.
+  as measured, and still the default and the fallback. **Half-paid 2026-09-19**:
+  `--legend-swatches auto` reads them off the largest `legend` OCR box at the
+  run's render and rejects the whole measured key if any class differs from the
+  fixed one by more than 0.04, so a second polychrome map no longer gets a wrong
+  key *silently* — but it still gets the 1882 key. ceiling moved, not removed:
+  the detector needs 1:1 (accepted at `--render 12102`, delta 0.008; falls back
+  at 6051, 4096 and 3000, where a swatch's thin outline merges with its
+  neighbour's and five boxes stop yielding ten separated border runs). upgrade:
+  a border finder allowing shared edges — five boxes between six lines — plus
+  reading class *names* off the adjacent lettering, which is what a genuinely
+  different palette would need. Trigger unchanged: the second polychrome sheet.
+  Do not loosen the border count to make `auto` fire; the count is what stops a
+  mis-paired run renaming the sheet instead of failing it.
 - **`HATCH_COHERENCE` (:870)** — one constant, 0.30, for the hatch test, not a
   trough voted from the sheet the way every other knob in this file is. ceiling:
   the number scales with `--render`, because a hatch aliases away as the sheet is

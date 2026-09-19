@@ -3,8 +3,14 @@
 
     python work/ocr/scripts/colour_blocks.py --map-id <uuid> --census
     python work/ocr/scripts/colour_blocks.py --map-id <uuid> --out work/ocr/outputs/<uuid>/colour
-    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --cream --drop-furniture --out <dir>
+    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --no-cream --no-drop-water --out <dir>
     python work/ocr/scripts/colour_blocks.py --self-check          # no network, no data
+
+The second line is the full pass — cream parcels, the legend key, the furniture,
+water and sliver drops and the oversize re-cut are all **on by default**, because
+that is the run every number in `work/ocr/EVAL-BASELINE.md` was measured on. Each
+has a `--no-...` escape that restores the run it names, and each escape's help
+text carries what turning it off costs.
 
 Why this exists: `modern_prior.py` builds the block prior from 2023 geodata —
 2.1M HCMC buildings dissolved, or TASCO road surfaces complemented — and warps
@@ -692,7 +698,8 @@ def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, flo
     return out
 
 
-def labels_matching(map_id: str, needle: str) -> list[tuple[str, str, float, float]]:
+def labels_matching(map_id: str, needle: str,
+                    run_id: str | None = None) -> list[tuple[str, str, float, float]]:
     """(text, category, x, y) for every OCR label whose text contains `needle`.
 
     Every match, deliberately. Several labels on the 1882 sheet have duplicate
@@ -700,13 +707,11 @@ def labels_matching(map_id: str, needle: str) -> list[tuple[str, str, float, flo
     changes the verdict — a check built on "the first row" is not reproducible
     and the journal has a 6/10-against-7/10 to prove it.
     """
-    from supabase_client import fetch_ocr_extractions
-
     low = needle.lower()
     return [(r["text"], r.get("category") or "?",
              r["global_x"] + (r["global_w"] or 0) / 2.0,
              r["global_y"] + (r["global_h"] or 0) / 2.0)
-            for r in fetch_ocr_extractions(map_id)
+            for r in ocr_rows(map_id, run_id)
             if r.get("global_x") is not None and low in (r.get("text") or "").lower()]
 
 
@@ -868,7 +873,40 @@ def subtract_blocks(feats: list[dict], min_keep: float = 0.15) -> tuple[list[dic
 
 # ── map furniture ────────────────────────────────────────────────────────────
 
-def water_points(map_id: str) -> list[tuple[float, float]]:
+_OCR_CACHE: dict[tuple[str, str | None], list] = {}
+
+
+def ocr_rows(map_id: str, run_id: str | None = None) -> list:
+    """Every OCR extraction on a sheet, read once and pinned to a run if asked.
+
+    **A table a pipeline writes into is not a fixed input**, and this function
+    is where that bites. The water seeds, the furniture mask, the legend panel
+    and `--explain` all read `ocr_extractions`, and with no run filter they read
+    whatever runs happen to be in it. The 1882 sheet's 499 placed labels are
+    three runs pooled — `post0910` 287, `v1b` 177 and `2026-09-04T0527` 35 —
+    so the same object is seeded up to three times and re-OCR'ing the sheet
+    changes this pass's geometry with nothing in the output recording why.
+
+    Pooling stays the default so no existing run moves, but it is now printed
+    rather than silent: pass `--ocr-run-id` to pin it, and `blocks.run.json`
+    records what was used.
+    """
+    key = (map_id, run_id)
+    if key not in _OCR_CACHE:
+        from supabase_client import fetch_ocr_extractions
+
+        rows = fetch_ocr_extractions(map_id, run_id)
+        runs: dict[str, int] = {}
+        for r in rows:
+            runs[r.get("run_id") or "(none)"] = runs.get(r.get("run_id") or "(none)", 0) + 1
+        where = ", ".join(f"{k} {v}" for k, v in sorted(runs.items(), key=lambda kv: -kv[1]))
+        print(f"  {len(rows)} OCR rows from "
+              + (f"run {run_id}" if run_id else f"{len(runs)} pooled run(s): {where}"))
+        _OCR_CACHE[key] = rows
+    return _OCR_CACHE[key]
+
+
+def water_points(map_id: str, run_id: str | None = None) -> list[tuple[float, float]]:
     """Centres of the sheet's `hydrology` labels, in source pixels.
 
     Sixteen of them on the 1882 sheet — far too sparse to outline the water, and
@@ -877,15 +915,19 @@ def water_points(map_id: str) -> list[tuple[float, float]]:
     there the region is already one connected blob and the label only has to
     land inside it.
     """
-    from supabase_client import fetch_ocr_extractions
-
     return [(r["global_x"] + (r["global_w"] or 0) / 2.0,
              r["global_y"] + (r["global_h"] or 0) / 2.0)
-            for r in fetch_ocr_extractions(map_id)
+            for r in ocr_rows(map_id, run_id)
             if r.get("category") == "hydrology" and r.get("global_x") is not None]
 
 
-def furniture_mask(map_id: str, pad: float = 200.0):
+def furniture_rows(map_id: str, run_id: str | None = None):
+    """One OCR read shared by the furniture mask and the unpadded legend crop."""
+    return [r for r in ocr_rows(map_id, run_id)
+            if r.get("category") in ("title", "legend") and r.get("global_x") is not None]
+
+
+def furniture_mask(map_id: str, pad: float = 200.0, *, rows=None, run_id: str | None = None):
     """The title cartouche and the legend box, from the sheet's own OCR labels.
 
     Both are printed rectangles full of text, which is the one thing the OCR
@@ -897,10 +939,8 @@ def furniture_mask(map_id: str, pad: float = 200.0):
     boundary annotations strung along the neatline, so their convex hull is
     very nearly the whole sheet. Per-label boxes, unioned.
     """
-    from supabase_client import fetch_ocr_extractions
-
-    rows = [r for r in fetch_ocr_extractions(map_id)
-            if r.get("category") in ("title", "legend") and r.get("global_x") is not None]
+    if rows is None:
+        rows = furniture_rows(map_id, run_id)
     if not rows:
         return None
     boxes = [shapely.box(r["global_x"], r["global_y"],
@@ -919,10 +959,13 @@ def furniture_mask(map_id: str, pad: float = 200.0):
 # hatch rather than a tint (59.6% ink in its swatch against 21.6% for the next
 # densest), so no trough on either axis has ever found it.
 #
-# ponytail: one sheet's swatches, hard-coded. Ceiling: every other sheet. The
-# upgrade is to read them off the `legend` region directly — they are the
-# saturated rectangles in it — and it is worth building the moment a second
-# polychrome sheet arrives.
+# --legend-swatches auto now reads the largest OCR legend box at the run's
+# render scale, with the detector checked at native scale to within 0.008.
+# Fixed remains the default and the fallback: a 0.04 disagreement on either
+# axis rejects the entire measured key. Ceiling: the five rectangles must still
+# be in the 1882 order, on the right of the panel, and near its colours. This
+# measures render-scale colour; it does not yet read class names or admit a
+# different palette. Ink density is scale-dependent and is not a third axis.
 LEGEND_SWATCHES = {
     "blue": (0.000, 0.008),      # domaniales affectees aux services militaire et marine
     "admin": (0.039, 0.067),     # domaniales affectees au service local  (a hatch)
@@ -930,6 +973,127 @@ LEGEND_SWATCHES = {
     "green": (0.016, 0.122),     # proprietes communales
     "salmon": (0.165, 0.263),    # proprietes particulieres
 }
+
+
+def groups(values):
+    """Inclusive runs of consecutive sorted integer values."""
+    cuts = np.flatnonzero(np.diff(values) > 1) + 1
+    return [(a[0], a[-1]) for a in np.split(values, cuts) if len(a)]
+
+
+def longest_run(mask):
+    ends = np.flatnonzero(np.diff(np.r_[False, mask, False]))
+    return max((b - a for a, b in zip(ends[::2], ends[1::2])), default=0)
+
+
+def find_swatches(rgb):
+    """The five outlined rectangles in a legend-panel crop, top to bottom.
+
+    The rightmost third is relative to the panel, not the whole sheet. These
+    are the probe's measured outline tests, unchanged.
+
+    **It only survives 1:1, so `--legend-swatches auto` is inert at every
+    render this pass actually uses.** Measured on the cached 1882 panel
+    (1754 x 988 source px), resampled to what each `--render` would hand it:
+
+        --render 12102  scale 1.00  1754 px   OK, max delta 0.008 -> accepted
+        --render  6051  scale 2.00   877 px   found 5 of 10 borders -> fallback
+        --render  4096  scale 2.95   594 px   found 5 of 10 borders -> fallback
+        --render  3000  scale 4.03   435 px   found 3 of 10 borders -> fallback
+
+    The cause is the row test, not the colour: a swatch outline is a thin rule,
+    and once shrunk the bottom border of one box and the top of the next merge
+    into a single dark run, so five stacked boxes stop yielding ten separate
+    ones. Counting `2 * len(LEGEND_SWATCHES)` is what then rejects the panel —
+    correctly, since a mis-paired run would mis-order the classes.
+
+    Not loosened, deliberately: the gate is the only thing standing between a
+    wrong crop and a repainted sheet, and a detector that guesses at which runs
+    are shared would trade a safe fallback for a silent mis-assignment. The
+    honest upgrade is a border finder that does not assume separated rules
+    (match five boxes between six lines, shared edges allowed) — worth building
+    with the second polychrome sheet, since until then 1:1 already answers it.
+    """
+    h, w = rgb.shape[:2]
+    x0 = 2 * w // 3                             # the key is a column on the right
+    dark = rgb.max(axis=2) <= int(0.45 * 255)
+    rows = np.array([longest_run(dark[y, x0:]) >= 0.045 * w for y in range(h)])
+    lines = groups(np.flatnonzero(rows))
+    if len(lines) != 2 * len(LEGEND_SWATCHES):
+        raise RuntimeError(f"expected {2 * len(LEGEND_SWATCHES)} horizontal swatch borders, "
+                           f"found {len(lines)}")
+    boxes = []
+    for top, bottom in zip(lines[::2], lines[1::2]):
+        t, b = top[0], bottom[1]
+        cols = np.array([longest_run(dark[t:b + 1, x]) >= 0.5 * (b - t)
+                         for x in range(x0, w)])
+        sides = [(a + x0, z + x0) for a, z in groups(np.flatnonzero(cols))]
+        border = np.r_[np.arange(top[0], top[1] + 1), np.arange(bottom[0], bottom[1] + 1)]
+        # Of every candidate left/right pair wide enough to be a swatch, take the
+        # one whose top and bottom edges are actually drawn between them.
+        choices = [(dark[border, left:right + 1].mean(), left, right)
+                   for i, (left, _) in enumerate(sides)
+                   for _, right in sides[i + 1:]
+                   if right - left >= 2 * (b - t)]
+        if not choices:
+            raise RuntimeError("could not match vertical sides to a horizontal outline")
+        _, left, right = max(choices)
+        boxes.append((t, b, left, right))
+    return boxes
+
+
+def legend_swatches(rgb: np.ndarray, scale: float, rows):
+    """Read the panel at the same scale as the polygons that will use its key.
+
+    `legend` also labels neatline annotations; their union was nearly the whole
+    sheet in the furniture experiment above. Take the single largest-area box,
+    without furniture padding, and never hunt for a more convenient candidate
+    if it fails. `scale` is source pixels per render pixel, hence division here.
+    Floor/ceil keep the box's edge pixels; clipping prevents negative indices
+    from wrapping into the far margin.
+
+    The probe's four-pixel inset and median RGB differences are kept literally,
+    now in render pixels. A shrunken outline can disappear or leave no interior.
+    Reject that, non-finite medians, and any axis over 0.04 from the fixed key;
+    accepting only part of a key would mix two different paper references in
+    the dilution fit. The gate makes a wrong crop safe, but cannot establish
+    new class meanings or validate a palette unlike the 1882 sheet's.
+    """
+    try:
+        panels = [r for r in rows if r.get("category") == "legend"]
+        if not panels:
+            raise ValueError("no legend OCR box")
+        panel = max(panels, key=lambda r: (r.get("global_w") or 0) * (r.get("global_h") or 0))
+        x, y, w, h = (panel[k] for k in ("global_x", "global_y", "global_w", "global_h"))
+        if w <= 0 or h <= 0:
+            raise ValueError("largest legend OCR box has no area")
+        height, width = rgb.shape[:2]
+        x0, y0 = max(0, math.floor(x / scale)), max(0, math.floor(y / scale))
+        x1, y1 = min(width, math.ceil((x + w) / scale)), min(height, math.ceil((y + h) / scale))
+        print(f"  legend panel source box: {[x, y, w, h]}")
+        if x1 <= x0 or y1 <= y0:
+            raise ValueError("legend OCR box is outside the render")
+        crop = rgb[y0:y1, x0:x1]
+        measured = {}
+        for name, (t, b, left, right) in zip(LEGEND_SWATCHES, find_swatches(crop)):
+            sw = crop[t + 4:b + 1 - 4, left + 4:right + 1 - 4]
+            if not sw.size:
+                raise ValueError(f"{name} has no interior after the 4 px inset")
+            med = np.median(sw.reshape(-1, 3) / 255, axis=0)
+            measured[name] = (float(med[0] - med[1]), float(med[0] - med[2]))
+        for name, value in measured.items():
+            print(f"  legend measured {name}: r-g {value[0]:.3f}, r-b {value[1]:.3f}")
+        for name, value in measured.items():
+            delta = np.abs(np.array(value) - LEGEND_SWATCHES[name])
+            if not np.isfinite(delta).all() or (delta > 0.04).any():
+                raise ValueError(f"{name} disagreed: delta r-g {delta[0]:.3f}, r-b {delta[1]:.3f}")
+    except Exception as exc:                                  # noqa: BLE001
+        print(f"  legend swatches source: fallback ({exc})")
+        return LEGEND_SWATCHES
+    print("  legend swatches source: measured")
+    return measured
+
+
 PAPER_CLASS = "cream"
 # The two classes the legend draws as ink rather than as a tint: *service local*
 # is a black hatch at 59.6% ink and the military class a blue ruling at 21.6%,
@@ -1067,6 +1231,96 @@ def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
         if win is not None:
             sel, x0, y0, x1, y1 = win
             out[y0:y1, x0:x1] |= sel
+    return out
+
+
+SPLIT_RG = 0.035            # a building's wash is this much redder than its plot's
+SPLIT_MIN_M2 = 40.0        # ...over an area a building could have
+SPLIT_MAX_SHARE = 0.80     # ...and covering less of the parcel than the parcel
+
+
+def split_buildings(feats: list[dict], rgb: np.ndarray, scale: float,
+                    mpp: float | None, rg: float = SPLIT_RG,
+                    ink_v: float = INK_V, min_m2: float = SPLIT_MIN_M2,
+                    max_share: float = SPLIT_MAX_SHARE) -> list[dict]:
+    """The redder wash inside a finished parcel, as building polygons.
+
+    This is P3 — the within-block split — and it is the one thing the block
+    prior has never been able to do: `building` sits at 0.122 against
+    `land_plot` 0.331 because a parcel legitimately holds several buildings,
+    so the ink is found and the subdivision is not.
+
+    **Two corrections to the plan this came from, both measured here.**
+
+    P3 was written as *split the salmon block*, on the reading that a building
+    stands on a *propriétés particulières* plot. On this sheet it does not:
+    of the 17 volunteer `building` traces, **15 fall inside a cream polygon and
+    2 inside a green one, and none inside a salmon one**. A rule scoped to
+    salmon could not have reached any of them, so this runs over every class.
+
+    And what separates a building from its plot is not a sheet-wide threshold.
+    P3's retracted null looked for two reds *in the sheet's histogram*; the
+    delta that exists is **local** — a trace's wash against the wash of the
+    parcel it stands in, median +0.035 with 10 of 17 positive. So the baseline
+    is each polygon's own median, re-derived per polygon, and the sheet's
+    global trough is not used at all.
+
+    The four traces that go the *other* way are the sheet's second building
+    convention: a dense black fill, ink 0.21-0.44 against an open parcel's
+    0.05-0.09, whose wash median is dragged *below* its plot's by its own ink.
+    They are not recoverable on colour and are not attempted here — an ink
+    axis was measured and is a separate null (see the 2026-09-19 audit).
+
+    Scored against the 17 traces at `rg` 0.035: **mean 0.278, @.5 5** against
+    the block prior's 0.122 / @.5 1 on 888 polygons and SAM2-on-the-modern-
+    prior's 0.160. Fewer predictions and five times the hits, which is the one
+    direction a best-match-per-trace metric cannot manufacture.
+
+    ponytail: there is still no precision figure for this, because nothing in
+    this repo could produce one until `seg_eval --window` landed beside it and
+    no window has been exhaustively traced yet. `--no-split-buildings` restores
+    the run without it. The upgrade is to trace one dense window and score it.
+    """
+    px_m2 = (mpp * scale) ** 2 if mpp else None
+    min_px = max(4, int(min_m2 / px_m2)) if px_m2 else MIN_AREA_PX
+    a = rgb.astype(np.float32) / 255.0
+    rgd = a[..., 0] - a[..., 1]
+    ink = a.max(axis=2) < ink_v
+
+    out: list[dict] = []
+    for f in feats:
+        win = _poly_window(f["geom"], rgb.shape[:2], scale)
+        if win is None:
+            continue
+        sel, x0, y0, x1, y1 = win
+        area = int(sel.sum())
+        if area < min_px * 2:
+            continue
+        sub_ink = ink[y0:y1, x0:x1]
+        wash = sel & ~sub_ink
+        if wash.sum() < 20:
+            continue
+        # The parcel's own wash, ink excluded. A parcel with buildings on it is
+        # still mostly open ground, so its median is the open ground's colour.
+        base = float(np.median(rgd[y0:y1, x0:x1][wash]))
+        cand = wash & (rgd[y0:y1, x0:x1] > base + rg)
+        # A building's outline is ink and splits its own wash in two; close
+        # across it, then clip back so nothing escapes the parcel.
+        cand = ndimage.binary_closing(cand, np.ones((3, 3), bool)) & sel
+        lab, n = ndimage.label(cand)
+        if not n:
+            continue
+        sizes = ndimage.sum(cand, lab, range(1, n + 1))
+        for idx, size in enumerate(sizes, start=1):
+            # Too small is noise in the wash; too large is the parcel itself
+            # coming back under a different name.
+            if size < min_px or size > max_share * area:
+                continue
+            geom = component_polygon(lab == idx, x0, y0, scale)
+            if geom is None:
+                continue
+            out.append({"geom": geom, "feature_type": "building",
+                        "area_px": round(float(geom.area), 1)})
     return out
 
 
@@ -1385,7 +1639,8 @@ def ink_coherence(geom, grad: tuple[np.ndarray, np.ndarray], scale: float,
 def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
                       alpha: float | None = None, green: float | None = None,
                       ink_v: float = INK_V,
-                      hatch: float | None = None) -> tuple[list[dict], int, float, int]:
+                      hatch: float | None = None,
+                      swatches: dict[str, tuple[float, float]] = LEGEND_SWATCHES) -> tuple[list[dict], int, float, int]:
     """Name each finished polygon by the wash it holds, against the fitted key.
 
     Runs after the geometry is fixed, which is the whole difference from the
@@ -1427,10 +1682,10 @@ def relabel_by_swatch(feats: list[dict], rgb: np.ndarray, scale: float,
         # and the named-block check falls from 6/8 to 5/8).
         tinted = [(q[0], q[1]) for f, q in zip(feats, pts)
                   if q[0] == q[0] and f["feature_type"] != PAPER_CLASS]
-        alpha, _ = fit_dilution(tinted or [(q[0], q[1]) for q in pts if q[0] == q[0]])
-    P = LEGEND_SWATCHES[PAPER_CLASS]
+        alpha, _ = fit_dilution(tinted or [(q[0], q[1]) for q in pts if q[0] == q[0]], swatches)
+    P = swatches[PAPER_CLASS]
     protos = {k: (P[0] + alpha * (v[0] - P[0]), P[1] + alpha * (v[1] - P[1]))
-              for k, v in LEGEND_SWATCHES.items()}
+              for k, v in swatches.items()}
     grad = None
     if hatch is not None:
         v = rgb.astype(np.float32).max(axis=2) / 255.0
@@ -1755,13 +2010,28 @@ def main() -> int:
                         "no block there the water region runs straight over the quay. It costs "
                         "888 polygons against 798, land_plot mean 0.331 against 0.350, and "
                         "~55 s. --no-recut restores the smaller, faster, blunter run")
-    p.set_defaults(recut=True)
-    p.add_argument("--swatch-labels", action="store_true",
-                   help="name each finished polygon against the legend's own five "
-                        "swatches, diluted to the strength the sheet actually prints "
-                        "them at, instead of by a pixel vote over the pigment classes. "
-                        "Adds the *service local* class and lets a block be cream. "
-                        "Changes no geometry")
+    # Every flag below defaults ON, which is the run every number in
+    # EVAL-BASELINE.md and docs/journals/260918-colour-blocks.md was measured on.
+    # They were opt-in while each was being proved; leaving them that way meant a
+    # bare `--map-id` run returned the 253-block pass at land_plot 0.247 instead of
+    # the 888-polygon one at 0.331, i.e. the script withheld its own best result
+    # from anyone who had not read the journal. `--recut` set the precedent for
+    # the `--no-...` escape and the others now follow it.
+    p.set_defaults(recut=True, cream=True, drop_furniture=True, drop_water=True,
+                   drop_slivers=True, swatch_labels=True, split_buildings=True)
+    p.add_argument("--no-swatch-labels", dest="swatch_labels", action="store_false",
+                   help="name each polygon by a pixel vote over the pigment classes "
+                        "instead of against the legend's own five swatches. The "
+                        "swatch key is the default because it is the only thing that "
+                        "gives the sheet its fifth class, *service local*, which is a "
+                        "hatch rather than a tint and which no trough can find; it "
+                        "also lets a block be cream, which a vote over the pigment "
+                        "union cannot. Changes no geometry either way")
+    p.add_argument("--legend-swatches", choices=("fixed", "auto"), default="fixed",
+                   help="fixed 1882 key (default), or measure the largest OCR legend "
+                        "box at render scale; requires --map-id, falls back on "
+                        "disagreement. Detection needs 1:1 — see find_swatches, it "
+                        "falls back at every --render below source width")
     p.add_argument("--hatch-coherence", type=float, default=HATCH_COHERENCE,
                    help="with --swatch-labels, the share of a block's line work that "
                         "must run at one angle for it to be called the hatched "
@@ -1769,24 +2039,37 @@ def main() -> int:
                         f"it (default {HATCH_COHERENCE}); 0 disables the test")
     p.add_argument("--dilution", type=float,
                    help="override the fitted wash strength (0-1) for --swatch-labels")
-    p.add_argument("--cream", action="store_true",
-                   help="also emit the cream parcels — the unassigned domain land the "
-                        "block pass leaves blank. Its own ink threshold, no closing")
+    p.add_argument("--no-cream", dest="cream", action="store_false",
+                   help="emit blocks only, leaving the cream parcels — the unassigned "
+                        "domain land — blank. The cream pass is the default because "
+                        "those parcels are two thirds of the 1882 sheet's hand-traced "
+                        "land plots: without it land_plot mean is 0.247 on 253 "
+                        "polygons, with it 0.331 on 888. Its own swept ink threshold, "
+                        "no closing")
     p.add_argument("--cream-ink", type=float,
                    help="override the swept cream ink threshold")
-    p.add_argument("--drop-furniture", action="store_true",
-                   help="drop polygons inside the title or legend box, located from the "
-                        "sheet's OCR labels (needs --map-id and Supabase credentials)")
-    p.add_argument("--drop-water", action="store_true",
-                   help="drop the polygons that are river surface: bare paper drawn "
-                        "over with sparse blue ripple, which the cream pass otherwise "
-                        "traces into long thin parcels across the whole river. Unlike "
-                        "every other flag here this one removes geometry")
-    p.add_argument("--drop-slivers", action="store_true",
-                   help="drop polygons too stringy to be a parcel (circularity below "
-                        f"{MIN_CIRCULARITY}). On the 1882 sheet these are the shapes the "
-                        "cream pass traces between the river's ripple lines. Removes "
-                        "geometry; swept, and the traces do not notice")
+    p.add_argument("--no-drop-furniture", dest="drop_furniture", action="store_false",
+                   help="keep the polygons inside the title cartouche and the legend "
+                        "box. They are printed rectangles full of text and are not "
+                        "parcels; dropping them is the default and moves no score, "
+                        "which is the point — it removes 19-21 things that were never "
+                        "scoreable. Located from the sheet's own OCR labels, so it "
+                        "needs --map-id and Supabase credentials and declines without "
+                        "them")
+    p.add_argument("--no-drop-water", dest="drop_water", action="store_false",
+                   help="keep the polygons that are river surface: bare paper drawn "
+                        "over with sparse blue ripple, which the cream pass traces "
+                        "into long thin parcels across the whole river. Dropping them "
+                        "is the default and takes ~200 polygons off the 1882 sheet "
+                        "without moving land_plot or building a digit, because every "
+                        "one of them was a false positive. This removes geometry")
+    p.add_argument("--no-drop-slivers", dest="drop_slivers", action="store_false",
+                   help="keep polygons too stringy to be a parcel (outline circularity "
+                        f"below {MIN_CIRCULARITY}). On the 1882 sheet these are the shapes "
+                        "the cream pass traces between the river's ripple lines. "
+                        "Dropping them is the default: swept, and the traces do not "
+                        "notice — though the ceiling is two steps away, at 0.15 "
+                        "land_plot falls to 0.326. Removes geometry")
     p.add_argument("--explain", metavar="X,Y|TEXT",
                    help="after the run, say what happened at a point — either source "
                         "pixels as X,Y or a substring of an OCR label ('Prisons'), in "
@@ -1794,6 +2077,23 @@ def main() -> int:
                         "rows at different positions are what makes a named check "
                         "irreproducible. Answers KEPT from the run's own output and "
                         "re-derives the component only when nothing covers the point")
+    p.add_argument("--no-split-buildings", dest="split_buildings", action="store_false",
+                   help="stop after the parcels, without the within-block split. The "
+                        "split is on by default because it is the only thing that has "
+                        "moved `building` off the block prior's ceiling — 0.122 to "
+                        "0.278 mean and 1 to 5 traces over IoU 0.5, on fewer polygons. "
+                        "It has no precision figure yet, so turn it off if a consumer "
+                        "needs the block prior alone")
+    p.add_argument("--split-rg", type=float, default=SPLIT_RG,
+                   help="how much redder than its own parcel's wash a building is "
+                        f"(default {SPLIT_RG}, the measured median over the 17 traces)")
+    p.add_argument("--ocr-run-id",
+                   help="pin the OCR rows this pass reads — the water seeds, the "
+                        "furniture mask, the legend panel and --explain — to one run. "
+                        "Without it every run on the sheet is pooled, which is the "
+                        "default only so nothing existing moves: the 1882 sheet's 499 "
+                        "labels are three runs, so an object can seed the pass three "
+                        "times and re-OCR'ing a sheet silently changes its geometry")
     p.add_argument("--census", action="store_true", help="print the histogram and stop")
     p.add_argument("--out", help="output directory for blocks.geojson + blocks.run.json")
     p.add_argument("--self-check", action="store_true")
@@ -1828,6 +2128,23 @@ def main() -> int:
     rgb = np.asarray(pil, dtype=np.uint8)[..., :3]
     scale = source_w / rgb.shape[1]
     print(f"working image {rgb.shape[1]} x {rgb.shape[0]}, scale {scale:.2f} source px per render px")
+
+    rows = None
+    swatches = LEGEND_SWATCHES
+    if args.legend_swatches == "auto":
+        try:
+            if not args.map_id:
+                raise ValueError("--legend-swatches auto needs --map-id")
+            rows = furniture_rows(args.map_id, args.ocr_run_id)
+        except Exception as exc:                              # noqa: BLE001
+            # None, not [] — `furniture_mask` reads this same fetch below and
+            # treats an empty list as "the sheet has no title or legend labels",
+            # so a blip here would silently turn --drop-furniture into a no-op
+            # and report it as a property of the sheet.
+            rows = None
+            print(f"  legend swatches source: fallback ({exc})")
+        else:
+            swatches = legend_swatches(rgb, scale, rows)
 
     counts, edges = rg_histogram(rgb)
     if args.rg_split is not None:
@@ -1877,7 +2194,7 @@ def main() -> int:
     wet: list[tuple[float, float]] = []
     if args.map_id:
         try:
-            wet = water_points(args.map_id)
+            wet = water_points(args.map_id, args.ocr_run_id)
             print(f"{len(wet)} hydrology labels — oversized components holding one stay dropped")
         except Exception as exc:                                  # noqa: BLE001
             print(f"  (no hydrology labels: {exc})")
@@ -1920,7 +2237,7 @@ def main() -> int:
             print("  --drop-furniture needs --map-id; skipped", file=sys.stderr)
         else:
             try:
-                furn = furniture_mask(args.map_id)
+                furn = furniture_mask(args.map_id, rows=rows, run_id=args.ocr_run_id)
             except Exception as exc:                              # noqa: BLE001
                 furn = None
                 print(f"  (no furniture mask: {exc})")
@@ -1949,12 +2266,18 @@ def main() -> int:
     if args.swatch_labels:
         feats, changed, alpha, demoted = relabel_by_swatch(
             feats, rgb, scale, alpha=args.dilution, green=green, ink_v=args.ink,
-            hatch=args.hatch_coherence or None)
+            hatch=args.hatch_coherence or None, swatches=swatches)
         print(f"  legend key fitted at alpha {alpha:.2f} of full ink; "
               f"re-labelled {changed} of {len(feats)} polygons")
         if demoted:
             print(f"  {demoted} of them held ink that runs no one way — stipple, "
                   f"not a hatch — and took the nearest tint instead")
+
+    if args.split_buildings:
+        built = split_buildings(feats, rgb, scale, mpp, rg=args.split_rg, ink_v=args.ink)
+        print(f"  within-parcel split: {len(built)} buildings off "
+              f"{len(feats)} parcels")
+        feats = feats + built
 
     kinds: dict[str, int] = {}
     for f in feats:
@@ -1971,7 +2294,7 @@ def main() -> int:
                 print("  --explain by label needs --map-id", file=sys.stderr)
                 targets = []
             else:
-                targets = labels_matching(args.map_id, args.explain)
+                targets = labels_matching(args.map_id, args.explain, args.ocr_run_id)
                 if not targets:
                     print(f"  no OCR label contains {args.explain!r}")
         for text, cat, x, y in targets:
@@ -1993,6 +2316,10 @@ def main() -> int:
             "ink_fraction": round(ink_fraction, 4),
             "cream_ink": round(cream_ink_v, 3) if cream_ink_v is not None else None,
             "block_area_m2": [args.min_m2, args.max_m2] if mpp else None,
+            # Which OCR rows seeded the water, the furniture mask and the legend
+            # panel. null means every run on the sheet was pooled, which is a
+            # property of the run and not of the sheet — see `ocr_rows`.
+            "ocr_run_id": args.ocr_run_id,
         })
     else:
         print("(no --out, nothing written)")

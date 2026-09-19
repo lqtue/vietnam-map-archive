@@ -1534,3 +1534,137 @@ So the water pass is done at the edge it can reach: the shoreline where the
 river's own ripple runs is correct, and the water drawn **inside** a block is
 left to the segmenter. Recorded as a null, with the numbers, so the four axes
 are not re-attempted as stated.
+
+## 2026-09-19 (iv) — the legend's own swatches: coherence names paper, nothing else
+
+The previous section closed texture as a *boundary* discriminator. The open
+question it left was the other half — texture as a *class* discriminator, which
+is where `ink_coherence` already earns its keep (the hatch test), and whether
+the prototype in `LEGEND_SWATCHES` should therefore widen from `(r-g, r-b)` to
+carry a texture term.
+
+The legend box is the place to ask, because a swatch is the only labelled
+sample of each symbol on the sheet, drawn at the sheet's own scale by the same
+hand. Measured on the five outlined swatches in the `legend` region
+`[9681, 6961, 1754, 988]` of the 1882 sheet, at **native source resolution**
+(not a `--render` shrink — the hatch aliases away when shrunk), interiors inset
+4 px, `min_grad` 0.02, ink density at `INK_V` 0.55:
+
+| class | px | used | coherence | ink density |
+|---|---:|---:|---:|---:|
+| blue | 9,200 | 97.5% | 0.854 | 0.165 |
+| admin | 8,955 | 99.5% | **0.925** | **0.566** |
+| cream | 9,200 | 15.0% | **0.110** | 0.002 |
+| green | 9,154 | 94.5% | 0.795 | 0.003 |
+| salmon | 8,955 | 98.4% | 0.827 | 0.077 |
+
+The medians reproduce `LEGEND_SWATCHES` to ±0.008, so the five rectangles are
+the five swatches and not something else in the box.
+
+**Coherence separates printed-anything from bare paper, and nothing else.**
+Only cream is low; the other four sit inside a 0.79–0.93 band. The
+`admin`/`blue` gap of 0.072 is therefore not a separation — it is smaller than
+the 0.13 spread across four classes nobody would confuse by eye, and
+`green`/`blue` would "separate" by 0.059 on the same reasoning.
+
+**Why: every pigment class on this sheet is engraved as ruled line work.**
+Green is the case that proves it — 0.795 coherence on **0.3%** ink density,
+while **94.5%** of its pixels clear the gradient floor. Ink density and
+gradient coverage disagreeing by two orders of magnitude is only possible if
+the green *tint* is a fine ruling drawn below `INK_V`. It is not a wash. Nor
+are salmon and blue. Classes drawn the same way cannot be told apart by how
+they are drawn.
+
+**Ink density is the axis that does work**, and it recovers the ordering the
+`LEGEND_SWATCHES` comment already recorded (59.6 / 21.6 / 10.6):
+
+    admin 0.566  >  blue 0.165  >  salmon 0.077  >  green 0.003 ~ cream 0.002
+
+hatch / ruling / tint / paper in one number. Green and cream collapse there and
+split on hue only, so the `(r-g, r-b)` terms stay load-bearing.
+
+**So the prototype widens to `(r-g, r-b, ink_density)` and coherence stays out
+of it** — it keeps the two jobs it already has, the paper/not-paper answer here
+and the ripple/stipple gate in `ruling_mask`.
+
+### Two caveats on the numbers, both of which bear on the threshold
+
+- **Ink density is not scale-invariant.** These densities run 3–5 pp under the
+  recorded ones (blue 16.5% vs 21.6%, admin 56.6% vs 59.6%), almost certainly a
+  render-scale difference in the original sampling — the same effect as the
+  hatch aliasing away. That matters more now than it did when the axes were
+  hue: the discriminating axis has become the scale-dependent one. It is also
+  the argument for reading the swatches **off the sheet** rather than
+  hard-coding them, which was already the `ponytail:` upgrade at
+  `colour_blocks.py:915` — prototype and blocks then get measured at one
+  render and the scale cancels.
+- **Channel.** Measured on mean-channel grey, which is `ruling_mask`'s
+  convention (`colour_blocks.py:1100`); the `ink_coherence` call site in
+  `relabel_by_swatch` builds its gradient from max-channel V
+  (`colour_blocks.py:1436`). A coloured ruling carries less contrast in V than
+  in mean, but coherence is a ratio and scale-free, and green clears the 0.02
+  floor either way, so the null is not expected to move. Not re-measured under
+  V.
+
+Measured by `work/ocr/scripts/legend_probe.py`, which was kept — it exits
+non-zero when the detected medians disagree with `LEGEND_SWATCHES`, so the
+numbers above cannot be believed unless the five rectangles were found and
+ordered correctly. Its `find_swatches` is also the detector step (a) needs, so
+the script outlived the null it was written to measure. **Do not re-attempt
+coherence as a per-class axis as stated.**
+
+## 2026-09-19 (v) — the swatches can be read off the sheet, but only at 1:1
+
+Step (a) of the plan §(iv) left: stop hard-coding `LEGEND_SWATCHES` and measure
+the five swatches off the sheet's own legend panel at the run's render, so the
+key is per-sheet and the scale cancels between prototype and blocks. `(b)`, the
+`ink_density` third axis, is deliberately **not** in this change — it is the
+one scale-dependent axis, so widening the prototype before (a) works would bake
+in the unexplained 3–5 pp residual rather than remove it.
+
+`find_swatches` moved out of `legend_probe.py` into `colour_blocks.py` with
+`groups` and `longest_run`; the probe imports them, so there is one copy and
+the probe's ±0.04 exit gate still guards it. New `--legend-swatches
+{fixed,auto}`, **default `fixed`**, so nothing existing moves — under `fixed`
+the only change is that the key is passed as an argument instead of read as a
+global, and it is the same dict.
+
+**The detector does not survive the render, and that is the finding.** The
+panel is located from the largest `legend` OCR box (not a union — `legend` also
+tags the neatline annotations, the same trap `furniture_mask` records), cropped
+from the run's own array, and measured with the probe's 4 px inset. Resampling
+the cached 1882 panel to what each `--render` would hand it:
+
+| `--render` | scale | panel px | result |
+|---|---:|---:|---|
+| 12102 | 1.00 | 1754 | OK, max delta **0.008** → accepted |
+| 6051 | 2.00 | 877 | 5 of 10 borders → fallback |
+| 4096 | 2.95 | 594 | 5 of 10 borders → fallback |
+| 3000 | 4.03 | 435 | 3 of 10 borders → fallback |
+
+So `auto` is **inert at every render the pass actually runs at**, and the sheet
+is painted by the hard-coded key exactly as before. The cause is the row test
+and not the colour: a swatch outline is a thin rule, and once shrunk the bottom
+border of one box merges with the top of the next, so five stacked boxes stop
+yielding ten separated runs. The `2 * len(LEGEND_SWATCHES)` count is what
+rejects the panel, and it is right to — a mis-paired run mis-orders the classes,
+which would rename the sheet rather than fail it.
+
+**Not loosened on purpose.** The ±0.04 gate is the only thing between a wrong
+crop and a repainted sheet, and a detector that guessed which runs are shared
+would trade a safe fallback for a silent mis-assignment. The upgrade is a border
+finder that does not assume separated rules — match five boxes between six
+lines, shared edges allowed — and it is worth building with the second
+polychrome sheet, since until then `--render 12102` already answers it.
+
+One defect found in review and fixed: the auto path pre-fetches the OCR rows
+that `furniture_mask` also needs, and on a fetch error it was caching `[]`,
+which `furniture_mask` reads as *this sheet has no title or legend labels*. A
+blip would have turned `--drop-furniture` into a no-op and reported it as a
+property of the sheet. `None` now, so it refetches.
+
+Verified: `--self-check` OK, both modules import, and `legend_probe` still
+reproduces §(iv) to the digit on the cached panel — coherence 0.854 / 0.925 /
+0.110 / 0.795 / 0.827, ink 0.165 / 0.566 / 0.002 / 0.003 / 0.077, max median
+delta 0.008. Not run end to end: under the default `fixed` the touched path is
+provably the same dict, so there is no number to move.

@@ -225,7 +225,7 @@ def _coord_bounds(coords) -> tuple[float, float, float, float] | None:
 
 
 def blocks_to_seeds(features: list[dict]) -> list[dict]:
-    """`modern_prior --blocks` features → seeds, same shape as `rows_to_seeds`.
+    """A block prior's features → seeds, same shape as `rows_to_seeds`.
 
     Pure — see the self-check. A block is prompted by its own bounding box,
     which is what SAM2 is given here (`predictor.predict(box=...)`), so the
@@ -258,10 +258,18 @@ def blocks_to_seeds(features: list[dict]) -> list[dict]:
         # from a run's measured mask IoU rather than from taste.
         if w <= 0 or h <= 0:
             continue
+        # A *modern* block does not name an 1882 one, which is why `text` is
+        # empty and `category` was a constant. `colour_blocks.py` writes the
+        # same contract but reads its classes off the sheet's own legend —
+        # salmon is *propriétés particulières*, admin is *service local* — so
+        # when the prior carries a `feature_type`, carry it through. It is the
+        # only route by which C6's write-back can stamp a cadastral class on
+        # what SAM2 returns; dropping it here made that unreachable.
+        klass = ((feat or {}).get("properties") or {}).get("feature_type")
         seeds.append({
             "extraction_id": None,      # nothing in ocr_extractions to point at
-            "text": "",                 # a modern block does not name an 1882 one
-            "category": "block",
+            "text": "",
+            "category": str(klass) if klass else "block",
             "bbox": [x0, y0, w, h],     # full-image px, y-down
             "centroid": [x0 + w / 2, y0 + h / 2],
         })

@@ -16,6 +16,7 @@ sheet's own source pixels — what `inference_tiles_as_video.py` and
 
     python work/ocr/scripts/seg_eval.py run_a.json run_b.json
     python work/ocr/scripts/seg_eval.py --map-id <uuid> --types land_plot run.json
+    python work/ocr/scripts/seg_eval.py --window x,y,w,h run.json
 
 `cover` is the median share of a ground-truth polygon's area caught by the
 union of all predictions. It answers a different question from IoU and the two
@@ -110,7 +111,7 @@ AREAL_LABELS = ("institution", "place", "building")
 NEGATIVE_LABELS = ("street",)
 
 
-def load_labels(map_id: str) -> list[dict]:
+def load_labels(map_id: str, ocr_run_id: str | None = None) -> tuple[list[dict], dict[str, int]]:
     """(text, category, x, y) for every placed OCR label on a sheet.
 
     The 1882 sheet has 499 of these against 46 hand traces, and they cost
@@ -123,17 +124,52 @@ def load_labels(map_id: str) -> list[dict]:
 
     url = os.environ["PUBLIC_SUPABASE_URL"]
     key = os.environ["SUPABASE_SERVICE_KEY"]
-    rows = requests.get(
-        f"{url}/rest/v1/ocr_extractions",
-        params={"select": "text,category,global_x,global_y,global_w,global_h",
-                "map_id": f"eq.{map_id}"},
-        headers={"apikey": key, "Authorization": f"Bearer {key}"},
-        timeout=30,
-    ).json()
-    return [{"text": r.get("text") or "", "category": r.get("category") or "?",
-             "x": r["global_x"] + (r["global_w"] or 0) / 2.0,
-             "y": r["global_y"] + (r["global_h"] or 0) / 2.0}
-            for r in rows if r.get("global_x") is not None]
+    # PostgREST's default maximum is 1,000 rows. A dense sheet can exceed it,
+    # so one response is not a measurement of all OCR labels on the sheet.
+    params = {
+        "select": "text,category,global_x,global_y,global_w,global_h,run_id",
+        "map_id": f"eq.{map_id}",
+    }
+    if ocr_run_id:
+        params["run_id"] = f"eq.{ocr_run_id}"
+    page_size = 1000
+    def fetch_page(start: int) -> list[dict]:
+        response = requests.get(
+            f"{url}/rest/v1/ocr_extractions",
+            params=params,
+            headers={
+                "apikey": key,
+                "Authorization": f"Bearer {key}",
+                "Range-Unit": "items",
+                "Range": f"{start}-{start + page_size - 1}",
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        return response.json()
+    rows = paged_rows(fetch_page, page_size)
+    provenance: dict[str, int] = {}
+    labels = []
+    for r in rows:
+        run_id = r.get("run_id") or "(no run_id)"
+        provenance[run_id] = provenance.get(run_id, 0) + 1
+        if r.get("global_x") is not None:
+            labels.append({"text": r.get("text") or "", "category": r.get("category") or "?",
+                           "x": r["global_x"] + (r["global_w"] or 0) / 2.0,
+                           "y": r["global_y"] + (r["global_h"] or 0) / 2.0})
+    return labels, provenance
+
+
+def paged_rows(fetch_page, page_size: int = 1000) -> list[dict]:
+    """Read contiguous PostgREST-sized pages until the first short page."""
+    rows = []
+    start = 0
+    while True:
+        page = fetch_page(start)
+        rows.extend(page)
+        if len(page) < page_size:
+            return rows
+        start += page_size
 
 
 def label_cover(polys: list, labels: list[dict], probe: float = 120.0) -> list[float]:
@@ -163,9 +199,10 @@ def label_cover(polys: list, labels: list[dict], probe: float = 120.0) -> list[f
     return out
 
 
-def report_labels(map_id: str, runs: dict[str, list], found: float = 0.5) -> None:
+def report_labels(map_id: str, runs: dict[str, list], found: float = 0.5,
+                  ocr_run_id: str | None = None) -> None:
     """Recall over the named areal features, and leak over the street names."""
-    labels = load_labels(map_id)
+    labels, provenance = load_labels(map_id, ocr_run_id)
     if not labels:
         print(f"No placed OCR labels on {map_id}", file=sys.stderr)
         return
@@ -173,6 +210,9 @@ def report_labels(map_id: str, runs: dict[str, list], found: float = 0.5) -> Non
     for lab in labels:
         counts[lab["category"]] = counts.get(lab["category"], 0) + 1
     print("named labels: " + " · ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+    print("OCR label runs: " + " · ".join(
+        f"{run_id} {n}" for run_id, n in sorted(provenance.items())
+    ))
     areal = [l for l in labels if l["category"] in AREAL_LABELS]
     street = [l for l in labels if l["category"] in NEGATIVE_LABELS]
     print(f"\n== named-label coverage (areal {len(areal)} · street {len(street)}); "
@@ -245,6 +285,96 @@ def load_run(path: str) -> list:
     return polys
 
 
+def load_run_records(path: str) -> list[tuple[object, str]]:
+    """Usable run polygons with their optional feature type for window FPs."""
+    from shapely.geometry import Polygon
+    from shapely.validation import make_valid
+
+    doc = json.load(open(path, encoding="utf-8"))
+    records = []
+    for p in doc.get("polygons") or []:
+        coords = p.get("coords")
+        if coords and len(coords) >= 3:
+            geom = make_valid(Polygon(coords))
+            if not geom.is_empty:
+                records.append((geom, p.get("feature_type") or "unknown"))
+    return records
+
+
+def parse_window(value: str) -> tuple[float, float, float, float]:
+    """Parse a positive source-pixel x,y,w,h window."""
+    try:
+        x, y, width, height = (float(v) for v in value.split(","))
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--window needs x,y,w,h") from exc
+    if width <= 0 or height <= 0:
+        raise argparse.ArgumentTypeError("--window width and height must be positive")
+    return x, y, width, height
+
+
+def window_score(gt: list[tuple[str, object]], records: list[tuple[object, str]],
+                 window: tuple[float, float, float, float], threshold: float) -> dict:
+    """Precision/recall in an exhaustively traced source-pixel rectangle.
+
+    Both sides are clipped before IoU. An edge-spanning parcel is still one
+    real object in the window, and clipping both shapes removes only the area
+    neither side was asked to account for. Including whole shapes would lower
+    an otherwise matching edge prediction merely for its unobserved outside
+    portion; centroid ownership would discard it altogether. Boundary-only
+    touches have zero scoreable area and are excluded after clipping.
+    """
+    from shapely.geometry import box
+
+    x, y, width, height = window
+    area = box(x, y, x + width, y + height)
+    clipped_gt = [(kind, geom.intersection(area)) for kind, geom in gt if geom.intersects(area)]
+    clipped_gt = [(kind, geom) for kind, geom in clipped_gt if not geom.is_empty and geom.area > 0]
+    clipped_preds = [(geom.intersection(area), kind) for geom, kind in records if geom.intersects(area)]
+    clipped_preds = [(geom, kind) for geom, kind in clipped_preds if not geom.is_empty and geom.area > 0]
+    gt_best = [max((iou(geom, pred) for pred, _ in clipped_preds), default=0.0)
+               for _, geom in clipped_gt]
+    pred_best = [max((iou(pred, geom) for _, geom in clipped_gt), default=0.0)
+                 for pred, _ in clipped_preds]
+    matched_gt = sum(value >= threshold for value in gt_best)
+    matched_preds = sum(value >= threshold for value in pred_best)
+    recall = matched_gt / len(clipped_gt) if clipped_gt else 0.0
+    precision = matched_preds / len(clipped_preds) if clipped_preds else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    false_positives = sorted(
+        ((geom.area, kind, best) for (geom, kind), best in zip(clipped_preds, pred_best)
+         if best < threshold), reverse=True
+    )
+    return {
+        "n_gt": len(clipped_gt), "n_pred": len(clipped_preds), "matched_gt": matched_gt,
+        "matched_pred": matched_preds, "precision": precision, "recall": recall, "f1": f1,
+        "false_positives": false_positives,
+    }
+
+
+def report_window(gt: list[tuple[str, object]], paths: list[str],
+                  window: tuple[float, float, float, float], threshold: float) -> None:
+    """Print precision, recall and the largest unmatched predictions per run."""
+    x, y, width, height = window
+    print(f"\n== exhaustively traced window ({x:g},{y:g},{width:g},{height:g}); IoU ≥ {threshold:.2f}")
+    print(f"{'run':30s}{'n_gt':>7s}{'n_pred':>8s}{'precision':>11s}{'recall':>8s}{'F1':>7s}")
+    results = []
+    for path in paths:
+        name = Path(path).stem
+        result = window_score(gt, load_run_records(path), window, threshold)
+        results.append((name, result))
+        print(f"{name[:30]:30s}{result['n_gt']:7d}{result['n_pred']:8d}"
+              f"{result['precision']:11.2f}{result['recall']:8.2f}{result['f1']:7.2f}")
+    print("  Precision is meaningful only because every parcel in this window is traced; "
+          "it does not describe untraced parts of the sheet.")
+    for name, result in results:
+        rows = result["false_positives"]
+        print(f"\n  {len(rows)} false positives in {name}, largest clipped area first.")
+        for area, kind, best in rows[:20]:
+            print(f"    {area:10.0f} px²  {kind:<14} best IoU {best:.3f}")
+        if len(rows) > 20:
+            print(f"    ... and {len(rows) - 20} more")
+
+
 def score(gt: list, preds: list) -> dict:
     """Best IoU per ground-truth polygon, plus the union's coverage of it."""
     from shapely.ops import unary_union
@@ -285,7 +415,8 @@ def _report(groups: dict[str, list], runs: dict[str, list]) -> None:
 
 def run(args: argparse.Namespace) -> int:
     if args.labels:
-        report_labels(args.map_id, {Path(p).stem: load_run(p) for p in args.runs})
+        report_labels(args.map_id, {Path(p).stem: load_run(p) for p in args.runs},
+                      ocr_run_id=args.ocr_run_id)
         return 0
     gt = load_gt(args.map_id)
     if not gt:
@@ -328,6 +459,8 @@ def run(args: argparse.Namespace) -> int:
         groups["pooled — mixes granularities, do not quote"] = [g for _, g in gt]
 
     _report(groups, runs)
+    if args.window:
+        report_window(gt, args.runs, args.window, args.iou)
     return 0
 
 
@@ -371,6 +504,26 @@ def _self_check() -> None:
     bowtie = make_valid(Polygon([(0, 0), (10, 10), (10, 0), (0, 10)]))
     assert 0.0 <= score([unit], [bowtie])["mean"] <= 1.0
 
+    # Window precision clips both sides: the edge-spanning perfect match stays
+    # perfect, while the unrelated in-window square is the one false positive.
+    edge_gt = Polygon([(8, 0), (18, 0), (18, 10), (8, 10)])
+    extra = Polygon([(1, 1), (3, 1), (3, 3), (1, 3)])
+    window = window_score(
+        [("land_plot", edge_gt)], [(edge_gt, "plot"), (extra, "furniture")],
+        (0, 0, 10, 10), 0.3,
+    )
+    assert window["n_gt"] == 1 and window["n_pred"] == 2, window
+    assert window["precision"] == 0.5 and window["recall"] == 1.0, window
+    assert window["f1"] == 2 / 3 and window["false_positives"][0][1] == "furniture", window
+
+    # A dense OCR sheet cannot silently lose its second PostgREST page.
+    starts = []
+    pages = [[{}] * 1000, [{}, {}]]
+    def fake_page(start: int) -> list[dict]:
+        starts.append(start)
+        return pages.pop(0)
+    assert len(paged_rows(fake_page)) == 1002 and starts == [0, 1000]
+
     # The label probe: a box, not a point, because a label on a block's edge is
     # the failure it exists to catch (the Arsenal reads 0.74 that way).
     lab = [{"text": "X", "category": "institution", "x": 50.0, "y": 50.0}]
@@ -397,6 +550,13 @@ def main() -> int:
                         "traces: recall over the named areal features, and leak over "
                         "the street names. 499 labels against 46 traces on the 1882 "
                         "sheet, and they cost nothing — OCR has already run")
+    p.add_argument("--ocr-run-id",
+                   help="OCR extraction run to use with --labels; without it, all runs are "
+                        "pooled and their row counts are printed")
+    p.add_argument("--window", type=parse_window, metavar="x,y,w,h",
+                   help="exhaustively traced source-pixel rectangle for precision/recall")
+    p.add_argument("--iou", type=float, default=0.3,
+                   help="IoU match threshold for --window (default: 0.3)")
     p.add_argument("--pooled", action="store_true",
                    help="also print the pooled row, for comparison with older numbers")
     p.add_argument("--self-check", action="store_true")

@@ -2265,3 +2265,145 @@ Hôpital Maritime at 0.25 (admits it). None generalises.
 The discriminator is the *drawn outline* around the basin, not the fill, which
 is ink geometry and therefore SAM2's, not this pass's. Do not re-attempt these
 four as stated.
+
+### 2026-09-19 (iv) — the legend swatches: coherence is a paper detector
+
+No code change. §(iii) closed texture as a *boundary* discriminator; this
+closes it as a *per-class* one, which is the axis a widened `LEGEND_SWATCHES`
+prototype would have used. Measured on the five outlined swatches in the
+`legend` region `[9681, 6961, 1754, 988]` of the 1882 sheet at native source
+resolution, interiors inset 4 px, `min_grad` 0.02, ink density at `INK_V` 0.55:
+
+| class | coherence | ink density |
+|---|---:|---:|
+| blue | 0.854 | 0.165 |
+| admin | 0.925 | 0.566 |
+| cream | 0.110 | 0.002 |
+| green | 0.795 | 0.003 |
+| salmon | 0.827 | 0.077 |
+
+Medians reproduce `LEGEND_SWATCHES` to ±0.008, so the rectangles are right.
+
+**Coherence separates printed-anything from bare paper and nothing else** —
+four classes inside a 0.79–0.93 band, so `admin`/`blue` at 0.072 apart is
+narrower than the 0.13 spread across classes that are unmistakable by eye.
+Green is why: **0.795 coherence on 0.3% ink density**, with 94.5% of its pixels
+clearing the gradient floor, which is only possible if the green tint is a fine
+ruling below `INK_V` rather than a wash. Every pigment class on this sheet is
+engraved line work, so none of them can be told apart by how ruled it is.
+
+**Ink density does work** — admin 0.566 > blue 0.165 > salmon 0.077 > green
+0.003 ≈ cream 0.002, i.e. hatch / ruling / tint / paper, consistent with the
+59.6 / 21.6 / 10.6 in the `LEGEND_SWATCHES` comment. Green and cream split on
+hue only. So the prototype widens to `(r-g, r-b, ink_density)`; coherence stays
+where it already pays, as the hatch test and as `ruling_mask`'s stipple gate.
+
+Two caveats before any threshold is derived from this: these densities run
+**3–5 pp under** the recorded ones (blue 16.5% vs 21.6%, admin 56.6% vs 59.6%),
+i.e. ink density is render-scale-dependent, which is now the argument for
+reading the swatches off the sheet instead of hard-coding them
+(`colour_blocks.py:915`); and coherence here is on mean-channel grey
+(`ruling_mask`'s convention, `:1100`) where the `ink_coherence` call site uses
+max-channel V (`:1436`) — scale-free ratio, green clears the floor either way,
+not re-measured. Full working: `docs/journals/260918-colour-blocks.md` §(iv).
+**Do not re-attempt coherence as a per-class axis as stated.**
+
+### 2026-09-19 (v) — `--legend-swatches auto`, and why it is off by default
+
+Code change, no score change. Step (a) of the §(iv) plan: read the five legend
+swatches off the sheet's own panel at the run's render instead of hard-coding
+one sheet's. `find_swatches` moved from `legend_probe.py` into
+`colour_blocks.py` (one copy; the probe imports it and keeps its ±0.04 exit
+gate). Panel located as the **largest** `legend` OCR box — not a union, since
+`legend` also tags the neatline annotations.
+
+**`auto` falls back at every render this pass uses**, so the sheet is still
+painted by the hard-coded key. Cached 1882 panel resampled to each `--render`:
+
+| `--render` | scale | result |
+|---|---:|---|
+| 12102 | 1.00 | max delta **0.008**, accepted |
+| 6051 | 2.00 | 5 of 10 borders → fallback |
+| 4096 | 2.95 | 5 of 10 borders → fallback |
+| 3000 | 4.03 | 3 of 10 borders → fallback |
+
+A swatch outline is a thin rule; shrunk, one box's bottom border merges with
+the next box's top, so five stacked boxes stop yielding ten separated runs.
+The border count rejects the panel and should — a mis-paired run mis-orders
+the classes, i.e. renames the sheet instead of failing. **Do not loosen the
+count to make `auto` fire**; the upgrade is a finder that allows shared edges
+(five boxes between six lines), worth building with the second polychrome
+sheet.
+
+`ink_density` as a third prototype axis is **not** in this change: it is the
+scale-dependent axis, and widening the prototype before (a) actually measures
+at run scale would bake in §(iv)'s unexplained 3–5 pp residual.
+
+Default `fixed`, and under it the key is the same dict passed as an argument
+rather than read as a global, so `land_plot` and `building` cannot move.
+Verified: `--self-check` OK, both modules import, `legend_probe` reproduces
+§(iv) to the digit. Detail: `docs/journals/260918-colour-blocks.md` §(v).
+
+## 2026-09-19 — the within-parcel split: `building` 0.122 → 0.355
+
+The block prior's standing ceiling was that a parcel legitimately holds several
+buildings, so the ink was found and the subdivision was not — `building` 0.122
+against `land_plot` 0.331, at cover 1.00. `colour_blocks.py` now splits each
+finished parcel on **its own** wash, and that is the whole of the change.
+
+`--render 6051`, whole 1882 sheet, all passes at their defaults, +3 s on an
+80 s run. CPU, no GPU, no checkpoint, and trained on nothing.
+
+| run | n | @.5 | @.3 | mean | med | cover |
+|---|---:|---:|---:|---:|---:|---:|
+| **building (n=17 volunteer traces)** | | | | | | |
+| blocks + parcels | 888 | 1 | 3 | 0.122 | 0.050 | 1.00 |
+| **+ within-parcel split** | **1443** | **5** | **9** | **0.355** | **0.314** | 1.00 |
+| SAM2 LoRA on the 4 m modern prior | 950 | — | — | 0.160 | — | 0.98 |
+| **land_plot (n=24)** | | | | | | |
+| blocks + parcels | 888 | 6 | 7 | 0.331 | 0.218 | 0.98 |
+| + within-parcel split | 1443 | 6 | 8 | 0.343 | 0.232 | 0.98 |
+| **areal (n=41)** | 1443 | 7 → **11** | 10 → **17** | 0.245 → **0.348** | | 1.00 |
+
+`road` 0.137 cover 0.14, `waterway` 0.582 cover 0.99 and label recall 0.78 all
+hold to the digit, as they must — the split only adds geometry inside parcels
+that were already claimed.
+
+**The n column, for the fourth time in this file.** 1443 against 888 is 1.6×,
+and `score()` takes the best match per trace, so the *mean* can rise on count
+alone. `land_plot` is the control for exactly that and moves 0.331 → 0.343,
+which is the size of the count effect. What count cannot buy is the **median**,
+0.050 → **0.314**, or **@0.5, 1 → 5**. Those are the defensible numbers.
+
+### Two corrections to P3, both measured before the code was written
+
+**No building on this sheet is in a salmon polygon.** P3 was scoped to splitting
+the salmon class, on the reading that a building stands on a *propriétés
+particulières* plot. Of the 17 traces, **15 are inside a cream polygon, 2 inside
+a green one, 0 inside a salmon one** — the rule as planned could not have
+reached one trace. The split runs over every class.
+
+**The delta is local.** P3's retracted null looked for two reds in the sheet's
+own histogram. What exists is per parcel: a trace's ink-excluded wash against
+its parent's, median **+0.035**, 10 of 17 positive. The baseline is therefore
+each polygon's own median and the sheet-wide trough is not used. That is why
+threshold work at sheet level never found it.
+
+### The seven it misses, and the ink null
+
+Four traces are *darker* than their parcel (ink 0.21–0.44 against an open
+parcel's 0.05–0.09) — the sheet's second building convention, a dense black
+fill whose own ink drags its wash median below the plot's. Three differ from
+their surroundings in neither colour nor ink. **An `r − g` OR ink-density
+candidate mask was tried and is a null**: dense ink is also the lettering, the
+hatching and every block outline, so the component count explodes sheet-wide.
+Do not re-attempt as stated.
+
+### Outstanding, and stated because it bounds everything above
+
+- **No precision figure.** 1443 predictions against 46 traces, and this file's
+  metric cannot see a prediction that matched nothing. `seg_eval --window` now
+  exists for exactly this and needs one exhaustively traced window.
+- **`--split-rg` is one measured point, not a swept plateau.** 0.020 / 0.050 /
+  0.070 was started and abandoned; a higher threshold is *slower*, because it
+  fragments the redder core into more components.

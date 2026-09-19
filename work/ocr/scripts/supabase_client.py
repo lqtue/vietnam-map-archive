@@ -209,8 +209,20 @@ def upsert_ocr_extractions(map_id: str, run_id: str, rows: list[dict[str, Any]])
 
     return total
 
+PAGE = 1000    # PostgREST's default ceiling, and its maximum without server config
+
+
 def fetch_ocr_extractions(map_id: str, run_id: str | None = None) -> list[dict[str, Any]]:
-    """Fetch extractions for a map (and optionally a specific run)."""
+    """Fetch extractions for a map (and optionally a specific run).
+
+    **Paged, because one response is not the sheet.** PostgREST caps a request
+    at 1,000 rows and says so only in the `content-range` header, so an
+    unpaged read of a dense sheet returns a truncated list that looks exactly
+    like a complete one. Measured 2026-09-19 against production: 4 of the 22
+    sheets with extractions are over the cap, the 1942 Plan de Saigon-Cho Lon
+    at 4,287 rows, so this silently dropped 77% of that sheet to every caller —
+    the label join, the furniture mask and the water seeds alike.
+    """
     url, key = _load_config()
     endpoint = f"{url}/rest/v1/ocr_extractions?map_id=eq.{map_id}"
     if run_id:
@@ -222,11 +234,16 @@ def fetch_ocr_extractions(map_id: str, run_id: str | None = None) -> list[dict[s
         "Authorization": f"Bearer {key}",
     }
 
-    resp = requests.get(endpoint, headers=headers, timeout=30)
-    if not resp.ok:
-        raise requests.HTTPError(f"{resp.status_code} fetch failed: {resp.text}", response=resp)
-    
-    data = resp.json()
+    data: list[dict[str, Any]] = []
+    while True:
+        resp = requests.get(f"{endpoint}&limit={PAGE}&offset={len(data)}",
+                            headers=headers, timeout=30)
+        if not resp.ok:
+            raise requests.HTTPError(f"{resp.status_code} fetch failed: {resp.text}", response=resp)
+        page = resp.json()
+        data += page
+        if len(page) < PAGE:
+            break
     # Normalize DB fields to match what ocr.py expects internally
     # DB has (global_x, global_y, global_w, global_h)
     for row in data:

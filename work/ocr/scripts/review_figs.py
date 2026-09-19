@@ -17,13 +17,15 @@ checks.
 
 Two runs, and every figure says which one it came from:
 
-    AFTER   the current default: --cream --drop-furniture --drop-water
-            --drop-slivers --swatch-labels, and --recut. 888/352/56.
-    BEFORE  the run as it shipped at 9a2fe561: --no-recut, and the wash cut
-            with no minimum component size. 798/203/43.
+    AFTER   the current default: every pass on, --recut, and the within-parcel
+            building split. 1443/352/56 — 888 blocks and parcels plus 555
+            buildings read out of them.
+    BEFORE  the run as it shipped at 9a2fe561: --no-recut, the wash cut with no
+            minimum component size, and no split. 798/203/43.
 
 Colours: orange = kept, blue outline = dropped, blue tint = the water region,
-green tint = the land mask that bounds it.
+green tint = the land mask that bounds it. In AFTER the small orange rings
+inside a parcel are the split's buildings.
 
 The PNGs are ~3 MB each and stay out of git — the record is this script plus
 the journal, not 164 MB of history.
@@ -88,7 +90,8 @@ def splits(rgb: np.ndarray):
     return split, cool, green
 
 
-def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, recut: bool):
+def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, recut: bool,
+             split_buildings: bool = True):
     """main()'s order, with the full flag set. Returns (kept, drowned, slivers, all)."""
     px_area_m2 = (mpp * scale) ** 2
     feats, _ = cb.blocks_from_colour(rgb, split, scale, mpp=mpp, cool=cool, green=green,
@@ -107,6 +110,8 @@ def pipeline(rgb, scale, *, split, cool, green, mpp, wet, furn, recut: bool):
     slivers = [f for f, t in zip(kept, thin) if t]
     kept = [f for f, t in zip(kept, thin) if not t]
     kept, *_ = cb.relabel_by_swatch(kept, rgb, scale, green=green, hatch=cb.HATCH_COHERENCE)
+    if split_buildings:
+        kept = kept + cb.split_buildings(kept, rgb, scale, mpp)
     return kept, drowned, slivers, feats
 
 
@@ -186,11 +191,12 @@ def main() -> int:
     runs, counts = {}, {}
     wash_min = cb.WATER_WASH_MIN_PX
     try:
-        for tag, recut, wash in (("after", True, wash_min), ("before", False, 0)):
+        for tag, recut, wash, sb in (("after", True, wash_min, True),
+                                     ("before", False, 0, False)):
             cb.WATER_WASH_MIN_PX = wash
             kept, drowned, slivers, allf = pipeline(
                 rgb, scale, split=split, cool=cool, green=green, mpp=mpp,
-                wet=wet, furn=furn, recut=recut)
+                wet=wet, furn=furn, recut=recut, split_buildings=sb)
             counts[tag] = (len(kept), len(drowned), len(slivers))
             runs[tag] = (kept, drowned, slivers, region_masks(allf, rgb, scale, wet))
             print(f"{tag:6s}: {len(kept)} kept, {len(drowned)} water, {len(slivers)} slivers")

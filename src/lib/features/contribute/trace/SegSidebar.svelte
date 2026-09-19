@@ -85,12 +85,16 @@
             placeholder="/content/drive/MyDrive/…"
           />
         </label>
-        {#if status?.ocr_run_id}
+        {#if status?.ocr_run_id || config.priorPath}
           <label class="seg-field">
             <span>MapSAM2 dir</span>
             <input type="text" bind:value={config.mapsam2Dir} placeholder="/content/MapSAM2" />
           </label>
         {/if}
+        <label class="seg-field">
+          <span>Colour-block prior (optional)</span>
+          <input type="text" bind:value={config.priorPath} placeholder="/content/blocks.geojson" />
+        </label>
         <div class="seg-row">
           <label class="seg-field seg-field--inline">
             <span>Encoder</span>
