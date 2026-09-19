@@ -204,8 +204,6 @@ RG_RANGE = (-0.10, 0.26)
 # RG_BINS and invisible.
 RG_FINE_BINS = 48
 RG_FINE_RANGE = (-0.05, 0.19)
-HULL_RATIO = 0.4
-MAX_HULL_POINTS = 600
 
 
 # ── colour ───────────────────────────────────────────────────────────────────
@@ -425,36 +423,73 @@ def dominant_class(masks: dict[str, np.ndarray], sel: np.ndarray,
 
 # ── geometry ─────────────────────────────────────────────────────────────────
 
-def component_polygon(sub: np.ndarray, ox: int, oy: int, scale: float,
-                      ratio: float = HULL_RATIO):
+def component_polygon(sub: np.ndarray, ox: int, oy: int, scale: float):
     """One component mask → a shapely polygon in full-image source pixels.
 
-    The ring comes from a concave hull over the component's boundary pixels,
-    decimated to `MAX_HULL_POINTS`. A block is a trapezoid or an L; a convex
-    hull swallows the notch of the L and a per-pixel trace carries a thousand
-    vertices SAM2 will never look at, since `blocks_to_seeds` reads the bounds
-    and throws the ring away. The hull is the middle that costs one call.
+    Follow exposed pixel edges, with the occupied pixel on the right. Unlike a
+    hull this preserves a quay's bends, parcel corners, and gaps inside a block.
+    Simplification removes the one-pixel stair steps after the topology is known.
     """
-    inner = ndimage.binary_erosion(sub, np.ones((3, 3), bool))
-    ys, xs = np.nonzero(sub & ~inner)
-    if len(xs) < 4:
+    if not sub.any():
         return None
-    if len(xs) > MAX_HULL_POINTS:
-        step = len(xs) // MAX_HULL_POINTS + 1
-        xs, ys = xs[::step], ys[::step]
+    padded = np.pad(sub, 1)
+    ys, xs = np.nonzero(sub)
+    edges: dict[tuple[int, int], list[tuple[int, int]]] = {}
 
-    pts = np.column_stack([(xs + ox) * scale, (ys + oy) * scale]).astype(float)
-    try:
-        geom = shapely.concave_hull(shapely.MultiPoint(pts), ratio=ratio)
-    except Exception:
-        geom = None
-    if geom is None or geom.is_empty or geom.geom_type != "Polygon":
-        # Collinear or degenerate: a box still prompts, and is still scoreable.
-        x0, y0, x1, y1 = pts[:, 0].min(), pts[:, 1].min(), pts[:, 0].max(), pts[:, 1].max()
-        if x1 <= x0 or y1 <= y0:
-            return None
-        geom = shapely.box(x0, y0, x1, y1)
-    geom = geom.simplify(max(scale, 1.0))
+    def add(a: tuple[int, int], b: tuple[int, int]) -> None:
+        edges.setdefault(a, []).append(b)
+
+    for y, x in zip(ys, xs):
+        if not padded[y, x + 1]:
+            add((x, y), (x + 1, y))
+        if not padded[y + 1, x + 2]:
+            add((x + 1, y), (x + 1, y + 1))
+        if not padded[y + 2, x + 1]:
+            add((x + 1, y + 1), (x, y + 1))
+        if not padded[y + 1, x]:
+            add((x, y + 1), (x, y))
+
+    rings = []
+    while edges:
+        start = next(iter(edges))
+        ring = [start]
+        here = start
+        direction = (0, -1)
+        while True:
+            options = edges[here]
+            # At a diagonal touch, keep the occupied pixel on the right.
+            def turn(end):
+                step = (end[0] - here[0], end[1] - here[1])
+                cross = direction[0] * step[1] - direction[1] * step[0]
+                dot = direction[0] * step[0] + direction[1] * step[1]
+                return (cross == 1, dot == 1, cross == -1)
+            end = max(options, key=turn)
+            options.remove(end)
+            if not options:
+                del edges[here]
+            direction = (end[0] - here[0], end[1] - here[1])
+            here = end
+            ring.append(here)
+            if here == start:
+                break
+        if len(ring) >= 5:
+            rings.append(ring)
+    if not rings:
+        return None
+
+    def signed_area(ring):
+        return sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(ring, ring[1:]))
+
+    outer = max(rings, key=signed_area)
+    holes = [r for r in rings if r is not outer and signed_area(r) < 0]
+    def source(ring):
+        return [((x + ox) * scale, (y + oy) * scale) for x, y in ring]
+    geom = shapely.Polygon(source(outer), [source(r) for r in holes])
+    if not geom.is_valid:
+        geom = shapely.make_valid(geom)
+    if geom.geom_type != "Polygon" or geom.is_empty:
+        return None
+    geom = geom.simplify(max(scale, 1.0), preserve_topology=True)
     return geom if geom.geom_type == "Polygon" and not geom.is_empty else None
 
 

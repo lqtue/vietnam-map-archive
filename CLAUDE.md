@@ -28,7 +28,7 @@ npm run format       # prettier --write .
 npm run test         # Playwright smoke suite, read-only (354 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
-npm run test:write   # Write-path smokes against that local stack (31 tests)
+npm run test:write   # Write-path smokes against that local stack (33 tests)
 npm run deploy       # Build + deploy to Cloudflare Pages via wrangler
 npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 ```

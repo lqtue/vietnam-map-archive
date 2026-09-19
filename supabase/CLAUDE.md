@@ -45,11 +45,15 @@ password; use the Dashboard SQL Editor or `db push` instead of pulling. Repair m
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 31 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 33 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done
 by letting `@supabase/ssr` mint the session cookies, so chunking and encoding match the app exactly.
+
+CI runs the same two commands on every PR (`.github/workflows/ci.yml`, job `write`) — a
+GitHub runner has Docker natively, so the suite is verified there even when the machine
+writing the migration cannot start the stack at all.
 
 Local ports are **54421** for the API and **54420** for the shadow DB, not the CLI defaults —
 54321/54320 collide with another local project. `-x vector -x logflare` is needed under colima:
