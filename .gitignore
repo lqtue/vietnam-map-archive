@@ -58,3 +58,6 @@ work/tonkin/sources/ign-serie-*.json
 # the rows the run wrote to the database, not the transcript of it writing them.
 work/ocr/logs/
 work/tonkin/*.log
+
+# outreach ledger + personal application material — never publish
+docs/private/
