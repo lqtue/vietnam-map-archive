@@ -40,3 +40,32 @@ jobs:
       - run: npm run test
         env:
           PURE_ONLY: '1'
+
+  # The write half, which `verify` above deliberately cannot do: 31 checks that
+  # sign in, POST through the server routes and read the rows back. They need a
+  # real Supabase — auth, PostgREST and the `extensions` PostGIS schema the
+  # place migrations call into — so they get the local stack, seeded fresh.
+  #
+  # A GitHub runner has Docker natively, which is the whole reason this lives
+  # here rather than on a laptop. `.env.test` holds the CLI's published demo
+  # keys, so nothing secret crosses a fork's PR run, and `write.spec.ts` throws
+  # unless PUBLIC_SUPABASE_URL is loopback — production cannot be reached from
+  # this job even by accident.
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: npm ci
+      - run: cp .env.test .env
+      # Same command as a laptop runs, so the two stacks cannot drift:
+      # `supabase start -x vector -x logflare` plus the fixture seed.
+      - run: npm run db:test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:write
