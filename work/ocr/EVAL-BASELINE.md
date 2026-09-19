@@ -2251,3 +2251,17 @@ and the Arsenal's dry docks and basins are each inside a compact block, so
 `land_mask` subtracts them and no label can seed them. The garden's *stream* is
 a different case and is not recoverable here: 0.147 against the stipple's
 0.153, the same number at this render.
+
+### 2026-09-19 (iii) — pattern axes on the Arsenal edge: four nulls
+
+No code change. The remaining Arsenal defect (the boundary is the block
+polygon's chord, and the dry docks inside the yard read as land) was tested
+against four per-cell texture axes, apron (land) vs basins (water):
+coherence **0.842 / 0.948**, washless paper **6.2% / 6.7%**, ink density
+**0.078 / 0.021**, and the multi-scale ratio c128/c16 **0.55 / 0.23** — which
+separates those two but scores the open river at 0.77 (drops it) and the
+Hôpital Maritime at 0.25 (admits it). None generalises.
+
+The discriminator is the *drawn outline* around the basin, not the fill, which
+is ink geometry and therefore SAM2's, not this pass's. Do not re-attempt these
+four as stated.

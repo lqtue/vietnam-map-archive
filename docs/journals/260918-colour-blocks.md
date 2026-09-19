@@ -1489,3 +1489,48 @@ lie over the narrow water the same pass just rescued.
 
 So the default trades creek coverage for the Arsenal. Both defects are real and
 the flag cannot fix both; the enclosed-water upgrade above is what would.
+
+## 2026-09-19 (iii) — four pattern axes on the Arsenal edge, and all four are null
+
+Reported with a zoom on the quay: the water/land boundary is a **straight
+orange chord**, which is the block polygon's edge, because `water_region` cuts
+the region with `solid &= ~land_mask(...)`. The shoreline is therefore a
+polygon edge and not the drawn ripple, and the basins cut into the yard are
+inside that polygon, so they are land. Asked directly: *we only use colour —
+how about patterns?*
+
+Patterns are already in — `ruling_mask` is a texture measure — so the question
+is whether a texture rule can lift the land mask's veto where the pattern says
+*water*. Four axes, all measured per 16 px cell on the 1882 sheet, and the two
+windows that matter are **arsenal apron** (land, hatched) and **arsenal
+basins** (water, the dry docks cut into it):
+
+| axis | apron | basins | verdict |
+|---|---:|---:|---|
+| coherence (is it ruled) | 0.842 | 0.948 | **null** — both are ruled; the apron *is* hatched |
+| washless paper (r−b ≥ 0.10) | 6.2% | 6.7% | **null**, and it admits admin hatch at 76% |
+| coherence c128/c16 (does it curve) | 0.55 | 0.23 | separates *these two* and **breaks elsewhere** |
+| ink density (sparse vs dense) | 0.078 | 0.021 | **null** — overlapping, and the Champ goes 91% |
+
+The multi-scale ratio is the interesting failure. A hatch is straight at every
+scale and a ripple curves, which is true of the creek (0.18) and the lake
+(0.12) — but the **open river reads 0.77**, because over 128 render px its
+ripple is nearly straight, and the **Hôpital Maritime reads 0.25**, like water.
+It would drop the river and admit the hospital: backwards on the two cases that
+carry the pass.
+
+Ink density fails for the reason the legend already gave — the hatch classes
+are dense *in their swatch* — but on the ground the apron's hatching is broken
+by buildings and roads and its per-cell density lands on the ripple's.
+
+**What this closes.** The Arsenal's remaining edge is not separable by any
+per-cell texture statistic measured here, and per-cell texture is what a
+colour pass can see. What actually distinguishes the basin from the apron is
+that the sheet *draws a line around the basin* — the evidence is the outline,
+not the fill. Reading an outline is ink geometry, which is C6's standing
+conclusion for the within-block split and is SAM2's job, not this pass's.
+
+So the water pass is done at the edge it can reach: the shoreline where the
+river's own ripple runs is correct, and the water drawn **inside** a block is
+left to the segmenter. Recorded as a null, with the numbers, so the four axes
+are not re-attempted as stated.
