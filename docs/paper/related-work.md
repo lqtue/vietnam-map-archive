@@ -444,11 +444,71 @@ each individually sound and collectively blind to one class of error by virtue o
 
 ---
 
+## §5 Two citations verified from the audit's asserted list
+
+Partial progress on Phase 1 item 1. Two of the seven taken; the other five are listed as still
+open at the bottom of this file, deliberately un-fudged.
+
+### Tyagi & Dubey — real, correctly attributed, and **its numbers cannot be quoted**
+
+The plan calls this *"the closest published work to C2"* and says it must be engaged directly. The
+record resolves and the attribution is sound:
+
+> Tyagi, P. & Dubey, V. **Automated Georeferencing of Topographic Maps via OCR and In-Context
+> Multimodal LLM Reasoning.** Springer Nature Switzerland, pp. 99–113.
+> `10.1007/978-3-032-08511-5_8`
+
+| | |
+|---|---|
+| authors | Pallavi Tyagi, Vishal Dubey — **as our notes say**, unlike MapSAM2 |
+| venue | NCVPRIPG 2025 proceedings, published by Springer; scite dates the volume **2026** |
+| access | **closed.** `contentDenied: true`, `oaStatus: "closed"`, no full text and no abstract served. Orderable at about $37.95 |
+
+**The problem.** `docs/field-comparison.md` and the plan attribute specific figures to it — *internal
+RMSE < 5 m, validation < 30 m on 11 of 12 sheets, < 350 s per sheet*. **None of those can be
+verified**, because nothing of the paper's body is readable through scite and the abstract was not
+served either. They are in the same position the MapSAM2 "+12.8% F1" claim was in, and they get the
+same treatment:
+
+> **Do not quote Tyagi & Dubey's numbers.** Cite the work as the nearest published approach to C2 —
+> printed graticule coordinates read by OCR plus multimodal LLM reasoning — and attribute no figure
+> to it until someone has read it.
+
+**This is a decision for Tue, not one to default.** It is the single closest paper to our own method
+and it is the one paper in the set we cannot read for free. Either $37.95 buys the ability to
+position C2 honestly against it, or C2 is written to engage it by method and not by number. The
+second is defensible; the first is better. Worth resolving before Phase 3, not during it.
+
+### The GPT-4o legend paper — verified, and it is Paper 2's, not Paper 1's
+
+> Kirsanova, S., Chiang, Y.-Y. & Duan, W. (2025). **Detecting Legend Items on Historical Maps Using
+> GPT-4o with In-Context Learning.** arXiv. `10.48550/arxiv.2510.08385` — open access, green.
+
+| | |
+|---|---|
+| method | LayoutLMv3 for layout detection + GPT-4o with in-context learning, linking legend items to their descriptions by bounding-box prediction |
+| figures | **88% F-1 and 85% IoU**, GPT-4 with structured JSON prompts against their baseline |
+| reported to affect performance | prompt design, number of examples, layout alignment |
+| context | part of **DIGMAPPER**, under the DARPA **CriticalMAAS** programme |
+| Yao-Yi Chiang | also an author of Uhl, Leyk & Chiang (2018) already in our list — same group, two of our references |
+
+Relevant to us because **structured JSON prompting beating a baseline, and prompt design mattering
+independently of the model, is the same result as Paper 2's "model moves the boxes, prompt moves the
+reading"** on one square. Cite it there. It has nothing to say about Paper 1 and should not be
+padded into §2.
+
+---
+
 ## Still to do in Phase 1
 
-- [ ] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
-      `docs/field-comparison.md` §Sources (mapKurator, ICDAR 2025 MapText, the GPT-4o legend paper,
-      Bahgat & Runfola, Ingensand et al., the Jerusalem CaGIS 2025 paper, Tyagi & Dubey NCVPRIPG 2025).
+- [~] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
+      `docs/field-comparison.md` §Sources. **2 of 7 done 2026-09-19 — see §5 above.**
+      - [x] **Tyagi & Dubey** — DOI and authorship verified; **closed access, numbers unverifiable**,
+            and a decision is pending on whether to buy it (§5).
+      - [x] **The GPT-4o legend paper** — verified as Kirsanova, Chiang & Duan (2025), 88% F-1 /
+            85% IoU. Belongs to Paper 2, not Paper 1 (§5).
+      - [ ] mapKurator · [ ] ICDAR 2025 MapText · [ ] Bahgat & Runfola · [ ] Ingensand et al. ·
+            [ ] the Jerusalem CaGIS 2025 paper.
 - [x] **Read Luft & Schiewe (2021) *Transactions in GIS* in full — done 2026-09-19. Notes and the
       drafted §2 paragraph are in *§2 Related Work* above.**
 - [x] **Read Janata & Cajthaml (2020) in full — done 2026-09-19.** Notes, the 23-vs-4 exclusion
