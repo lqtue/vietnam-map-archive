@@ -54,6 +54,73 @@ Measured budget, from the 49 calls already logged in `work/ocr/outputs/*/runs/*/
 - [ ] 3b. **Deferred on purpose: `--auto-priority` in the worker.** The flag exists in `ocr.py batch` and would let a sheet nobody triaged still skip its blank and water tiles. That is the automation, and the decision (2026-09-04) is to do the first sheets by hand first, so there is a human-triaged baseline to judge the automatic grid against. Reopen once ~5 sheets have been triaged and OCR'd by hand. Exit: on a triaged sheet, `--auto-priority` picks a grid within a tile or two of the human one.
 - [ ] 3c. **A second API key, and know the tier.** `.env` holds one `GEMINI_API_KEY`; `gemini_client.py` already rotates across `GEMINI_API_KEYS` (comma-separated) when one exhausts its daily quota, and 38 maps unattended is precisely the run that needs the spare. Google no longer publishes per-model RPM/TPM/RPD — read the real limits at <https://aistudio.google.com/rate-limit> before starting. Exit: `GEMINI_API_KEYS` set with two keys, and the tier's daily request cap written down here.
 
+### Map image-processing system — planned 2026-09-19
+
+The archive already has most of the processing stages: image preparation,
+georeference proposals, OCR, shape extraction, map joins and publication. The
+work now is to connect their evidence and make it clear which result is ready,
+which needs review, and which becomes stale after an upstream correction.
+
+Each result should retain its source image, input runs, settings, coordinate
+space, checks and acceptance decision. A completed job is not necessarily an
+accepted result. Keep source-pixel OCR and shapes even when a map's geographic
+placement changes; update their ground coordinates from the accepted transform.
+A replaced scan invalidates pixel work as well.
+
+The system has two kinds of checks. Relative checks ask whether neighbouring
+sheets join. Absolute checks ask whether a sheet is in the right place. Both
+are necessary: seams found L7014's mixed-datum fault, while the lattice and
+geographic audits catch a group of sheets shifted together. Appearance checks,
+such as colour and brightness differences, are separate from geographic fit.
+
+- [ ] **I1 — Show the next action for each sheet.** Extend the existing staff
+  status view with the next eligible action and an explanation of what blocks
+  it. Reuse `map_pipeline_status` and the review marks; do not build a second
+  queue. Exit: an operator can see whether a sheet needs a worker, a person,
+  an image repair or a placement check without reconstructing its history.
+
+- [ ] **I2 — Preserve OCR merge evidence.** `ensemble_items()` currently keeps
+  the largest self-reported confidence even though confidence is not comparable
+  across prompts, while pass agreement is reduced to `n_passes` and a note.
+  Retain every contributing run, reading and box alongside the selected result;
+  store agreement as structured data, not prose. Replay saved run directories
+  into a report before changing database writes. Exit: a reviewer can see why
+  two readings agree or disagree, and every reported signal traces to a run.
+
+- [ ] **I3 — Rebuild and verify L7014.** The live `l7014-20260913` mosaic is
+  known to contain sheets about 470 m out of place. Run the committed datum
+  fix through warp, tile and upload; require `fit` and `geo_audit.mjs` before
+  treating the new build as usable. Preserve the old build until the replacement
+  passes. Exit: the rebuilt archive clears its placement and seam gates.
+
+- [ ] **I4 — Measure shapes before tuning them.** Trace one bounded 1882 window
+  completely, then run `seg_eval --window` to measure both useful matches and
+  extra predictions. Keep machine predictions out of ground truth by construction.
+  Use printed street indexes as additional OCR evidence where they exist. Exit:
+  the project has a precision as well as a recall measurement, with the sample
+  and limitations recorded beside the result.
+
+- [ ] **I5 — Mark stale work after an upstream change.** Start with the two
+  failures already observed: a replaced scan leaves stale triage and pixel work;
+  a changed georeference leaves stale ground coordinates, warps, exports and
+  mosaic checks. Record the dependency and show the rebuild set. Exit: a test
+  correction identifies exactly what must be redone and keeps reusable work.
+
+- [ ] **I6 — Add optional review ordering after measurement.** Use structured
+  disagreement evidence to offer a “Needs attention first” ordering in the OCR
+  review surface. Compare it with the present order using a held-out sample and
+  retain a random audit of apparently easy rows. Do not call a score calibrated
+  until it has been tested against human outcomes. Exit: reviewers find more
+  confirmed errors in the same time without raising residual error.
+
+**Order:** I1 and I2 first; I3 is the required operational repair; I4 supplies
+the missing segmentation denominator; I5 follows the two known stale cases;
+I6 follows evidence collection. The existing workers remain the integration
+point for their supported job kinds. Analysis tools such as mosaic fitting,
+geographic audit and segmentation evaluation remain operator-run checks rather
+than being forced into the queue. Future model experiments are limited to a
+specific, measured decision and must beat the existing method on held-out work.
+
 ### The survey layer — done 2026-09-13
 
 The archive learned the difference between what it **holds** and what a survey
