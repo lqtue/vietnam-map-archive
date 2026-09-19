@@ -499,6 +499,131 @@ padded into §2.
 
 ---
 
+## §6 Three papers read from PDF, 2026-09-19
+
+Supplied by Tue (two in `~/Downloads`, one arXiv link) rather than found through scite. **Read from
+the PDFs directly**, so the figures below are quoted from the papers themselves — but note the
+provenance difference: `editorialNotices` were **not** checked through scite for these three, unlike
+every entry in the running list above. Do that before the preprint ships.
+
+### 6.1 Milleville, Verstockt & Van de Weghe (2022) — the other automatic route, with a number
+
+> **Automatic Georeferencing of Topographic Raster Maps.** *ISPRS Int. J. Geo-Inf.* 11(7):387.
+> `10.3390/ijgi11070387` · MDPI, open access · received 24 May 2022, published 11 July 2022.
+
+| | |
+|---|---|
+| **method** | Fully automatic, no GCP placement: recognise the text on the map → geocode the toponyms through public geocoders → cluster the matches → filter outliers with RANSAC → refined ROI → final prediction |
+| **corpus A** | M834 Belgium, **16 adjacent sheets** around Ghent, 2nd edition 1980–87, NGI. 225 dpi (6300 × 4900 px), 1:25,000, mean diagonal **18.94 km** |
+| **corpus B** | TOP50raster Netherlands, **9 adjacent sheets**, 2018, PDOK. 508 dpi (8000 × 10,000 px), 1:50,000, mean diagonal **32.06 km** |
+| **ground truth** | **External and independent** — the official NGI metadata polygon for A, the GeoTIFF's own corners for B, both converted to WGS84 |
+| **result** | Mean error **316 m (1.67% of diagonal)** on A, max 631 m (3.33%); **287 m (0.90%)** on B, max 438 m (1.37%). Centre errors 179 m and 162 m. Mean of three runs |
+| **the pipeline's own ladder** | A: prefilter 138 km → initial ROI 17.4 km → refined ROI 710 m → **final 316 m**. The filtering is almost all of the accuracy |
+| **distribution** | 15 of 16 M834 sheets under 500 m mean error; 11 of 16 under 200 m centre error |
+
+**A published metric caution, and it is our §8's exact shape:**
+
+> "the center error is not a good indicator of overall accuracy. As we only compared the predicted
+> and ground truth center; there is no indication of the relative scale of the predicted area.
+> Without filtering, the geolocation algorithm consistently predicted much larger areas than the
+> actual map."
+
+A metric that agrees with the truth at the centre while being wrong about the extent — reported by
+the authors against their own result. Third such precedent in this file, after Janata & Cajthaml's
+undecidable control set and Luft & Schiewe's stated floor.
+
+**The gap, and it is a clean one.** They have **16 adjacent sheets and 9 adjacent sheets**. They
+have a series. **Adjacency is never used** — not as a constraint (Janata & Cajthaml), not as a
+diagnostic (ours). Every sheet is scored independently against external ground truth, and the
+neighbours are right there. This is the strongest single piece of evidence that inter-sheet
+agreement as a *free* check is genuinely underused, because here is a paper that had it for nothing
+and did not reach for it.
+
+**It is also Paper 2's nearest prior work.** The plan's Paper 2 is a toponym-assisted georeferencing
+benchmark; this is that, done, with a number. **Paper 2's target to beat is 316 m at 1:25,000.**
+That belongs in the plan, not just here.
+
+### 6.2 Wijegunarathna, Stock & Jones (2025) — an LMM reading a map, and an infrastructure fault
+
+> **Large Multi-modal Model Cartographic Map Comprehension for Textual Locality Georeferencing.**
+> GIScience 2025, LIPIcs. `10.4230/LIPIcs.GIScience.2025.12` · arXiv:2507.08575 · Massey University
+> and Cardiff.
+
+Different task from ours: georeferencing **textual locality descriptions** from natural history
+collections, not map sheets. A labelled square grid is superimposed on a map excerpt and an LMM
+(`gpt-4o-2024-08-06`) is asked which cell the description denotes. Zero-shot.
+
+| method | avg distance | @1 km | @3 km |
+|---|---|---|---|
+| GEOLocate (text, ±region) | 107.23 km | 16.0% | 28.0% |
+| ChatGPT text | 10.91 km | 8.0% | 16.0% |
+| ChatGPT text+region | **10.12 km** | 8.0% | 16.0% |
+| GPT-4o text | 155.82 km | 4.0% | 16.0% |
+| GPT-4o text+region | 39.98 km | 0% | 12.0% |
+| **theirs** (centroid) | **1.03 km** | **60.0%** | 96.0% |
+
+32% of predictions land in exactly the right grid cell. Self-described as preliminary, on a small
+manually annotated set.
+
+**The finding worth taking, and it is not the headline.** ChatGPT-in-a-browser scores 10.91 km and
+*the same model through the API* scores 155.82 km — a 14× difference from the access path, which
+they diagnose:
+
+> "The stark difference in performance between the browser versions and the same model accessed via
+> the API raise an important issue: the inability to browse the web in the API versions
+> significantly hinders the quality of georeferencing."
+
+**A published number that depends on undocumented infrastructure rather than on method.** This is
+precisely the class our repo keeps finding — GDAL falling back to WGS 84 and succeeding, PROJ
+returning the input unchanged, `_cached_tile` writing a different key than it reads, PostgREST
+capping at 1,000 rows and reporting nothing. Cite it in §8 or in Paper 2 as outside evidence that
+the class is real and is not our local bad luck.
+
+### 6.3 Namgung & Chiang (2022) — post-OCR using where the words sit
+
+> **Incorporating Spatial Context for Post-OCR in Map Images.** GeoAI '22 (5th ACM SIGSPATIAL
+> International Workshop on AI for Geographic Knowledge Discovery), Seattle, 1 Nov 2022.
+> `10.1145/3557918.3565864`
+
+BART fine-tuned to correct map OCR, where word-level text is first assembled into pseudo-sentences
+by **spatial clustering** (K-means) rather than by reading order — so "Mississippi" and "River" are
+joined because of where they sit, not because a language model expects them. Trained on
+automatically generated synthetic maps.
+
+Recall improves **26% (Illinois) and 32.1% (Minnesota)** on synthetic maps, against the best lexical
+method's 4% and 7%.
+
+**Paper 2, not Paper 1.** It is the nearest prior work to our syllable-aware Vietnamese dedupe —
+same problem (map text is not a sentence and must not be treated as one), opposite direction (they
+assemble neighbours into phrases; we had to *stop* a bare `Đường` chaining 43 streets into one
+cluster). Worth engaging directly there. **Yao-Yi Chiang is now on three papers in our set** — this,
+the GPT-4o legend paper (§5), and Uhl, Leyk & Chiang (2018).
+
+### What the three add to Paper 1 — the error ladder
+
+Stated carefully, because the comparison is easy to make dishonestly:
+
+| | reported error |
+|---|---|
+| Automatic, content-based — Luft & Schiewe (2021) | **101 m** median |
+| Automatic, toponym-based — Milleville et al. (2022) | **316 m** / **287 m** mean |
+| LMM on locality descriptions — Wijegunarathna et al. (2025) | **~1.03 km** |
+| **Our human-placed GCPs** | **2.3–19.0 m** rms; the 1882 sheet at **11.3 m** RMSE |
+| **The L7014 datum fault we shipped** | **~470 m** |
+
+**The only honest comparison in this table is the last two rows against the middle ones**, and it is
+worth one sentence in §1:
+
+> The displacement we published without noticing is larger than the total georeferencing error that
+> the automatic literature reports as a success.
+
+What must **not** be written is that our 11 m beats their 101 m or 316 m. Those methods georeference
+a sheet from nothing; ours are human-placed control points. `field-comparison.md` §6 already says
+*"not competing — we use humans"*, and that row is right. The ladder's purpose is to size the fault,
+not to rank the methods.
+
+---
+
 ## Still to do in Phase 1
 
 - [~] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
@@ -519,5 +644,8 @@ padded into §2.
       *§4 Related Work* above. It is not in scite because **e-Perimetron mints no DOIs**; the PDF is
       free at `e-perimetron.org`. The read corrected a misattribution in `figures.md`, and produced
       the `Ha Noi`-against-their-five-checks table, which belongs in §7 rather than §2.
+- [ ] Check `editorialNotices` through scite for the three papers in §6 — they were read from PDF,
+      not retrieved through scite, and are the only entries in this file without that check.
+- [ ] Move "Paper 2's target to beat is 316 m at 1:25,000" (§6.1) into the plan's Paper 2 entry.
 - [ ] Decide whether §7 keeps the IIIF size-segment finding or it ships as its own note.
 - [ ] `report_citations` with the full include/exclude set once the list is closed.
