@@ -156,7 +156,7 @@ relaxing exactly this — "the map sheets' coordinates" — as the open problem.
 > series' sheet layout", and they state the consequence in print: "the alignment of corners also
 > directly determines the ability to seamlessly join neighbouring transformed map sheets, which is
 > a major concern for map users." Using the series' own lattice as the standard against which a
-> sheet is judged is therefore established practice. The check we describe in §X confirms it on a
+> sheet is judged is therefore established practice. The check we describe in §7.2 confirms it on a
 > second series and a different frame; it does not introduce it.
 >
 > Two properties of that construction bound what the yardstick can see, and both are this paper's
@@ -169,19 +169,20 @@ relaxing exactly this — "the map sheets' coordinates" — as the open problem.
 > metric is designed to exclude one class of error: corners are used because "neatlines are the
 > first thing constructed and have the least projection error, [so] they can be assumed to be drawn
 > at the 'correct' place", which keeps surveying and drawing error out of the measurement. It keeps
-> datum error out of it too. §X reports a 470 m datum fault affecting 285 of 437 published sheets,
+> datum error out of it too. §7.4 reports a 470 m datum fault affecting 285 of 437 published sheets,
 > on which a check of exactly this shape returns 2e-12.
 >
 > The second is that the seam is asserted rather than measured. Corner displacement is computed per
 > sheet against the layout and averaged over four corners into a single value; no two neighbours are
 > ever compared to each other. A per-sheet residual cannot separate a sheet that sits slightly off
 > its cell from two sheets that claim the same cell — the failure that caught `Ha Noi`, 75 km from
-> its cell while satisfying every per-sheet check (§Y). Inter-sheet agreement as a *constraint* is
+> its cell while satisfying every per-sheet check (§7.2). Inter-sheet agreement as a *constraint* is
 > well established: Janata and Cajthaml (2020) adjust a 250-sheet series under explicit adjacency
 > conditions. As a *diagnostic run across a whole archive*, it is not.
 
-**Placeholders.** `§X` is the blind-check section, `§Y` the lattice-collision section; neither is
-numbered yet. Resolve both before the preprint.
+**Numbered 2026-09-19** against `outline.md`. Note the two `§X`s were *different sections* and a
+blanket substitution would have merged them: the first is the lattice confirming Luft & Schiewe
+(**§7.2**), the second is the blind self-check (**§7.4**). `§Y` is the lattice collision (**§7.2**).
 
 ---
 
@@ -277,7 +278,7 @@ warping in at the smaller miss.
 > than that. The consequence for verification is structural rather than accidental. Once edge
 > identity is imposed as a condition, "the adjacent edges fit exactly together" by construction,
 > and the seam residual is identically zero however the mosaic as a whole is placed. Information
-> spent as a constraint cannot be spent again as a diagnostic. The seam census we report in §Y —
+> spent as a constraint cannot be spent again as a diagnostic. The seam census we report in §7.3 —
 > 750 adjacent seams, median 19 m, with all 33 seams between the mosaic and an independently
 > georeferenced sheet falling in a 447–504 m band that turned out to be a datum fault — is legible
 > only because no adjacency condition was applied.
@@ -297,8 +298,7 @@ warping in at the smaller miss.
 > about 250 m and fifty points do not cover Bohemia. They separately report a null on weighting
 > control points by object category. We report comparable nulls in §8.
 
-**Placeholder.** `§Y` is the seam-census section, still unnumbered — same as §2's `§X`/`§Y`.
-Resolve all three before the preprint.
+**Numbered 2026-09-19** against `outline.md`: the seam census is **§7.3**.
 
 ### Discipline note — a second internal count discrepancy
 

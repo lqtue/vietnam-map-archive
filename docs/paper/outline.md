@@ -37,10 +37,14 @@ things under one number and the placeholders could not land.
 
 ### Placeholders resolved
 
-Update these in `related-work.md` when §2–§4's paragraphs are moved into the draft:
+**Substituted into `related-work.md` on 2026-09-19**; the table is kept as the record of what each
+one meant. **The two `§X`s were different sections** — a blanket find-and-replace would have merged
+the lattice check into the blind check, which is the one substitution that would have destroyed the
+argument.
 
 | placeholder | where it appears | resolves to |
 |---|---|---|
+| `§X` | §2 draft, para 1 — "The check we describe in §X confirms it on a second series" | **§7.2** |
 | `§X` | §2 draft, para 2 — "reports a 470 m datum fault … on which a check of exactly this shape returns 2e-12" | **§7.4** |
 | `§Y` | §2 draft, para 3 — "the failure that caught `Ha Noi`" | **§7.2** |
 | `§Y` | §3 draft, para 1 — "The seam census we report in §Y" | **§7.3** |
