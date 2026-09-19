@@ -572,3 +572,39 @@ every SAM2 row in `EVAL-BASELINE.md` is still a train-set score, because the
 held-out trace set does not exist. Item 1 of *what it would take to claim "no
 GPU" in public* is still the blocker it was this morning, and it is a tracing
 job rather than a code one.
+
+## Three review examples: 1882 parcel outlines
+
+The 19 September review screenshots add three concrete boundary failures to
+the precision work above:
+
+1. At **Caserne et Ateliers de l'Artillerie**, a blue proposal makes a long
+   straight edge through a genuine street corner.
+2. At **Arsenal de la Marine / Dock Flottant**, the blue proposal's quay edge
+   continues into the water and does not follow the printed shore.
+3. At **Nouveau Palais de Justice**, the administrative wash proposals cover
+   pieces of the plots instead of their printed cadastral perimeters. The
+   missing pieces are part of the plot, not separate parcels.
+
+These are different failure points. The first two expose overreach by the
+`component_polygon` concave hull. The third starts earlier: the colour mask
+itself only claims part of a plot. Changing the polygonizer alone cannot
+recover pixels the mask omitted.
+
+I tested replacing the hull with a pixel-edge trace on the pinned 1882 scan.
+Under identical offline settings (`--local-image`, `--render 6051`,
+`--mpp 0.34`, no database labels), the current hull returns 1,135 proposals;
+the pure trace returns 648, because narrow ink channels make otherwise useful
+parcels too stringy for the sliver filter. A hybrid that keeps the hull for
+stringy components returns 1,109, but visual crops around the Arsenal and
+Palais de Justice still show jagged boundaries and the incomplete courthouse
+plots. These counts are **not** the published 1,443-proposal run: the offline
+pass has no database water or furniture labels and chooses a different cream
+threshold. They compare geometry methods against the same input, not production
+quality. The trace and hybrid were not kept.
+
+The next check needs complete hand-traced windows around both the Arsenal quay
+and the justice plots, including every parcel and the street/water surfaces.
+Score coverage *and* false overlap there before changing the polygonizer or
+approving these proposals. The present masks should be treated as review
+proposals, not corrected cadastral outlines.
