@@ -1017,6 +1017,9 @@ WATER_LINE_V = 0.80         # dark enough to be a drawn line
 WATER_LINE_RB = 0.07        # ...and less red than this sheet's black ink
 WATER_LINE_W = 2            # ...and thin enough to be a line rather than a wash
 WATER_WASH_MIN_PX = 200     # ...and a wash is a *region*, not an erosion crumb
+WATER_RIPPLE_COH = 0.30     # ...and a ripple is ruled, where tree stipple runs no way
+WATER_COH_CELL = 16         # render px; narrower than the creeks it has to resolve
+WATER_COH_BLOB = 8          # ...and stipple is a bed of cells, not one stray cell
 WATER_CLOSE = 8             # render px; bridges the gap between two ruled lines
 WATER_OPEN = 2              # ...then takes back the stray specks it joined
 WATER_MIN_PX = 5_000        # a body smaller than this is not a river
@@ -1067,6 +1070,66 @@ def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
     return out
 
 
+def ruling_mask(rgb: np.ndarray, cell: int = WATER_COH_CELL,
+                min_coh: float = WATER_RIPPLE_COH, min_blob: int = WATER_COH_BLOB,
+                min_grad: float = 0.02, min_ink: int = 24) -> np.ndarray:
+    """Cells whose line work runs one way. P2d's measure, read on a grid.
+
+    The wash test cannot tell a packed ripple from tree stipple: both are dark,
+    and both survive an erosion. Dropping the erosion crumbs to rescue the
+    creeks therefore let the Jardin Botanique's stipple into the region the
+    moment `--recut` took away the land polygon that had been covering it —
+    and no crumb size separates the two, because the stipple floods at 20 px
+    while the creek does not come back until 100.
+
+    Direction does separate them, which is exactly what P2d found for the
+    hatch: on a 16 px cell the creek's ruling scores p10 **0.304** and the open
+    river's **0.755**, against the garden's p50 **0.182**. Measured on the
+    gradient rather than on thresholded ink, for the reason in
+    `ink_coherence` — a one-pixel line comes back broken and a broken line has
+    no direction left.
+
+    This only ever *removes* from the blue mask, so it cannot reopen a window
+    the water was already staying out of.
+
+    ponytail: the threshold is one number on one sheet. Ceiling: a sheet whose
+    water is stippled rather than ruled, where this would erase the river.
+    Upgrade: read it off the distribution inside the hydrology labels' own
+    cells, which are water by assertion, instead of pinning it at 0.30.
+    """
+    grey = rgb.astype(np.float32).mean(axis=2) / 255.0
+    gy, gx = np.gradient(grey)
+    h, w = grey.shape
+    rows, cols = h // cell, w // cell
+    if not (rows and cols):
+        return np.ones((h, w), bool)
+    H, W = rows * cell, cols * cell
+    u, v = gx[:H, :W], gy[:H, :W]
+    use = np.hypot(u, v) > min_grad
+
+    def blocks(a: np.ndarray) -> np.ndarray:
+        return a.reshape(rows, cell, cols, cell).sum(axis=(1, 3))
+
+    jxx, jyy, jxy = blocks(u * u * use), blocks(v * v * use), blocks(u * v * use)
+    tr = jxx + jyy
+    coh = np.where(tr > 0, np.sqrt((jxx - jyy) ** 2 + 4 * jxy ** 2) / np.maximum(tr, 1e-12), 0.0)
+    # A cell with almost no ink has no direction to measure and no ripple in it
+    # either; leave it in and let the rest of the chain decide.
+    bad = (coh < min_coh) & (blocks(use.astype(np.float32)) >= min_ink)
+    # Only a *bed* of unruled cells is stipple. Gating cell by cell cut the
+    # creek at the 10% of its cells that fail and left fragments under
+    # WATER_MIN_PX, which killed the very thing this pass had just rescued —
+    # the same mistake as dilating every erosion crumb, one level up. The
+    # plateau is flat from 8 cells to 64, so this is a shape, not a tuning.
+    lab, n = ndimage.label(bad)
+    if n:
+        sizes = ndimage.sum(bad, lab, range(1, n + 1))
+        bad = np.isin(lab, [i for i in range(1, n + 1) if sizes[i - 1] >= min_blob])
+    out = np.ones((h, w), bool)
+    out[:H, :W] = ~np.repeat(np.repeat(bad, cell, axis=0), cell, axis=1)
+    return out
+
+
 def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
                  water: list[tuple[float, float]]) -> tuple[np.ndarray, np.ndarray, list[bool]]:
     """(the water as a pixel mask, the land mask bounding it, per-polygon named).
@@ -1106,6 +1169,7 @@ def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
         wsz = ndimage.sum(wash, wlab, range(1, wn + 1))
         wash = np.isin(wlab, [i for i in range(1, wn + 1) if wsz[i - 1] >= WATER_WASH_MIN_PX])
     blue &= ~ndimage.binary_dilation(wash, structure=disk(WATER_LINE_W + 2))
+    blue &= ruling_mask(rgb)
     solid = ndimage.binary_closing(blue, structure=disk(WATER_CLOSE))
     solid = ndimage.binary_opening(solid, structure=disk(WATER_OPEN))
     # The sheet names its own water, so read the name before guessing at shape.

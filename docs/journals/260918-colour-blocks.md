@@ -1416,3 +1416,76 @@ The price is unchanged and still real: `land_plot` mean **0.350 → 0.331**
 What *was* dirty is the picture: `review_figs.py` drew every dropped polygon,
 which on a river window is hundreds of ripple ribbons over the thing being
 checked. Now `--dropped`, off by default, and the kept outline is 2 px.
+
+## 2026-09-19 (ii) — the crumb rule let the garden in, and direction took it back
+
+`WATER_WASH_MIN_PX` rescued the creeks and then flooded the **Jardin
+Botanique's stipple beds** — but only under `--recut`, which is why the first
+sweep missed it. The land polygon that had been covering the garden is one of
+the ones the re-cut rearranges; take it away and the stipple, now surviving the
+weakened wash cut, joins the river's component.
+
+**No crumb size separates them.** Swept under `--recut`, the garden floods at
+`wash_min` **20** and the creek does not come back until **100**. The bands do
+not overlap, they invert.
+
+Direction does separate them, and it is P2d's own measure read on a grid —
+`ruling_mask`, 16 render px cells, coherence ≥ 0.30:
+
+| | median coherence | cells ≥ 0.30 |
+|---|---:|---:|
+| open river | 0.892 | 97% |
+| creek (Rach Cầu Chông) | 0.831 | 90% |
+| **Jardin Botanique lake** | **0.757** | **76%** |
+| Jardin Botanique stream | 0.147 | 21% |
+| Jardin Botanique stipple | 0.153 | 11% |
+
+**Gating cell by cell killed the creek**, which is the same mistake as dilating
+every erosion crumb, one level up: the 10% of a creek's cells that fail sever a
+thin ribbon into fragments under `WATER_MIN_PX`. Only a *bed* of unruled cells
+is stipple, so the unruled cells are componented and only components of
+**≥ 8 cells** are dropped. The plateau is flat from 8 to 64, so it is a shape
+rather than a tuning. Free on every score: `land_plot` 0.331 / 0.218,
+`building` 0.122, `waterway` 0.582, road cover 0.14, and the counts return to
+exactly 888 / 352 / 56 — the gate removes the stipple and nothing else.
+
+### The garden's stream is below this instrument's resolution
+
+Reported as "there truly is a lake and some river on the JB", and that is
+right. The measurement above says what can be done about each:
+
+- **The lake is separable** — 0.757, next door to the open river — and is lost
+  for a different reason: a compact land polygon covers it and `solid &= ~land`
+  removes it, and it carries no `hydrology` label to seed it back.
+- **The stream is not separable.** At 0.147 against the stipple's 0.153 it is
+  the same number. At this render a 32 source px cell is wider than the stream,
+  so the cell is mostly bed. Nothing here can claim the stream without claiming
+  the beds, and the blue that used to be there was the beds *with* the stream
+  inside them — the right answer for the wrong reason.
+
+### The one open defect, now named: enclosed water inside a land polygon
+
+The garden's lake and the **Arsenal's dry docks, basins and slipways** are the
+same failure. Each is drawn as ruled water, each scores like water, and each
+sits *inside* a compact block polygon, so `land_mask` subtracts it and the
+label seeding cannot reach it. This is what is left of "the Arsenal edge is
+still not perfect": the shoreline is now right, and the water drawn **inside**
+the yard is called land.
+
+The upgrade is not a threshold: it is to let a strongly-ruled region punch a
+hole in the land mask when the polygon containing it is much larger than it —
+a dock inside a yard, a lake inside a park. Not built, not measured.
+
+### `--recut` costs the creeks it was not supposed to touch
+
+Worth recording against the default decision: the re-cut's extra land polygons
+lie over the narrow water the same pass just rescued.
+
+| window | `--no-recut` | `--recut` |
+|---|---:|---:|
+| Rach Cầu Chông | **12.6%** | 7.8% |
+| Hội An inlet | **6.5%** | 1.5% |
+| Arsenal yard as land | 31.2% | **62.8%** |
+
+So the default trades creek coverage for the Arsenal. Both defects are real and
+the flag cannot fix both; the enclosed-water upgrade above is what would.

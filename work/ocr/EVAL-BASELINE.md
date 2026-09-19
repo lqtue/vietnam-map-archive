@@ -2232,3 +2232,22 @@ duplicates; the 89 nested pairs are sub-parcels, and dropping either member
 costs land_plot 0.026 or 0.038) and ring simplification (already 12 vertices
 per polygon). A seeding radius for the hydrology labels changes no component
 and no score once the mask is intact.
+
+### 2026-09-19 (ii) — the directional gate
+
+`WATER_WASH_MIN_PX` let the Jardin Botanique's tree stipple into the region
+under `--recut`. No crumb size separates them (the garden floods at 20, the
+creek returns at 100), so the water's line work is now also required to be
+**ruled**: `ruling_mask`, 16 px cells, coherence ≥ 0.30, dropping only
+components of ≥ 8 unruled cells. Cell-by-cell gating severed the creeks.
+
+Free on every score — 888 / 352 / 56 and `land_plot` 0.331 / 0.218,
+`building` 0.122 / 0.050, `waterway` 0.582 cover 0.99, road cover 0.14, all
+identical to the run without the gate. It removes the stipple and nothing else.
+
+**Open, and the last known-wrong thing in the water pass: enclosed water inside
+a land polygon.** The garden's lake (coherence 0.757, i.e. it reads as water)
+and the Arsenal's dry docks and basins are each inside a compact block, so
+`land_mask` subtracts them and no label can seed them. The garden's *stream* is
+a different case and is not recoverable here: 0.147 against the stipple's
+0.153, the same number at this render.

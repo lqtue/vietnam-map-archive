@@ -10,15 +10,17 @@ now lives here instead of beside its own output.
 
     python work/ocr/scripts/review_figs.py --map-id <uuid> [--out DIR]
 
-It mirrors `main()`'s order and must reproduce its counts exactly (798/203/43
-default, 888/352/56 under --recut) — that agreement is the only reason to
-trust the tints. It prints both, so a drift shows up as a wrong number rather
-than as a wrong picture nobody checks.
+It mirrors `main()`'s order and must reproduce its counts exactly — that
+agreement is the only reason to trust the tints. It prints both runs' counts,
+so a drift shows up as a wrong number rather than as a wrong picture nobody
+checks.
 
 Two runs, and every figure says which one it came from:
 
-    A. default    --cream --drop-furniture --drop-water --drop-slivers
-    B. + --recut  the same, plus --recut. Opt-in; 25 s -> 80 s.
+    AFTER   the current default: --cream --drop-furniture --drop-water
+            --drop-slivers --swatch-labels, and --recut. 888/352/56.
+    BEFORE  the run as it shipped at 9a2fe561: --no-recut, and the wash cut
+            with no minimum component size. 798/203/43.
 
 Colours: orange = kept, blue outline = dropped, blue tint = the water region,
 green tint = the land mask that bounds it.
@@ -41,13 +43,27 @@ MAP = "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b"          # 1882 Plan Cadastral
 IMG = ".tile_cache/ocr/full_c03b7f44a1d8d455c2b476d248651265.jpg"
 RENDER = 6051
 
-# Source-px windows, named for what each one is evidence of. 00-08 in the
-# 2026-09-18 folder were cropped by hand from an earlier build and are not
-# reproduced here; these four are the pair the Arsenal finding turns on.
-WINDOWS = {
-    "arsenal": (6450, 5830, 8250, 7630),
-    "arroyo": (500, 2400, 2400, 4300),
-}
+# Source-px windows on the 12102 x 8982 sheet, each named for what it is
+# evidence of. A window ending _BEFORE/_AFTER is rendered from both runs.
+WINDOWS = [
+    # (figure name, box, which runs, note)
+    ("whole_sheet",        (0, 0, 12102, 8982),          ("after",),  "the run at a glance"),
+    ("creek_khanh_hoi",    (630, 4050, 1830, 5100),      ("before", "after"),
+     "Rach Cau Chong: the packed ripple the wash cut used to eat"),
+    ("inlet_hoi_an",       (9300, 2650, 11100, 3750),    ("before", "after"),
+     "the same defect on a tidal inlet"),
+    ("arsenal_edge",       (6600, 6000, 8400, 7400),     ("before", "after"),
+     "the water/land edge --recut fixes: quay, sheds, dockyard apron"),
+    ("arroyo_chinois",     (1800, 4200, 3600, 5600),     ("after",),
+     "the named-label rule: the arroyo is water for its whole length"),
+    ("tam_hoi_shoreline",  (400, 6100, 1800, 7100),      ("after",),  "shoreline detail"),
+    ("vinh_hoi",           (200, 2900, 1600, 3900),      ("after",),  "shoreline detail"),
+    ("jardin_botanique",   (8100, 5850, 9300, 6750),     ("before", "after"),
+     "the lake and stream are real; the BEFORE floods the stipple beds around them"),
+    ("city_untouched",     (5700, 3300, 6900, 4200),     ("before", "after"),
+     "TRAP: Place de la Cathedrale. The pair must be identical"),
+    ("river_saigon",       (4200, 6100, 5400, 7000),     ("after",),  "the river the pass always had"),
+]
 
 
 def load(image: str, render: int):
@@ -139,7 +155,8 @@ def main() -> int:
     p.add_argument("--render", type=int, default=RENDER)
     p.add_argument("--out", type=Path, default=Path.home() / "Desktop" / "vma-colour-pass",
                    help="folder for the PNGs (default ~/Desktop/vma-colour-pass)")
-    p.add_argument("--size", type=int, default=1200, help="output width in px")
+    p.add_argument("--size", type=int, default=1400, help="output width in px")
+    p.add_argument("--only", help="render only figures whose name contains this")
     p.add_argument("--dropped", action="store_true",
                    help="also outline the polygons the run threw away. Off by default: on a "
                         "river window they are hundreds of ripple ribbons and they bury the "
@@ -163,27 +180,50 @@ def main() -> int:
     furn = cb.furniture_mask(args.map_id)
     print(f"{mpp:.4f} m per source px, {len(wet)} hydrology labels")
 
-    runs = {}
-    for name, recut in (("default", False), ("recut", True)):
-        kept, drowned, slivers, allf = pipeline(
-            rgb, scale, split=split, cool=cool, green=green, mpp=mpp,
-            wet=wet, furn=furn, recut=recut)
-        print(f"{name:8s}: {len(kept)} kept, {len(drowned)} water, {len(slivers)} slivers")
-        runs[name] = (kept, drowned, slivers, region_masks(allf, rgb, scale, wet))
+    # "before" is the run as it shipped at 9a2fe561: no re-cut, and the wash cut
+    # with no minimum component size. Reproduced here rather than described, so
+    # every pair in the folder is the same build arguing with itself.
+    runs, counts = {}, {}
+    wash_min = cb.WATER_WASH_MIN_PX
+    try:
+        for tag, recut, wash in (("after", True, wash_min), ("before", False, 0)):
+            cb.WATER_WASH_MIN_PX = wash
+            kept, drowned, slivers, allf = pipeline(
+                rgb, scale, split=split, cool=cool, green=green, mpp=mpp,
+                wet=wet, furn=furn, recut=recut)
+            counts[tag] = (len(kept), len(drowned), len(slivers))
+            runs[tag] = (kept, drowned, slivers, region_masks(allf, rgb, scale, wet))
+            print(f"{tag:6s}: {len(kept)} kept, {len(drowned)} water, {len(slivers)} slivers")
+    finally:
+        cb.WATER_WASH_MIN_PX = wash_min
 
-    b_kept, b_drowned, b_slivers, (b_water, b_land) = runs["default"]
-    r_kept, r_drowned, r_slivers, (r_water, r_land) = runs["recut"]
-    if not args.dropped:
-        b_drowned = b_slivers = r_drowned = r_slivers = []
     print(f"writing to {args.out}")
-    draw(pil, scale, WINDOWS["arsenal"], args.out / "09_arsenal_yard_STILL_WRONG.png",
-         water=b_water, land=b_land, kept=b_kept, dropped=b_drowned + b_slivers, size=args.size)
-    draw(pil, scale, WINDOWS["arsenal"], args.out / "10_arsenal_yard_FIXED_recut.png",
-         water=r_water, land=r_land, kept=r_kept, dropped=r_drowned + r_slivers, size=args.size)
-    draw(pil, scale, WINDOWS["arsenal"], args.out / "11_arsenal_yard_the_block.png",
-         kept=r_kept, size=args.size, width=5)
-    draw(pil, scale, WINDOWS["arroyo"], args.out / "12_arroyo_chinois_named_is_water.png",
-         water=r_water, land=r_land, kept=r_kept, dropped=r_drowned + r_slivers, size=args.size)
+    n, manifest = 0, []
+    for name, box, tags, note in WINDOWS:
+        for tag in tags:
+            suffix = f"_{tag.upper()}" if len(tags) > 1 else ""
+            out = args.out / f"{n:02d}_{name}{suffix}.png"
+            n += 1                          # numbering never depends on --only
+            manifest.append((out.name, note))
+            if args.only and args.only not in name:
+                continue
+            kept, drowned, slivers, (water, land) = runs[tag]
+            draw(pil, scale, box, out, water=water, land=land, kept=kept,
+                 dropped=(drowned + slivers) if args.dropped else (), size=args.size)
+
+    (args.out / "README.txt").write_text(
+        "THE COLOUR PASS — 1882 Plan Cadastral, map {m}\n"
+        "Regenerated by work/ocr/scripts/review_figs.py. Findings: "
+        "docs/journals/260918-colour-blocks.md\n\n"
+        "TWO RUNS\n"
+        "  AFTER   the current default (--recut on): {a[0]} kept, {a[1]} water, {a[2]} slivers\n"
+        "  BEFORE  as shipped at 9a2fe561 (--no-recut, no wash minimum): "
+        "{b[0]} kept, {b[1]} water, {b[2]} slivers\n\n"
+        "COLOURS  orange = kept - blue tint = the water region - green tint = the land\n"
+        "         mask that bounds it. Dropped polygons are off; --dropped draws them.\n\n"
+        "FIGURES\n".format(m=args.map_id[:8], a=counts["after"], b=counts["before"])
+        + "".join(f"  {fn:<38s} {note}\n" for fn, note in manifest))
+    print(f"  README.txt\n{n} figures")
     return 0
 
 
