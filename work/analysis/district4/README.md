@@ -52,8 +52,24 @@ scan exists.
 | 1923 | 0.85 m/px | 56% | Saigon - Cholon | 16064×14027 |
 | 1968 | 1.27 m/px | 66% | Sài Gòn — Việt Nam City Maps 1:12,500 | 10816×13523 |
 | 1895 | 1.68 m/px | 100% | Plan des environs de Saïgon | 13654×8964 |
-| 1942 | 1.69 m/px | 95% | Plan de Saigon - Cho Lon | 7479×6314 (confirmed — its own layout job, run 2026-09-05, reports this `source_size`) |
+| 1942 | 1.69 m/px | 95% | Plan de Saigon - Cho Lon | 7479×6314 — **superseded, see the 2026-09-19 note below** |
 | 1959 | 2.80 m/px | 97% | Đô thành Sài Gòn | 5000×3790, Virtual Saigon/IRD — **superseded, see below** |
+
+**The 1942 row above has the same fault, found 2026-09-19.** Its `Scan (px)` was recorded as
+7479×6314 and marked *confirmed* because the sheet's own layout job reported that `source_size` on
+2026-09-05. The sheet's **Allmaps annotation puts its control points on 14915×12602** — and
+14915/7479 = 1.994, 12602/6314 = 1.996, so this is one scan at twice the other, exactly the 1959
+situation. Both figures are correct about their own scan. The one that matters for any ground claim
+is the one the GCPs live on, which is the annotation's.
+
+This is the second time this table has been wrong in this precise way, so state it as a rule rather
+than a correction: **a `source_size` from a layout job describes the scan that job fetched, which is
+not necessarily the scan the georeference was built on.** Only the annotation settles it.
+
+Measured georeference error for all six sheets, added 2026-09-19:
+`work/analysis/district4/georef_error.md`. Four of six now carry a stated limit — 1968 at 9.0 m,
+1882 at 12.7 m, 1959 at 12.8 m, and **1942 at 72.3 m RMSE with a worst point of 193.7 m**. 1895 and
+1923 cannot be measured from their own control points, for reasons given there.
 
 **The 1959 row above is stale as of 2026-09-10.** It is what `collection_aoi.mjs`
 measured on 2026-09-04, against the 5,000×3790 scan. The scan the OCR pipeline
