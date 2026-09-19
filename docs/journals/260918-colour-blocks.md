@@ -1332,3 +1332,87 @@ md5 unchanged against `9a2fe561` — and costs no new constant.
 - `Prisons` and `Nouveau Palais de Justice` still have no polygon. They are
   *not* this problem — the oversize component is the only one dropped that way,
   so whatever drops those two is a different filter.
+
+## 2026-09-19 — the creek is the same ruling, packed
+
+Reported from the layers for the fourth time, and this one is not the river:
+the **Rach Cầu Chông** reach at Khánh Hội and the inlet at Hội An are drawn in
+the same engraved ripple as the Rivière de Saigon, and the pass claimed
+neither. Both are narrow.
+
+The measurement separates them in one line. Of the blue the hue test finds,
+the open river keeps **91%** through the wash cut and the creek keeps **21%**:
+
+| window | blue (hue) | after the wash cut | survives |
+|---|---:|---:|---:|
+| open river | 24.45% | 22.34% | 91% |
+| Rach Cầu Chông | 9.63% | **2.02%** | **21%** |
+
+The wash cut is `blue &= ~dilate(erode(blue, W), W + 2)`, and its premise is
+that water's line work is *sparse ruling*, which erodes to nothing, while a
+military or administrative wash is an area fill, which survives. That premise
+holds for a river 400 px wide. A creek is the same ruling packed into a
+ribbon, and wherever two lines touch, the pair survives the erosion as a
+crumb. The creek window threw **305 crumbs, none larger than 140 px**, against
+the river window's 62 totalling 243 px — and each crumb is then *dilated* by
+`W + 2`, so 1,869 px of crumb blanketed 8,200 px of creek.
+
+So the fix is not on the erosion, it is on what the erosion is allowed to
+call a wash: **component the survivors and keep only the ones big enough to be
+an area fill.** `WATER_WASH_MIN_PX = 200`. The creek's largest crumb is 140 px
+and the Arsenal quarter's genuine wash component is 1,140 px, so the threshold
+sits in a gap that is an order of magnitude wide, not a tuned number.
+
+Swept against the five windows that must **not** become water, and none of
+them moves at any setting:
+
+| `wash_min` | sheet | creek | pond | river || Botanique | Hôpital | Magasins | Champ | city |
+|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|
+| 0 (was) | 10.85% | **0.1%** | 0.0% | 86.7% || 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| 100 | 11.03% | 11.2% | — | 87.6% || 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| **200** | **11.04%** | **12.6%** | claimed | 87.6% || 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| 400 | 11.05% | 12.6% | — | 87.6% || 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+
+**It is free on every score in `EVAL-BASELINE`**: 798 → 797 polygons, 203 →
+204 dropped as river surface, and `land_plot` 0.350 / 0.218, `building` 0.122 /
+0.050, `waterway` 0.409, road cover 0.52 all hold to the digit. That is the
+point rather than a footnote — the pictures are the only instrument that can
+see this class of defect, which is the precision blind spot stated for the
+fourth time.
+
+**A seeding radius was measured and is not needed.** The `Rach Cầu Chông`
+label's centre lands on its own lettering and seeds nothing, so the obvious
+second fix is to seed from a disk. Swept at 0/30/60/120/200 source px it
+changes **no** component and **no** score, because once the mask is intact the
+creek is connected to the river it drains into and the river's own labels
+already seed it. Not built. It would be needed on a sheet of unconnected
+ponds, which this is not.
+
+### `--recut` is now the default
+
+The Arsenal's water/land edge was reported in the same round, and it is the
+2026-09-18 finding unchanged: the naval quarter is one 1.77 km² component, the
+area cap drops it, nothing bounds the region there, and the water runs over the
+quay, the sheds and the dockyard apron. `--recut` is the only thing that fixes
+it, and with the edge now the reported defect the flag has stopped being
+optional. `--no-recut` restores the old run.
+
+The price is unchanged and still real: `land_plot` mean **0.350 → 0.331**
+(@.5 7 → 6), 25 s → 80 s. What it buys, beside the Arsenal: road cover
+**0.52 → 0.14**, `waterway` 0.409 → **0.582** with cover 0.64 → **0.99**.
+
+### Two things measured and NOT built
+
+- **Dedup.** 797 kept polygons hold **0 pairs above IoU 0.90** — there are no
+  duplicates. What looks doubled is **89 pairs where the smaller polygon is
+  ≥95% inside a larger one** (0.176 km²), which is a sub-parcel inside a block,
+  not noise. Dropping the contained one costs `land_plot` 0.350 → **0.324**;
+  dropping the container costs 0.350 → **0.312**. Neither improves anything.
+  The traces match the nested polygons, so the nesting is carrying the score.
+- **Simplifying the rings.** They are already sparse — **12 vertices per
+  polygon**, 9,547 over the whole run — so there is no staircase to clean.
+  `simplify` at 4 source px removes 23% of the vertices and buys nothing.
+
+What *was* dirty is the picture: `review_figs.py` drew every dropped polygon,
+which on a river window is hundreds of ripple ribbons over the thing being
+checked. Now `--dropped`, off by default, and the kept outline is 2 px.

@@ -2201,3 +2201,34 @@ irreproducible.
   the queue assumed.
 - **The Arsenal** reads 74%, the partial signature above, with component 1544
   at 1.77 km² named as `DROPPED too large`.
+
+## 2026-09-19 — narrow water, and `--recut` as the default
+
+**The wash cut was eating every narrow reach.** The hue test finds the creek;
+the erosion-based wash cut then removes 79% of it, against 9% of the open
+river's, because a packed ripple survives an erosion where a sparse one does
+not. `WATER_WASH_MIN_PX = 200` keeps only erosion survivors large enough to be
+an area fill (creek's largest crumb 140 px, Arsenal's wash component 1,140 px).
+
+| run | n | water | land_plot | med | building | road cover | waterway |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `9a2fe561` shipped | 798 | 203 | 0.350 | 0.218 | 0.122 | 0.52 | 0.409 |
+| **+ wash min, `--no-recut`** | **797** | **204** | **0.350** | **0.218** | **0.122** | **0.52** | **0.409** |
+| **+ wash min, default (`--recut`)** | **888** | **352** | **0.331** | **0.218** | **0.122** | **0.14** | **0.582** |
+
+The water fix is **free on every score in this file** and visible only in the
+rendered layer — the Rach Cầu Chông reach and the Hội An inlet go from unclaimed
+to claimed end to end. Five trap windows (Jardin Botanique, Hôpital Maritime,
+Magasins des Travaux Publics, Champ de Manœuvres, city core) stay at 0.0% water
+at every setting swept, 0 → 400 px.
+
+**`--recut` is now on by default** (`--no-recut` restores the old run). It is
+the only thing that bounds the water region at the Arsenal's quay; without it
+the region runs over the yard and the sheds. Costs `land_plot` 0.019 and ~55 s,
+buys road cover 0.52 → 0.14 and `waterway` cover 0.64 → 0.99.
+
+**Measured and not built:** dedup (0 pairs over IoU 0.90 — there are no
+duplicates; the 89 nested pairs are sub-parcels, and dropping either member
+costs land_plot 0.026 or 0.038) and ring simplification (already 12 vertices
+per polygon). A seeding radius for the hydrology labels changes no component
+and no score once the mask is intact.

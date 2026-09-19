@@ -564,6 +564,24 @@ def _holds_point(mask: np.ndarray, sl: tuple, scale: float,
     return False
 
 
+def _kept_as(labels: np.ndarray, sl, idx: int, scale: float, feats: list[dict],
+             tree) -> tuple[float, int | None]:
+    """(overlap share, index in `feats`) for the polygon this component became.
+
+    Half of `explain_at`'s job is not accusing a filter of eating a block that
+    is sitting in the output. The share is over the component's own polygon, so
+    a block `subtract_blocks` cut back reads as a partial rather than as a miss.
+    """
+    if sl is None or tree is None:
+        return 0.0, None
+    g = component_polygon(labels[sl] == idx, sl[1].start, sl[0].start, scale)
+    if g is None or g.area <= 0:
+        return 0.0, None
+    share, best = max(((feats[i]["geom"].intersection(g).area / g.area, int(i))
+                       for i in tree.query(g)), default=(0.0, None))
+    return (share, best) if share >= 0.5 else (share, None)
+
+
 def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, float],
                feats: list[dict], *, mpp: float | None, close: int = CLOSE_PX,
                min_area_m2: float = MIN_AREA_M2, max_area_m2: float = MAX_AREA_M2,
@@ -590,9 +608,16 @@ def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, flo
     The covered share is answered from `feats`, the run's real output, so it
     can never disagree with the run. Only the verdicts on the components
     re-derive anything, and they re-derive it from the same `classify`,
-    closing and labelling the pass uses. A filter added to `blocks_from_colour`
-    and not named here shows up as a component that looks in-band and still has
-    no polygon, which is the honest failure for a stale explainer.
+    closing and labelling the pass uses.
+
+    An in-band component is matched back to the polygon it became before any
+    filter is named, because usually it became one. `Prisons` reads as a
+    3,385 px component "dropped later", and it is not dropped at all: it is the
+    5,739 m2 block beside the label, which simply does not contain the label's
+    own pixel. Naming four filters there is a false accusation, and it stood in
+    the queue for a session. A filter added to `blocks_from_colour` and not
+    named here still shows up honestly, as a component that is in band and
+    matches nothing in the output.
     """
     x, y = pt
     out = [f"at source px ({x:.0f}, {y:.0f}), probing {probe:.0f} px around it:"]
@@ -640,6 +665,7 @@ def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, flo
     if not ids:
         return out + ["  no pigment component anywhere in the box, even after the closing"]
     sizes = np.bincount(labels.ravel())
+    objs = None
     out.append(f"  {len(ids)} pigment component(s) in the box:")
     for idx in sorted(ids, key=lambda i: -sizes[i])[:4]:
         n_px = int(sizes[idx])
@@ -653,7 +679,14 @@ def explain_at(rgb: np.ndarray, split: float, scale: float, pt: tuple[float, flo
         elif area > max_area_m2:
             verdict = f"DROPPED too large, > {max_area_m2:,.0f} m² — --recut re-cuts it"
         else:
-            verdict = ("in band — dropped later: no ring, the furniture box, "
+            if objs is None:
+                objs = ndimage.find_objects(labels)
+            share, i = _kept_as(labels, objs[idx - 1], idx, scale, feats, tree)
+            verdict = (f"KEPT as a {feats[i]['geom'].area * mpp ** 2:,.0f} m² "
+                       f"{feats[i]['feature_type']} polygon ({share:.0%} of the "
+                       f"component) — the probe centre falls outside it"
+                       if i is not None else
+                       "in band and in no polygon — no ring, the furniture box, "
                        "the water test or the sliver filter")
         out.append(f"    {idx}: {n_px:,} px = {area:,.0f} m²  {verdict}")
     return out
@@ -983,6 +1016,7 @@ def fit_dilution(points: list[tuple[float, float]],
 WATER_LINE_V = 0.80         # dark enough to be a drawn line
 WATER_LINE_RB = 0.07        # ...and less red than this sheet's black ink
 WATER_LINE_W = 2            # ...and thin enough to be a line rather than a wash
+WATER_WASH_MIN_PX = 200     # ...and a wash is a *region*, not an erosion crumb
 WATER_CLOSE = 8             # render px; bridges the gap between two ruled lines
 WATER_OPEN = 2              # ...then takes back the stray specks it joined
 WATER_MIN_PX = 5_000        # a body smaller than this is not a river
@@ -1033,6 +1067,71 @@ def land_mask(feats: list[dict], shape: tuple[int, int], scale: float,
     return out
 
 
+def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
+                 water: list[tuple[float, float]]) -> tuple[np.ndarray, np.ndarray, list[bool]]:
+    """(the water as a pixel mask, the land mask bounding it, per-polygon named).
+
+    Split out of `water_mask` so the review renderer can tint exactly what the
+    pass tested. It had its own copy of this chain, and a second copy of a
+    twelve-step morphology is a copy that drifts — the pictures are the only
+    check the water work has, so they have to be of the real mask.
+    """
+    a = rgb.astype(np.float32) / 255.0
+    v = a.max(axis=2)
+    rb = a[..., 0] - a[..., 2]
+    h, w = v.shape
+
+    def disk(r: int) -> np.ndarray:
+        y, x = np.ogrid[-r:r + 1, -r:r + 1]
+        return x * x + y * y <= r * r
+
+    blue = (v < WATER_LINE_V) & (rb < WATER_LINE_RB)
+    # Hue alone is not enough: the military class's wash is blue-grey too, and
+    # it flowed down the streets of the Arsenal quarter and joined the river,
+    # taking the Jardin Botanique and 0.14 km² of the Magasins with it. The
+    # water is a *line*. Erode by a line's own width and a wash survives while
+    # a ruling disappears, so what survives is exactly what to throw away.
+    #
+    # ...but only what survives as a *region*. A wide river is ruled sparsely
+    # and erodes to nothing; a narrow creek is the same ruling packed into a
+    # ribbon, and where two lines touch it survives as a crumb. The Rach Cầu
+    # Chông reach threw 305 crumbs, none over 140 px, and dilating each by
+    # `WATER_LINE_W + 2` blanketed the creek: 79% of its blue went, against 9%
+    # of the open river's. Componenting the survivors and keeping the ones big
+    # enough to be an area fill separates the two — the creek's largest crumb
+    # is 140 px and the Arsenal quarter's wash is 1,140.
+    wash = ndimage.binary_erosion(blue, structure=disk(WATER_LINE_W))
+    wlab, wn = ndimage.label(wash)
+    if wn:
+        wsz = ndimage.sum(wash, wlab, range(1, wn + 1))
+        wash = np.isin(wlab, [i for i in range(1, wn + 1) if wsz[i - 1] >= WATER_WASH_MIN_PX])
+    blue &= ~ndimage.binary_dilation(wash, structure=disk(WATER_LINE_W + 2))
+    solid = ndimage.binary_closing(blue, structure=disk(WATER_CLOSE))
+    solid = ndimage.binary_opening(solid, structure=disk(WATER_OPEN))
+    # The sheet names its own water, so read the name before guessing at shape.
+    named = [any(shapely.contains_xy(f["geom"], x, y) for x, y in water) for f in feats]
+    land = land_mask(feats, (h, w), scale, named=named)
+    solid &= ~land
+    lab, n = ndimage.label(solid)
+    if not n:
+        return np.zeros((h, w), bool), land, named
+    sizes = ndimage.sum(solid, lab, range(1, n + 1))
+    seeded = {lab[int(y / scale), int(x / scale)] for x, y in water
+              if 0 <= int(y / scale) < h and 0 <= int(x / scale) < w}
+    seeded.discard(0)
+    full = np.isin(lab, [i for i in seeded if sizes[i - 1] >= WATER_MIN_PX])
+    if not full.any():
+        return full, land, named
+    # The sheet letters its own river. Black ink is not a blue line, so
+    # "RIVIÈRE DE SAIGON" punches a hole straight through the water it names.
+    holes = ndimage.binary_fill_holes(full) & ~full
+    hlab, hn = ndimage.label(holes)
+    if hn:
+        hs = ndimage.sum(holes, hlab, range(1, hn + 1))
+        full = full | np.isin(hlab, [i + 1 for i, s in enumerate(hs) if s <= WATER_HOLE_PX])
+    return full, land, named
+
+
 def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tuple[float, float]],
                ink_v: float = INK_V, share: float = WATER_SHARE) -> list[bool]:
     """True for each polygon lying in the sheet's water.
@@ -1051,45 +1150,10 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
     """
     if not water:
         return [False] * len(feats)
-    a = rgb.astype(np.float32) / 255.0
-    v = a.max(axis=2)
-    rb = a[..., 0] - a[..., 2]
-    h, w = v.shape
-
-    def disk(r: int) -> np.ndarray:
-        y, x = np.ogrid[-r:r + 1, -r:r + 1]
-        return x * x + y * y <= r * r
-
-    blue = (v < WATER_LINE_V) & (rb < WATER_LINE_RB)
-    # Hue alone is not enough: the military class's wash is blue-grey too, and
-    # it flowed down the streets of the Arsenal quarter and joined the river,
-    # taking the Jardin Botanique and 0.14 km² of the Magasins with it. The
-    # water is a *line*. Erode by a line's own width and a wash survives while
-    # a ruling disappears, so what survives is exactly what to throw away.
-    wash = ndimage.binary_erosion(blue, structure=disk(WATER_LINE_W))
-    blue &= ~ndimage.binary_dilation(wash, structure=disk(WATER_LINE_W + 2))
-    solid = ndimage.binary_closing(blue, structure=disk(WATER_CLOSE))
-    solid = ndimage.binary_opening(solid, structure=disk(WATER_OPEN))
-    # The sheet names its own water, so read the name before guessing at shape.
-    named = [any(shapely.contains_xy(f["geom"], x, y) for x, y in water) for f in feats]
-    solid &= ~land_mask(feats, (h, w), scale, named=named)
-    lab, n = ndimage.label(solid)
-    if not n:
-        return named
-    sizes = ndimage.sum(solid, lab, range(1, n + 1))
-    seeded = {lab[int(y / scale), int(x / scale)] for x, y in water
-              if 0 <= int(y / scale) < h and 0 <= int(x / scale) < w}
-    seeded.discard(0)
-    full = np.isin(lab, [i for i in seeded if sizes[i - 1] >= WATER_MIN_PX])
+    h, w = rgb.shape[:2]
+    full, _land, named = water_region(feats, rgb, scale, water)
     if not full.any():
         return named
-    # The sheet letters its own river. Black ink is not a blue line, so
-    # "RIVIÈRE DE SAIGON" punches a hole straight through the water it names.
-    holes = ndimage.binary_fill_holes(full) & ~full
-    hlab, hn = ndimage.label(holes)
-    if hn:
-        hs = ndimage.sum(holes, hlab, range(1, hn + 1))
-        full = full | np.isin(hlab, [i + 1 for i, s in enumerate(hs) if s <= WATER_HOLE_PX])
     out: list[bool] = []
     for f, is_named in zip(feats, named):
         if is_named:
@@ -1582,6 +1646,14 @@ def _self_check() -> None:
                          [{"geom": shapely.box(0, 0, 100, 100), "feature_type": "salmon"}],
                          mpp=1.0, cool=cool, green=gsplit, probe=20.0)
     assert "100% of that box" in covered[1], f"--explain must read the run first: {covered}"
+    # An in-band component that the run KEPT must be named as kept. Probing the
+    # street beside a parcel is the `Prisons` shape: the box is barely covered,
+    # the component beside it is in band, and blaming a filter for it is wrong.
+    f4, _ = blocks_from_colour(img, split, scale=1.0, mpp=1.0, cool=cool, green=gsplit)
+    beside = "\n".join(explain_at(img, split, 1.0, (100.0, 50.0), f4, mpp=1.0,
+                                  cool=cool, green=gsplit, probe=20.0))
+    assert "KEPT as" in beside and "dropped later" not in beside, \
+        f"--explain must match an in-band component to the polygon it became: {beside}"
 
     # The GeoJSON must carry the token to_sam2_seeds refuses on.
     assert PRIOR_CRS == "source-pixels-y-down"
@@ -1610,14 +1682,16 @@ def main() -> int:
     p.add_argument("--min-m2", type=float, default=MIN_AREA_M2)
     p.add_argument("--max-m2", type=float, default=MAX_AREA_M2)
     p.add_argument("--mpp", type=float, help="metres per source pixel; read from the annotation if omitted")
-    p.add_argument("--recut", action="store_true",
-                   help="rescue components over --max-m2 by re-cutting them at a higher "
-                        "ink threshold instead of dropping them. On the 1882 sheet there is "
-                        "exactly one such component, 1.77 km² of naval quarter welded to the "
-                        "river's ripple band, and re-cutting it is the only thing that puts a "
-                        "block over the Arsenal de la Marine's dockyard apron (81,764 m²). "
-                        "With --drop-water: 798 -> 888 polygons, blue 35 -> 82, land_plot mean "
-                        "0.350 -> 0.331, and ~55 s")
+    p.add_argument("--no-recut", dest="recut", action="store_false",
+                   help="drop components over --max-m2 instead of re-cutting them at a higher "
+                        "ink threshold. Re-cutting is the default because it is the only thing "
+                        "that puts a block over the Arsenal de la Marine's dockyard apron "
+                        "(81,764 m²) — on the 1882 sheet exactly one component trips the cap, "
+                        "1.77 km² of naval quarter welded to the river's ripple band, and with "
+                        "no block there the water region runs straight over the quay. It costs "
+                        "888 polygons against 798, land_plot mean 0.331 against 0.350, and "
+                        "~55 s. --no-recut restores the smaller, faster, blunter run")
+    p.set_defaults(recut=True)
     p.add_argument("--swatch-labels", action="store_true",
                    help="name each finished polygon against the legend's own five "
                         "swatches, diluted to the strength the sheet actually prints "
