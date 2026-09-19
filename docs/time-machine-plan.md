@@ -23,7 +23,7 @@ Measured against production, 2026-09-02:
 |------|-------|-------------|
 | `ocr_extractions` | 1,404 rows, **1 map**, 14 validated | E1 is empty until OCR runs on the corpus |
 | `footprint_submissions` | 46 rows, 1 map, all `submitted/volunteer`, **zero SAM2** | E2 needs the `seg` runner first |
-| Georeferenced Saigon city plans | 1799 · 1862 · 1863 · 1864 · 1878 · 1882 (cadastral) · 1882 · 1895 · 1898 · 1900 · 1912 · 1922 · 1923 · 1930 (Gia Định) · 1942 · 1959 · 1968 | District 4 series is already there: **1878 → 1882 → 1898 → 1912 → 1923 → 1942 → 1959 → 1968** |
+| Georeferenced Saigon city plans | 1799 · 1862 · 1863 · 1864 · 1878 · 1882 (cadastral) · 1882 · 1895 · 1898 · 1900 · 1912 · 1922 · 1923 · 1930 (Gia Định) · 1942 · 1959 · 1968 | District 4 series is already there: **1882 → 1895 → 1923 → 1942 → 1959 → 1968**. The 1878 and 1898 plans are wholly north of the Bến Nghé canal. |
 | Drafts, ungeoreferenced | 62, all 1900–1929 | E4 is a georef sprint, not an ingest problem |
 | Corpus scope | Saigon **plus Hanoi and Huế** sheets already georeferenced | Basemap PMTiles is a Saigon extract only; a Hanoi view needs a second extract |
 
@@ -217,7 +217,7 @@ Start only after E2 shows stable, reviewed fabric on ≥ 3 maps.
 | | Ships | Demo |
 |-|-------|------|
 | **M1** | 065 + `search_labels` · `include=labels` · catalog + explore results · `at=` deeplink · `enqueue_ocr_all` run on all georeferenced maps | Type "Khánh Hội", land on it on the 1923 plan |
-| **M2** | `seg` on Colab · `--aoi` triage · export upgrade · vectors toggle · `work/analysis/district4/` with the 8-map series | District 4 built-area % 1878→1968, slider on /explore |
+| **M2** | `seg` on Colab · `--aoi` triage · export upgrade · vectors toggle · `work/analysis/district4/` with the 6-map series | District 4 built-area % 1882→1968, slider on /explore |
 | **M3** | `/api/press` + press panel | Click "Khánh Hội" on the 1923 plan, read *L'Écho annamite* 1920s |
 | **M4 (ongoing)** | Georef sprint by decade gap · new scout sources | ≥ 3 city plans per decade |
 | **E5** | after M2 is stable | — |
