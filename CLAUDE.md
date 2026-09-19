@@ -59,7 +59,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 089**, pushed 2026-09-15. Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
+- **Migration head is 091**, pushed 2026-09-16 (090) / local (091). Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
   reason a collision takes the *year* rather than a counter: the header of `088_map_slug.sql`.
@@ -103,13 +103,13 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/image-processing-record.md` — **the image-processing work collected in one place**: chronology, the method at each stage, every measured number with its source file, the nine rejected approaches, the four things not yet established, and the anchors for comparing against the field
 - `docs/field-comparison.md` — **the same work held against the field**: MapSAM2 / SODUCO / mapKurator / ICDAR MapText / the two automatic georeferencing routes, what our numbers cannot be compared to and why, and the verdict per axis
 - `docs/worked-example-1882.md` — **one sheet all the way through**, with the number each stage produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one counts, the first `join` and the first `approved` footprints in the archive's history, and the four defects that only surfaced by running the chain
-- `docs/network.md` — **who is out there**: the Allmaps thread, the cold-but-matched research groups (§4 verified against institutional pages 19 Sep 2026, ETH IKG added), the archives that hold our sources, and the outbound ledger — one sent, one settled, three still sitting
+- `docs/private/` — **gitignored, never publish**: the outreach ledger (`network.md` — who is out there, §4 verified against institutional pages 19 Sep 2026), the Allmaps relationship file with its contact addresses (`allmaps.md`), and the personal application material moved out of `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
 - `docs/ROADMAP.md` — **the one tracker**: ship/harden · architecture steps · OCR↔SAM2 product · burn-down
 - `docs/time-machine-plan.md` — label search · temporal fabric · period sources (Track E detail)
 - `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route, warped sheets as a year slider, and the frozen-JSON seam between the two apps
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared and what stays per-app
 - `docs/strategy.md` (funder-facing), `docs/theory.md`, `docs/user-guide.md` — vision and outward-facing prose, not engineering reference. `docs/journals/` holds dated research notes (`YYMMDD-slug.md`)
-- `docs/private/` — **gitignored, never publish**: the outreach ledger, the Allmaps relationship file with its contact addresses, and the personal application material moved out of `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
+- `docs/private/` — **gitignored, never publish**: the outreach ledger (`network.md` — who is out there, §4 verified against institutional pages 19 Sep 2026), the Allmaps relationship file with its contact addresses (`allmaps.md`), and the personal application material moved out of `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
 - `docs/ponytail-debt.md` — ledger of `ponytail:` shortcut comments. The plugin that generated it is gone (Sept 2026); maintain it by hand with the grep at the top of that file (scope: `src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts`)
 - `docs/archive/` — frozen: historical plans and the August 2026 cleanup record (the personal application material moved to `docs/private/`). Do not cite as current; the live debt table is `docs/system-guidelines.md` §11
 - `contracts/` — JSON Schemas for the shapes VMA shares with other apps (`context`, `label-hit`, `footprint-feature`); checked by `tests/schemaCheck.ts`

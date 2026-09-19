@@ -13,8 +13,8 @@ Primary sources, in order of evidential weight:
 | `docs/journals/260919-seg-audit.md` | the audit of that pass, its work list, and the results |
 | `docs/worked-example-1882.md` | one sheet through every stage, with the four defects it exposed |
 | `docs/pipelines.md` | command reference + design rationale |
-| `docs/journals/260912-postgrad-route.md` | the dataset card and first-paper outline already drafted |
-| `docs/network.md` §4a, §4d-bis | who works on this, and what may be claimed to them |
+| `docs/private/260912-postgrad-route.md` | the dataset card and first-paper outline already drafted |
+| `docs/private/network.md` §4a, §4d-bis | who works on this, and what may be claimed to them |
 
 ---
 
@@ -178,7 +178,7 @@ were OCR label boxes rather than buildings (median IoU 0.83 to their own prompt 
 every `n=89` figure until they were found by rendering an overlay. They also caused a null to be
 declared and later retracted. Deleted 2026-09-19, backed up first.
 
-The sentence currently defensible in public, quoted verbatim from `docs/network.md` §4d-bis:
+The sentence currently defensible in public, quoted verbatim from `docs/private/network.md` §4d-bis:
 
 > a CPU-only colour pass, calibrated from the sheet itself and trained on nothing, produces a
 > block-and-parcel prior for a polychrome cadastral sheet in about nine seconds, and on the one
@@ -201,7 +201,7 @@ anchors:
   Vietnamese in any of them.
 - **Chen et al. (2024)** vectorization benchmarks · **mapKurator / Yao-Yi Chiang** · **EPFL DHLAB**
   (Jerusalem 1840–1940 4D) — the groups whose work is nearest, listed with what to lead with in
-  `docs/network.md` §4a.
+  `docs/private/network.md` §4a.
 
 Three axes on which this work is plausibly not the same as theirs, to be checked rather than
 assumed: a **VLM rather than a trained detector** as the prompt and text source; **ground per call**

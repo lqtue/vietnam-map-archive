@@ -148,7 +148,7 @@ The useful finding is *why the two working automatic routes do not transfer to t
 - the graticule route needs printed lat/long in the margin, which a colonial city cadastral usually
   does not carry (the Survey of India 1:50k sheets it was demonstrated on do).
 
-That leaves toponyms, which is exactly the route `docs/journals/260912-postgrad-route.md` already
+That leaves toponyms, which is exactly the route `docs/private/260912-postgrad-route.md` already
 outlined, and the reported weakness of toponym georeferencing (RMSE too large on some sheets) is the
 open question our corpus is unusually well placed to answer, because we hold **human GCPs, VLM
 toponyms and a gazetteer on the same 39 sheets**. That combination is what Bahgat & Runfola asked

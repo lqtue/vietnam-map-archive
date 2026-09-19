@@ -67,3 +67,6 @@ work/vectorize/
 
 # One-off pipeline run dumps from the 2026-05 deck/KG work
 work/deck-and-kg-2026-05/script-outputs/
+
+# outreach ledger + personal application material — never publish
+docs/private/
