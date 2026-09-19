@@ -18,7 +18,7 @@ as planned would have been the kind of error a reviewer finds in ten minutes.
 
 | paper | what it already does | how close to C3 |
 |---|---|---|
-| **Luft & Schiewe (2021)**, *Transactions in GIS* 25(6):2888–2906, `10.1111/tgis.12794` | Evaluates by comparing transformed map corners against **"the ground truth corner coordinates of the sheet boundaries"** from the series' sheet layout. And states the seam consequence in print: *"the alignment of corners also directly determines the ability to seamlessly join neighbouring transformed map sheets, which is a major concern for map users."* | **Closest. This is the lattice-as-evaluation-set idea, published.** |
+| **Luft & Schiewe (2021)**, *Transactions in GIS* 25(6):2888–2906, `10.1111/tgis.12794` | Evaluates by comparing transformed map corners against **"the ground truth corner coordinates of the sheet boundaries"** from the series' sheet layout. And states the seam consequence in print: *"the alignment of corners also directly determines the ability to seamlessly join neighbouring transformed map sheets, which is a major concern for map users."* | **Closest. This is the lattice-as-evaluation-set idea, published.** Read in full 2026-09-19 — see §2 below |
 | **Janata & Cajthaml (2020)**, *Applied Sciences* 11(1):299, `10.3390/app11010299` | Georeferences a multi-sheet series under **explicit sheet-adjacency constraints** in a least-squares adjustment, with IRLS / Huber M-estimate to downweight bad control points. 6,849 GCPs over 250 sheets of the First Military Survey. | Uses inter-sheet agreement as a **constraint**; we use the same information as a **diagnostic**. |
 | **Uhl, Leyk & Chiang (2018)**, `10.20944/preprints201803.0021.v2` | Computes displacement vectors between each GCP's known world coordinates (graticule intersections) and its post-transformation position, explicitly *"to identify anomalies … where users should be careful with respect to further information extraction from such map sheets."* | Per-sheet georeferencing-quality anomaly detection across a whole archive. |
 | **Gede & Varga (2021)**, *Proceedings of the ICA* 4:38, `10.5194/ica-proc-4-38-2021` | Detects map-content corners, OCRs the sheet identifier, derives the quadrangle extent from the ID, uses the corners as GCPs. 1,147 sheets at ~4 s each. **"False detection of the corners is automatically filtered by geometric analysis of the detected GCPs."** Corner error < 1% of sheet size on 89%, < 2% on 99%; sheet-ID recognition 75.9%. | **Closest to C2** — and it already has a geometric self-filter. |
@@ -102,13 +102,96 @@ Yizi Chen / Sidi Wu. Check the full author list and affiliations before that out
 
 ---
 
+## §2 Related Work — the Luft & Schiewe paragraph
+
+**Read in full 2026-09-19** (`read_fulltext`, 53,561 chars, six pages, `source: "fulltext"`).
+`editorialNotices` clean. Everything below is quoted from that read.
+
+### What the full read established
+
+| | |
+|---|---|
+| **method** | Segment blue water symbols in CIE Lab (global threshold, negative b\*); rasterise OSM water into each candidate sheet's bounding box; FAST corners + pixel-patch descriptors; cross-correlation matching; RANSAC affine; pick the sheet with the most surviving matches; assign that sheet's bounding-box coordinates; fine-align the content with ECC registration; crop to the neatline for stitching |
+| **corpus** | KDR100 1:100,000. The series is 674 original + 236 additional sheets; **the experiment uses 56** from Wikimedia at 400 ppi, mixed editions 1861–1913 |
+| **localisation** | Two failures, named: sheet 12 (early hand-coloured, rivers not coloured) and sheet 79a (Helgoland, coastline only). Reported as **96%** |
+| **accuracy** | median **101 m**, mean **168 m**, best 59 m (sheets 431, 333), worst >1,000 m. In pixels: mean RMSE 31.84 px, median 15.92 px, against Howe et al. (2019) 50.8 px mean / 46.1 px median (TPS) |
+| **floor** | The affine model cannot rectify the trapezoid sheet shape: an expected minimum of 10–15 px at the corners, 7.5 px in the best case |
+| **evaluation** | Corners annotated by hand on the **unwarped** original; template-matched in the warped output; their coordinates interpolated from the embedded spatial reference; compared against "the ground truth corner coordinates of the sheet boundaries"; both sides reprojected to WGS 84; geodetic distance; four corners averaged to one number per sheet |
+
+Three quotations the positioning rests on:
+
+> "For line-preserving transformations, any transformation error will interpolate linearly across
+> the image. Consequently, the points of highest error will always be on one of the map corners.
+> Therefore, it is sufficient to analyse the displacement of the transformed map corners from their
+> expected positions in the series' sheet layout. Conveniently, the alignment of corners also
+> directly determines the ability to seamlessly join neighbouring transformed map sheets, which is
+> a major concern for map users."
+
+> "Because neatlines are the first thing constructed and have the least projection error, they can
+> be assumed to be drawn at the 'correct' place."
+
+> "Location and extent for each sheet in the series are represented as sheet bounding boxes. The
+> complete set of bounding boxes was constructed in advance from the map series' metadata."
+
+**Count discrepancy inside the paper, noted so we never quote the raw fraction.** §4 says the method
+"predicted the correct bounding box … for 53 of the 55 input maps"; §5 says "we located 96% (54 of
+56) sheets correctly"; Figure 8's caption says 53 maps. Two failures either way, 96% either way.
+**Quote "96%", never "53 of 55" or "54 of 56".**
+
+**Also load-bearing for C4.** They do not need a neatline or graticule in the image, but they do
+need the frame as prior knowledge: "Approximate geographic coordinates of each map's boundaries
+need to be known. Those can usually be read from the map's margins." Their own Future Work names
+relaxing exactly this — "the map sheets' coordinates" — as the open problem.
+
+### The draft paragraph
+
+> The nearest prior work is Luft and Schiewe (2021), who georeference sheets of the *Karte des
+> Deutschen Reiches* 1:100,000 from their content: they segment the blue water symbols, match the
+> resulting binary mask against OpenStreetMap water rasterised into each candidate sheet's bounding
+> box, take the sheet with the most RANSAC-consistent patch matches, and finish with an ECC
+> registration of content against reference. They report 96% correct sheet identification over 56
+> sheets and a median georeferencing error of 101 m. What concerns us is not the matcher but the
+> yardstick. Because a line-preserving transform spreads its error linearly, the extreme always
+> falls at a corner, so they hold the transformed corners against "their expected positions in the
+> series' sheet layout", and they state the consequence in print: "the alignment of corners also
+> directly determines the ability to seamlessly join neighbouring transformed map sheets, which is
+> a major concern for map users." Using the series' own lattice as the standard against which a
+> sheet is judged is therefore established practice. The check we describe in §X confirms it on a
+> second series and a different frame; it does not introduce it.
+>
+> Two properties of that construction bound what the yardstick can see, and both are this paper's
+> subject. The first is that the sheet-layout bounding boxes are prior knowledge — "constructed in
+> advance from the map series' metadata" — and are used twice: once to give the output image its
+> spatial reference, and once as the ground truth the transformed corners are measured against. The
+> number that results is the residual of the image registration *inside an assumed frame*. Should
+> the frame itself be wrong — the datum, not the alignment — both sides of the comparison move
+> together and the residual does not move at all. Luft and Schiewe are explicit that the corner
+> metric is designed to exclude one class of error: corners are used because "neatlines are the
+> first thing constructed and have the least projection error, [so] they can be assumed to be drawn
+> at the 'correct' place", which keeps surveying and drawing error out of the measurement. It keeps
+> datum error out of it too. §X reports a 470 m datum fault affecting 285 of 437 published sheets,
+> on which a check of exactly this shape returns 2e-12.
+>
+> The second is that the seam is asserted rather than measured. Corner displacement is computed per
+> sheet against the layout and averaged over four corners into a single value; no two neighbours are
+> ever compared to each other. A per-sheet residual cannot separate a sheet that sits slightly off
+> its cell from two sheets that claim the same cell — the failure that caught `Ha Noi`, 75 km from
+> its cell while satisfying every per-sheet check (§Y). Inter-sheet agreement as a *constraint* is
+> well established: Janata and Cajthaml (2020) adjust a 250-sheet series under explicit adjacency
+> conditions. As a *diagnostic run across a whole archive*, it is not.
+
+**Placeholders.** `§X` is the blind-check section, `§Y` the lattice-collision section; neither is
+numbered yet. Resolve both before the preprint.
+
+---
+
 ## Still to do in Phase 1
 
 - [ ] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
       `docs/field-comparison.md` §Sources (mapKurator, ICDAR 2025 MapText, the GPT-4o legend paper,
       Bahgat & Runfola, Ingensand et al., the Jerusalem CaGIS 2025 paper, Tyagi & Dubey NCVPRIPG 2025).
-- [ ] Read Luft & Schiewe (2021) *Transactions in GIS* in full — it is the nearest prior work and
-      the paper's positioning depends on getting its claims exactly right.
+- [x] **Read Luft & Schiewe (2021) *Transactions in GIS* in full — done 2026-09-19. Notes and the
+      drafted §2 paragraph are in *§2 Related Work* above.**
 - [ ] Read Janata & Cajthaml (2020) §Discussion — how they treat sheets whose corners cannot be read
       (23 excluded) against our four thin-frame sheets.
 - [ ] Find MapEdge (Meijers & Schoonman, ICA Bologna 2024 / *e-Perimetron* 20(1):12–24, 2025) — not
