@@ -310,6 +310,140 @@ for the figures-file discipline this project runs on.
 
 ---
 
+## §4 Related Work — MapEdge, found outside scite
+
+**Found and read in full 2026-09-19.** Not through scite — **e-Perimetron mints no DOIs**, which is
+why every search term tried in this Phase 1 pass returned nothing and why the handoff recorded it as
+unresolved. It is a free PDF at `e-perimetron.org`. Record that reason next to the citation so
+nobody re-runs the search.
+
+> Meijers, M. & Schoonman, J. (2025). **Mapping the Edge: A Novel Approach to Georeferencing
+> Historical Map Series.** *e-Perimetron* 20(1):12–24. ISSN 1790-3769.
+> <http://www.e-perimetron.org/Vol_20_1/Meijers_et_al.pdf> · code
+> <https://github.com/bmmeijers/mapedge/>
+
+**Note the title.** It is *"Mapping the Edge: A Novel Approach to…"*, not *"A Novel Approach to…"* —
+the short form is what a search engine returns. **Authorship confirmed correct**, unlike MapSAM2's:
+Martijn Meijers (assistant professor, GIS technology, TU Delft) and Jules Schoonman (digital
+curator, TU Delft Library), two authors, in that order.
+
+### What the full read established
+
+| | |
+|---|---|
+| **corpus** | Three series, **557 sheets**: Topografisch Militaire Kaart (TU Delft, 65 sheets, ±1850), North Korea (Stanford, 308, ±1916), Waterstaatskaart 1st ed. (Utrecht, 184, ±1860). All 1:50,000 |
+| **method** | Low-res overview → binarise → **1D histogram of black pixels along each axis** → threshold → peak candidates → pairs ranked by a **fuzzy metric** (Zadeh) on pair separation and proximity to a user-stated expected position → approximate rectangle. Then high-res edge strips only, subdivided into **non-overlapping patches**; per patch a 1D histogram again, peaks ranked against a **user-supplied fuzzy width prior** ("best match between 6 and 8 pixels, but we also accept peaks between 4 and 10 pixels wide"); **RANSAC** line fit per side; intersect the four lines → corners, which serve as both the GCPs and the mask |
+| **inputs required** | A digitised sheet index linking sheet geometry to world coordinates. For both Dutch series this **did not exist and had to be reconstructed from historical documentation** |
+| **cost** | ~15 s per sheet including image transfer. Python, OpenCV, NumPy, Requests |
+| **accuracy reported** | **No metric error figure anywhere in the paper.** The only numbers: on the TMK, opposite-side length differences of ~10 px horizontally and ~6 px vertically on sheets of 12,500 × 14,800 px at 600 dpi; corners "exact (pixel perfect)" in some cases, "a minor offset of a few pixels" in others, attributed to paper distortion and scanning |
+| **failures** | 3 of 184 Waterstaatskaart sheets had neat lines missing around part of the frame, corners could not be deduced, and were done by hand in Allmaps Editor; masks hand-corrected where the map fragment stuck out past the frame |
+| **an index error caught by the checks** | On 3 further sheets the checks revealed that **sheet-size exceptions had been digitised wrongly in their own sheet index**, and the index was corrected afterwards |
+
+**Their five consistency checks**, which are the most developed per-sheet battery in this
+literature and matter to §7:
+
+1. enough points sampled along each rim, and enough RANSAC inliers;
+2. **internal** — opposite sides equal, diagonals equal; the ratio of smaller to larger should be 1;
+3. **external** — documented sheet size in cm × scan dpi → expected size in pixels, compared against
+   the measured sides;
+4. the distribution of inlier perpendicular distances against the fitted line, which detects **paper
+   bulging or caving**;
+5. a visual contact sheet of every detected corner with its IIIF crop, for browsing.
+
+They do **not** compare a sheet to its neighbours, to a lattice, or to any external reference
+geometry. There is no ground truth in the paper and no accuracy claim against one.
+
+### Correction this read forces — and it was in our own figures file
+
+`docs/paper/figures.md` §2 carried the row:
+
+> | where MapEdge's inward walk stops here | at the graticule band — 40 px / 170 m short, residuals
+> 14–41 px, every edge rejected |
+
+**MapEdge has no inward walk.** The inward walk is *ours* — `scripts/l7014_neatline.py`, which walks
+in from the blank margin until the paper stops being paper. `allmaps-series-note.md:109` and
+`docs/private/allmaps.md:195` both say so correctly; the figures file compressed the sentence and
+moved the method from us to them. Fixed in this commit.
+
+This is worth dwelling on for one line, because it is the exact failure the figures file exists to
+prevent, found inside the figures file: a claim that would have put a method Meijers never wrote
+into his mouth, **in a paper we plan to send him**, sourced to a row that looked checked.
+
+### What MapEdge actually differs from us in
+
+Both methods take 1D black-pixel profiles over full-resolution edge strips cut into patches, fit a
+line per side and intersect. **The difference is peak selection.** MapEdge ranks candidate peaks
+against a user-declared fuzzy width prior and a threshold. We take `argmax` with no threshold and no
+rule, because on these sheets the thick neatline is the darkest thing on the strip by a factor of
+three. Ours needs no prior and cannot be tuned; theirs is adaptable to layouts ours would fail on.
+That is the honest statement of the trade, and it is a much smaller and more defensible claim than
+the one the figures file implied.
+
+### The graticule failure is *their* stated limitation, which strengthens our position
+
+Their Discussion, verbatim:
+
+> "confusion can still occur, for instance, when map features inside the map fragment close to the
+> rim share similar characteristics with the rim side. For example, **linear features, such as
+> graticule lines, can occupy the same number of black pixels as the neat line.**"
+
+That is precisely our Như Trác failure — the walk stopping on the graticule band, 40 px and 170 m
+short, residuals 14–41 px, every edge rejected. **So this is not a gap we found in MapEdge; it is a
+limitation its authors state in print, on which we have a worked case and a concrete answer.** Same
+reframing as §2 and §3: cite it as taking up their stated open problem, never as a deficiency
+discovered. It is also, straightforwardly, the most useful thing we can offer them.
+
+### A measurement against their future work
+
+Their Discussion also proposes:
+
+> "Considering each neat line as two separate halves and estimating the location of the straight
+> line for each half separately could potentially reduce the influence of distant points (that
+> reside near the opposite corners)."
+
+We have measurements in the same neighbourhood, and they carry a warning their framing does not
+anticipate: averaging over half a sheet is exactly what fails when the scan is off square. Up to
+0.8° of skew smears a 10 px line across 30 and lets a weaker, shorter feature win the `argmax`; a
+half-width average put Như Trác's top neatline **35 px** from where it is. And fitting each side
+independently — four rotations rather than one — made opposite edges of the quad differ by **14 px**
+where the projection says 4.
+
+**State this carefully.** Their proposal is per-half fitting to cut leverage from distant points;
+ours is evidence that the tilt must be solved once, globally, before any averaging. The two are
+compatible and the second constrains the first. Do not write it as a refutation.
+
+### `Ha Noi` against their five checks — the §7 paragraph this read makes possible
+
+The sharpest use of this paper is not in Related Work at all. MapEdge's battery is the most complete
+set of per-sheet checks published, and our `Ha Noi` sheet — 75 km from the city it names — survives
+it:
+
+| their check | `Ha Noi` |
+|---|---|
+| 1 · enough rim points and inliers | passes; normally detected sheet |
+| 2 · internal — opposite sides and diagonals equal | passes; "corners agree with each other" |
+| 3 · external — sheet cm × dpi vs measured pixels | passes; **ground scale agrees with pixels to 0.78%** |
+| 4 · inlier residuals → paper bulge or cave | passes, and **cannot fail**: a flatness test is structurally incapable of seeing a translation |
+| 5 · visual browse of corner crops | passes; the content is unmistakably Hanoi |
+
+Nothing here is a criticism of the battery, which does what it claims. The point is that **all five
+are per-sheet**, and a sheet sitting on another sheet's cell is not a per-sheet property. It took a
+lattice collision to catch it. This is the third and cleanest instance of the paper's thesis: §2's
+frame stands on both sides of the metric, §3's seam is spent as a constraint, and §4's checks are
+each individually sound and collectively blind to one class of error by virtue of their scope.
+
+### Two bibliographic notes
+
+- **Burt et al.** — our running list says *(2020)*; MapEdge's reference list gives *Burt, J. E.,
+  White, J., Allord, G., Then, K. M., and Zhu, A.-X. (2019). Automated and semi-automated map
+  georeferencing. Cartography and Geographic Information Science, 47(1):46–66.* CaGIS 47(1) is a
+  2020 issue with 2019 online-first. Pick one form and use it consistently; check before citing.
+- MapEdge cites Luft & Schiewe (2021), Gede et al. (2022) and Heitzler et al. (2018) — **we are in
+  the right neighbourhood and these four papers already cite each other.** A submission to
+  e-Perimetron lands in the middle of an existing conversation rather than beside it.
+
+---
+
 ## Still to do in Phase 1
 
 - [ ] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
@@ -321,7 +455,9 @@ for the figures-file discipline this project runs on.
       comparison and the drafted §3 paragraph are in *§3 Related Work* above. The read also produced
       the second blind-by-construction instance (the seam spent as a constraint), which is a
       stronger result than the question it was opened for.
-- [ ] Find MapEdge (Meijers & Schoonman, ICA Bologna 2024 / *e-Perimetron* 20(1):12–24, 2025) — not
-      indexed in scite under these search terms; may need the e-Perimetron site directly.
+- [x] **Find and read MapEdge — done 2026-09-19.** Full read, notes and the drafted material are in
+      *§4 Related Work* above. It is not in scite because **e-Perimetron mints no DOIs**; the PDF is
+      free at `e-perimetron.org`. The read corrected a misattribution in `figures.md`, and produced
+      the `Ha Noi`-against-their-five-checks table, which belongs in §7 rather than §2.
 - [ ] Decide whether §7 keeps the IIIF size-segment finding or it ships as its own note.
 - [ ] `report_citations` with the full include/exclude set once the list is closed.

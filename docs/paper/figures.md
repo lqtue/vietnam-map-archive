@@ -120,7 +120,9 @@ consumer that forgets that filter reads 1,443 machine polygons as truth. This is
 | Như Trác printed corners | `115ᵍ,20`/`22ᵍ,875` and `115ᵍ,40`/`22ᵍ,75` → 106.017 E/20.5875 N, 106.197 E/20.475 N | `allmaps-series-note.md` §2 |
 | conversion | grades × 0.9 = degrees from Paris, + 2.3372 for Greenwich | ibid |
 | two independent checks | ground box 18.75 × 12.48 km aspect **1.50** vs neatline 4496 × 3014 px aspect **1.49**; ~4.2 m/px ≈ 150 dpi on a 75 × 50 cm sheet | ibid |
-| where MapEdge's inward walk stops here | at the graticule band — 40 px / 170 m short, residuals 14–41 px, every edge rejected | ibid |
+| where **our own L7014 inward walk** stops on these sheets | at the graticule band — 40 px / 170 m short, residuals 14–41 px, every edge rejected | ibid |
+| what MapEdge actually does (read in full 2026-09-19) | 1D black-pixel histograms on patched edge strips, peaks ranked against a user-declared fuzzy width prior, RANSAC per side, intersect. **No inward walk.** Reports no metric error figure at all | `related-work.md` §4 |
+| the graticule confusion itself | **named as a limitation in MapEdge's own Discussion** — "linear features, such as graticule lines, can occupy the same number of black pixels as the neat line". Cite as their stated open problem, never as our finding against them | ibid |
 | the anchor that works | thick neatline, `argmax`, no threshold — darkest thing on the strip by 3× | ibid |
 | rim-to-neatline constant, Như Trác | 83.2 / 84.9 / 83.5 / 83.9 px on the four sides | ibid |
 | cost of averaging half a sheet | scans up to 0.8° off square; a 10 px line smears across 30; top neatline landed 35 px out | ibid |
@@ -228,8 +230,16 @@ sheet. The metric survives; this evidence does not.
 
 ---
 
+**Correction, 2026-09-19 (same day).** The row above previously read *"where MapEdge's inward walk
+stops here"*. MapEdge has no inward walk — that is `scripts/l7014_neatline.py`, ours.
+`allmaps-series-note.md:109` and `docs/private/allmaps.md:195` were correct all along; this file
+compressed the sentence and reassigned the method to Meijers & Schoonman. Caught by reading the
+paper in full. Recorded rather than silently rewritten, per the `note:` convention.
+
 ## Changelog of this file
 
+- **2026-09-19** — MapEdge read in full; §2's "inward walk" row corrected (it described our detector,
+  not theirs) and two rows added. See `related-work.md` §4.
 - **2026-09-19** — created. Phase 0 of the paper plan. Live counts pulled; ten documented
   contradictions resolved across `pipelines.md`, `field-comparison.md`, `image-processing-record.md`,
   `digitalize-guide.md`, `db-guidelines.md`, `src/lib/CLAUDE.md`, `worked-example-1882.md`,
