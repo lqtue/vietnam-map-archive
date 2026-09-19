@@ -184,16 +184,9 @@ When the sheet is right, mark it **reviewed** — one of the three stages a pers
 
 That decision is stored with the polygon's `run_id`: accepted polygons are positive examples; rejected polygons and their tags are false-positive evidence; an edited approval becomes `sam-corrected`, preserving both the original model provenance and the corrected contour. Do not bulk-decide a group when its failure has a diagnosis worth retaining; open one representative result and record it.
 
-The colour-pass result from the 1882 audit is a local GeoJSON file, not yet a queue row. Import it once with a stable run name, then open the printed Validate link:
+The 1882 colour-pass run `colour-20260919` is already in the Validate queue: 1,443 proposals. Open `/scan?mode=shapes&tab=validate&map=0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` to review it. The normalized GeoJSON at `work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.normalized.geojson` retains all 1,443 geometries and maps their washes to review classes. Ten source polygons have interior holes that `pixel_polygon` cannot store; their indices and bounds are in the adjacent `audit.json`. The queue-safe file in that directory excludes those ten for any future reimport. The existing run may contain their filled exterior rings, so check those proposals before approving them.
 
-```bash
-node --env-file=.env scripts/import-seg-geojson.mjs \
-  --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
-  --run-id colour-20260919 \
-  --input /Users/airm1/Desktop/vma-1882-seg-260919/after/blocks.geojson
-```
-
-The importer turns the colour pass's raw washes (`cream`, `salmon`, `blue`, and so on) into the archive's review classes while retaining the wash as its cadastral category; it also removes only exact duplicate rings. It deliberately does **not** collapse a building inside a parcel — that is a useful, intentional overlap. The same map/run pair is refused a second time, so review counts and tuning data stay unambiguous. Use `--dry` first to validate a file without writing it.
+For a new colour-pass run, use `scripts/import-seg-geojson.mjs` with its raw `blocks.geojson`, a new run ID, and `--dry` first. The importer maps washes to review classes, retains the cadastral category, removes only exact duplicate rings, and rejects polygons with holes instead of silently filling them. It keeps buildings inside parcels as separate proposals and refuses a repeated map/run pair.
 
 ## The pipeline stages
 

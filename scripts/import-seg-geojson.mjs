@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 // Import a pixel-space segmentation proposal into the Validate queue.
 //
-// Example (the 1882 colour-pass audit):
-//   node --env-file=.env scripts/import-seg-geojson.mjs \
-//     --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
-//     --run-id colour-20260919 \
-//     --input /Users/airm1/Desktop/vma-1882-seg-260919/after/blocks.geojson
+// The 1882 colour-20260919 run is already imported. For a new run, pass its
+// raw, hole-free blocks.geojson and a fresh run id; use --dry first.
 //
 // The importer deliberately refuses an existing run_id. Re-importing a run
 // would create duplicate candidates and erase the meaning of review counts.
@@ -60,6 +57,11 @@ const seen = new Set();
 let duplicates = 0;
 const rows = document.features.flatMap((feature, index) => {
   const ring = feature?.geometry?.type === 'Polygon' ? feature.geometry.coordinates?.[0] : null;
+  if (feature?.geometry?.type === 'Polygon' && feature.geometry.coordinates?.length !== 1) {
+    throw new Error(
+      `feature ${index + 1} has interior rings; the Validate queue stores only an exterior ring`
+    );
+  }
   if (
     !Array.isArray(ring) ||
     ring.length < 3 ||
