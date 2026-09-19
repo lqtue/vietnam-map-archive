@@ -142,12 +142,18 @@ saying in print, because the GPT-4o legend paper's pipeline has the same exposur
 |---|---|---|
 | **Feature matching** (Jerusalem, CaGIS 2025) | an already-georeferenced map of the same place | SuperPoint + SuperGlue + Delaunay consistency; **RMSE < 1% of map diagonal on 71 of 86 maps** |
 | **Printed graticule + LLM** (Tyagi & Dubey, NCVPRIPG 2025) | printed lat/long labels in the margin | EasyOCR + two-stage multimodal LLM; **internal RMSE < 5 m, validation < 30 m on 11 of 12 sheets**, < 350 s/sheet |
-| **Toponym matching** (Bahgat & Runfola 2021) | a gazetteer and ≥ ~10 toponyms | usable for data extraction in nearly half of cases; affine RMSE elsewhere reported 16.9–84.2 px, i.e. sometimes too imprecise |
+| **Toponym matching** (Bahgat & Runfola 2021) | a gazetteer and ≥ ~10 toponyms | usable for data extraction ("nearly half of all cases", quoted from the abstract) — real-world sample: 40% at <5% error, 44% at <1% error; simulated: 12.6% true success at <1% error. **Not** "affine RMSE 16.9–84.2 px" — see the 2026-09-19 correction in §7 |
 | **Content-based** (Luft & Schiewe 2021) | topographic content | — |
-| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 11.3 m** on the 1882 sheet; affine buys 10.6 m |
+| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 12.7 m** on the 1882 sheet; affine buys 10.6 m. Not a floor for the archive — the 1942 sheet measures **72.3 m** |
 
-**We do no automatic georeferencing at all.** Our 11.3 m is a human result and belongs in the
+**We do no automatic georeferencing at all.** Our 12.7 m is a human result and belongs in the
 ground-truth column, not the results column.
+
+> **note 2026-09-19 — every "11.3 m" in this section read as written until today.** The 1882
+> similarity residual is **12.7 m, worst 27.7 m**: the recorded pair was computed over a *spherical*
+> earth and the figures now quoted are geodetic (`docs/worked-example-1882.md:44`). Separately, do
+> not read 1882 as the archive's figure — `work/analysis/district4/georef_error.md` measures 1942 at
+> **72.3 m RMSE, worst 193.7 m**, on the sheet holding 31.7% of all extractions.
 
 The useful finding is *why the two working automatic routes do not transfer to this corpus*:
 
@@ -163,7 +169,7 @@ toponyms and a gazetteer on the same 39 sheets**. That combination is what Bahga
 for in print. The blocker is unchanged and is not research: toponyms on all 39 sheets rather than 6.
 
 One reporting fix to adopt: the field states georeferencing error as **a percentage of map
-diagonal**, not in metres. Our 11.3 m on a 4.14 × 3.09 km sheet is ~0.22% of the diagonal. Quote
+diagonal**, not in metres. Our 12.7 m on a 4.14 × 3.09 km sheet is ~0.25% of the diagonal. Quote
 both.
 
 ---

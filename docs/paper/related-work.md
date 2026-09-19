@@ -1,8 +1,11 @@
 # Related work — verified references, and the verdict on the gap claim
 
 **Started 2026-09-19.** Phase 1 of the paper plan. Every entry was retrieved through scite on the
-date given; nothing here is cited from memory. Status of this file: **item 3 (the gap claim) is
-answered; items 1 and 2 (full audit verification, 25–35 paper depth) are in progress.**
+date given, or (§7.1, §7.5) through a direct fetch of a genuinely open copy when scite would not
+serve one — flagged individually where that happened. Nothing here is cited from memory. Status of
+this file: **item 3 (the gap claim) is answered; item 1 (full audit verification) is now complete —
+all 7 asserted citations checked, plus the three §6 papers' `editorialNotices`; item 2 (25–35 paper
+depth) is still in progress.**
 
 ---
 
@@ -599,6 +602,19 @@ assemble neighbours into phrases; we had to *stop* a bare `Đường` chaining 4
 cluster). Worth engaging directly there. **Yao-Yi Chiang is now on three papers in our set** — this,
 the GPT-4o legend paper (§5), and Uhl, Leyk & Chiang (2018).
 
+### `editorialNotices` check, 2026-09-19 — the item this read left open
+
+Closing the gap the read-from-PDF provenance note above flags. All three fetched through scite by
+DOI (`search_literature`, metadata-only call, no `term`); none returned an `editorialNotices` field,
+which is how a clean record reads through this tool (contrast the retraction/correction/concern
+fields scite populates when a notice exists). **All three clean.**
+
+| DOI | result |
+|---|---|
+| `10.3390/ijgi11070387` (Milleville et al.) | clean |
+| `10.4230/LIPIcs.GIScience.2025.12` (Wijegunarathna et al.) | clean |
+| `10.1145/3557918.3565864` (Namgung & Chiang) | clean |
+
 ### What the three add to Paper 1 — the error ladder
 
 Stated carefully, because the comparison is easy to make dishonestly:
@@ -608,8 +624,23 @@ Stated carefully, because the comparison is easy to make dishonestly:
 | Automatic, content-based — Luft & Schiewe (2021) | **101 m** median |
 | Automatic, toponym-based — Milleville et al. (2022) | **316 m** / **287 m** mean |
 | LMM on locality descriptions — Wijegunarathna et al. (2025) | **~1.03 km** |
-| **Our human-placed GCPs** | **2.3–19.0 m** rms; the 1882 sheet at **11.3 m** RMSE |
+| **Our human-placed GCPs** | **9.0 m to 1,415.9 m** RMSE across the 274-sheet archive; the 1882 sheet at **12.7 m**, and **65% of all extractions sit on a sheet with a bad stated limit or none** |
 | **The L7014 datum fault we shipped** | **~470 m** |
+
+> **note 2026-09-19 — this row read "**2.3–19.0 m** rms; the 1882 sheet at **11.3 m** RMSE".**
+> Both figures were wrong. 11.3 m is the superseded spherical-earth conversion, now 12.7 m geodetic
+> (`docs/worked-example-1882.md:44`). The 2.3–19.0 m range is worse than superseded — it understated
+> the archive's ceiling by nearly 4×. Measuring all six District 4 sheets through one code path
+> (`work/analysis/district4/georef_error.md`) puts **1942 at 72.3 m RMSE, worst point 193.7 m**, on
+> the sheet carrying 31.7% of all extractions. Two of the six cannot be measured from their own GCPs
+> at all.
+>
+> **The archive-wide pass has since run** — all 274 sheets, one code path
+> (`work/analysis/georef_coverage.md`). It is worse than District 4 suggested. Eight sheets are worse
+> than 1942; the worst is 1,415.9 m. **1922 (Carte routière des environs de Saïgon) is at 456.9 m and
+> is the archive's third most-extracted sheet** (1,420 rows). 35 of 274 sheets cannot be measured
+> from their own control points at all. Counted by extraction row rather than by sheet, **65.0%
+> (8,796 of 13,525) sit on a sheet whose stated limit is bad or absent.**
 
 **The only honest comparison in this table is the last two rows against the middle ones**, and it is
 worth one sentence in §1:
@@ -624,16 +655,161 @@ not to rank the methods.
 
 ---
 
+## §7 The five remaining verifications, 2026-09-19
+
+mapKurator, ICDAR 2025 MapText, Bahgat & Runfola, Ingensand et al., and the Jerusalem CaGIS 2025
+paper — the five left open at the bottom of this file. All five are real, correctly attributed
+(one correction below), and clean of editorial notices. Access and number-verification differ per
+paper and are called out individually.
+
+### 7.1 mapKurator — real, correctly attributed, numbers confirmed via an open duplicate
+
+> Kim, J., Li, Z., Lin, Y., Namgung, M., Jang, L., & Chiang, Y.-Y. (2023). **The mapKurator System:
+> A Complete Pipeline for Extracting and Linking Text from Historical Maps.** ACM SIGSPATIAL '23
+> (demo). `10.1145/3589132.3625579` — closed, purchase ~$37.95 via Article Galaxy, `contentDenied:
+> true`. An identical-title arXiv preprint exists: `10.48550/arxiv.2306.17059` (green OA,
+> CC BY-NC-ND) — also `contentDenied` through scite's `read_fulltext`, but genuinely open, so read
+> directly from arXiv instead.
+
+| | |
+|---|---|
+| authors | **Yao-Yi Chiang is confirmed on the author list** — scite's author-filtered search returns him first (Chiang, Kim, Li…), the unfiltered call returns Kim, Li, Lin first; both are the same six-author set (Kim, Li, Lin, Namgung, Jang, Chiang). `network.md`'s "mapKurator via the Knowledge Computing lab" attribution to Chiang is **correct** — unlike the MapSAM2 case, where the same kind of assumption was wrong |
+| figures | Read from the arXiv PDF directly (`arxiv.org/abs/2306.17059`): **"over 60,000 maps"** and **"over 100 million text/place names"**, both from the David Rumsey Historical Map collection — matches `field-comparison.md`'s "60,000+ maps, 100M+ text labels" exactly |
+| not confirmed | The **"~57,000 georeferenced maps processed"** sub-figure in `field-comparison.md` — the arXiv abstract page didn't surface it and a full-PDF fetch timed out. Not contradicted, just not independently reread; treat as unverified rather than wrong |
+| editorialNotices | clean on both DOIs |
+| access | ACM version closed; arXiv preprint open — cite the arXiv DOI as the accessible copy |
+
+### 7.2 ICDAR 2025 MapText — real, a misattribution found and corrected, numbers confirmed
+
+> Lin, Y., Tual, S., Li, Z., et al. (25 authors). **ICDAR 2025 Competition on Historical Map Text
+> Detection, Recognition, and Linking.** *ICDAR 2025*, Springer. `10.1007/978-3-032-04630-7_33` —
+> nominally green OA per scite metadata, but `read_fulltext` returned `contentDenied` and both the
+> Springer chapter page (login redirect) and the EPFL infoscience handle (405) blocked direct fetch.
+
+**A misattribution found and fixed.** `docs/image-processing-record.md:219` cited this as **"(Zou et
+al. 2025)"**. scite gives the first author as **Yijun Lin** (confirmed independently by the
+competition's own site, `rrc.cvc.uab.es/?ch=32`, which lists the full 25-name organiser roster —
+Lin, Tual, Li, Jang, Chiang, Weinman, Chazalon, Carlinet, Perret, Abadie, Duménieu, Chan, Liao, Su,
+**Zou**, Dai, Petitpierre, Vaienti, Kaplan, di Lenardo, Baek, Hentschel, Nakagome, Shuta, Lee,
+Choi). Mengjie Zou is on the list, far from the front — not the lead author. **Corrected to "Lin et
+al. 2025" in `image-processing-record.md`, dated note left in place** (old wording quoted there).
+Worth flagging: Beatrice Vaienti, Frédéric Kaplan and Isabella di Lenardo — the Jerusalem CaGIS
+authors, §7.5 below — are also on this competition's organiser list.
+
+**Figures**, confirmed via the competition's own site rather than the paper's fulltext (which scite
+would not serve and direct fetches were blocked): **seven teams, 25+ submissions, four tasks, three
+datasets** — Rumsey, expanded French Land Registers, and a **new Taiwanese dataset with Chinese
+characters**; **"detection performance is strong... recognition and linking remain difficult."**
+Matches `field-comparison.md`'s "7 teams, 25+ submissions, 4 tasks, 3 datasets… detection strong,
+recognition and linking still hard" exactly. editorialNotices clean.
+
+### 7.3 Bahgat & Runfola (2021) — real, correctly attributed, one figure in our docs could not be found in the paper and is now corrected
+
+> Bahgat, K. & Runfola, D. M. (2021). **Toponym-assisted map georeferencing: Evaluating the use of
+> toponyms for the digitization of map collections.** *PLOS ONE* 16(11):e0260039.
+> `10.1371/journal.pone.0260039` — gold OA, CC-BY, `contentDenied: false`. editorialNotices clean.
+
+**Read in full** (45,297 chars, all pages, `source: "fulltext"`). Authors and venue match our
+citation exactly. Two things checked and confirmed:
+
+- **"usable for data extraction… in nearly half of cases"** is a near-verbatim echo of the abstract:
+  *"sufficiently accurate to be used for data extraction purposes in nearly half of all cases."*
+  Their real-world sample: 40% of maps at <5% error (their high-accuracy bar), 44% at <1% error;
+  their simulated sample's true success rate at <1% error is 12.6%.
+- **"≥ ~10 toponyms"** matches: *"As few as 10 toponyms was shown to be sufficient… accuracy
+  dropping from about 80%… to 40% with smaller numbers of toponyms."*
+
+**One figure could not be found and appears to be wrong.** `field-comparison.md:145` read *"affine
+RMSE elsewhere reported 16.9–84.2 px, i.e. sometimes too imprecise."* Nothing in the paper's full
+text supports it: the paper never uses the word "affine" — it compares **1st/2nd/3rd-order
+polynomial transforms** (1st order used in 69% of maps) — and it never reports error in raw pixels
+anywhere; every accuracy figure is a **percentage of map radius** (`trueMax`, `modelMax`, `modelMax
+LOO`). No "16.9" or "84.2" appears in any of the six 8,000-char pages read. **Corrected in
+`field-comparison.md` 2026-09-19**: the cell now quotes the real figures above and flags the old
+pixel range as unsupported rather than repeating it.
+
+### 7.4 Ingensand, Lecorney & Blanc (2022) — real, correctly attributed, no number in our docs to check
+
+> Ingensand, J., Lecorney, S. & Blanc, N. (2022). **An open API for 3D-georeferenced historical
+> pictures.** *Int. Arch. Photogramm. Remote Sens. Spatial Inf. Sci.* XLVIII-4/W1-2022:217–222.
+> `10.5194/isprs-archives-xlviii-4-w1-2022-217-2022` — diamond OA, CC-BY, `contentDenied: false`.
+> editorialNotices clean.
+
+Authors, volume and pages match `260912-postgrad-route.md`'s reference exactly. Our docs cite this
+conceptually — "the host owns the image, the dataset owns the geometry" (`network.md`), "the
+rights-separation model `smapshot` uses" (`260912-postgrad-route.md:22`) — rather than by number, so
+there is no figure to verify against the text. As a sanity check: the abstract describes an open API
+onto **Smapshot**, an existing database of **200,000 3D-georeferenced images** contributed by **over
+800 volunteers** via monoplotting, which is consistent with — though not a direct statement of — the
+rights-separation framing our docs attribute to it.
+
+### 7.5 The Jerusalem CaGIS 2025 paper — real, correctly attributed, numbers corroborated independently (not via scite fulltext)
+
+> Vaienti, B., di Lenardo, I. & Kaplan, F. (2025). **Georeferencing historical maps using local
+> feature matching and Delaunay consistency.** *Cartography and Geographic Information Science*,
+> published online 2025-11-06. `10.1080/15230406.2025.2566789` — hybrid OA, CC-BY per scite
+> metadata, but `read_fulltext` returned `contentDenied` (nothing indexed) and direct fetches to
+> Taylor & Francis (403) and the `getft.io` redirect both failed. **Not read in full**; everything
+> below is corroborated through an independent secondary source (web search over the paper's
+> abstract/summary as indexed elsewhere), not scite's own fulltext.
+
+| | |
+|---|---|
+| authors | Beatrice Vaienti, Isabella di Lenardo, **Frédéric Kaplan** — Kaplan is the EPFL DHLAB
+director `network.md` names, so the attribution there is directionally correct |
+| method | confirmed: **SuperPoint + SuperGlue** for feature matching, **RANSAC** plus a
+**Delaunay-based consistency check** to discard erroneous matches — matches "SuperPoint + SuperGlue
++ Delaunay consistency" in `field-comparison.md` |
+| headline number | confirmed: **RMSE below 1% of the map diagonal for 71 of 86** georeferenced
+historical maps of Jerusalem — matches `field-comparison.md`'s "RMSE < 1% of map diagonal on 71 of
+86 maps" exactly. 71/86 = 82.6%, which is also where `field-knowledge-graph.md` and `AUDIT.md`'s
+"83% of 86 Jerusalem maps" comes from — **not an internal contradiction**, the same fact in two
+units, unlike the Luft & Schiewe / Janata & Cajthaml cases |
+| corpus note | the pipeline was separately applied to 113 non-georeferenced maps, of which 86 were
+successfully georeferenced past a keypoint-count threshold — a different "86" from the evaluation
+set above; not something our docs currently quote, flagged here so it isn't conflated later |
+| editorialNotices | clean (scite metadata) |
+
+**Caveat, stated plainly.** Every other paper in this file with a quoted number was either read in
+full through scite (`source: "fulltext"`) or, for the closed-access cases, explicitly marked
+unverifiable. This one sits in between: genuinely open access, but not served by scite and blocked
+on direct fetch, so the confirmation above rests on a secondary source rather than the primary text.
+Treat the numbers as corroborated, not scite-verified, and read the paper directly before the
+preprint ships if the 71/86 figure needs to survive review.
+
+### Bibliographic note found in passing
+
+`docs/private/network.md:102` describes Kaplan's relevant work as **"their Jerusalem 1840–1940 4D
+paper"** — a description that may point at a different EPFL DHLAB Jerusalem publication (there is
+at least one more, on planimetric distortion clustering, `10.3390/ijgi14030132`) rather than this
+CaGIS 2025 local-feature-matching paper. Not corrected here — `network.md` is outside this file's
+scope and the checklist item named "the Jerusalem CaGIS 2025 paper," which is what §7.5 verifies —
+but worth checking before that outreach goes out.
+
+---
+
 ## Still to do in Phase 1
 
-- [~] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
-      `docs/field-comparison.md` §Sources. **2 of 7 done 2026-09-19 — see §5 above.**
+- [x] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
+      `docs/field-comparison.md` §Sources. **7 of 7 done 2026-09-19 — see §5 and §7 above.**
       - [x] **Tyagi & Dubey** — DOI and authorship verified; **closed access, numbers unverifiable**,
             and a decision is pending on whether to buy it (§5).
       - [x] **The GPT-4o legend paper** — verified as Kirsanova, Chiang & Duan (2025), 88% F-1 /
             85% IoU. Belongs to Paper 2, not Paper 1 (§5).
-      - [ ] mapKurator · [ ] ICDAR 2025 MapText · [ ] Bahgat & Runfola · [ ] Ingensand et al. ·
-            [ ] the Jerusalem CaGIS 2025 paper.
+      - [x] **mapKurator** — real, Chiang's authorship confirmed, 60,000+ maps / 100M+ labels
+            confirmed via an open arXiv duplicate of the closed ACM paper (§7.1).
+      - [x] **ICDAR 2025 MapText** — real; **misattribution found and fixed** (was "Zou et al.",
+            first author is Yijun Lin); 7 teams / 25+ submissions / 4 tasks / 3 datasets confirmed
+            via the competition's own site (§7.2).
+      - [x] **Bahgat & Runfola** — real, correctly attributed; **the "affine RMSE 16.9–84.2 px"
+            figure in `field-comparison.md` does not appear anywhere in the paper and has been
+            corrected** — the paper reports percentage-of-radius accuracy only, never pixel RMSE,
+            and never uses the word "affine" (§7.3).
+      - [x] **Ingensand et al.** — real, correctly attributed; our docs cite it conceptually, no
+            number to verify (§7.4).
+      - [x] **The Jerusalem CaGIS 2025 paper** — real, correctly attributed; method and the "71 of
+            86 maps" figure corroborated, though through a secondary source rather than scite
+            fulltext (closed to both scite and direct fetch) — flagged as such (§7.5).
 - [x] **Read Luft & Schiewe (2021) *Transactions in GIS* in full — done 2026-09-19. Notes and the
       drafted §2 paragraph are in *§2 Related Work* above.**
 - [x] **Read Janata & Cajthaml (2020) in full — done 2026-09-19.** Notes, the 23-vs-4 exclusion
@@ -644,8 +820,8 @@ not to rank the methods.
       *§4 Related Work* above. It is not in scite because **e-Perimetron mints no DOIs**; the PDF is
       free at `e-perimetron.org`. The read corrected a misattribution in `figures.md`, and produced
       the `Ha Noi`-against-their-five-checks table, which belongs in §7 rather than §2.
-- [ ] Check `editorialNotices` through scite for the three papers in §6 — they were read from PDF,
-      not retrieved through scite, and are the only entries in this file without that check.
+- [x] Check `editorialNotices` through scite for the three papers in §6 — done 2026-09-19, all
+      three clean. See the "`editorialNotices` check" note inside §6.
 - [ ] Move "Paper 2's target to beat is 316 m at 1:25,000" (§6.1) into the plan's Paper 2 entry.
 - [ ] Decide whether §7 keeps the IIIF size-segment finding or it ships as its own note.
 - [ ] `report_citations` with the full include/exclude set once the list is closed.

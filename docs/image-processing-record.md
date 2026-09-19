@@ -39,8 +39,18 @@ Five months, one corpus, one sheet carrying almost all of the evidence.
 ## 2. The stages, and the method in each
 
 **Georeference.** Allmaps annotations, human GCPs, helmert. On the 1882 sheet: 10 GCPs, **RMSE
-11.3 m**, worst point 23.0 m; a 6-dof affine buys 10.6 m, so the scan is undistorted and more
-control points buy little. That 11 m is the floor on every ground claim from the sheet.
+12.7 m**, worst point 27.7 m; a 6-dof affine buys 10.6 m. That ~13 m is the floor on every ground
+claim from *that sheet* — and it is not the archive's floor: the 1942 sheet, which carries 31.7% of
+all extractions, measures **72.3 m RMSE with a worst point of 193.7 m**.
+
+> **note 2026-09-19 — this paragraph read "RMSE 11.3 m, worst point 23.0 m; a 6-dof affine buys
+> 10.6 m, so the scan is undistorted and more control points buy little. That 11 m is the floor on
+> every ground claim from the sheet."** Two corrections. The pair moved to 12.7 / 27.7 because the
+> original was computed over a *spherical* earth; the figures above are geodetic (WGS84 radii of
+> curvature, cross-checked against `pyproj` UTM 48N to 0.01 m). And "the scan is undistorted" does
+> not survive the same recomputation — the affine's two axis scales are 0.3396 and 0.3445, **1.4%
+> apart**. Full reasoning at `docs/worked-example-1882.md:44`; all six District 4 sheets through one
+> code path at `work/analysis/district4/georef_error.md`.
 `geo_audit.mjs` (is the map where it says it is) and `catalog_audit.mjs` (is a row consistent with
 its own table) are the standing checks. L7014's mixed-datum fault — Indian 1960 read as WGS 84,
 ~470 m — was found by seams, and is probed for now.
@@ -206,8 +216,11 @@ anchors:
   go in one table — see `docs/field-comparison.md` §0.
 - **Bahgat & Runfola (2021)**, toponym-assisted georeferencing — asked in print for the exact
   triple this corpus holds.
-- **ICDAR MapText** (Zou et al. 2025) — Rumsey, French Napoleonic cadastre, Taiwanese maps, and no
-  Vietnamese in any of them.
+- **ICDAR MapText** (Lin et al. 2025) — Rumsey, French Napoleonic cadastre, Taiwanese maps, and no
+  Vietnamese in any of them. **Misattribution corrected 2026-09-19**: this line previously read
+  "(Zou et al. 2025)". Checked against scite (`10.1007/978-3-032-04630-7_33`) and the competition's
+  own site (`rrc.cvc.uab.es/?ch=32`): the paper's first author is Yijun Lin. Mengjie Zou is a
+  co-author, well down a 25-name organiser list, not the lead — `docs/paper/related-work.md` §6.4.
 - **Chen et al. (2024)** vectorization benchmarks · **mapKurator / Yao-Yi Chiang** · **EPFL DHLAB**
   (Jerusalem 1840–1940 4D) — the groups whose work is nearest, listed with what to lead with in
   `docs/private/network.md` §4a.
