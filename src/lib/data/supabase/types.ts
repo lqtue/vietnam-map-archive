@@ -101,6 +101,10 @@ export type Database = {
           map_id: string | null
           name: string | null
           pixel_polygon: Json
+          review_note: string | null
+          review_tags: string[]
+          reviewed_at: string | null
+          reviewed_by: string | null
           run_id: string | null
           source: string
           status: string
@@ -123,6 +127,10 @@ export type Database = {
           map_id?: string | null
           name?: string | null
           pixel_polygon: Json
+          review_note?: string | null
+          review_tags?: string[]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           run_id?: string | null
           source?: string
           status?: string
@@ -145,6 +153,10 @@ export type Database = {
           map_id?: string | null
           name?: string | null
           pixel_polygon?: Json
+          review_note?: string | null
+          review_tags?: string[]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           run_id?: string | null
           source?: string
           status?: string
@@ -1323,6 +1335,8 @@ export type Database = {
           p_id: string
           p_name?: string
           p_pixel_polygon?: Json
+          p_review_note?: string
+          p_review_tags?: string[]
           p_status: string
           p_user: string
         }
@@ -1339,6 +1353,10 @@ export type Database = {
           map_id: string | null
           name: string | null
           pixel_polygon: Json
+          review_note: string | null
+          review_tags: string[]
+          reviewed_at: string | null
+          reviewed_by: string | null
           run_id: string | null
           source: string
           status: string

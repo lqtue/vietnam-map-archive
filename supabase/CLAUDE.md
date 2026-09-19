@@ -26,9 +26,9 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **089**, pushed 2026-09-15 (it drops the two INSERT policies that let the publishable key
-write rows: `footprints_service_insert` on `footprint_submissions`, `Service role can insert` on
-`scout_candidates`). Drop a new `supabase/migrations/NNN_*.sql`
+Head is **091** (090 pushed 2026-09-16, 091 still local). 090 made the footprint review queue
+two states and its verdict `approved | rejected`; 091 adds the reviewer's diagnosis
+(`review_tags`, `review_note`, `reviewed_by`, `reviewed_at`). Drop a new `supabase/migrations/NNN_*.sql`
 incrementing from head, `supabase db push`, then regenerate types:
 
 ```bash

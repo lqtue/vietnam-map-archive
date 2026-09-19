@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
+import { isReviewTag, REVIEW_NOTE_MAX } from '$lib/core/reviewTags';
 
 /**
  * GET /api/admin/footprints?map_id=&status=
@@ -48,18 +49,33 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
   const { user } = await requireRole(locals);
 
   const body = await request.json();
-  const { id, status, pixel_polygon, feature_type, name, category } = body as {
-    id: string;
-    status: string;
-    pixel_polygon?: [number, number][];
-    feature_type?: string;
-    name?: string;
-    category?: string;
-  };
+  const { id, status, pixel_polygon, feature_type, name, category, review_tags, review_note } =
+    body as {
+      id: string;
+      status: string;
+      pixel_polygon?: [number, number][];
+      feature_type?: string;
+      name?: string;
+      category?: string;
+      review_tags?: string[];
+      review_note?: string;
+    };
 
   if (!id || !status) throw error(400, 'id and status are required');
   if (!['approved', 'rejected'].includes(status)) {
     throw error(400, 'status must be approved or rejected');
+  }
+  if (
+    review_tags !== undefined &&
+    (!Array.isArray(review_tags) || !review_tags.every(isReviewTag))
+  ) {
+    throw error(400, 'review_tags contains an unknown diagnosis');
+  }
+  if (
+    review_note !== undefined &&
+    (typeof review_note !== 'string' || review_note.length > REVIEW_NOTE_MAX)
+  ) {
+    throw error(400, `review_note must be a string of at most ${REVIEW_NOTE_MAX} characters`);
   }
 
   const { data, error: err } = await adminClient().rpc('set_footprint_status', {
@@ -70,6 +86,8 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     p_feature_type: feature_type ?? undefined,
     p_name: name ?? undefined,
     p_category: category ?? undefined,
+    p_review_tags: review_tags ?? undefined,
+    p_review_note: review_note?.trim() || undefined,
   });
 
   if (err) dbError(err, 'Could not update footprint');

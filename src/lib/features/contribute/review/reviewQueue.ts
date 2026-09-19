@@ -27,6 +27,7 @@ export type QueueRow = Awaited<ReturnType<typeof fetchMapsWithSubmittedFootprint
     it here left the row exactly as it was and never reached `approved`, which
     is the state /api/export/footprints filters on (migration 090). */
 export type Verdict = 'approved' | 'rejected';
+export type ReviewFeedback = { tags: string[]; note: string };
 
 export type ReviewQueueState = {
   /** Sheets with shapes waiting, newest count first. */
@@ -44,6 +45,7 @@ export type ReviewQueueState = {
   error: string;
   /** Id currently being written, so its row can say so. */
   deciding: string | null;
+  feedback: ReviewFeedback;
 };
 
 const EMPTY: ReviewQueueState = {
@@ -56,6 +58,7 @@ const EMPTY: ReviewQueueState = {
   loading: false,
   error: '',
   deciding: null,
+  feedback: { tags: [], note: '' },
 };
 
 export function createReviewQueue(supabase: SupabaseClient<Database>) {
@@ -65,6 +68,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   /** Held until the verdict, then sent with it. */
   let pendingEdits: Record<string, { pixelPolygon?: [number, number][]; featureType?: string }> =
     {};
+  let pendingFeedback: Record<string, ReviewFeedback> = {};
 
   async function loadQueue() {
     try {
@@ -78,6 +82,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   /** Drop the open sheet's rows; the queue itself survives a sheet change. */
   function reset() {
     pendingEdits = {};
+    pendingFeedback = {};
     update((s) => ({ ...EMPTY, queue: s.queue, queueError: s.queueError }));
   }
 
@@ -108,14 +113,20 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
    */
   function select(id: string | null, mode: 'replace' | 'toggle' | 'range' = 'replace') {
     update((s) => {
-      if (id === null) return { ...s, selectedId: null, selectedIds: [] };
+      if (id === null)
+        return { ...s, selectedId: null, selectedIds: [], feedback: { tags: [], note: '' } };
 
       if (mode === 'toggle') {
         const has = s.selectedIds.includes(id);
         const selectedIds = has ? s.selectedIds.filter((x) => x !== id) : [...s.selectedIds, id];
         // Deselecting the anchor hands the anchor to whatever is still selected.
         const selectedId = has && s.selectedId === id ? (selectedIds[0] ?? null) : id;
-        return { ...s, selectedId, selectedIds };
+        return {
+          ...s,
+          selectedId,
+          selectedIds,
+          feedback: pendingFeedback[selectedId ?? ''] ?? { tags: [], note: '' },
+        };
       }
 
       if (mode === 'range' && s.selectedId) {
@@ -125,12 +136,26 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
           const [lo, hi] = from < to ? [from, to] : [to, from];
           // The anchor does not move on a shift-click, so the next one extends
           // from the same place rather than walking down the list.
-          return { ...s, selectedIds: s.footprints.slice(lo, hi + 1).map((f) => f.id) };
+          return {
+            ...s,
+            selectedIds: s.footprints.slice(lo, hi + 1).map((f) => f.id),
+            feedback: pendingFeedback[s.selectedId] ?? { tags: [], note: '' },
+          };
         }
       }
 
-      return { ...s, selectedId: id, selectedIds: [id] };
+      return {
+        ...s,
+        selectedId: id,
+        selectedIds: [id],
+        feedback: pendingFeedback[id] ?? { tags: [], note: '' },
+      };
     });
+  }
+
+  function setFeedback(id: string, feedback: ReviewFeedback) {
+    pendingFeedback[id] = feedback;
+    update((s) => (s.selectedId === id ? { ...s, feedback } : s));
   }
 
   function selectAll() {
@@ -166,6 +191,9 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     const body: Record<string, any> = { id, status };
     if (edits?.pixelPolygon) body.pixel_polygon = edits.pixelPolygon;
     if (edits?.featureType) body.feature_type = edits.featureType;
+    const feedback = pendingFeedback[id];
+    if (feedback?.tags.length) body.review_tags = feedback.tags;
+    if (feedback?.note.trim()) body.review_note = feedback.note.trim();
 
     const res = await fetch('/api/admin/footprints', {
       method: 'PATCH',
@@ -177,6 +205,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
       return message as string;
     }
     delete pendingEdits[id];
+    delete pendingFeedback[id];
     return null;
   }
 
@@ -195,6 +224,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
         footprints,
         selectedId,
         selectedIds: selectedId ? [selectedId] : [],
+        feedback: pendingFeedback[selectedId ?? ''] ?? { tags: [], note: '' },
         // Keep the rail's count honest without re-querying the whole queue.
         queue: s.queue.map((m) =>
           m.id === mapId ? { ...m, pendingCount: Math.max(0, m.pendingCount - ids.length) } : m
@@ -261,6 +291,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     clearSelection,
     edit,
     retype,
+    setFeedback,
     decide,
     decideMany,
   };

@@ -174,10 +174,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const scanTarget = retiredScanTarget(event.url);
   if (scanTarget) throw redirect(302, scanTarget);
 
-  const previewTarget = explorePreviewTarget(
-    event.url,
-    event.request.headers.get('user-agent')
-  );
+  const previewTarget = explorePreviewTarget(event.url, event.request.headers.get('user-agent'));
   if (previewTarget) throw redirect(302, previewTarget);
 
   // Read before anything renders, so a server-rendered page is already in the

@@ -280,6 +280,8 @@
               approving={$queue.deciding}
               {markingReviewed}
               {markReviewedError}
+              reviewTags={$queue.feedback.tags}
+              reviewNote={$queue.feedback.note}
               on:select={(e) => queue.select(e.detail.id, e.detail.mode)}
               on:approve={(e) => decideFootprint(e.detail.id, 'approved')}
               on:reject={(e) => decideFootprint(e.detail.id, 'rejected')}
@@ -288,6 +290,8 @@
               on:selectAll={queue.selectAll}
               on:clearSelection={queue.clearSelection}
               on:retype={(e) => queue.retype(e.detail.id, e.detail.featureType)}
+              on:feedback={(e) =>
+                queue.setFeedback(e.detail.id, { tags: e.detail.tags, note: e.detail.note })}
               on:markReviewed={markReviewed}
             />
           {/if}

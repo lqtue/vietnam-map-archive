@@ -1206,6 +1206,12 @@ under the prose rather than instead of it.
 
 SAM2/MapSAM2 segmentation: IIIF tiles → masks → polygons → `footprint_submissions`. Colab (GPU) or local M1 (base SAM2 only).
 
+An offline colour-pass `blocks.geojson` is also reviewable: import it as a named
+`needs_review` run with `scripts/import-seg-geojson.mjs --map-id <uuid> --run-id
+<name> --input <blocks.geojson>`, then use `/scan?mode=shapes&tab=validate`.
+The importer refuses duplicate map/run pairs, keeping one reproducible set of
+proposals behind each review and tuning result.
+
 No venv is checked in or currently set up for this pipeline — create one per your platform and install the SAM2 deps. Training/LoRA details, the paper reading and the improvement backlog are in **`work/MapSAM2/TECHNICAL.md`**; Colab config is in `work/MapSAM2/VMA_SETUP.md`.
 
 ```bash

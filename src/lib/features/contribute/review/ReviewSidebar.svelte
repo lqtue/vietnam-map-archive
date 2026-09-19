@@ -13,6 +13,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { SamFootprint } from '$lib/data/supabase/footprints';
   import { FEATURE_TYPE_COLORS, FEATURE_TYPE_LABELS } from '$lib/data/maps/footprintTypes';
+  import { REVIEW_TAGS, REVIEW_NOTE_MAX } from '$lib/core/reviewTags';
 
   export let footprints: SamFootprint[] = [];
   export let selectedId: string | null = null;
@@ -24,6 +25,8 @@
   /** Pipeline mutation state — owned by ReviewPage, mirrored here for the button. */
   export let markingReviewed = false;
   export let markReviewedError = '';
+  export let reviewTags: string[] = [];
+  export let reviewNote = '';
 
   const dispatch = createEventDispatcher<{
     select: { id: string; mode: 'replace' | 'toggle' | 'range' };
@@ -34,6 +37,7 @@
     selectAll: void;
     clearSelection: void;
     retype: { id: string; featureType: string };
+    feedback: { id: string; tags: string[]; note: string };
     markReviewed: void;
   }>();
 
@@ -70,6 +74,17 @@
 
   function classColor(ft: string) {
     return CLASS_COLORS[ft] ?? CLASS_COLORS.other;
+  }
+
+  function changeTags(id: string, tag: string) {
+    const tags = reviewTags.includes(tag)
+      ? reviewTags.filter((value) => value !== tag)
+      : [...reviewTags, tag];
+    dispatch('feedback', { id, tags, note: reviewNote });
+  }
+
+  function changeNote(id: string, note: string) {
+    dispatch('feedback', { id, tags: reviewTags, note });
   }
 </script>
 
@@ -154,6 +169,31 @@
                   <option {value}>{label}</option>
                 {/each}
               </select>
+              <fieldset class="feedback">
+                <legend>Model feedback <span>(optional)</span></legend>
+                <div class="tag-list">
+                  {#each REVIEW_TAGS as [value, label] (value)}
+                    <label class="tag-option">
+                      <input
+                        type="checkbox"
+                        checked={reviewTags.includes(value)}
+                        on:change={() => changeTags(fp.id, value)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  {/each}
+                </div>
+                <label class="note-label" for={`review-note-${fp.id}`}
+                  >What should the next run learn?</label
+                >
+                <textarea
+                  id={`review-note-${fp.id}`}
+                  rows="3"
+                  maxlength={REVIEW_NOTE_MAX}
+                  value={reviewNote}
+                  placeholder="e.g. hatch lines are being read as a building"
+                  on:input={(e) => changeNote(fp.id, e.currentTarget.value)}></textarea>
+              </fieldset>
               <div class="fp-actions">
                 <button
                   class="sb-btn is-success is-sm"
@@ -300,6 +340,70 @@
     grid-template-columns: 1fr 1fr;
     gap: 0.4rem;
     padding-top: 0.5rem;
+  }
+
+  .feedback {
+    border: 0;
+    border-top: 1px solid var(--color-gray-300);
+    margin: 0.7rem 0 0;
+    padding: 0.65rem 0 0;
+  }
+
+  .feedback legend {
+    padding: 0;
+    font-size: 0.72rem;
+    font-weight: var(--font-semibold);
+    color: var(--sb-text-meta);
+  }
+
+  .feedback legend span {
+    font-weight: var(--font-normal);
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+  }
+
+  .tag-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    font-size: 0.7rem;
+    color: var(--color-gray-500);
+    cursor: pointer;
+  }
+
+  .tag-option input {
+    margin: 0;
+    accent-color: var(--color-orange);
+  }
+
+  .note-label {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.7rem;
+    color: var(--sb-text-meta);
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+    margin-top: 0.25rem;
+    padding: 0.35rem 0.4rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--sb-radius-sm);
+    background: var(--color-white);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 0.75rem;
+  }
+
+  textarea:focus {
+    outline: 1px solid var(--color-orange);
+    outline-offset: -1px;
   }
 
   .type-select {

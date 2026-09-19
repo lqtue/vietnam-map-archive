@@ -178,6 +178,23 @@ You will need this mode. Two things to expect:
 
 When the sheet is right, mark it **reviewed** — one of the three stages a person asserts rather than the machine deriving.
 
+## Shapes, the third mode
+
+`/scan?mode=shapes&tab=validate` is the equivalent human check for segmentation. Click a proposed polygon to frame it, drag its vertices when its contour is wrong, change its class when needed, then approve or reject it. Before the verdict, add one or more **Model feedback** tags and, when a tag cannot say enough, a note. The tags distinguish errors the tuning pass needs to count — a too-wide boundary, an unwanted split or merge, a wrong class, map text mistaken for a shape, water/land confusion, and a missed neighbour. The note records the specific visual rule.
+
+That decision is stored with the polygon's `run_id`: accepted polygons are positive examples; rejected polygons and their tags are false-positive evidence; an edited approval becomes `sam-corrected`, preserving both the original model provenance and the corrected contour. Do not bulk-decide a group when its failure has a diagnosis worth retaining; open one representative result and record it.
+
+The colour-pass result from the 1882 audit is a local GeoJSON file, not yet a queue row. Import it once with a stable run name, then open the printed Validate link:
+
+```bash
+node --env-file=.env scripts/import-seg-geojson.mjs \
+  --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
+  --run-id colour-20260919 \
+  --input /Users/airm1/Desktop/vma-1882-seg-260919/after/blocks.geojson
+```
+
+The importer turns the colour pass's raw washes (`cream`, `salmon`, `blue`, and so on) into the archive's review classes while retaining the wash as its cadastral category; it also removes only exact duplicate rings. It deliberately does **not** collapse a building inside a parcel — that is a useful, intentional overlap. The same map/run pair is refused a second time, so review counts and tuning data stay unambiguous. Use `--dry` first to validate a file without writing it.
+
 ## The pipeline stages
 
 `/scan?mode=shapes` → **Segment** shows where the sheet is:

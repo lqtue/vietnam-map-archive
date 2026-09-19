@@ -502,6 +502,8 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
     data: {
       id: fp!.id,
       status: 'approved',
+      review_tags: ['boundary_too_wide', 'needs_split'],
+      review_note: 'A parcel contains two buildings.',
       pixel_polygon: [
         [0, 0],
         [12, 0],
@@ -513,7 +515,7 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
 
   const { data: reviewed } = await admin
     .from('footprint_submissions')
-    .select('status, source')
+    .select('status, source, review_tags, review_note, reviewed_by, reviewed_at')
     .eq('id', fp!.id)
     .single();
   // `approved` is what /api/export/footprints filters on. This used to assert
@@ -522,6 +524,10 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
   expect(reviewed!.status).toBe('approved');
   // An edited polygon is machine output a human fixed, and exports care.
   expect(reviewed!.source).toBe('sam-corrected');
+  expect(reviewed!.review_tags).toEqual(['boundary_too_wide', 'needs_split']);
+  expect(reviewed!.review_note).toBe('A parcel contains two buildings.');
+  expect(reviewed!.reviewed_by).toBe(session.user.id);
+  expect(reviewed!.reviewed_at).toBeTruthy();
 
   // A decided row leaves the queue exactly once: a second verdict is refused
   // rather than silently applied.
