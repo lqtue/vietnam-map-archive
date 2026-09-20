@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/93792eea-2b60-4871-a689-7783816f2062/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/93792eea-2b60-4871-a689-7783816f2062",
+     "type": "ImageService3",
+     "width": 4577,
+     "height": 5958
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4577\" height=\"5958\"><polygon points=\"185,307 4393,288 4381,4642 178,4662\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        185,
+        307
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.995692,
+        16.251676
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4393,
+        288
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        108.24566,
+        16.251681
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4381,
+        4642
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        108.245665,
+        16.001702
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        178,
+        4662
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.995697,
+        16.001696
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

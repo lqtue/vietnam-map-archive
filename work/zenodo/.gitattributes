@@ -1,0 +1,5 @@
+# This package is deposited byte-for-byte and SHA256SUMS is computed over these
+# exact bytes. Git must not normalise line endings in it, or a checkout fails
+# its own integrity check.
+package/** -text
+SHA256SUMS -text

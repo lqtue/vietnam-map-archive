@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/8bb23b06-3f98-4e27-9a1e-118ca5d6092c/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/8bb23b06-3f98-4e27-9a1e-118ca5d6092c",
+     "type": "ImageService3",
+     "width": 4624,
+     "height": 5894
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4624\" height=\"5894\"><polygon points=\"177,260 4469,246 4467,4579 170,4597\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        177,
+        260
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745942,
+        11.002077
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4469,
+        246
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.99591,
+        11.00208
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4467,
+        4579
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.995914,
+        10.752099
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        170,
+        4597
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745945,
+        10.752096
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

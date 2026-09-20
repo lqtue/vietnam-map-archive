@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/7c4e2eaa-2113-4561-a339-d031f1161429/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/7c4e2eaa-2113-4561-a339-d031f1161429",
+     "type": "ImageService3",
+     "width": 4664,
+     "height": 6110
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4664\" height=\"6110\"><polygon points=\"217,254 4521,240 4511,4597 205,4613\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        217,
+        254
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745949,
+        10.502116
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4521,
+        240
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.995917,
+        10.502119
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4511,
+        4597
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.99592,
+        10.252138
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        205,
+        4613
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745952,
+        10.252135
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

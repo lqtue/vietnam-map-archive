@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/08f9e044-c324-4291-99da-69783768e85f/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/08f9e044-c324-4291-99da-69783768e85f",
+     "type": "ImageService3",
+     "width": 4624,
+     "height": 5949
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4624\" height=\"5949\"><polygon points=\"199,294 4492,274 4485,4622 195,4638\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        199,
+        294
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.495973,
+        11.002073
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4492,
+        274
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745942,
+        11.002077
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4485,
+        4622
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745945,
+        10.752096
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        195,
+        4638
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.495977,
+        10.752093
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

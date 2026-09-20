@@ -1,0 +1,30 @@
+### index :: index :: 03:59:35
+### index exit=0 03:59:39
+### fetch :: fetch --jobs 4 :: 03:59:39
+### fetch exit=0 03:59:39
+### corners :: corners :: 03:59:39
+### corners exit=0 03:59:39
+lattice cells: 2
+### warp-fixed :: warp :: 03:59:39
+### warp-fixed exit=0 04:13:18
+### manifest-fixed :: manifest --key l7014-fixed :: 04:13:18
+### manifest-fixed exit=0 04:13:20
+### fit-fixed :: fit --key l7014-fixed :: 04:13:20
+### fit-fixed exit=1 04:13:21
+  6630-4    pdf mean     662 m  worst    2623 m  Xa Phan Thiet
+  6349-4    pdf mean     396 m  worst    1565 m  Cua Tra Ly
+fit: 434 sheets on cell, median 10 m, worst 95 m
+fit: 2 of 436 sheets more than 150 m off their cell -- do not upload this archive
+ 22G	work/l7014/cogs
+### warp-faulty :: warp --no-datum-shift :: 04:13:21
+### warp-faulty exit=0 04:29:32
+### manifest-faulty :: manifest --key l7014-faulty :: 04:29:32
+### manifest-faulty exit=0 04:29:33
+### fit-faulty :: fit --key l7014-faulty :: 04:29:33
+### fit-faulty exit=1 04:29:34
+  6245-3    pdf mean     242 m  worst     467 m  Tuan Tuong
+  6245-2    pdf mean     237 m  worst     468 m  Ky Anh
+  6145-2    pdf mean     200 m  worst     455 m  La Khe Thon
+fit: 161 sheets on cell, median 11 m, worst 50 m
+fit: 276 of 437 sheets more than 150 m off their cell -- do not upload this archive
+### ALL DONE 04:29:34

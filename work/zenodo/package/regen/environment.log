@@ -1,0 +1,15 @@
+$ git rev-parse HEAD
+7ee5d947303bdc9183ae8fffc2290bd88ea861ec
+
+$ gdalinfo --version
+GDAL 3.13.3 "Iowa City", released 2026/08/13
+
+$ projinfo --version
+Unrecognized option: --version
+exit: 1
+
+$ proj
+Rel. 9.9.0, September 15th, 2026
+
+$ df -h .
+/dev/disk3s1   228Gi   124Gi    78Gi    62%    1.3M  818M    0%   /System/Volumes/Data

@@ -1,0 +1,75 @@
+sheet,reject,quad_ok,quad_why,default_corners,default_edges,loose_corners,loose_edges
+5454-1,NOGEO,0,opposite edges disagree,0,....,0,....
+5554-4,NOGEO,0,opposite edges disagree,0,L..B,0,LR.B
+5650-1,OFFCELL,1,,4,LRTB,4,LRTB
+5654-1,NOGEO,0,opposite edges disagree,0,.RTB,0,.RTB
+5654-3,NOGEO,0,opposite edges disagree,0,.R..,0,LR.B
+5728-1,NOGEO,0,,0,....,0,....
+5729-1,OFFCELL,0,opposite edges disagree,0,....,0,...B
+5729-2,NOGEO,0,opposite edges disagree,0,....,0,....
+5750-1,NOGEO,1,,2,.RTB,4,LRTB
+5750-2,NOGEO,1,,2,LRT.,2,LRT.
+5754-2,NOGEO,0,aspect 1.387 vs 0.930,0,LRT.,0,LRT.
+5754-4,NOGEO,0,aspect 1.377 vs 0.928,0,LR..,0,LRT.
+5847-2,NOGEO,1,,4,LRTB,4,LRTB
+5851-3,NOGEO,1,,0,LR..,4,LRTB
+5853-1,NOGEO,1,,0,LR..,2,LR.B
+5854-4,NOGEO,0,opposite edges disagree,0,....,0,LR..
+5926-2,OFFCELL,0,opposite edges disagree,0,.R.B,0,.R.B
+5929-4,NOGEO,0,opposite edges disagree,0,...B,0,...B
+5946-1,NOGEO,1,,4,LRTB,4,LRTB
+5948-4,NOGEO,1,,0,LR..,4,LRTB
+5949-1,NOGEO,1,,4,LRTB,4,LRTB
+5949-3,NOGEO,0,aspect 0.879 vs 0.946,0,LRT.,0,LRT.
+5950-3,NOGEO,1,,4,LRTB,4,LRTB
+6030-1,NOGEO,0,edge not near the image axis,0,....,0,....
+6030-3,NOGEO,0,opposite edges disagree,0,....,0,....
+6030-4,NOGEO,0,opposite edges disagree,0,....,0,....
+6130-1,OFFCELL,0,opposite edges disagree,0,....,0,....
+6130-4,NOGEO,0,opposite edges disagree,0,....,0,....
+6131-3,NOGEO,0,opposite edges disagree,0,....,0,....
+6144-3,NOGEO,1,,4,LRTB,4,LRTB
+6146-2,OFFCELL,0,opposite edges disagree,0,.RT.,0,LRT.
+6147-1,OFFCELL,0,opposite edges disagree,0,.RTB,0,.RTB
+6148-4,NOGEO,0,opposite edges disagree,0,....,0,L..B
+6155-2,NOGEO,0,opposite edges disagree,0,....,0,L..B
+6155-3,NOGEO,0,opposite edges disagree,0,....,0,L..B
+6230-4,NOGEO,0,,0,....,0,....
+6232-3,NOGEO,0,edge not near the image axis,0,LR..,0,LR.B
+6243-3,NOGEO,1,,2,LRT.,2,LRT.
+6326-3,NOGEO,0,opposite edges disagree,0,.R..,0,.RT.
+6332-4,NOGEO,1,,4,LRTB,4,LRTB
+6342-1,NOGEO,0,opposite edges disagree,0,L.T.,0,L.T.
+6433-1,NOGEO,0,opposite edges disagree,0,.RT.,0,LRT.
+6433-3,OFFCELL,1,,4,LRTB,4,LRTB
+6433-4,NOGEO,1,,0,...B,2,LR.B
+6434-1,NOGEO,0,opposite edges disagree,0,LR.B,0,LR.B
+6436-1,NOGEO,1,,0,LR..,0,LR..
+6437-1,NOGEO,1,,4,LRTB,4,LRTB
+6438-1,NOGEO,0,opposite edges disagree,0,LRT.,0,LRT.
+6439-1,NOGEO,1,,0,LR..,2,LR.B
+6440-2,NOGEO,1,,4,LRTB,4,LRTB
+6440-3,NOGEO,0,opposite edges disagree,0,.RT.,0,LRT.
+6440-4,NOGEO,1,,2,LRT.,4,LRTB
+6441-1,NOGEO,1,,4,LRTB,4,LRTB
+6441-2,NOGEO,1,,4,LRTB,4,LRTB
+6441-3,NOGEO,1,,0,LR..,0,LR..
+6530-3,OFFGRID,1,,0,..TB,4,LRTB
+6534-3,OFFCELL,1,,4,LRTB,4,LRTB
+6534-4,NOGEO,1,,2,LRT.,2,LRT.
+6535-3,NOGEO,0,opposite edges disagree,0,L...,0,LRT.
+6535-4,NOGEO,1,,4,LRTB,4,LRTB
+6537-4,NOGEO,1,,4,LRTB,4,LRTB
+6538-2,NOGEO,1,,2,LRT.,4,LRTB
+6538-4,OFFCELL,1,,4,LRTB,4,LRTB
+6539-3,NOGEO,1,,4,LRTB,4,LRTB
+6539-4,NOGEO,1,,4,LRTB,4,LRTB
+6550-1,NOGEO,0,opposite edges disagree,0,....,0,....
+6550-4,NOGEO,0,opposite edges disagree,0,....,0,L..B
+6551-2,NOGEO,0,opposite edges disagree,0,....,0,....
+6636-4,OFFCELL,0,opposite edges disagree,0,....,0,.R..
+6731-1,OFFCELL,0,opposite edges disagree,0,L..B,0,LR.B
+6736-1,NOGEO,1,,2,L.TB,4,LRTB
+6833-2,NOGEO,0,opposite edges disagree,0,....,0,....
+6835-4,NOGEO,1,,0,L...,4,LRTB
+6836-1,NOGEO,0,opposite edges disagree,0,....,0,....

@@ -1,0 +1,3 @@
+work/l7014/corners.csv: 24 sheets x 4 corners
+work/l7014/lattice.json: 627 cells
+work/l7014/gcp/: one .points per sheet, ground filled in, corners to drag
