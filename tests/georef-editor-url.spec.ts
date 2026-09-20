@@ -56,6 +56,7 @@ test('the OHM editor link survives iD’s hash parser and round-trips the templa
   const url = ohmEditorUrl(tiles, [106.6862515, 10.7696121, 106.7139283, 10.7924709]);
   const q = idStringQs(new URL(url).hash);
 
+  expect(new URL(url).searchParams.get('editor')).toBe('id');
   expect(q.background).toBe(`custom:${tiles}`);
   expect(q.map).toBe('14/10.78104/106.70009');
 

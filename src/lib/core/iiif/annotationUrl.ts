@@ -86,5 +86,7 @@ export function ohmEditorUrl(tileUrl: string, bbox?: number[] | null): string {
       `map=${zoom}/${((minLat + maxLat) / 2).toFixed(5)}/${((minLon + maxLon) / 2).toFixed(5)}`
     );
   }
-  return `https://www.openhistoricalmap.org/edit#${hash.join('&')}`;
+  // OHM may otherwise open a user's preferred editor instead of iD, which
+  // does not necessarily understand iD's custom-background hash parameter.
+  return `https://www.openhistoricalmap.org/edit?editor=id#${hash.join('&')}`;
 }
