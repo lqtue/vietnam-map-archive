@@ -1,0 +1,18 @@
+ARS integrity-correction round 1 — author verdicts (2026-09-20)
+
+Five correction families from technical-revision-proposal.json (PROPOSAL_NOT_APPLIED,
+base_sha256 fd3efd18fa2e7c576270459e156068aa9378aa686c707b3bea16442c3e1a0eda) were presented
+to the author one at a time via interactive question. All five were accepted:
+
+F1 · Rejection denominator (R3, R8, R16) — accept
+F2 · CRS-selection independence (R9, R10, R11, R14, R15) — accept
+F3 · Hand-seam independence (R5) — accept
+F4 · Seam statistic + matched analysis (R4, R6, R7, R21) — accept
+F5 · Population and unrun methods (R2, R13, R17, R18, R19, R20) — accept
+
+Because F1, F2, F4 and F5 are all accepted, the two composite spans R1 (abstract) and R12
+(conclusion) apply verbatim as proposed — no hand-rewrite required.
+
+All 21 proposal operations are therefore authorized without modification, bundled into the
+20 corrections of docs/paper/revision/integrity-issue-list.json (R8+R9 share one correction,
+IL-SERIOUS-4, because both fall inside the same source block).

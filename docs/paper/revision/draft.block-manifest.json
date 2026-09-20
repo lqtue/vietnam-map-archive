@@ -1,0 +1,686 @@
+{
+  "manifest_format_version": "1.0",
+  "base_draft_hash": "b43b18d50d3b",
+  "blocks": [
+    {
+      "block_id": "B0001",
+      "old_hash": "3f37be5c58c3",
+      "first_line_excerpt": "# Blind by construction: verifying a georeferenced map series when the check sh…"
+    },
+    {
+      "block_id": "B0002",
+      "old_hash": "0c80614ae0f4",
+      "first_line_excerpt": "*Two historical map series of Vietnam*"
+    },
+    {
+      "block_id": "B0003",
+      "old_hash": "266c21b810ae",
+      "first_line_excerpt": "## Abstract"
+    },
+    {
+      "block_id": "B0004",
+      "old_hash": "c761cdb090f3",
+      "first_line_excerpt": "Georeferencing a historical map series is usually described as a per-sheet prob…"
+    },
+    {
+      "block_id": "B0005",
+      "old_hash": "7d0ff8df8118",
+      "first_line_excerpt": "**Keywords:** historical maps · georeferencing · map series · verification · re…"
+    },
+    {
+      "block_id": "B0006",
+      "old_hash": "8459a03bf828",
+      "first_line_excerpt": "<!--"
+    },
+    {
+      "block_id": "B0007",
+      "old_hash": "af5fbf9167e8",
+      "first_line_excerpt": "Every number in this file must exist in `figures.md` with a source. Numbers in …"
+    },
+    {
+      "block_id": "B0008",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0009",
+      "old_hash": "45f45dd417ca",
+      "first_line_excerpt": "## §1 Introduction"
+    },
+    {
+      "block_id": "B0010",
+      "old_hash": "30a1e6948b59",
+      "first_line_excerpt": "Historical maps are increasingly available as scans, but a scan becomes spatial…"
+    },
+    {
+      "block_id": "B0011",
+      "old_hash": "de9e6d824c9f",
+      "first_line_excerpt": "A datum specifies how map coordinates relate to positions on Earth. Using the w…"
+    },
+    {
+      "block_id": "B0012",
+      "old_hash": "e7e5e32d9218",
+      "first_line_excerpt": "This distinction matters because a small residual is not a general certificate …"
+    },
+    {
+      "block_id": "B0013",
+      "old_hash": "44c6289b9d47",
+      "first_line_excerpt": "Read the evidence in three steps. Figure 6 locates the affected sheets and show…"
+    },
+    {
+      "block_id": "B0014",
+      "old_hash": "efe49268111d",
+      "first_line_excerpt": "The size of that silent displacement is a useful warning, but not a benchmark c…"
+    },
+    {
+      "block_id": "B0015",
+      "old_hash": "de537873c93a",
+      "first_line_excerpt": "We examine two Vietnamese map series with complementary spatial evidence: US Ar…"
+    },
+    {
+      "block_id": "B0016",
+      "old_hash": "fd698c2ecc17",
+      "first_line_excerpt": "The paper makes three contributions. First, it models a survey as cells, archiv…"
+    },
+    {
+      "block_id": "B0017",
+      "old_hash": "633de38325f8",
+      "first_line_excerpt": "Our claim is deliberately narrow. Series self-consistency is not new, and neith…"
+    },
+    {
+      "block_id": "B0018",
+      "old_hash": "222e779590d4",
+      "first_line_excerpt": "**Figure 1 — why a wrong position can pass an internal check.** The two panels …"
+    },
+    {
+      "block_id": "B0019",
+      "old_hash": "46539623fb6c",
+      "first_line_excerpt": "![Figure 1](figures/figure-1.pdf)"
+    },
+    {
+      "block_id": "B0020",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0021",
+      "old_hash": "e53af56a968d",
+      "first_line_excerpt": "## §2 Related work"
+    },
+    {
+      "block_id": "B0022",
+      "old_hash": "b87b37a16655",
+      "first_line_excerpt": "### 2.1 Georeferencing a sheet series from its own content"
+    },
+    {
+      "block_id": "B0023",
+      "old_hash": "11dc174beba7",
+      "first_line_excerpt": "<!-- **[drafted]** -->"
+    },
+    {
+      "block_id": "B0024",
+      "old_hash": "722b89c1dbea",
+      "first_line_excerpt": "The nearest prior work is Luft and Schiewe (2021), who georeference sheets of t…"
+    },
+    {
+      "block_id": "B0025",
+      "old_hash": "3919db56d4af",
+      "first_line_excerpt": "Two properties of that construction bound what the yardstick can see, and both …"
+    },
+    {
+      "block_id": "B0026",
+      "old_hash": "6696670f115d",
+      "first_line_excerpt": "Luft and Schiewe say as much about a third study, and the remark is the cleares…"
+    },
+    {
+      "block_id": "B0027",
+      "old_hash": "154f06bd5c5e",
+      "first_line_excerpt": "The second is that the seam is asserted rather than measured. Corner displaceme…"
+    },
+    {
+      "block_id": "B0028",
+      "old_hash": "b63753f6a11e",
+      "first_line_excerpt": "Gede and Varga (2021) are the closest prior route to the Indochine method in §6…"
+    },
+    {
+      "block_id": "B0029",
+      "old_hash": "dc10ae759b80",
+      "first_line_excerpt": "Heitzler, Gkonos, Tsorlini and Hurni (2018) belong to the same graticule-inters…"
+    },
+    {
+      "block_id": "B0030",
+      "old_hash": "712b882d1a3b",
+      "first_line_excerpt": "### 2.2 Inter-sheet agreement, spent as a constraint"
+    },
+    {
+      "block_id": "B0031",
+      "old_hash": "11dc174beba7",
+      "first_line_excerpt": "<!-- **[drafted]** -->"
+    },
+    {
+      "block_id": "B0032",
+      "old_hash": "6097b36724ed",
+      "first_line_excerpt": "Inter-sheet agreement has been used before, as a constraint. Janata and Cajtham…"
+    },
+    {
+      "block_id": "B0033",
+      "old_hash": "a69d38628d9c",
+      "first_line_excerpt": "This is the same shape as the limit described in §2.1, arrived at by a differen…"
+    },
+    {
+      "block_id": "B0034",
+      "old_hash": "99763b4c423e",
+      "first_line_excerpt": "Both papers also report the limits of their own instruments, which is the regis…"
+    },
+    {
+      "block_id": "B0035",
+      "old_hash": "59c442492c51",
+      "first_line_excerpt": "### 2.3 Per-sheet consistency checks"
+    },
+    {
+      "block_id": "B0036",
+      "old_hash": "076e5e6202f5",
+      "first_line_excerpt": "Meijers and Schoonman (2025) reach the neatline the way we do and applies a sub…"
+    },
+    {
+      "block_id": "B0037",
+      "old_hash": "48fe75d1836e",
+      "first_line_excerpt": "What matters here is the battery of five checks applied afterwards: sufficient …"
+    },
+    {
+      "block_id": "B0038",
+      "old_hash": "961be8eee65d",
+      "first_line_excerpt": "Meijers and Schoonman also state in print the failure our own detector hits: \"l…"
+    },
+    {
+      "block_id": "B0039",
+      "old_hash": "2eae8ebbf591",
+      "first_line_excerpt": "### 2.4 Verification beyond geometry"
+    },
+    {
+      "block_id": "B0040",
+      "old_hash": "c9a70c982f89",
+      "first_line_excerpt": "External evidence is also used in automatic georeferencing, but it answers a di…"
+    },
+    {
+      "block_id": "B0041",
+      "old_hash": "bd48e8ee4d69",
+      "first_line_excerpt": "Text and image understanding methods extend the available evidence but do not r…"
+    },
+    {
+      "block_id": "B0042",
+      "old_hash": "97898c16e53d",
+      "first_line_excerpt": "Recent multi-sheet work makes the same distinction from another direction. Kuna…"
+    },
+    {
+      "block_id": "B0043",
+      "old_hash": "d7e89a01a0f9",
+      "first_line_excerpt": "Tyagi and Dubey (2026) read printed map text with OCR and a multimodal model to…"
+    },
+    {
+      "block_id": "B0044",
+      "old_hash": "ccd44e31a6ca",
+      "first_line_excerpt": "**Figure 2 — when a seam can reveal a displacement.** Schematic, not to scale. …"
+    },
+    {
+      "block_id": "B0045",
+      "old_hash": "f91eb41f4622",
+      "first_line_excerpt": "![Figure 2](figures/figure-2.pdf)"
+    },
+    {
+      "block_id": "B0046",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0047",
+      "old_hash": "276c40b3791d",
+      "first_line_excerpt": "## §3 Corpus"
+    },
+    {
+      "block_id": "B0048",
+      "old_hash": "e25bfb784b5c",
+      "first_line_excerpt": "The corpus comprises two colonial and Cold-War Vietnamese sheet series, treated…"
+    },
+    {
+      "block_id": "B0049",
+      "old_hash": "3f65206024c0",
+      "first_line_excerpt": "Several L7014 denominators appear below and they are not interchangeable; Figur…"
+    },
+    {
+      "block_id": "B0050",
+      "old_hash": "1f0b65a088a2",
+      "first_line_excerpt": "The two series are deliberately unlike in how they supply spatial evidence. L70…"
+    },
+    {
+      "block_id": "B0051",
+      "old_hash": "7ef991bc0eea",
+      "first_line_excerpt": "The corpus is not a representative sample of all historical maps of Vietnam, no…"
+    },
+    {
+      "block_id": "B0052",
+      "old_hash": "018f03d7df04",
+      "first_line_excerpt": "**Figure 3 — choose the denominator that belongs to the question.** The L7014 r…"
+    },
+    {
+      "block_id": "B0053",
+      "old_hash": "cc1d14c3c537",
+      "first_line_excerpt": "![Series coverage](figures/figure-3.pdf)"
+    },
+    {
+      "block_id": "B0054",
+      "old_hash": "b0e3f0cebf2e",
+      "first_line_excerpt": "## §4 C1 · Modelling the survey"
+    },
+    {
+      "block_id": "B0055",
+      "old_hash": "133dead86875",
+      "first_line_excerpt": "The archive models three related but non-interchangeable things: a survey cell,…"
+    },
+    {
+      "block_id": "B0056",
+      "old_hash": "659d0972c43b",
+      "first_line_excerpt": "This model makes the denominator visible. The ordinary `maps` table contains on…"
+    },
+    {
+      "block_id": "B0057",
+      "old_hash": "52d1c1f9fe92",
+      "first_line_excerpt": "Status is derived rather than stored: whether the archive holds or serves a cel…"
+    },
+    {
+      "block_id": "B0058",
+      "old_hash": "a42a8e14cd27",
+      "first_line_excerpt": "## §5 C2 method A — L7014"
+    },
+    {
+      "block_id": "B0059",
+      "old_hash": "4b3dc18fcfad",
+      "first_line_excerpt": "L7014 is a case where georeferencing control already arrives with the object. E…"
+    },
+    {
+      "block_id": "B0060",
+      "old_hash": "58922ba8281a",
+      "first_line_excerpt": "The procedure is intentionally conservative about what the source file establis…"
+    },
+    {
+      "block_id": "B0061",
+      "old_hash": "2c8ecd9adf3e",
+      "first_line_excerpt": "Figure 4 shows what a single sheet makes available, and why those two facts are…"
+    },
+    {
+      "block_id": "B0062",
+      "old_hash": "56fa4db9f1cf",
+      "first_line_excerpt": "**Figure 4 — the source of the shared assumption.** The graticule and the contr…"
+    },
+    {
+      "block_id": "B0063",
+      "old_hash": "772a59f4794e",
+      "first_line_excerpt": "![What one sheet supplies](figures/figure-4.pdf)"
+    },
+    {
+      "block_id": "B0064",
+      "old_hash": "99cad1039c1e",
+      "first_line_excerpt": "## §6 C2 method B — Indochine"
+    },
+    {
+      "block_id": "B0065",
+      "old_hash": "07fa47c39d90",
+      "first_line_excerpt": "The Indochine 1:25,000 series has no embedded georeference, but it prints the r…"
+    },
+    {
+      "block_id": "B0066",
+      "old_hash": "50c8a9a7eb7d",
+      "first_line_excerpt": "The detector differs from a simple inward edge walk because the printed layout …"
+    },
+    {
+      "block_id": "B0067",
+      "old_hash": "1874901b8553",
+      "first_line_excerpt": "Two implementation constraints follow from the scans rather than from an aesthe…"
+    },
+    {
+      "block_id": "B0068",
+      "old_hash": "dcc5116dd412",
+      "first_line_excerpt": "The method does not conceal its remaining ambiguity. The rim is a pair of thin …"
+    },
+    {
+      "block_id": "B0069",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0070",
+      "old_hash": "8d1212be2796",
+      "first_line_excerpt": "## §7 C3 · Verification"
+    },
+    {
+      "block_id": "B0071",
+      "old_hash": "1ac4d2aaadd7",
+      "first_line_excerpt": "### 7.1 What a series already knows about itself"
+    },
+    {
+      "block_id": "B0072",
+      "old_hash": "eaa612893424",
+      "first_line_excerpt": "The lattice, the seams, the rim constant and the sheet numbering are all prior …"
+    },
+    {
+      "block_id": "B0073",
+      "old_hash": "5849ba4bc48d",
+      "first_line_excerpt": "**Table 1 — which check sees which error class.**"
+    },
+    {
+      "block_id": "B0074",
+      "old_hash": "12d5a3bbdf74",
+      "first_line_excerpt": "| check | scope | misregistration inside the frame | the frame/datum itself wro…"
+    },
+    {
+      "block_id": "B0075",
+      "old_hash": "016fb015f22e",
+      "first_line_excerpt": "Three cells carry the argument, and each is sourced to a different paper's own …"
+    },
+    {
+      "block_id": "B0076",
+      "old_hash": "8e3e66962977",
+      "first_line_excerpt": "First, `graticule_error` on \"frame/datum wrong\" is `∅`, not `·`. It does not me…"
+    },
+    {
+      "block_id": "B0077",
+      "old_hash": "fda73a314961",
+      "first_line_excerpt": "Second, adjacency-as-constraint turns an entire row to `∅`. Once edge identity …"
+    },
+    {
+      "block_id": "B0078",
+      "old_hash": "1dbcb93c07c9",
+      "first_line_excerpt": "Third, every per-sheet row is `·` on \"two sheets on one cell\". MapEdge's five c…"
+    },
+    {
+      "block_id": "B0079",
+      "old_hash": "a433c1666b2b",
+      "first_line_excerpt": "The claim this table licenses:"
+    },
+    {
+      "block_id": "B0080",
+      "old_hash": "60f5c6caf6fe",
+      "first_line_excerpt": "> Verification instruments for georeferenced series are routinely blind to one …"
+    },
+    {
+      "block_id": "B0081",
+      "old_hash": "b19bc1f27e7d",
+      "first_line_excerpt": "It does not claim that the lattice is novel, that adjacency is novel, or that a…"
+    },
+    {
+      "block_id": "B0082",
+      "old_hash": "305ffa1502ae",
+      "first_line_excerpt": "### 7.2 The lattice: residual *and* collision"
+    },
+    {
+      "block_id": "B0083",
+      "old_hash": "902d1f450dcd",
+      "first_line_excerpt": "We read 58 sheets independently, before asking whether their readings formed a …"
+    },
+    {
+      "block_id": "B0084",
+      "old_hash": "d4a57a5fa6ea",
+      "first_line_excerpt": "The lattice has a second operation that a residual cannot perform: it makes dup…"
+    },
+    {
+      "block_id": "B0085",
+      "old_hash": "893a66a21ef1",
+      "first_line_excerpt": "Residual and collision therefore answer different questions. The former asks wh…"
+    },
+    {
+      "block_id": "B0086",
+      "old_hash": "7c87911c534c",
+      "first_line_excerpt": "### 7.3 The seam census"
+    },
+    {
+      "block_id": "B0087",
+      "old_hash": "43597c734c1b",
+      "first_line_excerpt": "The lattice compares sheets to the series frame. A seam compares each sheet to …"
+    },
+    {
+      "block_id": "B0088",
+      "old_hash": "2ead1b0d7cff",
+      "first_line_excerpt": "The distribution is not a diffuse consequence of paper distortion. The 36 hand-…"
+    },
+    {
+      "block_id": "B0089",
+      "old_hash": "2deefc86f2a3",
+      "first_line_excerpt": "The free comparisons need to be distinguished from those hand-to-mosaic checks.…"
+    },
+    {
+      "block_id": "B0090",
+      "old_hash": "d68698de48e5",
+      "first_line_excerpt": "Because the two warps differ in exactly one flag, the free seams can be read as…"
+    },
+    {
+      "block_id": "B0091",
+      "old_hash": "0645f904c66a",
+      "first_line_excerpt": "This is also the limit of the instrument. What the seam census detects is *diff…"
+    },
+    {
+      "block_id": "B0092",
+      "old_hash": "ef0d68d89fda",
+      "first_line_excerpt": "The seam anomaly was the first inexpensive indication, in this archive, that it…"
+    },
+    {
+      "block_id": "B0093",
+      "old_hash": "8bc2a2105968",
+      "first_line_excerpt": "**Figure 5 — the large-displacement tail is absent after correction.** Counts o…"
+    },
+    {
+      "block_id": "B0094",
+      "old_hash": "0f8e220de90c",
+      "first_line_excerpt": "![Free-seam census](figures/figure-5.pdf)"
+    },
+    {
+      "block_id": "B0095",
+      "old_hash": "0ca47ccaa5e4",
+      "first_line_excerpt": "A single seam has been offered as this kind of evidence before (§2.1): Heitzler…"
+    },
+    {
+      "block_id": "B0096",
+      "old_hash": "0535a46ca127",
+      "first_line_excerpt": "### 7.4 The blind self-check"
+    },
+    {
+      "block_id": "B0097",
+      "old_hash": "e7e18898450d",
+      "first_line_excerpt": "The seam anomaly led to a datum fault in the L7014 GeoPDF pipeline. The 437-she…"
+    },
+    {
+      "block_id": "B0098",
+      "old_hash": "d26b0d7ccc8c",
+      "first_line_excerpt": "Our existing `graticule_error` check did not report it. In the faulty pass it r…"
+    },
+    {
+      "block_id": "B0099",
+      "old_hash": "dd80ffe15a12",
+      "first_line_excerpt": "The same check failed a second time, in the opposite direction, and the second …"
+    },
+    {
+      "block_id": "B0100",
+      "old_hash": "666de609d93e",
+      "first_line_excerpt": "The fault is also not uniform across the series, and its shape is geographic ra…"
+    },
+    {
+      "block_id": "B0101",
+      "old_hash": "d1c4b07fe91e",
+      "first_line_excerpt": "**Figure 6 — the fault has a geographic boundary.** Each square is one indexed …"
+    },
+    {
+      "block_id": "B0102",
+      "old_hash": "b7f13c4e26e9",
+      "first_line_excerpt": "![Where the datum fault fell](figures/figure-6.pdf)"
+    },
+    {
+      "block_id": "B0103",
+      "old_hash": "f6d7a4d5d6cb",
+      "first_line_excerpt": "### 7.5 The outside opinion"
+    },
+    {
+      "block_id": "B0104",
+      "old_hash": "4d08165b89aa",
+      "first_line_excerpt": "We replaced that circular test with `pick_crs`. For each affected sheet it warp…"
+    },
+    {
+      "block_id": "B0105",
+      "old_hash": "7b00111a8bba",
+      "first_line_excerpt": "The decision rule matters as much as the preferred candidate. If neither warp l…"
+    },
+    {
+      "block_id": "B0106",
+      "old_hash": "2dc691737922",
+      "first_line_excerpt": "### 7.6 The fix, validated without being applied"
+    },
+    {
+      "block_id": "B0107",
+      "old_hash": "b2a4ee52423e",
+      "first_line_excerpt": "Applying the explicit Helmert transformation in a dry run changes which sheets …"
+    },
+    {
+      "block_id": "B0108",
+      "old_hash": "76dca6386550",
+      "first_line_excerpt": "That distinction is deliberate, and the live state is worse than \"uncorrected\".…"
+    },
+    {
+      "block_id": "B0109",
+      "old_hash": "f6152673e3ac",
+      "first_line_excerpt": "**Figure 7 — the correction recovers cell placement in the local reproduction.*…"
+    },
+    {
+      "block_id": "B0110",
+      "old_hash": "f96d7267c91a",
+      "first_line_excerpt": "![Datum-correction dry run](figures/figure-7.pdf)"
+    },
+    {
+      "block_id": "B0111",
+      "old_hash": "ab16b456b2cf",
+      "first_line_excerpt": "### 7.7 One layer down: a serving check"
+    },
+    {
+      "block_id": "B0112",
+      "old_hash": "4fc3512de580",
+      "first_line_excerpt": "The same scope rule applies after georeferencing, when a correct source image i…"
+    },
+    {
+      "block_id": "B0113",
+      "old_hash": "0b556dc70277",
+      "first_line_excerpt": "This is not a georeferencing error and should not inflate the positional claims…"
+    },
+    {
+      "block_id": "B0114",
+      "old_hash": "aa019bdb6cab",
+      "first_line_excerpt": "**Figure 8 — test the resolution that the viewer requests.** Orange is the shar…"
+    },
+    {
+      "block_id": "B0115",
+      "old_hash": "999219ab732f",
+      "first_line_excerpt": "![Figure 8](figures/figure-8.pdf)"
+    },
+    {
+      "block_id": "B0116",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0117",
+      "old_hash": "eb08d162a938",
+      "first_line_excerpt": "## §8 Negative results"
+    },
+    {
+      "block_id": "B0118",
+      "old_hash": "96dfb3de5566",
+      "first_line_excerpt": "Several plausible checks did not yield evidence strong enough to carry the argu…"
+    },
+    {
+      "block_id": "B0119",
+      "old_hash": "5012d3074c57",
+      "first_line_excerpt": "Toponym lookup was less useful still. Of twenty village names transcribed from …"
+    },
+    {
+      "block_id": "B0120",
+      "old_hash": "ac9868ff6425",
+      "first_line_excerpt": "The image-derived method also has known exceptions. Gia Bình, Phúc Nhạc, Quất L…"
+    },
+    {
+      "block_id": "B0121",
+      "old_hash": "440ab74b5adf",
+      "first_line_excerpt": "## §9 Discussion"
+    },
+    {
+      "block_id": "B0122",
+      "old_hash": "ddee04c89772",
+      "first_line_excerpt": "The contribution is not a new universal accuracy statistic. It is a way to deci…"
+    },
+    {
+      "block_id": "B0123",
+      "old_hash": "5b25d3d4ff6e",
+      "first_line_excerpt": "For a regular series, this yields a practical ordering of checks. Begin with lo…"
+    },
+    {
+      "block_id": "B0124",
+      "old_hash": "1e5a1f7c5313",
+      "first_line_excerpt": "The reasoning may apply beyond these two series where its structural conditions…"
+    },
+    {
+      "block_id": "B0125",
+      "old_hash": "3de5373906c9",
+      "first_line_excerpt": "## §10 Conclusion"
+    },
+    {
+      "block_id": "B0126",
+      "old_hash": "9b1422dd7b50",
+      "first_line_excerpt": "A georeferenced map series arrives with more evidence about itself than a singl…"
+    },
+    {
+      "block_id": "B0127",
+      "old_hash": "8dea1515a792",
+      "first_line_excerpt": "The generalisable part is not the magnitude, which is particular to this archiv…"
+    },
+    {
+      "block_id": "B0128",
+      "old_hash": "61725c93134a",
+      "first_line_excerpt": "## §11 Data and code availability"
+    },
+    {
+      "block_id": "B0129",
+      "old_hash": "b9e757a3c76d",
+      "first_line_excerpt": "The archive's derived data — georeference annotations, sheet and printing index…"
+    },
+    {
+      "block_id": "B0130",
+      "old_hash": "3388ee6eeb15",
+      "first_line_excerpt": "The implementation includes the L7014 mosaic pipeline, the Indochine frame and …"
+    },
+    {
+      "block_id": "B0131",
+      "old_hash": "46a5a75b91e8",
+      "first_line_excerpt": "**Figure 9 — three states of the evidence at the recorded audit.** The served a…"
+    },
+    {
+      "block_id": "B0132",
+      "old_hash": "6e086320191b",
+      "first_line_excerpt": "![Figure 9](figures/figure-9.pdf)"
+    },
+    {
+      "block_id": "B0133",
+      "old_hash": "cb3f91d54eee",
+      "first_line_excerpt": "---"
+    },
+    {
+      "block_id": "B0134",
+      "old_hash": "65b72d86eeeb",
+      "first_line_excerpt": "## References"
+    },
+    {
+      "block_id": "B0135",
+      "old_hash": "2bcfe654fffe",
+      "first_line_excerpt": "The bibliography below contains only works cited in this draft. Every entry wit…"
+    },
+    {
+      "block_id": "B0136",
+      "old_hash": "62bfa9938222",
+      "first_line_excerpt": "- Burt, J. E., White, J., Allord, G. J., Then, K. M., & Zhu, A.-X. (2019). Auto…"
+    }
+  ]
+}

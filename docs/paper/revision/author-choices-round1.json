@@ -1,0 +1,286 @@
+{
+  "schema_version": "integrity-correction-authorization-input/1.0",
+  "revision_patch_sha256": "d70ace0793188027bfd9921ef2f16b2a86976e780866d5225e8114e2602bd930",
+  "author_events": [
+    {
+      "event_id": "AUTHOR-EVENT-round1-accept-all",
+      "source": "explicit_session_user_message",
+      "actor_role": "author",
+      "input_sha256": "50c2cff38f6bbadeacf8d824d8cee5295f211b24056c321b5c8c6b57545f46f7"
+    }
+  ],
+  "author_decisions": [
+    {
+      "correction_id": "IL-SERIOUS-1",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0004",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-1",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0048",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-2",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0049",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-2",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0086",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-3",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0089",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-3",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0090",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-1",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0093",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-4",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0098",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-4",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0103",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        },
+        {
+          "block_id": "B0104",
+          "allowed_operations": [
+            "delete_block"
+          ]
+        },
+        {
+          "block_id": "B0105",
+          "allowed_operations": [
+            "delete_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-2",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0123",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-5",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0126",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-3",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0073",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-4",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0074",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-5",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0075",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-6",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0015",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-7",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0037",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-8",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0078",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-5",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0084",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-9",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0080",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-6",
+      "author_event_id": "AUTHOR-EVENT-round1-accept-all",
+      "decision": "authorize",
+      "authorized_targets": [
+        {
+          "block_id": "B0107",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "schema_version": "integrity-correction-list/1.0",
+  "revision_round": 1,
+  "base_draft_sha256": "b43b18d50d3b924e194227501d509f9fb317053dee7abd759607b57827453d1b",
+  "issues": [
+    {
+      "correction_id": "IL-SERIOUS-1",
+      "description": "R1: Correct the rejection denominator; make the matched-edge result central; bound the CRS-independence claim and remove the unverified 514-sheet headline.",
+      "proposed_targets": [
+        {
+          "block_id": "B0004",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-1",
+      "description": "R2: Separate reported holdings/publication totals from observed experimental populations.",
+      "proposed_targets": [
+        {
+          "block_id": "B0048",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-2",
+      "description": "R3: 510 minus 62 is 448; the 11 rejected files are outside the 437 retained files. OFFGRID is a graticule verdict, not the separate cell-fit verdict.",
+      "proposed_targets": [
+        {
+          "block_id": "B0049",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-2",
+      "description": "R4: Specify the actual estimator, sampling, distance approximation, threshold status and observational unit.",
+      "proposed_targets": [
+        {
+          "block_id": "B0086",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-3",
+      "description": "R5: The hand manifest does not independently warp raster content; the inherited REGEN note's JPG/JPG independence claim conflicts with code.",
+      "proposed_targets": [
+        {
+          "block_id": "B0089",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-3",
+      "description": "R6: New independently cross-checked matched-edge analysis rules out attrition as explanation for tail disappearance.",
+      "proposed_targets": [
+        {
+          "block_id": "B0090",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-1",
+      "description": "R7: Preserve Figure 5's full-build bars while connecting them to the matched analysis.",
+      "proposed_targets": [
+        {
+          "block_id": "B0093",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-4",
+      "description": "R8: Correct the incompatible rejection and retained-build denominators.; R9: Describe code rather than treating shared translation as a literal universal implementation model.",
+      "proposed_targets": [
+        {
+          "block_id": "B0098",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-4",
+      "description": "R10: Direct code inspection reveals shared Helmert parameters, nearest-registration score, 150 m cutoff and no-score fallback.",
+      "proposed_targets": [
+        {
+          "block_id": "B0103",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        },
+        {
+          "block_id": "B0104",
+          "allowed_operations": [
+            "delete_block"
+          ]
+        },
+        {
+          "block_id": "B0105",
+          "allowed_operations": [
+            "delete_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-2",
+      "description": "R11: External accuracy evidence is not supplied by shared-parameter lattice selection.",
+      "proposed_targets": [
+        {
+          "block_id": "B0123",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-SERIOUS-5",
+      "description": "R12: Do not equate a local reproduction with a verified live publication count or claim all displaced sheets had a measured zero residual.",
+      "proposed_targets": [
+        {
+          "block_id": "B0126",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-3",
+      "description": "R13: Capability matrix is conditional, not a measured sensitivity benchmark or universal guarantee.",
+      "proposed_targets": [
+        {
+          "block_id": "B0073",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-4",
+      "description": "R14: Actual implementation scores points, shares datum parameters and has a missing-score fallback.",
+      "proposed_targets": [
+        {
+          "block_id": "B0074",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-5",
+      "description": "R15: Carry the reference-dependence qualification directly with Table 1.",
+      "proposed_targets": [
+        {
+          "block_id": "B0075",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-6",
+      "description": "R16: Propagate the corpus qualification into the introduction.",
+      "proposed_targets": [
+        {
+          "block_id": "B0015",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-7",
+      "description": "R17: Distinguish a structural comparison from a benchmark that was not run.",
+      "proposed_targets": [
+        {
+          "block_id": "B0037",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-8",
+      "description": "R18: Remove categorical claims excluding independent per-sheet reference checks.",
+      "proposed_targets": [
+        {
+          "block_id": "B0078",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-5",
+      "description": "R19: Propagate the unrun-method qualification into the case study.",
+      "proposed_targets": [
+        {
+          "block_id": "B0084",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MEDIUM-9",
+      "description": "R20: Replace an unmeasured prevalence claim with the supported conditional claim.",
+      "proposed_targets": [
+        {
+          "block_id": "B0080",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    },
+    {
+      "correction_id": "IL-MINOR-6",
+      "description": "R21: The difference between marginal counts is not itself an individually matched transition count.",
+      "proposed_targets": [
+        {
+          "block_id": "B0107",
+          "allowed_operations": [
+            "replace_block"
+          ]
+        }
+      ]
+    }
+  ]
+}

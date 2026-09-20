@@ -1,0 +1,250 @@
+{
+  "patch_format_version": "1.1",
+  "authorization_context": "integrity_correction",
+  "revision_round": 1,
+  "base_draft_hash": "b43b18d50d3b",
+  "issue_list_sha256": "849b7c8a990aea247f828f5cac2ca3b3bf9ceaf0d619c070858aaac4adc75d90",
+  "ops": [
+    {
+      "op": "replace_block",
+      "block_id": "B0004",
+      "old_hash": "c761cdb090f3",
+      "new_text": "Historical map series often supply their own georeferencing control, but agreement with that\ncontrol does not independently establish placement. We examine this problem through a documented\nVietnam Map Archive failure and a controlled reproduction on US Army Map Service L7014 GeoPDFs.\nOf 510 source files, 62 lacked usable control, 11 failed the graticule check, and 437 entered the\nfaulty build. All 269 sheets with reproduced CRS displacements of 395–528 m (median 455 m)\npassed that check. The check evaluates registration in the sheet's own geographic CRS and cannot\nvalidate the subsequent datum transformation to WGS 84. Comparing the same 715 PDF/PDF edges\nbefore and after correction, the number with median outline separation above 100 m falls from\n189 to zero. This establishes improved inter-sheet agreement, not independent absolute accuracy:\nthe CRS-selection check and comparison lattice share the adopted Helmert parameters. A second\ncase, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner\nreadings can still assign two sheets to the same cell. Together these cases support a taxonomy of\nverification scope, committed inputs, detectable faults, and blind spots. The contribution is a\nreproducible account of how checks can remain silent under specific shared assumptions, with\nexplicit separation of source control, build measurements, and serving-state evidence.\n",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0048",
+      "old_hash": "e25bfb784b5c",
+      "new_text": "The corpus comprises a Cold-War and a colonial Vietnamese sheet series. L7014 is the US Army\nMap Service 1:50,000 coverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the\nUniversity of Texas at Austin. The second is the Service géographique de l'Indochine 1:25,000\ncoverage of Tonkin and Thanh Hóa, held by Cartomundi at Aix-Marseille Université/CNRS. The archive\npreviously reported a combined total of 514 sheets, comprising a 452-sheet L7014 publication\ncount and 62 pipeline-georeferenced Indochine sheets. Because the 452 is a hand-maintained\npublication constant that cannot be checked against the missing serving manifest (§7.6), the sum\nis an archive-reported total, not a verified count of processed or currently served sheets. The\nmeasured populations below supply the denominators for the results. The L7014 material dates from\nthe 1960s–70s; the Indochine material from 1903–1927.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0049",
+      "old_hash": "3f65206024c0",
+      "new_text": "Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them\non one map; Figure 3 separates the audit populations. The series index names **627** cells. **510** of those are held as GeoPDFs. Of the 510,\n**448** reach the graticule check after 62 files are excluded for missing control. The check rejects\n11, leaving **437** successfully warped files in the faulty build, and\nit is this 437 that the datum measurements in §7 are taken over. A further **24** sheets are\ngeoreferenced by hand rather than from embedded control, and sit outside that fault. The **452** in\nthe published mosaic is a hand-maintained constant rather than a count read back from the serving\nmanifest, and a corrected rebuild produces 436; we report it as the archive's own claim about itself\nand flag it in §7.6 rather than silently substituting a number the live layer cannot confirm. On the\nIndochine side, **79** cells are indexed and **75** held; **62** were georeferenced by the pipeline,\n**58** were read independently for the lattice check in §7.2, and the IIIF survey in §7.7 covers the\n**83** image sources those sheets resolve to, some cells holding more than one edition.\n",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0086",
+      "old_hash": "7c87911c534c",
+      "new_text": "### 7.3 The seam census\n\nThe census measures outline agreement rather than continuity of roads or other map content.\nThe lattice identifies shared edges but does not constrain the PDF outlines. For each edge,\n`l7014_seams.py` samples 25 equally spaced positions between 10% and 90% of its length,\navoiding corner junctions. At each position it finds the nearest point on each outline and measures\ntheir separation using a local longitude/latitude-to-metre approximation. The edge statistic is\nthe median of these distances; the reported census median is the median across edges. The 100 m\nand 300 m cutoffs summarize the observed tail, rather than define independently calibrated\nacceptance thresholds. For nearly straight parallel edges the distance principally reflects\nnormal separation; it need not recover along-edge displacement or a full displacement vector.\n\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0089",
+      "old_hash": "2deefc86f2a3",
+      "new_text": "The hand-sheet comparisons must be distinguished from the free PDF/PDF comparisons. The hand\nworkflow supplies lattice-derived ground corners, and the hand manifest is assembled from those\nground coordinates rather than independently measured warped image boundaries. A JPG/PDF join\ntherefore compares a PDF outline with a lattice-derived boundary. A JPG/JPG join compares two\nsuch boundaries. The 25 JPG/JPG distances of 0.0–0.6 m describe consistency of those ground\ncoordinates, not an independent validation of either image registration. Only the PDF/PDF cohort\nis used as free-seam evidence here.\n",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0090",
+      "old_hash": "d68698de48e5",
+      "new_text": "The two builds differ in the CRS-selection flag and in which files survive the checks. The faulty\nbuild contains 717 PDF/PDF seams, of which 189 exceed 100 m and 97 exceed 300 m. The corrected\nbuild contains 715, none above 100 m (Figure 5). To separate change in geometry from change in\nmembership, we matched edges by their unordered sheet-ID pair. All 715 corrected edges occur in\nthe faulty census. On these same edges, 189 fall from above 100 m to at most 100 m, with no\ncrossings in the opposite direction; the maximum corrected edge median is 72.4 m. The two\nfaulty-only edges measure 3.6 m and 15.6 m, so their exclusion cannot explain disappearance of\nthe large-displacement tail. Matched-cohort medians are 9.2 m before and 6.8 m after correction.\n\nThese are descriptive comparisons within one series. Edges share sheets and are not independent\nreplicates; their distances do not measure absolute accuracy or content alignment. The matched\nanalysis, input hashes and excluded pairs are reproducible with `scripts/paper-seam-pairs.mjs`.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0093",
+      "old_hash": "8bc2a2105968",
+      "new_text": "**Figure 5 — the large-displacement tail is absent after correction.** Counts of free PDF/PDF\nseams in each displacement bin. The faulty build has 189 of 717 seams over 100 m; the corrected\nbuild has 0 of 715. These are separate builds, not a paired analysis of the same 717 seams.\nA matched analysis of the 715 common edges also gives 189 versus zero above 100 m (§7.3).\nA small median (9.2 m before, 6.8 m after) alone would obscure the faulty build’s large tail.\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0098",
+      "old_hash": "d26b0d7ccc8c",
+      "new_text": "Our existing `graticule_error` check did not report it. In the faulty pass, 448 files reached\nthe check after 62 were excluded for missing control. It rejected 11 and retained 437, including\nall 269 with reproduced CRS displacements of 395–528 m. This is\nnot a sensitivity limit: the rejections it did issue fire between 0.004 and 0.076 degrees off the\nprinted graticule, so the instrument has a working dynamic range and still returned nothing on a\n455 m translation. On A Lưới — which `pick_crs` resolves to its declared CRS, and whose CRS\ndisplacement is 0.0 m — it returns `2.167e-12`. The implementation converts registration coordinates into the candidate CRS's own geographic\ncoordinate system (`CloneGeogCS`) and compares their extrema with the sheet's graticule\nmetadata, or with quarter-degree snapping when those metadata are absent. That calculation does\nnot independently test the subsequent transformation to WGS 84. It can reject inconsistent\nregistration while remaining insensitive to the omitted datum transformation at issue here.\nThe `∅` in Table 1 denotes this fault's inability to disturb the comparison; it does not mean\nthe check must return zero when other errors are present.\n",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0103",
+      "old_hash": "f6d7a4d5d6cb",
+      "new_text": "### 7.5 CRS selection against an adopted frame\n\nThe corrected route adds `pick_crs` before the graticule check. It scores the declared or\nfallback CRS and, where available, an Indian 1960 alternative with explicit Everest 1830\n(1937 Adjustment) Helmert parameters. For each candidate, it transforms the registration\ncoordinates to WGS 84 and averages, over the expected cell corners, the distance to the nearest\ntransformed registration point. Registration coordinates come from embedded GCPs, with neatline\nvertices as the fallback. It selects the candidate with the smaller score only if that score\nis at most 150 m. If every available candidate exceeds that threshold, it rejects the sheet.\nIf no score can be computed, however, the implementation retains the declared or fallback CRS;\nthis case is not verified by the lattice decision.\n\nThe reference is external to an individual GeoPDF declaration, but it is not independent of the\nadopted datum transformation. `cell_corners` transforms the index coordinates with the same\nexplicit Helmert parameters used by the alternative candidate. Agreement therefore tests\nconsistency with the adopted frame and can expose a missing transformation, while a shared\nerror in those parameters could remain undetected. The result does not establish absolute\naccuracy at the approximately 15 m scale of the reported index-to-outline agreement. Testing\nthat claim would require appropriately distributed reference positions whose coordinates were\nnot generated by the same transformation.\n\nThis distinction preserves the useful result without giving the selection rule a broader\nauthority than its inputs support. Refusal catches cases outside the scored alternatives;\nagreement identifies a compatible interpretation conditional on the adopted frame.",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "delete_block",
+      "block_id": "B0104",
+      "old_hash": "4d08165b89aa",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "delete_block",
+      "block_id": "B0105",
+      "old_hash": "7b00111a8bba",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0123",
+      "old_hash": "5b25d3d4ff6e",
+      "new_text": "For a regular series, this yields a practical ordering of checks. Begin with low-cost relations the\nseries itself supplies: lattice spacing, one-to-one cell occupancy and free seams. Use reference positions independent of the adopted transformation when absolute placement is\nthe claim to be tested. The `pick_crs` decision provides a narrower consistency check (§7.5).\nDo not turn a diagnostic relation into a hard constraint if it will later be the only available test\nof that relation. And preserve refusal as an outcome: an anomalous sheet is information for review,\nnot an invitation to publish the least implausible transformation.\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0126",
+      "old_hash": "9b1422dd7b50",
+      "new_text": "A georeferenced map series arrives with more evidence about itself than a single sheet can offer, and\nthe practical question is not how much of it to gather but what each piece is still free to say. A controlled reproduction of the archive's faulty route retained 437 sheets, including 269 with\nCRS displacements of 395–528 m that passed the graticule check. That check cannot independently\nvalidate the transformation from the sheet's geographic CRS to WGS 84. On the same 715 PDF/PDF\nedges, correction reduced the number above 100 m from 189 to zero. The comparison establishes\nimproved outline agreement. CRS selection against the lattice supplies a separate test of\nconsistency with the adopted Helmert transformation, whose absolute accuracy remains to be\nindependently assessed. These build measurements do not establish the exact population or\naccuracy of the serving archive.\n",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0073",
+      "old_hash": "5849ba4bc48d",
+      "new_text": "**Table 1 — which check sees which error class.**\nLegend: **✓** can flag it under the stated inputs · **·** not established as a diagnostic here ·\n**—** not applicable · **∅** the specified fault cannot disturb the constrained or shared-input\ncomparison ·\n**†** only where the fault is *partial* across the series, so that a displaced sheet borders an\nundisplaced one; a displacement common to every sheet leaves every seam closed (§7.3).\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0074",
+      "old_hash": "12d5a3bbdf74",
+      "new_text": "| check | scope | misregistration inside the frame | the frame/datum itself wrong | two sheets on one cell | sheet-index entry wrong | serving/tile fault |\n|---|---|:--:|:--:|:--:|:--:|:--:|\n| Corner residual vs sheet layout — *Luft & Schiewe 2021* | per-sheet | ✓ | · | · | · | — |\n| Internal consistency: sides, diagonals, cm×dpi, paper bulge — *Meijers & Schoonman 2025* | per-sheet | ✓ | · | · | ✓ | — |\n| `graticule_error` — sheet's GCPs vs the graticule it prints | per-sheet | ✓ | **∅** | · | · | — |\n| Adjacency as a least-squares constraint — *Janata & Cajthaml 2020* | inter-sheet | ✓ | · | · | · | — |\n| …the same adjacency read back as a residual | inter-sheet | **∅** | **∅** | **∅** | **∅** | — |\n| **Seam census** (adjacency left free) | inter-sheet | ✓ | **✓ †** | ✓ | · | — |\n| **Lattice residual** | series | ✓ | · | · | ✓ | — |\n| **Lattice collision** | series | · | · | **✓** | ✓ | — |\n| **`pick_crs`** — registration points scored against the adopted cell (§7.5) | per-sheet + index | · | **✓ ‡** | · | · | — |\n| **Tile-key audit** | serving | — | — | — | — | **✓** |\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0075",
+      "old_hash": "016fb015f22e",
+      "new_text": "**‡** Detects disagreement with the adopted frame when a cell score is available. The candidate\nand reference cell share Helmert parameters; the decision does not validate those parameters\nagainst independent absolute control. Table entries describe diagnostic scope, not measured\ndetection rates from running the published methods on this corpus.\n\nThree cells carry the argument, and each is sourced to a different paper's own design.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0015",
+      "old_hash": "de537873c93a",
+      "new_text": "We examine two Vietnamese map series with complementary spatial evidence: US Army Map Service\n1:50,000 GeoPDFs, and Service géographique de l'Indochine 1:25,000 sheets whose corners are printed\nin grades from the Paris meridian. The archive reports 514 sheets across these routes, but that total includes an unverified\npublication constant (§3). We therefore report each audit's measured population separately. The series setting makes relations available that a single sheet cannot supply:\nregular lattice spacing,\none-to-one occupancy of cells, shared edges, edition history and a distinction between a proposed\ncorrection and what readers currently receive.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-6"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0037",
+      "old_hash": "48fe75d1836e",
+      "new_text": "What matters here is the battery of five checks applied afterwards: sufficient rim samples and\nRANSAC inliers; an internal test that\nopposite sides and diagonals agree; an external test of documented sheet size in centimetres times\nscan dpi against the measured pixels; the distribution of inlier perpendicular distances, which\ndetects paper bulging or caving; and a visual contact sheet of every detected corner. The battery works — on three sheets it revealed that sheet-size exceptions had been digitised wrongly\nin the authors' own sheet index, which was corrected as a result. These checks concern per-sheet geometry. Our §7.2 example has internally coherent readings\nwhile occupying another sheet's cell. We did not run the MapEdge implementation on that sheet;\nthe comparison concerns the scope of internal geometric checks, not an observed MapEdge verdict.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-7"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0078",
+      "old_hash": "1dbcb93c07c9",
+      "new_text": "Third, the internal per-sheet checks listed here do not establish unique occupancy.\nThe `Ha Noi` example has coherent internal readings but conflicts with another sheet's\ncell assignment (§7.2). This is a scope argument, not a measured result from running\nMapEdge on `Ha Noi`. A check supplied with an independently verified sheet-to-cell assignment\ncould detect a misplaced sheet individually; internal geometry alone cannot establish that assignment.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-8"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0084",
+      "old_hash": "d4a57a5fa6ea",
+      "new_text": "The lattice has a second operation that a residual cannot perform: it makes duplicate occupancy\nvisible. `Ha Noi` (sheet 20, 1903) is the useful counterexample. Its corners agree with one another,\nits ground scale agrees with its pixels to 0.78%, its rim is at the series offset, and its content is\nunambiguously Hanoi. Yet its printed latitude places it 75 km south of the city, on the cell occupied\nby `Ninh Bình`; the longitude is right and the latitude is a clean 0.75 grades out. These observations establish the limits of internal consistency, without claiming an observed\npass from the MapEdge implementation described in §2.3. Nor would a small lattice\nresidual: a sheet can sit perfectly on a cell that belongs to another sheet. The collision is the\nevidence. A collision is a review flag: it may represent intentional alternative editions, a printed\nindex anomaly, or an archive/transcription error. Both editions are retained here pending a human\ndecision about which explanation applies.\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0080",
+      "old_hash": "60f5c6caf6fe",
+      "new_text": "> A verification instrument can remain insensitive to an error shared by its inputs or removed\n> from its residual by an imposed constraint. Interpreting its residual therefore requires\n> stating the comparison, the committed assumptions, and the faults capable of disturbing it.\n",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-9"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    },
+    {
+      "op": "replace_block",
+      "block_id": "B0107",
+      "old_hash": "b2a4ee52423e",
+      "new_text": "Applying the explicit Helmert transformation in a dry run changes which sheets reach their cell at\nall. The corrected pass warps 436 sheets to the faulty pass's 437, and 434 of them land on their\ncell against 161 before. Sheets more than 150 m off their cell fall from 276 of 437 to 2 of 436. The\nmedian miss among on-cell sheets barely moves — 11 m before, 10 m after — because the correction\ndoes not improve sheets that were already placed; it moves displaced sheets onto their cells. For\nthe same reason the worst on-cell miss rises, from 50 m to 95 m, with a net increase of 273 on-cell sheets across the two builds.\nThe two the correction leaves off cell are `6630-4` Xa Phan Thiet (mean 662 m) and `6349-4` Cua Tra\nLy (mean 396 m); in both the worst corner far exceeds the mean, which reads as a distorted or\nmis-clipped outline rather than a datum problem. The same method leaves the 24 hand-georeferenced\nsheets outside the fault: their control-point residuals remain 2.3–19.0 m RMS. These figures\nvalidate the proposed interpretation and correction; they do not describe a rebuilt public mosaic.\n",
+      "roadmap_item_ids": [
+        "IL-MINOR-6"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": []
+    }
+  ],
+  "emitted_by": "claude-sonnet-5 / ars-integrity-correction-round-1"
+}

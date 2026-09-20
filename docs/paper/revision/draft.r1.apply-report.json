@@ -1,0 +1,300 @@
+{
+  "report_format_version": "1.3",
+  "mode": "patch",
+  "base_path": "docs/paper/draft.md",
+  "output_path": "docs/paper/revision/draft.r1.md",
+  "base_draft_hash": "b43b18d50d3b",
+  "output_draft_hash": "468fabf99cc4",
+  "patch_digest": "d70ace0793188027bfd9921ef2f16b2a86976e780866d5225e8114e2602bd930",
+  "revision_round": 1,
+  "authorization_context": "integrity_correction",
+  "authorization_witness": {
+    "status": "pass",
+    "authorization_kind": "explicit_author_exact_integrity_patch",
+    "issue_list_sha256": "849b7c8a990aea247f828f5cac2ca3b3bf9ceaf0d619c070858aaac4adc75d90",
+    "integrity_authorization_sha256": "83e274c4a7739f7900b8c39021e1b0dae6362dcc325a366f1912859a9e4155e7",
+    "revision_patch_sha256": "d70ace0793188027bfd9921ef2f16b2a86976e780866d5225e8114e2602bd930",
+    "unregistered_claim_drift_review_required": true
+  },
+  "ops_applied": [
+    {
+      "op_index": 0,
+      "op": "replace_block",
+      "block_id": "B0004",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 1,
+      "op": "replace_block",
+      "block_id": "B0048",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 2,
+      "op": "replace_block",
+      "block_id": "B0049",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 3,
+      "op": "replace_block",
+      "block_id": "B0086",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": [
+        "B0138"
+      ]
+    },
+    {
+      "op_index": 4,
+      "op": "replace_block",
+      "block_id": "B0089",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 5,
+      "op": "replace_block",
+      "block_id": "B0090",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": [
+        "B0139"
+      ]
+    },
+    {
+      "op_index": 6,
+      "op": "replace_block",
+      "block_id": "B0093",
+      "roadmap_item_ids": [
+        "IL-MINOR-1"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 7,
+      "op": "replace_block",
+      "block_id": "B0098",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 8,
+      "op": "replace_block",
+      "block_id": "B0103",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": [
+        "B0140",
+        "B0141",
+        "B0142"
+      ]
+    },
+    {
+      "op_index": 9,
+      "op": "delete_block",
+      "block_id": "B0104",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 10,
+      "op": "delete_block",
+      "block_id": "B0105",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 11,
+      "op": "replace_block",
+      "block_id": "B0123",
+      "roadmap_item_ids": [
+        "IL-MINOR-2"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 12,
+      "op": "replace_block",
+      "block_id": "B0126",
+      "roadmap_item_ids": [
+        "IL-SERIOUS-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 13,
+      "op": "replace_block",
+      "block_id": "B0073",
+      "roadmap_item_ids": [
+        "IL-MINOR-3"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 14,
+      "op": "replace_block",
+      "block_id": "B0074",
+      "roadmap_item_ids": [
+        "IL-MINOR-4"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 15,
+      "op": "replace_block",
+      "block_id": "B0075",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": [
+        "B0137"
+      ]
+    },
+    {
+      "op_index": 16,
+      "op": "replace_block",
+      "block_id": "B0015",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-6"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 17,
+      "op": "replace_block",
+      "block_id": "B0037",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-7"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 18,
+      "op": "replace_block",
+      "block_id": "B0078",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-8"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 19,
+      "op": "replace_block",
+      "block_id": "B0084",
+      "roadmap_item_ids": [
+        "IL-MINOR-5"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 20,
+      "op": "replace_block",
+      "block_id": "B0080",
+      "roadmap_item_ids": [
+        "IL-MEDIUM-9"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    },
+    {
+      "op_index": 21,
+      "op": "replace_block",
+      "block_id": "B0107",
+      "roadmap_item_ids": [
+        "IL-MINOR-6"
+      ],
+      "claim_strength_changes": [],
+      "collateral_authorization_ids": [],
+      "new_block_ids": []
+    }
+  ],
+  "fresh_block_ids": [
+    "B0137",
+    "B0138",
+    "B0139",
+    "B0140",
+    "B0141",
+    "B0142"
+  ],
+  "pure_move_pairs": [],
+  "structural_flags": {
+    "heading_op_indexes": [
+      3,
+      8
+    ],
+    "section_count_delta": 0,
+    "touched_ratio": 0.1618,
+    "touched_ratio_threshold": 0.6,
+    "touched_ratio_exceeded": false,
+    "any": true,
+    "acknowledged": true
+  },
+  "counters": {
+    "blocks_total": 136,
+    "blocks_touched": 22,
+    "blocks_preserved_byte_identical": 114,
+    "preserved_ratio": 0.8382
+  }
+}
