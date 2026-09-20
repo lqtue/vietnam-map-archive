@@ -344,3 +344,41 @@ The difference between marginal counts is not itself an individually matched tra
 ```markdown
 with a net increase of 273 on-cell sheets across the two builds.
 ```
+
+---
+
+## Applied — 2026-09-20
+
+All 21 operations above (R1–R21) were accepted and applied through the ARS integrity-correction
+chain, run natively via the Claude Code plugin (ARS 3.22.0). The author adjudicated by family, not
+by individual operation:
+
+| Family | Ops | Verdict |
+|---|---|---|
+| F1 · Rejection denominator | R3, R8, R16 | Accept |
+| F2 · CRS-selection independence | R9, R10, R11, R14, R15 | Accept |
+| F3 · Hand-seam independence | R5 | Accept |
+| F4 · Seam statistic + matched analysis | R4, R6, R7, R21 | Accept |
+| F5 · Population and unrun methods | R2, R13, R17, R18, R19, R20 | Accept |
+
+All four families feeding R1 (abstract) and R12 (conclusion) were accepted, so both composite spans
+applied verbatim — no hand-rewrite was needed.
+
+- Base draft: `fd3efd18fa2e7c576270459e156068aa9378aa686c707b3bea16442c3e1a0eda`
+- Applied draft: `468fabf99cc49091b607ee1d81386e820855f0800da4a2ed56bc5bbd0420316d`
+- Chain evidence: `docs/paper/revision/integrity-issue-list.json` (20 corrections bundling the 21
+  ops — R8/R9 share one correction, targeting the same source block),
+  `integrity-authorization-round1.json`, `revision-patch.json`, `draft.r1.apply-report.json`
+  (22 patch ops after R10's heading+2-paragraph span split into replace+delete+delete; 114/136
+  blocks preserved byte-identical).
+- The applier's §3.6 structural checkpoint fired on two heading-touching ops (R4's block-local
+  insert, R10's actual section rename from "The outside opinion" to "CRS selection against an
+  adopted frame") and was acknowledged — section count was unchanged and touched-ratio (0.16) was
+  well under the 0.6 threshold.
+- `check_revision_token_conservation.py` ran as an advisory pass only; all deltas were expected
+  denominator/threshold numbers, nothing flagged as unconserved.
+- `docs/paper/technical-revision-proposal.json` now records `status: APPLIED`.
+
+Session 1 (adjudication) and Session 2 (apply) of `/Users/airm1/.claude/plans/use-ars-to-improve-spicy-papert.md`
+are complete. Next: Session 3 — propagate to `figures.md`, `submission.md`, `visual-plan.md`,
+`claim-audit.md`, then rebuild the PDF.

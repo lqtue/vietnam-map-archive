@@ -1,9 +1,12 @@
 {
-  "status": "PROPOSAL_NOT_APPLIED",
+  "status": "APPLIED",
   "date": "2026-09-20",
+  "applied_date": "2026-09-20",
   "target": "docs/paper/draft.md",
   "base_sha256": "fd3efd18fa2e7c576270459e156068aa9378aa686c707b3bea16442c3e1a0eda",
-  "authority": "Exact replacements pending author decision; this is not an ARS authorization sidecar or a verified revision-evidence bundle.",
+  "applied_sha256": "468fabf99cc49091b607ee1d81386e820855f0800da4a2ed56bc5bbd0420316d",
+  "declined_ids": [],
+  "authority": "Applied through the ARS integrity-correction chain (integrity-correction-list/1.0 → integrity-correction-authorization/1.0 → revision-patch/1.1, apply-report/1.3). All 21 operations authorized and applied verbatim; author accepted all five families (F1–F5) via interactive per-family adjudication on 2026-09-20. Evidence: docs/paper/revision/{integrity-issue-list.json, author-input-round1.txt, author-choices-round1.json, integrity-authorization-round1.json, revision-patch.json, draft.r1.apply-report.json}.",
   "operations": [
     {
       "id": "R1",

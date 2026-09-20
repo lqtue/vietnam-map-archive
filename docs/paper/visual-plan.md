@@ -20,7 +20,8 @@ start with **6 → 1 → 2 → 5 → 7**:
    absolute placement, and why a seam imposed during fitting is not a free diagnostic.
 4. **How much evidence is there?** Figure 5. A low median conceals a large tail:
    189 of 717 free seams exceed 100 m before correction; none of 715 do afterwards.
-   These are separate builds, not matched pairs.
+   The full bars are separate builds, but a matched analysis of the 715 common edges gives
+   the same 189-to-zero result, ruling out attrition as the explanation (§7.3).
 5. **Did the correction place the sheets?** Figure 7. The separate cell check improves
    from 161 of 437 on cell to 434 of 436. Two still need review. This is local evidence;
    it does not establish that the public archive has been rebuilt.

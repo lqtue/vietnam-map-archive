@@ -115,7 +115,7 @@ consumer that forgets that filter reads 1,443 machine polygons as truth. This is
 
 | figure | value | source |
 |---|---|---|
-| sheets georeferenced by pipeline | 514 (452 L7014 published of 535 + 62 Indochine) | `allmaps-series-note.md` |
+| sheets georeferenced by pipeline | 514 (452 L7014 + 62 Indochine); the 452 is a hand-maintained publication constant, not verified against a serving manifest — archive-reported total, not a checked count | `allmaps-series-note.md` |
 | Tonkin originals placed, no model calls | 121 of 121 | commits 2026-09-15 |
 | Như Trác printed corners | `115ᵍ,20`/`22ᵍ,875` and `115ᵍ,40`/`22ᵍ,75` → 106.017 E/20.5875 N, 106.197 E/20.475 N | `allmaps-series-note.md` §2 |
 | conversion | grades × 0.9 = degrees from Paris, + 2.3372 for Greenwich | ibid |
@@ -147,7 +147,7 @@ sheet numbers 0 rows out of order
 | mosaic-only cohort | **717** PDF/PDF seams; median 9.2 m; 97 over 300 m | `work/l7014/regen/REGEN.md`, 2026-09-20 |
 | hand-extended cohort | **778** total: 717 PDF/PDF + 36 JPG/PDF + 25 JPG/JPG; median 9.2 m; 111 over 300 m | ibid |
 | hand-to-mosaic subset | **36** JPG/PDF seams, spanning 1.8–446.2 m; seam components median 438.0 m E/W and 133.7 m N/S, recombined 457.9 m | `regen/seams-faulty-hand.csv`, 2026-09-20 |
-| free subsets in corrected run | 715 PDF/PDF and 25 JPG/JPG; JPG/JPG spans 0.0–0.6 m | ibid |
+| free subsets in corrected run | 715 PDF/PDF; the 25 JPG/JPG at 0.0–0.6 m are **not** free-seam evidence — `l7014_hand.py` assembles the hand manifest from lattice-derived ground corners on both sides, so this describes boundary consistency, not independent registration. Only PDF/PDF is used as free-seam evidence | ibid |
 | **free-seam A/B, binned** (Figure 5) | PDF/PDF only. faulty **377 / 149 / 2 / 92 / 97**, corrected **492 / 218 / 5 / 0 / 0** over bins 0–10 / 10–50 / 50–100 / 100–300 / >300 m. **189** faulty seams exceed 100 m; **0** corrected ones do. Median 9.2 m → **6.8 m** | `regen/seams-faulty.csv` + `seams-fixed.csv`, binned 2026-09-20 |
 | **the fault in space** (Figure 6) | of 627 cells: **269** warped and displaced, **168** warped and placed, **73** held but not warped, **117** not held. No `indian1960` sheet between **14°N and 17°N** | `figures/fault-map.json`, from `lattice.json` + `regen/datum-split.csv`, 2026-09-20 |
 | what Heitzler et al. (2018) report (read in full 2026-09-20) | Hough-transform grid intersections, per-cell bilinear warp. Per-module precision on 20 sheets: corners 100%, grid intersections 97.9% → 94.6% after local optimisation, coordinate detection 93.8%, symbol interpretation 95.6%. **No ground-distance error anywhere in the paper** | `related-work.md`, Heitzler note |
@@ -161,9 +161,10 @@ sheet numbers 0 rows out of order
 | sheets shipped that way | **276 by fit / 269 by CRS displacement**, of 437 | ibid |
 | `fit` verdict on the shipped archive | 341 of 452 sheets more than 150 m off their cell | ibid |
 | PROJ non-uniformity (probed) | `106.00,16.00` moves **470 m**; `109.25,13.25` moves **0** | ibid |
-| the blind self-check, at population scale | in the faulty pass `graticule_error` rejected **11 of 437** and passed **all 269** displaced sheets; the rejections it did issue fire at **0.004–0.076 deg** off the printed graticule, so this is not a sensitivity limit | `regen/warp-faulty.log`, 2026-09-20 |
+| the blind self-check, at population scale | of 510 source files, 62 have no usable control; **448** reach `graticule_error`; it rejects **11**, leaving **437** in the faulty build, including **all 269** displaced sheets; the rejections it did issue fire at **0.004–0.076 deg** off the printed graticule, so this is not a sensitivity limit | `regen/warp-faulty.log`, 2026-09-20 |
+| matched-pair seam result | same 715 PDF/PDF edges before/after correction: **189 → 0** above 100 m, max corrected edge 72.4 m; the two faulty-only edges (excluded from the match) measure 3.6 m and 15.6 m, so attrition cannot explain the tail's disappearance | `seam-paired-analysis.json`, `scripts/paper-seam-pairs.mjs`, 2026-09-20 |
 | **A Lưới is _not_ a displaced sheet** | `6441-4` resolves to `declared`, CRS displacement **0.00 m**; `graticule_error` **2.167e-12**. It demonstrates the blind check on a *correctly placed* sheet. Never describe it as displaced — the earlier "2e-12 against a real 470 m displacement" conflated two sheets | `regen/datum-split.csv` + `REGEN.md`, 2026-09-20 |
-| the outside opinion | `pick_crs` judges two candidates ~470 m apart against a 15′ cell good to ~15 m; refuses rather than take the smaller miss | ibid |
+| CRS selection against the adopted frame | `pick_crs` scores registration points against the lattice cell (150 m cutoff, refuses above it); `cell_corners` shares the same Everest 1830 (1937 Adj.) Helmert parameters as the alternative candidate, so agreement tests consistency with the adopted frame, not independent absolute accuracy at the ~15 m index-to-outline scale | ibid |
 | the Helmert | Everest 1830 (1937 Adj.) `+a=6377276.345 +rf=300.8017 +towgs84=198,881,317` | ibid |
 | `fit`, faulty pass | **161 of 437** on cell, median **11 m**, worst **50 m**; **276** more than 150 m off cell | `regen/fit-faulty.log`, 2026-09-20 |
 | `fit`, corrected pass | **434 of 436** on cell, median **10 m**, worst **95 m**; **2** more than 150 m off cell — `6630-4` Xa Phan Thiet (mean 662 m, worst 2623 m) and `6349-4` Cua Tra Ly (mean 396 m, worst 1565 m) | `regen/fit-fixed.log`, 2026-09-20 |
@@ -252,6 +253,12 @@ than silently rewritten, per the `note:` convention.
 
 ## Changelog of this file
 
+- **2026-09-20** — Applied the ARS integrity-correction round (`technical-revision-proposal.json`,
+  now `APPLIED`) to keep this ledger in step with `draft.md`: the 452-sheet publication constant is
+  now marked archive-reported/unverified; the blind-self-check row carries the full 510→62→448→11→437
+  denominator chain; the JPG/JPG hand-seam figure is marked as boundary-consistency, not free-seam
+  evidence; the CRS-selection row is reframed as consistency-with-adopted-frame; a matched-pair seam
+  result row was added.
 - **2026-09-20** — Heitzler et al. (2018) read in full; two rows added to §3.2. See `related-work.md`,
   the Heitzler note.
 - **2026-09-19** — MapEdge read in full; §2's "inward walk" row corrected (it described our detector,
