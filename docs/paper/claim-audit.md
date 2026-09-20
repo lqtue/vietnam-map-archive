@@ -74,9 +74,14 @@ expression of concern.** Three defects were found and fixed:
 | a named work with no reference | §2.4 named the ICDAR MapText competition with no entry. Added Li et al. (2024), `10.1007/978-3-031-70552-6_22`. |
 | an entry cited by system name only | mapKurator appeared without an author-year, leaving Kim et al. (2023) listed but never cited. Now cited in text. |
 
-One item remains open rather than fixed: Janata & Cajthaml is dated **2020** here, following the
-stored metadata, while the journal issue (*Applied Sciences* 11(1)) carries 2021. Confirm against
-the publisher's record before submission; the draft is internally consistent either way.
+**The Janata & Cajthaml year is resolved, and 2020 is correct.** The doubt was that *Applied
+Sciences* 11(1) is a 2021 volume, and MDPI's house citation style accordingly prints "Appl. Sci.
+2021, 11, 299". That is a volume-year display convention, not a publication date. The publisher's
+own Crossref deposit records `issued` and `published-online` as **2020-12-30** and carries no print
+date at all, and Crossref's APA formatter returns the year 2020 directly. OpenAlex, Semantic
+Scholar, Unpaywall and Scite all resolve the same date, and a reader following the DOI arrives at
+an article stamped 30 December 2020. The draft already reads 2020 in all six places — the four
+in-text mentions, the Table 1 row and the reference entry — so nothing changed.
 
 ## Submission requirement
 
