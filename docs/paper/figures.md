@@ -150,6 +150,8 @@ sheet numbers 0 rows out of order
 | free subsets in corrected run | 715 PDF/PDF and 25 JPG/JPG; JPG/JPG spans 0.0–0.6 m | ibid |
 | **free-seam A/B, binned** (Figure 5) | PDF/PDF only. faulty **377 / 149 / 2 / 92 / 97**, corrected **492 / 218 / 5 / 0 / 0** over bins 0–10 / 10–50 / 50–100 / 100–300 / >300 m. **189** faulty seams exceed 100 m; **0** corrected ones do. Median 9.2 m → **6.8 m** | `regen/seams-faulty.csv` + `seams-fixed.csv`, binned 2026-09-20 |
 | **the fault in space** (Figure 6) | of 627 cells: **269** warped and displaced, **168** warped and placed, **73** held but not warped, **117** not held. No `indian1960` sheet between **14°N and 17°N** | `figures/fault-map.json`, from `lattice.json` + `regen/datum-split.csv`, 2026-09-20 |
+| what Heitzler et al. (2018) report (read in full 2026-09-20) | Hough-transform grid intersections, per-cell bilinear warp. Per-module precision on 20 sheets: corners 100%, grid intersections 97.9% → 94.6% after local optimisation, coordinate detection 93.8%, symbol interpretation 95.6%. **No ground-distance error anywhere in the paper** | `related-work.md`, Heitzler note |
+| their one seam demonstration (Figure 11 in their paper) | one adjacent-sheet pair, by eye: a stream's topological break across the seam closes, a road's mismatch persists in both (attributed to needing conflation, not better georeferencing). No threshold, no denominator, no count | ibid |
 
 ### 3.3 The datum traps (absolute)
 
@@ -250,6 +252,8 @@ than silently rewritten, per the `note:` convention.
 
 ## Changelog of this file
 
+- **2026-09-20** — Heitzler et al. (2018) read in full; two rows added to §3.2. See `related-work.md`,
+  the Heitzler note.
 - **2026-09-19** — MapEdge read in full; §2's "inward walk" row corrected (it described our detector,
   not theirs) and two rows added. See `related-work.md` §4.
 - **2026-09-19** — created. Phase 0 of the paper plan. Live counts pulled; ten documented

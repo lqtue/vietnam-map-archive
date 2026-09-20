@@ -26,7 +26,8 @@ as planned would have been the kind of error a reviewer finds in ten minutes.
 | **Uhl, Leyk & Chiang (2018)**, `10.20944/preprints201803.0021.v2` | Computes displacement vectors between each GCP's known world coordinates (graticule intersections) and its post-transformation position, explicitly *"to identify anomalies … where users should be careful with respect to further information extraction from such map sheets."* | Per-sheet georeferencing-quality anomaly detection across a whole archive. |
 | **Gede & Varga (2021)**, *Proceedings of the ICA* 4:38, `10.5194/ica-proc-4-38-2021` | Detects map-content corners, OCRs the sheet identifier, derives the quadrangle extent from the ID, uses the corners as GCPs. 1,147 sheets at ~4 s each. **"False detection of the corners is automatically filtered by geometric analysis of the detected GCPs."** Corner error < 1% of sheet size on 89%, < 2% on 99%; sheet-ID recognition 75.9%. | **Closest to C2** — and it already has a geometric self-filter. |
 
-Also relevant and already engaged with by the above: **Heitzler et al. (2018)** and **Burt et al.
+Also relevant and already engaged with by the above: **Heitzler et al. (2018)** (read in full
+2026-09-20 — the Heitzler note at the end of this file) and **Burt et al.
 (2020)** use printed marginal information and graticule intersections, with Burt et al. reaching
 1–4 px RMSE on neatline corners and graticule intersections; **Kuna, Panecki & Zawadzki (2024)**,
 `10.3390/ijgi13070249`, mosaic 60 irregular-cut sheets with a section titled *"rectification of
@@ -788,6 +789,69 @@ but worth checking before that outreach goes out.
 
 ---
 
+## Heitzler et al. (2018) — verified in full 2026-09-20
+
+*Unnumbered on purpose: `§8` in this file already means the draft's §8, not a section of this one.*
+
+Carried as unresolved out of the round-2 figure pass ("couldn't verify, wasn't going to add an
+unchecked reference"). **Now read in full from the publisher's PDF.** The record:
+
+> Heitzler, M., Gkonos, C., Tsorlini, A. & Hurni, L. (2018). **A modular process to improve the
+> georeferencing of the Siegfried map.** *e-Perimetron* 13(2):85–100. ISSN 1790-3769.
+> <http://www.e-perimetron.org/Vol_13_2/Heitzler_et_al.pdf>
+
+**Not in scite, and now we know why: e-Perimetron mints no DOIs** — the same reason MapEdge was
+invisible (§4). Two of our references are in that journal. Stop searching scite for either.
+
+### The claim we make about it holds
+
+§2's one-liner — *"uses printed marginal information and graticule intersections"* — is correct, and
+the process is closer to C2 than that phrasing suggests. Six modules: pre-processing · map-frame
+corner detection by template matching · coordinate-grid extraction by **Hough transform** and
+intersection-point computation · marginal coordinate text located and read (a CNN, after tesseract
+was tried and dropped) · **a manual validation and correction step** · georeferencing by
+**quadrilateral-based bi-linear interpolation per grid cell**, each cell warped separately and the
+results aligned, rather than one transform for the whole sheet.
+
+### What it reports, and what it does not
+
+Per-module **precision** on 20 randomly selected sheets, and nothing else:
+
+| module | reported |
+|---|---|
+| 2 · frame corners | 80 / 80, **100.0%** |
+| 3 · grid intersections | 1097 / 1121 detected (97.9%); 36 of those misplaced in local optimisation → **94.6%** |
+| 4 · coordinate detection | 75 / 80, **93.8%** |
+| 5 · coordinate interpretation | 460 / 481 symbols, **95.6%** |
+| end to end | **2 sheets (10%)** needed no manual adjustment; 6 (30%) had displaced intersections; **60%** had a coordinate or a border intersection wrong |
+| time | 80.4 s per sheet, 66.7 s of it modules 4–5 |
+
+**No RMSE. No ground distance. No pixel error. Nowhere in the paper.** Same shape as MapEdge: a
+thorough internal-precision battery with no metric statement of where the sheet landed. Their own
+Discussion names the reason the precisions do not compose — four coordinates × six symbols at 95.6%
+each gives **0.956²⁴ = 34%**, so two sheets in three need a human, which is why module 5 exists.
+
+### The finding that matters to us
+
+**Their single demonstration that the method is more accurate than the existing one is a seam, by
+eye, on one pair of sheets.** Figure 11 puts Swisstopo's georeferencing beside theirs over *"a small
+area spanning two adjacent map sheets"*: a stream is topologically broken across the seam on the
+left and joins on the right. A road still mismatches in both, which they attribute to a limit of
+georeferencing itself — *"cannot be corrected by further improving the georeferencing process, but
+necessitate the use of complementary methods such as conflation"*.
+
+So the seam is **already accepted as the evidence that georeferencing improved** — by the ETH group,
+in print, in 2018. It is used as an illustration: one pair, chosen, no measurement, no census, no
+number. That is the third instance of the pattern and the cleanest one: Luft & Schiewe measure
+corners against the layout and state the seam consequence in prose; Janata & Cajthaml spend the
+seam as a constraint; **Heitzler et al. show the seam as a picture.** Nobody counts it.
+
+Cite it in §2 as precedent for the lattice — *the seam as evidence is theirs, the measurement is
+ours* — and in the draft's §7 as the third row of the blindness table. Attribute no error figure to it, because
+it reports none.
+
+---
+
 ## Still to do in Phase 1
 
 - [x] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
@@ -824,4 +888,7 @@ but worth checking before that outreach goes out.
       three clean. See the "`editorialNotices` check" note inside §6.
 - [ ] Move "Paper 2's target to beat is 316 m at 1:25,000" (§6.1) into the plan's Paper 2 entry.
 - [ ] Decide whether §7 keeps the IIIF size-segment finding or it ships as its own note.
+- [x] **Read Heitzler et al. (2018) — done 2026-09-20.** Record, method, the four precisions and
+      the Figure 11 seam are in *the Heitzler note* above. Not in scite for the same reason as MapEdge: e-Perimetron
+      mints no DOIs. It reports **no metric error figure**; quote none.
 - [ ] `report_citations` with the full include/exclude set once the list is closed.

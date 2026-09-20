@@ -2,7 +2,7 @@
 
 Generated from `draft.md` on 2026-09-20 — regenerate rather than edit by hand, so the abstract here
 can never drift from the one in the manuscript. The PDF to upload is
-`docs/paper/blind-by-construction.pdf` (19 pages, A4).
+`docs/paper/blind-by-construction.pdf` (20 pages, A4).
 
 **Do the Zenodo deposit first.** §11 promises a data DOI; posting before it exists means a v2 whose
 only change is a DOI. `work/zenodo/zenodo-metadata.json` is the form-fill for it.

@@ -166,6 +166,17 @@ lookup. Uhl et al. (2018), in turn, use GCP displacement vectors as a per-sheet 
 across map archives. Both methods reinforce the point of this paper: a useful per-sheet diagnostic
 is not thereby a diagnostic of a fault that belongs to the series frame.
 
+Heitzler, Gkonos, Tsorlini and Hurni (2018) belong to the same graticule-intersection family as
+Burt: they locate grid intersections with a Hough transform and warp each coordinate cell
+independently rather than the sheet as a whole, reporting per-module precision on 20 sheets — 100%
+corner detection, 94.6% grid-intersection placement, 95.6% coordinate interpretation — but no
+ground-distance error anywhere in the paper. Their only demonstration that the result improves on
+the existing georeferencing is a single adjacent-sheet pair: a stream's topological break across the
+seam closes under their method while a road's mismatch persists in both, and they note that the
+latter needs conflation rather than better georeferencing. One pair, chosen, unmeasured — but it is
+the same reflex §7.3 turns into a census: the seam is already the evidence a reader reaches for,
+before anyone counts it.
+
 ### 2.2 Inter-sheet agreement, spent as a constraint
 
 <!-- **[drafted]** -->
@@ -536,6 +547,11 @@ relative measurement.
 
 ![Free-seam census](figures/figure-5.pdf)
 
+A single seam has been offered as this kind of evidence before (§2.1): Heitzler et al. (2018) show
+one adjacent-sheet pair closing under their method, by eye, with no threshold and no denominator.
+What changes here is the count — 717 free seams, binned and thresholded, not one pair chosen to
+illustrate.
+
 ### 7.4 The blind self-check
 
 The seam anomaly led to a datum fault in the L7014 GeoPDF pipeline. The 437-sheet denominator contains
@@ -763,6 +779,9 @@ Sciences* 11(1) is a 2021 volume, and Burt et al. is deposited as 2019 although 
 - Gede, M., & Varga, L. (2021). Automatic georeferencing of topographic map sheets using OpenCV and
   Tesseract. *Proceedings of the International Cartographic Association*, 4, 38.
   https://doi.org/10.5194/ica-proc-4-38-2021
+- Heitzler, M., Gkonos, C., Tsorlini, A., & Hurni, L. (2018). A modular process to improve the
+  georeferencing of the Siegfried map. *e-Perimetron*, 13(2), 85–100.
+  http://www.e-perimetron.org/Vol_13_2/Heitzler_et_al.pdf
 - Ingensand, J., Lecorney, S., & Blanc, N. (2022). An open API for 3D-georeferenced historical
   pictures. *The International Archives of the Photogrammetry, Remote Sensing and Spatial Information
   Sciences*, XLVIII-4/W1-2022, 217–222.
