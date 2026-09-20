@@ -2,6 +2,7 @@
 // Backfill `maps.bbox` from each map's Allmaps annotation.
 //
 //   node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs [--dry] [--force] [--concurrency N]
+//   node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs --report-drift
 //
 // Measured on 2026-09-04: 0 of 101 maps had a bbox, so every "where is this
 // map?" question — /explore's zoom-to-overlay, `?map=` deep links, and any
@@ -38,8 +39,11 @@ import { GcpTransformer } from '@allmaps/transform';
 import { parseAnnotation } from '@allmaps/annotation';
 
 const args = process.argv.slice(2);
-const dry = args.includes('--dry');
-const force = args.includes('--force');
+// A report must be non-mutating even when its caller omits `--dry`.
+const reportDrift = args.includes('--report-drift');
+const dry = args.includes('--dry') || reportDrift;
+// Drift is meaningful only when every existing bbox is recomputed.
+const force = args.includes('--force') || reportDrift;
 const cIdx = args.indexOf('--concurrency');
 const concurrency = cIdx > -1 ? Number(args[cIdx + 1]) : 10;
 
@@ -66,6 +70,21 @@ function extentOf(points) {
   const lng = points.map((p) => p[0]);
   const lat = points.map((p) => p[1]);
   return [Math.min(...lng), Math.min(...lat), Math.max(...lng), Math.max(...lat)];
+}
+
+/** Largest stored-to-recomputed corner displacement, in metres. */
+function bboxDriftMetres(stored, computed) {
+  const lat = (stored[1] + stored[3] + computed[1] + computed[3]) / 4;
+  const lonMetres = 111320 * Math.cos((lat * Math.PI) / 180);
+  const latMetres = 110540;
+  return Math.max(
+    ...[
+      [0, 1],
+      [2, 3],
+    ].map(([x, y]) =>
+      Math.hypot((stored[x] - computed[x]) * lonMetres, (stored[y] - computed[y]) * latMetres)
+    )
+  );
 }
 
 /**
@@ -172,6 +191,7 @@ const writable = results.filter((r) => r.bbox && r.bbox[0] < r.bbox[2] && r.bbox
 const skipped = results.filter((r) => !writable.includes(r));
 
 let changed = 0;
+const drift = [];
 for (const r of writable) {
   const b = r.bbox.map((n) => +n.toFixed(6));
   const cur = r.m.bbox;
@@ -179,8 +199,11 @@ for (const r of writable) {
     Array.isArray(cur) && cur.length === 4 && cur.every((v, i) => Math.abs(v - b[i]) < 1e-6);
   if (same) continue;
   changed++;
+  const metres = bboxDriftMetres(cur, b);
+  drift.push({ metres, m: r.m, bbox: b, n: r.n, how: r.how });
+  if (reportDrift && metres < 0.25) continue;
   console.log(
-    `  ${String(r.m.year ?? '????')}  ${r.n}gcp ${r.how.padEnd(4)}  [${b}]  ${r.m.name.slice(0, 48)}`
+    `  ${String(r.m.year ?? '????')}  ${r.n}gcp ${r.how.padEnd(4)}  ${metres.toFixed(2).padStart(8)} m  [${b}]  ${r.m.name.slice(0, 48)}`
   );
   if (dry) continue;
   const { error: upErr } = await db.from('maps').update({ bbox: b }).eq('id', r.m.id);
@@ -197,4 +220,21 @@ console.log(
 const why = {};
 for (const r of skipped) why[r.why] = (why[r.why] ?? 0) + 1;
 for (const [k, n] of Object.entries(why)) console.log(`  ${String(n).padStart(3)}  ${k}`);
+if (reportDrift && drift.length) {
+  const ordered = drift.map((r) => r.metres).sort((a, b) => a - b);
+  const percentile = (p) => ordered[Math.ceil((ordered.length - 1) * p)];
+  const buckets = [
+    ['<0.25 m (rounding)', (n) => n < 0.25],
+    ['0.25–5 m', (n) => n >= 0.25 && n < 5],
+    ['5–50 m', (n) => n >= 5 && n < 50],
+    ['≥50 m (refresh)', (n) => n >= 50],
+  ];
+  console.log(
+    `  drift: p50 ${percentile(0.5).toFixed(3)} m, p90 ${percentile(0.9).toFixed(3)} m, max ${percentile(1).toFixed(3)} m`
+  );
+  for (const [label, includes] of buckets)
+    console.log(
+      `    ${String(drift.filter((r) => includes(r.metres)).length).padStart(3)}  ${label}`
+    );
+}
 if (!dry) console.log(`\nwrote ${changed} bboxes`);
