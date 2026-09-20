@@ -13,6 +13,7 @@
     pixel-coordinate tool it shared nothing with; /admin is where the queues are.
   */
   import { page } from '$app/stores';
+  import { ADMIN_TABS, resolveAdminTab, type AdminTab } from '$lib/core/routeModes';
   import PageHero from '$lib/ui/PageHero.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import BulkUploadPage from '$lib/features/admin/BulkUploadPage.svelte';
@@ -20,15 +21,19 @@
   import StatusPage from '$lib/features/admin/StatusPage.svelte';
   import StoryReviewPanel from '$lib/features/admin/StoryReviewPanel.svelte';
 
-  const TABS = [
-    { key: 'bulk', label: 'Bulk upload' },
-    { key: 'scout', label: 'Scout' },
-    { key: 'status', label: 'Status' },
-    { key: 'stories', label: 'Stories' },
-  ] as const;
+  const TAB_LABELS: Record<AdminTab, string> = {
+    bulk: 'Bulk upload',
+    scout: 'Scout',
+    status: 'Status',
+    stories: 'Stories',
+  };
+  const TABS = ADMIN_TABS.map((key) => ({
+    key,
+    label: TAB_LABELS[key],
+  }));
 
-  $: tab = $page.url.searchParams.get('tab') ?? 'bulk';
-  $: tabLabel = TABS.find((t) => t.key === tab)?.label ?? TABS[0].label;
+  $: tab = resolveAdminTab($page.url.searchParams.get('tab'));
+  $: tabLabel = TAB_LABELS[tab];
 </script>
 
 <svelte:head>

@@ -281,6 +281,8 @@ test('auth-gated and legacy routes redirect', async ({ page }) => {
     // it offered is /catalog/[id], which has the same tiles plus the record.
     ['/scan', '/catalog'],
     ['/scan?mode=nonsense', '/catalog'],
+    ['/explore?mode=nonsense', '/explore'],
+    ['/admin?tab=nonsense', '/admin?tab=status'],
     ['/admin/bulk', '/admin?tab=bulk'],
     ['/admin/status', '/admin?tab=status'],
     ['/place/rue-catinat', '/catalog/place/rue-catinat'],
