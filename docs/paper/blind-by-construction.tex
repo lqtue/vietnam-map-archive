@@ -6,6 +6,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage[section]{placeins}
+\captionsetup{font=small,labelfont=bf}
 \usepackage{xurl}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black,pdftitle={Blind by construction}}
@@ -22,7 +24,7 @@ This preprint has not been submitted to a journal for peer review.\par}
 \begin{center}
 {\LARGE\bfseries Blind by construction: verifying a georeferenced map series when the check shares the error\par}
 \vspace{0.5em}
-{\large Two colonial map series of Vietnam, 514 sheets\par}
+{\large Two historical map series of Vietnam\par}
 \vspace{1.2em}
 {\large Tue Quang Le\par}
 \vspace{0.3em}
@@ -45,7 +47,11 @@ Georeferencing a historical map series is usually described as a per-sheet probl
 
 Historical maps are increasingly available as scans, but a scan becomes spatially useful only when it can be placed, queried and compared with other maps. That operation is often described as a georeferencing problem: identify control points, fit a transformation and report an error. For a sheet series, however, the control is frequently already present. It may arrive in a GeoPDF, be printed as graticule intersections, or be recoverable from a repeated neatline and a known index. The difficult work shifts from placing an individual sheet to establishing whether an entire collection has been placed coherently and whether the resulting evidence can detect its own errors.
 
+A datum specifies how map coordinates relate to positions on Earth. Using the wrong datum can move a sheet while preserving its shape. A residual is the difference between two quantities compared by a check; it measures absolute placement only if the comparison can reveal an error in that placement. Figure 1 shows the key mechanism: add the same shift to both quantities and their difference does not change.
+
 This distinction matters because a small residual is not a general certificate of correctness. A check can be accurate for the relation it measures and nevertheless be unable to reveal a datum, frame or adjacency assumption that it shares with the transformation. In the Vietnam Map Archive, we published a substantial subset of GeoPDF sheets hundreds of metres from their intended locations. The pipeline completed, the maps rendered and the per-sheet graticule check passed every displaced sheet. The fault was not hidden by noise; it was invisible by construction because the check compared two quantities translated by the same wrong datum. A current reproduction finds CRS displacements of 395–528 m (median 455 m), with the exact fault population depending on whether it is counted from the fit or from the CRS displacement.
+
+Read the evidence in three steps. Figure 6 locates the affected sheets and shows why some shared edges expose the displacement. Figure 5 counts that disagreement before and after the correction. Figure 7 then asks the separate question of whether sheets reach their expected cells. Together these distinguish a check passing, neighbours agreeing and a sheet being correctly placed.
 
 The size of that silent displacement is a useful warning, but not a benchmark claim. It exceeds the 101 m median error reported by a content-based automatic method and is comparable with some automatic toponym-based results, yet the tasks are not comparable: those methods locate a sheet from content, while our pipeline begins with human-placed or source-supplied control. This paper is about the meaning of verification after control has been obtained, not about claiming that a human-assisted workflow outperforms automatic georeferencing.
 
@@ -55,11 +61,10 @@ The paper makes three contributions. First, it models a survey as cells, archive
 
 Our claim is deliberately narrow. Series self-consistency is not new, and neither are lattice or adjacency checks. The contribution is to show, with a published failure, that a verification instrument can be predictably blind to one error class by construction. Naming its scope and its committed assumptions is therefore a precondition for interpreting the residual it reports.
 
-\textbf{Figure 1 — from control to a meaningful verification claim.}
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/figure-1.pdf}
+\caption{Why a wrong position can pass an internal check. The two panels are a schematic of a shared translation, not measured sheet positions. If both operands move together, their difference stays unchanged. In the controlled L7014 reproduction, all 269 displaced sheets passed the graticule check despite a median CRS displacement of 455 m.}
 \end{figure}
 
 \bigskip\hrule\bigskip
@@ -106,11 +111,10 @@ Recent multi-sheet work makes the same distinction from another direction. Kuna,
 
 Tyagi and Dubey (2026) read printed map text with OCR and a multimodal model to derive a sheet's extent, which is the closest published neighbour to the printed-corner method in §6. We have not obtained the full text and therefore attribute no result to it. Legend detection is likewise outside this paper's scope: it concerns what a sheet depicts, not whether the sheet's spatial frame is independently verified.
 
-\textbf{Figure 2 — verification evidence has distinct scopes.}
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/figure-2.pdf}
+\caption{When a seam can reveal a displacement. Schematic, not to scale. A gap opens when neighbouring sheets move differently (B); a common translation preserves their join (C). The census is diagnostic only when adjacency was left free during the warp. Figure 6 shows the geographic populations that make case B possible in this archive.}
 \end{figure}
 
 \bigskip\hrule\bigskip
@@ -119,15 +123,17 @@ Tyagi and Dubey (2026) read printed map text with OCR and a multimodal model to 
 
 The corpus comprises two colonial and Cold-War Vietnamese sheet series, treated as series rather than as a collection of otherwise unrelated map images. L7014 is the US Army Map Service 1:50,000 coverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the University of Texas at Austin. The second is the Service géographique de l'Indochine 1:25,000 coverage of Tonkin and Thanh Hóa, held by Cartomundi at Aix-Marseille Université/CNRS. Together the recorded processing ledger covers 514 sheets: 452 L7014 sheets published as one PMTiles mosaic and 62 Indochine sheets. Current publication and annotation status is tracked separately from that run total. The L7014 material dates from the 1960s–70s; the Indochine material from 1903–1927.
 
-Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them on one map. The series index names \textbf{627} cells. \textbf{510} of those are held as GeoPDFs. Of the 510, \textbf{437} carry usable control and warp successfully — 62 have no GCPs and 11 land off their cell — and it is this 437 that the datum measurements in §7 are taken over. A further \textbf{24} sheets are georeferenced by hand rather than from embedded control, and sit outside that fault. The \textbf{452} in the published mosaic is a hand-maintained constant rather than a count read back from the serving manifest, and a corrected rebuild produces 436; we report it as the archive's own claim about itself and flag it in §7.6 rather than silently substituting a number the live layer cannot confirm. On the Indochine side, \textbf{79} cells are indexed and \textbf{75} held; \textbf{62} were georeferenced by the pipeline, \textbf{58} were read independently for the lattice check in §7.2, and the IIIF survey in §7.7 covers the \textbf{83} image sources those sheets resolve to, some cells holding more than one edition.
+Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them on one map; Figure 3 separates the audit populations. The series index names \textbf{627} cells. \textbf{510} of those are held as GeoPDFs. Of the 510, \textbf{437} carry usable control and warp successfully — 62 have no GCPs and 11 land off their cell — and it is this 437 that the datum measurements in §7 are taken over. A further \textbf{24} sheets are georeferenced by hand rather than from embedded control, and sit outside that fault. The \textbf{452} in the published mosaic is a hand-maintained constant rather than a count read back from the serving manifest, and a corrected rebuild produces 436; we report it as the archive's own claim about itself and flag it in §7.6 rather than silently substituting a number the live layer cannot confirm. On the Indochine side, \textbf{79} cells are indexed and \textbf{75} held; \textbf{62} were georeferenced by the pipeline, \textbf{58} were read independently for the lattice check in §7.2, and the IIIF survey in §7.7 covers the \textbf{83} image sources those sheets resolve to, some cells holding more than one edition.
 
 The two series are deliberately unlike in how they supply spatial evidence. L7014's source PDFs carry GCPs and a CRS declaration but require a test of that declaration. The Indochine sheets carry no embedded georeference but print corner coordinates and a regular quadrangle scheme. This contrast is useful for the paper's question: the checks in §7 do not depend on a single ingestion route, but on relations a sheet series makes available after its coordinates have been read.
 
 The corpus is not a representative sample of all historical maps of Vietnam, nor is it a ground truth dataset for absolute positional accuracy. Its holdings, digitisation quality and availability follow the decisions of the contributing institutions. The findings below should therefore be read as a failure taxonomy demonstrated on two well-structured series, not as a benchmark ranking against methods that recover a sheet's location from no prior spatial information.
 
-\textbf{Figure 3 — indexed cells, holdings and pipeline-georeferenced sheets in each series.}
-
-\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth]{figures/figure-3.pdf}\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-3.pdf}
+\caption{Choose the denominator that belongs to the question. The L7014 reproduction, Indochine audits and historical processing total count different populations. “Placed” uses the CRS-displacement classification; “on cell” uses the fit check. They must not be treated as the same test. The 452-sheet publication constant is not verified against the live manifest.}
+\end{figure}
 
 \section{C1 · Modelling the survey}
 
@@ -145,9 +151,11 @@ The procedure is intentionally conservative about what the source file establish
 
 Figure 4 shows what a single sheet makes available, and why those two facts are not independent evidence about each other. The sheet prints its own corner coordinates and, in its collar, the datum those coordinates are expressed in. A check that reads control points under the declared datum and compares them with the printed graticule is therefore comparing two quantities that a datum error moves together — the mechanism §7.4 measures.
 
-\textbf{Figure 4 — a sheet prints its graticule and declares its datum; a check that uses both cannot test either.} A Lưới 6441-4, AMS Series L7014 (US Army Map Service; scan by the Perry-Castañeda Library, University of Texas at Austin). US Government work, public domain.
-
-\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth]{figures/figure-4.pdf}\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-4.pdf}
+\caption{The source of the shared assumption. The graticule and the control points are interpreted in the sheet’s declared datum. Their agreement can test internal consistency but cannot independently establish that datum. This correctly placed sheet illustrates the inputs, not an example of the measured displacement. A Lưới 6441-4, AMS Series L7014 (US Army Map Service; scan by the Perry-Castañeda Library, University of Texas at Austin). US Government work, public domain.}
+\end{figure}
 
 \section{C2 method B — Indochine}
 
@@ -231,9 +239,11 @@ This is also the limit of the instrument. What the seam census detects is \emph{
 
 The seam anomaly was the first inexpensive indication, in this archive, that it had split into two spatial populations. The measurement needs neither a reference map nor a new set of control points: it needs only two sheets that claim to share an edge. Its value is diagnostic: it catches a disagreement that a per-sheet metric cannot see, provided adjacency has not already been imposed as a condition of the solution. A common displacement preserves a seam, just as it preserves any other relative measurement.
 
-\textbf{Figure 5 — free seam displacement before and after the datum correction. Every seam over 100 m — 189 of them — disappears.}
-
-\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth]{figures/figure-5.pdf}\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-5.pdf}
+\caption{The large-displacement tail is absent after correction. Counts of free PDF/PDF seams in each displacement bin. The faulty build has 189 of 717 seams over 100 m; the corrected build has 0 of 715. These are separate builds, not a paired analysis of the same 717 seams. A small median (9.2 m before, 6.8 m after) alone would obscure the faulty build’s large tail.}
+\end{figure}
 
 A single seam has been offered as this kind of evidence before (§2.1): Heitzler et al. (2018) show one adjacent-sheet pair closing under their method, by eye, with no threshold and no denominator. What changes here is the count — 717 free seams, binned and thresholded, not one pair chosen to illustrate.
 
@@ -247,9 +257,11 @@ The same check failed a second time, in the opposite direction, and the second f
 
 The fault is also not uniform across the series, and its shape is geographic rather than random. Figure 6 places all 627 indexed cells and colours each by the route its sheet took. The 269 displaced sheets fall in two groups, north and south, separated by a band between roughly 14°N and 17°N in which no sheet took the faulty route at all. That band is why a single probe can mislead: the archive holds two spatial populations, not one translated whole.
 
-\textbf{Figure 6 — the fault in geographic space, and the denominators it reconciles.}
-
-\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth]{figures/figure-6.pdf}\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-6.pdf}
+\caption{The fault has a geographic boundary. Each square is one indexed L7014 cell. Orange marks 269 displaced sheets; blue marks 168 placed sheets. No sheet between 14°N and 17°N took the faulty route. A seam can expose the fault where these populations meet; neighbouring sheets that share a displacement can still agree. Grey and empty cells distinguish missing warp results from missing holdings. Counts describe the controlled reproduction; 452 is the archive’s hand-maintained publication claim.}
+\end{figure}
 
 \subsection{The outside opinion}
 
@@ -263,9 +275,11 @@ Applying the explicit Helmert transformation in a dry run changes which sheets r
 
 That distinction is deliberate, and the live state is worse than "uncorrected". At the time of writing the \texttt{\detokenize{l7014-20260913}} archive has not been re-warped or re-uploaded, and its sheet manifest returns 404: the build shipped pixels without the accompanying \texttt{\detokenize{.geojson}}, so \texttt{\detokenize{fit}} cannot be run against the serving layer at all and the 452 constant quoted in §3 cannot be checked against it. What readers currently receive is therefore not merely displaced but unmeasurable from outside — itself an instance of §7.7's point that a serving layer needs its own instrument. The published fault is therefore part of the result, not a historical problem retrospectively erased from the evidence. A rebuild is an operational next step; reporting the dry run separately prevents it from being mistaken for a measurement of the current serving layer.
 
-\textbf{Figure 7 — the dry run moves sheets onto their cells: 161 → 434 on cell, 276 → 2 off by more than 150 m.}
-
-\begin{figure}[htbp]\centering\includegraphics[width=0.92\linewidth]{figures/figure-7.pdf}\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-7.pdf}
+\caption{The correction recovers cell placement in the local reproduction. Bars use a common sheet-count scale. The faulty build places 161 of 437 sheets on cell; the corrected build places 434 of 436. Orange marks sheets more than 150 m off cell. The two remaining failures require review. These results do not measure a rebuilt public mosaic.}
+\end{figure}
 
 \subsection{One layer down: a serving check}
 
@@ -273,11 +287,10 @@ The same scope rule applies after georeferencing, when a correct source image is
 
 This is not a georeferencing error and should not inflate the positional claims above. It belongs in the taxonomy because it demonstrates the same operational lesson at the serving layer. A successful full-resolution request does not test the tile keys a viewer will actually request. The appropriate instrument is a tile-key audit against keys present in the object store; it has no opinion about datum, lattice or seam geometry, and those checks have no opinion about it.
 
-\textbf{Figure 8 — a request can be valid IIIF syntax and still miss the server's tile grid.}
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/figure-8.pdf}
+\caption{Test the resolution that the viewer requests. Orange is the share of tile requests that fail at the stated level. Full-resolution success coexists with 58.6\% failures one level below the overview in the 83-image-source survey. This measures serving behaviour, not positional accuracy; no intermediate zoom-level rates are inferred.}
 \end{figure}
 
 \bigskip\hrule\bigskip
@@ -310,11 +323,10 @@ The archive's derived data — georeference annotations, sheet and printing inde
 
 The implementation includes the L7014 mosaic pipeline, the Indochine frame and corner-reading pipeline, the series-index migrations, and the checks described in §7. The figures ledger records the source and measurement date of every number quoted in this paper. The serving archive is also versioned separately from a proposed correction: reproducibility requires readers to distinguish the evidence measured on the current layer from the dry run that supports its rebuild.
 
-\textbf{Figure 9 — reproducibility boundary.}
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/figure-9.pdf}
+\caption{Three states of the evidence at the recorded audit. The served archive, local experiment and planned deposit have different evidentiary roles. Only the local reproduction supports the before/after counts. A future deposit must identify its build and preserve those distinctions; a DOI has not yet been minted.}
 \end{figure}
 
 \bigskip\hrule\bigskip

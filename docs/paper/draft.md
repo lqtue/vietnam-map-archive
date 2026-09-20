@@ -1,6 +1,6 @@
 # Blind by construction: verifying a georeferenced map series when the check shares the error
 
-*Two colonial map series of Vietnam, 514 sheets*
+*Two historical map series of Vietnam*
 
 ## Abstract
 
@@ -49,6 +49,12 @@ printed as graticule intersections, or be recoverable from a repeated neatline a
 The difficult work shifts from placing an individual sheet to establishing whether an entire
 collection has been placed coherently and whether the resulting evidence can detect its own errors.
 
+A datum specifies how map coordinates relate to positions on Earth. Using the wrong datum can
+move a sheet while preserving its shape. A residual is the difference between two quantities
+compared by a check; it measures absolute placement only if the comparison can reveal an error
+in that placement. Figure 1 shows the key mechanism: add the same shift to both quantities and
+their difference does not change.
+
 This distinction matters because a small residual is not a general certificate of correctness. A
 check can be accurate for the relation it measures and nevertheless be unable to reveal a datum,
 frame or adjacency assumption that it shares with the transformation. In the Vietnam Map Archive,
@@ -58,6 +64,11 @@ displaced sheet. The fault was not hidden by noise; it was invisible by construc
 check compared two quantities translated by the same wrong datum. A current reproduction finds CRS
 displacements of 395–528 m (median 455 m), with the exact fault population depending on whether it
 is counted from the fit or from the CRS displacement.
+
+Read the evidence in three steps. Figure 6 locates the affected sheets and shows why some
+shared edges expose the displacement. Figure 5 counts that disagreement before and after the
+correction. Figure 7 then asks the separate question of whether sheets reach their expected cells.
+Together these distinguish a check passing, neighbours agreeing and a sheet being correctly placed.
 
 The size of that silent displacement is a useful warning, but not a benchmark claim. It exceeds the
 101 m median error reported by a content-based automatic method and is comparable with some
@@ -89,19 +100,12 @@ adjacency checks. The contribution is to show, with a published failure, that a 
 instrument can be predictably blind to one error class by construction. Naming its scope and its
 committed assumptions is therefore a precondition for interpreting the residual it reports.
 
-**Figure 1 — from control to a meaningful verification claim.**
+**Figure 1 — why a wrong position can pass an internal check.** The two panels are a
+schematic of a shared translation, not measured sheet positions. If both operands move together,
+their difference stays unchanged. In the controlled L7014 reproduction, all 269 displaced sheets
+passed the graticule check despite a median CRS displacement of 455 m.
 
-```mermaid
-flowchart LR
-  A[Sheet series] --> B[Obtain control\nembedded or printed]
-  B --> C[Warp each sheet]
-  C --> D{Does the check\nshare an assumption\nwith the warp?}
-  D -- yes --> E[Residual may be blind\nto that error class]
-  D -- no --> F[Independent diagnostic]
-  E --> G[Add lattice, collision,\nfree seams, or outside test]
-  F --> H[Report scope and\nremaining blind spots]
-  G --> H
-```
+![Figure 1](figures/figure-1.pdf)
 
 ---
 
@@ -275,17 +279,12 @@ obtained the full text and therefore attribute no result to it.
 Legend detection is likewise outside this paper's scope: it concerns what a sheet depicts, not
 whether the sheet's spatial frame is independently verified.
 
-**Figure 2 — verification evidence has distinct scopes.**
+**Figure 2 — when a seam can reveal a displacement.** Schematic, not to scale. A gap opens
+when neighbouring sheets move differently (B); a common translation preserves their join (C).
+The census is diagnostic only when adjacency was left free during the warp. Figure 6 shows the
+geographic populations that make case B possible in this archive.
 
-```mermaid
-flowchart TB
-  P[Per-sheet evidence\nframe, diagonals, cm×dpi] --> L[Detects local geometry]
-  S[Series evidence\nlattice, occupancy, seams] --> R[Detects relational faults]
-  X[External evidence\nmetadata, imagery, cell index] --> A[Adjudicates shared frame]
-  L --> N[No single scope\ncertifies every error class]
-  R --> N
-  A --> N
-```
+![Figure 2](figures/figure-2.pdf)
 
 ---
 
@@ -301,7 +300,7 @@ publication and annotation status is tracked separately from that run total. The
 from the 1960s–70s; the Indochine material from 1903–1927.
 
 Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them
-on one map. The series index names **627** cells. **510** of those are held as GeoPDFs. Of the 510,
+on one map; Figure 3 separates the audit populations. The series index names **627** cells. **510** of those are held as GeoPDFs. Of the 510,
 **437** carry usable control and warp successfully — 62 have no GCPs and 11 land off their cell — and
 it is this 437 that the datum measurements in §7 are taken over. A further **24** sheets are
 georeferenced by hand rather than from embedded control, and sit outside that fault. The **452** in
@@ -324,7 +323,10 @@ follow the decisions of the contributing institutions. The findings below should
 a failure taxonomy demonstrated on two well-structured series, not as a benchmark ranking against
 methods that recover a sheet's location from no prior spatial information.
 
-**Figure 3 — indexed cells, holdings and pipeline-georeferenced sheets in each series.**
+**Figure 3 — choose the denominator that belongs to the question.** The L7014 reproduction,
+Indochine audits and historical processing total count different populations. “Placed” uses the
+CRS-displacement classification; “on cell” uses the fit check. They must not be treated as the same
+test. The 452-sheet publication constant is not verified against the live manifest.
 
 ![Series coverage](figures/figure-3.pdf)
 
@@ -375,8 +377,10 @@ those coordinates are expressed in. A check that reads control points under the 
 compares them with the printed graticule is therefore comparing two quantities that a datum error
 moves together — the mechanism §7.4 measures.
 
-**Figure 4 — a sheet prints its graticule and declares its datum; a check that uses both cannot test
-either.** A Lưới 6441-4, AMS Series L7014 (US Army Map Service; scan by the Perry-Castañeda Library,
+**Figure 4 — the source of the shared assumption.** The graticule and the control points are
+interpreted in the sheet’s declared datum. Their agreement can test internal consistency but cannot
+independently establish that datum. This correctly placed sheet illustrates the inputs, not an
+example of the measured displacement. A Lưới 6441-4, AMS Series L7014 (US Army Map Service; scan by the Perry-Castañeda Library,
 University of Texas at Austin). US Government work, public domain.
 
 ![What one sheet supplies](figures/figure-4.pdf)
@@ -542,8 +546,10 @@ disagreement that a per-sheet metric cannot see, provided adjacency has not alre
 condition of the solution. A common displacement preserves a seam, just as it preserves any other
 relative measurement.
 
-**Figure 5 — free seam displacement before and after the datum correction. Every seam over 100 m —
-189 of them — disappears.**
+**Figure 5 — the large-displacement tail is absent after correction.** Counts of free PDF/PDF
+seams in each displacement bin. The faulty build has 189 of 717 seams over 100 m; the corrected
+build has 0 of 715. These are separate builds, not a paired analysis of the same 717 seams.
+A small median (9.2 m before, 6.8 m after) alone would obscure the faulty build’s large tail.
 
 ![Free-seam census](figures/figure-5.pdf)
 
@@ -592,7 +598,12 @@ displaced sheets fall in two groups, north and south, separated by a band betwee
 17°N in which no sheet took the faulty route at all. That band is why a single probe can mislead:
 the archive holds two spatial populations, not one translated whole.
 
-**Figure 6 — the fault in geographic space, and the denominators it reconciles.**
+**Figure 6 — the fault has a geographic boundary.** Each square is one indexed L7014 cell.
+Orange marks 269 displaced sheets; blue marks 168 placed sheets. No sheet between 14°N and 17°N
+took the faulty route. A seam can expose the fault where these populations meet; neighbouring sheets
+that share a displacement can still agree. Grey and empty cells distinguish missing warp results
+from missing holdings. Counts describe the controlled reproduction; 452 is the archive’s
+hand-maintained publication claim.
 
 ![Where the datum fault fell](figures/figure-6.pdf)
 
@@ -636,8 +647,10 @@ therefore part of the result, not a historical problem retrospectively erased fr
 rebuild is an operational next step; reporting the dry run separately prevents it from being mistaken
 for a measurement of the current serving layer.
 
-**Figure 7 — the dry run moves sheets onto their cells: 161 → 434 on cell, 276 → 2 off by more than
-150 m.**
+**Figure 7 — the correction recovers cell placement in the local reproduction.** Bars use a
+common sheet-count scale. The faulty build places 161 of 437 sheets on cell; the corrected build
+places 434 of 436. Orange marks sheets more than 150 m off cell. The two remaining failures require
+review. These results do not measure a rebuilt public mosaic.
 
 ![Datum-correction dry run](figures/figure-7.pdf)
 
@@ -657,16 +670,12 @@ full-resolution request does not test the tile keys a viewer will actually reque
 instrument is a tile-key audit against keys present in the object store; it has no opinion about
 datum, lattice or seam geometry, and those checks have no opinion about it.
 
-**Figure 8 — a request can be valid IIIF syntax and still miss the server's tile grid.**
+**Figure 8 — test the resolution that the viewer requests.** Orange is the share of tile
+requests that fail at the stated level. Full-resolution success coexists with 58.6% failures one
+level below the overview in the 83-image-source survey. This measures serving behaviour, not
+positional accuracy; no intermediate zoom-level rates are inferred.
 
-```mermaid
-flowchart LR
-  A[Viewer requests\nwidth-only size] --> B{Exact generated\nsize segment?}
-  B -- full resolution --> C[Yes: 200]
-  B -- lower pyramid level --> D[Often no: 404]
-  E[Tile-key audit\nkeys in object store] --> D
-  E --> F[Serving fault isolated\nfrom georeference]
-```
+![Figure 8](figures/figure-8.pdf)
 
 ---
 
@@ -751,15 +760,12 @@ the source and measurement date of every number quoted in this paper. The servin
 versioned separately from a proposed correction: reproducibility requires readers to distinguish
 the evidence measured on the current layer from the dry run that supports its rebuild.
 
-**Figure 9 — reproducibility boundary.**
+**Figure 9 — three states of the evidence at the recorded audit.** The served archive, local
+experiment and planned deposit have different evidentiary roles. Only the local reproduction
+supports the before/after counts. A future deposit must identify its build and preserve those
+distinctions; a DOI has not yet been minted.
 
-```mermaid
-flowchart LR
-  A[Institutional scans\nIIIF or catalogue link] --> B[Derived control points\nand annotations]
-  B --> C[Verification outputs\nand figures ledger]
-  C --> D[Versioned Zenodo release\nCC-BY-4.0]
-  A -. scans not redistributed .-> D
-```
+![Figure 9](figures/figure-9.pdf)
 
 ---
 

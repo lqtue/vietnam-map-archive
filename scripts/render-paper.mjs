@@ -20,14 +20,50 @@ function writeFigure(name, content) {
 }
 
 function renderDiagrams() {
-	writeFigure('figure-1', svg(1100, 310,
-		box(25, 110, 160, 72, 'Sheet series') + arrow(185, 146, 235, 146) + box(240, 110, 190, 72, 'Obtain control\\nembedded or printed', 'amber') + arrow(430, 146, 480, 146) + box(485, 110, 145, 72, 'Warp each sheet') + arrow(630, 146, 680, 146) + box(685, 90, 190, 112, 'Does the check share\\nan assumption\\nwith the warp?', 'amber') + arrow(875, 118, 945, 65) + arrow(875, 174, 945, 230) + svgText(912, 80, 'yes', 'small') + svgText(912, 214, 'no', 'small') + box(950, 30, 140, 72, 'Residual may be\\nblind', 'rose') + box(950, 200, 140, 72, 'Independent\\ndiagnostic', 'green')));
-	writeFigure('figure-2', svg(1050, 290,
-		box(30, 95, 245, 88, 'Per-sheet evidence\\nframe · diagonals · scale') + box(400, 95, 245, 88, 'Series evidence\\nlattice · occupancy · seams', 'amber') + box(770, 95, 245, 88, 'External evidence\\nmetadata · imagery · cell index', 'green') + arrow(153, 183, 400, 245) + arrow(522, 183, 522, 238) + arrow(892, 183, 645, 245) + box(345, 245, 360, 38, 'No single scope certifies every error class', 'rose')));
-	writeFigure('figure-3', svg(1000, 350,
-		svgText(80, 38, 'Series coverage (sheets)', 'label') + svgText(350, 82, '0', 'small') + svgText(875, 82, '650', 'small') +
-		svgText(170, 135, 'L7014', 'label') + `<rect x="280" y="110" width="570" height="24" fill="#dbeafe"/><rect x="280" y="142" width="419" height="24" fill="#93c5fd"/><rect x="280" y="174" width="411" height="24" fill="#2563eb"/>` + svgText(880, 122, '627 indexed', 'small') + svgText(730, 154, '461 held', 'small') + svgText(722, 186, '452 pipeline', 'small') +
-		svgText(155, 255, 'Indochine', 'label') + `<rect x="280" y="230" width="72" height="24" fill="#fef3c7"/><rect x="280" y="262" width="68" height="24" fill="#fbbf24"/><rect x="280" y="294" width="57" height="24" fill="#b45309"/>` + svgText(375, 242, '79 indexed', 'small') + svgText(371, 274, '75 held', 'small') + svgText(360, 306, '62 pipeline', 'small')));
+	// Explanatory geometry is schematic; measured results are labelled separately.
+	const text = (x, y, value, css = 'small') => `<text x="${x}" y="${y}" class="${css}" style="text-anchor:start">${esc(value)}</text>`;
+	const rect = (x, y, w, h, fill, stroke = fill, dash = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-dasharray="${dash}"/>`;
+	const panel = (x, title) => rect(x, 65, 450, 265, '#f8fafc', '#e2e8f0') + text(x + 20, 98, title, 'label');
+	writeFigure('figure-1', svg(1000, 440,
+		svgText(500, 30, 'A shared error can leave the check unchanged', 'label') +
+		panel(30, 'A · Before a shared shift') + panel(520, 'B · After a shared shift') +
+		text(55, 150, 'Control') + text(55, 215, 'Graticule') +
+		text(545, 150, 'Control') + text(545, 215, 'Graticule') +
+		`<path d="M 250 125 V 240 M 740 125 V 240" stroke="#94a3b8" stroke-dasharray="5 5"/>` +
+		`<circle cx="250" cy="145" r="9" fill="#2a78d6"/><circle cx="250" cy="210" r="9" fill="#2a78d6"/>` +
+		arrow(740, 145, 870, 145) + arrow(740, 210, 870, 210) +
+		`<circle cx="870" cy="145" r="9" fill="#eb6834"/><circle cx="870" cy="210" r="9" fill="#eb6834"/>` +
+		text(55, 290, 'Their difference is zero.') + text(545, 290, 'Both move by the same amount: still zero.') +
+		svgText(500, 367, '(control + shift) − (graticule + shift) = control − graticule', 'label') +
+		svgText(500, 403, 'Measured in L7014: all 269 displaced sheets passed; median displacement 455 m.', 'small')));
+	writeFigure('figure-2', svg(1000, 440, (() => {
+		let out = svgText(500, 30, 'A seam detects a difference between neighbours', 'label');
+		const cases = [
+			['A · Neither sheet shifted', 0, 0, 'The edges meet.'],
+			['B · Only one sheet shifted', 0, 30, 'The gap exposes the fault.'],
+			['C · Both shifted together', 30, 30, 'The edges still meet.']
+		];
+		cases.forEach(([title, da, db, note], i) => {
+			const x = 25 + i * 330;
+			out += text(x, 85, title, 'label');
+			out += rect(x + 30, 130, 110, 125, 'none', '#94a3b8', '5 5') + rect(x + 140, 130, 110, 125, 'none', '#94a3b8', '5 5');
+			out += rect(x + 30 + da, 145, 110, 95, da ? '#ffe3d6' : '#deebfc', da ? '#eb6834' : '#2a78d6');
+			out += rect(x + 140 + db, 145, 110, 95, db ? '#ffe3d6' : '#deebfc', db ? '#eb6834' : '#2a78d6');
+			out += text(x + 30, 292, note);
+		});
+		return out + svgText(500, 350, 'Dashed outlines: unshifted cells. Coloured blocks: placed sheets. Schematic, not to scale.', 'small') +
+			svgText(500, 395, 'A common shift needs an outside reference. An enforced seam cannot serve as this test.', 'label');
+	})()));
+	writeFigure('figure-3', svg(1000, 410,
+		svgText(500, 30, 'Which population answers which question?', 'label') +
+		text(35, 85, 'L7014 · controlled reproduction', 'label') + text(560, 85, 'Indochine · distinct audits', 'label') +
+		text(35, 132, '627 indexed cells') + arrow(215, 125, 255, 125) + text(270, 132, '510 GeoPDFs held') +
+		text(35, 183, '437 warped in faulty pass') + text(35, 219, '269 displaced + 168 placed') +
+		text(35, 270, '436 warped in corrected pass') + text(35, 306, '434 on cell + 2 over 150 m off') +
+		text(560, 132, '79 indexed cells / 75 held') + text(560, 183, '62 pipeline-georeferenced sheets') +
+		text(560, 234, '58 sheets read for the lattice check') + text(560, 285, '83 image sources in the tile audit') +
+		rect(35, 335, 930, 48, '#f1f5f9') +
+		text(50, 364, '514 = recorded processing total (452 + 62); 452 is not a verified live manifest count.')));
 	// Figure 4 · A Lưới 6441-4, AMS Series L7014 (US Army Map Service — US Government work,
 	// public domain; scan: Perry-Castañeda Library, UT Austin). Crops written by
 	// `gdal_translate -srcwin` from the source GeoPDF.
@@ -41,7 +77,7 @@ function renderDiagrams() {
 		`<image href="sheet-datum.png" xlink:href="sheet-datum.png" x="700" y="180" width="360" height="61"/>` +
 		`<rect x="700" y="180" width="360" height="61" fill="none" stroke="#b3b1a7" stroke-width="1.5"/>` +
 		svgText(880, 278, 'B · the same sheet declares its datum', 'small') +
-		box(700, 330, 360, 140, 'graticule_error compares A against\\ncontrol points read under B.\\nA wrong datum moves both.', 'rose') +
+		box(700, 330, 360, 140, 'graticule_error compares A against\\ncontrol points read under B.\\nA shared datum error is invisible.', 'rose') +
 		svgText(550, 556, 'The two operands are not independent: the printed graticule and the control points are', 'small') +
 		svgText(550, 581, 'expressed in the same declared datum, so a datum error cancels out of their difference.', 'small')));
 	// Figure 5 · free seam distribution, faulty vs corrected. Counts binned from
@@ -50,9 +86,11 @@ function renderDiagrams() {
 		const bins = ['0–10 m', '10–50 m', '50–100 m', '100–300 m', 'over 300 m'];
 		const faulty = [377, 149, 2, 92, 97];
 		const fixed = [492, 218, 5, 0, 0];
-		const max = 492, base = 340, height = 250;
+		const max = 492, base = 340, height = 230;
 		let out =
-			svgText(500, 34, 'Free seam displacement: 717 seams before the fix, 715 after', 'label') +
+			`<rect x="612" y="85" width="330" height="260" fill="#fff3ec"/>` +
+			svgText(500, 34, 'A low median conceals 189 seams over 100 m', 'label') +
+			svgText(777, 105, 'Large-displacement tail', 'small') +
 			`<rect x="322" y="52" width="16" height="16" rx="3" fill="#eb6834"/>` + svgText(392, 61, 'faulty', 'small') +
 			`<rect x="462" y="52" width="16" height="16" rx="3" fill="#2a78d6"/>` + svgText(534, 61, 'corrected', 'small') +
 			`<line x1="90" y1="${base}" x2="950" y2="${base}" stroke="#b3b1a7" stroke-width="1.5"/>`;
@@ -68,7 +106,7 @@ function renderDiagrams() {
 				svgText(cx, base + 28, label, 'small');
 		});
 		return out +
-			svgText(500, 398, 'Every seam over 100 m disappears under the corrected datum: 189 of them, leaving none.', 'small');
+			svgText(500, 398, 'Seams over 100 m: 189 / 717 before; 0 / 715 after. Separate builds, not matched pairs.', 'small');
 	})()));
 	// Figure 6 · the fault in geographic space. Cells and classes from figures/fault-map.json,
 	// derived from work/l7014/lattice.json + regen/datum-split.csv, 2026-09-20.
@@ -97,7 +135,7 @@ function renderDiagrams() {
 			[3, '269 warped and displaced', '395–528 m, median 455 m'],
 			[2, '168 warped and placed', 'displacement under 100 m'],
 			[1, '73 held but not warped', 'no usable GCPs, or off its cell'],
-			[0, '117 cell not held', 'no sheet acquired']
+			[0, '117 cells not held', 'no sheet acquired']
 		];
 		legend.forEach(([c, head, sub], i) => {
 			const y = 120 + i * 78;
@@ -112,22 +150,32 @@ function renderDiagrams() {
 			`<text x="620" y="556" class="small" style="text-anchor:start">452 published in the mosaic (hand-maintained)</text>`;
 		return out;
 	})()));
-	writeFigure('figure-7', svg(1000, 345,
-		svgText(500, 35, 'Dry-run fit: sheets on their cell, faulty vs corrected', 'label') +
-		svgText(115, 122, 'faulty pass\\n437 warped', 'small') +
-		`<rect x="230" y="95" width="243" height="70" rx="4" class="box green"/>` +
-		`<rect x="473" y="95" width="417" height="70" rx="4" class="box rose"/>` +
-		svgText(352, 130, '161 on cell', 'label') +
-		svgText(682, 130, '276 over 150 m off', 'label') +
-		svgText(115, 227, 'corrected pass\\n436 warped', 'small') +
-		`<rect x="230" y="200" width="657" height="70" rx="4" class="box green"/>` +
-		`<rect x="887" y="200" width="3" height="70" class="box rose"/>` +
-		svgText(559, 235, '434 on cell', 'label') +
-		svgText(906, 235, '2', 'small') +
-		svgText(500, 302, 'Median miss among on-cell sheets: 11 m → 10 m; worst on-cell 50 m → 95 m as 273 sheets join that population.\\nThe correction moves displaced sheets onto their cells rather than improving sheets already on them.', 'small')));	writeFigure('figure-8', svg(1100, 310,
-		box(25, 110, 190, 72, 'Viewer requests\\nwidth-only size') + arrow(215, 146, 290, 146) + box(295, 96, 210, 100, 'Exact generated\\nsize segment?', 'amber') + arrow(505, 119, 590, 65) + arrow(505, 174, 590, 235) + svgText(550, 77, 'full resolution', 'small') + svgText(550, 220, 'lower pyramid level', 'small') + box(600, 30, 150, 72, 'Yes: 200', 'green') + box(600, 200, 150, 72, 'Often no: 404', 'rose') + box(800, 110, 175, 72, 'Tile-key audit\\nkeys in object store', 'blue') + arrow(800, 146, 750, 225) + arrow(975, 146, 1040, 146) + box(1045, 110, 50, 72, '✓', 'green')));
-	writeFigure('figure-9', svg(1100, 250,
-		box(25, 85, 190, 72, 'Institutional scans\\nIIIF or catalogue link') + arrow(215, 121, 285, 121) + box(290, 85, 190, 72, 'Derived control points\\nand annotations', 'amber') + arrow(480, 121, 550, 121) + box(555, 85, 190, 72, 'Verification outputs\\nand figures ledger') + arrow(745, 121, 815, 121) + box(820, 85, 230, 72, 'Versioned Zenodo release\\nCC-BY-4.0', 'green') + arrow(120, 157, 930, 215, true) + svgText(525, 205, 'scans not redistributed', 'small')));
+	writeFigure('figure-7', svg(1000, 400, (() => {
+		let out = svgText(500, 30, 'The correction changes how many sheets reach their cell', 'label');
+		for (const [y, name, total, placed, off] of [[115, 'Faulty', 437, 161, 276], [240, 'Corrected', 436, 434, 2]]) {
+			const w = 700 * placed / 437, bad = 700 * off / 437;
+			out += text(30, y, name, 'label') + text(30, y + 27, `${total} warped`);
+			out += rect(215, y - 25, w, 48, '#2a78d6') + rect(215 + w, y - 25, bad, 48, '#eb6834');
+			out += text(215, y + 54, `${placed} on cell`);
+			out += text(610, y + 54, `${off} more than 150 m off cell`);
+		}
+		return out + svgText(500, 355, 'Separate dry-run builds. One fewer sheet warps after correction. Public mosaic not rebuilt.', 'small');
+	})()));
+	writeFigure('figure-8', svg(1000, 330,
+		svgText(500, 30, 'A full-resolution success misses the failing zoom level', 'label') +
+		text(35, 95, 'Full resolution', 'label') + text(35, 195, 'One level below overview', 'label') +
+		rect(350, 70, 600, 40, '#deebfc') + text(350, 140, '0% of tiles fail') +
+		rect(350, 170, 600, 40, '#deebfc') + rect(350, 170, 600 * 0.586, 40, '#eb6834') +
+		text(350, 240, '58.6% of tiles fail across the 83-image-source survey') +
+		svgText(500, 295, 'Requested width-only size → stored explicit width,height key: audit the actual tile requests.', 'small')));
+	writeFigure('figure-9', svg(1000, 330,
+		svgText(500, 30, 'Keep the evidence attached to the build it describes', 'label') +
+		text(35, 95, 'PUBLIC ARCHIVE', 'label') + text(365, 95, 'LOCAL REPRODUCTION', 'label') + text(695, 95, 'PLANNED DEPOSIT', 'label') +
+		text(35, 145, 'l7014-20260913') + text(35, 180, 'Pixels served; manifest 404') + text(35, 215, '452 is an unverified constant') +
+		text(365, 145, 'Faulty and corrected runs') + text(365, 180, 'Logs, seams and cell checks') + text(365, 215, 'Evidence for the correction') +
+		text(695, 145, 'Versioned derived data + code') + text(695, 180, 'Zenodo DOI not yet minted') + text(695, 215, 'Scans remain at institutions') +
+		svgText(500, 285, 'A successful local correction does not establish what a public viewer receives.', 'label')));
+
 
 }
 
@@ -184,7 +232,7 @@ function table(rows) {
 const lines = readFileSync(source, 'utf8').split(/\r?\n/);
 const out = [];
 let paragraph = [];
-let diagramNumber = 0;
+let pendingCaption = null;
 const flush = () => {
 	if (paragraph.length) out.push(`${inline(paragraph.join(' ').trim())}\n`);
 	paragraph = [];
@@ -196,10 +244,20 @@ for (let index = 0; index < lines.length; index += 1) {
 		while (index < lines.length && !lines[index].includes('-->')) index += 1;
 		continue;
 	}
+	if (/^\*\*Figure \d+ — /.test(line)) {
+		flush();
+		const caption = [line];
+		while (index + 1 < lines.length && lines[index + 1].trim()) caption.push(lines[++index]);
+		pendingCaption = caption.join(' ').replace(/\*\*/g, '').replace(/^Figure \d+ — /, '');
+		pendingCaption = pendingCaption[0].toUpperCase() + pendingCaption.slice(1);
+		continue;
+	}
 	const image = line.match(/^!\[(.*)\]\(([^)]+)\)$/);
 	if (image) {
 		flush();
-		out.push(`\\begin{figure}[htbp]\\centering\\includegraphics[width=0.92\\linewidth]{${image[2]}}\\end{figure}\n`);
+		if (!pendingCaption) throw new Error(`Figure missing caption: ${image[2]}`);
+		out.push(`\\begin{figure}[htbp]\n\\centering\n\\includegraphics[width=\\linewidth]{${image[2]}}\n\\caption{${inline(pendingCaption)}}\n\\end{figure}\n`);
+		pendingCaption = null;
 		continue;
 	}
 	if (line.startsWith('```')) {
@@ -207,10 +265,8 @@ for (let index = 0; index < lines.length; index += 1) {
 		const language = line.slice(3).trim();
 		const code = [];
 		while (++index < lines.length && !lines[index].startsWith('```')) code.push(lines[index]);
-		if (language === 'mermaid') {
-			diagramNumber += 1;
-			out.push(`\\begin{figure}[htbp]\n\\centering\n\\includegraphics[width=\\linewidth]{figures/figure-${[1, 2, 8, 9][diagramNumber - 1]}.pdf}\n\\end{figure}\n`);
-		} else out.push(`\\begin{verbatim}\n${code.join('\n')}\n\\end{verbatim}\n`);
+		if (language === 'mermaid') throw new Error('Use an explicit figure path for paper diagrams.');
+		out.push(`\\begin{verbatim}\n${code.join('\n')}\n\\end{verbatim}\n`);
 		continue;
 	}
 	if (/^\|/.test(line)) {
@@ -270,6 +326,8 @@ const preamble = String.raw`\documentclass[11pt,a4paper]{article}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage[section]{placeins}
+\captionsetup{font=small,labelfont=bf}
 \usepackage{xurl}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black,pdftitle={Blind by construction}}
@@ -286,7 +344,7 @@ This preprint has not been submitted to a journal for peer review.\par}
 \begin{center}
 {\LARGE\bfseries Blind by construction: verifying a georeferenced map series when the check shares the error\par}
 \vspace{0.5em}
-{\large Two colonial map series of Vietnam, 514 sheets\par}
+{\large Two historical map series of Vietnam\par}
 \vspace{1.2em}
 {\large Tue Quang Le\par}
 \vspace{0.3em}

@@ -1,40 +1,63 @@
-# Visual plan — *Blind by construction*
+# Visual presentation — Blind by construction
 
-**Rule:** every typeset manuscript page gets one visual anchor: a data figure, an editable
-schematic, a table, or a captioned pull-out. No decorative map imagery. Every quantitative figure
-must derive from `figures.md`; every schematic must name the scope it does *not* test.
+Revised 2026-09-20. Figure 6 is the visual reference: show the phenomenon, label the
+observation, then explain what it permits the reader to conclude. No per-page visual quota.
 
-The final page count depends on the target venue template. This plan is a 12-page composition target
-and must be reflowed only after the manuscript is typeset.
+## Reading sequence
 
-| target page | manuscript material | visual anchor | source / construction |
-|---:|---|---|---|
-| 1 | title + §1 | **Figure 1**, control-to-verification flow | editable Mermaid in `draft.md` |
-| 2 | §2.1 | frame reused as input and yardstick | two-frame schematic: shared frame in amber, independent target in blue |
-| 3 | §2.2–2.4 | **Figure 2**, evidence scopes | editable Mermaid in `draft.md` |
-| 4 | §3 | corpus comparison | two-column series card: provenance, dates, input control, output |
-| 5 | §4 | survey / cell / printing entity diagram | three-layer relation diagram; examples from `figures.md` §1 |
-| 6 | §5 | L7014 pipeline | GeoPDF → neatline cutline → warp → PMTiles, with datum claim marked as unverified |
-| 7 | §6 | Indochine frame reading | scan-edge cross section: thick neatline, graticule band, rim; measured offsets only |
-| 8 | §7.1–7.2 | **Table 1**, failure taxonomy + lattice collision inset | existing table in `draft.md`; inset depicts two sheets on one cell |
-| 9 | §7.3 | seam census | separate cohorts: 717 PDF/PDF mosaic-only seams (97 over 300 m), plus 36 JPG/PDF hand-to-mosaic and 25 JPG/JPG seams in the 778-seam hand-extended run; distinguish free from hand-derived comparisons |
-| 10 | §7.4–7.6 | datum-fault causal chain | declared CRS → fallback / area-of-use behaviour → 395–528 m displacement (median 455 m) → independent `pick_crs` |
-| 11 | §7.7 + §8 | **Figure 6**, tile-key mismatch + negative-results panel | Mermaid in `draft.md`; small river-channel aperture diagram |
-| 12 | §9–10 | **Figure 7**, reproducibility boundary | editable Mermaid in `draft.md`; include release DOI placeholder only after minting |
+The manuscript keeps Figures 1–9 numbered in reading order. For an oral explanation,
+start with **6 → 1 → 2 → 5 → 7**:
 
-**Numbering, settled 2026-09-20.** The plan reserved 6–11 for per-page anchors that were never
-built, which would have left the manuscript running Figure 5 → Figure 12. The taxonomy is a table
-and is now **Table 1**; the two trailing diagrams renumbered to **Figure 6** and **Figure 7**. The
-figures are therefore contiguous 1–7, and pages without a built anchor carry the prose alone.
+1. **Where did the fault occur?** Figure 6. Each square is a survey cell. Orange sheets
+   were displaced; blue sheets were placed. The blue band matters: this was a partial
+   fault, so boundaries between the two populations could expose it.
+2. **Why did the check pass?** Figure 1. The control and comparison graticule share a
+   datum. A common shift changes their positions but leaves their difference unchanged.
+   The schematic explains the mechanism; the 269 passed displaced sheets establish that
+   it occurred in the reproduction.
+3. **What could reveal it?** Figure 2. Neighbours disagree when only one shifts. If both
+   shift together, their seam still closes. This is why seam agreement cannot certify
+   absolute placement, and why a seam imposed during fitting is not a free diagnostic.
+4. **How much evidence is there?** Figure 5. A low median conceals a large tail:
+   189 of 717 free seams exceed 100 m before correction; none of 715 do afterwards.
+   These are separate builds, not matched pairs.
+5. **Did the correction place the sheets?** Figure 7. The separate cell check improves
+   from 161 of 437 on cell to 434 of 436. Two still need review. This is local evidence;
+   it does not establish that the public archive has been rebuilt.
 
-## Build order
+The explanation to carry through the paper: **agreement is evidence only for an error
+that could have disturbed that agreement.** An independent comparison is independent
+of a specified assumption, not a universal certificate of truth.
 
-1. ~~Typeset the manuscript and confirm its real page count.~~ **Done 2026-09-20: 16 pages, A4,
-   compiles warning-free under `tectonic`.**
-2. ~~Produce the data figures as deterministic SVG/PDF from the cited measurements, not
-   AI-generated graphics.~~ **Done: Figures 3–5 are built from the measurements by
-   `scripts/render-paper.mjs`.** The unbuilt per-page anchors for §2.1, §3–§6 remain optional.
-3. ~~Replace Mermaid source with venue-compatible vector exports while retaining the Mermaid blocks
-   as editable source.~~ **Done: the renderer emits SVG, converts to PDF via `rsvg-convert`, and
-   substitutes it for each Mermaid block, which stays in `draft.md` as editable source.**
-4. Check every caption against `figures.md`, including present-versus-dry-run status for L7014.
+## Figure roles
+
+| Figure | Reader's question | Presentation |
+|---|---|---|
+| 1 | How can a wrong position pass? | Two operands before/after a shared translation; cancellation equation; observed result labelled separately |
+| 2 | When can seams help? | Three geometric cases: neither shifted, one shifted, both shifted; explicitly schematic |
+| 3 | Which denominator am I reading? | Separate L7014 reproduction and Indochine audit populations; publication constant qualified |
+| 4 | Where does the shared assumption enter? | Original corner and datum crops; correctly placed A Lưới identified as an input example |
+| 5 | What does the median hide? | Binned free-seam counts; large-displacement tail highlighted; build denominators explicit |
+| 6 | Where is the fault? | Geographic cell map retained; caption explains the fault boundary and missing-data classes |
+| 7 | What does correction achieve? | Common count scale; on-cell versus over-150-m counts; local-build scope explicit |
+| 8 | Why did a serving smoke check miss it? | Measured tile-failure shares at two resolutions; no invented intermediate values |
+| 9 | Which artifact supports which claim? | Served archive, local reproduction, planned deposit shown as distinct states |
+
+## Production rules
+
+- Numerical claims come from `figures.md`; this revision adds no new measurements.
+- Diagrams are deterministic SVG/PDF generated by `scripts/render-paper.mjs`.
+- `draft.md` supplies explicit figure paths and explanatory captions. Captions are emitted
+  inside the same LaTeX float as their figures; section barriers keep floats near discussion.
+- Blue and orange distinguish aligned/corrected versus displaced/faulty states. Labels
+  and panel geometry also carry the distinction. Figure 5 uses colour for the two builds.
+- Schematic displacement has no metric scale and must not be read as measured geography.
+- Related-work claims and the frozen audit's production status are not re-measured by an
+  editorial rebuild. The planned Zenodo deposit remains planned.
+
+## Build and inspect
+
+Run `node scripts/render-paper.mjs`, then
+`tectonic --keep-logs --outdir docs/paper docs/paper/blind-by-construction.tex`.
+Check the log for missing glyphs and overflowing text, and inspect the rendered figures
+and manuscript pages. PDF page count is an output, not a composition target.

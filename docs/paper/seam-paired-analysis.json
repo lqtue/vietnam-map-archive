@@ -1,0 +1,64 @@
+{
+  "inputs": [
+    {
+      "path": "work/l7014/regen/seams-faulty.csv",
+      "sha256": "abb42602cd8f65eb694a84f7a4a8fbc2ba093661315908a11a3296c30f75a5bc"
+    },
+    {
+      "path": "work/l7014/regen/seams-fixed.csv",
+      "sha256": "ff456c9755e01f0c5ee0a09e74c608a15a9f5a4584affdcc7fef4d947775a2c5"
+    }
+  ],
+  "measurement": "Per-edge median of 25 sampled outline distances; counts use strict > thresholds.",
+  "full": {
+    "faulty": {
+      "count": 717,
+      "median_m": 9.184269400302489,
+      "max_seam_median_m": 519.2660585155138,
+      "over_100_m": 189,
+      "over_300_m": 97
+    },
+    "corrected": {
+      "count": 715,
+      "median_m": 6.783067378159818,
+      "max_seam_median_m": 72.40664569236225,
+      "over_100_m": 0,
+      "over_300_m": 0
+    }
+  },
+  "paired": {
+    "faulty": {
+      "count": 715,
+      "median_m": 9.184269400302489,
+      "max_seam_median_m": 519.2660585155138,
+      "over_100_m": 189,
+      "over_300_m": 97
+    },
+    "corrected": {
+      "count": 715,
+      "median_m": 6.783067378159818,
+      "max_seam_median_m": 72.40664569236225,
+      "over_100_m": 0,
+      "over_300_m": 0
+    },
+    "median_change_m": -0.033467247686598256,
+    "over_100_to_at_most_100": 189,
+    "at_most_100_to_over_100": 0
+  },
+  "faulty_only": [
+    {
+      "pair": "6145-1|6146-2",
+      "median_m": 3.6184354691607608,
+      "max_m": 9.551482143211445,
+      "axis": "NS"
+    },
+    {
+      "pair": "6146-2|6146-3",
+      "median_m": 15.602186710678275,
+      "max_m": 43.36912785393082,
+      "axis": "EW"
+    }
+  ],
+  "corrected_only": [],
+  "interpretation": "Descriptive matched-edge analysis of saved builds, not independent observations or absolute-accuracy validation."
+}

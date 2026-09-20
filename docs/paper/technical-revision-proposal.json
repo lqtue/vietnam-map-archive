@@ -1,0 +1,135 @@
+{
+  "status": "PROPOSAL_NOT_APPLIED",
+  "date": "2026-09-20",
+  "target": "docs/paper/draft.md",
+  "base_sha256": "fd3efd18fa2e7c576270459e156068aa9378aa686c707b3bea16442c3e1a0eda",
+  "authority": "Exact replacements pending author decision; this is not an ARS authorization sidecar or a verified revision-evidence bundle.",
+  "operations": [
+    {
+      "id": "R1",
+      "reason": "Correct the rejection denominator; make the matched-edge result central; bound the CRS-independence claim and remove the unverified 514-sheet headline.",
+      "old_text": "Georeferencing a historical map series is usually described as a per-sheet problem: identify control\npoints, fit a transformation, report a residual. For a series, the control is frequently already\npresent — embedded in a GeoPDF, printed as graticule corners, or recoverable from a neatline and a\nsheet index — and the difficult work moves to verification: establishing that a whole collection has\nbeen placed coherently, and that the resulting evidence can detect its own errors. We report a\ndocumented archive failure that makes the distinction concrete. In the Vietnam Map Archive, a\nsubstantial subset of US Army Map Service L7014 sheets was published under a wrong datum; a\ncontrolled reproduction measures CRS displacements of 395–528 m across 269 sheets, with a median of\n455 m. The archive's per-sheet graticule check rejected 11 of 437 sheets and passed all 269\ndisplaced ones, because a sheet's control points and the graticule it prints are translated together\nby the same wrong datum. The fault was not hidden by noise; the check was blind to it by\nconstruction. Working from two colonial series and 514 pipeline-georeferenced sheets, we develop a\ntaxonomy that classifies verification checks by scope and by the information each has already\ncommitted to, and show which\nerror class each therefore cannot report. Two instruments detect this displacement: a free seam\ncensus, which requires no external reference but sees the fault only because it is partial across the\nseries, and an outside CRS decision that refuses rather than accept the smaller miss. A lattice occupancy check separately catches a sheet that passes every\nper-sheet test while sitting on another sheet's cell, 75 km from the city it is named for. The\nclaim is deliberately narrow: naming\na check's scope and its committed inputs is a precondition for interpreting the residual it reports.",
+      "new_text": "Historical map series often supply their own georeferencing control, but agreement with that\ncontrol does not independently establish placement. We examine this problem through a documented\nVietnam Map Archive failure and a controlled reproduction on US Army Map Service L7014 GeoPDFs.\nOf 510 source files, 62 lacked usable control, 11 failed the graticule check, and 437 entered the\nfaulty build. All 269 sheets with reproduced CRS displacements of 395–528 m (median 455 m)\npassed that check. The check evaluates registration in the sheet's own geographic CRS and cannot\nvalidate the subsequent datum transformation to WGS 84. Comparing the same 715 PDF/PDF edges\nbefore and after correction, the number with median outline separation above 100 m falls from\n189 to zero. This establishes improved inter-sheet agreement, not independent absolute accuracy:\nthe CRS-selection check and comparison lattice share the adopted Helmert parameters. A second\ncase, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner\nreadings can still assign two sheets to the same cell. Together these cases support a taxonomy of\nverification scope, committed inputs, detectable faults, and blind spots. The contribution is a\nreproducible account of how checks can remain silent under specific shared assumptions, with\nexplicit separation of source control, build measurements, and serving-state evidence."
+    },
+    {
+      "id": "R2",
+      "reason": "Separate reported holdings/publication totals from observed experimental populations.",
+      "old_text": "The corpus comprises two colonial and Cold-War Vietnamese sheet series, treated as series rather\nthan as a collection of otherwise unrelated map images. L7014 is the US Army Map Service 1:50,000\ncoverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the University of Texas at\nAustin. The second is the Service géographique de l'Indochine 1:25,000 coverage of Tonkin and Thanh\nHóa, held by Cartomundi at Aix-Marseille Université/CNRS. Together the recorded processing ledger\ncovers 514 sheets: 452 L7014 sheets published as one PMTiles mosaic and 62 Indochine sheets. Current\npublication and annotation status is tracked separately from that run total. The L7014 material dates\nfrom the 1960s–70s; the Indochine material from 1903–1927.",
+      "new_text": "The corpus comprises a Cold-War and a colonial Vietnamese sheet series. L7014 is the US Army\nMap Service 1:50,000 coverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the\nUniversity of Texas at Austin. The second is the Service géographique de l'Indochine 1:25,000\ncoverage of Tonkin and Thanh Hóa, held by Cartomundi at Aix-Marseille Université/CNRS. The archive\npreviously reported a combined total of 514 sheets, comprising a 452-sheet L7014 publication\ncount and 62 pipeline-georeferenced Indochine sheets. Because the 452 is a hand-maintained\npublication constant that cannot be checked against the missing serving manifest (§7.6), the sum\nis an archive-reported total, not a verified count of processed or currently served sheets. The\nmeasured populations below supply the denominators for the results. The L7014 material dates from\nthe 1960s–70s; the Indochine material from 1903–1927."
+    },
+    {
+      "id": "R3",
+      "reason": "510 minus 62 is 448; the 11 rejected files are outside the 437 retained files. OFFGRID is a graticule verdict, not the separate cell-fit verdict.",
+      "old_text": "**437** carry usable control and warp successfully — 62 have no GCPs and 11 land off their cell — and",
+      "new_text": "**448** reach the graticule check after 62 files are excluded for missing control. The check rejects\n11, leaving **437** successfully warped files in the faulty build, and"
+    },
+    {
+      "id": "R4",
+      "reason": "Specify the actual estimator, sampling, distance approximation, threshold status and observational unit.",
+      "old_text": "### 7.3 The seam census\n\n",
+      "new_text": "### 7.3 The seam census\n\nThe census measures outline agreement rather than continuity of roads or other map content.\nThe lattice identifies shared edges but does not constrain the PDF outlines. For each edge,\n`l7014_seams.py` samples 25 equally spaced positions between 10% and 90% of its length,\navoiding corner junctions. At each position it finds the nearest point on each outline and measures\ntheir separation using a local longitude/latitude-to-metre approximation. The edge statistic is\nthe median of these distances; the reported census median is the median across edges. The 100 m\nand 300 m cutoffs summarize the observed tail, rather than define independently calibrated\nacceptance thresholds. For nearly straight parallel edges the distance principally reflects\nnormal separation; it need not recover along-edge displacement or a full displacement vector.\n\n"
+    },
+    {
+      "id": "R5",
+      "reason": "The hand manifest does not independently warp raster content; the inherited REGEN note's JPG/JPG independence claim conflicts with code.",
+      "old_text": "The free comparisons need to be distinguished from those hand-to-mosaic checks. A JPG/PDF seam uses\nthe PDF sheet's departure from its lattice cell as one side of the comparison, because the hand\nworkflow writes that cell as the ground half of its control point. It is therefore a useful archive\ndiagnostic, but it is not the independent free seam described at the start of this section. The free\ncomparisons are the PDF/PDF and JPG/JPG seams; the 25 JPG/JPG seams span 0.0–0.6 m.",
+      "new_text": "The hand-sheet comparisons must be distinguished from the free PDF/PDF comparisons. The hand\nworkflow supplies lattice-derived ground corners, and the hand manifest is assembled from those\nground coordinates rather than independently measured warped image boundaries. A JPG/PDF join\ntherefore compares a PDF outline with a lattice-derived boundary. A JPG/JPG join compares two\nsuch boundaries. The 25 JPG/JPG distances of 0.0–0.6 m describe consistency of those ground\ncoordinates, not an independent validation of either image registration. Only the PDF/PDF cohort\nis used as free-seam evidence here."
+    },
+    {
+      "id": "R6",
+      "reason": "New independently cross-checked matched-edge analysis rules out attrition as explanation for tail disappearance.",
+      "old_text": "Because the two warps differ in exactly one flag, the free seams can be read as a controlled A/B, and\nit is the free cohort that carries the result. The faulty pass leaves 189 of its 717 PDF/PDF seams\nmore than 100 m open — 92 between 100 and 300 m and 97 above 300 m. The corrected pass, over a\nnear-identical 715, leaves **none**: the worst free seam falls inside 100 m and the median improves\nfrom 9.2 m to 6.8 m (Figure 5). The two runs are separate builds rather than subsets of one\npopulation, which is why the PDF/PDF counts differ by two.",
+      "new_text": "The two builds differ in the CRS-selection flag and in which files survive the checks. The faulty\nbuild contains 717 PDF/PDF seams, of which 189 exceed 100 m and 97 exceed 300 m. The corrected\nbuild contains 715, none above 100 m (Figure 5). To separate change in geometry from change in\nmembership, we matched edges by their unordered sheet-ID pair. All 715 corrected edges occur in\nthe faulty census. On these same edges, 189 fall from above 100 m to at most 100 m, with no\ncrossings in the opposite direction; the maximum corrected edge median is 72.4 m. The two\nfaulty-only edges measure 3.6 m and 15.6 m, so their exclusion cannot explain disappearance of\nthe large-displacement tail. Matched-cohort medians are 9.2 m before and 6.8 m after correction.\n\nThese are descriptive comparisons within one series. Edges share sheets and are not independent\nreplicates; their distances do not measure absolute accuracy or content alignment. The matched\nanalysis, input hashes and excluded pairs are reproducible with `scripts/paper-seam-pairs.mjs`."
+    },
+    {
+      "id": "R7",
+      "reason": "Preserve Figure 5's full-build bars while connecting them to the matched analysis.",
+      "old_text": "A small median (9.2 m before, 6.8 m after) alone would obscure the faulty build’s large tail.",
+      "new_text": "A matched analysis of the 715 common edges also gives 189 versus zero above 100 m (§7.3).\nA small median (9.2 m before, 6.8 m after) alone would obscure the faulty build’s large tail."
+    },
+    {
+      "id": "R8",
+      "reason": "Correct the incompatible rejection and retained-build denominators.",
+      "old_text": "Our existing `graticule_error` check did not report it. In the faulty pass it rejected 11 of the 437\nwarped sheets and passed all 269 that the CRS probe places 395–528 m from where they belong.",
+      "new_text": "Our existing `graticule_error` check did not report it. In the faulty pass, 448 files reached\nthe check after 62 were excluded for missing control. It rejected 11 and retained 437, including\nall 269 with reproduced CRS displacements of 395–528 m."
+    },
+    {
+      "id": "R9",
+      "reason": "Describe code rather than treating shared translation as a literal universal implementation model.",
+      "old_text": "The check reads control points into the sheet's\ndeclared datum and compares them with the graticule printed by that same sheet, so a datum mistake\ntranslates both operands together. It remains useful for errors it can see, such as a wrong zone or\na sheet off its grid, but it cannot test the datum shared by its two inputs. This is an empirical\ninstance of the `∅` rather than `·` distinction in Table 1: the fault cannot produce a non-zero\nresult under this instrument.",
+      "new_text": "The implementation converts registration coordinates into the candidate CRS's own geographic\ncoordinate system (`CloneGeogCS`) and compares their extrema with the sheet's graticule\nmetadata, or with quarter-degree snapping when those metadata are absent. That calculation does\nnot independently test the subsequent transformation to WGS 84. It can reject inconsistent\nregistration while remaining insensitive to the omitted datum transformation at issue here.\nThe `∅` in Table 1 denotes this fault's inability to disturb the comparison; it does not mean\nthe check must return zero when other errors are present."
+    },
+    {
+      "id": "R10",
+      "reason": "Direct code inspection reveals shared Helmert parameters, nearest-registration score, 150 m cutoff and no-score fallback.",
+      "old_text": "### 7.5 The outside opinion\n\nWe replaced that circular test with `pick_crs`. For each affected sheet it warps the neatline twice:\nonce under the sheet declaration and once under Indian 1960 with an explicit Everest 1830 (1937\nAdjustment) Helmert transformation. Each candidate is then compared with the independently derived\n15-minute lattice cell. The candidates differ by roughly 470 m; the cell localises the correct one\nto about 15 m. This is not an optimisation looking for the smallest residual among comparable\nanswers. It is a comparison of two specific datum hypotheses against a third source of information.\n\nThe decision rule matters as much as the preferred candidate. If neither warp lands sufficiently near\nthe cell, `pick_crs` refuses the sheet rather than accepting the smaller miss. Refusal preserves a\ndisagreement for review; choosing the least bad candidate would silently convert an unmodelled error\ninto a published location. The lattice is not independent of every possible error, but it is\nindependent of the GeoPDF datum declaration being tested, which is the independence this decision\nrequires.",
+      "new_text": "### 7.5 CRS selection against an adopted frame\n\nThe corrected route adds `pick_crs` before the graticule check. It scores the declared or\nfallback CRS and, where available, an Indian 1960 alternative with explicit Everest 1830\n(1937 Adjustment) Helmert parameters. For each candidate, it transforms the registration\ncoordinates to WGS 84 and averages, over the expected cell corners, the distance to the nearest\ntransformed registration point. Registration coordinates come from embedded GCPs, with neatline\nvertices as the fallback. It selects the candidate with the smaller score only if that score\nis at most 150 m. If every available candidate exceeds that threshold, it rejects the sheet.\nIf no score can be computed, however, the implementation retains the declared or fallback CRS;\nthis case is not verified by the lattice decision.\n\nThe reference is external to an individual GeoPDF declaration, but it is not independent of the\nadopted datum transformation. `cell_corners` transforms the index coordinates with the same\nexplicit Helmert parameters used by the alternative candidate. Agreement therefore tests\nconsistency with the adopted frame and can expose a missing transformation, while a shared\nerror in those parameters could remain undetected. The result does not establish absolute\naccuracy at the approximately 15 m scale of the reported index-to-outline agreement. Testing\nthat claim would require appropriately distributed reference positions whose coordinates were\nnot generated by the same transformation.\n\nThis distinction preserves the useful result without giving the selection rule a broader\nauthority than its inputs support. Refusal catches cases outside the scored alternatives;\nagreement identifies a compatible interpretation conditional on the adopted frame."
+    },
+    {
+      "id": "R11",
+      "reason": "External accuracy evidence is not supplied by shared-parameter lattice selection.",
+      "old_text": "Use an external\nreference only when the suspected failure is shared by the entire series frame, as in `pick_crs`.",
+      "new_text": "Use reference positions independent of the adopted transformation when absolute placement is\nthe claim to be tested. The `pick_crs` decision provides a narrower consistency check (§7.5)."
+    },
+    {
+      "id": "R12",
+      "reason": "Do not equate a local reproduction with a verified live publication count or claim all displaced sheets had a measured zero residual.",
+      "old_text": "We\npublished 269 sheets of a 437-sheet series between 395 and 528 m from where they belong. The check\nthat should have caught it returned effectively zero, not because the fault was small or the code was\nwrong, but because the quantity it compared had the error on both sides. Two instruments did see it:\na free seam census, which cost nothing beyond two sheets claiming a shared edge and worked only\nbecause the fault had a geographic boundary, and an outside CRS decision that was allowed to refuse.",
+      "new_text": "A controlled reproduction of the archive's faulty route retained 437 sheets, including 269 with\nCRS displacements of 395–528 m that passed the graticule check. That check cannot independently\nvalidate the transformation from the sheet's geographic CRS to WGS 84. On the same 715 PDF/PDF\nedges, correction reduced the number above 100 m from 189 to zero. The comparison establishes\nimproved outline agreement. CRS selection against the lattice supplies a separate test of\nconsistency with the adopted Helmert transformation, whose absolute accuracy remains to be\nindependently assessed. These build measurements do not establish the exact population or\naccuracy of the serving archive."
+    },
+    {
+      "id": "R13",
+      "reason": "Capability matrix is conditional, not a measured sensitivity benchmark or universal guarantee.",
+      "old_text": "Legend: **✓** catches it · **·** silent · **—** not applicable · **∅** cannot fail by construction ·",
+      "new_text": "Legend: **✓** can flag it under the stated inputs · **·** not established as a diagnostic here ·\n**—** not applicable · **∅** the specified fault cannot disturb the constrained or shared-input\ncomparison ·"
+    },
+    {
+      "id": "R14",
+      "reason": "Actual implementation scores points, shares datum parameters and has a missing-score fallback.",
+      "old_text": "| **`pick_crs`** — neatline warped under both readings, judged against the cell | external | · | **✓** | · | · | — |",
+      "new_text": "| **`pick_crs`** — registration points scored against the adopted cell (§7.5) | per-sheet + index | · | **✓ ‡** | · | · | — |"
+    },
+    {
+      "id": "R15",
+      "reason": "Carry the reference-dependence qualification directly with Table 1.",
+      "old_text": "Three cells carry the argument, and each is sourced to a different paper's own design.",
+      "new_text": "**‡** Detects disagreement with the adopted frame when a cell score is available. The candidate\nand reference cell share Helmert parameters; the decision does not validate those parameters\nagainst independent absolute control. Table entries describe diagnostic scope, not measured\ndetection rates from running the published methods on this corpus.\n\nThree cells carry the argument, and each is sourced to a different paper's own design."
+    },
+    {
+      "id": "R16",
+      "reason": "Propagate the corpus qualification into the introduction.",
+      "old_text": "Across the two processing routes, the recorded run ledger covers\n514 pipeline-georeferenced sheets; this is a run total and should not be read as current annotation\navailability.",
+      "new_text": "The archive reports 514 sheets across these routes, but that total includes an unverified\npublication constant (§3). We therefore report each audit's measured population separately."
+    },
+    {
+      "id": "R17",
+      "reason": "Distinguish a structural comparison from a benchmark that was not run.",
+      "old_text": "All five are nonetheless per-sheet, and\n§7.2 reports a sheet that passes all five while sitting 75 km from the city it is named for, because\na sheet occupying another sheet's cell is not a per-sheet property.",
+      "new_text": "These checks concern per-sheet geometry. Our §7.2 example has internally coherent readings\nwhile occupying another sheet's cell. We did not run the MapEdge implementation on that sheet;\nthe comparison concerns the scope of internal geometric checks, not an observed MapEdge verdict."
+    },
+    {
+      "id": "R18",
+      "reason": "Remove categorical claims excluding independent per-sheet reference checks.",
+      "old_text": "Third, every per-sheet row is `·` on \"two sheets on one cell\". MapEdge's five checks cover several\nper-sheet properties, and `Ha Noi` survives all five while sitting 75 km from the\ncity it names (§7.2). A per-sheet check cannot see a property that is not per-sheet.",
+      "new_text": "Third, the internal per-sheet checks listed here do not establish unique occupancy.\nThe `Ha Noi` example has coherent internal readings but conflicts with another sheet's\ncell assignment (§7.2). This is a scope argument, not a measured result from running\nMapEdge on `Ha Noi`. A check supplied with an independently verified sheet-to-cell assignment\ncould detect a misplaced sheet individually; internal geometry alone cannot establish that assignment."
+    },
+    {
+      "id": "R19",
+      "reason": "Propagate the unrun-method qualification into the case study.",
+      "old_text": "The MapEdge\nper-sheet battery described in §2.3 would have no reason to reject it.",
+      "new_text": "These observations establish the limits of internal consistency, without claiming an observed\npass from the MapEdge implementation described in §2.3."
+    },
+    {
+      "id": "R20",
+      "reason": "Replace an unmeasured prevalence claim with the supported conditional claim.",
+      "old_text": "> Verification instruments for georeferenced series are routinely blind to one error class by\n> construction, and which class is predictable from the instrument's scope and from what the\n> instrument has already committed to. Naming the scope is therefore a precondition for reporting a\n> residual.",
+      "new_text": "> A verification instrument can remain insensitive to an error shared by its inputs or removed\n> from its residual by an imposed constraint. Interpreting its residual therefore requires\n> stating the comparison, the committed assumptions, and the faults capable of disturbing it."
+    },
+    {
+      "id": "R21",
+      "reason": "The difference between marginal counts is not itself an individually matched transition count.",
+      "old_text": "as 273 sheets join that population.",
+      "new_text": "with a net increase of 273 on-cell sheets across the two builds."
+    }
+  ]
+}
