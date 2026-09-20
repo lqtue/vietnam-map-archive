@@ -70,3 +70,6 @@ work/deck-and-kg-2026-05/script-outputs/
 
 # outreach ledger + personal application material — never publish
 docs/private/
+
+# LaTeX build log — the PDF and .tex are the artifacts, the log is not
+docs/paper/*.log

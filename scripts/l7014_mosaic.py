@@ -497,10 +497,21 @@ def graticule_error(ds, srs, meta):
 
     In degrees, in the sheet's own datum. None when the XMP omits the corners.
     """
-    to_geo = osr.CoordinateTransformation(srs, srs.CloneGeogCS())
+    # Both sides are pinned to traditional (lon, lat) order. An SRS built from
+    # an EPSG code hands back (lat, lon) and one built from INDIAN_1960_PROJ4
+    # hands back (lon, lat), while both report the same axis strategy -- so
+    # reading the pair positionally silently transposed every sheet `pick_crs`
+    # corrected. It read as a 80-96 deg graticule error (the sheet's own
+    # longitude minus its latitude) and threw 370 of 437 sheets out as offgrid:
+    # the datum fix rejected by the check it was meant to supersede.
+    src = srs.Clone()
+    src.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    geog = srs.CloneGeogCS()
+    geog.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    to_geo = osr.CoordinateTransformation(src, geog)
     lons, lats = [], []
     for x, y in registration_points(ds):
-        lat, lon = to_geo.TransformPoint(x, y)[:2]
+        lon, lat = to_geo.TransformPoint(x, y)[:2]
         lons.append(lon)
         lats.append(lat)
     if not lons:
@@ -541,7 +552,7 @@ def write_cutline(ds, srs, path):
     return path
 
 
-def warp_one(row):
+def warp_one(row, no_datum_shift=False):
     pdf = local_pdf(row)
     out = COG_DIR / (pdf.stem + ".tif")
     if out.exists():
@@ -557,11 +568,17 @@ def warp_one(row):
     if not ds.GetGCPs() and ds.GetGeoTransform(can_return_null=True) is None:
         return "nogeo", f"{pdf.stem}: no georeference of any kind"
 
-    try:
-        srs, crs_src, lat_err = pick_crs(ds, meta, row["sheet"])
-    except ValueError as e:
-        return "offcell", f"{pdf.stem}: {e}"
-    trusted = crs_src == "declared"
+    if no_datum_shift:
+        # Reproduce the published datum fault only: let PROJ look the Indian
+        # 1960 transform up. This is never a production option.
+        srs, trusted = sheet_crs(ds, meta)
+        crs_src, lat_err = "proj-lookup", None
+    else:
+        try:
+            srs, crs_src, lat_err = pick_crs(ds, meta, row["sheet"])
+        except ValueError as e:
+            return "offcell", f"{pdf.stem}: {e}"
+        trusted = crs_src == "declared"
     err = graticule_error(ds, srs, meta)
     if err is not None and err > GRATICULE_TOL:
         return "offgrid", f"{pdf.stem}: control points {err:.5f} deg off the printed graticule"
@@ -618,7 +635,7 @@ def phase_warp(args):
     tally = {}
     # Threads are enough: the work happens in the gdalwarp subprocess.
     with cf.ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        for status, msg in pool.map(_warp_safe, rows):
+        for status, msg in pool.map(lambda row: _warp_safe(row, args.no_datum_shift), rows):
             tally[status] = tally.get(status, 0) + 1
             if status not in ("ok", "skip"):
                 print(f"  {status.upper()} {msg}")
@@ -630,9 +647,9 @@ def phase_warp(args):
         print("  offgrid sheets were left out of the mosaic rather than placed wrongly.")
 
 
-def _warp_safe(row):
+def _warp_safe(row, no_datum_shift=False):
     try:
-        return warp_one(row)
+        return warp_one(row, no_datum_shift)
     except Exception as e:  # noqa: BLE001
         return "fail", f"{row['file']}: {e}"
 
@@ -1344,6 +1361,8 @@ def main():
     p.add_argument("--key", default=f"l7014-{date.today():%Y%m%d}",
                    help="archive name; the build date is part of it because the "
                         "R2 domain caches hard and a rebuilt archive needs a new name")
+    p.add_argument("--no-datum-shift", action="store_true",
+                   help="reproduce the published PROJ datum fault; never use for production")
     args = p.parse_args()
     PHASES[args.phase](args)
 

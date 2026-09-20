@@ -39,8 +39,18 @@ Five months, one corpus, one sheet carrying almost all of the evidence.
 ## 2. The stages, and the method in each
 
 **Georeference.** Allmaps annotations, human GCPs, helmert. On the 1882 sheet: 10 GCPs, **RMSE
-11.3 m**, worst point 23.0 m; a 6-dof affine buys 10.6 m, so the scan is undistorted and more
-control points buy little. That 11 m is the floor on every ground claim from the sheet.
+12.7 m**, worst point 27.7 m; a 6-dof affine buys 10.6 m. That ~13 m is the floor on every ground
+claim from *that sheet* — and it is not the archive's floor: the 1942 sheet, which carries 31.7% of
+all extractions, measures **72.3 m RMSE with a worst point of 193.7 m**.
+
+> **note 2026-09-19 — this paragraph read "RMSE 11.3 m, worst point 23.0 m; a 6-dof affine buys
+> 10.6 m, so the scan is undistorted and more control points buy little. That 11 m is the floor on
+> every ground claim from the sheet."** Two corrections. The pair moved to 12.7 / 27.7 because the
+> original was computed over a *spherical* earth; the figures above are geodetic (WGS84 radii of
+> curvature, cross-checked against `pyproj` UTM 48N to 0.01 m). And "the scan is undistorted" does
+> not survive the same recomputation — the affine's two axis scales are 0.3396 and 0.3445, **1.4%
+> apart**. Full reasoning at `docs/worked-example-1882.md:44`; all six District 4 sheets through one
+> code path at `work/analysis/district4/georef_error.md`.
 `geo_audit.mjs` (is the map where it says it is) and `catalog_audit.mjs` (is a row consistent with
 its own table) are the standing checks. L7014's mixed-datum fault — Indian 1960 read as WGS 84,
 ~470 m — was found by seams, and is probed for now.
@@ -184,6 +194,8 @@ The sentence currently defensible in public, quoted verbatim from `docs/private/
 > block-and-parcel prior for a polychrome cadastral sheet in about nine seconds, and on the one
 > sheet measured it covers every hand-traced land plot.
 
+**The timing in that sentence is stale — corrected 2026-09-19.** "About nine seconds" is the 8.6 s pre-`--recut` default (`260918-colour-blocks.md`). `--recut` became the default in `d1da01f1` and the reference run is **80 s** of CPU (25 s under `--no-recut`), because re-cutting the oversized naval-quarter component is what bounds the water region at the Arsenal quay. The claim that survives is **CPU-only, no GPU, no checkpoint, trained on nothing, ~80 s a sheet** — still the right order of magnitude for the argument, and it must not be quoted at nine.
+
 ---
 
 ## 6. Where this goes next — the comparison itself
@@ -193,12 +205,22 @@ anchors:
 
 - **MapSAM2** (Xia et al. 2025, arXiv:2510.27547) — the tiles-as-video framing this pipeline
   borrowed. Its self-sorting memory bank is still unimplemented here; the paper measures memory
-  attention alone at +14.3% IoU on vineyards, +16.1% on railways, and prompt quality at +12.8% F1.
-- **SODUCO F1 = 0.59** — the segmentation baseline `work/MapSAM2/evaluate.py` quotes.
+  attention alone at +14.3% IoU on vineyards and +16.1% on railways (both verified against the paper's Table 2). A third figure, prompt quality at +12.8% F1, is **unverified** — 2026-09-19: MapSAM2's full text is not indexed and the number could not be confirmed. Do not quote it.
+- **SODUCO — the benchmark is COCO PQ, not F1.** Chen, Chazalon & Carlinet (2024), PLOS ONE
+  10.1371/journal.pone.0298217: best pipeline **51.1% COCO PQ** (U-Net + contrast + TPS
+  augmentation); 46.7% before augmentation; 47.1→45.1 is the mini-U-Net ablation. No F1 is
+  reported anywhere in it. `evaluate.py` and `pipelines.md:1240` carried "F1 = 0.59 @ IoU 0.5,
+  PQ = 47.1%" — the F1 unsourced, the PQ an ablation row rather than the headline. Both
+  corrected 2026-09-19 (verified via scite). **And it is still not our axis**: we report mean
+  IoU by best-match-per-trace with no precision term, so 51.1% PQ and `land_plot` 0.331 cannot
+  go in one table — see `docs/field-comparison.md` §0.
 - **Bahgat & Runfola (2021)**, toponym-assisted georeferencing — asked in print for the exact
   triple this corpus holds.
-- **ICDAR MapText** (Zou et al. 2025) — Rumsey, French Napoleonic cadastre, Taiwanese maps, and no
-  Vietnamese in any of them.
+- **ICDAR MapText** (Lin et al. 2025) — Rumsey, French Napoleonic cadastre, Taiwanese maps, and no
+  Vietnamese in any of them. **Misattribution corrected 2026-09-19**: this line previously read
+  "(Zou et al. 2025)". Checked against scite (`10.1007/978-3-032-04630-7_33`) and the competition's
+  own site (`rrc.cvc.uab.es/?ch=32`): the paper's first author is Yijun Lin. Mengjie Zou is a
+  co-author, well down a 25-name organiser list, not the lead — `docs/paper/related-work.md` §6.4.
 - **Chen et al. (2024)** vectorization benchmarks · **mapKurator / Yao-Yi Chiang** · **EPFL DHLAB**
   (Jerusalem 1840–1940 4D) — the groups whose work is nearest, listed with what to lead with in
   `docs/private/network.md` §4a.

@@ -1,0 +1,41 @@
+{
+  "title": "Verification artifacts for a georeferenced map series: AMS L7014 lattice, mosaic geometry, seam census and datum-correction dry run",
+  "upload_type": "dataset",
+  "version": "1.0.0",
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Le, Tue Quang",
+      "affiliation": "Independent researcher",
+      "orcid": "0009-0006-5863-6011"
+    }
+  ],
+  "keywords": [
+    "historical maps",
+    "georeferencing",
+    "map series",
+    "verification",
+    "reference frames",
+    "datum",
+    "spatial data quality",
+    "Vietnam",
+    "AMS L7014"
+  ],
+  "description": "<p>Derived geometry and verification outputs supporting the preprint <em>Blind by construction: verifying a georeferenced map series when the check shares the error</em>.</p><p>The deposit contains the L7014 survey lattice (627 cells), the source sheet manifest, mosaic footprint geometry from a controlled A/B pair of warp runs (faulty and datum-corrected, each with and without hand-georeferenced sheets), the raw seam tables behind the seam census, the per-sheet datum split, cached annotation control points, and the regeneration record with its logs and environment capture. <code>SHA256SUMS</code> verifies every file from the package root.</p><p><strong>Scope.</strong> The input GeoPDFs, JPG scans and generated COGs are not included. They remain under their holding institutions' terms and are referenced by path and provenance in <code>regen/REGEN.md</code>. Only derived geometry, verification tables and provenance are redistributed here, under CC BY 4.0.</p><p><strong>Two cohorts, not one denominator.</strong> The mosaic-only run yields 717 PDF/PDF seams; the hand-extended run adds 36 JPG/PDF and 25 JPG/JPG seams for 778 total and includes the mosaic cohort. A JPG/PDF join is partly committed by construction, because the hand workflow writes the lattice cell as the ground half of its control points, so it is not a free seam. Report the cohorts separately.</p><p><strong>Status of the correction.</strong> The datum correction is a validated dry run, not an applied rebuild. The served archive at the time of deposit is the faulty pass. <code>regen/REGEN.md</code> states which outputs describe the current layer and which describe the proposed rebuild.</p>",
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "PREPRINT_DOI_HERE",
+      "scheme": "doi",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "relation": "isDerivedFrom",
+      "identifier": "https://maparchive.vn",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Regenerated from commit 7ee5d947303bdc9183ae8fffc2290bd88ea861ec plus the two source changes recorded in regen/REGEN.md, both since committed at 0aa04f0b. Reproduction entry point: regen/REGEN.md; scripts: scripts/l7014_mosaic.py, scripts/l7014_hand.py, scripts/l7014_seams.py."
+}

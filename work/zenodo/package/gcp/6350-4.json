@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/45c50503-a010-46ca-8aba-25409b603878/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/45c50503-a010-46ca-8aba-25409b603878",
+     "type": "ImageService3",
+     "width": 4544,
+     "height": 5909
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4544\" height=\"5909\"><polygon points=\"251,268 4326,245 4324,4596 247,4618\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        251,
+        268
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.495767,
+        21.001229
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4326,
+        245
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745734,
+        21.001235
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4324,
+        4596
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745741,
+        20.751257
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        247,
+        4618
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.495774,
+        20.751251
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -264,7 +264,7 @@ node --env-file=.env scripts/enqueue_ocr_all.mjs --tile-metres 1400
 
 Expect roughly **+19% corpus-wide** from ground-referenced tiling, concentrated in the coarse sheets. Sheets already under ~1.5 km per call gain nothing.
 
-Budget: about **$12–24** for the whole corpus on `gemini-3.8-flash`, measured at 5,156 input / 1,810 output tokens per call and 30–60 calls per sheet. Cost is not the constraint; unattended quality is. Set `GEMINI_API_KEYS` with a second key before a long run — the client rotates when one hits its daily cap.
+Budget: about **$31–63** for the whole corpus on `gemini-3.8-flash`, measured at 5,156 input / 1,810 output tokens per call and 30–60 calls per sheet. (**Corrected 2026-09-19.** This line read $12–24, which is the same per-call token figures costed on the *visible* `output_tokens` field. Gemini bills `total_tokens − input_tokens`, thinking included, ~3.5–4× that — see `docs/pipelines.md` §Cost. `docs/ROADMAP.md` already carried the corrected range; this file did not.) Cost is not the constraint; unattended quality is. Set `GEMINI_API_KEYS` with a second key before a long run — the client rotates when one hits its daily cap.
 
 ---
 

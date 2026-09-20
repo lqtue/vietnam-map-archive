@@ -218,5 +218,5 @@ Moved here from `CLAUDE.md` in September 2026. The table lists what exists; the 
 | Item | Location | Fix |
 |------|---------|-----|
 | `label_pins` outlives its feature | `label_tasks` was dropped in mig 038 but `label_pins` remains, now written only by `POST /api/admin/maps/[id]/ocr/apply` | Either fold into `ocr_extractions` or document it as the OCR-applied point layer |
-| Migration head is 075 | `supabase/migrations/` | Regenerate `src/lib/data/supabase/types.ts` after every push: `supabase gen types typescript --linked` |
+| Generated types drift silently | `src/lib/data/supabase/types.ts` | Nothing regenerates them. Head is **091** (090 pushed 2026-09-16, 091 local) and the types are current against it — checked 2026-09-19. Re-run after every push: `supabase gen types typescript --linked`. This row named head 075 for five migrations, which is the drift it exists to warn about |
 | Production drifted from the migrations once | `pipeline_jobs_kind_check` allowed `warp` with no migration saying so; corrected in 070 | Nothing to fix now — but it means the migrations are not provably the whole schema. A `db pull` diff would settle it, and needs the direct DB password |

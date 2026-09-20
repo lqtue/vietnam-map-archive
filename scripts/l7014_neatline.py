@@ -172,7 +172,12 @@ def fit(points):
     return m, c, float(np.median(np.abs(b[keep] - (m * a[keep] + c)))), int(keep.sum())
 
 
-def corners(path, expect=None):
+def corners(path, expect=None, gate=None):
+    """`gate` overrides the module GATE for this call only -- e.g. to test a
+    looser threshold against a population `validate` has no ground truth for
+    (see scripts/l7014_autoplace.py). Never changes what `validate`/`propose`
+    do by default."""
+    gate = gate or GATE
     img, W, H = read_scaled(path)
     mask = paper_mask(img)
     if mask is None:
@@ -193,8 +198,8 @@ def corners(path, expect=None):
             if not f:
                 continue
             m, c, res, n = f
-            ok = (res < GATE["residual"] and n / sampled > GATE["inliers"]
-                  and len(pts) / sampled > GATE["found"])
+            ok = (res < gate["residual"] and n / sampled > gate["inliers"]
+                  and len(pts) / sampled > gate["found"])
             score = (ok, n / sampled - res / 10)
             if best is None or score > best[0]:
                 best = (score, m, c, res, n, len(pts), ok)

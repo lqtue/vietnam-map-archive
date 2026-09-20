@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/232e921a-7504-4d78-bbb6-526e8cd6afef/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/232e921a-7504-4d78-bbb6-526e8cd6afef",
+     "type": "ImageService3",
+     "width": 4624,
+     "height": 5917
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4624\" height=\"5917\"><polygon points=\"184,277 4474,277 4454,4633 156,4632\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        184,
+        277
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745945,
+        10.752096
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4474,
+        277
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.995914,
+        10.752099
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4454,
+        4633
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.995917,
+        10.502119
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        156,
+        4632
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.745949,
+        10.502116
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -113,12 +113,20 @@ plausible.
    six-sheet collection; rendering above 1:1 is byte-identical. The map-text literature works in
    **pixels**, because a trained detector has a fixed receptive field and the question does not
    arise. For a VLM it is the binding variable. I found nothing stating this.
-2. **Diacritic retention as a metric.** Our own measurement is that retention varies 9%–100% *by
-   run, not by sheet*, on the same sheets — the single biggest quality lever we have, and one no
-   standard metric captures. ICDAR MapText covers Latin, French and now Chinese; character accuracy
-   and edit distance are the reported units. For Vietnamese, `CHÂTEAU` vs `CHATEAU` is a small edit
-   distance and a wrong place name. A diacritic-retention metric on a diacritic-heavy corpus is a
-   short, citable methods contribution.
+2. **Diacritic retention as a metric.** ICDAR MapText covers Latin, French and now Chinese;
+   character accuracy and edit distance are the reported units. For Vietnamese, `CHÂTEAU` vs
+   `CHATEAU` is a small edit distance and a wrong place name. A diacritic-retention metric on a
+   diacritic-heavy corpus is a short, citable methods contribution.
+
+   **The evidence this paragraph used to cite is retracted — corrected 2026-09-19.** It read
+   "retention varies 9%–100% *by run, not by sheet*, on the same sheets — the single biggest
+   quality lever we have". `work/ocr/EVAL-BASELINE.md` (2026-09-08) measured it per run directory
+   and found the opposite: retention tracks the **sheet's language** (1895 fr 0.08–0.14 … 1959 vi
+   0.80–1.00) and moves only ±0.1 within one sheet. The 9%/100% pair spanned several sheets, so it
+   was reading corpus composition. What can be claimed is the metric itself and that no standard
+   one captures it — not a measured run-variance lever. The honest supporting numbers are
+   `diacritic_recall` 1.0 under `seq-v1` on the gate sheet, and 0.864 → 0.955 from the three-voter
+   tie-break. A defensible version of this claim needs the 39-sheet pass.
 
 **And one caution.** Our own Gemini-as-segmenter experiment found the model's `box_2d` is x-first
 rather than the documented y-first (mean IoU 0.909 vs 0.284 over 240 objects) and its `mask` is
@@ -134,12 +142,18 @@ saying in print, because the GPT-4o legend paper's pipeline has the same exposur
 |---|---|---|
 | **Feature matching** (Jerusalem, CaGIS 2025) | an already-georeferenced map of the same place | SuperPoint + SuperGlue + Delaunay consistency; **RMSE < 1% of map diagonal on 71 of 86 maps** |
 | **Printed graticule + LLM** (Tyagi & Dubey, NCVPRIPG 2025) | printed lat/long labels in the margin | EasyOCR + two-stage multimodal LLM; **internal RMSE < 5 m, validation < 30 m on 11 of 12 sheets**, < 350 s/sheet |
-| **Toponym matching** (Bahgat & Runfola 2021) | a gazetteer and ≥ ~10 toponyms | usable for data extraction in nearly half of cases; affine RMSE elsewhere reported 16.9–84.2 px, i.e. sometimes too imprecise |
+| **Toponym matching** (Bahgat & Runfola 2021) | a gazetteer and ≥ ~10 toponyms | usable for data extraction ("nearly half of all cases", quoted from the abstract) — real-world sample: 40% at <5% error, 44% at <1% error; simulated: 12.6% true success at <1% error. **Not** "affine RMSE 16.9–84.2 px" — see the 2026-09-19 correction in §7 |
 | **Content-based** (Luft & Schiewe 2021) | topographic content | — |
-| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 11.3 m** on the 1882 sheet; affine buys 10.6 m |
+| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 12.7 m** on the 1882 sheet; affine buys 10.6 m. Not a floor for the archive — the 1942 sheet measures **72.3 m** |
 
-**We do no automatic georeferencing at all.** Our 11.3 m is a human result and belongs in the
+**We do no automatic georeferencing at all.** Our 12.7 m is a human result and belongs in the
 ground-truth column, not the results column.
+
+> **note 2026-09-19 — every "11.3 m" in this section read as written until today.** The 1882
+> similarity residual is **12.7 m, worst 27.7 m**: the recorded pair was computed over a *spherical*
+> earth and the figures now quoted are geodetic (`docs/worked-example-1882.md:44`). Separately, do
+> not read 1882 as the archive's figure — `work/analysis/district4/georef_error.md` measures 1942 at
+> **72.3 m RMSE, worst 193.7 m**, on the sheet holding 31.7% of all extractions.
 
 The useful finding is *why the two working automatic routes do not transfer to this corpus*:
 
@@ -155,7 +169,7 @@ toponyms and a gazetteer on the same 39 sheets**. That combination is what Bahga
 for in print. The blocker is unchanged and is not research: toponyms on all 39 sheets rather than 6.
 
 One reporting fix to adopt: the field states georeferencing error as **a percentage of map
-diagonal**, not in metres. Our 11.3 m on a 4.14 × 3.09 km sheet is ~0.22% of the diagonal. Quote
+diagonal**, not in metres. Our 12.7 m on a 4.14 × 3.09 km sheet is ~0.25% of the diagonal. Quote
 both.
 
 ---
@@ -225,15 +239,24 @@ is not, and the measurement gap is a tracing job rather than a research problem.
 
 ## 7. Corrections this comparison turned up in our own docs
 
-- **`docs/pipelines.md:1240` cites a "SODUCO F1=0.59 baseline" in the `evaluate.py` command
-  comment.** I could not trace that figure. The published SODUCO/MapSeg benchmark (Chen et al.
-  2024, PLOS ONE) reports **51.1% COCO PQ** as its best pipeline, a different metric entirely.
-  Either source the 0.59 or drop it — it is currently a number in a command line that a reader
-  would take as a target.
-- **The MapSAM2 memory-attention figures in the same file check out** (+14.3 vineyard, +16.1
-  railway, both 10-shot). The "+12.8% F1 for prompt quality" claim attributed to the same paper was
-  **not** verified in this pass; it may come from MapSAM (2025) rather than MapSAM2. Flag before
-  quoting externally.
+- ~~**`docs/pipelines.md:1240` cites a "SODUCO F1=0.59 baseline"**~~ — **RESOLVED 2026-09-19**,
+  checked against the paper via scite. Chen, Chazalon & Carlinet (2024) use **COCO Panoptic Quality
+  throughout** and report no F1: best pipeline **51.1% PQ**, 46.7% before augmentation, and
+  47.1 → 45.1 for the mini-U-Net footprint ablation. So the F1 was unsourced *and* the 47.1% that
+  travelled with it was an ablation row, not the headline. `evaluate.py` and `pipelines.md:1240`
+  both now quote 51.1% PQ and say it is not our axis.
+- **The MapSAM2 memory-attention figures check out** (+14.3 vineyard, +16.1 railway, both 10-shot,
+  against Table 2). The **"+12.8% F1 for prompt quality" is still unverified** after a second pass
+  on 2026-09-19: MapSAM2's full text is not indexed by scite and the arXiv record
+  (10.48550/arxiv.2510.27547) is not open there, so the table could not be read. What the record
+  does confirm is that MapSAM2 cites the YOLO paper (10.1109/cvpr.2016.91) from its Methods, so the
+  claim's shape is plausible and the earlier guess that it came from MapSAM (2025) is not needed to
+  explain it. **Do not quote the number** until someone reads the table.
+- **The MapSAM2 author list is not the one `network.md` §4f assumes.** scite gives the first three
+  as **Xue Xia, Randall Balestriero, Tao Zhang**. §4f's premise — writing to ETH IKG as "the group
+  whose code we run" — rests on Hurni / Yizi Chen / Sidi Wu being its authors, and at least two of
+  the first three are not IKG names. Check the full author list and affiliations before that
+  outreach goes anywhere.
 - **Report georeference error as a percentage of map diagonal as well as in metres**, since that is
   the field's unit.
 

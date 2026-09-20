@@ -14,6 +14,7 @@
     switching is in NavBar, which is outside the fixed layer.
   */
   import { page } from '$app/stores';
+  import { resolveExploreMode } from '$lib/core/routeModes';
   import ExplorePage from '$lib/features/explore/ExplorePage.svelte';
   import StudioMode from '$lib/features/annotate/AnnotateMode.svelte';
   import CreateMode from '$lib/features/stories/editor/CreateMode.svelte';
@@ -21,9 +22,7 @@
   /* `?mode=annotate` is the name this mode shipped under and is still live in
      share links, bookmarks and the wild, so it stays an alias rather than a
      404 or a silent fall-through to browse. `studio` is what the UI says. */
-  const MODE_ALIASES: Record<string, string> = { annotate: 'studio' };
-  $: rawMode = $page.url.searchParams.get('mode') ?? 'browse';
-  $: mode = MODE_ALIASES[rawMode] ?? rawMode;
+  $: mode = resolveExploreMode($page.url.searchParams.get('mode')) ?? 'browse';
 
   /* From the /studio and /create routes this replaced. The browse title and
      viewport meta stay in ExplorePage, which owns them. */

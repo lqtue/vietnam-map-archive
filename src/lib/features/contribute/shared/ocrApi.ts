@@ -9,6 +9,14 @@ import type { EditableOcrExtraction, OcrExtraction } from './types';
 
 export type OcrStatus = 'pending' | 'validated' | 'rejected';
 
+/** The category a reviewer has accepted takes precedence over the model's guess.
+ * Keep this at the data seam so every review surface agrees after a correction. */
+export function reviewedCategory(
+  row: Pick<OcrExtraction, 'category' | 'category_validated'>
+): string {
+  return row.category_validated ?? row.category;
+}
+
 export type OcrReviewPage = {
   extractions: OcrExtraction[];
   total: number;

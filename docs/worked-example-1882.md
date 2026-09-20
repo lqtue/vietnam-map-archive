@@ -37,9 +37,23 @@ than trusting the stored figure:
 
 | model | result |
 |---|---|
-| similarity, no y-flip | RMSE 989 m — the wrong model, listed only because it is what you get if you forget the image axis points down |
-| **similarity + y-flip** (what Allmaps applies) | **0.3426 m/px, rotation 89.65°, RMSE 11.3 m, worst point 23.0 m** |
-| affine, 6 dof | 0.3417 / 0.3445 m/px, RMSE 10.6 m, worst 17.4 m |
+| similarity, no y-flip | RMSE 986 m — the wrong model, listed only because it is what you get if you forget the image axis points down |
+| **similarity + y-flip** (what Allmaps applies) | **0.3411 m/px, rotation 89.66°, RMSE 12.7 m, worst point 27.7 m** |
+| affine, 6 dof | 0.3396 / 0.3445 m/px, RMSE 10.6 m, worst 17.4 m |
+
+> **note 2026-09-19 — the similarity row was 11.3 m / 23.0 m / 0.3426 and is now 12.7 / 27.7 /
+> 0.3411.** Same annotation, same ten points; the difference is the degrees→metres conversion. The
+> original was computed over a *spherical* earth (R = 6,371,008 m), which reproduces 11.28 / 23.00
+> exactly. The figures above are geodetic — WGS84 radii of curvature at 10.78° N, cross-checked
+> against `pyproj` UTM 48N to **0.01 m** — and are the ones to quote.
+>
+> **The affine row did not move**, and that is the interesting part: it reads 10.58 / 17.41 under
+> every convention tried, because six degrees of freedom absorb a wrong lat/lon ratio into the
+> fitted coefficients and four cannot. The stricter model is the only one of the two that can see
+> an error in the frame it is measured in.
+>
+> Re-measured by `work/analysis/district4/georef_error.py`, which does all six District 4 sheets
+> through one code path — see `work/analysis/district4/georef_error.md`.
 
 Three things follow.
 
@@ -47,12 +61,20 @@ Three things follow.
 while `maps.bbox` reads 3.06 × 4.19 km — swapped, and consistent. Any naive
 pixel-to-ground check on this sheet looks wrong until you notice that.
 
-**Affine barely beats helmert** (10.6 m against 11.3 m). There is no shear and
-no differential scale, so the scan is undistorted and the 1882 survey is
-internally consistent. Helmert is the right model; adding control points buys
-very little.
+**Affine beats helmert** (10.6 m against 12.7 m), and its two axis scales are
+0.3396 and 0.3445 — **1.4% apart**. Helmert remains the right model, because it
+is what the annotation declares and therefore what Allmaps renders; but the
+earlier reading of this row, that there is "no differential scale, so the scan
+is undistorted", does not survive the corrected conversion.
 
-**11 m RMSE is the floor on every ground claim made from this sheet.** A Saigon
+> **note 2026-09-19.** This paragraph previously read *"Affine barely beats helmert (10.6 m against
+> 11.3 m). There is no shear and no differential scale, so the scan is undistorted and the 1882
+> survey is internally consistent."* Under the spherical conversion the two axis scales were 0.3417
+> and 0.3445 (0.8% apart) and the gap to affine was 0.7 m, which made that reading defensible.
+> Geodetically it is 1.4% and 2.1 m. Whether the residue is scanner geometry, paper, or the 1882
+> survey itself is **not established** by anything here.
+
+**13 m RMSE is the floor on every ground claim made from this sheet.** A Saigon
 cadastral plot is roughly 20–40 m across, so a label can land one plot off. It
 does not affect the label↔footprint join, which is pure pixel space, but it
 bounds anything compared against the modern city.
@@ -60,6 +82,12 @@ bounds anything compared against the modern city.
 `ocr_extractions.geom_rmse` is **16.50 for all 499 rows** — it is a per-*map*
 constant, not a per-point residual, and cannot be used to weigh an individual
 label.
+
+**And do not generalise this sheet's figure to the archive.** The same method run
+over all six District 4 sheets puts 1968 at 9.0 m and 1959 at 12.8 m, but **1942
+at 72.3 m RMSE with a worst point of 193.7 m** — on the sheet carrying 31.7% of
+every extraction in the corpus. Two of the six cannot be measured from their own
+control points at all. `work/analysis/district4/georef_error.md`, 2026-09-19.
 
 ## The crop
 
@@ -301,6 +329,11 @@ feature that could not work, for the fourth time this month.
 - **Volume.** 118 polygons over a 12102 × 8982 sheet is still thin, and the
   machine's 72 came from 109 seeds — so the ceiling is the OCR pass, not the
   segmenter. A sheet is only as segmentable as it is readable.
+
+  *(**Read that 118 carefully — clarified 2026-09-19.** Here it means polygons this run
+  **produced**. It is not the "118-row trace set" `work/ocr/EVAL-BASELINE.md` retracted, which
+  was 46 volunteer traces plus 72 machine rows mistaken for ground truth. Three senses of 118
+  have circulated in these docs; check the sentence, not the number.)*
 - **Segmentation quality.** The LoRA checkpoint was fine-tuned on *these* 46
   polygons on *this* sheet. Running it back on 1882 legitimately produces
   polygons for this example, but measures nothing. An honest number needs a

@@ -1,5 +1,8 @@
 # Knowledge Graph build — progress ledger
 
+> **FROZEN — 2026-06-04 snapshot.** Figures here (migration head 048, the corpus counts) are
+> the state when the May 2026 deck and knowledge graph were built. See `SYSTEM.md`'s banner.
+
 Resume anchor for the sectioned audit→graph→deck workflow.
 Full plan: `~/.claude/plans/foamy-giggling-parnas.md` · Instruction: `memory/project_kg_workflow.md`.
 

@@ -4,6 +4,7 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import type { Database } from '$lib/data/supabase/types';
 import { LOCALE_COOKIE, isLocale, localeFromPath, stripLocale } from '$lib/core/i18n';
 import { resolveScanMode } from '$lib/core/scanModes';
+import { resolveAdminTab, resolveExploreMode } from '$lib/core/routeModes';
 import { CANONICAL_HOST } from '$lib/core/site';
 
 /** Retired route paths → their replacements (301, query string preserved). */
@@ -74,6 +75,31 @@ function retiredScanTarget(url: URL): string | null {
   if (resolveScanMode(url.searchParams.get('mode'))) return null;
   const mapId = url.searchParams.get('map');
   return mapId && isMapRef(mapId) ? `${prefix}/catalog/${mapId}` : `${prefix}/catalog`;
+}
+
+/** Unknown dispatcher values are repaired instead of silently showing another tool. */
+function normalizedDispatcherTarget(url: URL): string | null {
+  const path = stripLocale(url.pathname);
+  const params = new URLSearchParams(url.searchParams);
+
+  if (
+    path === '/explore' &&
+    url.searchParams.has('mode') &&
+    !resolveExploreMode(url.searchParams.get('mode'))
+  ) {
+    params.delete('mode');
+    return `${url.pathname}${params.size ? `?${params}` : ''}`;
+  }
+
+  if (
+    path === '/admin' &&
+    resolveAdminTab(url.searchParams.get('tab')) !== url.searchParams.get('tab')
+  ) {
+    params.set('tab', resolveAdminTab(url.searchParams.get('tab')));
+    return `${url.pathname}?${params}`;
+  }
+
+  return null;
 }
 
 /**
@@ -170,6 +196,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const target = legacyTarget(event.url.pathname);
   if (target) throw redirect(301, withSearch(target, event.url.search));
+
+  const dispatcherTarget = normalizedDispatcherTarget(event.url);
+  if (dispatcherTarget) throw redirect(302, dispatcherTarget);
 
   const scanTarget = retiredScanTarget(event.url);
   if (scanTarget) throw redirect(302, scanTarget);

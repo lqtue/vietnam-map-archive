@@ -14,7 +14,7 @@ quiz check-in, a local passport. It is well designed and it is built to be
 **forked per event**. HCMC has the opposite substrate — no usable L7014 topo
 (the 25 ungeoreferenced JPGs in the series are exactly the ones over Saigon),
 but **17 georeferenced city plans, 1799→1968, and a complete District 4 series
-of 8**. So: fork the event app for a District 4 walk, and replace its single
+of 6**. So: fork the event app for a District 4 walk, and replace its single
 modern basemap with a **stack of warped historical sheets and a year slider**.
 The two codebases link through frozen JSON and PMTiles files, never a shared
 runtime — that is what keeps the walk working underground.
@@ -54,7 +54,7 @@ route on a phone before F4 starts.
 |---|---|---|
 | L7014 topo | sheet `6640-1`, 1984, ed. 003, `crs_forced: false`, graticule error 4.18e-12 — **already warped into `overlay/l7014-*.pmtiles`** | **hole.** The 25 JPG-only sheets are the ones over Saigon; `6641-3` (Da Nang) is one of them |
 | Archive sheets | none georeferenced | **17 city plans** 1799 · 1862 · 1863 · 1864 · 1878 · 1882 (cadastral) · 1882 · 1895 · 1898 · 1900 · 1912 · 1922 · 1923 · 1930 · 1942 · 1959 · 1968 |
-| D4 series | — | **1878 → 1882 → 1898 → 1912 → 1923 → 1942 → 1959 → 1968** (8 sheets, one AOI) |
+| D4 series | — | **1882 → 1895 → 1923 → 1942 → 1959 → 1968** (6 sheets, one AOI) |
 | Labels / footprints | none | `ocr_extractions` 1,404 rows on **1 map**, 14 validated; `footprint_submissions` 46 rows, 1 map, zero SAM2 |
 
 So Hội An ships one raster and no archive content; HCMC ships eight decades and

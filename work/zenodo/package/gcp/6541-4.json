@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/cdef2d04-4749-48a8-99f9-1a8b8f1c14ad/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/cdef2d04-4749-48a8-99f9-1a8b8f1c14ad",
+     "type": "ImageService3",
+     "width": 4584,
+     "height": 5909
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"4584\" height=\"5909\"><polygon points=\"257,230 4449,229 4421,4581 233,4581\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        257,
+        230
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.49575,
+        16.501645
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4449,
+        229
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.745718,
+        16.50165
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4421,
+        4581
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.745723,
+        16.251671
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        233,
+        4581
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.495755,
+        16.251666
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

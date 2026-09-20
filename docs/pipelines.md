@@ -370,7 +370,24 @@ python work/ocr/scripts/ocr.py batch --map-id <uuid> --iiif-base <url> --scout -
 python work/ocr/scripts/ocr.py clean \
   --local work/ocr/outputs/<map-id>/runs/<run-id> \
   --map-id <uuid> --run-id <clean-run-id> --min-confidence 0.1 [--apply]
+
+# Read-only post-run audit: artifact integrity + a focused human-review queue
+python work/ocr/scripts/audit_run.py \
+  --run-dir work/ocr/outputs/<map-id>/runs/<run-id> \
+  --output /tmp/<run-id>-audit.json
 ```
+
+`audit_run.py` is deliberately local and read-only. It refuses malformed saved
+artifacts (empty text, invalid confidence, or non-positive global box), then
+queues only **single-pass** labels below the established `0.7` confidence
+boundary or ones that explicitly say they are an edge/fragment. This is a
+review queue, not an auto-delete list:
+the shifted pass does not cover the first pass's outer strip, so a complete
+high-confidence singleton is still useful. Run it after every merge and before
+using the rows as a review or publication surface; `--self-check` is offline.
+When a map's source tiles are already cached, add `--tiles-dir
+work/ocr/outputs/<map-id> --review-dir /tmp/<run-id>-review` to produce one
+red-box crop per queued label and a `manifest.json`; no IIIF request is made.
 
 Subcommands (15): `run`, `batch`, `scout`, `stitch`, `clean`, `dedup`, `merge`, `preview`, `list-models`, `detect-layout`, `grid`, `numerals`, `legend`, `street-index`, `street-index-fixture`.
 
@@ -1237,7 +1254,7 @@ python work/MapSAM2/inference_tiles_as_video.py \
   --tile-size 1024 --overlap 128 --text-mask --watershed \
   --out-json footprints.json --write-supabase
 
-# Evaluate (SODUCO F1=0.59 baseline)
+# Evaluate (SODUCO baseline: best pipeline COCO PQ 51.1%, Chen et al. 2024 -- the F1=0.59 this line carried is unsourced, corrected 2026-09-19)
 python work/MapSAM2/evaluate.py --predictions footprints.json --map-id <uuid> [--iou-thresholds 0.5,0.75]
 ```
 
@@ -1313,7 +1330,7 @@ Highest single-change EV in the backlog, and the most complex.
 
 ## Gemini as the prompt source
 
-The paper uses a fine-tuned YOLO to produce instance-level bbox prompts, and shows prompt quality is worth **+12.8% F1** (holding the segmenter fixed, varying only YOLO's training size). VMA substitutes Gemini:
+The paper uses a fine-tuned YOLO to produce instance-level bbox prompts, and is reported here as showing prompt quality is worth **+12.8% F1** (holding the segmenter fixed, varying only YOLO's training size). **That figure is UNVERIFIED — checked 2026-09-19 and could not be confirmed.** MapSAM2's full text is not indexed by scite and the arXiv record (10.48550/arxiv.2510.27547) is not open there. What *is* confirmed is that MapSAM2 cites the YOLO paper (10.1109/cvpr.2016.91) from its Methods section, so the shape of the claim is plausible; the number is not sourced. Do not quote +12.8% externally until someone reads the table. The memory-attention ablation in the same paper **is** verified against its Table 2 (+14.3 IoU vineyard, +16.1 railway, both 10-shot) — cite that instead. VMA substitutes Gemini:
 
 - open-vocabulary, no training, several categories in one call;
 - returns the **text** as well as the box — one call, two signals, so OCR and prompt generation are the same pass;
@@ -1364,7 +1381,7 @@ Note for anyone porting Google's spatial-understanding patterns: their notebook 
 
 ## Prompt design decisions
 
-1. **System prompt establishes map identity first** — priors for a named corpus are far stronger than for "historical map" generically. But the identity has to be the *archive's*, not one sheet's: it names both the French colonial period and the mid-century Vietnamese one, and says explicitly not to assume which. Naming a single sheet ("an 1882 French colonial cadastral map") primes the wrong language for half the corpus, which is the suspected cause of the 9%–100% per-run diacritic spread. If a per-sheet prior is ever wanted, pass it from the map row; do not hardcode one in a shared prompt.
+1. **System prompt establishes map identity first** — priors for a named corpus are far stronger than for "historical map" generically. But the identity has to be the *archive's*, not one sheet's: it names both the French colonial period and the mid-century Vietnamese one, and says explicitly not to assume which. Naming a single sheet ("an 1882 French colonial cadastral map") primes the wrong language for half the corpus, which was the suspected cause of a per-run diacritic spread that has since been retracted (see *Known issues*: the spread was corpus composition). The priming argument stands on its own; do not cite the 9%–100% pair for it. If a per-sheet prior is ever wanted, pass it from the map row; do not hardcode one in a shared prompt.
    The prompt also demands diacritics in upper case as well as lower ("CHÂTEAU" not "CHATEAU", "ĐƯỜNG" not "DUONG") — an all-caps street name is where they were being dropped.
 2. **bbox within the tile** — coordinates relative to the submitted crop, directly compositable with SAM2 footprints (both pixel space).
 3. **`rotation_deg`** — street labels on French cadastral maps follow the road axis; capturing the angle allows correct placement in the label overlay.
@@ -1379,7 +1396,7 @@ The shipped category taxonomy is whatever `work/ocr/scripts/prompt.py` and the r
 - **IIIF server rate limits** — archive.org throttles at ~10 req/s. The fetcher caches to `.tile_cache/` to avoid re-fetching.
 - **Model IDs change** — Flash preview IDs get replaced or renamed. Run `ocr.py list-models` on first use of a new key.
 - **French + quốc ngữ mix** — early French colonial maps use early Romanized Vietnamese transliterations. The model handles these but accuracy is lower.
-- **Diacritic retention varies by run, not by sheet** — measured across the live table: one run read 9% of labels with any diacritic, another read 100%, on the same sheets. It is the single biggest quality lever and no current eval metric captures it; **diacritic retention rate** (share of labels containing a non-ASCII character) is the metric this corpus argues for.
+- **Diacritic retention tracks the sheet's language, not the run** — **corrected 2026-09-19.** This bullet read "varies by run, not by sheet — one run read 9% of labels with any diacritic, another 100%, on the same sheets". `work/ocr/EVAL-BASELINE.md` (2026-09-08, §*Also corrected here*) retracted that: the 9%/100% pair was computed over live-table `run_id`s spanning several sheets, so it was reading **corpus composition**, not run variance. Measured per run directory it tracks the sheet's language, hard — 1895 fr 0.08–0.14, 1882 fr 0.31–0.42, 1923 fr 0.23–0.41, 1942 fr 0.30–0.38, 1959 vi 0.80–1.00, 1968 vi 0.76–1.00 — while within one sheet it moves ±0.1. **The metric survives the retraction; this evidence for it does not.** `diacritic_recall` on the gate sheet reaches 1.0 under `seq-v1`, and the three-voter tie-break restores 0.864 → 0.955. The open lead is 1895 at 0.08 against three other French sheets above 0.23 — same prompt, same model, same language.
 - **`confidence` is not a usable signal as produced** — median 0.9 with p90 = p99 = 1.0, yet the pipeline gates on it (`--min-confidence 0.5` worker default, plus per-category floors in `ocr.py`). A field that is 1.0 for 90% of rows filters nothing and mis-ranks dedup winners. Either give the model a rubric or drop the gate.
 - **Edge labels cut off** — a label straddling a tile boundary is read as two fragments; `clean` rejoins them spatially, and sequence mode assembles some of them in-model.
 

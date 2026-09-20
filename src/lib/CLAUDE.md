@@ -92,7 +92,8 @@ most of it `extra_metadata` and the long source fields no list renders; the name
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
-- `src/lib/data/supabase/types.ts` is generated and current against migration head **088**. Nothing
+- `src/lib/data/supabase/types.ts` is generated and current against migration head **091** (verified
+  2026-09-19: 091's `review_tags` / `review_note` / `reviewed_by` / `reviewed_at` are present). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
   history and the `--local` trap: `docs/conventions.md` §Supabase types.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is

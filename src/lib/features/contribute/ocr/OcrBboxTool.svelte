@@ -22,6 +22,7 @@
 -->
 <script lang="ts">
   import { CAT_COLORS } from '../shared/constants';
+  import { reviewedCategory } from '../shared/ocrApi';
   import { INK } from '$lib/core/ink';
   import { onDestroy, createEventDispatcher } from 'svelte';
   import { get } from 'svelte/store';
@@ -112,7 +113,7 @@
   // ── Styling ───────────────────────────────────────────────────────────────
   function cornerStyleFn(feat: Feature): Style {
     const ext = rowOf(feat.get('bboxId') as string);
-    const color = CAT_COLORS[ext?.category ?? ''] ?? INK.grey;
+    const color = CAT_COLORS[ext ? reviewedCategory(ext) : ''] ?? INK.grey;
     return new Style({
       image: new RegularShape({
         points: 4,
@@ -126,7 +127,7 @@
 
   function rotateStyleFn(feat: Feature): Style {
     const ext = rowOf(feat.get('bboxId') as string);
-    const color = CAT_COLORS[ext?.category ?? ''] ?? INK.grey;
+    const color = CAT_COLORS[ext ? reviewedCategory(ext) : ''] ?? INK.grey;
     return new Style({
       image: new CircleStyle({
         radius: 6,
@@ -148,7 +149,7 @@
     }
     if (opacity === 0) return [];
 
-    const color = CAT_COLORS[ext.category] ?? INK.grey;
+    const color = CAT_COLORS[reviewedCategory(ext)] ?? INK.grey;
     const label = ext.text_validated ?? ext.text;
 
     return new Style({

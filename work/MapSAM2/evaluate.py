@@ -2,7 +2,16 @@
 """
 Evaluate MapSAM2 inference output against ground-truth footprints.
 
-Benchmarks against SODUCO (Chen 2024): F1=0.59 @ IoU 0.5, PQ=47.1%.
+Benchmarks against SODUCO (Chen et al. 2024): best pipeline COCO PQ = 51.1%.
+
+SODUCO baseline, verified against the paper 2026-09-19 (scite, DOI
+10.1371/journal.pone.0298217). Chen, Chazalon & Carlinet (2024) report **COCO Panoptic
+Quality throughout** — "We mainly follow the evaluation protocol used by [5,8], which relies
+on the COCO Panoptic metric". Their figures: **51.1% PQ** is the best pipeline (U-Net with
+contrast + TPS augmentation); 46.7% is U-Net before augmentation; **47.1% -> 45.1%** is the
+mini-U-Net footprint ablation. **No F1 score appears.** So quote 51.1% COCO PQ. The
+"F1=0.59 @ IoU 0.5" this file used to carry is unsourced and was not found in the paper;
+47.1% was real but was one row of an ablation, not the benchmark's headline.
 
 Usage:
   python evaluate.py --predictions footprints.json --ground-truth gt.json
@@ -202,7 +211,7 @@ def main():
     print("=== Benchmarks (SODUCO Chen 2024) ===")
     m50 = polygon_f1(pred_coords, gt_coords, 0.5)
     print(f"  VMA F1 @ 0.5:    {m50.f1:.3f}")
-    print(f"  SODUCO F1 @ 0.5: 0.590")
+    print(f"  SODUCO best COCO PQ: 51.1%  (Chen et al. 2024; this repo reports mean IoU, not PQ -- not comparable, see docs/field-comparison.md \u00a70)")
     print(f"  Morlighem floor:  0.639  (degraded)")
     print(f"  Morlighem ceil:   0.929  (clean)")
 
