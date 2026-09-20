@@ -11,16 +11,18 @@ sheet index — and the difficult work moves to verification: establishing that 
 been placed coherently, and that the resulting evidence can detect its own errors. We report a
 documented archive failure that makes the distinction concrete. In the Vietnam Map Archive, a
 substantial subset of US Army Map Service L7014 sheets was published under a wrong datum; a
-controlled reproduction measures CRS displacements of 395–528 m, with a median of 455 m. The
-archive's per-sheet graticule check returned an error of `2e-12` on a displaced sheet, because the
-sheet's control points and the graticule it prints are translated together by the same wrong datum.
-The fault was not hidden by noise; the check was blind to it by construction. Working from two
-colonial series and 514 pipeline-georeferenced sheets, we develop a taxonomy that classifies
-verification checks by scope and by the information each has already committed to, and show which
-error class each therefore cannot report. Two instruments detect the shared displacement: a free
-seam census, which requires no external reference, and an outside CRS decision that refuses rather
-than accept the smaller miss. A lattice occupancy check separately catches a sheet that passes every
-per-sheet test while sitting 75 km from the cell it names. The claim is deliberately narrow: naming
+controlled reproduction measures CRS displacements of 395–528 m across 269 sheets, with a median of
+455 m. The archive's per-sheet graticule check rejected 11 of 437 sheets and passed all 269
+displaced ones, because a sheet's control points and the graticule it prints are translated together
+by the same wrong datum. The fault was not hidden by noise; the check was blind to it by
+construction. Working from two colonial series and 514 pipeline-georeferenced sheets, we develop a
+taxonomy that classifies verification checks by scope and by the information each has already
+committed to, and show which
+error class each therefore cannot report. Two instruments detect this displacement: a free seam
+census, which requires no external reference but sees the fault only because it is partial across the
+series, and an outside CRS decision that refuses rather than accept the smaller miss. A lattice occupancy check separately catches a sheet that passes every
+per-sheet test while sitting on another sheet's cell, 75 km from the city it is named for. The
+claim is deliberately narrow: naming
 a check's scope and its committed inputs is a precondition for interpreting the residual it reports.
 
 **Keywords:** historical maps · georeferencing · map series · verification · reference frames ·
@@ -51,11 +53,11 @@ This distinction matters because a small residual is not a general certificate o
 check can be accurate for the relation it measures and nevertheless be unable to reveal a datum,
 frame or adjacency assumption that it shares with the transformation. In the Vietnam Map Archive,
 we published a substantial subset of GeoPDF sheets hundreds of metres from their intended
-locations. The pipeline completed, the maps rendered and the per-sheet graticule check returned
-effectively zero error on a demonstrably displaced sheet. The fault was not hidden by noise; it was
-invisible by construction because the check compared two quantities translated by the same wrong
-datum. A current reproduction finds CRS displacements of 395–528 m (median 455 m), with the exact
-fault population depending on whether it is counted from the fit or from the CRS displacement.
+locations. The pipeline completed, the maps rendered and the per-sheet graticule check passed every
+displaced sheet. The fault was not hidden by noise; it was invisible by construction because the
+check compared two quantities translated by the same wrong datum. A current reproduction finds CRS
+displacements of 395–528 m (median 455 m), with the exact fault population depending on whether it
+is counted from the fit or from the CRS displacement.
 
 The size of that silent displacement is a useful warning, but not a benchmark claim. It exceeds the
 101 m median error reported by a content-based automatic method and is comparable with some
@@ -68,8 +70,8 @@ We examine two Vietnamese map series with complementary spatial evidence: US Arm
 1:50,000 GeoPDFs, and Service géographique de l'Indochine 1:25,000 sheets whose corners are printed
 in grades from the Paris meridian. Across the two processing routes, the recorded run ledger covers
 514 pipeline-georeferenced sheets; this is a run total and should not be read as current annotation
-availability. The
-series setting makes relations available that a single sheet cannot supply: regular lattice spacing,
+availability. The series setting makes relations available that a single sheet cannot supply:
+regular lattice spacing,
 one-to-one occupancy of cells, shared edges, edition history and a distinction between a proposed
 correction and what readers currently receive.
 
@@ -134,14 +136,23 @@ designed to exclude one class of error: corners are used because "neatlines are 
 constructed and have the least projection error, [so] they can be assumed to be drawn at the
 'correct' place", which keeps surveying and drawing error out of the measurement. It keeps datum
 error out of it too. §7.4 reports a several-hundred-metre datum fault across part of the 437-sheet
-L7014 denominator, on
-which a check of exactly this shape returns 2e-12.
+L7014 denominator, which a check of exactly this shape passes without a single rejection.
+
+Luft and Schiewe say as much about a third study, and the remark is the clearest statement of this
+paper's thesis we have found in the prior literature. Comparing their own result with Burt, White,
+Allord, Then and Zhu (2019), who georeference USGS topographic sheets from neatline corners and
+graticule intersections, they note that those authors reach "almost perfect accuracy of 1–4 px RMSE"
+and immediately qualify it: the figure "reflects the detection accuracy of graticule intersections on
+the map image and is hardly influenced by the georeferencing process itself." That is precisely the
+distinction Table 1 formalises — a residual reports the relation it measures, not the one its reader
+wants — observed in passing rather than developed. We take it as a precedent for the argument, not as
+a gap.
 
 The second is that the seam is asserted rather than measured. Corner displacement is computed per
 sheet against the layout and averaged over four corners into a single value; no two neighbours are
 ever compared to each other. A per-sheet residual cannot separate a sheet that sits slightly off its
-cell from two sheets that claim the same cell — the failure that caught `Ha Noi`, 75 km from its
-cell while satisfying every per-sheet check (§7.2). Inter-sheet agreement as a *constraint* is well
+cell from two sheets that claim the same cell — the failure that caught `Ha Noi`, 75 km from the city
+it is named for while satisfying every per-sheet check (§7.2). Inter-sheet agreement as a *constraint* is well
 established: Janata and Cajthaml (2020) adjust a 250-sheet series under explicit adjacency
 conditions. We treat unforced inter-sheet agreement as a diagnostic in this archive, without
 claiming priority for that use.
@@ -189,7 +200,7 @@ object category. We report comparable nulls in §8.
 
 ### 2.3 Per-sheet consistency checks
 
-Meijers (2025) reaches the neatline the way we do and applies a substantial per-sheet check set.
+Meijers and Schoonman (2025) reach the neatline the way we do and applies a substantial per-sheet check set.
 MapEdge detects the frame of 557 sheets across three 1:50,000 series by taking 1D
 black-pixel profiles along each axis of a low-resolution overview, ranking candidate peak pairs by a
 fuzzy metric over separation and expected position, then repeating the profile on full-resolution
@@ -204,22 +215,16 @@ What matters here is the battery of five checks applied afterwards: sufficient r
 RANSAC inliers; an internal test that
 opposite sides and diagonals agree; an external test of documented sheet size in centimetres times
 scan dpi against the measured pixels; the distribution of inlier perpendicular distances, which
-detects paper bulging or caving; and a visual contact sheet of every detected corner. The battery
-works — on three sheets it revealed that sheet-size exceptions had been digitised wrongly in the
-authors' own sheet index, which was corrected as a result. All five are nonetheless per-sheet, and
-§7.2 reports a sheet that passes all five while sitting 75 km from the cell it claims, because a
-sheet occupying another sheet's cell is not a per-sheet property.
+detects paper bulging or caving; and a visual contact sheet of every detected corner. The battery works — on three sheets it revealed that sheet-size exceptions had been digitised wrongly
+in the authors' own sheet index, which was corrected as a result. All five are nonetheless per-sheet, and
+§7.2 reports a sheet that passes all five while sitting 75 km from the city it is named for, because
+a sheet occupying another sheet's cell is not a per-sheet property.
 
-Meijers also states in print the failure our own detector hits: "linear features, such as graticule
+Meijers and Schoonman also state in print the failure our own detector hits: "linear features, such as graticule
 lines, can occupy the same number of black pixels as the neat line." §6 reports a worked case of
 exactly that — a walk stopping on the graticule band, 40 px and 170 m short, every edge rejected —
 and what we do about it. We take this up as the open problem its author names, not as a deficiency
 we found.
-
-<!-- ponytail: the per-half-fitting measurement (35 px on Như Trác, 14 px opposite-edge disagreement
-     from four independent rotations) belongs in §6 next to the one-rotation-per-sheet decision, not
-     here. State it as constraining their proposed future work, never as a refutation.
-     related-work.md §4, "A measurement against their future work". -->
 
 ### 2.4 Verification beyond geometry
 
@@ -253,8 +258,9 @@ Lecorney and Blanc (2022) describe validation indicators based on GCP count, com
 coverage. Those indicators are useful gates; Table 1 specifies the error classes they leave
 outside their scope.
 
-Tyagi and Dubey's OCR- and multimodal-reasoning route is cited as a close conceptual neighbour to
-our printed-corner method, but its closed paper has not been read and no result is attributed to it.
+Tyagi and Dubey (2026) read printed map text with OCR and a multimodal model to derive a sheet's
+extent, which is the closest published neighbour to the printed-corner method in §6. We have not
+obtained the full text and therefore attribute no result to it.
 Legend detection is likewise outside this paper's scope: it concerns what a sheet depicts, not
 whether the sheet's spatial frame is independently verified.
 
@@ -280,8 +286,20 @@ coverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the Univ
 Austin. The second is the Service géographique de l'Indochine 1:25,000 coverage of Tonkin and Thanh
 Hóa, held by Cartomundi at Aix-Marseille Université/CNRS. Together the recorded processing ledger
 covers 514 sheets: 452 L7014 sheets published as one PMTiles mosaic and 62 Indochine sheets. Current
-publication and annotation status is tracked separately from that run total. The L7014 material dates from the
-1960s–70s; the Indochine material from 1903–1927.
+publication and annotation status is tracked separately from that run total. The L7014 material dates
+from the 1960s–70s; the Indochine material from 1903–1927.
+
+Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them
+on one map. The series index names **627** cells. **510** of those are held as GeoPDFs. Of the 510,
+**437** carry usable control and warp successfully — 62 have no GCPs and 11 land off their cell — and
+it is this 437 that the datum measurements in §7 are taken over. A further **24** sheets are
+georeferenced by hand rather than from embedded control, and sit outside that fault. The **452** in
+the published mosaic is a hand-maintained constant rather than a count read back from the serving
+manifest, and a corrected rebuild produces 436; we report it as the archive's own claim about itself
+and flag it in §7.6 rather than silently substituting a number the live layer cannot confirm. On the
+Indochine side, **79** cells are indexed and **75** held; **62** were georeferenced by the pipeline,
+**58** were read independently for the lattice check in §7.2, and the IIIF survey in §7.7 covers the
+**83** image sources those sheets resolve to, some cells holding more than one edition.
 
 The two series are deliberately unlike in how they supply spatial evidence. L7014's source PDFs
 carry GCPs and a CRS declaration but require a test of that declaration. The Indochine sheets carry
@@ -340,6 +358,18 @@ tests a join after the warp. The rest of this paper follows from taking those li
 particular, the datum fault in §7 was not a failure to find control points or to execute a
 warp. It was a failure to test an assumption carried by both.
 
+Figure 4 shows what a single sheet makes available, and why those two facts are not independent
+evidence about each other. The sheet prints its own corner coordinates and, in its collar, the datum
+those coordinates are expressed in. A check that reads control points under the declared datum and
+compares them with the printed graticule is therefore comparing two quantities that a datum error
+moves together — the mechanism §7.4 measures.
+
+**Figure 4 — a sheet prints its graticule and declares its datum; a check that uses both cannot test
+either.** A Lưới 6441-4, AMS Series L7014 (US Army Map Service; scan by the Perry-Castañeda Library,
+University of Texas at Austin). US Government work, public domain.
+
+![What one sheet supplies](figures/figure-4.pdf)
+
 ## §6 C2 method B — Indochine
 
 The Indochine 1:25,000 series has no embedded georeference, but it prints the required information.
@@ -386,16 +416,18 @@ similarity suggests. **Table 1** states this paper's thesis: rows are checks, co
 error classes.
 
 **Table 1 — which check sees which error class.**
-Legend: **✓** catches it · **·** silent · **—** not applicable · **∅** cannot fail by construction.
+Legend: **✓** catches it · **·** silent · **—** not applicable · **∅** cannot fail by construction ·
+**†** only where the fault is *partial* across the series, so that a displaced sheet borders an
+undisplaced one; a displacement common to every sheet leaves every seam closed (§7.3).
 
 | check | scope | misregistration inside the frame | the frame/datum itself wrong | two sheets on one cell | sheet-index entry wrong | serving/tile fault |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | Corner residual vs sheet layout — *Luft & Schiewe 2021* | per-sheet | ✓ | · | · | · | — |
-| Internal consistency: sides, diagonals, cm×dpi, paper bulge — *MapEdge 2025* | per-sheet | ✓ | · | · | ✓ | — |
+| Internal consistency: sides, diagonals, cm×dpi, paper bulge — *Meijers & Schoonman 2025* | per-sheet | ✓ | · | · | ✓ | — |
 | `graticule_error` — sheet's GCPs vs the graticule it prints | per-sheet | ✓ | **∅** | · | · | — |
 | Adjacency as a least-squares constraint — *Janata & Cajthaml 2020* | inter-sheet | ✓ | · | · | · | — |
 | …the same adjacency read back as a residual | inter-sheet | **∅** | **∅** | **∅** | **∅** | — |
-| **Seam census** (adjacency left free) | inter-sheet | ✓ | **✓** | ✓ | · | — |
+| **Seam census** (adjacency left free) | inter-sheet | ✓ | **✓ †** | ✓ | · | — |
 | **Lattice residual** | series | ✓ | · | · | ✓ | — |
 | **Lattice collision** | series | · | · | **✓** | ✓ | — |
 | **`pick_crs`** — neatline warped under both readings, judged against the cell | external | · | **✓** | · | · | — |
@@ -406,7 +438,8 @@ Three cells carry the argument, and each is sourced to a different paper's own d
 First, `graticule_error` on "frame/datum wrong" is `∅`, not `·`. It does not merely miss the fault;
 it cannot report it under those shared-input conditions. The sheet's control points are read into the
 sheet's own datum and compared against the graticule that same sheet prints, so a datum error moves
-both sides together — measured at 2e-12 on A Lưới against a real displacement (§7.4). Luft and
+both sides together — the check passed all 269 displaced sheets, and returns 2.167e-12 on a sheet
+it places correctly (§7.4). Luft and
 Schiewe's corner metric has
 the same shape, and says so without meaning to when it justifies corners on the grounds that
 neatlines "can be assumed to be drawn at the 'correct' place".
@@ -472,11 +505,24 @@ The distribution is not a diffuse consequence of paper distortion. The 36 hand-t
 the shared edge: the hand comparisons have medians of 438.0 m east/west and 133.7 m north/south,
 recombining to 457.9 m, close to the 454.9 m median CRS displacement.
 
-The free comparisons need to be distinguished from those hand-to-mosaic checks. In the corrected
-run, the free subsets include 715 PDF/PDF seams and 25 JPG/JPG seams; the latter span 0.0–0.6 m. A JPG/PDF seam
-uses the PDF sheet's departure from its lattice cell as one side of the comparison, because the
-hand workflow writes that cell as the ground half of its control point. It is therefore a useful
-archive diagnostic, but it is not the independent free seam described at the start of this section.
+The free comparisons need to be distinguished from those hand-to-mosaic checks. A JPG/PDF seam uses
+the PDF sheet's departure from its lattice cell as one side of the comparison, because the hand
+workflow writes that cell as the ground half of its control point. It is therefore a useful archive
+diagnostic, but it is not the independent free seam described at the start of this section. The free
+comparisons are the PDF/PDF and JPG/JPG seams; the 25 JPG/JPG seams span 0.0–0.6 m.
+
+Because the two warps differ in exactly one flag, the free seams can be read as a controlled A/B, and
+it is the free cohort that carries the result. The faulty pass leaves 189 of its 717 PDF/PDF seams
+more than 100 m open — 92 between 100 and 300 m and 97 above 300 m. The corrected pass, over a
+near-identical 715, leaves **none**: the worst free seam falls inside 100 m and the median improves
+from 9.2 m to 6.8 m (Figure 5). The two runs are separate builds rather than subsets of one
+population, which is why the PDF/PDF counts differ by two.
+
+This is also the limit of the instrument. What the seam census detects is *differential*
+disagreement across a shared edge, and it fired here only because the fault was partial: a displaced
+sheet was somewhere adjacent to an undisplaced one. Had every sheet in the series moved by the same
+vector, every seam would have closed exactly as before and this census would have reported nothing.
+The instrument found the fault because the fault had a boundary — the boundary Figure 6 maps.
 
 The seam anomaly was the first inexpensive indication, in this archive, that it had split into two
 spatial populations. The measurement needs neither a reference map nor a new set of control points:
@@ -485,9 +531,10 @@ disagreement that a per-sheet metric cannot see, provided adjacency has not alre
 condition of the solution. A common displacement preserves a seam, just as it preserves any other
 relative measurement.
 
-**Figure 4 — separate seam cohorts isolate a concentrated datum-boundary pattern.**
+**Figure 5 — free seam displacement before and after the datum correction. Every seam over 100 m —
+189 of them — disappears.**
 
-![Free-seam census](figures/figure-4.pdf)
+![Free-seam census](figures/figure-5.pdf)
 
 ### 7.4 The blind self-check
 
@@ -501,13 +548,37 @@ returns the input unchanged outside its area of use. The behaviour is non-unifor
 106.00 E, 16.00 N moves about 470 m, while one at 109.25 E, 13.25 N moves 0. The production archive
 therefore contains a discontinuity rather than one uniform translation.
 
-Our existing `graticule_error` check did not report it. On A Lưới it returns `2e-12`, effectively
-zero, despite the real displacement. This is not a numerical accident. The check reads control
-points into the sheet's declared datum and compares them with the graticule printed by that same
-sheet. A datum mistake translates both operands together. The check remains useful for errors it can
-see, such as a wrong zone, but it cannot test the datum shared by its two inputs. The number is thus
-an empirical instance of the `∅` rather than `·` distinction in Table 1: the fault cannot produce
-a non-zero result under this instrument.
+Our existing `graticule_error` check did not report it. In the faulty pass it rejected 11 of the 437
+warped sheets and passed all 269 that the CRS probe places 395–528 m from where they belong. This is
+not a sensitivity limit: the rejections it did issue fire between 0.004 and 0.076 degrees off the
+printed graticule, so the instrument has a working dynamic range and still returned nothing on a
+455 m translation. On A Lưới — which `pick_crs` resolves to its declared CRS, and whose CRS
+displacement is 0.0 m — it returns `2.167e-12`. The check reads control points into the sheet's
+declared datum and compares them with the graticule printed by that same sheet, so a datum mistake
+translates both operands together. It remains useful for errors it can see, such as a wrong zone or
+a sheet off its grid, but it cannot test the datum shared by its two inputs. This is an empirical
+instance of the `∅` rather than `·` distinction in Table 1: the fault cannot produce a non-zero
+result under this instrument.
+
+The same check failed a second time, in the opposite direction, and the second failure is worth
+recording because it is the first one's mirror. `graticule_error` read its transformed coordinate
+pair positionally, and the two spatial-reference objects it compares disagree about axis order while
+reporting the same axis strategy. Every sheet the datum correction moved was therefore transposed,
+producing an apparent error of tens of degrees, and **370 of 437 sheets were rejected — the datum fix
+thrown out by the check it was meant to supersede**. Pinning both operands to traditional order took
+the rejections from 370 to 1. A check that cannot see a real fault and a check that rejects a real
+correction are the same defect seen from two sides: in neither case was the quantity being compared
+the quantity the reader assumed.
+
+The fault is also not uniform across the series, and its shape is geographic rather than random.
+Figure 6 places all 627 indexed cells and colours each by the route its sheet took. The 269
+displaced sheets fall in two groups, north and south, separated by a band between roughly 14°N and
+17°N in which no sheet took the faulty route at all. That band is why a single probe can mislead:
+the archive holds two spatial populations, not one translated whole.
+
+**Figure 6 — the fault in geographic space, and the denominators it reconciles.**
+
+![Where the datum fault fell](figures/figure-6.pdf)
 
 ### 7.5 The outside opinion
 
@@ -527,21 +598,32 @@ requires.
 
 ### 7.6 The fix, validated without being applied
 
-Applying the explicit Helmert transformation in a dry run over all 437 GeoPDF sheets changes the
-median cell miss from 430 m to 0 m. The 95th percentile is 9 m, the maximum is 115 m, and no sheet
-misses its cell by more than 150 m. The same method leaves the 24 hand-georeferenced sheets outside
-the fault: their control-point residuals remain 2.3–19.0 m RMS. These figures validate the proposed
-interpretation and correction; they do not describe a rebuilt public mosaic.
+Applying the explicit Helmert transformation in a dry run changes which sheets reach their cell at
+all. The corrected pass warps 436 sheets to the faulty pass's 437, and 434 of them land on their
+cell against 161 before. Sheets more than 150 m off their cell fall from 276 of 437 to 2 of 436. The
+median miss among on-cell sheets barely moves — 11 m before, 10 m after — because the correction
+does not improve sheets that were already placed; it moves displaced sheets onto their cells. For
+the same reason the worst on-cell miss rises, from 50 m to 95 m, as 273 sheets join that population.
+The two the correction leaves off cell are `6630-4` Xa Phan Thiet (mean 662 m) and `6349-4` Cua Tra
+Ly (mean 396 m); in both the worst corner far exceeds the mean, which reads as a distorted or
+mis-clipped outline rather than a datum problem. The same method leaves the 24 hand-georeferenced
+sheets outside the fault: their control-point residuals remain 2.3–19.0 m RMS. These figures
+validate the proposed interpretation and correction; they do not describe a rebuilt public mosaic.
 
-That distinction is deliberate. At the time of writing, the live `l7014-20260913` archive has not
-been re-warped or re-uploaded, and its archive-level `fit` check still fails. The published fault is
+That distinction is deliberate, and the live state is worse than "uncorrected". At the time of
+writing the `l7014-20260913` archive has not been re-warped or re-uploaded, and its sheet manifest
+returns 404: the build shipped pixels without the accompanying `.geojson`, so `fit` cannot be run
+against the serving layer at all and the 452 constant quoted in §3 cannot be checked against it. What
+readers currently receive is therefore not merely displaced but unmeasurable from outside — itself an
+instance of §7.7's point that a serving layer needs its own instrument. The published fault is
 therefore part of the result, not a historical problem retrospectively erased from the evidence. A
 rebuild is an operational next step; reporting the dry run separately prevents it from being mistaken
 for a measurement of the current serving layer.
 
-**Figure 5 — cell miss in the all-437-sheet dry run: the median collapses from 430 m to 0 m.**
+**Figure 7 — the dry run moves sheets onto their cells: 161 → 434 on cell, 276 → 2 off by more than
+150 m.**
 
-![Datum-correction dry run](figures/figure-5.pdf)
+![Datum-correction dry run](figures/figure-7.pdf)
 
 ### 7.7 One layer down: a serving check
 
@@ -559,7 +641,7 @@ full-resolution request does not test the tile keys a viewer will actually reque
 instrument is a tile-key audit against keys present in the object store; it has no opinion about
 datum, lattice or seam geometry, and those checks have no opinion about it.
 
-**Figure 6 — a request can be valid IIIF syntax and still miss the server's tile grid.**
+**Figure 8 — a request can be valid IIIF syntax and still miss the server's tile grid.**
 
 ```mermaid
 flowchart LR
@@ -619,7 +701,25 @@ checks, which is precisely why its residual must not be made to imply more. The 
 is part of the method here: series membership, editions, gaps and serving routes are not merely catalogue
 metadata when they determine which verification relations can be computed.
 
-## §10 Data and code availability
+## §10 Conclusion
+
+A georeferenced map series arrives with more evidence about itself than a single sheet can offer, and
+the practical question is not how much of it to gather but what each piece is still free to say. We
+published 269 sheets of a 437-sheet series between 395 and 528 m from where they belong. The check
+that should have caught it returned effectively zero, not because the fault was small or the code was
+wrong, but because the quantity it compared had the error on both sides. Two instruments did see it:
+a free seam census, which cost nothing beyond two sheets claiming a shared edge and worked only
+because the fault had a geographic boundary, and an outside CRS decision that was allowed to refuse.
+
+The generalisable part is not the magnitude, which is particular to this archive, nor the
+instruments, which are not new. It is the bookkeeping: a verification check has a scope and a set of
+inputs it has already committed to, and those two facts determine which error classes it can still
+report. Table 1 is that bookkeeping for the checks we use and for three published ones, and every
+`∅` in it is the ordinary consequence of a sound design — including our own, which is the worst row
+in the table. Stating a residual without stating its scope is therefore not a small omission. It is
+the omission that let a 455 m error render, pass its check, and ship.
+
+## §11 Data and code availability
 
 The archive's derived data — georeference annotations, sheet and printing indexes, verification
 outputs and code used to produce them — will be deposited under CC-BY-4.0 in a versioned Zenodo
@@ -635,7 +735,7 @@ the source and measurement date of every number quoted in this paper. The servin
 versioned separately from a proposed correction: reproducibility requires readers to distinguish
 the evidence measured on the current layer from the dry run that supports its rebuild.
 
-**Figure 7 — reproducibility boundary.**
+**Figure 9 — reproducibility boundary.**
 
 ```mermaid
 flowchart LR
@@ -651,8 +751,15 @@ flowchart LR
 
 The bibliography below contains only works cited in this draft. Every entry with a DOI was resolved
 against stored publisher metadata on 2026-09-20 and screened for editorial notices; none carries a
-retraction, correction or expression of concern.
+retraction, correction or expression of concern. Two entries carry a year that differs from the one
+their publisher's house style prints, because we use the date in the publisher's own Crossref deposit
+rather than the volume year: Janata and Cajthaml is deposited as 30 December 2020 although *Applied
+Sciences* 11(1) is a 2021 volume, and Burt et al. is deposited as 2019 although *CaGIS* 47(1) is a
+2020 issue.
 
+- Burt, J. E., White, J., Allord, G. J., Then, K. M., & Zhu, A.-X. (2019). Automated and
+  semi-automated map georeferencing. *Cartography and Geographic Information Science*, 47(1), 46–66.
+  https://doi.org/10.1080/15230406.2019.1604161
 - Gede, M., & Varga, L. (2021). Automatic georeferencing of topographic map sheets using OpenCV and
   Tesseract. *Proceedings of the International Cartographic Association*, 4, 38.
   https://doi.org/10.5194/ica-proc-4-38-2021
@@ -687,9 +794,9 @@ retraction, correction or expression of concern.
 - Tyagi, P., & Dubey, V. (2026). Automated georeferencing of topographic maps via OCR and
   in-context multimodal LLM reasoning. In *NCVPRIPG 2025 proceedings* (pp. 99–113).
   https://doi.org/10.1007/978-3-032-08511-5_8
-- Uhl, J. H., Leyk, S., Chiang, Y.-Y., Duan, W., & Knoblock, C. A. (2018). Map archive mining:
-  Visual-analytical approaches to explore large historical map collections.
-  https://doi.org/10.20944/preprints201803.0021.v2
+- Uhl, J., Leyk, S., & Chiang, Y.-Y. (2018). Map archive mining: Visual-analytical approaches to
+  explore large historical map collections. *ISPRS International Journal of Geo-Information*, 7(4),
+  148. https://doi.org/10.3390/ijgi7040148
 - Wijegunarathna, R., Stock, K., & Jones, C. (2025). Large multi-modal model cartographic map
   comprehension for textual locality georeferencing. *GIScience 2025*.
   https://doi.org/10.4230/LIPIcs.GIScience.2025.12

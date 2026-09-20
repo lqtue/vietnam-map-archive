@@ -148,6 +148,8 @@ sheet numbers 0 rows out of order
 | hand-extended cohort | **778** total: 717 PDF/PDF + 36 JPG/PDF + 25 JPG/JPG; median 9.2 m; 111 over 300 m | ibid |
 | hand-to-mosaic subset | **36** JPG/PDF seams, spanning 1.8–446.2 m; seam components median 438.0 m E/W and 133.7 m N/S, recombined 457.9 m | `regen/seams-faulty-hand.csv`, 2026-09-20 |
 | free subsets in corrected run | 715 PDF/PDF and 25 JPG/JPG; JPG/JPG spans 0.0–0.6 m | ibid |
+| **free-seam A/B, binned** (Figure 5) | PDF/PDF only. faulty **377 / 149 / 2 / 92 / 97**, corrected **492 / 218 / 5 / 0 / 0** over bins 0–10 / 10–50 / 50–100 / 100–300 / >300 m. **189** faulty seams exceed 100 m; **0** corrected ones do. Median 9.2 m → **6.8 m** | `regen/seams-faulty.csv` + `seams-fixed.csv`, binned 2026-09-20 |
+| **the fault in space** (Figure 6) | of 627 cells: **269** warped and displaced, **168** warped and placed, **73** held but not warped, **117** not held. No `indian1960` sheet between **14°N and 17°N** | `figures/fault-map.json`, from `lattice.json` + `regen/datum-split.csv`, 2026-09-20 |
 
 ### 3.3 The datum traps (absolute)
 
@@ -157,10 +159,13 @@ sheet numbers 0 rows out of order
 | sheets shipped that way | **276 by fit / 269 by CRS displacement**, of 437 | ibid |
 | `fit` verdict on the shipped archive | 341 of 452 sheets more than 150 m off their cell | ibid |
 | PROJ non-uniformity (probed) | `106.00,16.00` moves **470 m**; `109.25,13.25` moves **0** | ibid |
-| the blind self-check | `graticule_error` returns `2e-12` on A Lưới — both sides move together | ibid |
+| the blind self-check, at population scale | in the faulty pass `graticule_error` rejected **11 of 437** and passed **all 269** displaced sheets; the rejections it did issue fire at **0.004–0.076 deg** off the printed graticule, so this is not a sensitivity limit | `regen/warp-faulty.log`, 2026-09-20 |
+| **A Lưới is _not_ a displaced sheet** | `6441-4` resolves to `declared`, CRS displacement **0.00 m**; `graticule_error` **2.167e-12**. It demonstrates the blind check on a *correctly placed* sheet. Never describe it as displaced — the earlier "2e-12 against a real 470 m displacement" conflated two sheets | `regen/datum-split.csv` + `REGEN.md`, 2026-09-20 |
 | the outside opinion | `pick_crs` judges two candidates ~470 m apart against a 15′ cell good to ~15 m; refuses rather than take the smaller miss | ibid |
 | the Helmert | Everest 1830 (1937 Adj.) `+a=6377276.345 +rf=300.8017 +towgs84=198,881,317` | ibid |
-| dry run of the fix, all 437 | median **430 m → 0 m**, p95 **9 m**, max **115 m**, none over 150 | `pipelines.md` |
+| `fit`, faulty pass | **161 of 437** on cell, median **11 m**, worst **50 m**; **276** more than 150 m off cell | `regen/fit-faulty.log`, 2026-09-20 |
+| `fit`, corrected pass | **434 of 436** on cell, median **10 m**, worst **95 m**; **2** more than 150 m off cell — `6630-4` Xa Phan Thiet (mean 662 m, worst 2623 m) and `6349-4` Cua Tra Ly (mean 396 m, worst 1565 m) | `regen/fit-fixed.log`, 2026-09-20 |
+| ~~dry run of the fix: median 430 m → 0 m, p95 9 m, max 115 m, none over 150~~ | **withdrawn 2026-09-20.** Sourced to `pipelines.md`, which predates the controlled A/B. `fit` reports no all-sheet median — it reports a median over the *on-cell* subset plus a count of off-cell sheets, so "430 → 0" was never a statistic `fit` computes. Superseded by the two rows above | — |
 | ArcGIS index, shifted correctly | agrees with the GeoPDFs' own `NEATLINE` to **4–17 m** | `architecture.md` |
 | hand-georeferenced sheets | 2.3–19.0 m rms, unaffected | ibid |
 
@@ -234,6 +239,14 @@ stops here"*. MapEdge has no inward walk — that is `scripts/l7014_neatline.py`
 `allmaps-series-note.md:109` and `docs/private/allmaps.md:195` were correct all along; this file
 compressed the sentence and reassigned the method to Meijers & Schoonman. Caught by reading the
 paper in full. Recorded rather than silently rewritten, per the `note:` convention.
+
+**Correction, 2026-09-20.** §3.3's dry-run row and blind-self-check row were both stale against
+`work/l7014/regen/`, which is the source and therefore wins. Two claims that had reached `draft.md`
+were wrong, not merely imprecise: A Lưới was described as a displaced sheet (it is not — 0.00 m,
+`declared`), and the correction was said to leave no sheet more than 150 m off its cell (it leaves
+two). `REGEN.md`'s "Against the paper's claims" table had already marked both **revise**; the
+2026-09-20 claim audit transcribed seven of its nine revise rows and missed these. Recorded rather
+than silently rewritten, per the `note:` convention.
 
 ## Changelog of this file
 
