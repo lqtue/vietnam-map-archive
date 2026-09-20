@@ -1,0 +1,69 @@
+# Claim and evidence audit
+
+**Audit date:** 2026-09-20. This is an authoring record, not paper prose. It prevents a useful
+archive incident from becoming an unwarranted priority or generalisation claim.
+
+## Evidence labels
+
+| label | meaning |
+|---|---|
+| A | reproduced in this audit from the current repository or production service |
+| B | recorded run and source file exist, but the result was not reproduced in this environment |
+| C | checked against a retrieved publication, including editorial-notice screening in Scite |
+| D | logical statement under explicitly stated inputs; not an empirical prevalence claim |
+| R | revise, qualify, or remove before submission |
+
+## Reproduction ledger
+
+| claim or number | status | current evidence | consequence for draft |
+|---|---|---|---|
+| catalog: 274 maps, 252 published, 174 IIIF sources, 160 jobs, 21 queued | A | `node --env-file=.env scripts/catalog_audit.mjs --quiet`, 2026-09-20 | Reproduced live totals; do not substitute them for the older OCR/gazetteer/footprint counts. |
+| L7014 461 held/627; Indochine 75/79; 0 adrift/dangling/unindexed over 706 cells | A | `node --env-file=.env scripts/check_series_index.mjs`, 2026-09-20 | Reproducible live coverage. |
+| 274 maps and 253 usable GCP sets | A | `node --env-file=.env scripts/geo_audit.mjs --quiet`, 2026-09-20 | Reproduces a current inventory only. |
+| L7014 A/B: 437 denominator, fault population, displacement, seam census | A | re-run 2026-09-20, `work/l7014/regen/REGEN.md`; controlled A/B on one flag (`l7014_mosaic.py warp --no-datum-shift`) | Reproduced, but several numbers move: fault population **276** (`fit`) / **269** (CRS displacement), not 285; displacement **395–528 m, median 455**, not "~470"; seams **717**, median **9.2 m**, **97** over 300 m, not 750 / 19 m / 56. |
+| 33 hand-to-mosaic seams at 447–504 m | **R** | `scripts/l7014_hand.py` + `regen/seams-faulty-hand.csv`, 2026-09-20 | Does not reproduce. **36** such seams, spanning **1.8–446.2 m**, none in that band. A seam returns only the component normal to the shared edge: median **438.0 m** E/W, **133.7 m** N/S, recombining to **457.9 m** against a median CRS displacement of 454.9 m. The band is a displacement magnitude, not a seam. Rewrite §7.3 or move the number to §7.2. |
+| hand sheets are not a free seam | **R** | `corners` writes the lattice cell as the ground half of every hand control point | A `jpg / pdf` seam measures the pdf sheet's departure from its cell, so it is not the independent join §7.3 opens with. The free ones are the 715 `pdf / pdf` and the 25 `jpg / jpg` (**0.0–0.6 m**, which sharpens "2.5–14 m"). Say which is which. |
+| A Lưới `graticule_error = 2e-12` | B + D | recorded in `docs/pipelines.md`; zero mechanism follows when the same datum translation is applied to both operands | Case-study exhibit, not evidence of prevalence elsewhere. |
+| Indochine lattice, `Ha Noi` collision, neatline/rim readings | B | `allmaps-series-note.md`, surfaced by `figures.md` | Include provenance artifacts in the release package. |
+| fixture and geometry invariants | A | `catalog_audit --self-check`, `check_series_index --self-check`, `geo_audit --self-test`, `georef_error.py --self-check` all passed | These validate code behavior, not production measurements. |
+
+## Claims that survive, claims that need limits
+
+| location | claim | status | required wording |
+|---|---|---|---|
+| §1/§3 | 514 processed sheets | B | State it is the recorded run ledger and distinguish it from current annotation availability. |
+| §2.1/§7.4 | common frame error is invisible to a self-check using that same frame | D | State the common-input condition; do not say every lattice check is blind. |
+| §2.2 | an imposed seam has zero residual in its fitted representation | D | It says nothing by itself about independent external accuracy. |
+| §2.3 | “most developed” per-sheet battery | R | Removed: the review cannot establish field priority. |
+| §7.1 | `∅` “cannot fail by construction” | D | A definition under named inputs, not a universal assertion about all implementations. |
+| §7.2 | duplicate occupancy | D/R | A review flag; it may be an intentional alternative edition, a printed anomaly, or a transcription error. |
+| §7.3 | “first inexpensive indication” | B/R | Limit to “first ... in this archive.” A free seam detects differential disagreement, not a common translation. |
+| §9 | “pattern generalises” | R | Replace with “reasoning may apply where stated structural conditions hold.” |
+| §10 | Zenodo release | R | Explicitly prospective until the DOI and artifacts exist. |
+
+## Literature screen and novelty boundary
+
+The targeted review covered multi-sheet registration, accuracy evaluation, independent
+control/landmark checks, reference frames, and sheet boundaries. It is a focused review, **not an
+exhaustive systematic review** and therefore cannot prove absence of prior conceptual work.
+
+- Lattice/corner and adjacency information are already used in series georeferencing and adjustment
+  (Luft & Schiewe, 2021; Janata & Cajthaml, 2020) [C].
+- Independent control/landmark or reference-frame evaluation is established practice; this paper
+  does not invent it (Bozzano et al., 2024; Ingensand et al., 2022; Xu et al., 2026) [C].
+- Recent work reports gaps, overlaps, and persistent feature misalignment after georeferencing
+  (Piškinaitė & Veteikis, 2023; Wang et al., 2022) [C].
+- Kuna et al. (2024) closely supports the narrower point that good geometric parameters do not by
+  themselves establish a correct reference-frame relationship [C].
+
+The contribution that survives the screen is a documented archive case with a large shared datum
+displacement and a self-check predictably silent under named shared inputs, plus a compact taxonomy
+of check scope, already-committed inputs, detectable faults, and blind spots. It is not the first
+use of lattices, seams, independent checkpoints, or external validation, nor evidence that the
+observed magnitude or frequency applies generally.
+
+## Submission requirement
+
+Before submission, deposit immutable or regenerable versions of the L7014 lattice, mosaic GeoJSON,
+source-manifest hashes, raw seam table, `fit` and correction dry-run outputs, and exact commit /
+environment commands. Until then, label B rows as recorded runs.
