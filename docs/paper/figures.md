@@ -144,18 +144,17 @@ sheet numbers 0 rows out of order
 
 | figure | value | source |
 |---|---|---|
-| adjacent seams measured | 750 | `docs/architecture.md` |
-| median | 19 m | ibid |
-| over 300 m | 56 | ibid |
-| where a hand-georeferenced sheet meets the mosaic | **all 33** at 447–504 m | ibid |
-| correctly-warped seams | 2.5–14 m, inside the series' own ±25 m drafting accuracy | ibid |
+| mosaic-only cohort | **717** PDF/PDF seams; median 9.2 m; 97 over 300 m | `work/l7014/regen/REGEN.md`, 2026-09-20 |
+| hand-extended cohort | **778** total: 717 PDF/PDF + 36 JPG/PDF + 25 JPG/JPG; median 9.2 m; 111 over 300 m | ibid |
+| hand-to-mosaic subset | **36** JPG/PDF seams, spanning 1.8–446.2 m; seam components median 438.0 m E/W and 133.7 m N/S, recombined 457.9 m | `regen/seams-faulty-hand.csv`, 2026-09-20 |
+| free subsets in corrected run | 715 PDF/PDF and 25 JPG/JPG; JPG/JPG spans 0.0–0.6 m | ibid |
 
 ### 3.3 The datum traps (absolute)
 
 | figure | value | source |
 |---|---|---|
-| displacement | ~470 m northwest | `docs/pipelines.md` trap 1 |
-| sheets shipped that way | **285 of 437** | ibid |
+| displacement | 395–528 m, median 455 m | `work/l7014/regen/REGEN.md`, 2026-09-20 |
+| sheets shipped that way | **276 by fit / 269 by CRS displacement**, of 437 | ibid |
 | `fit` verdict on the shipped archive | 341 of 452 sheets more than 150 m off their cell | ibid |
 | PROJ non-uniformity (probed) | `106.00,16.00` moves **470 m**; `109.25,13.25` moves **0** | ibid |
 | the blind self-check | `graticule_error` returns `2e-12` on A Lưới — both sides move together | ibid |
