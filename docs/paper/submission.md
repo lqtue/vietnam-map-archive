@@ -51,6 +51,7 @@ Georeferencing a historical map series is usually described as a per-sheet probl
 
 - [ ] Zenodo deposited, DOI pasted into §10 of `draft.md`, `node scripts/render-paper.mjs` re-run,
       `tectonic` re-run, PDF re-checked.
-- [ ] Janata & Cajthaml dated 2020 here per stored metadata; the *Applied Sciences* issue carries
-      2021. One look at the publisher page settles it.
+- [x] Janata & Cajthaml year — **resolved 2026-09-20, 2020 is correct and the draft already had
+      it.** MDPI's page prints 2021 because volume 11 is a 2021 volume; the publisher's Crossref
+      deposit gives 2020-12-30 and no print date. See `claim-audit.md`.
 - [ ] Confirm the ORCID record lists this preprint once EarthArXiv assigns the DOI.
