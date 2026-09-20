@@ -20,9 +20,12 @@ before and after correction, the number with median outline separation above 100
 the CRS-selection check and comparison lattice share the adopted Helmert parameters. A second
 case, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner
 readings can still assign two sheets to the same cell. Together these cases support a taxonomy of
-verification scope, committed inputs, detectable faults, and blind spots. The contribution is a
-reproducible account of how checks can remain silent under specific shared assumptions, with
-explicit separation of source control, build measurements, and serving-state evidence.
+verification scope, committed inputs, detectable faults, and blind spots; the taxonomy is drawn from
+two cases in one project and is offered as an organizing account of this failure mode, not a claim
+that it generalizes across archives or pipelines. The contribution is an
+account, structured for reproducibility, of how checks can remain silent under specific shared
+assumptions, with explicit separation of source control, build measurements, and serving-state
+evidence; the derived data and code supporting that reproduction are pending deposit (§11).
 
 <!--block:B0005-->
 **Keywords:** historical maps · georeferencing · map series · verification · reference frames ·
@@ -341,7 +344,10 @@ count and 62 pipeline-georeferenced Indochine sheets. Because the 452 is a hand-
 publication constant that cannot be checked against the missing serving manifest (§7.6), the sum
 is an archive-reported total, not a verified count of processed or currently served sheets. The
 measured populations below supply the denominators for the results. The L7014 material dates from
-the 1960s–70s; the Indochine material from 1903–1927.
+the 1960s–70s; the Indochine material from 1903–1927. The Indochine sheets are colonial-era survey
+products of the Service géographique de l'Indochine, and their control and coverage reflect the
+administrative priorities of that survey rather than a neutral sampling of the territory; we make no
+claim about the map content beyond the geometric properties used for verification here.
 
 <!--block:B0049-->
 Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them
@@ -390,7 +396,11 @@ key and sheet number. A served sheet records the archive's present route to that
 `maps` row, a raster in a pre-tiled mosaic, or an unheld gap. A printing records an edition at a
 particular institution, including its title, date, part and source identifier. The distinction is not
 abstract: the same cell can be reprinted years apart, renamed, or issued as eastern and western
-halves before a later assembly.
+halves before a later assembly. The three-way split echoes the FRBR work/expression/manifestation/item
+separation long used in archival and library cataloguing (IFLA Study Group on the Functional
+Requirements for Bibliographic Records, 2009); we adopt a coarser, three-entity version of that
+precedent because the archive's verification relations operate at the cell and served-sheet levels,
+not at FRBR's finer expression grain.
 
 <!--block:B0056-->
 This model makes the denominator visible. The ordinary `maps` table contains only successful archive
@@ -608,7 +618,10 @@ their separation using a local longitude/latitude-to-metre approximation. The ed
 the median of these distances; the reported census median is the median across edges. The 100 m
 and 300 m cutoffs summarize the observed tail, rather than define independently calibrated
 acceptance thresholds. For nearly straight parallel edges the distance principally reflects
-normal separation; it need not recover along-edge displacement or a full displacement vector.
+normal separation; it need not recover along-edge displacement or a full displacement vector. The
+25-point, 10–90%-of-length sampling design was fixed by inspection rather than swept for sensitivity
+to sample count or window; we report this as an open parameter rather than a calibrated choice, and
+expect the census's bin counts, not its exact median, to be the figure robust to that choice.
 
 <!--block:B0087-->
 The lattice compares sheets to the series frame. A seam compares each sheet to its neighbour while
@@ -750,7 +763,11 @@ transformed registration point. Registration coordinates come from embedded GCPs
 vertices as the fallback. It selects the candidate with the smaller score only if that score
 is at most 150 m. If every available candidate exceeds that threshold, it rejects the sheet.
 If no score can be computed, however, the implementation retains the declared or fallback CRS;
-this case is not verified by the lattice decision.
+this case is not verified by the lattice decision. The 150 m threshold was set as a generous
+ceiling against gross datum or projection mismatches, not derived from the ~15 m index-to-outline
+agreement scale reported below; the two figures answer different questions — 150 m gates a
+candidate CRS in or out, 15 m describes how tightly an accepted candidate then agrees — and we
+have not established what a tighter `pick_crs` threshold would cost in false rejections.
 
 <!--block:B0141-->
 The reference is external to an individual GeoPDF declaration, but it is not independent of the
@@ -771,7 +788,12 @@ agreement identifies a compatible interpretation conditional on the adopted fram
 ### 7.6 The fix, validated without being applied
 
 <!--block:B0107-->
-Applying the explicit Helmert transformation in a dry run changes which sheets reach their cell at
+The faulty and corrected passes compared below isolate exactly one pipeline flag
+(`l7014_mosaic.py warp --no-datum-shift`); no other stage of the build changed between them, so the
+before/after difference reported here is attributable to the datum-transformation step alone. This
+correction has been verified only by the same author and pipeline that produced the original
+datum-blindness fault; it has not yet been independently reproduced by a third party. Applying the
+explicit Helmert transformation in a dry run changes which sheets reach their cell at
 all. The corrected pass warps 436 sheets to the faulty pass's 437, and 434 of them land on their
 cell against 161 before. Sheets more than 150 m off their cell fall from 276 of 437 to 2 of 436. The
 median miss among on-cell sheets barely moves — 11 m before, 10 m after — because the correction
@@ -871,7 +893,11 @@ can mean before reporting it. Every verification check has a scope, and some che
 frame or adjacency relation that the georeferencing procedure already assumed. Such a check may be
 entirely appropriate for detecting local misregistration while being incapable of detecting a
 shared displacement. The useful question is therefore not whether a residual is small in isolation,
-but which error classes could have made it small.
+but which error classes could have made it small. This is a structural instance of the test oracle
+problem in software testing: an oracle is only as independent as the process that supplies it, and
+a relation-based check — asking whether an output is *consistent* rather than *correct* — inherits
+that limitation whenever the relation is derived from the same artefact it verifies (Barr, Harman,
+McMinn, Shahbaz & Yoo, 2015).
 
 <!--block:B0123-->
 For a regular series, this yields a practical ordering of checks. Begin with low-cost relations the
@@ -879,7 +905,21 @@ series itself supplies: lattice spacing, one-to-one cell occupancy and free seam
 the claim to be tested. The `pick_crs` decision provides a narrower consistency check (§7.5).
 Do not turn a diagnostic relation into a hard constraint if it will later be the only available test
 of that relation. And preserve refusal as an outcome: an anomalous sheet is information for review,
-not an invitation to publish the least implausible transformation.
+not an invitation to publish the least implausible transformation. This ordering is offered
+retrospectively: the build that shipped the fault did not follow it, and the fault is the reason the
+ordering exists rather than evidence that a project working from it in advance would have caught
+this class of error unaided.
+
+<!--block:B0123b-->
+The failure was also organisational, not only algorithmic. The graticule check and the CRS-selection
+step were written and reviewed as separate units of work, each locally reasonable, without anyone
+asking whether the second step's inputs already depended on an assumption the first step existed to
+test. Nothing in the code review process flagged the shared Helmert parameters as a shared premise,
+because no step in that process asked what a passing check had already assumed. The algorithmic
+mechanism in §7.4 explains why the check could not have caught this fault; it does not by itself
+explain why a check with that structure was the one that shipped. That second question is a process
+question, not a geometry one, and it is the reason the ordering above is stated as a checklist rather
+than left implicit in the method.
 
 <!--block:B0124-->
 The reasoning may apply beyond these two series where its structural conditions hold. A seam census
@@ -956,6 +996,9 @@ Sciences* 11(1) is a 2021 volume, and Burt et al. is deposited as 2019 although 
 2020 issue.
 
 <!--block:B0136-->
+- Barr, E. T., Harman, M., McMinn, P., Shahbaz, M., & Yoo, S. (2015). The oracle problem in software
+  testing: A survey. *IEEE Transactions on Software Engineering*, 41(5), 507–525.
+  https://doi.org/10.1109/TSE.2014.2372785
 - Burt, J. E., White, J., Allord, G. J., Then, K. M., & Zhu, A.-X. (2019). Automated and
   semi-automated map georeferencing. *Cartography and Geographic Information Science*, 47(1), 46–66.
   https://doi.org/10.1080/15230406.2019.1604161
@@ -965,6 +1008,9 @@ Sciences* 11(1) is a 2021 volume, and Burt et al. is deposited as 2019 although 
 - Heitzler, M., Gkonos, C., Tsorlini, A., & Hurni, L. (2018). A modular process to improve the
   georeferencing of the Siegfried map. *e-Perimetron*, 13(2), 85–100.
   http://www.e-perimetron.org/Vol_13_2/Heitzler_et_al.pdf
+- IFLA Study Group on the Functional Requirements for Bibliographic Records. (2009). *Functional
+  requirements for bibliographic records: Final report* (2009 amended and corrected ed.).
+  International Federation of Library Associations and Institutions. https://doi.org/10.82487/ifla.811
 - Ingensand, J., Lecorney, S., & Blanc, N. (2022). An open API for 3D-georeferenced historical
   pictures. *The International Archives of the Photogrammetry, Remote Sensing and Spatial Information
   Sciences*, XLVIII-4/W1-2022, 217–222.
