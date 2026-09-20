@@ -187,6 +187,26 @@ verify, write `footprint_submissions.tags jsonb`. LoD2 = footprint × levels × 
 shape → CityJSON. **Add the `tags` column with the first writer, not before.**
 Start only after E2 shows stable, reviewed fabric on ≥ 3 maps.
 
+**Why OSM tags and not CityJSON first** (recorded 2026-09-20). Simple 3D Buildings is a schema
+the owner already worked in at Tasco, and it renders today in open-source WebGL clients
+(StreetGL, OSM Buildings) with nothing written. CityJSON needs a pipeline before anything is
+visible. Tags first is the shorter path to a picture, and it closes no door: tags → CityJSON is
+the `× levels × 3 m` line above, and `cjio` is there when a geomatics collaborator wants the
+standard format. `docs/archive/4d-city-model-plan.md` is CityJSON-first; it is frozen, and E5
+supersedes it on this point.
+
+**And the tag split is the honesty mechanism, so do not collapse it.** `building:levels` is a
+**count** — an oblique view can support it, because storeys are countable in an engraving.
+`height` is **metres**, which no pictorial panorama can establish. Write `building:levels`;
+leave `height` unset and let the renderer apply its own default. The `× 3 m` above is a
+rendering convenience, **never a value to store** — the moment it lands in a `height` tag the
+archive is asserting a measurement it does not have. Same rule as `geom_rmse`: carry the
+uncertainty, do not launder it.
+
+**Where it goes to be seen.** OSM tags plus `start_date`/`end_date` is OpenHistoricalMap's own
+model, and OHM is already listed as an open-ecosystem home in `docs/private/network.md` §5. So
+the chain is tags → OHM → renders, with no new format anywhere in it.
+
 ---
 
 ## Cross-cutting
