@@ -19,12 +19,12 @@
   import {
     fetchExtractions,
     batchSetStatus,
-    revertRecent,
     withEditState,
     markRowSaving,
     saveRowStatus,
     saveRowText,
     isRowDirty,
+    reviewedCategory,
     type OcrStatus,
   } from '../shared/ocrApi';
   import { toggleSort as nextSort, applySort } from '$lib/core/utils/tableSort';
@@ -57,7 +57,8 @@
   let statusCounts: Record<string, number> = {};
   let availableRuns: string[] = [];
 
-  let filterStatus: '' | 'pending' | 'validated' | 'rejected' = '';
+  /** A reviewer arrives at undecided work; history is an explicit choice. */
+  let filterStatus: '' | 'pending' | 'validated' | 'rejected' = 'pending';
   let filterSearch = '';
   /** What the box holds right now; `filterSearch` is what the table answers to. */
   let searchInput = '';
@@ -113,7 +114,7 @@
       if (filterStatus && e.status !== filterStatus) return false;
       if (filterRunId && e.run_id !== filterRunId) return false;
       if (e.confidence < filterMinConf) return false;
-      if (!filterCategories.has(e.category)) return false;
+      if (!filterCategories.has(reviewedCategory(e))) return false;
       if (filterSuspectOnly && !suspects.has(e.id)) return false;
       if (jobOf(e, regions) !== job) return false;
       if (filterSearch.trim()) {
@@ -143,12 +144,12 @@
   $: shownRows = visible.slice(0, renderCap);
 
   // What the loaded rows actually hold, so the chips are the sheet's own
-  // vocabulary rather than the whole one. Counted off `category`, which is what
-  // the chip filters on — not `_editCategory`, which is the unsaved edit.
-  $: categoryCounts = extractions.reduce<Record<string, number>>(
-    (acc, e) => ({ ...acc, [e.category]: (acc[e.category] ?? 0) + 1 }),
-    {}
-  );
+  // vocabulary rather than the whole one. A saved correction is the category
+  // a reviewer sees and filters, not the machine's original guess.
+  $: categoryCounts = extractions.reduce<Record<string, number>>((acc, e) => {
+    const category = reviewedCategory(e);
+    return { ...acc, [category]: (acc[category] ?? 0) + 1 };
+  }, {});
   $: jobTally = jobCounts(extractions, regions);
   $: dispatch('counts', jobTally);
   /** The job's own row count, before the confidence floor and the chips. */
@@ -210,20 +211,21 @@
    * confidence, drag the floor up until the rows look right, then accept or
    * reject the lot. One PUT.
    *
-   * Both verdicts remember their ids, because the server's ⟲ only undoes
-   * *validations* (`revert_recent_validations` matches on `validated_by`, and
-   * a rejected row carries none). Without that memory a mis-aimed reject of a
-   * thousand rows would have no undo at all — which is most of the reason the
-   * button did not exist before.
+   * Both verdicts remember their ids so the result notice can undo precisely
+   * this operation. A reject has no validation stamp, so a broad time-window
+   * revert could never have safely recovered it.
    */
   async function batchVerdict(status: 'validated' | 'rejected') {
+    // A model pass is the unit that can be trusted or rolled back. Never let
+    // the default "All runs" view silently make a batch decision across runs.
+    if (!filterRunId) return;
     const ids = visible.filter((e) => e.status === 'pending').map((e) => e.id);
     if (!ids.length) return;
     const verb = status === 'validated' ? 'Validate' : 'Reject';
     const floor = Math.round(filterMinConf * 100);
     if (
       !confirm(
-        `${verb} ${ids.length} shown label${ids.length === 1 ? '' : 's'} (confidence ≥ ${floor}%)?`
+        `${verb} ${ids.length} label${ids.length === 1 ? '' : 's'} from ${filterRunId} (confidence ≥ ${floor}%)?`
       )
     )
       return;
@@ -232,7 +234,6 @@
     try {
       const count = await batchSetStatus(mapId, ids, status);
       lastBatch = { ids, status, count };
-      if (status === 'validated') startRevertClock();
       notice = `${status === 'validated' ? 'Validated' : 'Rejected'} ${count} label${count === 1 ? '' : 's'}.`;
       await load();
     } catch (e: any) {
@@ -242,7 +243,7 @@
     }
   }
 
-  /** The last batch verdict, kept only so the notice can offer one undo. */
+  /** The last batch verdict is an operation-level undo, never a broad time sweep. */
   let lastBatch: { ids: string[]; status: OcrStatus; count: number } | null = null;
 
   async function undoBatch() {
@@ -262,31 +263,7 @@
     }
   }
 
-  // How much of the server's 15-minute revert window is left. Client-side and
-  // deliberately so: it is a readout of a batch this session made, and after a
-  // reload there is nothing honest to show. The interval runs only while a
-  // window is open, and is cleared when it lapses or the component goes.
-  const REVERT_WINDOW_MS = 15 * 60_000;
-  let validatedAt = 0;
-  let now = Date.now();
-  let clock: ReturnType<typeof setInterval> | null = null;
-  $: revertMsLeft = validatedAt ? Math.max(0, validatedAt + REVERT_WINDOW_MS - now) : 0;
-
-  /** Starts (or restarts) the countdown. The tick closes it out — `$:` derives
-   *  `revertMsLeft` and writes nothing, so there is no cycle to chase. */
-  function startRevertClock() {
-    validatedAt = now = Date.now();
-    if (clock) return;
-    clock = setInterval(() => {
-      now = Date.now();
-      if (now - validatedAt < REVERT_WINDOW_MS) return;
-      clearInterval(clock!);
-      clock = null;
-      validatedAt = 0;
-    }, 1000);
-  }
   onDestroy(() => {
-    if (clock) clearInterval(clock);
     if (searchTimer) clearTimeout(searchTimer);
   });
 
@@ -295,8 +272,8 @@
     loading = true;
     error = '';
     try {
-      // Default to All runs (filterRunId '') so every category shows at once;
-      // the run dropdown still lets you narrow to one. 2000 covers big legends.
+      // Pending is the default review queue. A reviewer can explicitly open
+      // history or a single run from the filters above.
       const page = await fetchExtractions(mapId, {
         limit: 2000,
         status: filterStatus,
@@ -322,6 +299,7 @@
   // `load()` assigns `availableRuns`, but this statement only *reads* `mapId`,
   // so `availableRuns` is not one of its dependencies and there is no loop.
   $: if (mapId) {
+    filterStatus = 'pending';
     filterRunId = '';
     availableRuns = [];
     // eslint-disable-next-line svelte/infinite-reactive-loop
@@ -366,30 +344,6 @@
       error = e.message;
     } finally {
       extractions = markRowSaving(extractions, ext.id, false);
-    }
-  }
-
-  // Two-step inline confirm — no native confirm()/alert() dialogs.
-  let revertArmed = false;
-
-  async function emergencyRevert() {
-    if (!revertArmed) {
-      revertArmed = true;
-      setTimeout(() => (revertArmed = false), 4000);
-      return;
-    }
-    revertArmed = false;
-    loading = true;
-    error = '';
-    try {
-      const count = await revertRecent(mapId, 15);
-      notice = `Reverted ${count} item${count === 1 ? '' : 's'}.`;
-      setTimeout(() => (notice = ''), 4000);
-      await load();
-    } catch (e: any) {
-      error = e.message;
-    } finally {
-      loading = false;
     }
   }
 
@@ -512,21 +466,21 @@
     {dirtyCount}
     {pendingShown}
     {loading}
-    {revertArmed}
-    {revertMsLeft}
+    batchRunId={filterRunId}
     on:change={load}
     on:save={saveAllEdits}
     on:validateShown={() => batchVerdict('validated')}
     on:rejectShown={() => batchVerdict('rejected')}
-    on:revert={emergencyRevert}
     on:reload={load}
   />
 
-  {#if revertArmed}
-    <div class="ocr-notice">
-      Revert the last 15 minutes of validations? Click ⟲ again to confirm.
-    </div>
-  {:else if notice}
+  {#if !filterRunId && pendingShown > 0}
+    <div class="batch-scope">Choose one run above to enable a batch verdict.</div>
+  {:else if filterRunId}
+    <div class="batch-scope">Batch scope · {filterRunId} · {pendingShown} pending</div>
+  {/if}
+
+  {#if notice}
     <div class="ocr-notice">
       {notice}
       {#if lastBatch}
@@ -609,6 +563,15 @@
     color: var(--tone-amber-ink);
     font-size: 0.72rem;
     border-bottom: var(--border-thin);
+    flex-shrink: 0;
+  }
+  .batch-scope {
+    padding: 0.3rem 0.75rem;
+    background: var(--tone-blue-wash);
+    border-bottom: var(--border-thin);
+    color: var(--color-text);
+    font-size: 0.66rem;
+    font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
   /* A link inside the notice plate, so it inherits the plate's ink instead of

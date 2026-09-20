@@ -8,6 +8,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { OCR_CATEGORIES, CAT_COLORS } from '../shared/constants';
+  import { reviewedCategory } from '../shared/ocrApi';
   import type { OcrExtraction } from '../shared/types';
   import type { OcrStatus } from '../shared/ocrApi';
 
@@ -47,7 +48,7 @@
   <div class="bbox-panel-row">
     <span
       class="bbox-panel-cat-dot"
-      style="background: {CAT_COLORS[extraction.category] ?? CAT_COLORS.other}"
+      style="background: {CAT_COLORS[reviewedCategory(extraction)] ?? CAT_COLORS.other}"
     ></span>
     <input
       class="bbox-panel-text"

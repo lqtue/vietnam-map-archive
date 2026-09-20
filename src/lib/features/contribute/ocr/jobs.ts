@@ -26,6 +26,7 @@
 
 import type { LayoutRegion } from '$lib/data/maps/triageTypes';
 import type { OcrExtraction } from '../shared/types';
+import { reviewedCategory } from '../shared/ocrApi';
 import { regionOf, regionBox, type RegionKey } from './regionFilter';
 
 export type JobKey = 'names' | 'index' | 'numbers' | 'other';
@@ -80,8 +81,9 @@ export function jobOf(row: OcrExtraction, regions: LayoutRegion[]): JobKey {
   const where = regionOf(row, regions);
   if (where === 'legend' || where === 'names') return 'index';
   if (where === 'map') {
-    if (row.category === 'legend_ref') return 'numbers';
-    if (NAME_CATS.includes(row.category)) return 'names';
+    const category = reviewedCategory(row);
+    if (category === 'legend_ref') return 'numbers';
+    if (NAME_CATS.includes(category)) return 'names';
   }
   return 'other';
 }

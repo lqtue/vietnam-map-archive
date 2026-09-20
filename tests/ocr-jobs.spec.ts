@@ -97,6 +97,11 @@ test('a sheet with no layout pass is all map, so nothing is filed as printed', (
   expect(jobCounts([row(1, 1, 'street')], []).index).toBe(0);
 });
 
+test('a reviewer’s category correction moves map work to its reviewed job', () => {
+  const corrected = { ...row(5000, 5000, 'other'), category_validated: 'street' };
+  expect(jobOf(corrected, REGIONS)).toBe('names');
+});
+
 test('a job frames the part of the sheet it reads', () => {
   // Index spans both legends and both name lists — one rectangle over the lot.
   const index = jobBox('index', REGIONS)!;

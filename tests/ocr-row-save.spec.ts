@@ -18,6 +18,7 @@ import {
   saveRowStatus,
   markRowSaving,
   isRowDirty,
+  reviewedCategory,
   type RowSaveState,
 } from '../src/lib/features/contribute/shared/ocrApi';
 import type { EditableOcrExtraction } from '../src/lib/features/contribute/shared/types';
@@ -151,4 +152,10 @@ test('a row is dirty against its validated columns, not its raw OCR text', () =>
   expect(isRowDirty({ ...clean, text_validated: 'Rue Catinat', _editText: 'Rue Taberd' })).toBe(
     true
   );
+});
+
+test('a saved category correction is the category every review surface uses', () => {
+  const corrected = { ...row('a', 'pending'), category_validated: 'place' };
+  expect(reviewedCategory(corrected)).toBe('place');
+  expect(reviewedCategory(row('b', 'pending'))).toBe('street');
 });
