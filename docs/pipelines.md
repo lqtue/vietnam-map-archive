@@ -370,7 +370,24 @@ python work/ocr/scripts/ocr.py batch --map-id <uuid> --iiif-base <url> --scout -
 python work/ocr/scripts/ocr.py clean \
   --local work/ocr/outputs/<map-id>/runs/<run-id> \
   --map-id <uuid> --run-id <clean-run-id> --min-confidence 0.1 [--apply]
+
+# Read-only post-run audit: artifact integrity + a focused human-review queue
+python work/ocr/scripts/audit_run.py \
+  --run-dir work/ocr/outputs/<map-id>/runs/<run-id> \
+  --output /tmp/<run-id>-audit.json
 ```
+
+`audit_run.py` is deliberately local and read-only. It refuses malformed saved
+artifacts (empty text, invalid confidence, or non-positive global box), then
+queues only **single-pass** labels below the established `0.7` confidence
+boundary or ones that explicitly say they are an edge/fragment. This is a
+review queue, not an auto-delete list:
+the shifted pass does not cover the first pass's outer strip, so a complete
+high-confidence singleton is still useful. Run it after every merge and before
+using the rows as a review or publication surface; `--self-check` is offline.
+When a map's source tiles are already cached, add `--tiles-dir
+work/ocr/outputs/<map-id> --review-dir /tmp/<run-id>-review` to produce one
+red-box crop per queued label and a `manifest.json`; no IIIF request is made.
 
 Subcommands (15): `run`, `batch`, `scout`, `stitch`, `clean`, `dedup`, `merge`, `preview`, `list-models`, `detect-layout`, `grid`, `numerals`, `legend`, `street-index`, `street-index-fixture`.
 
