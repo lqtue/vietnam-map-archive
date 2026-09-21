@@ -62,3 +62,23 @@ export async function sourceSizeMismatch(
     `control point and the mask. Re-georeference this sheet against the scan R2 holds.`
   );
 }
+
+/**
+ * Which R2 base a re-mirror should rewrite the annotation's source to.
+ *
+ * Not always `<R2_BASE>/<mapId>`. A sheet that has been rescanned lives under a
+ * dated key — 1942 is `…-7651a1c48aba-20260911`, 14915x12602, while the bare map
+ * id still serves the original 7479x6314 — and `maps.iiif_image` is what points
+ * at it. Assuming the bare id silently demotes such a sheet back to the old scan
+ * on every re-mirror: consistent, half the resolution, no error anywhere.
+ *
+ * Keeping the rescan is what makes `sourceSizeMismatch` matter — the upstream
+ * annotation is still drawn on the original, so the rewrite now aims coordinates
+ * at an image of a different size and is refused instead of written.
+ */
+export function r2MirrorBase(
+  currentIiifImage: string | null | undefined,
+  fallback: string
+): string {
+  return currentIiifImage?.includes('maparchive.vn') ? currentIiifImage : fallback;
+}

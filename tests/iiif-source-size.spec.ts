@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { declaredSourceSize, sourceSizeMismatch } from '../src/lib/core/iiif/sourceSize';
+import {
+  declaredSourceSize,
+  r2MirrorBase,
+  sourceSizeMismatch,
+} from '../src/lib/core/iiif/sourceSize';
 
 // The mirror's URL rewrite is a string replace. It cannot move resourceCoords or
 // the mask, so an R2 copy that is a rescan silently multiplies the georeference
@@ -54,4 +58,31 @@ test('matching sizes pass, and a missing info.json is the first mirror, not a fa
       sourceSizeMismatch(annotation(7479, 6314), 'https://iiif.maparchive.vn/iiif/m')
     )
   ).toBeNull();
+});
+
+// The 1942 sheet, live: the rescan lives under a dated key, the bare map id still
+// serves the original. Rewriting to the bare id is consistent and loses half the
+// resolution; rewriting to the rescan is caught by the guard above.
+const MAP_ID = 'eca788e5-6780-4dca-bf23-7651a1c48aba';
+const BARE = `https://iiif.maparchive.vn/iiif/${MAP_ID}`;
+const RESCAN = `${BARE}-20260911`;
+
+test('a rescanned sheet keeps its dated key across a re-mirror', () => {
+  expect(r2MirrorBase(RESCAN, BARE)).toBe(RESCAN);
+  // Nothing on R2 yet, or an upstream original: the map id is the right target.
+  expect(r2MirrorBase(null, BARE)).toBe(BARE);
+  expect(r2MirrorBase('https://iiif.archive.org/image/iiif/3/sg1942%2FUntitled.png', BARE)).toBe(
+    BARE
+  );
+});
+
+test('the 1942 chain end to end: upstream is drawn on the original, so the rescan is refused', async () => {
+  const upstream = annotation(7479, 6314); // what Allmaps serves for this sheet
+  const target = r2MirrorBase(RESCAN, BARE);
+  expect(target).toBe(RESCAN);
+
+  const msg = await withInfo({ width: 14915, height: 12602 }, () =>
+    sourceSizeMismatch(upstream, target)
+  );
+  expect(msg).toContain('Re-georeference');
 });

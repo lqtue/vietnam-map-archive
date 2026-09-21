@@ -25,7 +25,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (361 tests)
+npm run test         # Playwright smoke suite, read-only (363 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (33 tests)
@@ -92,7 +92,7 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - `docs/architecture.md` — **the map runtime**, unabridged: MapShell/ImageShell, the stores, route groups, the /explore rails, the contribute tools, the PMTiles basemap, the series layers
 - `docs/db-guidelines.md` — schema conventions; all migrations must follow these
 - `docs/conventions.md` — the reasoning behind the one-line rules: fonts, the gazetteer key, the generated types, the realtime stub, the component/theme vocabulary
-- `docs/testing.md` — what each of the 361 tests pins, and the failure it exists to catch
+- `docs/testing.md` — what each of the 363 tests pins, and the failure it exists to catch
 - `docs/system-guidelines.md` — layering rule, page structure, component patterns, route map, and §11 the live debt table
 - `docs/design-system.md` — tokens, the CSS file map, the page template
 - `docs/api.md` — every server route, its auth class and its contract
