@@ -236,24 +236,50 @@ is visible only because a healthy sheet was measured alongside.
 Dropping the worst point always lowers RMSE, so **RMSE cannot say when to stop dropping.**
 The warped river can, because it is not used in the fit:
 
-| dropped | n | GCP RMSE | river ↔ 1959 | river ↔ 1968 |
+| dropped | n | GCP RMSE | river ↔ 1959, old scan | river ↔ 1959, rescan |
 |---|---:|---:|---:|---:|
-| none | 12 | 72.3 m | 31.6 m | 58.3 m |
-| #1 | 11 | 43.2 m | 30.0 m | 58.3 m |
-| #1, #7 | 10 | 34.2 m | 28.3 m | 58.3 m |
-| **#1, #7, #11** | 9 | **19.3 m** | **22.4 m** | 58.3 m |
-| #1, #7, #11, #4 | 8 | 15.9 m | 22.4 m | 56.6 m |
-| #1, #7, #11, #4, #9 | 7 | 12.6 m | **50.0 m** | 60.0 m |
+| none | 12 | 72.3 m | 31.6 m | 31.6 m |
+| #1 | 11 | 43.2 m | 30.0 m | 30.0 m |
+| #1, #7 | 10 | 34.2 m | 28.3 m | 28.3 m |
+| #1, #7, #11 | 9 | 19.3 m | 22.4 m | 28.3 m |
+| **#1, #7, #11, #4** | 8 | **15.9 m** | **22.4 m** | **22.4 m** |
+| #1, #7, #11, #4, #9 | 7 | 12.6 m | 50.0 m | 44.7 m |
 
 The fifth exclusion takes RMSE to 12.6 m — the healthiest number in the table — while the
-independent river check **more than doubles**. That is overfitting, and nothing in the GCP
-residual reveals it.
+independent river check roughly doubles. That is overfitting, and nothing in the GCP
+residual reveals it. **The cliff reproduces on two independently built masks**, the old
+7479 px scan and the 14915 px rescan, which is the strongest thing here.
 
-**Recommendation: drop GCPs #1, #7 and #11 from the 1942 annotation** (#1 is the 193.7 m
-point at 106.70371, 10.76800). RMSE 72.3 → 19.3 m *and* independent river agreement
-31.6 → 22.4 m, moving together. This is the archive's most-extracted sheet at 31.7% of all
-extractions. **Not yet applied** — it is a write to a published annotation and wants a human
-look at those three points on the sheet first.
+**Corrected 2026-09-21, same day:** the first version of this table was measured only on
+the old scan and recommended three exclusions. On the rescan's mask, three gives 28.3 m and
+only the fourth reaches 22.4 m. The higher-resolution mask is the better evidence, so the
+recommendation is **four**, not three.
+
+**Recommendation: drop GCPs #1, #7, #11 and #4 from the 1942 annotation.** RMSE 72.3 → 15.9 m,
+worst 193.7 → 27.3 m, and independent river agreement 31.6 → 22.4 m, moving together.
+A corrected annotation is written to `/private/tmp/vma-river-full/corrected/1942-corrected.json`,
+validated to keep the same target image and the `helmert` transformation.
+**Not applied** — it is a write to a published annotation on the sheet holding 31.7% of all
+extractions, and re-placing a point beats deleting it.
+
+### The four points, looked at on the sheet
+
+Rendered at their own pixel coordinates and inspected, the statistical verdict has a visible
+cause: **every dropped point sits on a featureless interior.**
+
+| # | resid | what is actually at the crosshair |
+|---|---:|---|
+| 1 | 193.7 m | inside a city block off Rue Guynemer — no corner |
+| 11 | 81.0 m | an **empty field** by the Champ de Courses — nothing there at all |
+| 7 | 75.1 m | the open yard of the Rue Louis Gage wharf, among sheds |
+| 4 | 54.7 m | the middle of a **park** — stippled trees and an ornamental pond |
+| 6 | 5.7 m | *(kept, the best point)* a sharp canal junction with a distinctive enclosure |
+
+**#9 (46.6 m) is the honest anomaly.** It looks as weak as #4 — open ground between a road
+and a canal — yet removing it makes the river fit worse on both masks. Convex-hull area of
+the remaining control points falls 18% when it goes, but that is the same loss as the third
+exclusion, which helped, so **the geometric explanation does not hold and the cause is not
+isolated.** Treat #9 as a good point that looks unremarkable.
 
 ### What this does not establish
 
@@ -270,5 +296,5 @@ Reproduce:
 ```bash
 python work/analysis/district4/river_align.py --self-check
 python work/analysis/district4/river_align.py --step 4
-python work/analysis/district4/river_align.py --step 4 --drop-1942 1 7 11
+python work/analysis/district4/river_align.py --step 4 --drop-1942 1 7 11 4
 ```

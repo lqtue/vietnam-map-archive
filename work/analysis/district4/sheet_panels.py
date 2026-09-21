@@ -35,13 +35,15 @@ from river_full_map import MAPS, region  # noqa: E402
 # Panels found by eye on the overview, then snapped to the printed neat-line by
 # `frames()` below. Only sheets actually inspected appear here.
 PANELS = {
+    # Rescaled to the 2026 rescan (x1.9943, y1.9959) when MAPS["1942"] moved to it;
+    # `frames()` re-snaps these to the printed neat-line anyway.
     "1942": {
-        "Cholon": (127, 3724, 1151, 6129),
-        "Saigon": (3692, 7291, 164, 5137),
+        "Cholon": (253, 7427, 2297, 12233),
+        "Saigon": (7363, 14540, 327, 10253),
     },
 }
 # Seam traces: (name, guessed centreline y, x from, x to, step).
-SEAMS = {"1942": ("Tau Hu canal", 3709, 3300, 4200, 50)}
+SEAMS = {"1942": ("Tau Hu canal", 7403, 6581, 8376, 100)}
 
 
 def window(tiles: Path, width: int, height: int,

@@ -32,7 +32,10 @@ from river_probe import SETTINGS, disk  # noqa: E402
 
 MAPS = {
     "1923": ("1bce28f0-aa82-48eb-8e33-8f0b07182c2f", 16064, 14027),
-    "1942": ("eca788e5-6780-4dca-bf23-7651a1c48aba", 7479, 6314),
+    # 1942 is the 2026 rescan its GCPs were placed on, not the older 7479x6314
+    # image: twice the linear resolution, colour-matched, and it removes the
+    # 1.994 factor between source pixels and the annotation.
+    "1942": ("eca788e5-6780-4dca-bf23-7651a1c48aba-20260911", 14915, 12602),
     "1959": ("34d4edb2-f7df-4c47-a65a-f6b471400396", 14000, 10773),
     "1968": ("3a446d85-25a8-4e81-9cfc-8de357c3a5df", 10816, 13523),
 }
@@ -41,7 +44,7 @@ CORE = 1024
 HALO = 32
 
 # Metres per source pixel, from each sheet's live scan (docs/journals/260920-colour-transfer.md).
-MPP = {"1923": 0.8452, "1942": 1.69, "1959": 0.9974, "1968": 1.2729}
+MPP = {"1923": 0.8452, "1942": 0.8473, "1959": 0.9974, "1968": 1.2729}
 
 # The tighten pass is specified in ground units, not pixels, so one setting covers
 # four scans at four resolutions. Water is a solid fill or a dense hatch; the wash,
@@ -254,8 +257,20 @@ def frame_box(map_id: str, width: int, height: int) -> tuple[int, int, int, int]
     this picks up an interior rule and would cut half the map, so a bad box has
     to fail loudly rather than silently crop a river away.
     """
-    url = f"https://iiif.maparchive.vn/iiif/{map_id}/full/1600,/0/default.jpg"
-    grey = Image.open(BytesIO(requests.get(url, timeout=60).content)).convert("L")
+    # A level0 service serves only the sizes it advertises, and `maxWidth` is a
+    # hard cap: the 1942 rescan tops out at 800, so a hardcoded 1600 returns an
+    # error body rather than an image. Ask info.json what exists and take the
+    # largest, which is ample for locating a margin.
+    base = f"https://iiif.maparchive.vn/iiif/{map_id}"
+    info = requests.get(f"{base}/info.json", timeout=30).json()
+    widths = [s["width"] for s in info.get("sizes", []) if s.get("width")]
+    cap = info.get("maxWidth")
+    if cap:
+        widths = [w for w in widths if w <= cap]
+    if not widths:
+        return None
+    grey = Image.open(BytesIO(requests.get(
+        f"{base}/full/{max(widths)},/0/default.jpg", timeout=60).content)).convert("L")
     dark = 255.0 - np.asarray(grey, np.float32)
     h, w = dark.shape
 
@@ -363,7 +378,7 @@ def self_check() -> None:
     assert HALO >= max(s[4] for s in SETTINGS.values()), SETTINGS
 
     # Tiling covers the sheet exactly once, with no gap and no double write.
-    for width, height in ((7479, 6314), (16064, 14027), (1, 1)):
+    for width, height in ((14915, 12602), (16064, 14027), (1, 1)):
         cores = [(x, y, min(CORE, width - x), min(CORE, height - y))
                  for y in range(0, height, CORE) for x in range(0, width, CORE)]
         seen = np.zeros((height, width), np.uint8)
