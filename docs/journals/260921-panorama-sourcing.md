@@ -20,9 +20,16 @@ enough — creator "Favre," engraver "Lepère" — to treat as the same work, bu
 previously recorded creator/engraver/publisher, so that match was not independently confirmed
 before now; worth a visual check against whatever image the original plan-writer had in hand.
 
-**Access note:** Gallica returns HTTP 403 to WebFetch (bot-blocked); the record above came from
-search-result snippets, not a direct read of the ark page. Someone should open the ark URL in a
-browser to confirm the metadata and pull a usable image before this is wired into the pipeline.
+**Confirmed 2026-09-21**, via Gallica's OAI record (`/services/OAIRecord?ark=ark:/12148/btv1b53062212t`)
+— the ark page itself is a JS shell; the notice fields live there. Every field above matches
+exactly: title, creator ("Favre (18..-18..?; capitaine). Cartographe"), engraver ("Lepère, Auguste
+(1849-1918). Graveur"), publisher ("Mouillot (Paris)"), date (1881), format ("1 flle ; 77 x 58 cm").
+Adds a shelfmark not previously recorded: **BnF, département Cartes et plans, GE C-3950**, and the
+linked catalogue record `http://catalogue.bnf.fr/ark:/12148/cb40761158r`. (The earlier 403 was this
+session's own DNS resolver failing on `gallica.bnf.fr`, not a Gallica bot-block — `--resolve` to the
+IP worked first try.) Still not visually confirmed — the OAI record has no image link beyond the
+og:image thumbnail (`…/btv1b53062212t/f1.medres`); pulling the full-res scan is the remaining step
+before this is wired into the pipeline.
 
 ## "1901" pair — found, and the year was off
 

@@ -624,16 +624,26 @@ function selfCheck() {
   process.exit(failed ? 1 : 0);
 }
 
-async function readAll(db, table, cols) {
+/**
+ * Pages by the count actually returned, not a hardcoded page size — PostgREST
+ * applies its own max-rows cap (a dashboard setting on the hosted project,
+ * independent of the local stack's `max_rows` in supabase/config.toml), and a
+ * page short of what we asked for is not the same as the last page. Orders by
+ * the table's own primary key so `.range()` pages over a stable sequence
+ * instead of relying on undefined ordering across paginated reads.
+ */
+async function readAll(db, table, cols, orderBy = 'id') {
   const out = [];
-  for (let from = 0; ; from += 1000) {
+  for (let from = 0, pageSize = 1000; ; ) {
     const { data, error } = await db
       .from(table)
       .select(cols)
-      .range(from, from + 999);
+      .order(orderBy)
+      .range(from, from + pageSize - 1);
     if (error) throw new Error(`${table}: ${error.message}`);
+    if (!data.length) return out;
     out.push(...data);
-    if (data.length < 1000) return out;
+    from += data.length;
   }
 }
 
@@ -653,7 +663,7 @@ async function main() {
       'maps',
       'id,slug,name,status,year,year_label,bbox,iiif_image,iiif_manifest,annotation_url,allmaps_id,georef_done,thumbnail,source_type,source_url,holding_institution,collection'
     ),
-    readAll(db, 'map_slug_aliases', 'slug,map_id'),
+    readAll(db, 'map_slug_aliases', 'slug,map_id', 'slug'),
     readAll(db, 'map_iiif_sources', 'id,map_id,source_type,is_primary,iiif_image'),
     readAll(
       db,
