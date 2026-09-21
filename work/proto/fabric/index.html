@@ -1,0 +1,120 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Temporal fabric — Saigon</title>
+<style>
+  :root { --ink:#2a2a28; --line:#4a7f74; --warm:#b8763e; --paper:#fbfaf7; --mute:#8b877e; }
+  body { margin:0; background:var(--paper); color:var(--ink); overflow:hidden;
+         font:13px/1.55 ui-sans-serif,system-ui,sans-serif; }
+  #stage { position:fixed; inset:0; perspective:2600px; cursor:grab; }
+  #stage:active { cursor:grabbing; }
+  #stack { position:absolute; left:50%; top:50%; transform-style:preserve-3d; }
+  .layer { position:absolute; left:-350px; top:-350px; width:700px; height:700px; }
+  .layer svg { width:100%; height:100%; overflow:visible; }
+  .layer path { fill:none; stroke:var(--ink); stroke-width:1; vector-effect:non-scaling-stroke;
+                opacity:.5; transition:opacity .2s,stroke .2s; }
+  .layer.hot path { opacity:1; stroke:var(--line); }
+  .spar { position:absolute; height:1px; background:var(--line); opacity:.2;
+          transform-origin:0 50%; transition:opacity .15s,background .15s; }
+  .spar.hot { opacity:1; background:var(--warm); height:2px; }
+  #legend { position:fixed; right:28px; top:36px; width:210px; }
+  #legend > div { padding:12px 0; border-top:1px solid #ddd9d1; opacity:.5;
+                  transition:opacity .2s; cursor:default; }
+  #legend > div.hot { opacity:1; }
+  b { font-weight:600; letter-spacing:.13em; font-size:11px; }
+  small { display:block; color:var(--mute); font-size:11px; }
+  #names { position:fixed; right:28px; bottom:28px; width:210px; max-height:46vh;
+           overflow:auto; border-top:1px solid #ddd9d1; padding-top:10px; }
+  #names p { margin:0 0 6px; color:var(--mute); font-size:11px; }
+  #names a { display:block; padding:2px 0; color:var(--ink); font-size:12px;
+             text-decoration:none; cursor:pointer; }
+  #names a:hover { color:var(--warm); }
+  #note { position:fixed; left:24px; bottom:18px; max-width:46ch;
+          color:var(--mute); font-size:11px; }
+</style>
+<div id="stage"><div id="stack"></div></div>
+<div id="legend"></div>
+<div id="names"></div>
+<p id="note"></p>
+<script>
+const YEAR_PX = 9;     // z per elapsed year — the stack IS the time axis
+const SIZE = 700, SPAN = 1000;
+
+fetch('layers.json').then(r => r.json()).then(({layers, links}) => {
+  const stack = document.getElementById('stack');
+  const px = c => [c[0] * SIZE / SPAN - SIZE / 2, c[1] * SIZE / SPAN - SIZE / 2];
+  const y0 = layers[0].year, span = layers.at(-1).year - y0;
+  const z = yr => (yr - y0 - span / 2) * YEAR_PX;
+
+  layers.forEach(l => {
+    const d = l.polys.map(p => 'M' + p.map(c => c.join(' ')).join('L') + 'Z').join('');
+    const el = document.createElement('div');
+    el.className = 'layer';
+    el.style.transform = `translateZ(${z(l.year)}px)`;
+    el.innerHTML = `<svg viewBox="0 0 ${SPAN} ${SPAN}"><path d="${d}"></path></svg>`;
+    stack.appendChild(el);
+  });
+
+  // one spar per shared name: same NAME on both sheets, each at its own position
+  const spars = links.map(L => {
+    const [ax, ay] = px(L.p), [bx, by] = px(L.q);
+    const az = z(layers[L.a].year), bz = z(layers[L.b].year);
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const len = Math.hypot(dx, dy, dz);
+    const el = document.createElement('div');
+    el.className = 'spar';
+    el.style.width = len + 'px';
+    el.style.transform = `translate3d(${ax}px,${ay}px,${az}px)`
+      + ` rotateZ(${Math.atan2(dy, dx)}rad) rotateY(${-Math.asin(dz / len)}rad)`;
+    el.title = L.t;
+    stack.appendChild(el);
+    return el;
+  });
+
+  const legend = document.getElementById('legend');
+  layers.forEach((l, i) => {
+    const row = document.createElement('div');
+    row.innerHTML = `<b>0${i + 1} / ${l.year}</b><small>${l.label}</small>`
+      + `<small>${l.n_blocks} blocks · ${l.n_labels} names</small>`
+      + `<small>${l.georef.gcps} GCPs · ${l.georef.exact
+            ? 'exact fit, unverifiable' : 'RMSE ' + l.georef.rmse_m + ' m'}`
+      + ` · ${l.georef.scale_spread_pct}% scale spread</small>`;
+    row.onmouseenter = () => stack.children[i].classList.add('hot');
+    row.onmouseleave = () => stack.children[i].classList.remove('hot');
+    legend.appendChild(row);
+  });
+
+  const names = document.getElementById('names');
+  names.innerHTML = `<p>${links.length} names on both sheets, within 150 m</p>`;
+  links.forEach((L, i) => {
+    const a = document.createElement('a');
+    a.innerHTML = `${L.t} <span style="color:var(--mute)">${L.m} m</span>`;
+    a.onmouseenter = () => spars[i].classList.add('hot');
+    a.onmouseleave = () => spars[i].classList.remove('hot');
+    names.appendChild(a);
+  });
+
+  document.getElementById('note').textContent =
+    `${layers.map(l => l.year).join(' → ')}, each warped to the ground by its own `
+    + `Allmaps GCPs. A spar joins the same name on both sheets; its length is how `
+    + `far apart the two printings put it. 1898 has only 3 control points, so its `
+    + `fit is exact by arithmetic and unverified. Drag to rotate.`;
+
+  let rx = 64, rz = -38, drag = null;
+  const draw = () => stack.style.transform = `rotateX(${rx}deg) rotateZ(${rz}deg)`;
+  draw();
+  const stage = document.getElementById('stage');
+  stage.onpointerdown = e => { drag = [e.x, e.y, rx, rz]; stage.setPointerCapture(e.pointerId); };
+  stage.onpointerup = () => drag = null;
+  stage.onpointermove = e => {
+    if (!drag) return;
+    rx = Math.max(0, Math.min(89, drag[2] - (e.y - drag[1]) * .3));
+    rz = drag[3] + (e.x - drag[0]) * .3;
+    draw();
+  };
+  addEventListener('wheel', e => {
+    stack.style.setProperty('--s', 1);
+    document.getElementById('stage').style.perspective =
+      Math.max(900, Math.min(6000, parseFloat(getComputedStyle(stage).perspective) + e.deltaY * 3)) + 'px';
+  }, {passive: true});
+});
+</script>
