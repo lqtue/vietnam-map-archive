@@ -14,6 +14,7 @@
 import { error } from '@sveltejs/kit';
 import { adminClient } from './supabaseAdmin';
 import { uploadJson } from './storage';
+import { sourceSizeMismatch } from '$lib/core/iiif/sourceSize';
 
 const R2_BASE = 'https://iiif.maparchive.vn/iiif';
 const ANNOTATIONS_BUCKET = 'annotations';
@@ -102,6 +103,9 @@ export async function mirrorAnnotation(
   const updated = oldSourceUrl
     ? rewriteSourceUrl(annotation, oldSourceUrl, newIiifBase)
     : annotation;
+
+  const mismatch = await sourceSizeMismatch(updated, newIiifBase);
+  if (mismatch) throw error(409, mismatch);
 
   // History first: if the second write fails, we have still kept the version.
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
