@@ -59,6 +59,13 @@ const SERIES_URL_MIN = 4;
 
 const published = (m) => m.status === 'public' || m.status === 'featured';
 
+/** True if `year` is named in `label`, either literally or as inside a "YYYY-YYYY" range. */
+function yearInLabel(year, label) {
+  const range = String(label).match(/^(\d{4})-(\d{4})$/);
+  if (range) return year >= Number(range[1]) && year <= Number(range[2]);
+  return String(label).includes(String(year));
+}
+
 /** Word-order and punctuation-insensitive fold, for spotting one name typed twice. */
 const foldName = (s) =>
   String(s ?? '')
@@ -185,8 +192,10 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (m.year != null && (m.year < 1500 || m.year > new Date(now).getUTCFullYear()))
       say('FAIL', 'metadata', who(m), `year ${m.year} is not a year this archive can hold`);
     // A label is free text and may be a range or a printing date, but if it
-    // names no year in common with the column, one of the two is wrong.
-    if (m.year != null && m.year_label && !String(m.year_label).includes(String(m.year)))
+    // names no year in common with the column, one of the two is wrong. A
+    // "YYYY-YYYY" range is checked numerically — a year in the middle of one
+    // (1880 in "1876-1883") is not a substring of the label, but is still in it.
+    if (m.year != null && m.year_label && !yearInLabel(m.year, m.year_label))
       say(
         'WARN',
         'metadata',
@@ -464,8 +473,12 @@ function selfCheck() {
     'a year its label never mentions is flagged'
   );
   ok(
-    !has(run({ year: 1876, year_label: '1876-1883' }), 'metadata', 'WARN'),
+    !has(run({ year: 1880, year_label: '1876-1883' }), 'metadata', 'WARN'),
     'a year inside a range label is accepted'
+  );
+  ok(
+    has(run({ year: 1885, year_label: '1876-1883' }), 'metadata', 'WARN'),
+    'a year outside a range label is still flagged'
   );
   ok(
     has(
