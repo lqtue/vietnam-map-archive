@@ -174,6 +174,58 @@ both.
 
 ---
 
+## 3b. Water extraction specifically — checked 2026-09-21
+
+Asked directly where our river colour pass sits. Searched for historical-map *hydrography*
+extraction; the answer is that it is a thin spot in the field, and the gap that matters is not the
+algorithm.
+
+| system | supervision | metric | result |
+|---|---|---|---|
+| **MapSAM2** (Xia et al. 2025) | 10-shot | semantic IoU | 75.8 building block · 67.6 vineyard · 73.0 railway |
+| **SODUCO/MapSeg** best (Chen et al. 2024) | 8,362 polygons | COCO PQ | 51.1% |
+| **U-Net on IfSAR terrain** (Stanislawski et al. 2021) | ~15% of a 50-watershed area | F1 | **66–68 average**; authors call it adequate to *validate* hydrography, not to acquire it |
+| **rule-based, no annotation** (Lemaître & Camillerapp 2021) | **none** | Hausdorff | **3rd** of the MapSeg ICDAR'21 content-area task (112 over 95 test images); 2nd on graticule |
+| **VMA river colour pass** | none | — | **no metric at all** |
+
+**Water from a scanned map image is barely studied.** What exists extracts hydrography from
+elevation, lidar or radar — a different problem, since those have terrain and we have printed ink.
+Stanislawski et al. is therefore an anchor, not a benchmark we can be scored against. Its value here
+is the order of magnitude: well-resourced *supervised* water extraction lands in the 60s–80s F1, not
+the 99s.
+
+**Our family of method is not disqualified.** Lemaître & Camillerapp took a purely rule-based,
+zero-annotation system to third place in a live competition and wrote, in as many words, that "in
+the era of deeplearning supremacy, it is interesting to show that some traditional methods can still
+perform well."
+
+**But look at what beat them.** The MapSeg content-area winner (Baloun et al.) used an FCN trained
+on **26 annotated images**. MapSAM2's headline regime is **10 examples**. So the distance between a
+hand-tuned threshold and the published state of the art is not a research programme — it is roughly
+**ten traced windows**. That is the same artifact `river-comparison.md` §Gate already demands before
+any georeference changes, and the same one whose absence stopped the 1923 hatch-density retune on
+2026-09-21 (`docs/journals/260920-colour-transfer.md`). One tracing job unblocks the honest
+threshold tune, the first real IoU/precision numbers for water in this repo, and the option of
+testing a few-shot learned model — all three.
+
+**The technique worth stealing** is Uhl, Leyk & Chiang (2020): extract from historical topographic
+sheets *in the absence of training data* by using contemporary geospatial data as ancillary guidance
+to auto-collect training samples, then train a CNN on those. For us the Saigon river and main canals
+still exist in OSM, so modern water warped through an accepted Allmaps GCP set can auto-label the
+easy water. **Training signal, never ground truth** — reclamation and bank movement in District 4
+are exactly what makes a neat match to the wrong shoreline possible, which `river-comparison.md`
+already warns about.
+
+**And the framing correction.** Better river masks are not the state-of-the-art path to
+*georeferencing*. §3 above shows why the two working automatic routes do not transfer to this
+corpus; the river is a substitute for them, and even a perfect mask still needs the matching and
+transform-fitting step after it.
+
+Sources added below: Lemaître & Camillerapp 2021; Stanislawski, Shavers & Wang 2021; Uhl, Leyk &
+Chiang 2020. All open access, all retrieved via scite rather than from memory.
+
+---
+
 ## 4. Infrastructure, and the part that is closer to industry than to papers
 
 | | them | us |
@@ -277,3 +329,6 @@ is not, and the measurement gap is a tracing job rather than a research problem.
 - [Allmaps](https://allmaps.org/) · [IIIF Georeference Extension](https://iiif.io/api/extension/georef/) · [Allmaps–IIIF partnership 2026–28](https://allmaps.org/iiif-partnership/)
 - [Digitizing scanned maps using AI in ArcGIS Pro](https://www.esri.com/arcgis-blog/products/arcgis-pro/mapping/digitizing-scanned-maps-using-ai-in-arcgis-pro) · [Digitization of Historical Maps in the Age of AI](https://dlab.berkeley.edu/news/digitization-historical-maps-age-ai) (Berkeley D-Lab, 2025)
 - [Kartta Labs](https://dl.acm.org/doi/10.1145/3356471.3365236) — ACM SIGSPATIAL workshop 2019
+- [Segmentation of historical maps without annotated data](https://doi.org/10.1145/3476887.3476909) — Lemaître & Camillerapp, ACM 2021 ([PDF](https://inria.hal.science/hal-03374571)) — rule-based, 3rd at MapSeg ICDAR'21
+- [Extensibility of U-Net Neural Network Model for Hydrographic Feature Extraction](https://doi.org/10.3390/rs13122368) — Stanislawski, Shavers & Wang, Remote Sensing 2021 — F1 66–68 from IfSAR
+- [Automated Extraction of Human Settlement Patterns From Historical Topographic Map Series Using Weakly Supervised CNNs](https://doi.org/10.1109/access.2019.2963213) — Uhl, Leyk & Chiang, IEEE Access 2020 — contemporary data as ancillary labels

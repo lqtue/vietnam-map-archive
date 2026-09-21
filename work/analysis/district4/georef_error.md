@@ -140,3 +140,135 @@ This six-sheet result is extended to all 274 sheets in `maps`, same code path, i
 rows sit on a sheet with no stated georeference limit or a bad one, and 1942 is not even the worst
 case — eight sheets score worse, one of them (1922, 456.9 m RMSE) the archive's third
 most-extracted sheet.
+
+## The 1942 two-panel suspicion, tested and rejected (2026-09-21)
+
+The 1942 scan carries **two separate printed sheets** — `PLAN DE CHOLON` (itself
+marked *"Extrait du Plan de Saigon-Cholon en 4 feuilles"*) and `PLAN DE SAIGON`,
+both *Edition de Novembre 1942*, both 1:10.000 — laid side by side with their
+neat-lines butted together. That is visible on any overview and is not recorded
+anywhere else in this repo.
+
+It is the obvious explanation for 72.3 m: two plans cannot share one rigid
+transform. **Measured, it is not the explanation.** `sheet_panels.py --year 1942`
+fits each panel's printed neat-line to sub-pixel precision off the native tiles
+and traces the Tàu Hủ canal across the seam in the full-sheet river mask:
+
+| | |
+|---|---|
+| Cholon panel | 3597 × 4978 px, neat-lines −0.0219° |
+| Saigon panel | 3599 × 4973 px, neat-lines −0.0467° |
+| panel-to-panel rotation | **0.0248°** — 4 m corner to corner at 1.69 m/px |
+| panel size agreement | 0.06% in x, 0.10% in y — two sheets of one series |
+| canal across the seam | largest bend 5.5 px (9 m), **at x=3800, past the neat-line**; median 1.5 px |
+
+No step at the seam, no relative rotation, no scale difference. Whoever
+assembled this scan aligned the ground rather than the paper — the panels' own
+frames are 987 px apart vertically precisely because the ground was matched
+instead. **The mosaic is sound to a few pixels, so it contributes nothing like
+72 m and the sheet's residual has another cause.**
+
+Reproduce (needs that sheet's tiles and mask from `river_full_map.py --year 1942`):
+
+```bash
+python work/analysis/district4/sheet_panels.py --self-check
+python work/analysis/district4/sheet_panels.py --year 1942
+```
+
+### What this leaves
+
+The affine residual is 67.1 m against the similarity's 72.3 m. **Six degrees of
+freedom buy almost nothing**, so whatever is wrong is not a systematic linear
+distortion — not rotation, not scale, not shear, and now not a mosaic seam
+either. An error that a more flexible model cannot absorb, with a worst point at
+193.7 m against a 72.3 m RMSE, is the signature of **a few blunder points**, not
+of a distorted sheet.
+
+That is cheap to test and has not been tested: refit dropping the worst
+residual, one point at a time, and watch the RMSE. If three exclusions take it
+from 72 m to the ~13 m the other healthy sheets sit at, the sheet is fine and
+its annotation has bad control points — which is a fixable data problem on the
+archive's most-extracted sheet, not a limit on it.
+
+**Blocked on credentials, not on method.** `annotation_for_map` needs
+`PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_KEY`, and there is no `.env` in the
+working tree; the Allmaps public annotation server 404s on these IIIF images, so
+the GCPs cannot be reached another way. Everything above was measured off the
+public IIIF tiles instead, which is why it is about the scan and not about the
+control points.
+
+### Also checked
+
+**1923 is a single sheet, not a mosaic** — but it is a *folded* one, and both
+fold creases are strong enough that the river detector traces them across the
+full sheet (`docs/journals/260920-colour-transfer.md`, 2026-09-21). With 3 GCPs
+and an unmeasurable residual already, that sheet's geometry should not be
+assumed rigid either.
+
+## The 1942 blunder points, found — and the river as the stopping rule (2026-09-21)
+
+**The credential blocker was wrong.** The annotations are mirrored to a *public* Supabase
+Storage bucket (`maps.annotation_url`), so plain `curl` reaches every sheet's GCPs with no
+service key. The `maps` row that names the URL needs only the anon key, which ships in the
+deployed bundle. Nothing here required `SUPABASE_SERVICE_KEY`.
+
+**And the "1942 scan mismatch" was never a data error.** Its GCPs sit on
+`eca788e5-…-20260911`, a 2026 rescan at 14915×12602 that is live and serving tiles. The
+7479×6314 image every river run used is the *older* scan. The ratio is 1.9943 × 1.9959, so
+the two are reconcilable exactly, and `river_align.py` carries that factor. The rescan is
+twice the linear resolution and the river work should move onto it.
+
+### All four sheets, measured
+
+| year | GCPs | declared | similarity RMSE | worst | affine RMSE |
+|---|---:|---|---:|---:|---:|
+| 1923 | 3 | polynomial | 8.8 m | 11.6 m | 0.0 m — degenerate, 3 points exactly determine an affine |
+| **1942** | 12 | helmert | **72.3 m** | 193.7 m | 67.1 m |
+| 1959 | 10 | polynomial | 14.0 m | 22.9 m | 12.8 m |
+| 1968 | 15 | helmert | 9.0 m | 20.1 m | 8.8 m |
+
+1968 is the control this file previously lacked. Its leave-one-out curve falls **10–15% per
+exclusion**; 1942 falls **40% on the first**. That contrast is the blunder signature, and it
+is visible only because a healthy sheet was measured alongside.
+
+### The stopping rule, which is the actual finding
+
+Dropping the worst point always lowers RMSE, so **RMSE cannot say when to stop dropping.**
+The warped river can, because it is not used in the fit:
+
+| dropped | n | GCP RMSE | river ↔ 1959 | river ↔ 1968 |
+|---|---:|---:|---:|---:|
+| none | 12 | 72.3 m | 31.6 m | 58.3 m |
+| #1 | 11 | 43.2 m | 30.0 m | 58.3 m |
+| #1, #7 | 10 | 34.2 m | 28.3 m | 58.3 m |
+| **#1, #7, #11** | 9 | **19.3 m** | **22.4 m** | 58.3 m |
+| #1, #7, #11, #4 | 8 | 15.9 m | 22.4 m | 56.6 m |
+| #1, #7, #11, #4, #9 | 7 | 12.6 m | **50.0 m** | 60.0 m |
+
+The fifth exclusion takes RMSE to 12.6 m — the healthiest number in the table — while the
+independent river check **more than doubles**. That is overfitting, and nothing in the GCP
+residual reveals it.
+
+**Recommendation: drop GCPs #1, #7 and #11 from the 1942 annotation** (#1 is the 193.7 m
+point at 106.70371, 10.76800). RMSE 72.3 → 19.3 m *and* independent river agreement
+31.6 → 22.4 m, moving together. This is the archive's most-extracted sheet at 31.7% of all
+extractions. **Not yet applied** — it is a write to a published annotation and wants a human
+look at those three points on the sheet first.
+
+### What this does not establish
+
+- 1942 ↔ 1968 sits at ~58 m throughout and barely responds. Different era, real bank change
+  and 1968's own error are all mixed into it; the pairwise number cannot separate them.
+- The river masks have **no hand-drawn reference** (`river-comparison.md` §Gate), so these
+  distances are agreement between two unvalidated masks, not accuracy.
+- Mask thickness enters the distance. A median of 22.4 m is a few cells at 10 m grid.
+- 1923's river is the least trustworthy of the four (8.55% of sheet, folds and boulevards
+  still in) and its 3-GCP fit is degenerate, so its rows are context, not evidence.
+
+Reproduce:
+
+```bash
+python work/analysis/district4/river_align.py --self-check
+python work/analysis/district4/river_align.py --step 4
+python work/analysis/district4/river_align.py --step 4 --drop-1942 1 7 11
+```
