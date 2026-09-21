@@ -16,7 +16,8 @@ python3 work/analysis/district4/georef_error.py                # the table below
 | 1882 | Plan Cadastral de la ville de Saigon | 10 | `helmert` | 12102×8982 | 0.3411 | 89.66° | **12.7 m** | 27.7 m | 10.6 m | 17.4 m |
 | 1895 | Plan des environs de Saïgon | 11 | `thinPlateSpline` | 13654×8964 | 1.7073 | 359.49° | 34.6 m | 59.1 m | 26.4 m | 49.7 m |
 | 1923 | Saigon – Cholon | **3** | `polynomial` order 1 | 16064×14027 | 0.8452 | 359.57° | 8.8 m | 11.6 m | 0.0 m | 0.0 m |
-| 1942 | Plan de Saigon – Cho Lon | 12 | `helmert` | 14915×12602 | 0.8458 | 0.21° | **72.3 m** | **193.7 m** | 67.1 m | 174.5 m |
+| 1942 | Plan de Saigon – Cho Lon | 8 | `helmert` | 14915×12602 | 0.8483 | 0.30° | **15.9 m** | **27.3 m** | — | — |
+| 1942 *(before the 2026-09-21 correction)* | | 12 | `helmert` | 14915×12602 | 0.8458 | 0.21° | 72.3 m | 193.7 m | 67.1 m | 174.5 m |
 | 1959 | Đô thành Sài Gòn | 10 | `polynomial` order 1 | 14000×10773 | 0.9974 | 359.69° | 14.0 m | 22.9 m | **12.8 m** | 18.1 m |
 | 1968 | Sài Gòn – Việt Nam City Maps 1:12,500 | 15 | `helmert` | 10816×13523 | 1.2729 | 359.53° | **9.0 m** | 20.1 m | 8.8 m | 18.9 m |
 
@@ -41,7 +42,7 @@ So the archive's actual position on these six sheets:
 | **1968** | **9.0 m** RMSE, worst 20.1 m | measurable, healthy |
 | **1882** | **12.7 m** RMSE, worst 27.7 m | measurable, healthy |
 | **1959** | **12.8 m** RMSE, worst 18.1 m | measurable, healthy |
-| **1942** | **72.3 m** RMSE, worst 193.7 m | measurable, **and bad** |
+| **1942** | **15.9 m** RMSE, worst 27.3 m (was 72.3 / 193.7 before 2026-09-21) | measurable, and good |
 | 1895 | **not measurable from its own GCPs** | TPS is exact at them by construction |
 | 1923 | **not measurable from its own GCPs** | 3 GCPs exactly determine its declared affine |
 
@@ -259,8 +260,22 @@ recommendation is **four**, not three.
 worst 193.7 → 27.3 m, and independent river agreement 31.6 → 22.4 m, moving together.
 A corrected annotation is written to `/private/tmp/vma-river-full/corrected/1942-corrected.json`,
 validated to keep the same target image and the `helmert` transformation.
-**Not applied** — it is a write to a published annotation on the sheet holding 31.7% of all
-extractions, and re-placing a point beats deleting it.
+**Applied upstream 2026-09-21.** The eight surviving points were pasted into Allmaps Editor on
+the rescan and saved; `annotations.allmaps.org/images/5e15b735f9e963c5` now serves them. Re-measured
+from the published document: **15.91 m** RMSE, worst 27.25 m, scale 0.8483 m/px, and the river check
+lands on **22.4 m** — the predicted figures exactly, so nothing was lost in the round trip.
+
+Two things the round trip taught, both worth keeping:
+
+- **Allmaps Editor's GCP paste box reads `pixelX pixelY mapX mapY`** — pixel pair *first*, ground
+  pair second, whitespace-separated, no header, and image y **positive** (down). The QGIS `.points`
+  convention is the reverse order with a negative y, and pasting it that way is silent: the editor
+  takes the pixel column as lon/lat, every point collapses to one absurd ground position, and the
+  map will not publish at all. The display rounds ground coordinates to integers, so a correct paste
+  and a broken one look identical in the list — only the annotation server tells them apart.
+- **The editor fits in EPSG:3857**, not a local tangent plane, which costs this sheet 15.91 → 18.39 m
+  RMSE and 0.4% of scale (0.8483 → 0.8506 m/px). That is Web Mercator's latitude stretch varying
+  across ~9 km of north-south extent. Real, stated, and inside the noise for a 1942 lithograph.
 
 ### The four points, looked at on the sheet
 
