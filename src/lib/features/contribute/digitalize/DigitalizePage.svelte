@@ -237,7 +237,7 @@
       case 'e':
         return handled(e, () => bboxPanel?.focusText());
       case 'd':
-        return handled(e, review.toggleDraw);
+        return handled(e, toggleDraw);
       case 'f':
         return handled(e, review.toggleIsolation);
       // The label's own angle, not the canvas: 1 deg a press, 5 with shift.
@@ -255,6 +255,20 @@
   function handled(e: KeyboardEvent, fn: () => void) {
     e.preventDefault();
     fn();
+  }
+
+  /**
+   * Entering draw mode over a printed block is a silent no-op otherwise:
+   * `focusRegion` drops `showBoxes` to keep the per-tile crop rectangles off a
+   * table you're trying to read (see its docstring), but `OcrBboxTool`'s Draw
+   * interaction is gated on that same `visible` prop, so a hidden box layer
+   * swallows the drag with no feedback. Turning draw mode on always means you
+   * want to see (and place) a box, so force it back on here rather than making
+   * a person notice the left rail toggle first.
+   */
+  function toggleDraw() {
+    if (!$review.drawMode) showBoxes = true;
+    review.toggleDraw();
   }
 
   // ── Triage derivations + persistence ──────────────────────────────────────────
@@ -585,7 +599,7 @@
       drawMode={$review.drawMode}
       isolationMode={$review.isolationMode}
       {rotationDeg}
-      on:toggleDraw={review.toggleDraw}
+      on:toggleDraw={toggleDraw}
       on:toggleIsolation={review.toggleIsolation}
       on:rotate={(e) => rotate(e.detail.deg)}
       on:resetRotation={resetRotation}
