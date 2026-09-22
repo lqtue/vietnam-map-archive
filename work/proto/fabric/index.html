@@ -1,32 +1,174 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Temporal Fabric — Saigon</title>
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
-:root{--ink:#252725;--line:#397a71;--warm:#b66736;--paper:#f8f7f3;--mute:#797870;--faint:#d9d6ce;--panel:rgba(248,247,243,.92)}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);overflow:hidden;font:13px/1.5 ui-sans-serif,system-ui,sans-serif}button{font:inherit}#stage{position:fixed;inset:0;perspective:3200px;cursor:grab;touch-action:none}#stage:active{cursor:grabbing}#stack{position:absolute;left:50%;top:50%;transform-style:preserve-3d}.layer{position:absolute;left:-350px;top:-350px;width:700px;height:700px}.scan,.fabric{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.scan{opacity:.28;transition:opacity .2s}.fabric path{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.38}.layer.hot .scan,.layer.focus .scan{opacity:.68}.layer.hot .fabric path,.layer.focus .fabric path{opacity:.9;stroke:var(--line)}.spar{position:absolute;height:1px;background:var(--line);opacity:.16;transform-origin:0 50%;transition:opacity .15s,background .15s,height .15s}.spar.hot{opacity:1;background:var(--warm);height:2px}.anchor{position:absolute;width:8px;height:8px;border:1.5px solid var(--line);background:var(--paper);border-radius:50%;opacity:0;pointer-events:none}.anchor.hot{opacity:1;background:var(--warm)}.panel{position:fixed;z-index:2;background:var(--panel)}#masthead{left:28px;top:25px;width:min(360px,calc(100vw - 56px))}.eyebrow{margin:0 0 7px;color:var(--line);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}h1{margin:0;font-size:28px;font-weight:500;letter-spacing:-.045em;line-height:1}#thesis{margin:10px 0 0;max-width:39ch;color:#50514d}#scope{margin:10px 0 0;color:var(--mute);font-size:11px;max-width:47ch}#legend{right:28px;top:29px;width:260px;max-height:calc(100vh - 58px);overflow:auto}.section-label{margin:0 0 8px;color:var(--mute);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}.year{display:block;width:100%;padding:8px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}.year:hover,.year[aria-pressed=true]{color:var(--ink)}.year b{display:block;font-size:11px;font-weight:650;letter-spacing:.12em}.year small{display:block;margin-top:2px;font-size:11px;line-height:1.35}.year[aria-pressed=true] b{color:var(--line)}#reading{right:28px;bottom:27px;width:260px;border-top:1px solid var(--faint);padding-top:10px}#reading p,#anchor-readout p{margin:0;color:var(--mute);font-size:11px}strong{color:var(--ink);font-weight:600}#controls{position:fixed;z-index:2;left:28px;bottom:25px;width:min(390px,calc(100vw - 56px))}#anchor-readout{min-height:50px;border-top:1px solid var(--faint);padding:9px 0 8px}#names{display:flex;gap:5px;max-width:100%;overflow:auto;padding:2px 0 4px;scrollbar-width:thin}.name{flex:0 0 auto;padding:5px 7px;border:1px solid var(--faint);border-radius:999px;background:var(--paper);color:#555650;font-size:11px;line-height:1;cursor:pointer}.name:hover,.name[aria-pressed=true]{border-color:var(--warm);color:var(--ink)}.name[aria-pressed=true]{background:#f4e6dc}#instruction{margin:7px 0 0;color:var(--mute);font-size:11px}#method{position:fixed;z-index:2;left:50%;bottom:25px;width:250px;transform:translateX(-50%);text-align:center;color:var(--mute);font-size:10px;line-height:1.45}#method span{color:var(--line);font-weight:650}@media(max-width:720px){#masthead{top:18px;left:20px}h1{font-size:24px}#legend{top:auto;right:20px;bottom:18px;width:160px}.year{padding:5px 0}.year small,#reading,#method{display:none}#controls{left:20px;bottom:18px;width:calc(100vw - 210px)}}
-:root{--scan-opacity:.48}.scan{opacity:var(--scan-opacity)}.layer.focus .scan{opacity:1}.layer.dim .scan{opacity:.045}.layer.dim .fabric{opacity:.08}.fabric path{stroke:#276c61;opacity:.85}.no-outlines .fabric{display:none}.plane-year{position:absolute;left:0;top:100%;font-size:19px;color:var(--line);border-top:1px solid var(--line);padding-top:4px}.spar{opacity:.045}.spar.hot{opacity:1}.layer,.spar,.anchor{pointer-events:none}#stack{will-change:transform}#toolbar{position:fixed;z-index:4;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:7px;padding:10px 14px;border:1px solid var(--faint);border-radius:12px;background:var(--panel);max-width:calc(100vw - 28px);width:max-content}#toolbar button{background:var(--paper);border:1px solid var(--faint);border-radius:6px;padding:5px 10px;cursor:pointer}button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}#toolbar label{display:flex;align-items:center;gap:5px;font-size:11px}#toolbar input[type=range]{width:70px}#zoom-value{min-width:42px;align-self:center;text-align:center}#controls{bottom:100px;width:300px}#reading{bottom:110px;font-size:11px;color:var(--mute)}#legend{max-height:calc(100vh - 270px)}#method{display:none}#status{color:var(--mute);font-size:11px;margin-top:10px}.clean .panel,.clean #toolbar{visibility:hidden}.clean #stage{cursor:none}#restore{display:none;position:fixed;right:12px;bottom:12px;z-index:5;opacity:.15;border:0;background:var(--paper);padding:8px}.clean #restore{display:block}#restore:hover,#restore:focus{opacity:1}@media(max-width:720px){#masthead{width:240px}#thesis,#scope{display:none}#legend{top:100px;bottom:auto;right:14px;width:120px;max-height:45vh}#controls{bottom:140px;left:14px;width:180px}#toolbar{bottom:10px}#toolbar label{font-size:10px}}
-/* recording view */
-:root{--scan-opacity:.2}.scan{opacity:var(--scan-opacity)}.layer.focus .scan{opacity:1}.layer.dim .scan{opacity:.035}.fabric{opacity:0;transition:opacity .2s}.layer.focus .fabric{opacity:1}.fabric path{fill:none;stroke:#b66736;stroke-width:1.3;vector-effect:non-scaling-stroke;opacity:.9}.no-outlines .fabric{display:none}.spar{opacity:.1;height:2px}.spar.hot{opacity:1;height:3px}.anchor{opacity:.2}.anchor.hot{opacity:1}.name{display:block;width:100%;margin:0 0 4px;padding:6px 8px;text-align:left}.name[hidden]{display:none}#names{display:block;max-height:31vh;overflow:auto;padding-right:2px}#name-search{width:100%;margin:0 0 7px;padding:7px 8px;border:1px solid var(--faint);border-radius:6px;background:var(--paper);color:var(--ink)}#controls{bottom:100px;width:300px}#reading{bottom:110px}#legend{max-height:calc(100vh - 270px)}#method{display:none}
-#toolbar{display:none}#legend{top:50%;transform:translateY(-50%);bottom:auto}.layer.hot .fabric{opacity:1}.layer.focus .fabric path,.layer.hot .fabric path{stroke:#b66736;stroke-width:.45}.spar{background:#8066a6;height:1px;opacity:.22}.spar.hot{background:#8066a6;height:2px;opacity:1}
-/* Phone layout: each panel gets its own vertical band. The previous rules
-   placed the legend, reading panel, and controls over one another in the
-   bottom half of the viewport. */
+:root{
+  --ink:#252725;--line:#397a71;--warm:#b66736;--paper:#f8f7f3;
+  --mute:#797870;--faint:#d9d6ce;--panel:rgba(248,247,243,.92);--soft:#50514d;
+  /* 1% of the viewport actually visible right now. Plain vh on mobile Safari
+     is 1% of the LARGEST viewport (as if the address bar were hidden), so a
+     panel sized in vh can run taller than what's on screen while the bar is
+     showing, pushing later fixed-position panels into each other. dvh tracks
+     the real visible height; older engines that don't parse it keep the vh
+     fallback above (an unsupported value invalidates only that declaration). */
+  --vh:1vh;
+}
+@supports (height:100dvh){:root{--vh:1dvh}}
+/* Dark follows the OS by default; #theme-toggle can pin it either way via
+   [data-theme] on <html> (set synchronously in <head>, before first paint,
+   so there's no flash of the wrong theme). The palette keeps its warm cast
+   (a charcoal paper, not neutral black) rather than inverting to a generic
+   dark-UI gray. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#ece9e1;--line:#6fc2b0;--warm:#e0925c;--paper:#1b1a17;
+  --mute:#9c9a90;--faint:#37352f;--panel:rgba(27,26,23,.82);--soft:#c7c4b9;
+}}
+:root[data-theme="dark"]{
+  --ink:#ece9e1;--line:#6fc2b0;--warm:#e0925c;--paper:#1b1a17;
+  --mute:#9c9a90;--faint:#37352f;--panel:rgba(27,26,23,.82);--soft:#c7c4b9;
+}
+*{box-sizing:border-box}
+/* iOS Safari ignores body{overflow:hidden} for touch scrolling: a stray swipe
+   rubber-bands the whole document and drags every position:fixed panel with
+   it. position:fixed here is the standard cross-browser lock for that. */
+html,body{position:fixed;inset:0;width:100%;height:100%;overscroll-behavior:none}
+body{margin:0;background:var(--paper);color:var(--ink);overflow:hidden;font:13px/1.5 -apple-system,BlinkMacSystemFont,ui-sans-serif,system-ui,sans-serif}
+button{font:inherit}
+button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}
+
+/* stage: WebGL canvas fills it; OrbitControls owns drag/zoom/pan/inertia */
+#stage{position:fixed;inset:0;cursor:grab;touch-action:none}
+#stage.grabbing{cursor:grabbing}
+#stage.pointable{cursor:pointer}
+#stage canvas{display:block}
+
+/* panels: on a wide screen, one right-hand column (#sheet) holds source
+   sheets → shared names, stacked in flow order; #sheet-body's children give
+   up any position of their own and become plain stacked blocks with a rule
+   between each. Mobile below re-styles #sheet into a slide-up bottom card
+   instead. */
+.panel{position:fixed;z-index:2;background:var(--panel);border-radius:16px;box-shadow:0 12px 32px -8px rgba(37,39,37,.22),0 1px 0 rgba(37,39,37,.04);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
+#masthead,#legend,#controls,#names,#sheet-body{overscroll-behavior:contain}
+/* #column is the one visible card (title → sheets → names); #masthead and
+   #sheet give up their own box entirely and become plain stacked sections
+   inside it. Mobile below makes #column inert (display:contents) so its
+   two children go back to being independent fixed panels there. */
+#column{right:28px;top:29px;width:260px;max-height:calc((var(--vh) * 100) - 58px);overflow-y:auto;padding:20px;box-shadow:none}
+#column>*+*{margin-top:14px;padding-top:14px;border-top:1px solid var(--faint)}
+#masthead,#sheet{position:static;width:auto;padding:0;background:none;box-shadow:none;border-radius:0;backdrop-filter:none;-webkit-backdrop-filter:none;max-height:none;overflow:visible;top:auto;right:auto;left:auto;bottom:auto}
+#sheet-body{padding:0}
+#sheet-handle{display:none}
+#sheet-body>*{position:static;background:none;box-shadow:none;padding:0;width:auto;max-height:none;overflow:visible;right:auto;left:auto;bottom:auto;top:auto;border:0}
+#sheet-body>*+*{margin-top:14px;padding-top:14px;border-top:1px solid var(--faint)}
+h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.18}
+#thesis{margin:9px 0 0;max-width:40ch;color:var(--soft)}
+#status{margin:10px 0 0;font-size:11px;color:var(--mute)}
+
+.year{display:block;width:100%;padding:8px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}
+.year:first-child,.name:first-child{border-top:0}
+.year:hover,.year[aria-pressed=true]{color:var(--ink)}
+.year b{display:block;font-size:11px;font-weight:650;letter-spacing:.12em}
+.year small{display:block;margin-top:2px;font-size:11px;line-height:1.35}
+.year[aria-pressed=true] b{color:var(--line)}
+
+strong{color:var(--ink);font-weight:600}
+
+#name-search{width:100%;margin:0 0 7px;padding:5px 7px;border:1px solid var(--faint);border-radius:6px;background:var(--paper);color:var(--ink);font-size:11px}
+#names{display:block;max-height:calc(var(--vh) * 31);overflow:auto;padding-right:2px}
+.name{display:block;width:100%;padding:7px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);font-size:11px;line-height:1.3;text-align:left;cursor:pointer}
+.name:hover,.name[aria-pressed=true]{color:var(--ink)}
+.name[aria-pressed=true]{color:var(--warm)}
+.name[hidden]{display:none}
+#instruction{margin:7px 0 0;color:var(--mute);font-size:11px}
+
+#theme-toggle{position:fixed;left:12px;bottom:12px;z-index:5;border:1px solid var(--faint);border-radius:8px;background:var(--panel);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:0 8px 20px -6px rgba(37,39,37,.25);color:var(--ink);font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer}
+#theme-toggle:hover,#theme-toggle:focus-visible{border-color:var(--warm)}
+.clean #theme-toggle{visibility:hidden}
+
+/* clean/recording mode: hide chrome for a screenshot or a screen recording;
+   #restore is the only way back in on a touch device (no Escape key) */
+.clean .panel{visibility:hidden}
+.clean #stage{cursor:none}
+#restore{display:none;position:fixed;right:12px;bottom:12px;z-index:5;opacity:.15;border:0;border-radius:6px;background:var(--paper);padding:8px;cursor:pointer}
+.clean #restore{display:block}
+#restore:hover,#restore:focus{opacity:1}
+
+/* popup: detail on the one name just clicked, at the click point — the
+   sidebar list stays a plain index and never grows this content itself */
+#popup{position:fixed;z-index:6;width:260px;padding:12px 14px;border-radius:10px;box-shadow:0 8px 30px rgba(37,39,37,.18);display:none}
+#popup.open{display:block}
+#popup h2{margin:0;font-size:13px;font-weight:650;color:var(--ink);padding-right:18px}
+#popup p{margin:6px 0 0;font-size:11px;color:var(--mute);line-height:1.4}
+#popup .doling{margin-top:8px;padding-top:8px;border-top:1px solid var(--faint)}
+#popup .doling a{color:var(--line)}
+#popup-close{position:absolute;top:6px;right:6px;border:0;background:none;color:var(--mute);font-size:15px;line-height:1;padding:4px;cursor:pointer}
+#popup-close:hover{color:var(--ink)}
+@media(max-width:720px){#popup{width:calc(100vw - 40px)}}
+
+/* ---- mobile: the map is the hero, everything else recedes to arm's length ----
+   A frosted title pill up top, a frosted icon toolbar with one overflow
+   button, and every list (sheets / names) folded into one bottom
+   sheet that opens on tap — Apple's own pattern for "content first, chrome
+   one gesture away" (Maps, Weather). Collapsed, the sheet is just a handle;
+   nothing about it competes with the stack for attention. */
 @media(max-width:720px){
-  #masthead{top:12px;left:12px;width:calc(100vw - 24px);max-height:27vh;overflow:auto;padding:9px 11px}
-  #masthead h1{font-size:23px}
-  #thesis,#scope{display:block}
-  #thesis{margin-top:8px;font-size:12px;line-height:1.4}
-  #scope{margin-top:7px;font-size:10px;line-height:1.35}
-  #status{margin:7px 0 0;font-size:10px}
-  #legend{top:29vh;left:12px;right:12px;width:auto;max-height:27vh;transform:none;overflow:auto;padding:8px 11px}
-  #legend .section-label{margin-bottom:4px}
-  .year{padding:5px 0}
-  .year small{font-size:10px}
-  #reading{display:block;left:12px;right:12px;bottom:35vh;width:auto;max-height:10vh;overflow:auto;padding:6px 11px;background:var(--panel)}
-  #controls{left:12px;right:12px;bottom:12px;width:auto;max-height:31vh;overflow:auto;padding:8px 11px;background:var(--panel)}
-  #name-search{display:none}
-  #anchor-readout{min-height:0;padding:0 0 6px}
-  #names{max-height:13vh}
+  html,body{-webkit-tap-highlight-color:transparent}
+  /* #column only exists to fuse title+sheet into one card on a wide screen;
+     here it goes back to generating no box at all, so #masthead and #sheet
+     resume being independent fixed panels (their own rules below). */
+  #column{display:contents}
+  #masthead{position:fixed;top:12px;left:12px;right:12px;width:auto;max-height:none;overflow:visible;padding:10px 14px;background:var(--panel);border-radius:16px;box-shadow:0 12px 32px -8px rgba(37,39,37,.22),0 1px 0 rgba(37,39,37,.04);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
+  #thesis{display:none}
+  h1{font-size:19px;font-weight:600}
+  #status{margin-top:2px;font-size:10px}
+
+  /* the sheet: one flowed column of legend → names, clipped to a peek
+     height until opened. Its children give up their own fixed positions
+     and become ordinary flow content inside it. */
+  #sheet{display:block;position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;z-index:3;background:var(--panel);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(37,39,37,.1);max-height:60px;overflow:hidden;transition:max-height .4s cubic-bezier(.32,.72,0,1)}
+  #sheet.expanded{max-height:calc(var(--vh) * 72)}
+  #sheet-handle{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:10px 16px 12px;border:0;background:none;color:var(--mute);font:inherit;text-align:center;cursor:pointer}
+  #sheet-handle .bar{width:36px;height:4px;border-radius:2px;background:var(--faint)}
+  #sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(var(--vh) * 72 - 56px);padding:0 16px 16px}
+  .year small{display:block}
   #instruction{margin:6px 0 0;font-size:10px;line-height:1.35}
+  #restore{right:12px;bottom:12px}
+
+  .year:active,.name:active,#sheet-handle:active{transform:scale(.96)}
+}
+@media(max-width:720px) and (prefers-reduced-motion:reduce){
+  #sheet{transition:none}
 }
 </style>
-<body><main id="stage" aria-label="Three-dimensional comparison of historical Saigon maps"><div id="stack"></div></main><header id="masthead" class="panel"><p class="eyebrow">Temporal fabric / Saigon</p><h1>Historical substrate,<br>across six dates</h1><p id="thesis">Each plane is a source map independently georeferenced onto the same ground. Its image remains visible; traced blocks appear only where that extraction exists.</p><p id="scope">This is an evidence sketch, not a causal model. The stack precedes the later addition of contemporary building fabric and dated POI histories.</p></header><aside id="legend" class="panel" aria-label="Map layers"><p class="section-label">Source sheets / 1882–1968</p></aside><aside id="reading" class="panel" aria-live="polite"><p>Select a sheet to bring its scanned map and available extracted fabric forward.</p></aside><section id="controls" class="panel" aria-label="Shared place names"><div id="anchor-readout"></div><nav id="names" aria-label="Select a shared historical name"></nav><p id="instruction">Drag to rotate. Click a year to isolate its source image; select a name to trace an adjacent-sheet match.</p></section><p id="method" class="panel"><span>Depth is calendar time</span><br>One plane per source map, positioned from its own ground controls.</p>
-<script src="viewer.js" defer></script></body></html>
+<body>
+<main id="stage" aria-label="Three-dimensional comparison of historical Saigon maps"></main>
+<div id="column" class="panel">
+<header id="masthead" class="panel">
+  <h1>Saigon,<br>1882–1968</h1>
+  <p id="thesis">Six sheets, independently georeferenced and stacked by year.</p>
+</header>
+<div id="sheet" class="panel">
+  <button id="sheet-handle" type="button" aria-expanded="false" aria-controls="sheet-body">
+    <span class="bar" aria-hidden="true"></span>
+    <span>Sheets &amp; names</span>
+  </button>
+  <div id="sheet-body">
+    <aside id="legend" class="panel" aria-label="Map layers"></aside>
+    <section id="controls" class="panel" aria-label="Shared place names">
+      <nav id="names" aria-label="Select a shared historical name"></nav>
+      <p id="instruction">Drag to rotate; click a year or a name to isolate it.</p>
+    </section>
+  </div>
+</div>
+</div>
+<button id="theme-toggle" type="button">Dark</button>
+<button id="restore" type="button" aria-label="Show panels">Show panels</button>
+<div id="popup" class="panel" role="dialog" aria-label="Name detail">
+  <button id="popup-close" type="button" aria-label="Close">×</button>
+  <div id="popup-body"></div>
+</div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+</script>
+<script type="module" src="viewer.js"></script>
+</body></html>
