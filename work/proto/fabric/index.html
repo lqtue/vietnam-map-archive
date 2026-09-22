@@ -1,120 +1,31 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>Temporal fabric — Saigon</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Temporal Fabric — Saigon</title>
 <style>
-  :root { --ink:#2a2a28; --line:#4a7f74; --warm:#b8763e; --paper:#fbfaf7; --mute:#8b877e; }
-  body { margin:0; background:var(--paper); color:var(--ink); overflow:hidden;
-         font:13px/1.55 ui-sans-serif,system-ui,sans-serif; }
-  #stage { position:fixed; inset:0; perspective:2600px; cursor:grab; }
-  #stage:active { cursor:grabbing; }
-  #stack { position:absolute; left:50%; top:50%; transform-style:preserve-3d; }
-  .layer { position:absolute; left:-350px; top:-350px; width:700px; height:700px; }
-  .layer svg { width:100%; height:100%; overflow:visible; }
-  .layer path { fill:none; stroke:var(--ink); stroke-width:1; vector-effect:non-scaling-stroke;
-                opacity:.5; transition:opacity .2s,stroke .2s; }
-  .layer.hot path { opacity:1; stroke:var(--line); }
-  .spar { position:absolute; height:1px; background:var(--line); opacity:.2;
-          transform-origin:0 50%; transition:opacity .15s,background .15s; }
-  .spar.hot { opacity:1; background:var(--warm); height:2px; }
-  #legend { position:fixed; right:28px; top:36px; width:210px; }
-  #legend > div { padding:12px 0; border-top:1px solid #ddd9d1; opacity:.5;
-                  transition:opacity .2s; cursor:default; }
-  #legend > div.hot { opacity:1; }
-  b { font-weight:600; letter-spacing:.13em; font-size:11px; }
-  small { display:block; color:var(--mute); font-size:11px; }
-  #names { position:fixed; right:28px; bottom:28px; width:210px; max-height:46vh;
-           overflow:auto; border-top:1px solid #ddd9d1; padding-top:10px; }
-  #names p { margin:0 0 6px; color:var(--mute); font-size:11px; }
-  #names a { display:block; padding:2px 0; color:var(--ink); font-size:12px;
-             text-decoration:none; cursor:pointer; }
-  #names a:hover { color:var(--warm); }
-  #note { position:fixed; left:24px; bottom:18px; max-width:46ch;
-          color:var(--mute); font-size:11px; }
+:root{--ink:#252725;--line:#397a71;--warm:#b66736;--paper:#f8f7f3;--mute:#797870;--faint:#d9d6ce;--panel:rgba(248,247,243,.92)}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);overflow:hidden;font:13px/1.5 ui-sans-serif,system-ui,sans-serif}button{font:inherit}#stage{position:fixed;inset:0;perspective:3200px;cursor:grab;touch-action:none}#stage:active{cursor:grabbing}#stack{position:absolute;left:50%;top:50%;transform-style:preserve-3d}.layer{position:absolute;left:-350px;top:-350px;width:700px;height:700px}.scan,.fabric{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.scan{opacity:.28;transition:opacity .2s}.fabric path{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.38}.layer.hot .scan,.layer.focus .scan{opacity:.68}.layer.hot .fabric path,.layer.focus .fabric path{opacity:.9;stroke:var(--line)}.spar{position:absolute;height:1px;background:var(--line);opacity:.16;transform-origin:0 50%;transition:opacity .15s,background .15s,height .15s}.spar.hot{opacity:1;background:var(--warm);height:2px}.anchor{position:absolute;width:8px;height:8px;border:1.5px solid var(--line);background:var(--paper);border-radius:50%;opacity:0;pointer-events:none}.anchor.hot{opacity:1;background:var(--warm)}.panel{position:fixed;z-index:2;background:var(--panel)}#masthead{left:28px;top:25px;width:min(360px,calc(100vw - 56px))}.eyebrow{margin:0 0 7px;color:var(--line);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}h1{margin:0;font-size:28px;font-weight:500;letter-spacing:-.045em;line-height:1}#thesis{margin:10px 0 0;max-width:39ch;color:#50514d}#scope{margin:10px 0 0;color:var(--mute);font-size:11px;max-width:47ch}#legend{right:28px;top:29px;width:260px;max-height:calc(100vh - 58px);overflow:auto}.section-label{margin:0 0 8px;color:var(--mute);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}.year{display:block;width:100%;padding:8px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}.year:hover,.year[aria-pressed=true]{color:var(--ink)}.year b{display:block;font-size:11px;font-weight:650;letter-spacing:.12em}.year small{display:block;margin-top:2px;font-size:11px;line-height:1.35}.year[aria-pressed=true] b{color:var(--line)}#reading{right:28px;bottom:27px;width:260px;border-top:1px solid var(--faint);padding-top:10px}#reading p,#anchor-readout p{margin:0;color:var(--mute);font-size:11px}strong{color:var(--ink);font-weight:600}#controls{position:fixed;z-index:2;left:28px;bottom:25px;width:min(390px,calc(100vw - 56px))}#anchor-readout{min-height:50px;border-top:1px solid var(--faint);padding:9px 0 8px}#names{display:flex;gap:5px;max-width:100%;overflow:auto;padding:2px 0 4px;scrollbar-width:thin}.name{flex:0 0 auto;padding:5px 7px;border:1px solid var(--faint);border-radius:999px;background:var(--paper);color:#555650;font-size:11px;line-height:1;cursor:pointer}.name:hover,.name[aria-pressed=true]{border-color:var(--warm);color:var(--ink)}.name[aria-pressed=true]{background:#f4e6dc}#instruction{margin:7px 0 0;color:var(--mute);font-size:11px}#method{position:fixed;z-index:2;left:50%;bottom:25px;width:250px;transform:translateX(-50%);text-align:center;color:var(--mute);font-size:10px;line-height:1.45}#method span{color:var(--line);font-weight:650}@media(max-width:720px){#masthead{top:18px;left:20px}h1{font-size:24px}#legend{top:auto;right:20px;bottom:18px;width:160px}.year{padding:5px 0}.year small,#reading,#method{display:none}#controls{left:20px;bottom:18px;width:calc(100vw - 210px)}}
+:root{--scan-opacity:.48}.scan{opacity:var(--scan-opacity)}.layer.focus .scan{opacity:1}.layer.dim .scan{opacity:.045}.layer.dim .fabric{opacity:.08}.fabric path{stroke:#276c61;opacity:.85}.no-outlines .fabric{display:none}.plane-year{position:absolute;left:0;top:100%;font-size:19px;color:var(--line);border-top:1px solid var(--line);padding-top:4px}.spar{opacity:.045}.spar.hot{opacity:1}.layer,.spar,.anchor{pointer-events:none}#stack{will-change:transform}#toolbar{position:fixed;z-index:4;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:7px;padding:10px 14px;border:1px solid var(--faint);border-radius:12px;background:var(--panel);max-width:calc(100vw - 28px);width:max-content}#toolbar button{background:var(--paper);border:1px solid var(--faint);border-radius:6px;padding:5px 10px;cursor:pointer}button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}#toolbar label{display:flex;align-items:center;gap:5px;font-size:11px}#toolbar input[type=range]{width:70px}#zoom-value{min-width:42px;align-self:center;text-align:center}#controls{bottom:100px;width:300px}#reading{bottom:110px;font-size:11px;color:var(--mute)}#legend{max-height:calc(100vh - 270px)}#method{display:none}#status{color:var(--mute);font-size:11px;margin-top:10px}.clean .panel,.clean #toolbar{visibility:hidden}.clean #stage{cursor:none}#restore{display:none;position:fixed;right:12px;bottom:12px;z-index:5;opacity:.15;border:0;background:var(--paper);padding:8px}.clean #restore{display:block}#restore:hover,#restore:focus{opacity:1}@media(max-width:720px){#masthead{width:240px}#thesis,#scope{display:none}#legend{top:100px;bottom:auto;right:14px;width:120px;max-height:45vh}#controls{bottom:140px;left:14px;width:180px}#toolbar{bottom:10px}#toolbar label{font-size:10px}}
+/* recording view */
+:root{--scan-opacity:.2}.scan{opacity:var(--scan-opacity)}.layer.focus .scan{opacity:1}.layer.dim .scan{opacity:.035}.fabric{opacity:0;transition:opacity .2s}.layer.focus .fabric{opacity:1}.fabric path{fill:none;stroke:#b66736;stroke-width:1.3;vector-effect:non-scaling-stroke;opacity:.9}.no-outlines .fabric{display:none}.spar{opacity:.1;height:2px}.spar.hot{opacity:1;height:3px}.anchor{opacity:.2}.anchor.hot{opacity:1}.name{display:block;width:100%;margin:0 0 4px;padding:6px 8px;text-align:left}.name[hidden]{display:none}#names{display:block;max-height:31vh;overflow:auto;padding-right:2px}#name-search{width:100%;margin:0 0 7px;padding:7px 8px;border:1px solid var(--faint);border-radius:6px;background:var(--paper);color:var(--ink)}#controls{bottom:100px;width:300px}#reading{bottom:110px}#legend{max-height:calc(100vh - 270px)}#method{display:none}
+#toolbar{display:none}#legend{top:50%;transform:translateY(-50%);bottom:auto}.layer.hot .fabric{opacity:1}.layer.focus .fabric path,.layer.hot .fabric path{stroke:#b66736;stroke-width:.45}.spar{background:#8066a6;height:1px;opacity:.22}.spar.hot{background:#8066a6;height:2px;opacity:1}
+/* Phone layout: each panel gets its own vertical band. The previous rules
+   placed the legend, reading panel, and controls over one another in the
+   bottom half of the viewport. */
+@media(max-width:720px){
+  #masthead{top:12px;left:12px;width:calc(100vw - 24px);max-height:27vh;overflow:auto;padding:9px 11px}
+  #masthead h1{font-size:23px}
+  #thesis,#scope{display:block}
+  #thesis{margin-top:8px;font-size:12px;line-height:1.4}
+  #scope{margin-top:7px;font-size:10px;line-height:1.35}
+  #status{margin:7px 0 0;font-size:10px}
+  #legend{top:29vh;left:12px;right:12px;width:auto;max-height:27vh;transform:none;overflow:auto;padding:8px 11px}
+  #legend .section-label{margin-bottom:4px}
+  .year{padding:5px 0}
+  .year small{font-size:10px}
+  #reading{display:block;left:12px;right:12px;bottom:35vh;width:auto;max-height:10vh;overflow:auto;padding:6px 11px;background:var(--panel)}
+  #controls{left:12px;right:12px;bottom:12px;width:auto;max-height:31vh;overflow:auto;padding:8px 11px;background:var(--panel)}
+  #anchor-readout{min-height:0;padding:0 0 6px}
+  #names{max-height:13vh}
+  #instruction{margin:6px 0 0;font-size:10px;line-height:1.35}
+}
 </style>
-<div id="stage"><div id="stack"></div></div>
-<div id="legend"></div>
-<div id="names"></div>
-<p id="note"></p>
-<script>
-const YEAR_PX = 9;     // z per elapsed year — the stack IS the time axis
-const SIZE = 700, SPAN = 1000;
-
-fetch('layers.json').then(r => r.json()).then(({layers, links}) => {
-  const stack = document.getElementById('stack');
-  const px = c => [c[0] * SIZE / SPAN - SIZE / 2, c[1] * SIZE / SPAN - SIZE / 2];
-  const y0 = layers[0].year, span = layers.at(-1).year - y0;
-  const z = yr => (yr - y0 - span / 2) * YEAR_PX;
-
-  layers.forEach(l => {
-    const d = l.polys.map(p => 'M' + p.map(c => c.join(' ')).join('L') + 'Z').join('');
-    const el = document.createElement('div');
-    el.className = 'layer';
-    el.style.transform = `translateZ(${z(l.year)}px)`;
-    el.innerHTML = `<svg viewBox="0 0 ${SPAN} ${SPAN}"><path d="${d}"></path></svg>`;
-    stack.appendChild(el);
-  });
-
-  // one spar per shared name: same NAME on both sheets, each at its own position
-  const spars = links.map(L => {
-    const [ax, ay] = px(L.p), [bx, by] = px(L.q);
-    const az = z(layers[L.a].year), bz = z(layers[L.b].year);
-    const dx = bx - ax, dy = by - ay, dz = bz - az;
-    const len = Math.hypot(dx, dy, dz);
-    const el = document.createElement('div');
-    el.className = 'spar';
-    el.style.width = len + 'px';
-    el.style.transform = `translate3d(${ax}px,${ay}px,${az}px)`
-      + ` rotateZ(${Math.atan2(dy, dx)}rad) rotateY(${-Math.asin(dz / len)}rad)`;
-    el.title = L.t;
-    stack.appendChild(el);
-    return el;
-  });
-
-  const legend = document.getElementById('legend');
-  layers.forEach((l, i) => {
-    const row = document.createElement('div');
-    row.innerHTML = `<b>0${i + 1} / ${l.year}</b><small>${l.label}</small>`
-      + `<small>${l.n_blocks} blocks · ${l.n_labels} names</small>`
-      + `<small>${l.georef.gcps} GCPs · ${l.georef.exact
-            ? 'exact fit, unverifiable' : 'RMSE ' + l.georef.rmse_m + ' m'}`
-      + ` · ${l.georef.scale_spread_pct}% scale spread</small>`;
-    row.onmouseenter = () => stack.children[i].classList.add('hot');
-    row.onmouseleave = () => stack.children[i].classList.remove('hot');
-    legend.appendChild(row);
-  });
-
-  const names = document.getElementById('names');
-  names.innerHTML = `<p>${links.length} names on both sheets, within 150 m</p>`;
-  links.forEach((L, i) => {
-    const a = document.createElement('a');
-    a.innerHTML = `${L.t} <span style="color:var(--mute)">${L.m} m</span>`;
-    a.onmouseenter = () => spars[i].classList.add('hot');
-    a.onmouseleave = () => spars[i].classList.remove('hot');
-    names.appendChild(a);
-  });
-
-  document.getElementById('note').textContent =
-    `${layers.map(l => l.year).join(' → ')}, each warped to the ground by its own `
-    + `Allmaps GCPs. A spar joins the same name on both sheets; its length is how `
-    + `far apart the two printings put it. 1898 has only 3 control points, so its `
-    + `fit is exact by arithmetic and unverified. Drag to rotate.`;
-
-  let rx = 64, rz = -38, drag = null;
-  const draw = () => stack.style.transform = `rotateX(${rx}deg) rotateZ(${rz}deg)`;
-  draw();
-  const stage = document.getElementById('stage');
-  stage.onpointerdown = e => { drag = [e.x, e.y, rx, rz]; stage.setPointerCapture(e.pointerId); };
-  stage.onpointerup = () => drag = null;
-  stage.onpointermove = e => {
-    if (!drag) return;
-    rx = Math.max(0, Math.min(89, drag[2] - (e.y - drag[1]) * .3));
-    rz = drag[3] + (e.x - drag[0]) * .3;
-    draw();
-  };
-  addEventListener('wheel', e => {
-    stack.style.setProperty('--s', 1);
-    document.getElementById('stage').style.perspective =
-      Math.max(900, Math.min(6000, parseFloat(getComputedStyle(stage).perspective) + e.deltaY * 3)) + 'px';
-  }, {passive: true});
-});
-</script>
+<body><main id="stage" aria-label="Three-dimensional comparison of historical Saigon maps"><div id="stack"></div></main><header id="masthead" class="panel"><p class="eyebrow">Temporal fabric / Saigon</p><h1>Historical substrate,<br>across six dates</h1><p id="thesis">Each plane is a source map independently georeferenced onto the same ground. Its image remains visible; traced blocks appear only where that extraction exists.</p><p id="scope">This is an evidence sketch, not a causal model. The stack precedes the later addition of contemporary building fabric and dated POI histories.</p></header><aside id="legend" class="panel" aria-label="Map layers"><p class="section-label">Source sheets / 1882–1968</p></aside><aside id="reading" class="panel" aria-live="polite"><p>Select a sheet to bring its scanned map and available extracted fabric forward.</p></aside><section id="controls" class="panel" aria-label="Shared place names"><div id="anchor-readout"></div><nav id="names" aria-label="Select a shared historical name"></nav><p id="instruction">Drag to rotate. Click a year to isolate its source image; select a name to trace an adjacent-sheet match.</p></section><p id="method" class="panel"><span>Depth is calendar time</span><br>One plane per source map, positioned from its own ground controls.</p>
+<script src="viewer.js" defer></script></body></html>
