@@ -22,7 +22,7 @@ const WINNER = '830551ec-0eed-439d-8206-1a64c8b10d4f';
 const ARCHIVED = 'cdef2d04-4749-48a8-99f9-1a8b8f1c14ad';
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 console.log('--- 1. demote the worse-georeferenced duplicate: new slug, draft status ---');
@@ -51,7 +51,7 @@ console.log('\n--- 2. promote the winner: slug, collection, description, status 
         'battalions with the National Geographic Service of Vietnam, and later ' +
         'the Defense Mapping Agency — so the producing body is printed on each ' +
         'sheet rather than shared across the series.',
-      status: 'public'
+      status: 'public',
     })
     .eq('id', WINNER)
     .select('id,slug,collection,status');

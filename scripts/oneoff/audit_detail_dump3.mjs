@@ -1,7 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, { auth: { persistSession: false } });
+const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+  auth: { persistSession: false },
+});
 
-const { data: indo } = await db.from('maps').select('slug,source_url,holding_institution').eq('collection', 'Indochine 1:25,000 — Tonkin & Thanh Hóa');
+const { data: indo } = await db
+  .from('maps')
+  .select('slug,source_url,holding_institution')
+  .eq('collection', 'Indochine 1:25,000 — Tonkin & Thanh Hóa');
 const byInst = {};
 for (const r of indo) {
   const k = r.holding_institution ?? '(null)';

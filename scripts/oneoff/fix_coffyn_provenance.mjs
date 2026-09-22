@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 // Virtual Saigon's own record (ID 1267, virtual-saigon.net/Maps/Collection?ID=1267) lists

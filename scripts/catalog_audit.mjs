@@ -647,7 +647,7 @@ function selfCheck() {
  */
 async function readAll(db, table, cols, orderBy = 'id') {
   const out = [];
-  for (let from = 0, pageSize = 1000; ; ) {
+  for (let from = 0, pageSize = 1000; ;) {
     const { data, error } = await db
       .from(table)
       .select(cols)

@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 // the others, so the run summary at the end shows exactly what landed.
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 const steps = [
@@ -21,7 +21,7 @@ const steps = [
         .from('maps')
         .update({ year: 1888 })
         .eq('slug', 'cochinchine-francaise')
-        .select('slug,year,year_label')
+        .select('slug,year,year_label'),
   },
   {
     name: 'map-of-imperial-city-of-hue provenance',
@@ -37,10 +37,10 @@ const steps = [
         .from('maps')
         .update({
           holding_institution: 'National Library of Vietnam (Thư viện Quốc gia Việt Nam)',
-          source_url: 'https://lib.nomfoundation.org/collection/1/volume/168/'
+          source_url: 'https://lib.nomfoundation.org/collection/1/volume/168/',
         })
         .eq('slug', 'map-of-imperial-city-of-hue')
-        .select('slug,holding_institution,source_url')
+        .select('slug,holding_institution,source_url'),
   },
   {
     name: 'sai-gon-viet-nam-city-maps-1-12-500 holding institution',
@@ -54,11 +54,12 @@ const steps = [
       db
         .from('maps')
         .update({
-          holding_institution: 'Perry-Castañeda Library Map Collection, University of Texas at Austin'
+          holding_institution:
+            'Perry-Castañeda Library Map Collection, University of Texas at Austin',
         })
         .eq('slug', 'sai-gon-viet-nam-city-maps-1-12-500')
-        .select('slug,holding_institution,source_url')
-  }
+        .select('slug,holding_institution,source_url'),
+  },
 ];
 
 const results = [];

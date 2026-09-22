@@ -45,15 +45,18 @@ const CANDIDATES = [
   [106.7064, 10.7917, '1882+1942 (3.4 m)'],
   [106.6367, 10.8018, '1895+1968 (4.4 m)'],
   [106.6959, 10.7826, '1882+1959 (6.7 m)'],
-  [106.71, 10.7955, '1895+1968 (23.5 m, weak)']
+  [106.71, 10.7955, '1895+1968 (23.5 m, weak)'],
 ];
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 });
 
 function annotationUrlFor(row) {
-  return row.annotation_url || (row.allmaps_id ? `https://annotations.allmaps.org/images/${row.allmaps_id}` : null);
+  return (
+    row.annotation_url ||
+    (row.allmaps_id ? `https://annotations.allmaps.org/images/${row.allmaps_id}` : null)
+  );
 }
 
 const asJson = process.argv.includes('--json');
@@ -74,10 +77,14 @@ const withInfoJson = (u) => (/\.json($|\?)/.test(u) ? u : `${u.replace(/\/$/, ''
 // against map_iiif_sources instead of guessing by source_type.
 function editorUrlFallback(row) {
   if (row.iiif_manifest) return EDITOR_BASE + encodeURIComponent(withInfoJson(row.iiif_manifest));
-  const original = row.map_iiif_sources?.find((s) => s.source_type !== 'r2' && s.iiif_image)?.iiif_image;
+  const original = row.map_iiif_sources?.find(
+    (s) => s.source_type !== 'r2' && s.iiif_image
+  )?.iiif_image;
   if (original) return EDITOR_BASE + encodeURIComponent(withInfoJson(original));
   if (!row.annotation_url && row.allmaps_id)
-    return EDITOR_BASE + encodeURIComponent(`https://annotations.allmaps.org/images/${row.allmaps_id}`);
+    return (
+      EDITOR_BASE + encodeURIComponent(`https://annotations.allmaps.org/images/${row.allmaps_id}`)
+    );
   return null;
 }
 
@@ -94,7 +101,9 @@ function editorUrlFromAnnotation(row, sourceId) {
 for (const id of mapIds) {
   const { data: rows, error } = await db
     .from('maps')
-    .select('id,year,name,slug,allmaps_id,annotation_url,iiif_manifest,map_iiif_sources(iiif_image,source_type)')
+    .select(
+      'id,year,name,slug,allmaps_id,annotation_url,iiif_manifest,map_iiif_sources(iiif_image,source_type)'
+    )
     .eq('id', id);
   if (error || !rows?.length) {
     console.log(`\n## ${id} — could not read maps row (${error?.message ?? 'no row'})`);
@@ -108,7 +117,7 @@ for (const id of mapIds) {
     name: row.name ?? row.slug ?? id,
     editorUrl: editorUrlFallback(row),
     editorUrlVerified: false,
-    points: []
+    points: [],
   };
   report.push(sheet);
   console.log(`\n## ${row.year ?? '?'} ${row.name ?? row.slug ?? id} (${id.slice(0, 8)})`);
@@ -134,12 +143,16 @@ for (const id of mapIds) {
   const verified = editorUrlFromAnnotation(row, source?.id);
   if (verified) {
     if (sheet.editorUrl && sheet.editorUrl !== verified) {
-      console.log(`  editor link corrected — annotation is fit to a different source than the heuristic picked (target: ${source.id})`);
+      console.log(
+        `  editor link corrected — annotation is fit to a different source than the heuristic picked (target: ${source.id})`
+      );
     }
     sheet.editorUrl = verified;
     sheet.editorUrlVerified = true;
   } else if (source?.id) {
-    console.log(`  WARNING: annotation targets ${source.id}, which is not in map_iiif_sources — editor link may open the wrong scan`);
+    console.log(
+      `  WARNING: annotation targets ${source.id}, which is not in map_iiif_sources — editor link may open the wrong scan`
+    );
   }
 
   const maps = parseAnnotation(annotation);
