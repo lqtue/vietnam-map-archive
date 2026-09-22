@@ -26,7 +26,8 @@ One thing, one name. These are the ones that have been confused before:
 | **Vietnam Map Archive**, VMA | the product, and how to refer to it in prose | a hostname |
 | `maparchive.vn` | the live site | the Pages project |
 | `vmabeta` | the Cloudflare Pages project id, and nothing else | a name for the product — never use it in prose |
-| `vietnam-map-archive` | the GitHub repo (renamed from `svelte-beta`, Sept 2026) | the local directory, which is still `svelte-beta` |
+| `lqtue/vietnam-map-archive` | the GitHub repo (renamed from `svelte-beta`, Sept 2026) | the local directory, which is still `svelte-beta` |
+| `VietnamMapArchive` | a GitHub org that exists; the repo has **not** been transferred into it | where the repo lives today |
 | **HACW** | the Hội An event PWA, a separate app that Walk forks | part of VMA |
 | **Shapes · Search · Walk · Debt** | the four lines of work, in `docs/ROADMAP.md` | Tracks C/E/F/D, which is what they were called until 2026-09-22 |
 
@@ -100,7 +101,10 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   undefined in Pages Functions. So every environment that builds needs all three present, or the
   build fails on the first import. CI copies `.env.test` to `.env` before `check` and `build`.
 - **The repo is `lqtue/vietnam-map-archive`** (renamed from `svelte-beta`, Sept 2026; GitHub
-  redirects the old URL and the local directory is still called `svelte-beta`). The Pages project is
+  redirects the old URL and the local directory is still called `svelte-beta`). A
+  `VietnamMapArchive` GitHub org exists and the repo **has not been transferred into it** — that
+  move is cheap and available whenever it is wanted; `docs/deploy.md` §Ownership has the cost of
+  each platform's move, including the two not worth making. The Pages project is
   still `vmabeta`, because renaming it would change the deploy target and the `.pages.dev` host for
   nothing.
 - **`vmabeta.pages.dev` 301s to `maparchive.vn`** — `hooks.server.ts`, exact host match, so preview

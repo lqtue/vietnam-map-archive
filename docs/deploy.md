@@ -67,3 +67,27 @@ crawler and a reader follow.
 
 Turning the `.pages.dev` host off entirely is a dashboard setting and would
 work too; this keeps it in the repo, where it is visible.
+
+## Ownership — considered 2026-09-22, mostly declined
+
+Nothing here is broken, and nothing below has been done. This section exists so the question is not
+re-opened from scratch: it records what consolidating the accounts would actually cost.
+
+Today the three platforms sit under two identities — GitHub and Cloudflare under `lqtue`, Supabase
+under a second identity the same person controls. A `VietnamMapArchive` GitHub org exists but holds
+nothing.
+
+| Platform | Can it move between accounts? | What moving costs |
+|---|---|---|
+| GitHub | **Yes, cheaply.** Transfer to the org; issues, PRs and stars come along and both old URLs keep redirecting, git included | Actions secrets and the Cloudflare Pages build integration do **not** travel. Re-add the secrets, and re-authorize the GitHub App for the org — a Pages source left pointing at the old owner builds nothing, which presents as the blank page this file's last section describes, with no obvious cause |
+| Supabase | **Org-scoped only.** A project moves between orgs you own and keeps its ref; there is no account-to-account move | Nothing, if the ref is preserved. If the ref ever changes it is `PUBLIC_SUPABASE_URL` in both Cloudflare environments, and a wrong value there fails the **build** at the first `$env/static/private` import rather than at runtime |
+| Cloudflare | **No.** Pages projects, R2 buckets and zones are all account-bound | Recreate the Pages project (new `.pages.dev` host), re-enter every variable and secret by hand in both environments, redeploy `vma-iiif-worker`, copy 119,616 tile objects to a new R2 bucket, and cut `maparchive.vn` DNS over. Hours of work and real downtime on tiles, to change a name that appears only in a dashboard |
+
+**The verdict:** the GitHub transfer is worth doing on any day it is wanted, and needs the two
+follow-ups in its row. The Cloudflare move is not worth making, now or later — `vmabeta` is an
+internal project id and no reader ever sees it. The one thing worth five minutes regardless is
+adding a second **Owner** to the Supabase org: of everything here, that project is the only piece
+that cannot be recreated from this repo.
+
+`vmabeta` and `svelte-beta` therefore survive on purpose — the first is the Pages project id, the
+second the local directory. Neither is a name for the product; see the Names table in `CLAUDE.md`.

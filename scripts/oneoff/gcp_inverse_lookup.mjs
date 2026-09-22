@@ -5,7 +5,7 @@
 // 14,000 px scan by eye from scratch.
 //
 // Ground points are the cross-sheet convergence points found by comparing
-// every District 4 sheet's existing GCPs pairwise (see chat / ROADMAP §E6):
+// every District 4 sheet's existing GCPs pairwise (see ROADMAP `sheet-overlap-floor`):
 // coordinates where two or more independently-georeferenced sheets already
 // agree to within ~25 m. Not fabricated — read off the live annotations.
 //
