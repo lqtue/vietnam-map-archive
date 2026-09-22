@@ -2,7 +2,152 @@
 
 One list. Everything else is detail or history. Update this file, not the others.
 
-## Start here — do next (2026-09-04)
+## Start here — do next (2026-09-21)
+
+Supersedes the 2026-09-04 list below, which stays as the OCR pass's own record. The reason for
+re-ordering: **every elaborate pass in this file ended by finding a basic thing broken** — T1 (no
+OCR run could read an R2-hosted map at all), T5 (a 31.8% white-hole overview the model scored 7/7
+on), 3g (a fixed pixel tile is a different amount of ground on every sheet), the L7014 mixed-datum
+fault, 56 published sheets drawing nothing. The file already wrote the lesson down twice: *verify
+the thing, not the gate*, and *measure before tuning*. So the next stretch is the foundations —
+georeference quality, segmentation measurement, metadata that maintains itself, and corpus size —
+not another method.
+
+Ordered. Each item names the check that says it is finished; the detail is in the section it links.
+
+- [ ] **N1 — Rebuild and verify L7014** (= I3). The live `l7014-20260913` mosaic places sheets
+      about **470 m out**, the datum fix is committed, and the warp/tile/upload has never run. This
+      is the only item on this list that is serving wrong data to readers right now, which is why
+      it is first. Preserve the old build until the replacement passes. Exit: `fit` and
+      `geo_audit.mjs` both clear on the new build, and the old one is retired only after.
+      **Phases A+B run 2026-09-21** on key `l7014-20260921` (436 sheets, matches the 2026-09-20 dry
+      run). `geo_audit.mjs` found one real FAIL beyond the known `fit` outliers: `hue-l7014-6541-4`
+      (public, 3 GCPs) sat 5,391 m from printed cell 6541-4, while a draft duplicate
+      `hue-l7014-6541-4-2` (4 GCPs) sat correctly on it. **Fixed 2026-09-22**: swapped the two
+      rows' status and re-pointed `series_sheets` cell 6541-4 at the `-2` row.
+      `geo_audit.mjs --key l7014-20260921` now reports **0 FAIL** (47 WARN, all pre-existing
+      draft-sheet annotation gaps, unaffected by the swap). `fit`'s two known-bad sheets (`6630-4`,
+      `6349-4`, distorted outlines, see `work/l7014/regen/REGEN.md`) are expected on every run and
+      not part of this gate. Still open before N1 closes: `tile`/`upload` have never run — gated on
+      a paper-framing decision (`docs/paper/draft.md` §7.6 / `blind-by-construction.tex` cite the
+      *unrebuilt* archive as evidentiary) that belongs to the user; and `rasterSeries.ts`'s
+      hand-carried `sheets: 452` needs updating to 436 (with `tests/series-rows.spec.ts:20,96`) as
+      part of that same pass. Separately, **a new bug surfaced while checking this**:
+      `series_sheets.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
+      WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — not yet
+      fixed, not yet its own item; do that first if picking this back up. See `.claude/handoff.md`
+      for the full trail.
+- [ ] **N2 — Give the 11 remaining three-point sheets a measurable residual.** A 3-GCP affine fit
+      has zero degrees of freedom, so its RMSE is identically 0 and a sheet can be badly wrong
+      while reporting nothing. This is not a backlog item, it is a hole in the quality signal
+      itself. A 4th point on each buys a number where there currently cannot be one. Do the five
+      one-point GCP fixes and the 1912 Saigon-Cholon (three near-collinear points in one corner) in
+      the same sitting. The 1880 *Plan annamite d'Hanoi* is 802 px and needs a new scan before it
+      needs GCPs. (Was 12 — `hue-l7014-6541-4` dropped off the list 2026-09-22: its N1 swap
+      promoted the 4-GCP `hue-l7014-6541-4-2` in its place.) Exit: no georeferenced sheet in the
+      corpus sits on fewer than 4 points, and `modern_prior.py --sweep` reports a residual for
+      every one.
+- [ ] **N3 — Finish the Indochine 1:100,000 ingest.** 578 of 581 half-sheet scans un-ingested; the
+      path is proved on 3 (real rows, tiled, serving). Cheapest corpus growth available — a batch
+      run, not a project. 561 first (100% ready IIIF URLs), then 325 (exercises the constructed
+      `f110IdNakala` path at scale). Grep each run for `TILING FAILED`; the script leaves a
+      pixel-less `draft` row rather than failing loudly. Exit: `/catalog/series` renders both
+      surveys sensibly, and `scripts/check_series_index.mjs` is still clean. See
+      `.claude/handoff.md`.
+- [ ] **N4 — Mark stale work after an upstream change** (= I5). Already bit us once and left no
+      trace: re-scanning the 1959 sheet emptied `maps.triage`, and had the triage survived, the
+      saved neatline would have cropped the **old** scan's pixels while looking entirely valid.
+      Record the two observed dependencies — a replaced scan invalidates triage and all pixel work;
+      a changed georeference invalidates ground coordinates, warps, exports and mosaic checks — and
+      show the rebuild set. Exit: a test correction names exactly what must be redone and keeps
+      what is still reusable.
+- [ ] **N5 — Measure shapes before tuning them** (= I4). There is a recall-ish number and **no
+      precision number at all**, so every segmentation change to date is unfalsifiable. Trace one
+      bounded 1882 window completely, run `seg_eval --window`, keep machine predictions out of the
+      ground truth by construction. Related and blocking the District 4 table: **there are no
+      footprints inside District 4** — all 46 volunteer traces are in District 1, the nearest 68 m
+      north of the Bến Nghé canal. Review is not the blocker; tracing the peninsula is. Exit: a
+      precision figure alongside the recall one, with its sample and limitations recorded beside
+      it.
+- [ ] **N6 — The 62 ungeoreferenced drafts, by machine.** Biggest single jump available (40 usable
+      sheets → 102) and the least verified thing on this list. The SGI Tonkin series prints a
+      graticule in **grades from the Paris meridian** (`grades × 0.9 + 2.337229` = degrees east),
+      each sheet's number, and an 8-neighbour index diagram, on a 7-column series grid. **Evidence
+      is one sheet read by eye** (Cua Thai Binh 1905), whose latitude labels were too small to be
+      sure of. Read the graticule on three sheets and confirm the latitudes **before building
+      anything**. Gate on `modern_prior.py --sweep`. The named-institution lead (3 confirmed
+      survivors out of 28 names on one sheet) is a seed and a cross-check, never a fit on its own —
+      do not oversell it.
+
+**Also basics, cheap, no ordering claim** — do them when the surrounding work opens the file:
+
+- [ ] `series_sheets.held_by` is a snapshot nothing maintains — publishing a draft leaves its cell
+      drawn as a gap. Derive it in a view or a trigger on `maps`; the detector is not the fix. (See
+      *Open from the survey layer*.)
+- [x] **Done, and the item was stale when written. Verified 2026-09-21** by direct SELECT: the
+      Indochine 1:25,000 collection is **205 rows** and **zero** of them say "Public domain". 143
+      Nakala-direct half-sheets read `CC BY 4.0 — IGN, deposited in Nakala`, and the 62 original
+      composites read `CC BY 4.0 — scan by IGN, deposited in Nakala; this copy assembled from the
+      two printed half-sheets`. Corroborated per item, unauthenticated, at
+      `api.nakala.fr/datas/10.34847/nkl.<id>` (`nakala.fr/terms#license = "CC-BY-4.0"`) and by
+      CartoMundi's own serie-243 record (IGN sole holder, `tr38Licence` null on all 216 copies).
+      `source_url` is likewise 0/205 missing, so that bullet was stale too. **Two things worth
+      carrying**, neither of which reopens the item: (1) the 62 composites carry no `nakala_doi`,
+      so their licence rests on `check_indochine_provenance.py`'s two-cell visual-fingerprint
+      argument generalised to 60 more sheets — an inference, and that script labels it as one;
+      (2) the write that produced their current `rights` text matches no string in any committed
+      script, so it was applied ad hoc and **is not reproducible by re-running anything in the
+      tree**. The licence is right; the audit trail for it is not.
+- [ ] **The 1:100,000 series' CC-BY-NC-SA-4.0 is now in question.** Probed 2026-09-21 with the same
+      per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also
+      returns `"CC-BY-4.0"`, not NC-SA — and both series' CartoMundi records name the *same* Nakala
+      collection DOI (`10.34847/nkl.d2a82952`). So the per-item field does not discriminate between
+      them, and whatever established NC-SA for the 100,000 series was not re-verifiable: the Nakala
+      collection page now demands SSO. `scripts/oneoff/ingest_indochine_100k_nakala.mjs` writes
+      CC-BY-NC-SA-4.0 into every row it mints. Settle this **before** the N3 ingest run mints 578
+      more of them — over-claiming a restriction is cheaper than under-claiming one, but a
+      collection of 578 rows carrying the wrong licence string is expensive to correct.
+- [x] **The five are converted** (2026-09-21) — `backfill_indochine_descriptions`,
+      `fix_l909_series_index`, `import_l7014_series_sheets`, `publish_l7014_city_sheets`,
+      `scout_cartomundi_series` now take `--apply`, each verified against its own dry output
+      one at a time. `import_l7014_series_sheets` could not be exercised either side of the
+      edit — it reads `work/l7014/coverage.json`, which is not in this checkout, and fails
+      identically before and after at an unconditional `readFileSync` that precedes the flag
+      check; converted by reading, syntax-checked only.
+- [ ] **But the exit condition was wrong, and seven more scripts have the same defect.** The
+      note said four such scripts existed, the next morning's audit found nine, and the real
+      number is **sixteen**: `scripts/enqueue_seg.mjs`, `enqueue_layout_all.mjs`,
+      `enqueue_ocr_all.mjs`, `collection_aoi.mjs`, `import-seg-geojson.mjs`,
+      `enqueue_warp_all.mjs` and `oneoff/backfill_map_bbox.mjs` are each still
+      `const dry = args.includes('--dry')` over a real write. Verified 2026-09-21: every one
+      of the seven contains an insert/update/upsert and writes on a bare invocation. Six of
+      them queue `pipeline_jobs`, which is cheaper to undo than publishing a sheet but is
+      still an unattended write nobody asked for. **Three times now this item has been closed
+      on a count that was too low** — so the exit is the grep, not a number:
+      `grep -rn "includes('--dry')" scripts/` returns only `lib/cli.mjs`'s own
+      both-flags guard, and nothing under `scripts/` writes without `--apply`.
+- [ ] The colour/wash pre-pass is a **confirmed null**, not an unknown: every saturated pixel on
+      the 1882 sheet is hue 0–60° and `compute_tile_colours` looks at 60–260°. If colour
+      segmentation is to do real work, that window is the starting point — and it needs a second
+      sheet's histogram before the new one is trusted.
+- [ ] **21 draft L7014 sheets carry an `annotation_url` that 404s or 500s** — all created
+      2026-09-13/14, `georef_done` true in the row while the annotation store holds nothing
+      (measured 2026-09-21 by the `modern_prior.py --sweep` re-run). A different failure from the
+      point-count trap below: there is no thin fit to distrust, there is no fit. Exit: every row
+      claiming a georeference resolves to a real annotation, or stops claiming one.
+- [ ] **The 1912 Saigon-Cholon cannot be fit at all.** `saigon-cholon-et-environs`: 3 points, SVD
+      condition ratio **0.0302** against `scale.py`'s `MIN_GCP_CONDITION` floor of 0.05, so
+      `fit_sheet()` returns `None` rather than an exact-but-uninformative transform. Recorded on
+      2026-09-11 as "three near-collinear points in one corner", which understates it. Folded into
+      N2; noted here because it is the corpus's clearest single example of the guard working.
+- [ ] Two Huế sheets (800×628, 754×877) are under the scout's 1024 px floor. They need larger
+      scans, which is sourcing, not code.
+
+**Deliberately not first:** I1/I2/I6 (the evidence-legibility surfaces) and the OCR corpus drain.
+Both are real, and both compound better once N1–N4 mean a corrected sheet does not silently
+invalidate six downstream artefacts.
+
+## The OCR pass — previous first list (2026-09-04)
 
 The actionable list. Everything below it is the reference plan and the record; read the why when you need it, not before you start. Each item names the command or query that says it is finished.
 
@@ -230,12 +375,14 @@ Four lessons, each of which cost real time today:
       objects that already served and then failed its own verification pass the
       same way, which shares the probe — so a wholly successful run and a total
       failure printed the same thing. One User-Agent header, `2e9fd48b`.
-- [ ] **`rights` on all 62 Indochine rows is an unverified "Public domain".**
-      CartoMundi's Nakala items for the neighbouring 1:100,000 series are
-      CC-BY-NC-SA-4.0. Check before any bulk export claims a licence.
-- [ ] **Two Indochine sheets have no `source_url`**: 35 "An Thi" (ours 1904;
-      serie 243 holds 1905 and 1924 — our year may be a typo) and `0 bis` "Nha
-      nam" (absent from 243 entirely; 175 has it).
+- [x] **Done — and stale when written. Verified 2026-09-21**: all 205 rows carry a
+      CC BY 4.0 string, none says "Public domain", corroborated per item against
+      Nakala and CartoMundi serie 243. See the entry in the 2026-09-21 list at the
+      top of this file, including the two caveats it raises (the 62 composites'
+      licence is an inference, and the write is not reproducible from the tree).
+- [x] **Done. Verified 2026-09-21: 0 of 205 Indochine rows are missing `source_url`.**
+      The open question the bullet also carried survives it: 35 "An Thi" is dated 1904
+      here while serie 243 holds 1905 and 1924, so our year may still be a typo.
 - [ ] **AMS L909 has no `series_sheets` index**, so it has no coverage page and
       its /explore row offers no link — one decision, not two. Three sheets;
       someone must decide what that survey contains.
@@ -588,4 +735,6 @@ it cost us this week, cheapest fix first.
 ## Order
 A1–A4 → B1 → B2 → C0 → C1 → B3 → B4 → B5 → C2… ; B6/B7 interleave when a public/moderation need shows; A5 alongside B3 (RPCs are what make write tests cheap). D never blocks.
 
-Next: **E1 → E2 → E3**; E4 whenever there is human time; E5 not before E2 is reviewed. F0 before any of F1–F6 is worth starting; F3 is independent and can run alongside E.
+Superseded 2026-09-21 by **N1 → N6** at the top of this file — the foundations pass. E4 still runs whenever there is human time (N2 and N6 are its two halves).
+
+Previously: **E1 → E2 → E3**; E4 whenever there is human time; E5 not before E2 is reviewed. F0 before any of F1–F6 is worth starting; F3 is independent and can run alongside E.
