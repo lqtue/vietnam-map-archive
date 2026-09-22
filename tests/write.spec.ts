@@ -10,7 +10,7 @@ import { loadSchema, unsupportedKeywords, validate } from './schemaCheck';
 import { placeCoreKey } from '../src/lib/core/utils/placeKey';
 
 /**
- * Write-path smokes (ROADMAP A5). Unlike smoke.spec.ts these DO write rows, so
+ * Write-path smokes (roadmap-record A5). Unlike smoke.spec.ts these DO write rows, so
  * they refuse to run against anything but a loopback Supabase and delete what
  * they create.
  *

@@ -1,10 +1,12 @@
-# Time walk — plan (2026-09-12)
+# Walk — plan (2026-09-12)
+
+Was "Time walk"; renamed 2026-09-22 because it and "Time machine" were indistinguishable.
 
 **Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `main` @ fbfbfc2e;
 HACW-rebuild `main` @ 2026-09-11 (`~/Downloads/Personal/test/HACW-rebuild`);
-`docs/time-machine-plan.md` and `docs/platform-design.md` read 2026-09-12.
+`docs/search-plan.md` and `docs/platform-design.md` read 2026-09-12.
 
-Track F of `docs/ROADMAP.md`. Track E turns the raster corpus into searchable
+Walk, in `docs/ROADMAP.md`. Search turns the raster corpus into searchable
 text and dated vector fabric; this is the surface a person **walks through** —
 one district, on foot, with the sheets underneath and the old names on top.
 
@@ -166,7 +168,7 @@ editors owning one field is a sync loop with no winner. Canonical by subject:
 
 `story.schema.json` sits at step 3 of `platform-design.md` §6, behind the engine
 (1.5) and `packages/contracts` (2). It needs **neither** — no PostGIS, no
-`context_at`. It can jump the queue, and Track F is why it should.
+`context_at`. It can jump the queue, and Walk is why it should.
 
 ---
 

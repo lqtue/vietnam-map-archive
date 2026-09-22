@@ -11,7 +11,7 @@ network and can be checked against geometry whose answer is known:
 
     python work/analysis/district4/metrics.py --self-check
 
-Design notes: `docs/time-machine-plan.md` §E2. The features come from
+Design notes: `docs/search-plan.md` §E2. The features come from
 `/api/export/footprints`, which warps them server-side, so this module only
 ever sees WGS84 and never touches a georeference.
 

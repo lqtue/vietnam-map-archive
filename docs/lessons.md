@@ -58,7 +58,7 @@ single run's small delta as a result (2026-09-04).
 
 **A three-point fit has zero degrees of freedom, so its RMSE is identically 0.** A sheet on 3 GCPs
 can be badly wrong while reporting nothing at all. A residual of 0 is the absence of a measurement,
-not a good measurement — this is N2's whole reason for existing.
+not a good measurement — this is `three-point-residuals`' whole reason for existing.
 
 **Say which number you mean before comparing it to another.** Four numbers can all be correct and
 all differ: for L7014 an ArcGIS index says 627 cells, PCL publishes 535 scans, we hold 461, and 9
@@ -84,7 +84,7 @@ only `lib/cli.mjs`'s own guard.
 **A replaced scan invalidates pixel work; a changed georeference invalidates ground work.** Observed
 once already: re-scanning the 1959 sheet emptied `maps.triage`, and had the triage survived, the
 saved neatline would have cropped the *old* scan's pixels while looking entirely valid
-(2026-09-10). This is N4.
+(2026-09-10). This is `stale-after-change`.
 
 **A sheet number is not a token — four of them contain a space.** A backfill keyed its updates on
 `` `${series_key} ${sheet_number}` `` and split on the space, so `"0 bis"` came back as sheet `"0"`

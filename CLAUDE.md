@@ -17,6 +17,23 @@ open a file in their tree, which is why their content is not repeated here:
 
 Working in one of those trees? Read its file first.
 
+## Names
+
+One thing, one name. These are the ones that have been confused before:
+
+| Name | Is | Is not |
+|------|-----|--------|
+| **Vietnam Map Archive**, VMA | the product, and how to refer to it in prose | a hostname |
+| `maparchive.vn` | the live site | the Pages project |
+| `vmabeta` | the Cloudflare Pages project id, and nothing else | a name for the product — never use it in prose |
+| `vietnam-map-archive` | the GitHub repo (renamed from `svelte-beta`, Sept 2026) | the local directory, which is still `svelte-beta` |
+| **HACW** | the Hội An event PWA, a separate app that Walk forks | part of VMA |
+| **Shapes · Search · Walk · Debt** | the four lines of work, in `docs/ROADMAP.md` | Tracks C/E/F/D, which is what they were called until 2026-09-22 |
+
+Roadmap items are named for their subject — `l7014-rebuild`, `hand-triage`, `colour-blocks` — never
+by a letter code. "Time machine" and "Time walk" are retired: they were two names for two different
+things that nobody could tell apart, and they are now **Search** and **Walk**.
+
 ## Commands
 
 ```bash
@@ -122,15 +139,17 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one
   counts, the first `join` and the first `approved` footprints in the archive's history, and the
   four defects that only surfaced by running the chain
-- `docs/ROADMAP.md` — **the one tracker, open work only**: the N-list foundations pass, the OCR
-  drain, the I-series, Tracks C/E/F, burn-down. Close an item by moving it out, not by ticking it
+- `docs/ROADMAP.md` — **the one tracker, open work only**: the foundations pass, the OCR drain,
+  evidence, survey layer, Shapes · Search · Walk · Debt. Items are named for what they act on
+  (`l7014-rebuild`, not `N1`); the old letter codes map to those names at the bottom of that file.
+  Close an item by moving it out, not by ticking it
 - `docs/roadmap-record.md` — **frozen 2026-09-22**: every closed pass with its measurements and the
   defects it turned up. Not maintained; read it for what something cost, never for what is open
 - `docs/lessons.md` — **the rules this project has paid for more than once**, each with the failure
   that taught it and a date. Read before any unattended run, any database write, or any pass that
   produces a number
-- `docs/time-machine-plan.md` — label search · temporal fabric · period sources (Track E detail)
-- `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route,
+- `docs/search-plan.md` — label search · temporal fabric · period sources (**Search** detail)
+- `docs/walk-plan.md` — the walk-through surface (**Walk**): HACW forked for a District 4 route,
   warped sheets as a year slider, and the frozen-JSON seam between the two apps
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared and what stays per-app
 - `docs/strategy.md` (funder-facing), `docs/theory.md`, `docs/user-guide.md` — vision and

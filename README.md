@@ -214,7 +214,7 @@ written for both people and coding agents. Then:
 
 | Doc | What it is |
 | --- | --- |
-| `docs/ROADMAP.md` | The one tracker, open work only: the foundations pass, the OCR drain, Tracks C/E/F, burn-down |
+| `docs/ROADMAP.md` | The one tracker, open work only: the foundations pass, the OCR drain, Shapes, Search, Walk, Debt |
 | `docs/roadmap-record.md` | Frozen record of closed passes — what each one measured and what it turned up |
 | `docs/lessons.md` | The rules paid for more than once, each with the failure that taught it |
 | `docs/system-guidelines.md` | Layering rule, page structure, component patterns, known debt (§11) |
@@ -225,7 +225,7 @@ written for both people and coding agents. Then:
 | `docs/digitalize-guide.md` | Operator guide for `/scan?mode=prepare` — including the failure modes that return plausible output while dropping data |
 | `docs/pipelines.md` | OCR + MapSAM2 commands, and what not to re-attempt |
 | `docs/admin-tooling.md` | Map editing, bulk upload, Scout, the R2 worker |
-| `docs/time-machine-plan.md`, `docs/platform-design.md` | The temporal-fabric plan; the shared-platform proposal |
+| `docs/search-plan.md`, `docs/platform-design.md` | The temporal-fabric plan; the shared-platform proposal |
 | `docs/strategy.md`, `docs/theory.md`, `docs/user-guide.md` | Vision and outward-facing prose |
 | `docs/journals/` | Dated research notes |
 | `work/MapSAM2/TECHNICAL.md`, `work/ocr/EVAL-BASELINE.md` | Model notes; the measured OCR quality gate |

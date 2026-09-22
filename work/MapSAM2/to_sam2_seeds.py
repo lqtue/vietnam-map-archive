@@ -1,4 +1,4 @@
-"""OCR extractions → SAM2 prompts (ROADMAP C4).
+"""OCR extractions → SAM2 prompts (roadmap-record C4).
 
 `inference_tiles_as_video.py --mode prompted` needs, for each tile, the boxes to
 prompt SAM2 with. Those come from the OCR pass: a label sitting on the map is

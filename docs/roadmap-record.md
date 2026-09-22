@@ -8,6 +8,9 @@ the way, and the reasoning behind decisions that are now just one line in the tr
 - The rules that keep getting re-learned are **`docs/lessons.md`**.
 - Anything below that looks open has been carried into the tracker or dropped; believe the tracker,
   not this file.
+- **The letter codes in here are retired.** `N1`, `I3`, `C5`, `E2b`, `F0` and the rest still name
+  the items below, but the tracker names work by what it acts on. The map between them is the
+  "Renamed from" table at the bottom of `docs/ROADMAP.md`.
 
 ---
 
@@ -670,7 +673,7 @@ pure checks):
       the first link `/admin?tab=scout` and `/admin?tab=bulk` have ever had. Written because every
       exit condition in this file was a query its owner could not run
 
-**Then, in order** (detail in `docs/time-machine-plan.md`, engine design in
+**Then, in order** (detail in `docs/search-plan.md`, engine design in
 `docs/platform-design.md`):
 
 - [ ] 7. **E2 step 1 on Colab** — mint a `seg`-scoped worker key, run `vma_worker.py --kinds seg` in
@@ -994,7 +997,7 @@ Flow: colour pre-pass → OCR → coarse seg (blocks, rivers) → fine seg (buil
 - [ ] deferred: gazetteer link, LoRA shot set
 Runs as B1 jobs (`ocr`, `seg`, `join`) once B1 lands — no more copy-paste CLI.
 
-## Track E — Time machine (`docs/time-machine-plan.md`, planned 2026-09-02)
+## Track E — Time machine (`docs/search-plan.md`, planned 2026-09-02)
 Label search → temporal fabric → period sources, on the existing jobs + HITL + RPC substrate.
 Measured start: OCR on 1 map, zero SAM2 output, 8-map Saigon series 1878→1968 already georeferenced
 for District 4.
@@ -1055,7 +1058,7 @@ for District 4.
 - [ ] E5 Building attributes → OSM tags → LoD2 — deferred until E2 fabric is reviewed on ≥ 3 maps;
       `tags jsonb` lands with its first writer
 
-## Track F — Time walk (`docs/time-walk-plan.md`, planned 2026-09-12)
+## Track F — Time walk (`docs/walk-plan.md`, planned 2026-09-12)
 The surface a person walks through: one District 4 route on foot, the warped sheets underneath, the
 old names on top. HACW (the Hội An event PWA) forked for Saigon — it is built to be forked per event
 — with its single modern basemap replaced by a stack of warped historical sheets and a year slider.

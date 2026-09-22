@@ -640,7 +640,7 @@ def _self_check() -> None:
     """
     Run: python work/worker/vma_worker.py --self-check
 
-    Guards ROADMAP 5c. Patches claim() rather than the network, so this needs
+    Guards roadmap-record 5c. Patches claim() rather than the network, so this needs
     no worker key, no server and no database.
     """
     import contextlib
@@ -816,7 +816,7 @@ def main() -> None:
         except requests.RequestException as e:
             # A transport error is not an empty queue. Conflating the two is how
             # ocr job 107182d6 sat stranded in `running` with a dead subprocess
-            # while an unattended drain reported success (ROADMAP 5c). Under
+            # while an unattended drain reported success (roadmap-record 5c). Under
             # --once the caller is a shell loop reading the exit code, so fail
             # there; when polling, keep going — a blip should not kill a worker
             # that is meant to run for hours.

@@ -2,8 +2,8 @@
 
 **Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `feat/label-search` @ bccd495, HACW
 `main` @ 2026-08-30, Tasco `platform/docs` read 2026-09-02.
-Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is
-`docs/time-machine-plan.md`, Track F is `docs/time-walk-plan.md` — which forks the event app rather
+Detail for the "Platform" idea in `docs/strategy.md`; the Search product plan is
+`docs/search-plan.md`, Walk is `docs/walk-plan.md` — which forks the event app rather
 than merging it, and jumps §6's queue with `story.schema.json` (it needs neither the engine nor
 `packages/contracts`).
 

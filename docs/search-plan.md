@@ -1,6 +1,8 @@
-# Time machine — plan (2026-09-02)
+# Search — plan (2026-09-02)
 
-Design detail for **Track E** of `docs/ROADMAP.md` (the single tracker). Vision in
+Was "Time machine"; renamed 2026-09-22 because it and "Time walk" were indistinguishable.
+
+Design detail for **Search** in `docs/ROADMAP.md` (the single tracker). Vision in
 `docs/strategy.md` / `docs/theory.md`; this file is the engineering plan only.
 
 **One sentence.** Turn the georeferenced raster corpus into searchable text, dated

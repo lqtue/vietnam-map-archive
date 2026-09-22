@@ -20,7 +20,7 @@ in Postgres and does it better: `place_key` folds punctuation *and* accents, so
 FOURRIERE and FOURRIÈRE are one row there and two cross-linked rows here. The
 view is the gazetteer of record and feeds /place and /api/press. This file earns
 its place only on what the view drops — `legend_entry` rows, a confidence
-filter, and the per-sighting provenance below. See ROADMAP item 4b: the grouping
+filter, and the per-sighting provenance below. See ROADMAP `dictionary-on-place-names`: the grouping
 here should be replaced by a read of that view before the two rules drift.
 """
 

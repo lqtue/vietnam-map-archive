@@ -531,5 +531,5 @@ puts most of its module-level ones — and every SQL `--` comment. A bare
 **Hand-drop the prose mentions.** The grep scope above returns one non-marker
 hit, `work/cleanup/TODO.md`, which is a scratch note rather than a comment on
 code. Widen the scope beyond it and you also pick up this file's own header,
-`CLAUDE.md`, `contracts/README.md:22` and `docs/time-machine-plan.md:232` — all
+`CLAUDE.md`, `contracts/README.md:22` and `docs/search-plan.md:232` — all
 cross-references to the convention, none of them markers.
