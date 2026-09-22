@@ -41,9 +41,19 @@ function withInfoJson(url: string): string {
  *
  * The editor keys a map off its IIIF resource, not off an annotation, so the
  * source has to be the manifest or image service the map was georeferenced
- * from. An R2 source is deliberately skipped: `allmaps_id` derives from the
- * image URL, so opening our mirror would derive a different id and start a
- * blank map instead of loading the points already placed.
+ * from. An R2 source is skipped by default — `allmaps_id` derives from the
+ * image URL, so opening our mirror would usually derive a different id and
+ * start a blank map instead of loading the points already placed.
+ *
+ * "Usually": the whole District 4 series is the exception. Their GCPs were
+ * re-fit against the R2-hosted copy after mirroring (1942 most visibly — its
+ * R2 copy is a distinct, higher-res rescan the original scan never had), so
+ * for those sheets the "skip r2" default is exactly backwards and opens a
+ * stale scan. `verifiedSourceId` — the annotation's own `target.source.id`,
+ * fetched by the caller — is ground truth and overrides the default whenever
+ * it matches one of `sources`, r2 included. Callers that can't fetch the
+ * annotation (no caller currently omits it, but the type stays optional so
+ * this remains a pure, synchronous fallback) get the old heuristic.
  *
  * Returns '' when the map carries nothing the editor can open.
  */
@@ -53,8 +63,16 @@ export function allmapsEditorSourceUrl(
     annotation_url?: string | null;
     allmaps_id?: string | null;
   },
-  sources: { iiif_image?: string | null; source_type?: string | null }[] = []
+  sources: { iiif_image?: string | null; source_type?: string | null }[] = [],
+  verifiedSourceId?: string | null
 ): string {
+  if (verifiedSourceId) {
+    const stripInfoJson = (u: string) => u.replace(/\/info\.json$/, '');
+    const matched = sources.find(
+      (s) => s.iiif_image && stripInfoJson(s.iiif_image) === stripInfoJson(verifiedSourceId)
+    )?.iiif_image;
+    if (matched) return withInfoJson(matched);
+  }
   if (map.iiif_manifest) return withInfoJson(map.iiif_manifest);
   const original = sources.find((s) => s.source_type !== 'r2' && s.iiif_image)?.iiif_image;
   if (original) return withInfoJson(original);

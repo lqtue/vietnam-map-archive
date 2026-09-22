@@ -26,6 +26,7 @@
   } from '$lib/data/admin/adminApi';
   import NeatlineEditor from './NeatlineEditor.svelte';
   import { allmapsEditorSourceUrl } from '$lib/core/iiif/annotationUrl';
+  import { fetchAnnotationSourceId } from '$lib/data/maps/georef';
 
   export let map: MapRow;
 
@@ -288,10 +289,31 @@
   // Effective annotation URL: override wins, else build from bare allmaps_id.
   $: annotationUrl =
     annotation_url || (allmaps_id ? `https://annotations.allmaps.org/images/${allmaps_id}` : '');
+  // Ground truth for which source the annotation is really fit to — r2
+  // included, since the District 4 series' GCPs are re-fit against their R2
+  // mirror. Guarded against the map changing mid-fetch (the modal can be
+  // reused for a different row without remounting).
+  let verifiedSourceId: string | null = null;
+  /* eslint-disable svelte/infinite-reactive-loop -- writes verifiedSourceId
+     asynchronously, guarded by URL match; editorAllmapsUrl below only reads
+     it and writes nothing back, so there is no real cycle. */
+  $: if (annotationUrl) {
+    const forUrl = annotationUrl;
+    fetchAnnotationSourceId(forUrl).then((id) => {
+      if (forUrl === annotationUrl) verifiedSourceId = id;
+    });
+  } else {
+    verifiedSourceId = null;
+  }
+  /* eslint-enable svelte/infinite-reactive-loop */
   // Shared with the share page's "Fix georeference" link — see
-  // $lib/data/maps/georef.ts for why an R2 source is skipped and why an
-  // annotation URL must not take /info.json.
-  $: editorAllmapsUrl = allmapsEditorSourceUrl({ ...map, annotation_url, allmaps_id }, iiifSources);
+  // $lib/data/maps/georef.ts for why an R2 source is skipped by default and
+  // why an annotation URL must not take /info.json.
+  $: editorAllmapsUrl = allmapsEditorSourceUrl(
+    { ...map, annotation_url, allmaps_id },
+    iiifSources,
+    verifiedSourceId
+  );
 </script>
 
 <div class="hosting-section">

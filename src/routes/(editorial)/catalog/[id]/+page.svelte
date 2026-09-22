@@ -130,7 +130,7 @@
     role = (await fetchUserRole(supabase, session?.user?.id)) ?? 'user';
   });
   $: canFixGeoref = role === 'admin' || role === 'mod';
-  $: editorSource = allmapsEditorSourceUrl(map, map.map_iiif_sources ?? []);
+  $: editorSource = allmapsEditorSourceUrl(map, map.map_iiif_sources ?? [], data.editorSourceId);
   $: editorUrl = editorSource
     ? `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(editorSource)}`
     : null;
