@@ -1,9 +1,22 @@
 # Platform design — one codebase for VMA, HACW and what comes next (2026-09-02)
 
-**Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `feat/label-search` @ bccd495, HACW `main` @ 2026-08-30, Tasco `platform/docs` read 2026-09-02.
-Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is `docs/time-machine-plan.md`, Track F is `docs/time-walk-plan.md` — which forks the event app rather than merging it, and jumps §6's queue with `story.schema.json` (it needs neither the engine nor `packages/contracts`).
+**Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `feat/label-search` @ bccd495, HACW
+`main` @ 2026-08-30, Tasco `platform/docs` read 2026-09-02.
+Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is
+`docs/time-machine-plan.md`, Track F is `docs/time-walk-plan.md` — which forks the event app rather
+than merging it, and jumps §6's queue with `story.schema.json` (it needs neither the engine nor
+`packages/contracts`).
 
-**For the hurried reader.** At the core is not an app but a **place-time index**: Postgres + PostGIS answering *what was here, when, and what was it called* (§0). Three codebases share an author: VMA (SvelteKit, legacy syntax, OpenLayers + Allmaps, Supabase, Python workers), HACW (SvelteKit, runes, MapLibre + shipped PMTiles, no backend), and Tasco's mobility platform (employer's Go/React monorepo — a source of practices, not code). Tasco's docs encode one rule that settles the unification question: **promote something to shared only when a second real consumer exists** (`tasco/platform/docs/engineering-workflow.md:79`). Applied honestly, that yields a small pnpm monorepo whose shared surface is **contracts, basemap recipe, deploy conventions, docs system, decision register** — and leaves map engine, data store, auth, design tokens and Svelte syntax per-app. Unify the seams, not the bodies.
+**For the hurried reader.** At the core is not an app but a **place-time index**: Postgres + PostGIS
+answering *what was here, when, and what was it called* (§0). Three codebases share an author: VMA
+(SvelteKit, legacy syntax, OpenLayers + Allmaps, Supabase, Python workers), HACW (SvelteKit, runes,
+MapLibre + shipped PMTiles, no backend), and Tasco's mobility platform (employer's Go/React monorepo
+— a source of practices, not code). Tasco's docs encode one rule that settles the unification
+question: **promote something to shared only when a second real consumer exists**
+(`tasco/platform/docs/engineering-workflow.md:79`). Applied honestly, that yields a small pnpm
+monorepo whose shared surface is **contracts, basemap recipe, deploy conventions, docs system,
+decision register** — and leaves map engine, data store, auth, design tokens and Svelte syntax
+per-app. Unify the seams, not the bodies.
 
 ---
 
@@ -11,9 +24,12 @@ Detail for the "Platform" idea in `docs/strategy.md`; Track E product plan is `d
 
 Everything above is packaging. The thing being packaged is one query:
 
-> **`(lng, lat, year?)` → everything the archive knows about that spot**, and its inverse **`text` → places** (E1 shipped that half).
+> **`(lng, lat, year?)` → everything the archive knows about that spot**, and its inverse **`text` →
+places** (E1 shipped that half).
 
-That is what no competitor has. `pastmaps` browses rasters; `hanoimaps` is a static site; a IIIF viewer serves pixels. An archive that can answer *what was here, when, and what did people call it* is a data product, and the apps in §2 are its clients.
+That is what no competitor has. `pastmaps` browses rasters; `hanoimaps` is a static site; a IIIF
+viewer serves pixels. An archive that can answer *what was here, when, and what did people call it*
+is a data product, and the apps in §2 are its clients.
 
 ### Where the geometry is today
 
@@ -26,20 +42,36 @@ That is what no competitor has. `pastmaps` browses rasters; `hanoimaps` is a sta
 | `story_points` | lng/lat | yes |
 | press sources (E3) | not stored; fetched live | no |
 
-Every map-derived row is in pixel space, and the pixel→geo warp happens in `$lib/server/transformer.ts` on each request. So "what was here in 1923" cannot be one query today. Closing that is the engine.
+Every map-derived row is in pixel space, and the pixel→geo warp happens in
+`$lib/server/transformer.ts` on each request. So "what was here in 1923" cannot be one query today.
+Closing that is the engine.
 
 ### Decision: PostGIS, warped on write, read through RPCs
 
-1. **`create extension postgis`.** Supabase's Postgres ships it; no new infrastructure, no second store.
+1. **`create extension postgis`.** Supabase's Postgres ships it; no new infrastructure, no second
+   store.
 2. **Add derived geometry beside the pixel columns**, never instead of them:
    - `ocr_extractions.geom geography(Point,4326)` — the bbox centre warped.
    - `footprint_submissions.geom geography(Polygon,4326)` — the ring warped.
-   - both plus `geom_src text` (the annotation version the warp used) and `geom_rmse double precision` (that map's GCP residual).
-   - GiST index on each; `geom` is null until warped, and null is a legitimate state (ungeoreferenced map).
+   - both plus `geom_src text` (the annotation version the warp used) and
+     `geom_rmse double precision` (that map's GCP residual).
+   - GiST index on each; `geom` is null until warped, and null is a legitimate state
+     (ungeoreferenced map).
 
-   Pixel coordinates stay the master; `geom` is **derived, disposable and rebuildable** — the rule from `tasco/platform/docs/map-data-operations.md:39-45`. Nothing hand-edits it, and `geom_src` is what says whether it is stale.
-3. **Warp on write, in the writer that already holds the transformer.** Every path into these tables is a server route on the service key: `/api/pipeline/results` (worker OCR rows), `/api/contribute/footprints` (hand traces), `/api/admin/maps/[id]/ocr-review` (manual bboxes and coordinate edits). Each already resolves the map, so each computes `geom` inline. Re-georeferencing is the only other event that invalidates it: `$lib/server/annotationMirror.ts` enqueues one `warp` job per map, and the worker recomputes that map's rows through `/api/pipeline/execute` — the kind that runs server-side because it needs the service key. One new job kind, no new machinery.
-4. **Read through RPCs, never PostgREST on a geometry column.** `supabase gen types` renders PostGIS types as `unknown`, and a client that selects `geom` gets WKB it cannot use. Two functions, both `security definer`, both gated exactly as migrations 063/065 gate their tables:
+   Pixel coordinates stay the master; `geom` is **derived, disposable and rebuildable** — the rule
+   from `tasco/platform/docs/map-data-operations.md:39-45`. Nothing hand-edits it, and `geom_src` is
+   what says whether it is stale.
+3. **Warp on write, in the writer that already holds the transformer.** Every path into these tables
+   is a server route on the service key: `/api/pipeline/results` (worker OCR rows),
+   `/api/contribute/footprints` (hand traces), `/api/admin/maps/[id]/ocr-review` (manual bboxes and
+   coordinate edits). Each already resolves the map, so each computes `geom` inline.
+   Re-georeferencing is the only other event that invalidates it: `$lib/server/annotationMirror.ts`
+   enqueues one `warp` job per map, and the worker recomputes that map's rows through
+   `/api/pipeline/execute` — the kind that runs server-side because it needs the service key. One
+   new job kind, no new machinery.
+4. **Read through RPCs, never PostgREST on a geometry column.** `supabase gen types` renders PostGIS
+   types as `unknown`, and a client that selects `geom` gets WKB it cannot use. Two functions, both
+   `security definer`, both gated exactly as migrations 063/065 gate their tables:
 
    ```
    context_at(lng, lat, radius_m default 150, year_from default null, year_to default null,
@@ -47,7 +79,10 @@ Every map-derived row is in pixel space, and the pixel→geo warp happens in `$l
      { maps: [...], labels: [...], footprints: [...], legend_points: [...], stories: [...] }
    ```
 
-   Each item carries `map_id`, `year`, `distance_m`, and the warp's own `geom_rmse`, so a caller can weigh a 1799 sketch differently from a 1923 cadastral plan. Sister function `map_context(map_id)` answers the map-centric view (everything this sheet knows), which is what `/api/export/footprints` and the thesis notebook want.
+   Each item carries `map_id`, `year`, `distance_m`, and the warp's own `geom_rmse`, so a caller can
+   weigh a 1799 sketch differently from a 1923 cadastral plan. Sister function `map_context(map_id)`
+   answers the map-centric view (everything this sheet knows), which is what
+   `/api/export/footprints` and the thesis notebook want.
 
 ### Why this is the platform's first contract, ahead of stories
 
@@ -66,16 +101,28 @@ So step 2 of §6 leads with `context.schema.json`, and `story.schema.json` follo
 
 ### What this changes in the tracker
 
-- **B8 un-defers, re-scoped.** It was written as "PostGIS on footprints + `build_pmtiles`", deferred because a geometry column only pays off when /explore wants city-wide layers. That reasoning holds for *rendering* and is wrong for *querying*: the index pays for itself the first time anything asks a spatial question, which E3 and the thesis both do. Vector tiles stay deferred; `build_pmtiles` stays a non-goal.
+- **B8 un-defers, re-scoped.** It was written as "PostGIS on footprints + `build_pmtiles`", deferred
+  because a geometry column only pays off when /explore wants city-wide layers. That reasoning holds
+  for *rendering* and is wrong for *querying*: the index pays for itself the first time anything
+  asks a spatial question, which E3 and the thesis both do. Vector tiles stay deferred;
+  `build_pmtiles` stays a non-goal.
 - **E2's export becomes a view over the index** rather than a warp loop per request.
-- **E1 is already the inverse half** of the engine — text → place. `context_at` is place → everything.
+- **E1 is already the inverse half** of the engine — text → place. `context_at` is place →
+  everything.
 
 ### Honest limits, carried in the response
 
-- **Warp error is per map and sometimes large.** A 1799 sketch has few GCPs and metres of residual; asking for a 150 m radius there is fiction dressed as data. Every row returns `geom_rmse` and the UI shows it. Flag, never pretend — `tasco/BUILDINGS_PLAN.md:345-347`.
-- **`geom_src` is the staleness contract.** A map re-georeferenced after a warp has rows whose `geom_src` no longer matches its annotation; the `warp` job clears that, and a mismatch is a queryable defect rather than silent drift.
-- **Radius, not containment.** A label's point is its bbox centre, not its extent, so `context_at` answers "near here", and the honest unit for a street name is tens of metres.
-- **No temporal database.** `year` comes from the map the row was observed on; there is no `valid_to` and no attempt at continuity between sheets. Change is computed by comparing two years, in the notebook or in the caller.
+- **Warp error is per map and sometimes large.** A 1799 sketch has few GCPs and metres of residual;
+  asking for a 150 m radius there is fiction dressed as data. Every row returns `geom_rmse` and the
+  UI shows it. Flag, never pretend — `tasco/BUILDINGS_PLAN.md:345-347`.
+- **`geom_src` is the staleness contract.** A map re-georeferenced after a warp has rows whose
+  `geom_src` no longer matches its annotation; the `warp` job clears that, and a mismatch is a
+  queryable defect rather than silent drift.
+- **Radius, not containment.** A label's point is its bbox centre, not its extent, so `context_at`
+  answers "near here", and the honest unit for a street name is tens of metres.
+- **No temporal database.** `year` comes from the map the row was observed on; there is no
+  `valid_to` and no attempt at continuity between sheets. Change is computed by comparing two years,
+  in the notebook or in the caller.
 
 ## 1. What Tasco's docs teach, and what we adopt
 
@@ -106,7 +153,11 @@ So step 2 of §6 leads with `context.schema.json`, and `story.schema.json` follo
 | Three-layer docs: root curated / `guides/` / `journals/`, promote rarely; README is an index | `.agents/AGENTS.md:105-113`, `README.md:5-14` | §5 |
 | One canonical agent policy, thin per-tool adapters | `.agents/AGENTS.md:5-10` | `docs/AGENTS.md` canonical; `CLAUDE.md` becomes an adapter |
 
-**Explicitly not adopted** (Tasco-scale, wrong here): two-repo Argo release plane; three speed planes; two-cloud airlock ADR; H3 grid + MAUP apparatus; K ≥ 4 blind-source latent-class model (a historical sheet is one image, and two OCR engines see the same pixels — the doc's own objection at `collection-system-plan.md:342`); contributor-history estimators; crew routing / CELF; ablation-based value; Keycloak SSO.
+**Explicitly not adopted** (Tasco-scale, wrong here): two-repo Argo release plane; three speed
+planes; two-cloud airlock ADR; H3 grid + MAUP apparatus; K ≥ 4 blind-source latent-class model (a
+historical sheet is one image, and two OCR engines see the same pixels — the doc's own objection at
+`collection-system-plan.md:342`); contributor-history estimators; crew routing / CELF;
+ablation-based value; Keycloak SSO.
 
 ---
 
@@ -126,9 +177,13 @@ platform/                          (pnpm workspace; today = the VMA repo, rename
 └─ package.json                    check · lint · test · build → pnpm -r
 ```
 
-Two apps, two packages. No `packages/ui`, no `packages/map`, no `packages/tokens`. Each of those has one consumer.
+Two apps, two packages. No `packages/ui`, no `packages/map`, no `packages/tokens`. Each of those has
+one consumer.
 
-**Why a monorepo at all** (vs. two repos + copy): shared packages without publishing; one `check/lint/test` lane; one docs tree; one agent policy; HACW's per-event fork becomes `content/<event>/` instead of a repo per festival. Cost: CF Pages root-dir setting per app, one-time `git subtree` import of HACW, and the discipline of §6.
+**Why a monorepo at all** (vs. two repos + copy): shared packages without publishing; one
+`check/lint/test` lane; one docs tree; one agent policy; HACW's per-event fork becomes
+`content/<event>/` instead of a repo per festival. Cost: CF Pages root-dir setting per app, one-time
+`git subtree` import of HACW, and the discipline of §6.
 
 ---
 
@@ -145,9 +200,11 @@ Two apps, two packages. No `packages/ui`, no `packages/map`, no `packages/tokens
 | Deploy conventions — adapter-cloudflare, env in dashboard, `node:` prefix rule, smoke pattern | — | both apps | Move the hard-won CLAUDE.md deployment section to `docs/guides/cloudflare-pages.md` |
 | `docs/` system + `docs/AGENTS.md` | — | both apps, all agents | §5 |
 
-Rule for adding a row: name the second consumer. If it is "future", it is not a row (`engineering-workflow.md:83-84`).
+Rule for adding a row: name the second consumer. If it is "future", it is not a row
+(`engineering-workflow.md:83-84`).
 
-Type generation: `json-schema-to-typescript` in `packages/contracts` `generate` lane; apps import `@platform/contracts`. Generated files are committed, never edited; CI regenerates and diffs.
+Type generation: `json-schema-to-typescript` in `packages/contracts` `generate` lane; apps import
+`@platform/contracts`. Generated files are committed, never edited; CI regenerates and diffs.
 
 ---
 
@@ -162,17 +219,28 @@ Type generation: `json-schema-to-typescript` in `packages/contracts` `generate` 
 | Svelte syntax | legacy (`$:`, `export let`) | runes | Both are Svelte 5; they coexist per file. Archive migrates on its own schedule, not for the merge |
 | Pipelines | `work/` Python | none | — |
 
-Reopen any row when a second consumer appears (e.g. an archive "field mode" that wants HACW's precached-PMTiles offline trick → `packages/basemap` grows an `offline` helper; still not a map package).
+Reopen any row when a second consumer appears (e.g. an archive "field mode" that wants HACW's
+precached-PMTiles offline trick → `packages/basemap` grows an `offline` helper; still not a map
+package).
 
 ---
 
 ## 5. Docs and decisions
 
-- **Three layers** (`.agents/AGENTS.md:105-113`): root `docs/*.md` = curated must-read (architecture, operating model, this file, ROADMAP); `docs/guides/` = how-to (Cloudflare Pages, local Supabase, worker, pmtiles); `docs/journals/YYMMDD-slug.md` = what shipped / decisions / loose end / lesson. New docs default to guides or journals.
+- **Three layers** (`.agents/AGENTS.md:105-113`): root `docs/*.md` = curated must-read
+  (architecture, operating model, this file, ROADMAP); `docs/guides/` = how-to (Cloudflare Pages,
+  local Supabase, worker, pmtiles); `docs/journals/YYMMDD-slug.md` = what shipped / decisions /
+  loose end / lesson. New docs default to guides or journals.
 - **`docs/decisions.md`**: register `| # | Decision | Status | Overturned by |`, retraction table, kill conditions. Seeded from decisions already made but scattered: OL over MapLibre, no PostGIS yet (B8), `word_similarity` over trigram index (065), `security definer` + `p_public_only`, stories publish = submit for review, legacy syntax.
-- **ADR** only for a boundary move (new app, new store, engine change): Status / Date / Context / Decision / Rationale / What must NOT be split / Alternatives / Consequences (`adr-multi-cloud-split.md:1-6`).
-- **Every design doc**: Status/Owner/Baseline header with the commit verified against; "for the hurried reader" paragraph; changelog in an appendix so the body reads present-tense.
-- **`docs/AGENTS.md`** canonical (layering rule, contract-first rule, MR limits, no-runes-in-archive, docs placement); `CLAUDE.md` shrinks to an adapter + repo facts. Today's 300-line CLAUDE.md is content, not an index — the split happens when HACW's CLAUDE.md lands beside it and the duplication is visible, not before.
+- **ADR** only for a boundary move (new app, new store, engine change): Status / Date / Context /
+  Decision / Rationale / What must NOT be split / Alternatives / Consequences
+  (`adr-multi-cloud-split.md:1-6`).
+- **Every design doc**: Status/Owner/Baseline header with the commit verified against; "for the
+  hurried reader" paragraph; changelog in an appendix so the body reads present-tense.
+- **`docs/AGENTS.md`** canonical (layering rule, contract-first rule, MR limits,
+  no-runes-in-archive, docs placement); `CLAUDE.md` shrinks to an adapter + repo facts. Today's
+  300-line CLAUDE.md is content, not an index — the split happens when HACW's CLAUDE.md lands beside
+  it and the duplication is visible, not before.
 
 ---
 
@@ -193,7 +261,8 @@ Reopen any row when a second consumer appears (e.g. an archive "field mode" that
 **Non-goals, with reopen conditions**
 - Shared UI package — reopen when a third app needs `LocationSearch`/`MapCard`-class components.
 - One map engine — reopen if `@allmaps/maplibre` reaches parity and the archive wants 3D or offline.
-- Runes migration of the archive — reopen when a runes-only dependency or a measured DX cost forces it.
+- Runes migration of the archive — reopen when a runes-only dependency or a measured DX cost forces
+  it.
 - PostGIS / vector tiles for footprints (B8) — reopen when /explore wants city-wide fabric layers.
 - Tasco code reuse — never; practices only. Its repo is the employer's.
 

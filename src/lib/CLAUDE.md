@@ -10,7 +10,8 @@ Do not use `$state`, `$derived`, `$effect`.
 
 **House rules live in one place**: the `svelte-core-bestpractices` skill (`.agents/skills/`,
 symlinked into `.claude/skills/`) — a project fork of the upstream `sveltejs/ai-tools` skill,
-rewritten for this dialect and merged with <https://github.com/spiegelgraphics/svelte-best-practices>.
+rewritten for this dialect and merged with
+<https://github.com/spiegelgraphics/svelte-best-practices>.
 **Load it before creating, editing or reviewing any `.svelte` file.** It covers the dialect, the
 HTML→CSS→template→JS ladder, `$:` discipline, reassign-don't-mutate, keyed `{#each}`, scoped CSS,
 component size and teardown. `skills-lock.json` still carries the upstream hash, so `npx skills add`
@@ -69,7 +70,8 @@ error, not a code-review catch.
   persisted `vma-layers-v1`), `mapStore` (camera + active map), `layerStore` (per-shell view
   settings), `urlStore` (hash carries camera + basemap; the selected map is `?map=<id>`).
 - **Canonical types** live in `src/lib/data/maps/` (`types.ts`, `footprintTypes.ts`,
-  `triageTypes.ts`, `service.ts`, `iiifManifest.ts`, `georef.ts`). `src/lib/map/types.ts` is UI-only.
+  `triageTypes.ts`, `service.ts`, `iiifManifest.ts`, `georef.ts`). `src/lib/map/types.ts` is
+  UI-only.
 - **Basemap and overlays are self-hosted PMTiles** on `tiles.maparchive.vn` — see
   `docs/architecture.md` §Map libraries before changing a URL, a zoom range or a build key.
 - **`@allmaps/openlayers` is loaded on demand** — one runtime importer, `createWarpedLayer` in
@@ -87,18 +89,21 @@ MapShell + the map stores.
 List reads go through `LIST_COLUMNS` in `src/lib/data/maps/service.ts` — exactly the columns
 `toMapListItem` projects. `select('*')` was 120 kB of row for the catalog (37 kB over the wire),
 most of it `extra_metadata` and the long source fields no list renders; the named list is 9 kB.
-`fetchMapRow` still takes the whole row, because the admin editor writes back columns no list carries.
+`fetchMapRow` still takes the whole row, because the admin editor writes back columns no list
+carries.
 
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
 - `src/lib/data/supabase/types.ts` is generated and current against migration head **091** (verified
-  2026-09-19: 091's `review_tags` / `review_note` / `reviewed_by` / `reviewed_at` are present). Nothing
+  2026-09-19: 091's `review_tags` / `review_note` / `reviewed_by` / `reviewed_at` are present).
+  Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
   history and the `--local` trap: `docs/conventions.md` §Supabase types.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
   what forces most `as any` casts downstream.
-- **Realtime is stubbed out of the browser bundle** (`vite.config.ts` aliases `@supabase/realtime-js`).
+- **Realtime is stubbed out of the browser bundle** (`vite.config.ts` aliases
+  `@supabase/realtime-js`).
   The day a real `.channel()` appears, the alias and the stub both come out.
 
 **Environment variables:**

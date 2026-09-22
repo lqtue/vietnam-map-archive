@@ -82,7 +82,8 @@ This reverses any inference that the four rivers are equally invisible to a
 color method. The 1959 and 1968 water fills should be straightforward to
 segment with **sheet-specific** color samples. The 1923 hatch needed a
 source-resolution test, and the 1942 low-contrast fill needed its bank geometry
-tested; both tests are recorded below. None of these claims is a measured river IoU. The existing 1882
+tested; both tests are recorded below. None of these claims is a measured river IoU. The existing
+1882
 `water_region` detector is seeded by hydrology OCR and calibrated to ruled
 water, so the four image-only whole-sheet runs did not test it.
 

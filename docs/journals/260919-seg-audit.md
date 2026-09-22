@@ -1,6 +1,7 @@
 # 260919 — audit of 1882 detection + segmentation, and the work list
 
-**Date:** 2026-09-19 · **Severity:** —  · **Component:** seg / Track C · **Status:** audit, nothing built
+**Date:** 2026-09-19 · **Severity:** —  · **Component:** seg / Track C · **Status:** audit, nothing
+built
 
 Companion to `docs/journals/260918-colour-blocks.md`, which is the working record of how the
 colour pass got here. This file asks a different question: **on the 1882 Plan Cadastral, what is
@@ -211,7 +212,8 @@ Ordered so each item unblocks the next. Owner is who should do it, not who thoug
 > python3 work/ocr/scripts/colour_blocks.py --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
 >   --local-image .tile_cache/ocr/full_c03b7f44a1d8d455c2b476d248651265.jpg \
 >   --render 6051 --cream --drop-furniture --drop-water --drop-slivers --swatch-labels --out <dir>
-> python3 work/ocr/scripts/seg_eval.py --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b <dir>/blocks.run.json
+> python3 work/ocr/scripts/seg_eval.py --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b
+<dir>/blocks.run.json
 > ```
 > Baseline: 888 polygons, land_plot 0.331 / 0.218, building 0.122 / 0.050, waterway 0.582,
 > road cover 0.14, areal recall 0.78.

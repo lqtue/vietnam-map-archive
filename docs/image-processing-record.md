@@ -194,7 +194,12 @@ The sentence currently defensible in public, quoted verbatim from `docs/private/
 > block-and-parcel prior for a polychrome cadastral sheet in about nine seconds, and on the one
 > sheet measured it covers every hand-traced land plot.
 
-**The timing in that sentence is stale — corrected 2026-09-19.** "About nine seconds" is the 8.6 s pre-`--recut` default (`260918-colour-blocks.md`). `--recut` became the default in `d1da01f1` and the reference run is **80 s** of CPU (25 s under `--no-recut`), because re-cutting the oversized naval-quarter component is what bounds the water region at the Arsenal quay. The claim that survives is **CPU-only, no GPU, no checkpoint, trained on nothing, ~80 s a sheet** — still the right order of magnitude for the argument, and it must not be quoted at nine.
+**The timing in that sentence is stale — corrected 2026-09-19.** "About nine seconds" is the 8.6 s
+pre-`--recut` default (`260918-colour-blocks.md`). `--recut` became the default in `d1da01f1` and
+the reference run is **80 s** of CPU (25 s under `--no-recut`), because re-cutting the oversized
+naval-quarter component is what bounds the water region at the Arsenal quay. The claim that survives
+is **CPU-only, no GPU, no checkpoint, trained on nothing, ~80 s a sheet** — still the right order of
+magnitude for the argument, and it must not be quoted at nine.
 
 ---
 
@@ -205,7 +210,9 @@ anchors:
 
 - **MapSAM2** (Xia et al. 2025, arXiv:2510.27547) — the tiles-as-video framing this pipeline
   borrowed. Its self-sorting memory bank is still unimplemented here; the paper measures memory
-  attention alone at +14.3% IoU on vineyards and +16.1% on railways (both verified against the paper's Table 2). A third figure, prompt quality at +12.8% F1, is **unverified** — 2026-09-19: MapSAM2's full text is not indexed and the number could not be confirmed. Do not quote it.
+  attention alone at +14.3% IoU on vineyards and +16.1% on railways (both verified against the
+  paper's Table 2). A third figure, prompt quality at +12.8% F1, is **unverified** — 2026-09-19:
+  MapSAM2's full text is not indexed and the number could not be confirmed. Do not quote it.
 - **SODUCO — the benchmark is COCO PQ, not F1.** Chen, Chazalon & Carlinet (2024), PLOS ONE
   10.1371/journal.pone.0298217: best pipeline **51.1% COCO PQ** (U-Net + contrast + TPS
   augmentation); 46.7% before augmentation; 47.1→45.1 is the mini-U-Net ablation. No F1 is

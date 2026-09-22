@@ -9,45 +9,70 @@ _Drafted: 2026-03-10_
 **Vietnam Map Archive (VMA)** — publicly launched, featured in Saigoneer (Jan 2026).
 - Founded by Tuệ (data journalist, VnExpress / Fulbright MPP)
 - ~10 volunteers across maps, research, tech, and operations (~10 hrs/week each)
-- Currently: ~20 historical maps (1791–present), sourced from BnF Gallica, David Rumsey, Historic Vietnam
+- Currently: ~20 historical maps (1791–present), sourced from BnF Gallica, David Rumsey, Historic
+  Vietnam
 - Tech stack: IIIF, Internet Archive (3-location redundancy), SvelteKit, Supabase, Allmaps
 - Stated long-term vision: _"3D immersive reconstruction allowing virtual time travel"_
 
-**Primary focus period: 1880–1930** (French colonial Saigon — when the city was physically remade from a river port into a modern metropolis). This is the best-documented period with the richest map and archival sources.
+**Primary focus period: 1880–1930** (French colonial Saigon — when the city was physically remade
+from a river port into a modern metropolis). This is the best-documented period with the richest map
+and archival sources.
 
-**Approach: HITL (Human-in-the-Loop)** — community contributors create training data that improves AI models that accelerate future contributions. Free, open source, community-owned. Sustainable through grants + hosted AI API + institutional membership. See `docs/startup-strategy.md` for full economic model.
+**Approach: HITL (Human-in-the-Loop)** — community contributors create training data that improves
+AI models that accelerate future contributions. Free, open source, community-owned. Sustainable
+through grants + hosted AI API + institutional membership. See `docs/startup-strategy.md` for full
+economic model.
 
 ---
 
 ## Vision
 
-A web-native platform that reconstructs Saigon's urban fabric across time — **primary focus 1880–1930** (the French colonial transformation) — through:
+A web-native platform that reconstructs Saigon's urban fabric across time — **primary focus
+1880–1930** (the French colonial transformation) — through:
 
-1. **Geotemporal Knowledge Graph (KG)** — the data spine: buildings, streets, people, events and their relationships, each stamped with temporal validity
-2. **Crowdsourced footprints** — community vectorization of building outlines from georeferenced historical maps (Cartographer tier; OSM community as natural partner for tracing volunteers)
-3. **Automated 3D city model** — Morlighem pipeline (histo3d, CC-BY, TU Delft 2021) adapted to VMA's IIIF georef output → LoD2 CityJSON for all buildings. See `docs/pipeline-3d.md`.
-4. **Photo + photogrammetry pipeline** — archival EFEO/BnF/Manhhai photos → SfM meshes (COLMAP/Meshroom) → LoD3+ hero models for ~30 landmark buildings
+1. **Geotemporal Knowledge Graph (KG)** — the data spine: buildings, streets, people, events and
+   their relationships, each stamped with temporal validity
+2. **Crowdsourced footprints** — community vectorization of building outlines from georeferenced
+   historical maps (Cartographer tier; OSM community as natural partner for tracing volunteers)
+3. **Automated 3D city model** — Morlighem pipeline (histo3d, CC-BY, TU Delft 2021) adapted to VMA's
+   IIIF georef output → LoD2 CityJSON for all buildings. See `docs/pipeline-3d.md`.
+4. **Photo + photogrammetry pipeline** — archival EFEO/BnF/Manhhai photos → SfM meshes
+   (COLMAP/Meshroom) → LoD3+ hero models for ~30 landmark buildings
 5. **Research library** — books, articles, archive documents cited against specific entities
-6. **4D viewer** — timeline scrubber through the city's spatial evolution, from 2D footprints to 3D reconstruction
-7. **Community model (OSM + Wikipedia)** — OSM-style tracing (Cartographer), Wikipedia-style per-building discussion pages (Phase 2+), building adoption for 3D (Architect), citation-based knowledge editing (Historian). See `docs/gamification.md`. Photo Hunter (photo tagging workflow) is deprioritized until the building dataset is published — photos are contributed via building pages in Phase 2.
+6. **4D viewer** — timeline scrubber through the city's spatial evolution, from 2D footprints to 3D
+   reconstruction
+7. **Community model (OSM + Wikipedia)** — OSM-style tracing (Cartographer), Wikipedia-style
+   per-building discussion pages (Phase 2+), building adoption for 3D (Architect), citation-based
+   knowledge editing (Historian). See `docs/gamification.md`. Photo Hunter (photo tagging workflow)
+   is deprioritized until the building dataset is published — photos are contributed via building
+   pages in Phase 2.
 
 ---
 
 ## Community Model
 
-VMA is built on the same principles as OpenStreetMap and Wikipedia — the two most successful community knowledge projects in the world. This is a deliberate architectural choice, not a metaphor.
+VMA is built on the same principles as OpenStreetMap and Wikipedia — the two most successful
+community knowledge projects in the world. This is a deliberate architectural choice, not a
+metaphor.
 
 ### From OpenStreetMap
 - **Anyone can trace.** No credential, no gatekeeping. The barrier is a browser.
 - **Every edit is attributed and versioned.** Nothing disappears; disputes are traceable.
-- **Community validation replaces central authority.** Agree / flag / correct. Trust accumulates through track record.
-- **Machine-assisted tools scale the community.** OSM's RapiD (AI-assisted road tracing) lets a small community cover enormous area. VMA's AI building detector plays the same role — it proposes, the community validates.
-- **Open license (ODbL) creates a self-reinforcing commons.** Researchers use the data → publish results → attract more contributors.
+- **Community validation replaces central authority.** Agree / flag / correct. Trust accumulates
+  through track record.
+- **Machine-assisted tools scale the community.** OSM's RapiD (AI-assisted road tracing) lets a
+  small community cover enormous area. VMA's AI building detector plays the same role — it proposes,
+  the community validates.
+- **Open license (ODbL) creates a self-reinforcing commons.** Researchers use the data → publish
+  results → attract more contributors.
 
 ### From Wikipedia
-- **Every subject gets a page.** Every building in the archive gets: geometry, history, sources, photos, discussion.
-- **Anyone can add a fact — with a citation.** Citations resolve disputes. No argument from authority.
-- **A talk/discussion page alongside every article.** The community debates, corrects, and cross-references. The discussion itself is a historical record.
+- **Every subject gets a page.** Every building in the archive gets: geometry, history, sources,
+  photos, discussion.
+- **Anyone can add a fact — with a citation.** Citations resolve disputes. No argument from
+  authority.
+- **A talk/discussion page alongside every article.** The community debates, corrects, and
+  cross-references. The discussion itself is a historical record.
 - **Edit history is the audit trail.** Who added what, when, with what source.
 
 ### VMA's Application
@@ -58,9 +83,14 @@ VMA is built on the same principles as OpenStreetMap and Wikipedia — the two m
 | Phase 2 (knowledge) | Wikipedia-style building pages: each building has an editable page with history, photos, discussion |
 | Phase 3 (3D) | Building adoption: Architect tier produces 3D meshes; community validates; visual reveal |
 
-**Decentralized by design:** No single organisation controls what is true. Citations resolve disputes. The dataset is openly licensed (ODbL) and self-hostable. Any city with a map archive and a community can fork VMA and run the same pipeline without asking permission.
+**Decentralized by design:** No single organisation controls what is true. Citations resolve
+disputes. The dataset is openly licensed (ODbL) and self-hostable. Any city with a map archive and a
+community can fork VMA and run the same pipeline without asking permission.
 
-**Photo contribution model:** Photos are not a separate upload workflow (which requires its own moderation and storage infrastructure). In Phase 2, photos are attached to building pages — the same model Wikipedia uses for images. This defers the storage/moderation problem until the dataset that gives photos context actually exists.
+**Photo contribution model:** Photos are not a separate upload workflow (which requires its own
+moderation and storage infrastructure). In Phase 2, photos are attached to building pages — the same
+model Wikipedia uses for images. This defers the storage/moderation problem until the dataset that
+gives photos context actually exists.
 
 ---
 
@@ -475,9 +505,12 @@ After Stage 4 (annotate) + Stage 5 (propagate), auto-create KG entities:
 
 ### Gamification → KG attribution
 - Every `contributions` row references `entity_id` — the KG entity that contribution affected
-- When a `footprint_submission` is merged → KG entity, a `contributions` row with type `footprint_trace` is created
-- Attribution is permanent: KG entity pages show who traced, photographed, and modelled each building
-- Quality weighting: contributors with high validation scores get higher confidence weight in consensus
+- When a `footprint_submission` is merged → KG entity, a `contributions` row with type
+  `footprint_trace` is created
+- Attribution is permanent: KG entity pages show who traced, photographed, and modelled each
+  building
+- Quality weighting: contributors with high validation scores get higher confidence weight in
+  consensus
 
 ---
 
@@ -485,7 +518,10 @@ After Stage 4 (annotate) + Stage 5 (propagate), auto-create KG entities:
 
 Full technical detail: `docs/pipeline-3d.md`
 
-**Summary:** VMA adapts the Morlighem (2021) pipeline (*histo3d*, TU Delft MSc, CC-BY) — proven on Belgian/Dutch historical maps, open-source at `github.com/CamilleMorlighem/histo3d`. VMA's automated georeferencing is the exact prerequisite the Morlighem pipeline required but left manual. The two projects are a clean complement.
+**Summary:** VMA adapts the Morlighem (2021) pipeline (*histo3d*, TU Delft MSc, CC-BY) — proven on
+Belgian/Dutch historical maps, open-source at `github.com/CamilleMorlighem/histo3d`. VMA's automated
+georeferencing is the exact prerequisite the Morlighem pipeline required but left manual. The two
+projects are a clean complement.
 
 **Two-tier 3D output:**
 
@@ -494,14 +530,23 @@ Full technical detail: `docs/pipeline-3d.md`
 | LoD2 (automated) | Morlighem pipeline: OBIA → vectorise → procedural model → height inference | CityJSON — all buildings | Full 1880–1930 city |
 | LoD3+ (hand-crafted) | Blender artists + architecture historians; SfM for facade texture | GLB/GLTF hero models | ~30 landmark buildings |
 
-**Height inference (no LiDAR):** Probabilistic roof type table (hipped / gabled / flat) × building typology × colonial construction standards → height estimate with uncertainty score. Calibrated by two contemporaneous painting-map pairs:
-- **1881 B&W engraving + 1882 cadastral map** — full oblique city view; height classes + roof massing
-- **1901 colored lithograph + 1898 cadastral map** — full-color oblique view; additionally confirms terracotta roof tile dominant across residential/commercial stock at city scale, providing independent validation of the NYPL color classifier's semantic accuracy
+**Height inference (no LiDAR):** Probabilistic roof type table (hipped / gabled / flat) × building
+typology × colonial construction standards → height estimate with uncertainty score. Calibrated by
+two contemporaneous painting-map pairs:
+- **1881 B&W engraving + 1882 cadastral map** — full oblique city view; height classes + roof
+  massing
+- **1901 colored lithograph + 1898 cadastral map** — full-color oblique view; additionally confirms
+  terracotta roof tile dominant across residential/commercial stock at city scale, providing
+  independent validation of the NYPL color classifier's semantic accuracy
 
-The two paintings together also provide visual ground-truth for the temporal change classification: blocks that appear stable in both paintings cross-validate the automated "stable" label from the `match` command. Results cited as approximate; see `docs/pipeline-3d.md` §Stage 5 for full methodology.
+The two paintings together also provide visual ground-truth for the temporal change classification:
+blocks that appear stable in both paintings cross-validate the automated "stable" label from the
+`match` command. Results cited as approximate; see `docs/pipeline-3d.md` §Stage 5 for full
+methodology.
 
 **Photogrammetry (L3 facade mesh):**
-- Source photos: EFEO (largest French Indochina collection), BnF Gallica postcards, Manhhai collection, family archives
+- Source photos: EFEO (largest French Indochina collection), BnF Gallica postcards, Manhhai
+  collection, family archives
 - Saigon postcard industry 1900–1930 provides natural multi-angle coverage
 - SfM pipeline: COLMAP (open-source) or Meshroom → point cloud → textured mesh → GLB export
 - Locked to KG entity via `photogrammetry_sessions.entity_id`
@@ -517,14 +562,24 @@ The two paintings together also provide visual ground-truth for the temporal cha
 
 **Academic partnerships:**
 
-**TU Delft 3D Geoinformation Group** (Hugo Ledoux + Anna Labetski — both supervised Morlighem; Francesca Noardo co-reader) is the natural collaborator for the 3D pipeline. VMA brings colonial Vietnamese maps; TU Delft brings the pipeline expertise.
+**TU Delft 3D Geoinformation Group** (Hugo Ledoux + Anna Labetski — both supervised Morlighem;
+Francesca Noardo co-reader) is the natural collaborator for the 3D pipeline. VMA brings colonial
+Vietnamese maps; TU Delft brings the pipeline expertise.
 
-**ETH Zürich IKG (Institute of Cartography and Geoinformation)** — Prof. Dr. Lorenz Hurni's group (advisors: Dr. Sidi Wu, Dr. Yizi Chen) is a second key cluster. Three recent theses from this group are directly relevant:
-- Bauckhage 2025 ("EvolutionMap") — temporal 4D **visualization** of landscape from historical map stacks; relevant to VMA's `/timeline` scrubber and animated transitions (not building reconstruction)
-- Gao 2024 — diffusion model synthetic map generation for training change detection models; relevant to VMA's future ML training data pipeline on colonial map styles
-- Liu 2025 — KG + LLM geospatial Q&A using SPARQL; relevant if VMA adds a natural language query interface to the KG
+**ETH Zürich IKG (Institute of Cartography and Geoinformation)** — Prof. Dr. Lorenz Hurni's group
+(advisors: Dr. Sidi Wu, Dr. Yizi Chen) is a second key cluster. Three recent theses from this group
+are directly relevant:
+- Bauckhage 2025 ("EvolutionMap") — temporal 4D **visualization** of landscape from historical map
+  stacks; relevant to VMA's `/timeline` scrubber and animated transitions (not building
+  reconstruction)
+- Gao 2024 — diffusion model synthetic map generation for training change detection models; relevant
+  to VMA's future ML training data pipeline on colonial map styles
+- Liu 2025 — KG + LLM geospatial Q&A using SPARQL; relevant if VMA adds a natural language query
+  interface to the KG
 
-Note: Liu's approach requires a formal RDF/SPARQL ontology. VMA's current PostgreSQL/JSONB KG cannot support this without a separate RDF layer or SPARQL endpoint. The "CIDOC-CRM is too complex" design decision needs a stronger scholarly justification given this gap.
+Note: Liu's approach requires a formal RDF/SPARQL ontology. VMA's current PostgreSQL/JSONB KG cannot
+support this without a separate RDF layer or SPARQL endpoint. The "CIDOC-CRM is too complex" design
+decision needs a stronger scholarly justification given this gap.
 
 ---
 
@@ -575,7 +630,8 @@ See `docs/gamification.md` for the full SQL schema of the gamification tables.
 - [ ] `src/lib/sources/SourceUpload.svelte` — upload photo/doc to Supabase Storage
 - [ ] API routes: `/api/kg/entities`, `/api/kg/sources`
 
-**First dataset target**: 20–30 key Saigon landmarks manually entered (Cathedral, City Hall, Opera House, Majestic Hotel, Ben Thanh Market, key streets)
+**First dataset target**: 20–30 key Saigon landmarks manually entered (Cathedral, City Hall, Opera
+House, Majestic Hotel, Ben Thanh Market, key streets)
 
 ---
 
@@ -587,7 +643,8 @@ See `docs/gamification.md` for the full SQL schema of the gamification tables.
 - [ ] `src/lib/footprint/PolygonDraw.ts` — pixel → WGS84 transform via Allmaps
 - [ ] `/contribute/footprint` route — task queue + canvas UI
 - [ ] `/admin/footprint` — task creation from any georef map region, submission review
-- [ ] API routes: `/api/footprint/tasks`, `/api/footprint/tasks/[id]/submit`, `/api/footprint/tasks/[id]/merge`
+- [ ] API routes: `/api/footprint/tasks`, `/api/footprint/tasks/[id]/submit`,
+      `/api/footprint/tasks/[id]/merge`
 - [ ] Ingest Saigon colonial maps: target BnF Gallica / ANOM plans (1880–1930)
 
 **First dataset target**: 200+ building footprints from 1900–1920 Saigon cadastral maps
@@ -605,7 +662,8 @@ See `docs/gamification.md` for the full SQL schema of the gamification tables.
 - [ ] Admin: bulk import bibliography from Zotero export (CSL JSON)
 - [ ] API: `/api/kg/sources`, `/api/kg/entities/[id]/sources`
 
-**First dataset target**: 50 key archival photos (BnF Gallica postcards, EFEO collection); 30 bibliographic entries (key DH/HGIS works on colonial Saigon)
+**First dataset target**: 50 key archival photos (BnF Gallica postcards, EFEO collection); 30
+bibliographic entries (key DH/HGIS works on colonial Saigon)
 
 ---
 

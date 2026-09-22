@@ -33,10 +33,12 @@ npm run deploy       # Build + deploy to Cloudflare Pages via wrangler
 npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 ```
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs eighteen read-only
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs eighteen
+read-only
 browser checks — twelve in `tests/smoke.spec.ts`, six in `tests/catalog-series.spec.ts` (they hit
 the real Supabase project but never write) — plus 340 browser-less pure checks riding the same
-runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a check or adding one, because most of them exist to
+runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a
+check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
 see `supabase/CLAUDE.md`.
 
@@ -59,7 +61,8 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 091**, pushed 2026-09-16 (090) / local (091). Adding one, and regenerating types afterwards: `supabase/CLAUDE.md`.
+- **Migration head is 091**, pushed 2026-09-16 (090) / local (091). Adding one, and regenerating
+  types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
   reason a collision takes the *year* rather than a counter: the header of `088_map_slug.sql`.
@@ -89,28 +92,64 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 
 ## Docs
 
-- `docs/architecture.md` — **the map runtime**, unabridged: MapShell/ImageShell, the stores, route groups, the /explore rails, the contribute tools, the PMTiles basemap, the series layers
+- `docs/architecture.md` — **the map runtime**, unabridged: MapShell/ImageShell, the stores, route
+  groups, the /explore rails, the contribute tools, the PMTiles basemap, the series layers
 - `docs/db-guidelines.md` — schema conventions; all migrations must follow these
-- `docs/conventions.md` — the reasoning behind the one-line rules: fonts, the gazetteer key, the generated types, the realtime stub, the component/theme vocabulary
+- `docs/conventions.md` — the reasoning behind the one-line rules: fonts, the gazetteer key, the
+  generated types, the realtime stub, the component/theme vocabulary
 - `docs/testing.md` — what each of the 363 tests pins, and the failure it exists to catch
-- `docs/system-guidelines.md` — layering rule, page structure, component patterns, route map, and §11 the live debt table
+- `docs/system-guidelines.md` — layering rule, page structure, component patterns, route map, and
+  §11 the live debt table
 - `docs/design-system.md` — tokens, the CSS file map, the page template
 - `docs/api.md` — every server route, its auth class and its contract
-- `docs/deploy.md` — Cloudflare Pages: env in the dashboard, no root `wrangler.toml`, the blank-page-after-deploy effect
+- `docs/deploy.md` — Cloudflare Pages: env in the dashboard, no root `wrangler.toml`, the
+  blank-page-after-deploy effect
 - `docs/pipelines.md` — OCR + MapSAM2 command reference and design rationale
+- `docs/allmaps-series-note.md` — how a survey is carried as one Allmaps layer, and what the
+  annotation format does and does not allow
 - `docs/admin-tooling.md` — MapEditModal, Bulk Upload, Scout, R2 worker, holding-institution model
-- `docs/digitalize-guide.md` — **operator guide** for `/scan?mode=prepare`: propose-then-accept, the layout categories, the ground-per-call target, and the failure modes that return plausible output while dropping data
-- `docs/image-processing-record.md` — **the image-processing work collected in one place**: chronology, the method at each stage, every measured number with its source file, the nine rejected approaches, the four things not yet established, and the anchors for comparing against the field
-- `docs/field-comparison.md` — **the same work held against the field**: MapSAM2 / SODUCO / mapKurator / ICDAR MapText / the two automatic georeferencing routes, what our numbers cannot be compared to and why, and the verdict per axis
-- `docs/worked-example-1882.md` — **one sheet all the way through**, with the number each stage produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one counts, the first `join` and the first `approved` footprints in the archive's history, and the four defects that only surfaced by running the chain
-- `docs/private/` — **gitignored, never publish**: the outreach ledger (`network.md` — who is out there, §4 verified against institutional pages 19 Sep 2026), the Allmaps relationship file with its contact addresses (`allmaps.md`), and the personal application material moved out of `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
-- `docs/ROADMAP.md` — **the one tracker**: ship/harden · architecture steps · OCR↔SAM2 product · burn-down
+- `docs/digitalize-guide.md` — **operator guide** for `/scan?mode=prepare`: propose-then-accept, the
+  layout categories, the ground-per-call target, and the failure modes that return plausible output
+  while dropping data
+- `docs/image-processing-record.md` — **the image-processing work collected in one place**:
+  chronology, the method at each stage, every measured number with its source file, the nine
+  rejected approaches, the four things not yet established, and the anchors for comparing against
+  the field
+- `docs/field-comparison.md` — **the same work held against the field**: MapSAM2 / SODUCO /
+  mapKurator / ICDAR MapText / the two automatic georeferencing routes, what our numbers cannot be
+  compared to and why, and the verdict per axis
+- `docs/worked-example-1882.md` — **one sheet all the way through**, with the number each stage
+  produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one
+  counts, the first `join` and the first `approved` footprints in the archive's history, and the
+  four defects that only surfaced by running the chain
+- `docs/ROADMAP.md` — **the one tracker, open work only**: the N-list foundations pass, the OCR
+  drain, the I-series, Tracks C/E/F, burn-down. Close an item by moving it out, not by ticking it
+- `docs/roadmap-record.md` — **frozen 2026-09-22**: every closed pass with its measurements and the
+  defects it turned up. Not maintained; read it for what something cost, never for what is open
+- `docs/lessons.md` — **the rules this project has paid for more than once**, each with the failure
+  that taught it and a date. Read before any unattended run, any database write, or any pass that
+  produces a number
 - `docs/time-machine-plan.md` — label search · temporal fabric · period sources (Track E detail)
-- `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route, warped sheets as a year slider, and the frozen-JSON seam between the two apps
+- `docs/time-walk-plan.md` — the walk-through surface (Track F): HACW forked for a District 4 route,
+  warped sheets as a year slider, and the frozen-JSON seam between the two apps
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared and what stays per-app
-- `docs/strategy.md` (funder-facing), `docs/theory.md`, `docs/user-guide.md` — vision and outward-facing prose, not engineering reference. `docs/journals/` holds dated research notes (`YYMMDD-slug.md`)
-- `docs/private/` — **gitignored, never publish**: the outreach ledger (`network.md` — who is out there, §4 verified against institutional pages 19 Sep 2026), the Allmaps relationship file with its contact addresses (`allmaps.md`), and the personal application material moved out of `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
-- `docs/ponytail-debt.md` — ledger of `ponytail:` shortcut comments. The plugin that generated it is gone (Sept 2026); maintain it by hand with the grep at the top of that file (scope: `src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts`)
-- `docs/archive/` — frozen: historical plans and the August 2026 cleanup record (the personal application material moved to `docs/private/`). Do not cite as current; the live debt table is `docs/system-guidelines.md` §11
-- `contracts/` — JSON Schemas for the shapes VMA shares with other apps (`context`, `label-hit`, `footprint-feature`); checked by `tests/schemaCheck.ts`
-- `CHANGELOG.md` — version history, 1.0 (Apr 2025, one `index.html`) to **7.4** (current). The numbers continue the ones the commits already used, so the SvelteKit rewrite is 3.x; the number moves on a structural change, not a build. **Its public twin is `/changelog`**, whose source is `src/routes/(editorial)/changelog/releases.ts` — plain language, shorter, a different audience. Nothing generates one from the other: add a release to both
+- `docs/strategy.md` (funder-facing), `docs/theory.md`, `docs/user-guide.md` — vision and
+  outward-facing prose, not engineering reference. `docs/journals/` holds dated research notes
+  (`YYMMDD-slug.md`)
+- `docs/private/` — **gitignored, never publish**: the outreach ledger (`network.md` — who is out
+  there, §4 verified against institutional pages 19 Sep 2026), the Allmaps relationship file with
+  its contact addresses (`allmaps.md`), and the personal application material moved out of
+  `docs/archive/` on 19 Sep 2026. The repo is public; this directory is the reason nothing in it is
+- `docs/ponytail-debt.md` — ledger of `ponytail:` shortcut comments. The plugin that generated it is
+  gone (Sept 2026); maintain it by hand with the grep at the top of that file (scope:
+  `src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts`)
+- `docs/archive/` — frozen: historical plans and the August 2026 cleanup record (the personal
+  application material moved to `docs/private/`). Do not cite as current; the live debt table is
+  `docs/system-guidelines.md` §11
+- `contracts/` — JSON Schemas for the shapes VMA shares with other apps (`context`, `label-hit`,
+  `footprint-feature`); checked by `tests/schemaCheck.ts`
+- `CHANGELOG.md` — version history, 1.0 (Apr 2025, one `index.html`) to **7.4** (current). The
+  numbers continue the ones the commits already used, so the SvelteKit rewrite is 3.x; the number
+  moves on a structural change, not a build. **Its public twin is `/changelog`**, whose source is
+  `src/routes/(editorial)/changelog/releases.ts` — plain language, shorter, a different audience.
+  Nothing generates one from the other: add a release to both

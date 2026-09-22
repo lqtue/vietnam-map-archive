@@ -1,8 +1,10 @@
 # Deployment (Cloudflare Pages)
 
-How the app is built and deployed, and the two expensive lessons behind the rules. Moved out of `CLAUDE.md` in September 2026; the rules stay there, the story lives here.
+How the app is built and deployed, and the two expensive lessons behind the rules. Moved out of
+`CLAUDE.md` in September 2026; the rules stay there, the story lives here.
 
-Cloudflare Pages adapter. Build output: `.svelte-kit/cloudflare`. There is **no** root `wrangler.toml` — see below for why. The R2 tile worker has its own `worker/wrangler.toml`.
+Cloudflare Pages adapter. Build output: `.svelte-kit/cloudflare`. There is **no** root
+`wrangler.toml` — see below for why. The R2 tile worker has its own `worker/wrangler.toml`.
 
 **Environment lives in the Cloudflare dashboard, and `wrangler.toml` must not exist.**
 A root `wrangler.toml` carrying `pages_build_output_dir` makes the Wrangler file the
@@ -41,7 +43,14 @@ stayed green through all ten build failures.
 
 ## Blank page right after a deploy
 
-Expected, and self-heals. Pages serves the new HTML and `entry/app.<hash>.js` before every `_app/immutable/` chunk is reachable at the edge; individual chunks 404 for a minute or two. Because every `(app)` route sets `ssr = false`, one unreachable chunk is a fully blank document whose only symptom is `Failed to fetch dynamically imported module` (WebKit: `Importing a module script failed`). Wait and hard-reload before debugging; `curl -o /dev/null -w "%{http_code}"` against the chunk the console names will flip to 200. `scripts/check-bundle.mjs` guards against a genuinely inconsistent bundle at build time, which is a different failure.
+Expected, and self-heals. Pages serves the new HTML and `entry/app.<hash>.js` before every
+`_app/immutable/` chunk is reachable at the edge; individual chunks 404 for a minute or two. Because
+every `(app)` route sets `ssr = false`, one unreachable chunk is a fully blank document whose only
+symptom is `Failed to fetch dynamically imported module` (WebKit:
+`Importing a module script failed`). Wait and hard-reload before debugging;
+`curl -o /dev/null -w "%{http_code}"` against the chunk the console names will flip to 200.
+`scripts/check-bundle.mjs` guards against a genuinely inconsistent bundle at build time, which is a
+different failure.
 
 ## One address
 

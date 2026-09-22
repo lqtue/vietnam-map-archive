@@ -11,8 +11,10 @@ VMA's community model draws directly from two proven open-knowledge projects:
 - Anyone can contribute. No credential required.
 - Every edit is attributed and versioned.
 - Community validation (agree/flag/correct) replaces central authority.
-- The map improves because contributors benefit from its improvement — a self-reinforcing public commons.
-- Machine-assisted tools (RapiD, JOSM AI suggestions) let the community scale beyond what manual effort alone could achieve. VMA's AI building detector plays the same role.
+- The map improves because contributors benefit from its improvement — a self-reinforcing public
+  commons.
+- Machine-assisted tools (RapiD, JOSM AI suggestions) let the community scale beyond what manual
+  effort alone could achieve. VMA's AI building detector plays the same role.
 
 **From Wikipedia:**
 - Every subject (building, street, person) gets its own page.
@@ -28,7 +30,10 @@ VMA's community model draws directly from two proven open-knowledge projects:
 - Any city with a map archive and a community can run the same pipeline.
 
 **Sequencing:**
-The Wikipedia model becomes available once the building dataset is published. Phase 1 creates the dataset (footprints, basic attributes). Phase 2 opens each building page for community contribution. Phase 3 adds 3D geometry to the same pages. The contribution model is persistent — it doesn't end when the archive is "complete" because an archive of living memory is never complete.
+The Wikipedia model becomes available once the building dataset is published. Phase 1 creates the
+dataset (footprints, basic attributes). Phase 2 opens each building page for community contribution.
+Phase 3 adds 3D geometry to the same pages. The contribution model is persistent — it doesn't end
+when the archive is "complete" because an archive of living memory is never complete.
 
 ---
 
@@ -39,13 +44,15 @@ The city disappears into the past. You bring it back. One building at a time.
 When a building you contributed gets rendered in the 3D city, you receive a notification:
 > *"Số 5 Rue Catinat just appeared in 1910 Saigon. You helped build it."*
 
-Your name is permanently attributed in the KG entity. In 50 years, people will know you helped reconstruct this city.
+Your name is permanently attributed in the KG entity. In 50 years, people will know you helped
+reconstruct this city.
 
 ---
 
 ## Contribution Tiers (Skill Ladder)
 
-Four tiers, each unlocking the next. Anyone can start at L1 (once Photo Hunter is re-enabled). Experts self-select upward.
+Four tiers, each unlocking the next. Anyone can start at L1 (once Photo Hunter is re-enabled).
+Experts self-select upward.
 
 ```
 L4 · HISTORIAN        KG entities, citations, relations, building discussion pages
@@ -54,7 +61,11 @@ L2 · CARTOGRAPHER     Building footprint tracing, validation
 L1 · PHOTO HUNTER     Find & tag historical photos by location  [DEPRIORITIZED — see note]
 ```
 
-> **Note on Photo Hunter (L1):** Photo Hunter requires photo upload infrastructure (storage, moderation, deduplication at scale) that is not the current focus. The photo contribution model will be revisited after the building dataset is published — at which point users can attach photos directly to building pages in the Wikipedia-style discussion layer. See §Wikipedia Discussion Layer below.
+> **Note on Photo Hunter (L1):** Photo Hunter requires photo upload infrastructure (storage,
+moderation, deduplication at scale) that is not the current focus. The photo contribution model will
+be revisited after the building dataset is published — at which point users can attach photos
+directly to building pages in the Wikipedia-style discussion layer. See §Wikipedia Discussion Layer
+below.
 
 Each active tier has its own leaderboard, badges, and visual presence in the city.
 
@@ -63,11 +74,16 @@ Each active tier has its own leaderboard, badges, and visual presence in the cit
 ## Tier 1 — Photo Hunter _(DEPRIORITIZED)_
 _"Find the city before it vanishes"_
 
-**Status:** Deprioritized until the building dataset is published and Wikipedia-style building pages are live. Photo contribution will be handled as part of the building-page discussion layer rather than as a separate tagging workflow. This avoids building photo upload infrastructure before there is a dataset for photos to be attached to.
+**Status:** Deprioritized until the building dataset is published and Wikipedia-style building pages
+are live. Photo contribution will be handled as part of the building-page discussion layer rather
+than as a separate tagging workflow. This avoids building photo upload infrastructure before there
+is a dataset for photos to be attached to.
 
-**Original task:** Browse EFEO, BnF Gallica, Manhhai collection, family archives. Tag each historical photo to a location on the map. Assess angle coverage.
+**Original task:** Browse EFEO, BnF Gallica, Manhhai collection, family archives. Tag each
+historical photo to a location on the map. Assess angle coverage.
 
-**Why this works for community:** Zero technical barrier. A Vietnamese diaspora member in California who recognizes their grandmother's street can contribute immediately. Mobile-friendly.
+**Why this works for community:** Zero technical barrier. A Vietnamese diaspora member in California
+who recognizes their grandmother's street can contribute immediately. Mobile-friendly.
 
 **Points:**
 | Action | Points |
@@ -95,9 +111,11 @@ _"Find the city before it vanishes"_
 ## Tier 2 — Cartographer
 _"Draw the city back into existence"_
 
-**Task:** Trace building footprints on georeferenced historical maps. Validate other contributors' traces. The core HITL vectorization loop.
+**Task:** Trace building footprints on georeferenced historical maps. Validate other contributors'
+traces. The core HITL vectorization loop.
 
-**Why this works:** Direct, visible progress. Each traced building fills a gap on the district completion map. You can see the city assembling in real time.
+**Why this works:** Direct, visible progress. Each traced building fills a gap on the district
+completion map. You can see the city assembling in real time.
 
 **Points:**
 | Action | Points |
@@ -115,14 +133,18 @@ _"Draw the city back into existence"_
 - ⚡ *Speed Tracer* — 20 buildings in one session
 
 **District completion map:**
-The city is divided into ~30 districts. Each shows a % completion bar. Colours shift from dark (untraced) to bright (complete) as buildings are traced. Diaspora communities naturally rally around their ancestral districts — Cholon for Vietnamese-Chinese community, central Saigon for French heritage communities, etc.
+The city is divided into ~30 districts. Each shows a % completion bar. Colours shift from dark
+(untraced) to bright (complete) as buildings are traced. Diaspora communities naturally rally around
+their ancestral districts — Cholon for Vietnamese-Chinese community, central Saigon for French
+heritage communities, etc.
 
 ---
 
 ## Tier 3 — Architect
 _"Raise the city off the page"_
 
-**Task:** "Adopt a building" — take ownership of producing its 3D model. Ranges from simple photo texture projection (any volunteer) to full SfM mesh processing (photogrammetry specialists).
+**Task:** "Adopt a building" — take ownership of producing its 3D model. Ranges from simple photo
+texture projection (any volunteer) to full SfM mesh processing (photogrammetry specialists).
 
 **The adoption mechanic:**
 - Any contributor can claim an un-adopted building in the KG
@@ -135,7 +157,8 @@ _"Raise the city off the page"_
 > Angles covered: front ✅ south ✅ north ❌ east ❌ aerial ❌
 > Contribute: find photos for missing angles → unlock SfM processing
 
-When complete, the building visually "rises" from the flat map into a textured 3D model for all users. Contributors get a reveal notification.
+When complete, the building visually "rises" from the flat map into a textured 3D model for all
+users. Contributors get a reveal notification.
 
 **Points:**
 | Action | Points |
@@ -153,16 +176,20 @@ When complete, the building visually "rises" from the flat map into a textured 3
 - 🌆 *District Architect* — all landmarks in a district modelled
 
 **Visual reveal:**
-When a building's model is accepted, it appears in the 3D timeline viewer with a brief animation — rising from a flat footprint into a rendered structure. Contributors get a shareable moment: "I helped rebuild Saigon's Central Post Office."
+When a building's model is accepted, it appears in the 3D timeline viewer with a brief animation —
+rising from a flat footprint into a rendered structure. Contributors get a shareable moment: "I
+helped rebuild Saigon's Central Post Office."
 
 ---
 
 ## Tier 4 — Historian
 _"Give the city its memory back"_
 
-**Task:** Add entities, relations, and sources to the Knowledge Graph. Every building needs a history — who built it, who owned it, what happened there, what it was called under each regime.
+**Task:** Add entities, relations, and sources to the Knowledge Graph. Every building needs a
+history — who built it, who owned it, what happened there, what it was called under each regime.
 
-**Why this works:** Research-minded volunteers, academics, Vietnamese history enthusiasts. The KG is where the Public Policy lens lives — political economy, social history, colonial administration.
+**Why this works:** Research-minded volunteers, academics, Vietnamese history enthusiasts. The KG is
+where the Public Policy lens lives — political economy, social history, colonial administration.
 
 **Points:**
 | Action | Points |
@@ -188,10 +215,12 @@ _"Give the city its memory back"_
 ### Three leaderboard types
 
 **1. Global leaderboard**
-All-time and weekly reset. Weekly reset means newcomers can compete and win — important for retention.
+All-time and weekly reset. Weekly reset means newcomers can compete and win — important for
+retention.
 
 **2. District leaderboard**
-Who has contributed most to each of the ~30 districts. Creates territorial ownership — communities rally around "their" district.
+Who has contributed most to each of the ~30 districts. Creates territorial ownership — communities
+rally around "their" district.
 
 **3. Team leaderboard**
 Community groups compete collectively:
@@ -200,7 +229,8 @@ Community groups compete collectively:
 - Professional groups (architects, historians, GIS specialists)
 - Geographic communities (people from Cholon, people from District 1)
 
-Teams share points from all members. A team claiming a district can "name" a street or building — a small act of ownership that creates deep motivation.
+Teams share points from all members. A team claiming a district can "name" a street or building — a
+small act of ownership that creates deep motivation.
 
 ### Points visibility
 
@@ -239,10 +269,12 @@ REWARD              Name on building · 500 pts · Landmark badge
 [Find a photo for this mission →]
 ```
 
-When the photo threshold is met, the mission automatically queues for SfM processing. An Architect volunteer claims it and runs COLMAP/Meshroom. When validated, all contributors get the reveal.
+When the photo threshold is met, the mission automatically queues for SfM processing. An Architect
+volunteer claims it and runs COLMAP/Meshroom. When validated, all contributors get the reveal.
 
 **The social share moment:**
-> "I helped reconstruct the Saigon Central Post Office as it looked in 1910. See it here: [link to 3D viewer, timestamped to 1910]"
+> "I helped reconstruct the Saigon Central Post Office as it looked in 1910. See it here: [link to
+3D viewer, timestamped to 1910]"
 
 This is shareable, emotional, and directly promotes the platform.
 
@@ -250,11 +282,15 @@ This is shareable, emotional, and directly promotes the platform.
 
 ## Ghost Buildings
 
-Buildings that no longer exist — demolished, bombed, replaced — get special visual treatment: a translucent wireframe "ghost" in the 3D city, visible only when the timeline is set to their era.
+Buildings that no longer exist — demolished, bombed, replaced — get special visual treatment: a
+translucent wireframe "ghost" in the 3D city, visible only when the timeline is set to their era.
 
-Contributing to a ghost building earns the **Ghost Keeper** badge. These are often the most historically significant buildings — the ones that have vanished completely and exist only in archives.
+Contributing to a ghost building earns the **Ghost Keeper** badge. These are often the most
+historically significant buildings — the ones that have vanished completely and exist only in
+archives.
 
-This creates a specific emotional hook for the Vietnamese diaspora: *"My grandparents' house was here. I helped make it visible again."*
+This creates a specific emotional hook for the Vietnamese diaspora: *"My grandparents' house was
+here. I helped make it visible again."*
 
 ---
 
@@ -265,7 +301,9 @@ Any contributor can attach a personal connection to a KG building entity:
 - "My grandfather worked here"
 - "This was destroyed in [event]"
 
-These are shown as soft data (clearly labelled as personal testimony, not verified historical fact) and create a layer of lived memory over the reconstructed city. The L6 layer — human interaction — made tangible.
+These are shown as soft data (clearly labelled as personal testimony, not verified historical fact)
+and create a layer of lived memory over the reconstructed city. The L6 layer — human interaction —
+made tangible.
 
 Families contributing a verified connection get:
 - Their family name on the building's KG page
@@ -280,7 +318,8 @@ _Unlocks in Phase 2, after the building dataset is published_
 
 ### Concept
 
-Every building in the archive gets a page — like a Wikipedia article for a single structure. The page contains:
+Every building in the archive gets a page — like a Wikipedia article for a single structure. The
+page contains:
 
 - **Geometry tab**: footprint on the historical map, link to source map
 - **History tab**: KG entities — who built it, who owned it, what happened there
@@ -478,7 +517,8 @@ CREATE TABLE team_members (
 
 ## Why This Works
 
-The community model is not cosmetic. Each tier directly feeds the data pipeline, and the community and the AI improve each other:
+The community model is not cosmetic. Each tier directly feeds the data pipeline, and the community
+and the AI improve each other:
 
 | Tier | Feeds | Improves |
 |---|---|---|
@@ -490,11 +530,13 @@ The community model is not cosmetic. Each tier directly feeds the data pipeline,
 **Why the OSM model works here:**
 - Contributors trace buildings because they want the map to exist — not because they're paid.
 - Community validation (agree/flag/correct) scales quality without a central review team.
-- Open data license means researchers, journalists, and educators use and promote the result — which attracts more contributors.
+- Open data license means researchers, journalists, and educators use and promote the result — which
+  attracts more contributors.
 
 **Why the Wikipedia model works here:**
 - Each building page gives contributors a specific, bounded task: improve *this* entry.
 - Citations resolve disputes — no argument from authority, just evidence.
 - The edit history is a permanent record of who knew what and when — valuable data in itself.
 
-**Trust:** Contributors with high validation agreement scores get weighted more heavily in the consensus algorithm. Trust is earned through track record, not assumed.
+**Trust:** Contributors with high validation agreement scores get weighted more heavily in the
+consensus algorithm. Trust is earned through track record, not assumed.

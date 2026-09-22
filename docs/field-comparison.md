@@ -316,19 +316,53 @@ is not, and the measurement gap is a tracing job rather than a research problem.
 
 ## Sources
 
-- [MapSAM2: Adapting SAM2 for Automatic Segmentation of Historical Map Images and Time Series](https://arxiv.org/abs/2510.27547) — Xia, Balestriero, Zhang, Zhou, Ding, Saini, Hurni, Oct 2025 ([IEEE version](https://ieeexplore.ieee.org/document/11457033/))
-- [Automatic vectorization of historical maps: A benchmark](https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0298217) — Chen et al., PLOS ONE 2024 (SODUCO/MapSeg) · [code](https://github.com/soduco/Benchmark_historical_map_vectorization)
-- [The mapKurator System](https://dl.acm.org/doi/10.1145/3589132.3625579) — ACM SIGSPATIAL 2023 · [Text on Maps at David Rumsey](https://machines-reading-maps.github.io/rumsey/) · [Turing Institute announcement](https://www.turing.ac.uk/news/new-collaboration-promises-enrich-data-60000-historical-maps)
-- [ICDAR 2025 Competition on Historical Map Text Detection, Recognition, and Linking](https://link.springer.com/chapter/10.1007/978-3-032-04630-7_33) · [results](https://rrc.cvc.uab.es/?ch=32)
-- [LIGHT: Multi-modal Text Linking on Historical Maps](https://link.springer.com/chapter/10.1007/978-3-032-04617-8_4) — Lin, Olson, Wu, Chiang, Weinman 2025
-- [Detecting Legend Items on Historical Maps Using GPT-4o with In-Context Learning](https://arxiv.org/pdf/2510.08385) — GeoSearch'25
-- [Georeferencing historical maps using local feature matching and Delaunay consistency](https://www.tandfonline.com/doi/full/10.1080/15230406.2025.2566789) — CaGIS 2025 (Jerusalem, 86 maps)
-- [Automated Georeferencing of Topographic Maps via OCR and In-Context Multimodal LLM Reasoning](https://link.springer.com/chapter/10.1007/978-3-032-08511-5_8) — Tyagi & Dubey, NCVPRIPG 2025
-- [Automatic content-based georeferencing of historical topographic maps](https://onlinelibrary.wiley.com/doi/full/10.1111/tgis.12794) — Luft & Schiewe, Transactions in GIS 2021
-- [Effective annotation for the automatic vectorization of cadastral maps](https://academic.oup.com/dsh/article/38/3/1227/7074303) — Petitpierre & Guhennec, DSH 2023 · [Semap dataset](https://zenodo.org/records/19048095) · [Generalizable Multiscale Segmentation of Heterogeneous Map Collections](https://infoscience.epfl.ch/server/api/core/bitstreams/bcf0ca8b-d9d6-45c8-a02f-e83cb8d72e89/content)
-- [Allmaps](https://allmaps.org/) · [IIIF Georeference Extension](https://iiif.io/api/extension/georef/) · [Allmaps–IIIF partnership 2026–28](https://allmaps.org/iiif-partnership/)
-- [Digitizing scanned maps using AI in ArcGIS Pro](https://www.esri.com/arcgis-blog/products/arcgis-pro/mapping/digitizing-scanned-maps-using-ai-in-arcgis-pro) · [Digitization of Historical Maps in the Age of AI](https://dlab.berkeley.edu/news/digitization-historical-maps-age-ai) (Berkeley D-Lab, 2025)
+- [MapSAM2: Adapting SAM2 for Automatic Segmentation of Historical Map Images and Time
+  Series](https://arxiv.org/abs/2510.27547) — Xia, Balestriero, Zhang, Zhou, Ding, Saini, Hurni, Oct
+  2025 ([IEEE version](https://ieeexplore.ieee.org/document/11457033/))
+- [Automatic vectorization of historical maps: A
+  benchmark](https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0298217) — Chen et
+  al., PLOS ONE 2024 (SODUCO/MapSeg) ·
+  [code](https://github.com/soduco/Benchmark_historical_map_vectorization)
+- [The mapKurator System](https://dl.acm.org/doi/10.1145/3589132.3625579) — ACM SIGSPATIAL 2023 ·
+  [Text on Maps at David Rumsey](https://machines-reading-maps.github.io/rumsey/) · [Turing
+  Institute
+  announcement](https://www.turing.ac.uk/news/new-collaboration-promises-enrich-data-60000-historical-maps)
+- [ICDAR 2025 Competition on Historical Map Text Detection, Recognition, and
+  Linking](https://link.springer.com/chapter/10.1007/978-3-032-04630-7_33) ·
+  [results](https://rrc.cvc.uab.es/?ch=32)
+- [LIGHT: Multi-modal Text Linking on Historical
+  Maps](https://link.springer.com/chapter/10.1007/978-3-032-04617-8_4) — Lin, Olson, Wu, Chiang,
+  Weinman 2025
+- [Detecting Legend Items on Historical Maps Using GPT-4o with In-Context
+  Learning](https://arxiv.org/pdf/2510.08385) — GeoSearch'25
+- [Georeferencing historical maps using local feature matching and Delaunay
+  consistency](https://www.tandfonline.com/doi/full/10.1080/15230406.2025.2566789) — CaGIS 2025
+  (Jerusalem, 86 maps)
+- [Automated Georeferencing of Topographic Maps via OCR and In-Context Multimodal LLM
+  Reasoning](https://link.springer.com/chapter/10.1007/978-3-032-08511-5_8) — Tyagi & Dubey,
+  NCVPRIPG 2025
+- [Automatic content-based georeferencing of historical topographic
+  maps](https://onlinelibrary.wiley.com/doi/full/10.1111/tgis.12794) — Luft & Schiewe, Transactions
+  in GIS 2021
+- [Effective annotation for the automatic vectorization of cadastral
+  maps](https://academic.oup.com/dsh/article/38/3/1227/7074303) — Petitpierre & Guhennec, DSH 2023 ·
+  [Semap dataset](https://zenodo.org/records/19048095) · [Generalizable Multiscale Segmentation of
+  Heterogeneous Map
+  Collections](https://infoscience.epfl.ch/server/api/core/bitstreams/bcf0ca8b-d9d6-45c8-a02f-e83cb8d72e89/content)
+- [Allmaps](https://allmaps.org/) · [IIIF Georeference
+  Extension](https://iiif.io/api/extension/georef/) · [Allmaps–IIIF partnership
+  2026–28](https://allmaps.org/iiif-partnership/)
+- [Digitizing scanned maps using AI in ArcGIS
+  Pro](https://www.esri.com/arcgis-blog/products/arcgis-pro/mapping/digitizing-scanned-maps-using-ai-in-arcgis-pro)
+  · [Digitization of Historical Maps in the Age of
+  AI](https://dlab.berkeley.edu/news/digitization-historical-maps-age-ai) (Berkeley D-Lab, 2025)
 - [Kartta Labs](https://dl.acm.org/doi/10.1145/3356471.3365236) — ACM SIGSPATIAL workshop 2019
-- [Segmentation of historical maps without annotated data](https://doi.org/10.1145/3476887.3476909) — Lemaître & Camillerapp, ACM 2021 ([PDF](https://inria.hal.science/hal-03374571)) — rule-based, 3rd at MapSeg ICDAR'21
-- [Extensibility of U-Net Neural Network Model for Hydrographic Feature Extraction](https://doi.org/10.3390/rs13122368) — Stanislawski, Shavers & Wang, Remote Sensing 2021 — F1 66–68 from IfSAR
-- [Automated Extraction of Human Settlement Patterns From Historical Topographic Map Series Using Weakly Supervised CNNs](https://doi.org/10.1109/access.2019.2963213) — Uhl, Leyk & Chiang, IEEE Access 2020 — contemporary data as ancillary labels
+- [Segmentation of historical maps without annotated data](https://doi.org/10.1145/3476887.3476909)
+  — Lemaître & Camillerapp, ACM 2021 ([PDF](https://inria.hal.science/hal-03374571)) — rule-based,
+  3rd at MapSeg ICDAR'21
+- [Extensibility of U-Net Neural Network Model for Hydrographic Feature
+  Extraction](https://doi.org/10.3390/rs13122368) — Stanislawski, Shavers & Wang, Remote Sensing
+  2021 — F1 66–68 from IfSAR
+- [Automated Extraction of Human Settlement Patterns From Historical Topographic Map Series Using
+  Weakly Supervised CNNs](https://doi.org/10.1109/access.2019.2963213) — Uhl, Leyk & Chiang, IEEE
+  Access 2020 — contemporary data as ancillary labels

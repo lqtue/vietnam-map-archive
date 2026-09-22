@@ -1,17 +1,27 @@
 # Admin tooling
 
-Admin controls live inline in `/catalog` (gated by `role === 'admin' | 'mod'`). There is no separate `/admin` route — except for the scout and bulk-upload sub-pages noted below.
+Admin controls live inline in `/catalog` (gated by `role === 'admin' | 'mod'`). There is no separate
+`/admin` route — except for the scout and bulk-upload sub-pages noted below.
 
 ## Catalog admin mode
 
-**`/catalog`** renders `src/lib/features/catalog/CatalogUnifiedSearch.svelte` unconditionally — there is no `?v=` switch and no legacy view. It hits `/api/search` once per `q` / `include=scout` change; facet chips filter and re-tally client-side so chip toggles are instant.
+**`/catalog`** renders `src/lib/features/catalog/CatalogUnifiedSearch.svelte` unconditionally —
+there is no `?v=` switch and no legacy view. It hits `/api/search` once per `q` / `include=scout`
+change; facet chips filter and re-tally client-side so chip toggles are instant.
 
-- `src/lib/ui/FacetRail.svelte` — multi-select chip groups with "all-but-this-dimension" tallies; two-way binds the selection.
-- `src/lib/features/catalog/CatalogTable.svelte` — the result rows (curated + scout). `src/lib/ui/CatalogGrid.svelte` / `CatalogCard.svelte` are the card-grid counterparts.
-- `src/lib/features/catalog/CatalogDetailDrawer.svelte` — row detail. Staff (`role === 'admin' | 'mod'`) get an **✎ Edit** action on curated rows only; it dispatches `edit` up through `CatalogUnifiedSearch`.
-- Staff also get an **Include scout queue** toggle in the toolbar. Non-staff never see scout rows — `/api/search` drops `include=scout` server-side.
+- `src/lib/ui/FacetRail.svelte` — multi-select chip groups with "all-but-this-dimension" tallies;
+  two-way binds the selection.
+- `src/lib/features/catalog/CatalogTable.svelte` — the result rows (curated + scout).
+  `src/lib/ui/CatalogGrid.svelte` / `CatalogCard.svelte` are the card-grid counterparts.
+- `src/lib/features/catalog/CatalogDetailDrawer.svelte` — row detail. Staff
+  (`role === 'admin' | 'mod'`) get an **✎ Edit** action on curated rows only; it dispatches `edit`
+  up through `CatalogUnifiedSearch`.
+- Staff also get an **Include scout queue** toggle in the toolbar. Non-staff never see scout rows —
+  `/api/search` drops `include=scout` server-side.
 
-**The catalog page owns the modal, not the search component.** `src/routes/(editorial)/catalog/+page.svelte` listens for `on:edit`, loads the row via `fetchMapRow`, and renders `MapEditModal`; on save it calls the component's exported `refresh()`.
+**The catalog page owns the modal, not the search component.**
+`src/routes/(editorial)/catalog/+page.svelte` listens for `on:edit`, loads the row via
+`fetchMapRow`, and renders `MapEditModal`; on save it calls the component's exported `refresh()`.
 
 ## MapEditModal
 
@@ -24,26 +34,48 @@ Admin controls live inline in `/catalog` (gated by `role === 'admin' | 'mod'`). 
 | **Hosting & Georef** | `MapEditHostingTab.svelte` | IIIF source list (primary indicator), Mirror to R2, Allmaps ID + annotation_url + Fetch-from-Allmaps + Editor link, IA image upload, `NeatlineEditor` |
 | **Pipeline** | `MapEditPipelineTab.svelte` | georef_done / legend_done flags, legend mode + text, label categories, OCR pipeline controls |
 
-Supporting modules in `src/lib/features/admin/`: `NeatlineEditor.svelte`, `neatlineDatum.ts`, `neatlineViewport.ts`, `GeorefSyncPanel.svelte`, `ScoutCard.svelte`. The admin API client is `src/lib/data/admin/adminApi.ts`; the PATCH body is assembled in `src/lib/data/admin/mapEditPayload.ts`.
+Supporting modules in `src/lib/features/admin/`: `NeatlineEditor.svelte`, `neatlineDatum.ts`,
+`neatlineViewport.ts`, `GeorefSyncPanel.svelte`, `ScoutCard.svelte`. The admin API client is
+`src/lib/data/admin/adminApi.ts`; the PATCH body is assembled in
+`src/lib/data/admin/mapEditPayload.ts`.
 
 ## Bulk upload (`/admin?tab=bulk`)
 
-Spreadsheet-style page for batch-creating draft `maps` rows. Admin pastes file paths (one per line, tab/CSV optional for per-row `name`/`year`/`collection`/`map_type`/`location`); names auto-parse from filenames matching `<sheet#> <Place> <YYYY>.jpg`. "Create batch" inserts via `POST /api/admin/maps` and outputs a copy-paste shell script of `./scripts/tile_map.sh <uuid> '<path>'` lines. Tiling still runs locally (vips constraint). After tiling, "Backfill thumbnails" fetches each map's info.json and PATCHes `thumbnail` + `iiif_image`.
+Spreadsheet-style page for batch-creating draft `maps` rows. Admin pastes file paths (one per line,
+tab/CSV optional for per-row `name`/`year`/`collection`/`map_type`/`location`); names auto-parse
+from filenames matching `<sheet#> <Place> <YYYY>.jpg`. "Create batch" inserts via
+`POST /api/admin/maps` and outputs a copy-paste shell script of
+`./scripts/tile_map.sh <uuid> '<path>'` lines. Tiling still runs locally (vips constraint). After
+tiling, "Backfill thumbnails" fetches each map's info.json and PATCHes `thumbnail` + `iiif_image`.
 
 Companion CLI scripts:
-- `scripts/bulk_upload_local.sh <file-list.txt> [--collection ...]` — tiles + inserts `maps` + `map_iiif_sources` rows in one pass. Logs to `scripts/bulk_upload_<timestamp>.log`.
+- `scripts/bulk_upload_local.sh <file-list.txt> [--collection ...]` — tiles + inserts `maps` +
+  `map_iiif_sources` rows in one pass. Logs to `scripts/bulk_upload_<timestamp>.log`.
 
 ## R2 / IIIF worker
 
 Self-hosted IIIF tile serving via Cloudflare R2 + Worker at `https://iiif.maparchive.vn/iiif`.
 
 - `worker/` — Cloudflare Worker source + `wrangler.toml`; proxies IIIF tile requests to R2.
-- `scripts/tile_map.sh <map-uuid> <source-image-url-or-path> [original-iiif-base] [--new-version | --version N] [--dry-run]` — downloads (or copies a local file), tiles with `vips dzsave --layout iiif3 --tile-size 256`, uploads to R2 at `tiles/<map-uuid>/`. **A re-tile of a map that is already mirrored takes `--new-version`**, which writes `tiles/<map-uuid>/v<N>/` instead and prints the versioned service id to put in the database — see *Re-tiling a mirrored map* below. `--dry-run` prints the keys and the service id and stops. The mirror-r2 API and `/admin?tab=bulk` return the exact command, always unversioned: they only ever mint a first tiling.
-- After mirroring: `maps.iiif_image` and the primary `map_iiif_sources` row point to `https://iiif.maparchive.vn/iiif/<map-uuid>`; `maps.annotation_url` becomes the Supabase Storage public URL of the updated annotation JSON (mig 047 — earlier code overloaded `allmaps_id` for this; the column now holds only bare image IDs).
+- `scripts/tile_map.sh <map-uuid> <source-image-url-or-path> [original-iiif-base] [--new-version | --version N] [--dry-run]`
+  — downloads (or copies a local file), tiles with `vips dzsave --layout iiif3 --tile-size 256`,
+  uploads to R2 at `tiles/<map-uuid>/`. **A re-tile of a map that is already mirrored takes
+  `--new-version`**, which writes `tiles/<map-uuid>/v<N>/` instead and prints the versioned service
+  id to put in the database — see *Re-tiling a mirrored map* below. `--dry-run` prints the keys and
+  the service id and stops. The mirror-r2 API and `/admin?tab=bulk` return the exact command, always
+  unversioned: they only ever mint a first tiling.
+- After mirroring: `maps.iiif_image` and the primary `map_iiif_sources` row point to
+  `https://iiif.maparchive.vn/iiif/<map-uuid>`; `maps.annotation_url` becomes the Supabase Storage
+  public URL of the updated annotation JSON (mig 047 — earlier code overloaded `allmaps_id` for
+  this; the column now holds only bare image IDs).
 
-**info.json patching:** the worker patches `vips dzsave`'s info.json on the fly — injects `tiles[0].height` (defaults to width per spec but required by OL's IIIFInfo parser) and a `sizes` array computed from scaleFactors. Without these, OpenLayers renders stretched/seamy tiles. Served with `Cache-Control: public, max-age=0`.
+**info.json patching:** the worker patches `vips dzsave`'s info.json on the fly — injects
+`tiles[0].height` (defaults to width per spec but required by OL's IIIFInfo parser) and a `sizes`
+array computed from scaleFactors. Without these, OpenLayers renders stretched/seamy tiles. Served
+with `Cache-Control: public, max-age=0`.
 
-Deploy: `cd worker && npx wrangler deploy --env production`. A bare `wrangler deploy` updates only the default env (orphan worker on `workers.dev`) and does NOT update the production route.
+Deploy: `cd worker && npx wrangler deploy --env production`. A bare `wrangler deploy` updates only
+the default env (orphan worker on `workers.dev`) and does NOT update the production route.
 
 **Edge cache (2026-09-06):** the worker stores every successful tile response in
 `caches.default` and checks it before touching R2. A Worker response is not
@@ -153,37 +185,69 @@ behind a miss is a property of the map, not of a render, and every version wants
 
 ### Why pre-tiled
 
-Historical scans never change, so tiling once means zero compute at request time and no dependency on Internet Archive or Gallica staying up. `vips dzsave` takes any JPEG/PNG/TIFF directly — no pyramidal TIFF step. R2 egress is free, so tile serving costs storage only (~$0.15/mo at 20 maps × ~500 MB; ~$1.50/mo at 200).
+Historical scans never change, so tiling once means zero compute at request time and no dependency
+on Internet Archive or Gallica staying up. `vips dzsave` takes any JPEG/PNG/TIFF directly — no
+pyramidal TIFF step. R2 egress is free, so tile serving costs storage only (~$0.15/mo at 20 maps ×
+~500 MB; ~$1.50/mo at 200).
 
 ### Layout and config
 
-- Bucket `vma-tiles`, binding `TILES` (`worker/wrangler.toml`). Keys under `tiles/{mapId}/…`, `info.json` at `tiles/{mapId}/info.json`. A re-tile adds a sibling prefix `tiles/{mapId}/v{N}/…` served at `/iiif/{mapId}/v{N}` — the original keys are never touched (*Re-tiling a mirrored map* above).
-- Production route `iiif.maparchive.vn/iiif/*` on zone `maparchive.vn`. (Older notes say `iiif.vmaproject.org` — that host was never live; a stale comment survives at `scripts/tile_map.sh:11`.)
-- Tiles are served `Cache-Control: immutable`; `info.json` is served `max-age=0` because the worker patches it per-request.
-- `Access-Control-Allow-Origin: *` is required on **both** `info.json` and tile responses — Allmaps will not load the overlay without it.
-- Source scans stay in Supabase Storage as the re-tiling input; they are never served directly (egress).
+- Bucket `vma-tiles`, binding `TILES` (`worker/wrangler.toml`). Keys under `tiles/{mapId}/…`,
+  `info.json` at `tiles/{mapId}/info.json`. A re-tile adds a sibling prefix `tiles/{mapId}/v{N}/…`
+  served at `/iiif/{mapId}/v{N}` — the original keys are never touched (*Re-tiling a mirrored map*
+  above).
+- Production route `iiif.maparchive.vn/iiif/*` on zone `maparchive.vn`. (Older notes say
+  `iiif.vmaproject.org` — that host was never live; a stale comment survives at
+  `scripts/tile_map.sh:11`.)
+- Tiles are served `Cache-Control: immutable`; `info.json` is served `max-age=0` because the worker
+  patches it per-request.
+- `Access-Control-Allow-Origin: *` is required on **both** `info.json` and tile responses — Allmaps
+  will not load the overlay without it.
+- Source scans stay in Supabase Storage as the re-tiling input; they are never served directly
+  (egress).
 
 ### Prerequisites and gotchas
 
-- `vips --version` and `rclone listremotes` (must show `r2:`) — `wrangler` cannot upload a directory, so `tile_map.sh` uses rclone.
-- Tile size 256 is standard; 512 cuts request count on very large maps but enlarges the first tile. `Q=85` is the right quality band for archival scans (limited palette).
-- BnF Gallica: download the highest-res JPEG from the viewer, not via the manifest (slow). IA: `https://archive.org/download/{identifier}/{file}.jpg`.
-- Running mirror-r2 *before* the tiles are uploaded points `maps.iiif_image` at R2 while the objects are missing — the worker then falls back to the origin proxy and can 500. Tile first, or expect a gap.
+- `vips --version` and `rclone listremotes` (must show `r2:`) — `wrangler` cannot upload a
+  directory, so `tile_map.sh` uses rclone.
+- Tile size 256 is standard; 512 cuts request count on very large maps but enlarges the first tile.
+  `Q=85` is the right quality band for archival scans (limited palette).
+- BnF Gallica: download the highest-res JPEG from the viewer, not via the manifest (slow). IA:
+  `https://archive.org/download/{identifier}/{file}.jpg`.
+- Running mirror-r2 *before* the tiles are uploaded points `maps.iiif_image` at R2 while the objects
+  are missing — the worker then falls back to the origin proxy and can 500. Tile first, or expect a
+  gap.
 - Keep the pre-mirror URL in `extra_metadata.iiif_image_original` as a fallback reference.
 
 Full historical plan (phases, worker source draft, cost table): `docs/archive/iiif-r2-plan.md`.
 
 ## Scout & ingest (`/admin?tab=scout`)
 
-External-source discovery + curate + bulk-ingest pipeline. Surfaces candidates from Gallica, Humazur, David Rumsey, Library of Congress, UWM AGDM as a reviewable grid. Admin approves rows → bulk-ingest as `draft` `maps` rows with full DC + `holding_institution`.
+External-source discovery + curate + bulk-ingest pipeline. Surfaces candidates from Gallica,
+Humazur, David Rumsey, Library of Congress, UWM AGDM as a reviewable grid. Admin approves rows →
+bulk-ingest as `draft` `maps` rows with full DC + `holding_institution`.
 
-**Data flow:** scout JSON → `scout_candidates` table → admin review UI → approved → POST ingests as `maps` rows.
+**Data flow:** scout JSON → `scout_candidates` table → admin review UI → approved → POST ingests as
+`maps` rows.
 
-**The review UI** is two views over one queue, chosen by a pill toggle and remembered in `vma-scout-view-v1`: the **card grid** (judge a sheet by its picture) and a dense **table** on `.data-table.is-dense` (scan a thousand titles, spot the near-duplicates). Sorting is the server's — `?order=&dir=` — because the page holds 60 of 1041 rows and re-ordering only those would label the oldest sheet *on this page* as the oldest in the queue.
+**The review UI** is two views over one queue, chosen by a pill toggle and remembered in
+`vma-scout-view-v1`: the **card grid** (judge a sheet by its picture) and a dense **table** on
+`.data-table.is-dense` (scan a thousand titles, spot the near-duplicates). Sorting is the server's —
+`?order=&dir=` — because the page holds 60 of 1041 rows and re-ordering only those would label the
+oldest sheet *on this page* as the oldest in the queue.
 
-`ScoutDecision.svelte` is the approve/reject control both views mount, so a verdict behaves identically in each: preset reasons plus free text, Enter commits, Escape cancels, and a blank reason is allowed — the keyboard sweep (`a`/`r`) decides with no reason at all, which is the trade for clearing a page of obvious rows in seconds. The reason lands in `scout_candidates.review_note` (mig 078), which is the *person's* column: `reasons` belongs to the scorer and `load_scout_to_db.mjs` overwrites it on every re-load. Bulk approve/reject takes one reason for the batch.
+`ScoutDecision.svelte` is the approve/reject control both views mount, so a verdict behaves
+identically in each: preset reasons plus free text, Enter commits, Escape cancels, and a blank
+reason is allowed — the keyboard sweep (`a`/`r`) decides with no reason at all, which is the trade
+for clearing a page of obvious rows in seconds. The reason lands in `scout_candidates.review_note`
+(mig 078), which is the *person's* column: `reasons` belongs to the scorer and
+`load_scout_to_db.mjs` overwrites it on every re-load. Bulk approve/reject takes one reason for the
+batch.
 
-**The score is no longer shown.** The loader still computes it and `score`/`reasons` still exist, but neither the chip nor the min-score filter is in the UI — 822 of 1041 rows score ≥ 40, so it never separated anything a person needed separated. A candidate with no usable image source carries a `no image` flag instead, which is the fact that actually decides whether ingest can proceed.
+**The score is no longer shown.** The loader still computes it and `score`/`reasons` still exist,
+but neither the chip nor the min-score filter is in the UI — 822 of 1041 rows score ≥ 40, so it
+never separated anything a person needed separated. A candidate with no usable image source carries
+a `no image` flag instead, which is the fact that actually decides whether ingest can proceed.
 
 ### Scout scripts (read-only, produce JSON)
 
@@ -199,14 +263,42 @@ External-source discovery + curate + bulk-ingest pipeline. Surfaces candidates f
 
 ### Source patterns (for adding new sources)
 
-- **Gallica SRU**: `https://gallica.bnf.fr/SRU?operation=searchRetrieve&version=1.2&query=(dc.type adj "carte") and (dc.title all "{keyword}")&maximumRecords=50&startRecord=1` — federated. Rate-limit ~3s/req, returns 429 if hammered. Use `--use-system-ca` or `NODE_TLS_REJECT_UNAUTHORIZED=0`.
-- **David Rumsey Luna**: `https://www.davidrumsey.com/luna/servlet/as/search?q={kw}&dh=50&os=json&so={offset}` — JSON, ~994 raw "Vietnam" hits. Filter on `fieldValues.Country/City/Region` to drop atlas pages.
-- **Library of Congress**: `https://www.loc.gov/maps/?q={kw}&fo=json&c=50&sp={page}` — small but high-quality, ~50 total Vietnam hits. **No Presentation manifest is reachable**: item pages and `?fo=json` on an item both answer 403 behind a Cloudflare challenge. The Image API is fine, and the thumbnail names it — `tile.loc.gov/storage-services/service/gmd/gmd7/g7823/g7823g/ct003290.gif` → `tile.loc.gov/image-services/iiif/service:gmd:gmd7:g7823:g7823g:ct003290/info.json`. `deriveImageUrl` in `scoutDerive.mjs` does that, parking the result in `raw.iiif_image`, which ingest writes to `maps.iiif_image`. Rows with no thumbnail derive nothing and cannot be ingested.
-- **Omeka S** (Humazur, and Bordeaux 3 via Gallica SRU federation): `{host}/iiif/{item_id}/manifest` — a IIIF v2 manifest. Two of the "gallica" federated hosts are Omeka S, so the BnF ark pattern leaves them with no manifest; `deriveManifestUrl` keys off the `source_url` host.
-- **UWM AGDM (CONTENTdm)**: `https://collections.lib.uwm.edu/digital/bl/dmwebservices/index.php?q=dmQuery/agdm/CISOSEARCHALL^{kw}^all^and/{fields}/nosort/{n}/{offset}/1/0/0/0/json` — the American Geographical Society Library's map collection, 55 Vietnam hits, strong on 1920s-1960s French and US sheets. Field nicknames come from `dmGetCollectionFieldInfo/agdm/json` (`map`=creator, `maa`=publisher, `public`=date, `boundi`=bbox, almost always empty). IIIF Image API is level1 at `/digital/iiif/agdm/{pointer}`, manifest at `/iiif/2/agdm:{pointer}/manifest.json`. A `filetype: cpd` record is a **compound multi-sheet object**: its own pointer carries no image, so the single-item thumbnail answers 200 with HTML — take the first `pageptr` from `dmGetCompoundObjectInfo/agdm/{pointer}/json` (12 of the 55 are compound).
-- **Humazur Omeka S**: `https://humazur.univ-cotedazur.fr/api/items?item_set_id={set}&resource_class_id=33&per_page=100&page={n}` — `resource_class_id=33` is StillImage. item_sets: 59 (Cartothèque ASEMI, ~417 pure maps), 519 (Indochine française, 1500+ mixed).
+- **Gallica SRU**:
+  `https://gallica.bnf.fr/SRU?operation=searchRetrieve&version=1.2&query=(dc.type adj "carte") and (dc.title all "{keyword}")&maximumRecords=50&startRecord=1`
+  — federated. Rate-limit ~3s/req, returns 429 if hammered. Use `--use-system-ca` or
+  `NODE_TLS_REJECT_UNAUTHORIZED=0`.
+- **David Rumsey Luna**:
+  `https://www.davidrumsey.com/luna/servlet/as/search?q={kw}&dh=50&os=json&so={offset}` — JSON, ~994
+  raw "Vietnam" hits. Filter on `fieldValues.Country/City/Region` to drop atlas pages.
+- **Library of Congress**: `https://www.loc.gov/maps/?q={kw}&fo=json&c=50&sp={page}` — small but
+  high-quality, ~50 total Vietnam hits. **No Presentation manifest is reachable**: item pages and
+  `?fo=json` on an item both answer 403 behind a Cloudflare challenge. The Image API is fine, and
+  the thumbnail names it —
+  `tile.loc.gov/storage-services/service/gmd/gmd7/g7823/g7823g/ct003290.gif` →
+  `tile.loc.gov/image-services/iiif/service:gmd:gmd7:g7823:g7823g:ct003290/info.json`.
+  `deriveImageUrl` in `scoutDerive.mjs` does that, parking the result in `raw.iiif_image`, which
+  ingest writes to `maps.iiif_image`. Rows with no thumbnail derive nothing and cannot be ingested.
+- **Omeka S** (Humazur, and Bordeaux 3 via Gallica SRU federation): `{host}/iiif/{item_id}/manifest`
+  — a IIIF v2 manifest. Two of the "gallica" federated hosts are Omeka S, so the BnF ark pattern
+  leaves them with no manifest; `deriveManifestUrl` keys off the `source_url` host.
+- **UWM AGDM (CONTENTdm)**:
+  `https://collections.lib.uwm.edu/digital/bl/dmwebservices/index.php?q=dmQuery/agdm/CISOSEARCHALL^{kw}^all^and/{fields}/nosort/{n}/{offset}/1/0/0/0/json`
+  — the American Geographical Society Library's map collection, 55 Vietnam hits, strong on
+  1920s-1960s French and US sheets. Field nicknames come from `dmGetCollectionFieldInfo/agdm/json`
+  (`map`=creator, `maa`=publisher, `public`=date, `boundi`=bbox, almost always empty). IIIF Image
+  API is level1 at `/digital/iiif/agdm/{pointer}`, manifest at
+  `/iiif/2/agdm:{pointer}/manifest.json`. A `filetype: cpd` record is a **compound multi-sheet
+  object**: its own pointer carries no image, so the single-item thumbnail answers 200 with HTML —
+  take the first `pageptr` from `dmGetCompoundObjectInfo/agdm/{pointer}/json` (12 of the 55 are
+  compound).
+- **Humazur Omeka S**:
+  `https://humazur.univ-cotedazur.fr/api/items?item_set_id={set}&resource_class_id=33&per_page=100&page={n}`
+  — `resource_class_id=33` is StillImage. item_sets: 59 (Cartothèque ASEMI, ~417 pure maps), 519
+  (Indochine française, 1500+ mixed).
 
-Skipped: IA (3500+ noisy hits, no clean filter); Cartomundi (JS app, needs headless browser); Princeton GeoBlacklight (geographic-bbox-indexed, 0 hits for "vietnam"); Harvard LibraryCloud (endpoint quirks); HathiTrust (Cloudflare-blocked).
+Skipped: IA (3500+ noisy hits, no clean filter); Cartomundi (JS app, needs headless browser);
+Princeton GeoBlacklight (geographic-bbox-indexed, 0 hits for "vietnam"); Harvard LibraryCloud
+(endpoint quirks); HathiTrust (Cloudflare-blocked).
 
 ### Workflow
 
@@ -228,13 +320,18 @@ open https://<host>/admin?tab=scout
 
 ### API endpoints (admin/mod only)
 
-- `GET /api/admin/scout?status=pending&source=humazur&category=urban_plan&minScore=40&q=Saigon&limit=60&offset=0` — paginated list with facet counts on first page.
+- `GET /api/admin/scout?status=pending&source=humazur&category=urban_plan&minScore=40&q=Saigon&limit=60&offset=0`
+  — paginated list with facet counts on first page.
 - `PATCH /api/admin/scout/[id]` — approve/reject/revert (sets `reviewer_id` + `reviewed_at`).
-- `POST /api/admin/scout` `{ ids: [...] }` — bulk-ingest approved candidates → `maps` rows (only operates on `status=approved`; sets `status=ingested` + `map_id` on success). Maps holding-institution string to `source_type`: "David Rumsey" → `rumsey`; "Bibliothèque nationale" → `bnf`; else `other`. Stamps `extra_metadata.scout_candidate_id` for traceability.
+- `POST /api/admin/scout` `{ ids: [...] }` — bulk-ingest approved candidates → `maps` rows (only
+  operates on `status=approved`; sets `status=ingested` + `map_id` on success). Maps
+  holding-institution string to `source_type`: "David Rumsey" → `rumsey`; "Bibliothèque nationale" →
+  `bnf`; else `other`. Stamps `extra_metadata.scout_candidate_id` for traceability.
 
 ## Holding institution model
 
-`maps.holding_institution` (mig 044) separates **who holds the original** from **how VMA serves it**.
+`maps.holding_institution` (mig 044) separates **who holds the original** from **how VMA serves
+it**.
 
 | Column | Meaning | Example |
 |--------|---------|---------|
@@ -297,10 +394,12 @@ answered 'whole'.
 That never reached the database, because `nakala.json` is a pre-filtered read holding 11 demi-format
 and 21 demi-feuille records and no assemblage. It was a landmine: regenerate that file over serie
 175, which is *all* assemblages, and 79 two-half cells get minted as single whole-cell sheets, with
-nothing in the output saying so. The merged `half()` now throws on one instead, because that script's
+nothing in the output saying so. The merged `half()` now throws on one instead, because that
+script's
 row model has no way to represent it.
 
-`tests/ingest-cells.spec.ts` pins all of it on bytes copied out of the four catalogues (20 checks, in
+`tests/ingest-cells.spec.ts` pins all of it on bytes copied out of the four catalogues (20 checks,
+in
 `npm run test`). `node scripts/lib/cells.test.mjs` is the full-corpus run — every old parser beside
 its replacement over all 304 IGN records, 160 ANU items and both hand-read TTU tables; the dumps are
 42 MB and gitignored, so it skips cleanly when they are not on disk and is worth running after any
@@ -309,7 +408,8 @@ re-fetch, which is when a new spelling would arrive.
 ### What has not moved
 
 `tile_map.sh` and `bulk_upload_local.sh` still each do their own `maps` insert, and
-`ingest_indochine_nakala.mjs` shells into the first. Unifying the mirror step is worth doing **after**
+`ingest_indochine_nakala.mjs` shells into the first. Unifying the mirror step is worth doing
+**after**
 the container decision in `docs/journals/260914-iiif-space-efficiency.md` — 119,616 tile objects
 against one COG — because packaging it first means packaging it twice.
 

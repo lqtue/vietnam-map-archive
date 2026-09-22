@@ -8,7 +8,8 @@ _March 2026_
 
 VMA produces 3D models of 1880–1930 Saigon through two complementary pipelines:
 
-1. **Automated LoD2** — Morlighem (2021) pipeline adapted to VMA's IIIF georef output → CityJSON box models for all buildings
+1. **Automated LoD2** — Morlighem (2021) pipeline adapted to VMA's IIIF georef output → CityJSON box
+   models for all buildings
 2. **Photogrammetry LoD3+** — SfM from archival photos → textured mesh for ~30 landmark buildings
 
 These correspond to **L2 (volumetric 3D)** and **L3 (facade + road)** in the 6-layer data stack.
@@ -19,15 +20,23 @@ These correspond to **L2 (volumetric 3D)** and **L3 (facade + road)** in the 6-l
 
 ### Source
 
-**Morlighem, C. (2021).** *Automatic reconstruction of 3D city models from historical maps.* MSc thesis, TU Delft / Delft University of Technology. Supervisor: Hugo Ledoux (CityJSON creator, TU Delft 3D Geoinformation Group).
+**Morlighem, C. (2021).** *Automatic reconstruction of 3D city models from historical maps.* MSc
+thesis, TU Delft / Delft University of Technology. Supervisor: Hugo Ledoux (CityJSON creator, TU
+Delft 3D Geoinformation Group).
 
 Code: `github.com/CamilleMorlighem/histo3d` (CC-BY licence)
 
-**Results (original paper):** >84% building plot detection, >89% building plot classification, >99% valid CityJSON geometry. Tested on two cities: Delft (Dutch) and Brussels (Belgian).
+**Results (original paper):** >84% building plot detection, >89% building plot classification, >99%
+valid CityJSON geometry. Tested on two cities: Delft (Dutch) and Brussels (Belgian).
 
-**Critical condition:** These results apply only to maps that are *"properly scanned, with sufficient spatial resolution and strict symbology rules."* Morlighem's abstract frames this as the primary determinant of pipeline quality. Inconsistent scanning, low resolution, or variable cartographic conventions degrade results significantly — this is VMA's main technical risk, not a minor calibration question.
+**Critical condition:** These results apply only to maps that are *"properly scanned, with
+sufficient spatial resolution and strict symbology rules."* Morlighem's abstract frames this as the
+primary determinant of pipeline quality. Inconsistent scanning, low resolution, or variable
+cartographic conventions degrade results significantly — this is VMA's main technical risk, not a
+minor calibration question.
 
-**Co-supervisors:** Hugo Ledoux and Anna Labetski (TU Delft 3D geoinformation group); co-reader Francesca Noardo.
+**Co-supervisors:** Hugo Ledoux and Anna Labetski (TU Delft 3D geoinformation group); co-reader
+Francesca Noardo.
 
 ### Why This Fits VMA
 
@@ -38,7 +47,9 @@ Code: `github.com/CamilleMorlighem/histo3d` (CC-BY licence)
 | Building footprints as OBIA input | Stage 4 of Morlighem; VMA community tracing pre-populates this |
 | CityJSON output format | Hugo Ledoux (CityJSON creator) is Morlighem's supervisor — direct compatibility |
 
-**The key complement:** VMA automates georeferencing (the prerequisite Morlighem left manual). Morlighem automates 3D from georeferenced maps. Together they form a complete pipeline from scanned map → validated 3D city model.
+**The key complement:** VMA automates georeferencing (the prerequisite Morlighem left manual).
+Morlighem automates 3D from georeferenced maps. Together they form a complete pipeline from scanned
+map → validated 3D city model.
 
 ### Pipeline Steps
 
@@ -142,7 +153,8 @@ Stage 6: 3D procedural modelling
 ### Validation
 
 - **Geometric validation:** `cjio` (CityJSON CLI) — checks topology, manifold geometry
-- **Attribution validation:** Every automated building is flagged `vma:source: morlighem_auto_v1` so users know it is approximate
+- **Attribution validation:** Every automated building is flagged `vma:source: morlighem_auto_v1` so
+  users know it is approximate
 - **Community review:** Architect tier contributors can flag incorrect height/roof assignments
 - **Ground truth:** EFEO photos provide spot-checks for key buildings
 
@@ -152,7 +164,9 @@ Stage 6: 3D procedural modelling
 
 ### Goal
 
-For ~30 landmark buildings (Notre Dame, City Hall, Opera House, Central Post Office, Ben Thanh Market, key Cholon merchant buildings), produce textured 3D meshes with facade detail — linked to KG entities, viewable in browser.
+For ~30 landmark buildings (Notre Dame, City Hall, Opera House, Central Post Office, Ben Thanh
+Market, key Cholon merchant buildings), produce textured 3D meshes with facade detail — linked to KG
+entities, viewable in browser.
 
 ### Photo Sources
 
@@ -166,17 +180,37 @@ For ~30 landmark buildings (Notre Dame, City Hall, Opera House, Central Post Off
 | Family archives | Diaspora uploads via community contribution | Via `/contribute/photo` |
 | ANOM (Archives nationales d'outre-mer) | French colonial admin photos | On-site / digitisation project needed |
 
-**Key insight on painting-map pairs:** VMA has two contemporaneous painting-map pairs — a rare combination that most historical reconstruction projects lack:
+**Key insight on painting-map pairs:** VMA has two contemporaneous painting-map pairs — a rare
+combination that most historical reconstruction projects lack:
 
-- **Pair 1882:** The 1881 B&W engraving "Saigon" (Colonies Françaises — Cochinchine) pairs with the 1882 cadastral map. The engraving shows the full city from an elevated oblique south-to-north perspective. Massing, story heights, and roof shapes are directly readable for all blocks visible in the scene.
+- **Pair 1882:** The 1881 B&W engraving "Saigon" (Colonies Françaises — Cochinchine) pairs with the
+  1882 cadastral map. The engraving shows the full city from an elevated oblique south-to-north
+  perspective. Massing, story heights, and roof shapes are directly readable for all blocks visible
+  in the scene.
 
-- **Pair 1898:** The 1901 full-color lithograph pairs with the 1898 cadastral map. The painting shows the city at peak first-wave colonial development. The color is the critical additional value: near-uniform terracotta roof tiling across residential and commercial stock is visually confirmed at city scale — this directly calibrates the NYPL color classifier and the Morlighem probabilistic roof type table without requiring European priors. Institutional buildings (white/cream) and military/warehouse zones (grey/brown) are visually distinct and map precisely onto the cadastral color classes.
+- **Pair 1898:** The 1901 full-color lithograph pairs with the 1898 cadastral map. The painting
+  shows the city at peak first-wave colonial development. The color is the critical additional
+  value: near-uniform terracotta roof tiling across residential and commercial stock is visually
+  confirmed at city scale — this directly calibrates the NYPL color classifier and the Morlighem
+  probabilistic roof type table without requiring European priors. Institutional buildings
+  (white/cream) and military/warehouse zones (grey/brown) are visually distinct and map precisely
+  onto the cadastral color classes.
 
-**Temporal pair methodology:** The two paintings together enable a visual cross-validation of the automated temporal classification (stable / new / demolished) produced by the `match` command. A block that appears built-up in both the 1881 and 1901 paintings is a visual confirmation of "stable" status for that building cluster. A block sparse in 1881 but dense in 1901 visually confirms "new construction" between the two map dates.
+**Temporal pair methodology:** The two paintings together enable a visual cross-validation of the
+automated temporal classification (stable / new / demolished) produced by the `match` command. A
+block that appears built-up in both the 1881 and 1901 paintings is a visual confirmation of "stable"
+status for that building cluster. A block sparse in 1881 but dense in 1901 visually confirms "new
+construction" between the two map dates.
 
-**Workflow:** Architecture historians annotate buildings visible in each painting → cross-reference with the paired cadastral polygon → assign height class (1/2/3 stories) + roof type → calibrate height estimates in probabilistic table → apply as priors in Morlighem height inference. Landmark height anchors: Notre-Dame Cathedral spires (57 m, documented), Hôtel de Ville facade (approx. 18 m), Marché Central roof ridge (approx. 12 m).
+**Workflow:** Architecture historians annotate buildings visible in each painting → cross-reference
+with the paired cadastral polygon → assign height class (1/2/3 stories) + roof type → calibrate
+height estimates in probabilistic table → apply as priors in Morlighem height inference. Landmark
+height anchors: Notre-Dame Cathedral spires (57 m, documented), Hôtel de Ville facade (approx. 18
+m), Marché Central roof ridge (approx. 12 m).
 
-**Key insight on postcards:** The Saigon postcard industry (1900–1930) produced a large volume of images of the city's major buildings. [NOTE: the claim that this exceeds other colonial cities in comparable volume needs a citation before it appears in a paper — it is currently unverified.]
+**Key insight on postcards:** The Saigon postcard industry (1900–1930) produced a large volume of
+images of the city's major buildings. [NOTE: the claim that this exceeds other colonial cities in
+comparable volume needs a citation before it appears in a paper — it is currently unverified.]
 
 ### SfM Pipeline
 
@@ -215,11 +249,23 @@ Phase 4: Validation + publish
 
 ### Limitations and Honest Notes
 
-- **No interior data:** Historical photos are almost entirely exterior. Interior reconstructions are not feasible.
-- **Photo dating uncertainty:** Many Manhhai/EFEO photos have approximate dates (1900–1910). SfM meshes inherit this uncertainty — buildings may show a composite of several decades.
-- **Scale ambiguity:** SfM produces relative scale. Absolute scale requires at least one known dimension (building width from cadastral record, or person of known height in photo). Architecture historians provide this from KG data.
-- **Older photos = lower quality:** Pre-1910 glass plate photographs are lower resolution. Some will not produce clean SfM meshes. Expectation: ~60% of landmark buildings produce usable meshes from available EFEO/Gallica material. [NOTE: this figure is an estimate without citation — needs empirical support or should be reframed as a hypothesis.]
-- **Nostalgin (Kapoor et al. 2019) is NOT a SfM precedent.** That paper uses single-view neural reconstruction (MaskRCNN + inpainting) and explicitly assumes a Manhattan-world (orthogonal grid). Colonial Saigon's street network violates this assumption. Nostalgin is referenced in some VMA notes as a photogrammetry precedent — this is incorrect. VMA's COLMAP/Meshroom SfM approach has no direct published precedent for colonial Southeast Asian architecture and should be framed as original applied research.
+- **No interior data:** Historical photos are almost entirely exterior. Interior reconstructions are
+  not feasible.
+- **Photo dating uncertainty:** Many Manhhai/EFEO photos have approximate dates (1900–1910). SfM
+  meshes inherit this uncertainty — buildings may show a composite of several decades.
+- **Scale ambiguity:** SfM produces relative scale. Absolute scale requires at least one known
+  dimension (building width from cadastral record, or person of known height in photo). Architecture
+  historians provide this from KG data.
+- **Older photos = lower quality:** Pre-1910 glass plate photographs are lower resolution. Some will
+  not produce clean SfM meshes. Expectation: ~60% of landmark buildings produce usable meshes from
+  available EFEO/Gallica material. [NOTE: this figure is an estimate without citation — needs
+  empirical support or should be reframed as a hypothesis.]
+- **Nostalgin (Kapoor et al. 2019) is NOT a SfM precedent.** That paper uses single-view neural
+  reconstruction (MaskRCNN + inpainting) and explicitly assumes a Manhattan-world (orthogonal grid).
+  Colonial Saigon's street network violates this assumption. Nostalgin is referenced in some VMA
+  notes as a photogrammetry precedent — this is incorrect. VMA's COLMAP/Meshroom SfM approach has no
+  direct published precedent for colonial Southeast Asian architecture and should be framed as
+  original applied research.
 
 ---
 
@@ -247,7 +293,8 @@ The 3D city model is served through the `/timeline` route as temporal snapshots:
 | 1910 | BnF Gallica 1905 + EFEO 1908 | Full colonial city |
 | 1930 | ANOM 1924 + EFEO 1930 | Full city + suburbs |
 
-At each snapshot: footprints from community tracing → LoD2 model from Morlighem → LoD3+ overlaid for landmarks.
+At each snapshot: footprints from community tracing → LoD2 model from Morlighem → LoD3+ overlaid for
+landmarks.
 
 Users can scrub between snapshots and watch buildings appear, change, or disappear.
 
@@ -261,10 +308,12 @@ Users can scrub between snapshots and watch buildings appear, change, or disappe
 - TU Delft has experience with historical city reconstruction across Dutch/Belgian cities
 - VMA brings the first Southeast Asian colonial city application of this methodology
 
-**Contact at TU Delft:** Hugo Ledoux + Anna Labetski (both supervised Morlighem). Francesca Noardo (co-reader) is also a relevant contact — she specialises in 3D standards and cultural heritage.
+**Contact at TU Delft:** Hugo Ledoux + Anna Labetski (both supervised Morlighem). Francesca Noardo
+(co-reader) is also a relevant contact — she specialises in 3D standards and cultural heritage.
 
 **Proposed collaboration:**
-- Joint paper: *Automated 3D reconstruction of a French colonial city from historical map rasters — extending the Morlighem pipeline to French Indochina cartographic symbology*
+- Joint paper: *Automated 3D reconstruction of a French colonial city from historical map rasters —
+  extending the Morlighem pipeline to French Indochina cartographic symbology*
 - Target venue: ISPRS Annals or International Journal of Digital Earth
 - TU Delft co-applies to EU Horizon Digital Heritage calls with VMA as domain partner
 

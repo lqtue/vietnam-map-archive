@@ -1,6 +1,7 @@
 # 260918 — the sheet knows where its own blocks are
 
-**Date:** 2026-09-18 · **Severity:** medium · **Component:** seg / Track C · **Status:** P1 + P2 built and scored, P3 a recorded null, P4 open
+**Date:** 2026-09-18 · **Severity:** medium · **Component:** seg / Track C · **Status:** P1 + P2
+built and scored, P3 a recorded null, P4 open
 
 ## The goal
 

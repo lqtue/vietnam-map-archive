@@ -5,7 +5,10 @@
 
 ## Context
 
-The app has 16 routes with copy-pasted nav/footer, three separate catalog/admin interfaces, a monolithic LabelStudio, and an AnnotateMode that bypasses MapShell entirely. This plan restructures around **composable shells** and **four page types**: geo map viewer, image viewer, catalog, editorial. Maximize module reuse; eliminate duplication.
+The app has 16 routes with copy-pasted nav/footer, three separate catalog/admin interfaces, a
+monolithic LabelStudio, and an AnnotateMode that bypasses MapShell entirely. This plan restructures
+around **composable shells** and **four page types**: geo map viewer, image viewer, catalog,
+editorial. Maximize module reuse; eliminate duplication.
 
 ---
 
@@ -29,9 +32,11 @@ The app has 16 routes with copy-pasted nav/footer, three separate catalog/admin 
 
 ### Layer 1: ToolLayout (RENAME from GeoMapShell)
 
-`GeoMapShell.svelte` is already a pure layout component — zero map-specific logic. Rename to `ToolLayout.svelte` and share across BOTH viewers.
+`GeoMapShell.svelte` is already a pure layout component — zero map-specific logic. Rename to
+`ToolLayout.svelte` and share across BOTH viewers.
 
-**Provides:** sidebar + map/image stage + floating controls + mobile drawer + responsive breakpoints.
+**Provides:** sidebar + map/image stage + floating controls + mobile drawer + responsive
+breakpoints.
 **File:** `src/lib/map/shell/ToolLayout.svelte` (rename from `src/lib/map/shell/GeoMapShell.svelte`)
 **Slots:** `sidebar`, `default` (main content), `floating`, `mobile-sidebar`
 
@@ -45,7 +50,8 @@ ToolLayout (shared responsive layout)
 ├── /contribute/trace → ToolLayout > ImageShell + TraceTool
 ```
 
-All tool pages get the same sidebar collapse, mobile drawer, floating controls, and SearchPanel pattern for free.
+All tool pages get the same sidebar collapse, mobile drawer, floating controls, and SearchPanel
+pattern for free.
 
 ### Layer 2: ImageShell (NEW) — IIIF image viewer base
 
@@ -70,7 +76,8 @@ ImageShell (base IIIF viewer)
 
 ### Layer 3: MapShell (EXISTING) — geo map viewer base
 
-Already well-structured. Provides OL Map, basemap switching, bidirectional store sync, URL hash sync. Context via `getShellContext()`. Children compose in slot.
+Already well-structured. Provides OL Map, basemap switching, bidirectional store sync, URL hash
+sync. Context via `getShellContext()`. Children compose in slot.
 
 **Current composability: ~50%.** AnnotateMode bypasses it via StudioMap.
 
@@ -83,7 +90,11 @@ MapShell (base geo viewer)
 
 ### Shared search integration
 
-`SearchPanel.svelte` and `MapSearchBar.svelte` already exist as reusable components. Both viewers use them in the same position (top of map-stage, above the canvas). The search panel has two tabs (Maps catalog search + Location geocoding). For image viewer pages, the Maps tab is the primary entry point for selecting which map to view/label/trace. The panel emits events (`selectMap`, `navigate`) — each page handles them appropriately.
+`SearchPanel.svelte` and `MapSearchBar.svelte` already exist as reusable components. Both viewers
+use them in the same position (top of map-stage, above the canvas). The search panel has two tabs
+(Maps catalog search + Location geocoding). For image viewer pages, the Maps tab is the primary
+entry point for selecting which map to view/label/trace. The panel emits events (`selectMap`,
+`navigate`) — each page handles them appropriately.
 
 ---
 
@@ -107,7 +118,8 @@ Maps v:                          Contribute v:
 ### Route classification
 
 **Editorial** (NavBar + footer from shared layout):
-`/`, `/catalog`, `/about`, `/blog`, `/blog/[slug]`, `/contribute`, `/contribute/georef`, `/login`, `/signup`, `/profile`
+`/`, `/catalog`, `/about`, `/blog`, `/blog/[slug]`, `/contribute`, `/contribute/georef`, `/login`,
+`/signup`, `/profile`
 
 **App/tool** (fullscreen, no NavBar):
 `/view`, `/image`, `/create`, `/annotate`, `/contribute/label`, `/contribute/trace`
@@ -117,9 +129,12 @@ Maps v:                          Contribute v:
 - `/contribute/catalog` — Dublin Core metadata editing moved to `/catalog` (role-gated, mod+)
 
 **Deprioritized routes** (kept but not in nav):
-- `/contribute/review` — SAM2 review not working yet; route stays but hidden from nav until functional
+- `/contribute/review` — SAM2 review not working yet; route stays but hidden from nav until
+  functional
 
-**Auth pages note:** `/login` and `/signup` are in the `(editorial)` group, so they get NavBar from the shared layout. This lets users navigate away from auth pages — the auth card renders below the nav.
+**Auth pages note:** `/login` and `/signup` are in the `(editorial)` group, so they get NavBar from
+the shared layout. This lets users navigate away from auth pages — the auth card renders below the
+nav.
 
 ### Unified /catalog
 
@@ -131,7 +146,9 @@ Single route with role-based progressive disclosure:
 | Mod+ | + "Edit" toggle -> inline Dublin Core metadata editing, completeness bar |
 | Admin | + "New Map" button, delete, upload image, IIIF source mgmt, label config, featured toggle |
 
-Reuses existing API routes (`/api/contribute/catalog/[mapId]` for mod edits, `/api/admin/maps/*` for admin ops). Existing modals (`MapEditModal`, `MapUploadModal`) from `AdminDashboard` are imported conditionally.
+Reuses existing API routes (`/api/contribute/catalog/[mapId]` for mod edits, `/api/admin/maps/*` for
+admin ops). Existing modals (`MapEditModal`, `MapUploadModal`) from `AdminDashboard` are imported
+conditionally.
 
 ---
 
@@ -279,9 +296,14 @@ Tools call `getImageShellContext()` and add their own OL interactions to the map
 
 ### Map selection UX change (label/trace pages)
 
-Currently LabelStudio has a custom task-based map picker (fetches `label_tasks`, cycles through maps). The new label/trace pages use the shared `SearchPanel` instead — the same search used in `/view` and `/create`. Users search for a map by name, then the page resolves its IIIF URL and loads it.
+Currently LabelStudio has a custom task-based map picker (fetches `label_tasks`, cycles through
+maps). The new label/trace pages use the shared `SearchPanel` instead — the same search used in
+`/view` and `/create`. Users search for a map by name, then the page resolves its IIIF URL and loads
+it.
 
-**Task data** (legend items, categories, pin/footprint lists) is still fetched from `label_tasks` + `label_pins` + `footprint_submissions` after a map is selected. The change is the map discovery mechanism, not the data model.
+**Task data** (legend items, categories, pin/footprint lists) is still fetched from `label_tasks` +
+`label_pins` + `footprint_submissions` after a map is selected. The change is the map discovery
+mechanism, not the data model.
 
 ---
 

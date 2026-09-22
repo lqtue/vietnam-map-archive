@@ -1,6 +1,7 @@
 # 260914 — IIIF costs nothing in bytes; what it costs is compliance
 
-**Date:** 2026-09-14 · **Severity:** medium · **Component:** tiles / R2 worker · **Status:** two fixes in flight, container choice deferred to F1
+**Date:** 2026-09-14 · **Severity:** medium · **Component:** tiles / R2 worker · **Status:** two
+fixes in flight, container choice deferred to F1
 
 The question was whether IIIF tile serving can be made as space- and
 serving-efficient as PMTiles. Measured today against the live bucket and the

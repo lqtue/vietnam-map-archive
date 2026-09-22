@@ -1,6 +1,7 @@
 # 260921 — sourcing the two calibration panoramas
 
-**Date:** 2026-09-21 · **Severity:** —  · **Component:** L2 mass model / District 4 4D plan · **Status:** both found, neither visually confirmed; "1901" label was wrong (it's 1898)
+**Date:** 2026-09-21 · **Severity:** —  · **Component:** L2 mass model / District 4 4D plan ·
+**Status:** both found, neither visually confirmed; "1901" label was wrong (it's 1898)
 
 `docs/archive/pipeline-3d.md` and `docs/private/priority-2026q4.md:152` name two painting-map pairs
 as the height-calibration source for the LoD1 mass model (no LiDAR for colonial Saigon): an 1881
@@ -20,7 +21,8 @@ enough — creator "Favre," engraver "Lepère" — to treat as the same work, bu
 previously recorded creator/engraver/publisher, so that match was not independently confirmed
 before now; worth a visual check against whatever image the original plan-writer had in hand.
 
-**Confirmed 2026-09-21**, via Gallica's OAI record (`/services/OAIRecord?ark=ark:/12148/btv1b53062212t`)
+**Confirmed 2026-09-21**, via Gallica's OAI record
+(`/services/OAIRecord?ark=ark:/12148/btv1b53062212t`)
 — the ark page itself is a JS shell; the notice fields live there. Every field above matches
 exactly: title, creator ("Favre (18..-18..?; capitaine). Cartographe"), engraver ("Lepère, Auguste
 (1849-1918). Graveur"), publisher ("Mouillot (Paris)"), date (1881), format ("1 flle ; 77 x 58 cm").

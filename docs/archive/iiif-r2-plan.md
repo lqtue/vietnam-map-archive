@@ -1,9 +1,11 @@
 # IIIF Self-Hosting Plan — Cloudflare R2 + Static Tiles
 
-> **Archived.** This plan shipped; the live reference is `docs/admin-tooling.md` §R2 / IIIF worker. The host below (`iiif.vmaproject.org`) was never used — production is `iiif.maparchive.vn`.
+> **Archived.** This plan shipped; the live reference is `docs/admin-tooling.md` §R2 / IIIF worker.
+The host below (`iiif.vmaproject.org`) was never used — production is `iiif.maparchive.vn`.
 
 **Goal:** Eliminate dependency on Internet Archive and BnF Gallica IIIF servers going down.
-**Approach:** Pre-tile each map once with vips, store tile trees in Cloudflare R2, serve via a minimal Worker.
+**Approach:** Pre-tile each map once with vips, store tile trees in Cloudflare R2, serve via a
+minimal Worker.
 **Cost:** ~$0–1/month. **Time:** ~1 day of work.
 
 ---
@@ -167,7 +169,8 @@ Scale to 200 maps: ~$1.50/month.
 ## Pending: Maps to Tile
 
 ### btv1b52508901z (BnF Gallica)
-mirror-r2 has been run — DB already points to R2 (`maps.iiif_image = https://iiif.maparchive.vn/iiif/<uuid>`).
+mirror-r2 has been run — DB already points to R2
+(`maps.iiif_image = https://iiif.maparchive.vn/iiif/<uuid>`).
 Tiles not yet uploaded → worker falls back to Gallica proxy → 500s.
 
 Run once rclone + vips are confirmed:
@@ -176,7 +179,8 @@ Run once rclone + vips are confirmed:
   "https://gallica.bnf.fr/iiif/ark:/12148/btv1b52508901z/f1/full/full/0/native.jpg" \
   "https://gallica.bnf.fr/iiif/ark:/12148/btv1b52508901z/f1"
 ```
-(`tile_command` was also returned by POST /api/admin/maps/[id]/mirror-r2 — check admin modal Hosting tab for exact UUID.)
+(`tile_command` was also returned by POST /api/admin/maps/[id]/mirror-r2 — check admin modal Hosting
+tab for exact UUID.)
 
 Prerequisites:
 - `rclone listremotes` → must show `r2:`
@@ -188,8 +192,10 @@ Prerequisites:
 
 - `vips dzsave` with `--layout iiif` outputs IIIF Image API 2.1-compatible tiles
 - Input format: any JPEG, PNG, or TIFF — no pyramidal TIFF needed
-- BnF Gallica source images: download the highest-res JPEG from the Gallica viewer (not the IIIF manifest, which may be slow)
+- BnF Gallica source images: download the highest-res JPEG from the Gallica viewer (not the IIIF
+  manifest, which may be slow)
 - IA source images: `https://archive.org/download/{identifier}/{file}.jpg`
 - Allmaps requires `Access-Control-Allow-Origin: *` on both `info.json` and tile responses
-- Tile size 256px is standard; 512px reduces request count for large maps but increases first-tile size
+- Tile size 256px is standard; 512px reduces request count for large maps but increases first-tile
+  size
 - `Q=85` JPEG quality is a good balance for archival maps (color palette is limited)

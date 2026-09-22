@@ -1,14 +1,18 @@
 # VMA System Guidelines
 
-Canonical reference for code organisation, page structure, and component patterns. All new routes and components follow these rules; deviations need a comment saying why.
+Canonical reference for code organisation, page structure, and component patterns. All new routes
+and components follow these rules; deviations need a comment saying why.
 
-Companion docs: `db-guidelines.md` (schema), `design-system.md` (tokens + CSS), `admin-tooling.md`, `pipelines.md`, `theory.md` (the intellectual framing), `cleanup-2026-08.md` (what the Aug-2026 restructure changed).
+Companion docs: `db-guidelines.md` (schema), `design-system.md` (tokens + CSS), `admin-tooling.md`,
+`pipelines.md`, `theory.md` (the intellectual framing), `cleanup-2026-08.md` (what the Aug-2026
+restructure changed).
 
 ---
 
 ## 0. Mission and product layers
 
-Build the spatial memory of colonial Saigon: ingest historical maps → process into geometry → enrich with knowledge → serve to users and researchers.
+Build the spatial memory of colonial Saigon: ingest historical maps → process into geometry → enrich
+with knowledge → serve to users and researchers.
 
 ```
 6. PLATFORM        auth, nav, about, blog, profile
@@ -19,15 +23,19 @@ Build the spatial memory of colonial Saigon: ingest historical maps → process 
 1. INGEST          upload map → IA / BnF / R2 / own server
 ```
 
-Layers 1, 2, 4 and 6 are built. Layer 3 and 5 are aspirations — no schema and no code. See `docs/theory.md` for the underlying data-stack model and `docs/strategy.md` for what is funded or planned.
+Layers 1, 2, 4 and 6 are built. Layer 3 and 5 are aspirations — no schema and no code. See
+`docs/theory.md` for the underlying data-stack model and `docs/strategy.md` for what is funded or
+planned.
 
 ---
 
 ## 1. The layering rule
 
-> **`core → data → map → features → routes`; `ui` is leaf primitives with zero domain imports; `server` is `$lib/server` only.**
+> **`core → data → map → features → routes`; `ui` is leaf primitives with zero domain imports;
+`server` is `$lib/server` only.**
 
-A directory may import only from directories to its **left**. This is the single organising rule for `src/lib`; it replaced 19 ad-hoc top-level directories in August 2026.
+A directory may import only from directories to its **left**. This is the single organising rule for
+`src/lib`; it replaced 19 ad-hoc top-level directories in August 2026.
 
 ```
 src/lib/
@@ -53,18 +61,28 @@ src/lib/
 
 **Consequences to respect:**
 
-- `data/maps/types.ts` is the **only** home for `MapRecord` / `MapListItem` / `MapStatus`. `map/types.ts` no longer re-exports them and holds UI-only types (`ViewMode`, `DrawingMode`, `AnnotationSummary`, `SearchResult`, `AnnotationSet`).
-- `core/` must not import `@allmaps/openlayers` or `ol` — that is what keeps the OL bundle off `/explore`'s data path.
-- `ui/` must not import from `features/`. When a primitive needs domain behaviour, the **route page** wires it: `/catalog` renders `MapEditModal` itself, `CatalogUnifiedSearch` only dispatches `edit`.
-- Routes are thin — load, wire, render. Business logic belongs in a `features/` module so it stays importable and testable.
-- Features are isolated from each other. Cross-feature imports go through `features/shared/` (cross-cutting UI) or `features/<x>/shared/` (a feature's public API); anything else under another feature is private. Lint-enforced by the regex rule in `eslint.config.js` — `catalog/` had been a shared layer by accident, imported by four features, before the seam was declared.
+- `data/maps/types.ts` is the **only** home for `MapRecord` / `MapListItem` / `MapStatus`.
+  `map/types.ts` no longer re-exports them and holds UI-only types (`ViewMode`, `DrawingMode`,
+  `AnnotationSummary`, `SearchResult`, `AnnotationSet`).
+- `core/` must not import `@allmaps/openlayers` or `ol` — that is what keeps the OL bundle off
+  `/explore`'s data path.
+- `ui/` must not import from `features/`. When a primitive needs domain behaviour, the **route
+  page** wires it: `/catalog` renders `MapEditModal` itself, `CatalogUnifiedSearch` only dispatches
+  `edit`.
+- Routes are thin — load, wire, render. Business logic belongs in a `features/` module so it stays
+  importable and testable.
+- Features are isolated from each other. Cross-feature imports go through `features/shared/`
+  (cross-cutting UI) or `features/<x>/shared/` (a feature's public API); anything else under another
+  feature is private. Lint-enforced by the regex rule in `eslint.config.js` — `catalog/` had been a
+  shared layer by accident, imported by four features, before the seam was declared.
 - One Svelte component per file. No barrel `index.ts` re-exports for components.
 
 ---
 
 ## 2. Route map
 
-The group in parentheses is the SvelteKit layout group, not part of the URL. Both groups render `NavBar`; only `(editorial)` adds `EditorialFooter` (`src/routes/(editorial)/+layout.svelte`).
+The group in parentheses is the SvelteKit layout group, not part of the URL. Both groups render
+`NavBar`; only `(editorial)` adds `EditorialFooter` (`src/routes/(editorial)/+layout.svelte`).
 
 | Route | Group | Entry component | Auth |
 |-------|-------|-----------------|------|
@@ -87,9 +105,11 @@ The group in parentheses is the SvelteKit layout group, not part of the URL. Bot
 | `/scan?mode=text` | (app) | `+page.svelte` + `DigitalizePage` + `OcrBboxTool` | auth |
 | `/scan?mode=shapes` | (app) | `+page.svelte` + `ShapesPage` + `TraceTool` / `SegSidebar` / `ReviewTool` | auth; Validate is mod/admin |
 
-Every route is in one of the two groups — the footprint review moved into `(app)` in Aug 2026, and became `?mode=shapes&tab=validate` in Sept.
+Every route is in one of the two groups — the footprint review moved into `(app)` in Aug 2026, and
+became `?mode=shapes&tab=validate` in Sept.
 
-**Redirects** are a table, not stub pages. `LEGACY_REDIRECTS` in `src/hooks.server.ts` issues a 301 with the query string preserved:
+**Redirects** are a table, not stub pages. `LEGACY_REDIRECTS` in `src/hooks.server.ts` issues a 301
+with the query string preserved:
 
 - `/view` → `/explore`
 - `/annotate`, `/studio` → `/explore?mode=annotate`
@@ -115,7 +135,8 @@ Four registers. The register decides the shell and the CSS.
 
 ### Editorial
 
-`/`, `/about`, `/blog`, `/blog/[slug]`, `/catalog`, `/contribute`, `/contribute/georef`, `/login`, `/profile`, `/admin?tab=bulk`, `/admin?tab=scout`.
+`/`, `/about`, `/blog`, `/blog/[slug]`, `/catalog`, `/contribute`, `/contribute/georef`, `/login`,
+`/profile`, `/admin?tab=bulk`, `/admin?tab=scout`.
 
 Nav and footer come from the group layout, so a page renders only its own body:
 
@@ -132,23 +153,36 @@ Nav and footer come from the group layout, so a page renders only its own body:
 </div>
 ```
 
-The shared classes (`.editorial-hero`, `.editorial-main`, `.section-card`, `.label-chip`, `.text-highlight`, `.action-btn`, `.pill-btn`, `.badge-chip`, `.chip-*`) live in `src/styles/components/editorial.css`, imported globally. **Do not redefine them per component** — add a modifier class or extend the sheet. Page-specific CSS goes in `src/styles/pages/<page>.css`.
+The shared classes (`.editorial-hero`, `.editorial-main`, `.section-card`, `.label-chip`,
+`.text-highlight`, `.action-btn`, `.pill-btn`, `.badge-chip`, `.chip-*`) live in
+`src/styles/components/editorial.css`, imported globally. **Do not redefine them per component** —
+add a modifier class or extend the sheet. Page-specific CSS goes in `src/styles/pages/<page>.css`.
 
 ### Geo-map tool
 
 `/explore`, `/explore?mode=annotate`, `/explore?mode=story`, `/trip/[id]`.
 
-`src/lib/map/shell/MapWorkspace.svelte` is the shared base (§5). It composes `ToolLayout` + `MapShell` + `LayerRenderer` + `MapModeOverlays`. Never create a second OL map outside `MapShell`.
+`src/lib/map/shell/MapWorkspace.svelte` is the shared base (§5). It composes `ToolLayout` +
+`MapShell` + `LayerRenderer` + `MapModeOverlays`. Never create a second OL map outside `MapShell`.
 
 ### IIIF-canvas tool
 
-`/scan`, `/scan?mode=prepare`, `/scan?mode=text`, `/scan?mode=shapes`, plus `NeatlineEditor` inside the admin modal.
+`/scan`, `/scan?mode=prepare`, `/scan?mode=text`, `/scan?mode=shapes`, plus `NeatlineEditor` inside
+the admin modal.
 
-These use `ImageShell` (static image extent, pixel coordinates) and the shared sidebar frame `ToolSidebarShell` + `ToolMapPicker`. They do **not** use MapShell or the global map stores. CSS: `src/styles/layouts/tool-page.css` + `src/styles/components/sidebar.css` — one sidebar vocabulary, `.sb-*`. `components/tool-sidebar.css` held a second one (`.tool-*`) until Sept 2026; its last speaker was `TriageSidebar` and the sheet is gone.
+These use `ImageShell` (static image extent, pixel coordinates) and the shared sidebar frame
+`ToolSidebarShell` + `ToolMapPicker`. They do **not** use MapShell or the global map stores. CSS:
+`src/styles/layouts/tool-page.css` + `src/styles/components/sidebar.css` — one sidebar vocabulary,
+`.sb-*`. `components/tool-sidebar.css` held a second one (`.tool-*`) until Sept 2026; its last
+speaker was `TriageSidebar` and the sheet is gone.
 
 ### Admin
 
-Admin work happens inside the editorial register. Map CRUD is a modal rendered by `/catalog`; bulk and scout are ordinary editorial pages using `src/styles/pages/admin-bulk.css` and `admin-scout.css`, with modal chrome in `src/styles/components/admin-modals.css`. The old `layouts/admin.css` dashboard sheet was deleted — there is no `.dashboard` / `.top-bar` register any more.
+Admin work happens inside the editorial register. Map CRUD is a modal rendered by `/catalog`; bulk
+and scout are ordinary editorial pages using `src/styles/pages/admin-bulk.css` and
+`admin-scout.css`, with modal chrome in `src/styles/components/admin-modals.css`. The old
+`layouts/admin.css` dashboard sheet was deleted — there is no `.dashboard` / `.top-bar` register any
+more.
 
 ---
 
@@ -168,28 +202,44 @@ let derived = $derived(value.toUpperCase());
 ```
 
 - Parent → child: props. Child → parent: `createEventDispatcher`. Never two-way bind complex data.
-- Deep sharing: `setContext`/`getContext` — `getShellContext()`, `getImageShellStore()`, `getSupabaseContext()`, `getAnnotationContext()`. Never prop-drill more than two levels.
-- `$:` for derived values only, and keep it under ~3 lines — extract a function past that. Never use `$:` for async side effects; use `onMount` or an explicit call.
+- Deep sharing: `setContext`/`getContext` — `getShellContext()`, `getImageShellStore()`,
+  `getSupabaseContext()`, `getAnnotationContext()`. Never prop-drill more than two levels.
+- `$:` for derived values only, and keep it under ~3 lines — extract a function past that. Never use
+  `$:` for async side effects; use `onMount` or an explicit call.
 - Always return a cleanup function from `onMount` when you add listeners.
-- Any component past ~400 lines is a smell. The Aug-2026 pass split every file over that line; the largest survivor is 575.
+- Any component past ~400 lines is a smell. The Aug-2026 pass split every file over that line; the
+  largest survivor is 575.
 
 ---
 
 ## 5. MapWorkspace contract
 
-`src/lib/map/shell/MapWorkspace.svelte` is the unified base for geo-map modes. `/explore`, `StudioMode` and `CreateMode` all build on it; new geo-map surfaces must use it rather than mounting `MapShell` directly.
+`src/lib/map/shell/MapWorkspace.svelte` is the unified base for geo-map modes. `/explore`,
+`StudioMode` and `CreateMode` all build on it; new geo-map surfaces must use it rather than mounting
+`MapShell` directly.
 
-**Owns:** `ToolLayout` chrome (responsive workspace, sidebar resize, mobile drawer stack) · `MapShell` + `LayerRenderer` + `MapModeOverlays` · the map-list fetch and bounds backfill (`useMapList`) · deriving `selectedMap` · forwarding view-mode changes to `layerStore` · the "Zoom to Map" prompt.
+**Owns:** `ToolLayout` chrome (responsive workspace, sidebar resize, mobile drawer stack) ·
+`MapShell` + `LayerRenderer` + `MapModeOverlays` · the map-list fetch and bounds backfill
+(`useMapList`) · deriving `selectedMap` · forwarding view-mode changes to `layerStore` · the "Zoom
+to Map" prompt.
 
-**Does NOT own:** auth gates (the route page decides whether to render it) · mode-specific stores (story player, annotation project, story library) · URL parameter parsing (the route page reads params and seeds the stores).
+**Does NOT own:** auth gates (the route page decides whether to render it) · mode-specific stores
+(story player, annotation project, story library) · URL parameter parsing (the route page reads
+params and seeds the stores).
 
-**Props:** `mapStore` and `layerStore` (created by `createGeoMapStores()` in the route page — that helper also wires the `topOverlay → mapStore.activeMapId` bridge), `supabase` (pass `null` to skip auto-load), `dualPaneActive`, sidebar width/max props for both sidebars.
+**Props:** `mapStore` and `layerStore` (created by `createGeoMapStores()` in the route page — that
+helper also wires the `topOverlay → mapStore.activeMapId` bridge), `supabase` (pass `null` to skip
+auto-load), `dualPaneActive`, sidebar width/max props for both sidebars.
 
 **Bind targets:** `shellMap`, `sidebarCollapsed`, `isMobile`, `isCompact`.
 
-**Slots:** `sidebar`, `right-sidebar`, `map-children` (rendered inside MapShell's default slot — GpsTracker, StoryMarkers, DrawTool, MapClickCapture, LegendPointsLayer), `dual-pane`, `map-overlay`, `floating`, `mobile-layers`, `mobile-controls`, `mobile-browse`, `mobile-sidebar` (legacy single-drawer fallback).
+**Slots:** `sidebar`, `right-sidebar`, `map-children` (rendered inside MapShell's default slot —
+GpsTracker, StoryMarkers, DrawTool, MapClickCapture, LegendPointsLayer), `dual-pane`, `map-overlay`,
+`floating`, `mobile-layers`, `mobile-controls`, `mobile-browse`, `mobile-sidebar` (legacy
+single-drawer fallback).
 
-**Events:** `mapsloaded` only. Overlay load/error state is handled internally by `MapModeOverlays`; there are no `overlayload*` events to wire.
+**Events:** `mapsloaded` only. Overlay load/error state is handled internally by `MapModeOverlays`;
+there are no `overlayload*` events to wire.
 
 **Z-index scale** (`src/styles/layouts/mode-shared.css`) — follow it:
 
@@ -205,7 +255,8 @@ let derived = $derived(value.toUpperCase());
 
 ## 6. API route conventions
 
-All API routes live under `src/routes/api/`. Every handler is `requireRole → adminClient → query → json`, built from `$lib/server`:
+All API routes live under `src/routes/api/`. Every handler is
+`requireRole → adminClient → query → json`, built from `$lib/server`:
 
 | Helper | File | Purpose |
 |---|---|---|
@@ -219,15 +270,23 @@ All API routes live under `src/routes/api/`. Every handler is `requireRole → a
 | `probeAllmapsAnnotation`, `lookupAllmapsId` | `server/allmaps.ts` | georef probe + id derivation |
 | `bulkSetStatus`, `revertRecentValidations` | `server/ocrReview.ts` | OCR review write paths |
 
-Rules: accept JSON, return JSON — no form data. Admin routes re-check `profiles.role` in the handler; do not rely on RLS alone. The service key is `$env/static/private` and must never reach a component. The current route inventory is in `src/routes/CLAUDE.md`.
+Rules: accept JSON, return JSON — no form data. Admin routes re-check `profiles.role` in the
+handler; do not rely on RLS alone. The service key is `$env/static/private` and must never reach a
+component. The current route inventory is in `src/routes/CLAUDE.md`.
 
 ---
 
 ## 7. Data layer conventions
 
-**Map identity.** `maps.id` (UUID) is the canonical identifier everywhere — FK columns, URL params, component props. `maps.allmaps_id` is used only when calling Allmaps (annotation URLs, warped tile layers) and is never a join key. `mapStore.activeMapId` now holds the UUID and is mirrored from `layersStore.topOverlay`; the old `&map=` hash writer is gone and the deep-link param is `?map=<uuid>`.
+**Map identity.** `maps.id` (UUID) is the canonical identifier everywhere — FK columns, URL params,
+component props. `maps.allmaps_id` is used only when calling Allmaps (annotation URLs, warped tile
+layers) and is never a join key. `mapStore.activeMapId` now holds the UUID and is mirrored from
+`layersStore.topOverlay`; the old `&map=` hash writer is gone and the deep-link param is
+`?map=<uuid>`.
 
-**Client usage.** Browser: `getSupabaseContext()` → `{ supabase, session }`. Server: `adminClient()` from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Database>(...)`. A bare `createClient(...)` is what forces `as any` casts downstream; about 25 remain.
+**Client usage.** Browser: `getSupabaseContext()` → `{ supabase, session }`. Server: `adminClient()`
+from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Database>(...)`. A bare
+`createClient(...)` is what forces `as any` casts downstream; about 25 remain.
 
 **Generated types.** `src/lib/data/supabase/types.ts` is generated — never hand-edit:
 
@@ -235,34 +294,54 @@ Rules: accept JSON, return JSON — no form data. Admin routes re-check `profile
 supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
 ```
 
-It is current against migration head 051. Insert/Update payloads use `?:` optional fields, not `Partial<{...}>` (which resolves as `never`).
+It is current against migration head 051. Insert/Update payloads use `?:` optional fields, not
+`Partial<{...}>` (which resolves as `never`).
 
 ---
 
 ## 8. Styling
 
-Everything shared lives in `src/styles/`, reached via the `$styles` alias. `global.css` imports `tokens.css` plus the always-on component sheets; layout and page sheets are imported by whoever needs them. The full file map and the token list are in `docs/design-system.md`.
+Everything shared lives in `src/styles/`, reached via the `$styles` alias. `global.css` imports
+`tokens.css` plus the always-on component sheets; layout and page sheets are imported by whoever
+needs them. The full file map and the token list are in `docs/design-system.md`.
 
-**Token rule.** Never hardcode a colour, border or shadow in a component `<style>` block. Component CSS carries layout and positioning; everything visual goes through `var(--token)`.
+**Token rule.** Never hardcode a colour, border or shadow in a component `<style>` block. Component
+CSS carries layout and positioning; everything visual goes through `var(--token)`.
 
 ```css
 /* wrong */ border: 3px solid #111;
 /* right */ border: var(--border-thick);
 ```
 
-The Aug-2026 sweep took component hex literals from ~900 to 116. The Sept-2026 plate-tone pass took the rest: canvas colours moved to `INK` in `src/lib/core/ink.ts` (an OpenLayers style is a draw call and cannot read a CSS variable), stale `var(--token, #old-value)` fallbacks became `var(--token, var(--other-token))`, and ink-at-alpha scrims became `color-mix`. Four literals survive in the tree and each says why where it sits: `ink.ts` itself, the offscreen analysis canvas in `suggestTriage.ts`, the Google logo paths, and `ReviewSidebar`'s cadastral class swatches.
+The Aug-2026 sweep took component hex literals from ~900 to 116. The Sept-2026 plate-tone pass took
+the rest: canvas colours moved to `INK` in `src/lib/core/ink.ts` (an OpenLayers style is a draw call
+and cannot read a CSS variable), stale `var(--token, #old-value)` fallbacks became
+`var(--token, var(--other-token))`, and ink-at-alpha scrims became `color-mix`. Four literals
+survive in the tree and each says why where it sits: `ink.ts` itself, the offscreen analysis canvas
+in `suggestTriage.ts`, the Google logo paths, and `ReviewSidebar`'s cadastral class swatches.
 
-**One button system.** Every button is in `components/buttons.css` except `.sb-btn` (token-scoped). A component that needs a near-`.chip` adds the class and overrides `--btn-*`; it never rebuilds the shape, and it never redefines a global button class in its own `<style>` block — Svelte scoping makes that win silently.
+**One button system.** Every button is in `components/buttons.css` except `.sb-btn` (token-scoped).
+A component that needs a near-`.chip` adds the class and overrides `--btn-*`; it never rebuilds the
+shape, and it never redefines a global button class in its own `<style>` block — Svelte scoping
+makes that win silently.
 
-**Scoping.** `<style>` is component-scoped by default — use it freely for layout. Never redefine a shared global class per component. Use `:global()` only for third-party DOM (OL controls). Inline `style=` is for dynamic values only (`style="--sidebar-width: {w}px"`).
+**Scoping.** `<style>` is component-scoped by default — use it freely for layout. Never redefine a
+shared global class per component. Use `:global()` only for third-party DOM (OL controls). Inline
+`style=` is for dynamic values only (`style="--sidebar-width: {w}px"`).
 
-**Two themes.** `tokens.css` writes each ink as `light-dark(light, dark)`; `:root[data-theme='light'|'dark']` pins which face is used, and the `vma-theme` boot script in `src/app.html` replays the reader's choice before first paint. A new colour needs both faces — `tests/theme.spec.ts` asserts the contrast of each. Anything that paints to a canvas rather than reading CSS (the OL basemap, annotation ink) subscribes to `isDarkTheme` instead.
+**Two themes.** `tokens.css` writes each ink as `light-dark(light, dark)`;
+`:root[data-theme='light'|'dark']` pins which face is used, and the `vma-theme` boot script in
+`src/app.html` replays the reader's choice before first paint. A new colour needs both faces —
+`tests/theme.spec.ts` asserts the contrast of each. Anything that paints to a canvas rather than
+reading CSS (the OL basemap, annotation ink) subscribes to `isDarkTheme` instead.
 
 ---
 
 ## 9. Navigation and page state
 
-Nav and footer render once from the group layout. To add a public page: create the route under `(editorial)/`, add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`, and add a row to §2 above.
+Nav and footer render once from the group layout. To add a public page: create the route under
+`(editorial)/`, add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`,
+and add a row to §2 above.
 
 Editorial pages use a mount fade-in:
 
@@ -274,7 +353,8 @@ Editorial pages use a mount fade-in:
 <div class="page" class:mounted>…</div>
 ```
 
-Async data shows a skeleton or spinner **inside** the content area — the hero and nav are visible immediately.
+Async data shows a skeleton or spinner **inside** the content area — the hero and nav are visible
+immediately.
 
 ---
 
@@ -287,7 +367,9 @@ Async data shows a skeleton or spinner **inside** the content area — the hero 
 | `mod` | + review/approve footprints, OCR review, map metadata, scout |
 | `admin` | + create/delete maps, publish, bulk upload, pipeline control |
 
-Role lives in `profiles.role`, read on the client via `fetchUserRole` (`data/supabase/role.ts`) and enforced server-side by `requireRole`. `/contribute` shows the review and admin cards only to `mod` / `admin`.
+Role lives in `profiles.role`, read on the client via `fetchUserRole` (`data/supabase/role.ts`) and
+enforced server-side by `requireRole`. `/contribute` shows the review and admin cards only to `mod`
+/ `admin`.
 
 ---
 

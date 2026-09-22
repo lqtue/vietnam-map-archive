@@ -168,7 +168,9 @@ Vietnamese label with diacritics.
 **Bottleneck is georef, not ingest.** Scout already covers gallica / rumsey / loc /
 humazur; 62 drafts wait for a human in `/contribute/georef`.
 
-- **Sprint list, by value:** `select year, name from maps where not georef_done order by year` filtered to sheets covering the District 4 peninsula; target ≥ 3 georeferenced city plans per decade 1860–1975.
+- **Sprint list, by value:** `select year, name from maps where not georef_done order by year`
+  filtered to sheets covering the District 4 peninsula; target ≥ 3 georeferenced city plans per
+  decade 1860–1975.
 - **Series propagation** (proven on L7014) for any uniform series in the drafts.
 - **New scout sources:** UT Austin PCL (Vietnam city plans), NARA aerial indexes, ANOM
   where IIIF exists. hanoimaps.github.io is a link list, mine it for sources; pastmaps
@@ -248,6 +250,11 @@ Order: M1 → M2 → M3; M4 in parallel whenever there is human time; E5 not bef
 
 Diverged from the sketch above in two places, both measured:
 
-- **RPC is `security definer` with `p_public_only`**, not `security invoker`. `/api/search` runs on the service client and already knows the role; invoker would have made the RPC useless from there.
-- **No trigram index.** `<%` reads `pg_trgm.word_similarity_threshold`, which the `postgres` role gets *permission denied* setting on a function under Supabase, and its 0.6 default misses one-letter typos ("khan hoy" → "khanh hoi" = 0.55). Explicit `word_similarity() >= 0.5` instead; the upgrade path is in the migration's `ponytail:` note.
-- Bonus fix: `ocr_extractions` read policy had been `using (true)` since 040 — every draft map's labels were readable with the publishable key. Now gated like `maps` (mig 063).
+- **RPC is `security definer` with `p_public_only`**, not `security invoker`. `/api/search` runs on
+  the service client and already knows the role; invoker would have made the RPC useless from there.
+- **No trigram index.** `<%` reads `pg_trgm.word_similarity_threshold`, which the `postgres` role
+  gets *permission denied* setting on a function under Supabase, and its 0.6 default misses
+  one-letter typos ("khan hoy" → "khanh hoi" = 0.55). Explicit `word_similarity() >= 0.5` instead;
+  the upgrade path is in the migration's `ponytail:` note.
+- Bonus fix: `ocr_extractions` read policy had been `using (true)` since 040 — every draft map's
+  labels were readable with the publishable key. Now gated like `maps` (mig 063).

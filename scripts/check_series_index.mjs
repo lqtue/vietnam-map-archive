@@ -10,7 +10,7 @@
  * percentage on it is wrong by a plausible amount. There is no other symptom.
  *
  * This is the detector, not the fix. The fix is to derive `held_by` in a view
- * or a trigger (docs/ROADMAP.md, "Open from the survey layer"); until that
+ * or a trigger (docs/ROADMAP.md, "Also open"); until that
  * exists, run this after any publish, georeference or re-import:
  *
  *     node --env-file=.env scripts/check_series_index.mjs

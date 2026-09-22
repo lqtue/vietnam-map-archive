@@ -1,5 +1,9 @@
 # L7014 rebuild checklist
 
+> **Naming:** the ROADMAP item this checklist executes is **N1**; it was called **I3** when this
+> file was written, and both names appear below. The I-series entry now lives in
+> `docs/roadmap-record.md`.
+
 A verified, ordered checklist for rebuilding and republishing the AMS Series L7014 raster
 archive with the committed datum fix. Written after tracing `scripts/l7014_mosaic.py`
 (`index`/`fetch`/`warp`/`manifest`/`fit`/`tile`/`upload`), `scripts/geo_audit.mjs`, every

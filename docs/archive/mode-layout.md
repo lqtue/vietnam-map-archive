@@ -1,6 +1,7 @@
 # Mode Layout Reference
 
-Canonical layout implemented in `/view` mode. All modes should follow this structure for consistency.
+Canonical layout implemented in `/view` mode. All modes should follow this structure for
+consistency.
 
 ## Template Structure
 
@@ -104,7 +105,8 @@ Canonical layout implemented in `/view` mode. All modes should follow this struc
 
 ### Stores (`$lib/map/stores/`)
 - `mapStore` — `lng`, `lat`, `zoom`, `rotation`, `activeMapId`
-- `layerStore` — `basemap`, `overlayOpacity`, `overlayVisible`, `viewMode`, `sideRatio`, `lensRadius`
+- `layerStore` — `basemap`, `overlayOpacity`, `overlayVisible`, `viewMode`, `sideRatio`,
+  `lensRadius`
 - `urlStore` — bidirectional URL hash ↔ stores sync
 
 ## Toolbar Width Sync
@@ -193,7 +195,8 @@ Bottom-right vertical stack of 40px circle buttons:
 </div>
 ```
 
-Each mode can add/remove buttons. Common ones: basemap toggle, GPS. Mode-specific: undo/redo (annotate), save (create).
+Each mode can add/remove buttons. Common ones: basemap toggle, GPS. Mode-specific: undo/redo
+(annotate), save (create).
 
 ## Bottom Toolbar Pattern
 
@@ -247,4 +250,5 @@ Each mode replaces:
 4. **MapShell slot children** — mode-specific headless components (markers, draw interactions)
 5. **Top search bar behavior** — can remain the same or be customized
 
-The shell (`MapShell` + `HistoricalOverlay` + stores + search bar + loading/error) stays identical across modes.
+The shell (`MapShell` + `HistoricalOverlay` + stores + search bar + loading/error) stays identical
+across modes.

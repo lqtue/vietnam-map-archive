@@ -1,0 +1,1241 @@
+# Roadmap record — frozen 2026-09-22
+
+The roadmap as it stood before the tracker was split out. **This file is frozen and is not
+maintained.** It is here for what each pass cost to learn: the measurements, the defects found on
+the way, and the reasoning behind decisions that are now just one line in the tracker.
+
+- Live work is **`docs/ROADMAP.md`** — open items only.
+- The rules that keep getting re-learned are **`docs/lessons.md`**.
+- Anything below that looks open has been carried into the tracker or dropped; believe the tracker,
+  not this file.
+
+---
+
+## The OCR pass — previous first list (2026-09-04)
+
+The actionable list. Everything below it is the reference plan and the record; read the why when you
+need it, not before you start. Each item names the command or query that says it is finished.
+
+**Blocked on the user's shell** (classifier-blocked for the agent — see the memory note on outward
+actions). Verified against production 2026-09-04: **065–069 are all live**, 6 of 39 georeferenced
+maps carry extractions (1,544 rows, 1,509 warped), 40 of 101 maps carry a `bbox`, and the job queue
+is empty — 0 queued, 0 running, 0 failed.
+
+- [x] 1. `supabase db push` — **065, 066 and 067 are live on production** (067 needed a fix first: a
+      view cannot pin its own `search_path`, so every PostGIS name had to be schema-qualified).
+      **068 is live too** (verified 2026-09-04: `search_labels` returns `lng`/`lat`,
+      `set_extraction_geom` exists, `place_names` is gated to published maps).
+- [x] 2. Types regenerated against production. Re-run once more if `search_labels` changes again;
+      068's signature is already reflected.
+
+### Goal — OCR the whole georeferenced corpus (2026-09-04)
+
+Label search, the `/place/` hub pages, the gazetteer and `/api/press`'s spelling variants are each
+only as good as the share of the corpus with extractions. That share is **6 maps in 39** (1,544
+extractions, of which 1,064 are the 1882 cadastral and 398 the 1968 sheet; the four District 4 crops
+contributed 5–35 each). Every Track E surface looks empty for the same single reason, and draining
+this queue is the one action that fixes all of them at once.
+
+Measured budget, from the 49 calls already logged in `work/ocr/outputs/*/runs/*/calls.jsonl` (5,156
+input / 1,810 output tokens per call, 30–60 calls per map): **$31–63 for all 38 maps on
+`gemini-3.8-flash`** (this said $12–24 until 2026-09-10, when the per-call output was recomputed on
+the billed basis — `total_tokens − input_tokens`, thinking included, 3.5× the logged `output_tokens`
+field; the measured 1968 pass was 48 calls at $1.236), $1–3 on `gemini-2.5-flash-lite`, half either
+way through the Batch API. Cost is not the constraint. Unattended quality is, which is what 3a–3c
+are for. **That same run is also the gate on the project's first paper** —
+`docs/private/260912-postgrad-route.md` (dataset card + outline, 2026-09-12): the
+toponym-georeferencing measurement needs toponyms on all 39 sheets, not 6.
+
+- [x] 3a. **Model pinned — done 2026-09-04.** `gemini_client.DEFAULT_MODEL` is `gemini-3.8-flash`;
+      `ocr_argv()` passes `--model` when the payload names one; `POST /api/admin/maps/[id]/ocr` and
+      `enqueue_ocr_all.mjs --model NAME` both carry it. Verified against the local stack: a payload
+      with `"model": "gemini-2.5-flash-lite"` produces `batch … --model gemini-2.5-flash-lite`,
+      covered by a write smoke.
+- [x] 3t. **Triage is savable — done 2026-09-04.** Migration 069 adds `maps.triage`, and
+      `/scan?mode=prepare` gets a **Save triage** button beside Run OCR. localStorage stays the
+      working draft; the saved copy is the deliberate assertion "this sheet is triaged", and it is
+      the only one a server-side script can see. `enqueue_ocr_all.mjs` now queues **only** triaged
+      sheets by default, spreading the saved neatline, tile size, overlap and per-tile grid into the
+      payload unchanged — so a triaged sheet runs with `--crop` and no scout pass. `--untriaged`
+      restores the old behaviour, `--dry` prints the split. Verified end to end on the local stack;
+      write smoke covers the round-trip and the payload. It also turned up a pre-existing defect,
+      now fixed: a PATCH whose every field the allow-list dropped answered 500, and now answers 400.
+- [x] T5. **Layout Detect measured — 2026-09-04.** The gate before 3b reopens. Two findings, in
+      order.
+
+  **The feature could not work as shipped, and the failure was silent.** A plain `ocr.py scout` on
+  the 1882 cadastral returned `regions: []`, `map_content_bbox: None`, `cartouche_bbox: None` — not
+  the model declining, but the model never being asked. Two independent defects in the multi-scale
+  path, which is the default whenever a source has more than one pre-rendered level:
+  1. `extract_labels_sequence` rebuilt the response schema from scratch with only `extractions`,
+     dropping SCOUT_SCHEMA's `regions`, `map_content_bbox`, `cartouche_bbox` and `metadata`. No slot
+     to answer in.
+  2. `cmd_scout` assembled a `multi_prompt` carrying PROMPT_SCOUT's nine-value vocabulary and then
+     **passed nothing** — the function took no user prompt and used its own hardcoded tile-seam text
+     about "1882 Saigon cadastral" tiles. The layout instructions never reached the model.
+
+  Both fixed: the function now takes an optional `user_prompt` and preserves the caller's schema.
+  `EXTRACTION_SCHEMA` has only `extractions`, so the batch row-sequence path is byte-identical; the
+  other two call sites pass keyword args and are untouched. Same command, after: **0 regions → 7**,
+  plus the cartouche bound and full cartouche metadata (title, subtitle, year, scale, engraver) that
+  were being dropped with them.
+
+  **The model itself is good at this.** Judged by eye against the scan, 1882 cadastral, all eight
+  regions correct and nothing invented: `main_map` on the printed neatline, `title` tight on the
+  title block, `legend` exactly on the *Légende* key at lower right, `scale_bar` on the *Echelle de
+  1/4000*, and three `stamp` boxes — the red RF oval plus both faint pencil "Ge B9" shelf marks. It
+  returned **no** `name_list`, correctly, because this sheet has none; it did not fill the slot to
+  please the schema.
+
+  Best corroboration: `main_map` came back as (447, 431, 11085, 7886) source px. The ink-profile
+  detector in `suggestTriage.ts`, which knows nothing about the model, independently gives (443,
+  423, 11093, 7932) — two unrelated methods agreeing within 8px on origin and 0.4% on height. Either
+  can now check the other.
+
+  Cost: 4 calls on `gemini-3.8-flash`, cents.
+
+  **Second sheet, and the discriminating test passed.** The 1968 *Sài Gòn - Việt Nam City Maps
+  1:12,500* (10816×13523) returned 7 regions, all correct by eye: `main_map` on the neatline
+  excluding the whole bottom marginal apparatus; `legend` exactly on the GLOSSARY / CHÚ-GIẢI symbol
+  key; **two** separate `name_list` boxes on the multi-column street indexes; `scale_bar` on the
+  scale/contour/projection block; and `title` on the stock-number block in the lower-right *margin*,
+  an unusual placement it found anyway. So the vocabulary does separate a symbol legend from a name
+  index — the question 3b's gate was actually asking. **Gate met**; 3b may reopen.
+
+  **Three defects in the level0 fetcher, found because that sheet came back wrong.** The 1968
+  overview assembled with a checkerboard of white holes — 31.8% of the sheet — and the model scored
+  7/7 anyway, which is why nothing would have caught it downstream.
+  1. **Tiles hang rather than 404**, and it is map-specific: on an idle host, 3 of 8 sampled tiles
+     for `3a446d85` timed out at 20s with 0 bytes while 8 of 8 succeeded for `0e02b9d9`. Transient,
+     not missing objects — retries recover them.
+  2. **No retry.** `fetch_crop_level0` skipped a failed tile and moved on, so a transient timeout
+     became a permanent hole. Now 3 attempts at a 10s timeout rather than one at 30s; a real 404
+     still breaks out immediately rather than being retried three times.
+  3. **A partial assembly was cached**, so one bad run poisoned every later one — and a white hole
+     is indistinguishable from blank paper to the density pass and to the model. `fetch_crop` now
+     caches only a complete assembly, `fetch_crop_level0` reports coverage, and it refuses outright
+     below 90% telling the caller to re-run `tile_to_r2`.
+
+  Measured before and after on that sheet: **20+ minutes and 31.8% holes → 4 seconds and 0.0%**. Two
+  poisoned cache entries purged.
+
+  **Worth carrying:** OCR reads tiles through this same function, so before the fix any mirrored map
+  with flaky tiles would have silently lost that share of its labels, with nothing in the output to
+  say so. If a run's log shows a `level0: N of M tiles unreadable` line, that map's `tile_to_r2` is
+  suspect.
+
+- [x] 3g. **Done 2026-09-04. Ground-referenced tiling.** The finding that reframes the whole OCR
+      pass: what starves a read is one call covering too much ground, and a fixed pixel tile is a
+      different amount of ground on every sheet — 2048 px is 1.7 km on the 1923 sheet and 5.7 km on
+      the 1959 one, which is why coarse sheets looked empty and got blamed on their scans. Measured
+      on the 1959 sheet, same crop and same 1:1 rendering, counting distinct labels that warp back
+      inside District 4: **5.7 km/call → 1 label · 2.9 km → 2 · 1.4 km → 6** (5 on a repeat).
+      Rendering was ruled out separately — 1024 px rendered 1:1 and at 2x gave byte-identical
+      output, so upsampling past the scan buys nothing.
+
+  Corpus-wide the same change is **+19%** (58 → 69 District 4 labels), *not* the 5x one sheet
+  suggested. Only sheets whose ground-per-call dropped a long way improved; three of six moved
+  within noise, and the 1882 cadastral got **worse** under the first version of the rule, because at
+  0.34 m/px it needs a 4118 px tile to reach 1400 m. Hence the invariant: **the rule may make a
+  sheet finer, never coarser.** `collection_aoi.mjs --tile-metres` (default 1400) and
+  `enqueue_ocr_all.mjs --tile-metres` (opt-in, so a saved triage's own tile size is not silently
+  overridden) both apply it; m/px is measured through the sheet's own georeference, falling back to
+  the pixel hull of the GCPs when nobody has triaged the sheet.
+
+  Also fixed here: `enqueue_ocr_all.mjs` never set `render_size`, so every queued job fell through
+  to the worker's 1024 default — reintroducing by omission the 2.34x downsample that was fixed in
+  the worker the same day.
+
+  **Caveat worth carrying:** run-to-run variance is not nothing. The same configuration twice on
+  1959 gave 6 labels and 5, and the disagreement was mostly the same feature transcribed differently
+  (`KINH BẾN NGHÉ` vs `Kinh Bến Nghé`). The `category` field is noisier than the text, so an early
+  "0 vs 4 street names" reading was largely category noise. Do not treat a single run's small delta
+  as a result, and expect dedup to need fuzzy text matching rather than equality.
+- [ ] 3b. **Deferred on purpose: `--auto-priority` in the worker.** The flag exists in
+      `ocr.py batch` and would let a sheet nobody triaged still skip its blank and water tiles. That
+      is the automation, and the decision (2026-09-04) is to do the first sheets by hand first, so
+      there is a human-triaged baseline to judge the automatic grid against. Reopen once ~5 sheets
+      have been triaged and OCR'd by hand. Exit: on a triaged sheet, `--auto-priority` picks a grid
+      within a tile or two of the human one.
+- [ ] 3c. **A second API key, and know the tier.** `.env` holds one `GEMINI_API_KEY`;
+      `gemini_client.py` already rotates across `GEMINI_API_KEYS` (comma-separated) when one
+      exhausts its daily quota, and 38 maps unattended is precisely the run that needs the spare.
+      Google no longer publishes per-model RPM/TPM/RPD — read the real limits at
+      <https://aistudio.google.com/rate-limit> before starting. Exit: `GEMINI_API_KEYS` set with two
+      keys, and the tier's daily request cap written down here.
+
+### Map image-processing system — planned 2026-09-19
+
+The archive already has most of the processing stages: image preparation,
+georeference proposals, OCR, shape extraction, map joins and publication. The
+work now is to connect their evidence and make it clear which result is ready,
+which needs review, and which becomes stale after an upstream correction.
+
+Each result should retain its source image, input runs, settings, coordinate
+space, checks and acceptance decision. A completed job is not necessarily an
+accepted result. Keep source-pixel OCR and shapes even when a map's geographic
+placement changes; update their ground coordinates from the accepted transform.
+A replaced scan invalidates pixel work as well.
+
+The system has two kinds of checks. Relative checks ask whether neighbouring
+sheets join. Absolute checks ask whether a sheet is in the right place. Both
+are necessary: seams found L7014's mixed-datum fault, while the lattice and
+geographic audits catch a group of sheets shifted together. Appearance checks,
+such as colour and brightness differences, are separate from geographic fit.
+
+- [ ] **I1 — Show the next action for each sheet.** Extend the existing staff
+  status view with the next eligible action and an explanation of what blocks
+  it. Reuse `map_pipeline_status` and the review marks; do not build a second
+  queue. Exit: an operator can see whether a sheet needs a worker, a person,
+  an image repair or a placement check without reconstructing its history.
+
+- [ ] **I2 — Preserve OCR merge evidence.** `ensemble_items()` currently keeps
+  the largest self-reported confidence even though confidence is not comparable
+  across prompts, while pass agreement is reduced to `n_passes` and a note.
+  Retain every contributing run, reading and box alongside the selected result;
+  store agreement as structured data, not prose. Replay saved run directories
+  into a report before changing database writes. Exit: a reviewer can see why
+  two readings agree or disagree, and every reported signal traces to a run.
+
+- [ ] **I3 — Rebuild and verify L7014.** Live as **N1** at the top of this file, which
+  carries the current state; this entry is kept only for its place in the I-series order.
+
+- [ ] **I4 — Measure shapes before tuning them.** Live as **N5**. One addition not repeated
+  there: use printed street indexes as extra OCR evidence where they exist.
+
+- [ ] **I5 — Mark stale work after an upstream change.** Live as **N4**.
+
+- [ ] **I6 — Add optional review ordering after measurement.** Use structured
+  disagreement evidence to offer a “Needs attention first” ordering in the OCR
+  review surface. Compare it with the present order using a held-out sample and
+  retain a random audit of apparently easy rows. Do not call a score calibrated
+  until it has been tested against human outcomes. Exit: reviewers find more
+  confirmed errors in the same time without raising residual error.
+
+**Order:** I1 and I2 first; I3 is the required operational repair; I4 supplies
+the missing segmentation denominator; I5 follows the two known stale cases;
+I6 follows evidence collection. The existing workers remain the integration
+point for their supported job kinds. Analysis tools such as mosaic fitting,
+geographic audit and segmentation evaluation remain operator-run checks rather
+than being forced into the queue. Future model experiments are limited to a
+specific, measured decision and must beat the existing method on held-out work.
+
+### The survey layer — done 2026-09-13
+
+The archive learned the difference between what it **holds** and what a survey
+**contains**, and the gap turned out to be most of the corpus.
+
+- **`series_sheets` (mig 083)** — one row per sheet a survey contains, held or
+  not. Status is derived from `held_by`/`source`, never stored. 703 rows seeded:
+  L7014 627 cells (461 held / 123 obtainable at Texas Tech / 43 no known scan),
+  Indochine 79 (59 held).
+- **`map_series` counts cells, not rows (084)** — the Indochine survey holds
+  three cells twice, so /explore said "56 sheets" over 53. Adds `survey_sheets`,
+  the denominator. **085** rebuilds 083's check constraint, which was null-blind
+  and had never once fired: `held_by = 'map'` against a NULL `held_by` evaluates
+  to NULL, and a CHECK rejects only false.
+- **L7014 is one row in /explore, not two.** The mosaic and the nine warped city
+  sheets are complementary, not alternative — the mosaic's hole over Saigon *is*
+  the city sheets' coverage. A row carries `refs` and they go on together.
+- **`/catalog/series/<key>` and `/catalog/series/<key>/<number>`** — 452 mosaic
+  cells had no URL anywhere. Unheld sheets get a page too, `noindex`.
+- **62 Indochine sheets had no width-addressed derivative at all** and 404'd
+  every one, `?force_proxy=1` included. `MapCard` hid the image outright, so 56
+  published sheets drew nothing in /catalog's grid while the same rows drew fine
+  in list view. Both fixed; `backfill_iiif_widths.py` rebuilds derivatives from
+  the tile pyramid. 0/62 → 62/62.
+- **Indochine metadata**: descriptions 0/62 → 62/62, `source_url` 0/62 → 60/62.
+
+Four lessons, each of which cost real time today:
+
+1. **A green gate over a broken thing happened three times in one day** — 56
+   sheets published and drawing nothing, a constraint that could not fire, a
+   denominator seeded from the wrong catalogue. Verify the thing, not the gate.
+2. **Check which edition you are comparing against.** CartoMundi catalogues the
+   Tonkin 1:25,000 **three** times. Against serie 175 our rows matched 8 of 62
+   with a thirty-year offset, which reads exactly like a bad attribution; against
+   serie 243 it is 60 of 62. The existing `holding_institution` was right all
+   along and was nearly overwritten.
+3. **Neither catalogue is complete, and they are incomplete in different
+   directions.** 175 has cells 7/8/9/19; 243 has 1/34/67. We *hold* cell 1 (Viet
+   Tri), so the index said the survey did not contain a sheet we own. The
+   denominator is the union: 79.
+4. **A freshly written R2 object is not immediately readable through the
+   worker.** Verified straight after rclone reported success and got 404 on all
+   three widths; 200 a few seconds later. Nearly logged a working fix as broken.
+5. **A probe that is refused reads exactly like a probe that was answered "no".**
+   `backfill_iiif_widths.py` asked the edge whether a width existed using
+   urllib's default User-Agent and got 403, which its "not 200 means missing"
+   rule turned into 93 phantom gaps. Curl, same URLs, same second: 6. Whenever a
+   script decides what work to do by probing a network service, make the refusal
+   distinguishable from the answer.
+6. **A sheet number is not a token — four of them contain a space.** The 086
+   backfill keyed its updates on `` `${series_key} ${sheet_number}` `` and split
+   on the space, so `"0 bis"` came back as sheet `"0"` and that cell was written
+   with the wrong row's printing. It was invisible because Ha-Châu and Nha-Nam
+   are both 1907 — and only because of that: `5`/`5 bis` are 1912 and 1907, and
+   `10`/`10 bis` are 1911 and 1907, so probing either of those instead would have
+   shown it immediately. Separator is NUL now, and all four pairs (`0`, `5`,
+   `10`, `73` and their `bis`) were verified against their own `maps` rows
+   afterwards. Any future writer to `series_sheets` has the same trap waiting.
+7. **Two `npm run build` runs in one shared worktree lose each other's output.**
+   `build` wipes `.svelte-kit/output` before writing it, so two builds a minute
+   apart leave a half-overwritten tree and the deploy that runs last publishes
+   it. Tonight that put a deployment on production missing a blog post and two
+   images while serving every other new page — same commit, different bytes,
+   and nothing in either build log said so. Found by diffing the two deployment
+   URLs against the custom domain; fixed by one clean build alone. In a shared
+   worktree, announce a build and hold all writes until it is deployed.
+
+### Open from the survey layer (2026-09-13)
+
+- [ ] **`series_sheets.held_by` / `map_id` is a snapshot, and nothing maintains
+      it.** Verified 2026-09-13: no trigger, no function, and the only writers
+      in the tree are the one-off import scripts. So the day anyone
+      georeferences one of the 123 obtainable L7014 sheets, or publishes a
+      draft, the index still says *gap* and the coverage page still draws it as
+      missing — right about the survey, wrong about us, with no symptom but a
+      plausible-looking number. That is the same shape as all three of today's
+      green-gate failures, one level up. The index is consistent **right now**
+      (no cell marked gap has a `maps` row). Stopgap: both seeders upsert on
+      `series_key,sheet_number`, so re-running them is safe and idempotent. Real
+      fix: derive `held_by`/`map_id` in a view, or a trigger on `maps`.
+      Exit: publishing a draft moves its cell to *held* with nobody running
+      anything. **Until then there is a detector**, which is not the same thing
+      and does not close this item:
+      `node --env-file=.env scripts/check_series_index.mjs` joins the index to
+      `maps` on slugged collection + `sheet_number` and exits 1 on a cell the
+      index calls a gap that a `maps` row claims, a `map_id` pointing at a row
+      that is gone, or (since 2026-09-15) a `maps` row whose `sheet_number` the
+      index does not contain at all. That last one is the typo case, and drift
+      could never see it: drift walks the index, and a mistyped sheet number is
+      exactly a cell the index has no row for — the sheet just drops out of the
+      series page, the coverage denominator and `search_vector` while the map
+      itself still looks fine. Reported only for a survey the index already
+      covers, so an unimported one stays quiet. Clean on production 2026-09-15:
+      **0 adrift, 0 dangling, 0 unindexed over 706 sheets**, 461/627 and 75/79
+      held — the same numbers the two coverage pages print. `--self-check` needs no database and was
+      verified
+      to fail before it was trusted. Run it after any publish, georeference or
+      re-import.
+- [x] **Done 2026-09-13. Six L7014 rows had no `full/400,/` derivative** — Gò
+      Công 6329-4, Nhơn Trạch 6330-2, Sài Gòn 6330-4, Biên Hòa 6330-1, Cần Giờ
+      6329-1, Cần Giuộc 6330-3, each missing 400 and 200 while 800 served. 12
+      objects written; all 31 sheets x 3 widths now serve, re-checked with curl.
+      **The script's own probe was the obstacle, not the derivatives.**
+      `head_status` used urllib's default User-Agent, which the edge answers
+      with 403, and it reads anything that is not a 200 as "missing" — so it
+      reported 31 of 31 L7014 and 62 of 62 Indochine sheets as missing all three
+      widths. Same URLs under curl: 6 and 0. A real run would have rewritten 93
+      objects that already served and then failed its own verification pass the
+      same way, which shares the probe — so a wholly successful run and a total
+      failure printed the same thing. One User-Agent header, `2e9fd48b`.
+- [x] **Done — and stale when written. Verified 2026-09-21**: all 205 rows carry a
+      CC BY 4.0 string, none says "Public domain", corroborated per item against
+      Nakala and CartoMundi serie 243. See the entry in the 2026-09-21 list at the
+      top of this file, including the two caveats it raises (the 62 composites'
+      licence is an inference, and the write is not reproducible from the tree).
+- [x] **Done. Verified 2026-09-21: 0 of 205 Indochine rows are missing `source_url`.**
+      The open question the bullet also carried survives it: 35 "An Thi" is dated 1904
+      here while serie 243 holds 1905 and 1924, so our year may still be a typo.
+- [ ] **AMS L909 has no `series_sheets` index**, so it has no coverage page and
+      its /explore row offers no link — one decision, not two. Three sheets;
+      someone must decide what that survey contains.
+- [x] **Done 2026-09-13. `/catalog/series` is the index.** The coverage pages
+      had one way in — the `›` beside a series row in the /explore rail, which is
+      a control inside a full-screen tool behind `ssr = false`, so no address a
+      crawler could follow and nothing for the palette to offer. The index reads
+      `map_series` rather than a hand-kept array, so a survey appears by being
+      ingested; it is in the sitemap with one entry per survey, and in
+      `paletteDestinations.ts`, which is what puts it on /directory too. A survey
+      with no imported index is excluded from both, because its coverage page
+      404s on purpose — `ams-l909` was in the sitemap for one revision, which is
+      a crawl invitation to a 404. Palette ties now break by position in
+      `DESTINATIONS` instead of alphabetically: "Map series" had taken `map` off
+      "Map viewer" on the strength of an s preceding a v.
+- [x] **Done 2026-09-14. Series reach /catalog, three ways.** The index built the
+      day before had no link from the archive's own front door: a reader who
+      never opened the command palette or a blog post could not find out the
+      archive holds surveys at all. /catalog now server-renders a **band** of
+      survey rows above the results (the crawlable path, and it steps aside the
+      moment a query or a facet is set); a row opens a **drawer** — the
+      counterpart to the map one, opening with the coverage bar rather than a
+      thumbnail, because a survey's picture is the shape of what is missing —
+      whose three actions are Open in map, All sheets and Filter the catalog;
+      and **series is a fourth facet** beside area/type/period, matching
+      `maps.collection` with its choices passed down from `map_series` rather
+      than re-derived on the client. The rows are one component shared with
+      `/catalog/series`, so the fraction cannot differ between them, and the
+      "which surveys qualify" filter is one `fetchSeriesIndex`.
+      Three latent bugs fell out and are fixed: `.page` carried
+      `animation: … both`, and a `forwards` fill keeps an opacity animation
+      applied forever, which kept the stacking context it creates forever —
+      **every fixed drawer and modal on every editorial page was sealed under
+      the nav**, unreachable by any z-index, with the scrim dimming the page but
+      not the bar above it; `--color-text-muted`, `--space-sm/md/lg`,
+      `--space-5` and `--radius-xs` were used in eight files and declared
+      nowhere, so fourteen declarations had been rendering as nothing; and
+      "Open in map" computes its camera from the survey's own bounds via
+      `cellCamera`, which is the ponytail note in `ExploreBrowsePanel` — every
+      other `?series=` link in the repo hand-codes one.
+- [ ] **Sheet titles should come off the sheet, not the catalogue.** CartoMundi's
+      spellings are French colonial transcriptions: `Kim Thanh` → `Kim-Thành`
+      restores a real diacritic, `Bac Ninh` → `Bac-Ninh` only adds a hyphen, and
+      `Yen Dinh` → `Yên-Dinh` is half-accented for Yên Định and reads as an
+      error. Deliberately **not** applied; it is behind `--names` in
+      `backfill_indochine_descriptions.mjs`. OCR the title block instead.
+- [ ] **The Vietnamese string `'All sheets in this survey'`** was written by a
+      non-speaker as "Tất cả bản đồ trong bộ này", following the dictionary's
+      use of `bản đồ` for a sheet. Wants a native check.
+- [ ] **The L7014 coverage page is ~500 kB of HTML for 627 rows**, server-
+      rendered per request. Fine today; revisit before Cochinchine's 826 lands.
+- [ ] **`series_sheets` can name only one printing of a cell.** Its primary key
+      is `(series_key, sheet_number)`, one row per cell — but the archive holds
+      **10 cells in more than one edition**, three of them with two *published*
+      printings each, fourteen years apart, and `SheetEditions.svelte` already
+      surfaces those in the Info rail. So the survey index and its coverage page
+      can point at exactly one of them, silently. Verified 2026-09-13 by counting
+      `maps` rows grouped on collection + `sheet_number`. **Migration 086 is
+      pushed and backfilled** (2026-09-13 — `year`/`edition`, 505 of 706 rows
+      with a year, 445 with an edition, 505 of the 520 held carrying a printing;
+      editions normalised to `1`–`6` plus `3-DMA`/`4-DMA`/`5-DMA`, since PCL
+      spells one edition `"003"` and `"3"`). The coverage page now has a Version
+      column and a `2 editions` badge — Indochine sheets 2, 13 and 14, published
+      printings only. **That does not lift this item**: 086 hangs a printing off
+      the existing one-row-per-cell key, so the page can say which printing it
+      serves and that others exist, while the index still cannot enumerate them.
+      Widening the key is the open half and it is the whole item. Exit: a
+      survey's coverage page lists both published printings of Indochine cell 1
+      without either being the one the other hides behind.
+- [ ] **Cochinchine 1:25,000 is the next survey to index** — 826 sheets across
+      three series, Saigon and the Mekong delta, top of the scout queue at
+      `/admin?tab=scout`. The importer pattern is
+      `scripts/oneoff/import_indochine_series_sheets.mjs`; union every edition
+      of the survey, not one.
+
+**Four numbers can all be correct and all differ**, and a mismatch between them
+is not a bug. L7014: an ArcGIS index says 627 cells, PCL publishes 535 scans, we
+hold 461, and 9 are `maps` rows. Indochine: its own series record declares 81,
+the union of CartoMundi's two catalogues gives 79 — so 79 is a floor, not the
+truth. Say which of the four a number is before comparing it to another.
+
+Two traps found on the way, worth not rediscovering:
+
+- **`map_series.sheets` counts CELLS as of 084, not rows.** Compare it against a
+  `maps` row count and you are off by the multi-edition cells: for a signed-in
+  reader L7014 is 24 cells over 31 rows, Indochine 59 over 62.
+- Selecting a column `map_series` no longer has returns `null` through
+  `.maybeSingle()` rather than erroring — so a stale column name reads as "no
+  such series" instead of failing.
+
+### One page per sheet — done 2026-09-14 (7.3)
+
+The public read-only viewer and the sheet's record page were two pages showing
+one sheet; they are one page now, at an address that is the sheet's name.
+`SheetZoom.svelte` on `/catalog/[id]` (ImageShell dynamically imported on the
+click, so OpenLayers stays out of the first paint), `/scan` reduced to its staff
+modes with everything else 302'd to /catalog carrying `?map=`, drafts served to
+a signed-in reader with a banner and `noindex`, and **migration 088** minting
+`maps.slug` in Postgres with `map_slug_aliases` behind it. Detail is CHANGELOG
+7.3; the minting rule and why a collision takes the year is the header of
+`088_map_slug.sql`.
+
+Verified: check 0/0, lint clean, 351 read-only tests, 31 write tests against a
+stack replayed from 001, 088 live on production with 0 null slugs.
+
+### Open after 7.3 (2026-09-15)
+
+- [x] **Deployed 2026-09-15** (`4d4da6f5`), and verified on the live host rather
+      than on the deploy log: `/catalog/vinh-yen-1906` 200s, the uuid 301s to
+      `/catalog/quang-yen`, a bare `/scan` 302s to `/catalog`, `/scan?map=` 302s
+      carrying the sheet, and `?mode=prepare` still 200s. The sitemap looked
+      wrong for an hour and was not — it is `max-age=3600` at the edge, and the
+      same URL with a cache-buster was already emitting slugs. **Check a cached
+      route with a cache-buster before believing it did not deploy.**
+- [x] **Done 2026-09-21. Five one-off scripts still wrote unless you passed `--dry`.**
+      Converted to `--apply`; but the audit that closed them found seven more with the same
+      defect, which is the open item at the top of this file.
+- [ ] **`/scan?mode=inspect` may now be dead weight.** /catalog/[id] serves the
+      same tiles, and serves them for a draft to a signed-in reader, which was
+      inspect's last stated job. Before deleting `features/contribute/inspect/`
+      and dropping the mode, check the two things the record page does *not*
+      obviously carry over: the tool map picker (switching sheets without
+      leaving the surface) and whatever a volunteer uses the plain level0 look
+      for. Exit: either the directory is gone and `SCAN_MODES` has three
+      entries, or `scanModes.ts` says which job keeps it alive.
+- [ ] **`map_slug_aliases` is empty on production**, so the retired-name 301 is
+      exercised only by the local write test. The first real alias appears the
+      first time a slug is re-minted or a name collides on insert. Exit: after
+      the first one, one `curl -sI` on the retired name showing a 301 to the
+      live slug.
+- [ ] **A label hit and a footprint submission still reach the UI carrying only
+      `map_id`**, so those links are the uuid fallback in `mapSlug.ts` and cost
+      a redirect. Intentional today — the fallback has to exist regardless —
+      but adding `slug` to the two payloads (`search_labels`, the footprint
+      read) makes the common path land directly. Exit: no `/catalog/<uuid>`
+      link is generated by a page the archive itself renders.
+- [ ] **`scripts/lib/cells.test.mjs` cannot run in CI.** It needs the 42 MB
+      catalogue dumps, which are gitignored; `tests/ingest-cells.spec.ts` is the
+      half that rides the runner. Run the full one by hand after any catalogue
+      re-fetch — that is when a new spelling arrives.
+- [ ] **`tile_map.sh` and `bulk_upload_local.sh` still each do their own `maps`
+      insert**, and `ingest_indochine_nakala.mjs` shells into the first.
+      Unifying the mirror step waits on the container decision in
+      `docs/journals/260914-iiif-space-efficiency.md` — 119,616 tile objects
+      against one COG — because packaging it first means packaging it twice.
+
+### Found while starting the OCR pass (2026-09-04)
+
+- [x] T1. **Done 2026-09-04. `fetch_crop` could not read an R2-hosted map — every OCR run is dead.**
+      It requests an arbitrary region at an arbitrary scale
+      (`{x},{y},{w},{h}/{size},/0/default.jpg`); `worker/` renders nothing, it is a key lookup
+      (`key = tiles/${mapId}${rest}`) serving only what `vips dzsave` wrote. Measured: **39 of 39**
+      georeferenced maps resolve to `iiif.maparchive.vn`, and both an OCR tile and the overview 404.
+      `info.json` claims `profile: level2`, which is false and is why this went unseen. Fix in
+      Python only — compose the region from the pyramid: sf ∈ 1…32 (not 64, though `scaleFactors`
+      lists it), origin a multiple of 256·sf, region clipped to the image, and
+      **`size = ceil(region_w / sf)`**, which is the non-obvious part — plain `256,` 404s on clipped
+      edge tiles. Proven by hand: a 379×281 overview of the 1882 sheet assembles from 4 requests.
+      `fetch_crop` now falls back to `fetch_crop_level0`, which composes the region from the
+      pyramid. Verified against the live host: overview, an aligned OCR tile and an off-grid crop
+      all return correct pixels; `iiif_tiles.py --self-check` covers the addressing.
+- [x] T2. **Done 2026-09-04. The contribute map picker searches fields it never receives.**
+      `ToolMapPicker` builds `{id, name, allmaps_id, iiif_image}`, but `SearchMapsTab` filters on
+      `name, location, dc_description, year` and renders year and location badges — so filtering by
+      year or city silently cannot match, and no badge ever draws, which is why the list is a wall
+      of untriaged titles. Also: no accent folding, so "sai gon" misses "Sài Gòn" (Postgres already
+      folds this in `label_key`); and the `⇄` button adds to `layersStore`, the /explore layer
+      stack, which does nothing on an ImageShell page. Add triage / OCR status too — over a 39-sheet
+      pass, "which have I done?" is the column that matters. `unaccent` moved from
+      `$lib/server/gallica.ts` (which no component could import) to `$lib/core/utils/unaccent.ts`,
+      with `matchesAllTerms` so extra words narrow rather than match nothing; the picker now passes
+      year/location/description, badges Triaged and OCR'd, shows an `n of m` count, and drops `⇄`.
+      Five pure checks in `tests/search-fold.spec.ts`.
+- [x] T3. **Done 2026-09-04. Suggest triage.** `detect_neatline` is "bounding box of anything darker
+      than 230" and returns `None` on the 1882 sheet, because the scan margins are ink-black (100%
+      below the threshold, median grey 26–116 on all four edges) — so `--smart-grid` silently falls
+      back to the full image and crops nothing. An ink-profile over the same overview surfaces the
+      printed rules immediately (columns 14–15 / 253–256, rows 13–15 / 259–260). Propose, do not
+      decide: a button that fills the neatline and the priority grid, drawn on the canvas for the
+      human to correct before saving. `src/lib/features/contribute/digitalize/suggestTriage.ts` +
+      `$lib/core/iiif/level0.ts`: a **Suggest** button assembles a 2048px overview from the pyramid,
+      walks the ink profile to the printed rule, and fills the priority grid. Prototyped in Python
+      against the real sheet first — the box lands on the rule, 81% of the scan, versus the old
+      detector's `None`.
+
+  Two measured findings came out of it, both now fixed or recorded:
+  - **`--auto-priority` was actively harmful, not merely weak.** `compute_tile_densities` is
+    resolution-critical and `_overview()` fed it 1024px. Centre-tile vs edge-tile mean density:
+    0.019/0.134 at 600px, 0.044/0.129 at 1024, 0.106/0.140 at 1513, 0.127/0.140 at 1700 — **inverted
+    at every one**, so it rated the dense city centre below the margins and would have skipped
+    exactly the tiles worth reading (14 low-res + 2 skip on a 24-tile grid). It only comes right at
+    2048 (0.166/0.139, 3 low-res, nothing skipped). `OVERVIEW_WIDTH = 2048` now, in both the Python
+    and the TS.
+  - **The colour/wash pre-pass fires on nothing.** `compute_tile_colours` scored 0.000 on every
+    tile, and not because of its saturation gate — 0.25 down to 0.10 changes nothing. Every
+    saturated pixel on the sheet is hue 0–60° (warm paper, pink parcel tint); it looks at 60–260°.
+    Recorded as a null result in the docstring; the TS proposal deliberately omits it rather than
+    ship an untested signal.
+- [x] T4. **Done 2026-09-04. Sidebar.** Eight sections at one visual weight, so the three things a
+      person does (drag the box, click tiles, save) sit among readouts; and 069 left two competing
+      primary buttons stacked. Four numbered steps — Neatline · Tiles · Save triage · Run OCR — with
+      the tile config and priority legend merged, and exactly one primary button at a time: Save
+      while the triage is unsaved, Run once it is on the server.
+
+- [x] 3p. **Done 2026-09-04. Migration 069 is live on production.** Verified directly:
+      `select id,triage from maps limit 1` returns `200` with `"triage": {}` — a missing column
+      answers `42703`, which is what the same probe gives for a name that really is absent.
+      `enqueue_ocr_all.mjs` no longer throws there. The checked-in types already carry the three
+      `triage` lines; regenerate only if something else changes.
+- [x] 3L. **Done 2026-09-04. Triage learned what a sheet is made of.** It had meant one rectangle —
+      the neatline, everything inside it tiled identically — so a legend, a title block and an index
+      of street names were all read as terrain at full resolution. `scout` now returns `regions`:
+      sheet, main_map, title, legend, name_list, inset, scale_bar, north_arrow, stamp, on the same
+      0-1000 scale as its other boxes, scaled to source pixels and written to `maps.triage.regions`
+      (migration 070). A new `layout` job kind runs it — the Gemini key lives on the worker and
+      deliberately not in the web app — and `/scan?mode=prepare` gains a **Layout** step that
+      enqueues one, polls, and draws the answer as labelled rectangles you can select, drag,
+      recategorise or delete. Dashed is the model's, solid is yours. `enqueue_ocr_all.mjs` crops to
+      `main_map` in preference to the neatline. Ten pure checks in `tests/layout-regions.spec.ts`
+      cover the parse (an invented category, a zero-area box and a NaN are each dropped rather than
+      stored) and the crop preference.
+- [x] 3q. **Done, verified on production 2026-09-06. Migration 070 is live** — 37 `layout` jobs have
+      finished and 2 failed, which the old `pipeline_jobs_kind_check` would have refused at insert.
+      The two failures are the same fact: *Map of Imperial City of Hue* (800×628 px) and *Town Plan
+      of Hue* (754×877 px) are thumbnail-sized at the source, not just on R2, so the scout picked
+      zero scale levels and crashed on `images[-1]`. It now refuses with
+      `Sheet is W×H px, under the 1024 px the scout needs…` (`SCOUT_MIN_WIDTH`, checked by
+      `iiif_tiles.py --self-check`). Those two maps need a larger scan before layout or OCR can mean
+      anything; a third Huế sheet (1660×2147) is borderline.
+- [ ] 3h. **Triage the first sheets by hand**, one at a time, at `/scan?mode=prepare`: draw the
+      neatline, click the blank and water tiles down to skip, press **Save triage**. Exit:
+      `select count(*) from maps where triage ? 'neatline'` equals the number you meant to do, and
+      `enqueue_ocr_all.mjs --dry` lists exactly those.
+- [ ] 3. `node --env-file=.env scripts/enqueue_ocr_all.mjs --dry`, then without `--dry`. Verified
+      2026-09-04: **39 georeferenced · 1 already OCR'd · 0 in flight → 38 candidates**, spanning
+      1791–1900s and covering Hanoi, Huế and Gia Định as well as Saigon — of which it will now queue
+      only the triaged ones. **Measured on production 2026-09-04: 0 maps carry a saved triage**, so
+      a plain run queues nothing at all today — 3h comes first, or pass `--untriaged` and accept the
+      scout-guessed neatline. Exit:
+      `select count(*) from pipeline_jobs where kind='ocr' and status='queued'` matches the script's
+      own count.
+- [ ] 4.
+      `source work/ocr/.venv/bin/activate && python work/worker/vma_worker.py --worker $(hostname)`
+      — drain it. Hours, not minutes. Exit: `select count(distinct map_id) from ocr_extractions` >
+      30.
+- [ ] 4b. **Fold `dictionary.py` onto `place_names`.** `work/ocr/scripts/dictionary.py` (added
+      2026-09-04) writes an offline, reviewable gazetteer to `work/ocr/outputs/dictionary.{json,md}`
+      — 677 names from 1,404 extractions across 2 maps, each entry carrying its full sighting list
+      (map, year, run, confidence, pixel position), which the view does not keep. But it
+      reimplements the grouping, and migration 067's `place_names` already does that better:
+      `place_key` folds punctuation *and* accents, so the view returns **394** grouped names where
+      the script returns 434 ground names plus 66 cross-linked accent twins (`FOURRIERE` /
+      `FOURRIÈRE`). Two normalisation rules for one corpus will drift. Rebuild the script to read
+      `place_names` for headwords and variants, keeping its own pass only for what the view
+      deliberately drops — `legend_entry` rows (243 of them), the `--min-confidence` filter, and
+      per-sighting provenance. Exit: the script's ground-name count equals the view's, and
+      `--self-check` still passes.
+- [ ] 4c. **Review the dictionary.** Once 4 has run, `python work/ocr/scripts/dictionary.py` again
+      and read `dictionary.md` end to end. This is the first artefact in the project a human can
+      check against the actual sheets, and OCR errors that are invisible one bbox at a time
+      (`ARSENAL DE L`, `HOTEL DU GNRAL`, a bare `Rue` seen 14 times) are obvious in an alphabetical
+      list. Corrections go through the OCR Review tab, which `text_validated` then feeds back into
+      both the view and the file. Exit: the corpus's 20 most-sighted names are each either validated
+      or rejected.
+- [x] 5. **Done 2026-09-04, and done before 3–4 rather than after.** Migration 066 warps *on write*,
+      so the 38 maps step 3 queues will arrive with `geom` already set — the backfill only ever
+      concerned rows that predate the index. Running it first cost seconds and nothing, and it
+      turned on what 068 §3 had shipped dark: until it ran, `search_labels` returned `lng: null` for
+      every hit and each caller fell back to fetching the annotation over HTTP, which is the exact
+      cost 068 was written to remove. Both jobs closed on the first attempt. **Measured: 1,369 of
+      1,404 rows carry `geom`.** The other 35 have `global_x is null` — read without a box on the
+      page, so there is no position to compute; 12 are already rejected. `context_at` at Saigon
+      centre now returns 50 labels, nearest at 58 m.
+- [x] 5b. **Done 2026-09-04. `maps.bbox` backfilled.** Found while verifying 5: **0 of 39**
+      published maps stored a ground rectangle, so `context_at`'s `maps` bucket was empty for every
+      query — the "which sheets cover this spot?" half of the engine had never answered. `/explore`
+      was unaffected, because `resolveBounds()` derives the extent client-side per map from the
+      annotation and nothing persisted it. `scripts/oneoff/backfill_map_bbox.mjs` reads each
+      georeferenced map's annotation, computes the ground bbox and writes the column. **Measured on
+      production: 40 of 101 maps now carry a `bbox`**, and `context_at` at Saigon centre returns 21
+      maps.
+
+- [x] 5c. **Done 2026-09-04. `vma_worker.py --once` could not tell a dead network from an empty
+      queue.** The claim call caught `requests.RequestException`, set `job = None`, printed "queue
+      empty" and returned 0 — a transport error reporting success. That is how a DNS blip stranded
+      ocr job `107182d6` in `running` with a dead subprocess while an unattended drain said it was
+      done; recovered by hand with `finish_job(..., 'failed')`, which requeued it at 1/3 and it
+      completed on retry. Now: under `--once` a failed claim exits 1 to stderr, and when polling it
+      sleeps and retries, since a blip should not kill a worker meant to run for hours.
+      `--self-check` patches `claim()` rather than the network, so it needs no key, no server and no
+      database; it was verified to **fail** against the old code
+      (`a claim that raises must exit non-zero, got 0`) before being trusted against the new.
+- [ ] 6. **E1 + E3 acceptance on production.** Search "Khánh Hội" on /catalog and /explore, land on
+      the spot, watch the pulse, read the press panel. Check a draft map's labels are absent when
+      signed out. Exit: hits from ≥ 5 maps, and `/api/context?lng=106.70098&lat=10.77653` returns
+      labels.
+
+**Shipped on `feat/label-search` today** (code green: check 0/0, lint 0 errors, 19 write smokes + 17
+pure checks):
+
+- [x] E1 label search — mig 065, `/api/search?include=labels`, `LabelHits` on /catalog and /explore,
+      `?at=` deeplink both read and written, `FocusPulse` on the landed spot,
+      `scripts/enqueue_ocr_all.mjs`
+- [x] E2b **the engine** — mig 066: PostGIS, `geom`/`geom_src`/`geom_rmse` beside the pixel master,
+      warp-on-write in the three server writers, the `warp` job kind and its server-side runner,
+      `context_at()` / `map_context()`, public `GET /api/context`
+- [x] E2 pieces — `--aoi-px` study-area triage; export by map list, year and ground bbox, defaulting
+      to `approved`; the ⬡ per-layer vectors toggle drawing a sheet's fabric on the ground; the
+      `seg` runner so a Colab GPU session is just a worker
+- [x] E3 — `GET /api/press` over Gallica **and** the National Library of Vietnam's 262k-page press
+      archive, edge-cached 24 h, plus the "In the press" panel on /explore
+- [x] ← / → scrub the years, ↑ / ↓ the opacity, camera held still
+- [x] `--clahe` adaptive-contrast pre-pass, **off** until the eval set measures it (commands in
+      `docs/pipelines.md`)
+- [x] `scripts/pmtiles_extract.sh` — one basemap recipe for both apps; proven by building a real Huế
+      extract, 2.3 MB in 15 s
+- [x] E1b gazetteer — mig 067's `place_names` view (every spelling · years · sheets · a position),
+      `place_key` folding punctuation so hyphenated and spaced forms group, plus `/place/<name>`
+      server-rendered hub pages linked from every share page
+- [x] Platform step 2 — `contracts/` with `context`, `label-hit` and `footprint-feature`, each
+      naming its second consumer, validated against the live API by the write smoke
+- [x] `work/analysis/district4/` — `metrics.py` (self-checking morphology measurements) and
+      `series.py` (`--demo` proves the path with no data, real run pulls the export per sheet)
+- [x] `/api/press?variants=` takes the gazetteer's attested spellings instead of guessing three
+      forms, and the place page passes them
+- [x] **`/admin?tab=status`** (2026-09-04) — the archive's own review queue: what is held, what is
+      stuck, what would unstick it, in plain sentences rather than SQL. `GET /api/admin/status`
+      (admin|mod, 16 head-counts, no rows transferred) + a page whose wording all lives in one
+      `build()` function. Reachable from a new **Staff tools** block on `/profile`, which is also
+      the first link `/admin?tab=scout` and `/admin?tab=bulk` have ever had. Written because every
+      exit condition in this file was a query its owner could not run
+
+**Then, in order** (detail in `docs/time-machine-plan.md`, engine design in
+`docs/platform-design.md`):
+
+- [ ] 7. **E2 step 1 on Colab** — mint a `seg`-scoped worker key, run `vma_worker.py --kinds seg` in
+      the notebook. Exit: one `seg` job goes `queued → done` and writes `footprint_submissions` rows
+      with `source='sam-auto'`.
+- [ ] 8. **District 4 review** — `work/analysis/district4/` is built and self-checking
+      (`series.py --demo` proves the path with no data), so what is left is human: review the series
+      in `/scan?mode=shapes&tab=validate` until the table stops printing zeros. The series is
+      **six** sheets, not eight, and is now generated rather than remembered
+      (`scripts/collection_aoi.mjs --aoi district4`, ranked by ground resolution over the district):
+      **1882 · 1895 · 1923 · 1942 · 1959 · 1968**. 1878 and 1898 are out — their georeferences put
+      them wholly north of the Bến Nghé canal, so they are plans of the colonial centre, not of the
+      peninsula. The AOI is now `district4.geojson`, since the old bbox measured 7.62 km² of box
+      against 4.46 km² of land and halved every ratio. OCR ran cropped to the district (8% of the
+      paper, 12x fewer tiles, and 1:1 rendering instead of the 2.34x downsample the worker was
+      silently applying) and the queue drained clean — **+140 extractions across the four new
+      sheets, 5–35 each**. That is a thin yield for a 1:1 pass and is worth reading before queueing
+      more: either the crops land off the district, or the sheets carry few names inside it. Exit:
+      real numbers for those six years, and the approved polygons exported as the C5 seg eval set.
+
+  **Two blockers found 2026-09-04, one fixed, one not.** Fixed: `/api/export/footprints` had never
+  warped a single row — it dropped `annotation_url` and only tried
+  `annotations.allmaps.org/maps/{allmaps_id}`, which 404s for all 101 maps because `allmaps_id` is
+  an *image* id (`/images/` is the working endpoint, and `allmapsAnnotationUrl` now builds it).
+  Every export was pixel coordinates with `geo_converted: false`, which `metrics.py` drops — so the
+  series could not have produced a number no matter how much review happened. Not fixed, and not
+  code: **there are no footprints inside District 4.** All 46 volunteer traces sit in District 1,
+  the nearest 68 m north of the Bến Nghé canal. The review queue is not the blocker; tracing or
+  segmenting the peninsula itself is.
+- [ ] 9. **Measure `--clahe`** against `work/ocr/EVAL-BASELINE.md` and record the result, including
+      a null one. Exit: a numbered row in that file.
+- [ ] 10. **Feed `/api/press` from the gazetteer** instead of its three guessed spelling forms —
+      `place_names.variants` now holds the real ones. Cheap, and waiting only on a corpus with more
+      than one map OCR'd.
+- [ ] 11. **Colonial ↔ current street names** with namesake notes
+      (`docs/journals/260902-creator-scan.md`: the single best-performing feature post of a
+      comparable project, sourced from one book appendix). Needs the source data, not code.
+- [ ] 12. **Figures for the District 4 table**, once it has numbers. Deliberately absent: a chart of
+      three zero rows is worse than no chart.
+
+**Parallel, whenever there is human time:** E4 georef sprint — the 62 drafts are all 1900–1929, so
+target the decade gaps first (`select year, name from maps where not georef_done order by year`).
+
+**Deliberately not now:** E5 (needs reviewed E2 fabric on ≥ 3 maps), the monorepo import (platform
+steps 4–5, after a contract has two real consumers), vector tiles / `build_pmtiles`, the runes
+migration. Reopen conditions in `docs/platform-design.md` §6.
+
+## Done — August cleanup (branch `chore/cleanup`, 24 commits, not yet merged)
+Record: `docs/archive/cleanup-2026-08.md`. The working material under `work/cleanup/` was deleted
+once the pass closed; git history has it.
+Layout now `core → data → map → features → routes`, `ui` primitives, `server` guarded (rule in
+`CLAUDE.md`). check 0/0, lint 0 err, smoke 7/7, build green.
+
+## Track A — Ship + harden (done)
+- [x] A1 CF preview click-through (2026-08-31, https://chore-cleanup.vmabeta.pages.dev): 12 routes
+      load, smoke 7/7 against the preview, zero console errors except /explore's Allmaps 404s.
+      Tokenised review + digitalize confirmed light. Needed a deploy fix: `pagesBuildOutputDir` →
+      `pages_build_output_dir`. Three findings pushed to Track D.
+- [x] A2 PR #7 `chore/cleanup` → `main` (merged 2026-09-01, 65 commits). #8–#12 followed: the Pages
+      environment, mig 063, the self-hosted basemap.
+- [x] A3 CI: `npm run lint && npm run check && npm run build` on PR (none exists)
+- [x] A4 eslint `import/no-restricted-paths` encoding the layering rule (ui/core ↛ features; client
+      ↛ server)
+- [x] A5 Local Supabase stack + seeded staff user → 4 write-path smokes (`npm run test:write`).
+      Found and fixed a real bug: mig 021's `populate_footprint_map_id` trigger outlived the
+      `task_id` column 038 dropped, so **every** footprint insert failed — mig 052 drops it.
+
+## Track B — Architecture (design archived at `docs/archive/architecture-target.md`; decisions now in `CLAUDE.md`)
+- [x] B1 mig 053 (`pipeline_jobs`, `worker_keys`, `claim_job`/`finish_job` RPCs) ·
+      `work/worker/vma_worker.py` · `/api/…/ocr` enqueues (202/409) · `cli_only` deleted. Verified
+      end to end on the local stack.
+- [x] B2 `/api/pipeline/{claim,results}` + `worker_keys` bearer auth (`$lib/server/workerAuth.ts`),
+      `scripts/mint-worker-key.mjs`; worker and `ocr.py --db` hold no DB creds
+- [x] B3 RPCs (mig 054 `set_extraction_status`, `revert_recent_validations`, `set_footprint_status`;
+      `claim_job`/`finish_job` from 053) with every API writer calling them · mig 055 widens the
+      footprint `status`/`source` checks that rejected every SAM2 write · mig 056 turns
+      `map_pipeline_status` into a view over `pipeline_jobs` + the new `map_review_marks`, so the
+      stage has one writer per fact.
+- [x] B4 mig 058 (trigger + backfill, deduped by the one-live-job index) · runners from B5 · mig 062
+      lands the constraint as "public needs `annotation_url` **or** `allmaps_id`": the literal
+      `annotation_url NOT NULL` deadlocks, because publishing is what enqueues the mirror. Prod
+      satisfied it on day one — all 38 published maps already carry an annotation URL.
+- [x] B5 `$lib/server/annotationMirror.ts` (shared by mirror-r2 + the new `/sync-allmaps`), history
+      at `annotations/{id}/{ISO}.json`, "Fetch latest from Allmaps" button, and
+      `/api/pipeline/execute` so the `mirror_annotation`/`sync_allmaps` jobs actually run — which is
+      also what B4's queue was waiting for.
+- [x] B6 `/catalog/[id]` share page, server-rendered with OG/Twitter tags, drafts 404. SSR on
+      `(editorial)` turned out to be **already true** except the home page, which has no server load
+      to render anyway — the flag alone would ship an empty skeleton, so it stays SPA until its data
+      moves into a load function. `render_preview` dropped: the OG image is the IIIF thumbnail,
+      which needs no job, no storage and no rendering.
+- [x] B7 mig 059 gives stories `status`/`reviewed_by`/`reviewed_at` and **drops `is_public`**
+      (publishing = submitting for review; RLS stops an author approving their own).
+      `/scan?mode=shapes&tab=validate` has a tab per kind; `/api/admin/stories` is the story queue.
+      Rate limiting is `assertUnderRateLimit` in `lib/server/auth.ts`, used by the new
+      `/api/contribute/footprints` — which also fixed hand traces writing `source: 'manual'`, a
+      value the constraint rejects. Column named `user_id`, not `submitted_by`, per db-guidelines.
+- [ ] B8 **Re-scoped 2026-09-02 as the place-time index** (`docs/platform-design.md` §0), not a
+      render layer. The original deferral — "a geometry column only pays off when /explore wants
+      city-wide layers" — is right about *rendering* and wrong about *querying*: E3 and the thesis
+      both ask spatial questions, and today every map-derived row is pixel-space, warped in
+      TypeScript per request, so "what was here in 1923" cannot be one query. Scope:
+      `create extension postgis`; `geom` + `geom_src` + `geom_rmse` beside (never instead of) the
+      pixel columns on `ocr_extractions` and `footprint_submissions`; warp-on-write in the three
+      server writers that already hold the transformer; one `warp` job kind for re-georeference;
+      `context_at()` / `map_context()` RPCs read through jsonb, because PostGIS columns type as
+      `unknown` in supabase-js. `build_pmtiles` and vector tiles **stay** non-goals.
+- [x] B9 mig 060 drops `maps.is_public`/`is_featured` (four RLS policies rewritten onto `status`
+      first) and `story_points.quest`/`qr_payload`. The admin modal's two checkboxes are gone; the
+      status select is the whole visibility control.
+
+## Track C — Product: OCR ↔ SAM2 join (`feat/ocr-footprint-join`; design 2026-08-08)
+Flow: colour pre-pass → OCR → coarse seg (blocks, rivers) → fine seg (buildings) → level-aware join
+→ px→geo → `/api/maps/[id]/legend-points` → `LegendPointsLayer` on /explore.
+- [x] C0 **Blocker check — grids agree, but the writer never worked.** Both sides are full-image
+      source px off the same `info.json` (`ocr.py:_to_global` and
+      `shift_polygons(origin=tile, scale=src/render)`), so the join is geometrically sound. What
+      blocked it instead: MapSAM2's `write_to_supabase` posted `coords` / `iou_score` / `ocr_seed` —
+      none of which are columns — with `source='mapsam2'`, which the check constraint rejects. Fixed
+      to `pixel_polygon` / `confidence` / `sam-auto`. Run pinning added: mig 057 gives footprints a
+      `run_id`, and `join_labels` now pins the newest run on each side (hand-traced polygons always
+      stay in the pool).
+- [x] C1 Verified: mig 050's `footprint_id` FK is exactly what the join needs (nullable,
+      `on delete set null`, so re-running seg never drops extractions), and `join_labels.py` already
+      implements smallest-containing-polygon with the category↔level preference. Made it a queue
+      citizen: mig 061 adds the `join` job kind and the worker runs it (`--kinds` now defaults to
+      `ocr,join`).
+- [x] C2 The Triage grid was already auto-filled from text density (`--auto-priority`). Added the
+      colour half: `compute_tile_colours` scores each tile's water/vegetation wash in HSV, and a
+      washed tile is **demoted one step** (full → low_res, low_res → skip). Demotion only, so a
+      misread wash costs resolution, never a tile; a monochrome scan scores ~0 and changes nothing.
+      `--wash-above` tunes it. Self-check: `python work/ocr/scripts/iiif_tiles.py --self-check`.
+- [x] C3 **Rejected on measurement, not skipped** — `work/ocr/EVAL-BASELINE.md` records the attempt:
+      recall regressed 16 points, from bad frame attribution and centroid ownership leaking in the
+      overlap band. Row-sequence stays the default. Don't re-attempt without fixing both, and only
+      with a bigger ground-truth set.
+- [x] C4 `work/MapSAM2/to_sam2_seeds.py` — the module `inference_tiles_as_video.py` has been
+      importing behind a try/except and never had, so `--mode prompted` silently fell back to
+      automatic. Seeds are area-category extractions only (a street name labels a line, so prompting
+      its box would segment the lettering's background), owned by centroid so the overlap band
+      cannot double-prompt, clipped to the tile. Prompted polygons now carry the label as `name`, so
+      area features are labelled at birth and the join pass only handles what was never a prompt.
+- [ ] C5 Eval harness — **blocked on data, not code.** The OCR harness exists
+      (`work/ocr/EVAL-BASELINE.md`); the segmentation side needs ~20 hand-labelled Saigon tiles
+      before any number it prints means anything.
+- [ ] C6 **Blocks from the sheet's own colour, not from 2023 geodata** —
+      `docs/journals/260918-colour-blocks.md` (plan, 2026-09-18). The flow line above always said
+      "colour pre-pass"; C2 implemented it as tile triage and the block prior went to
+      `modern_prior.py`, which inherits 11.3 m RMSE and 141 years of drift. Measured on one 1882
+      tile: `r − g` is bimodal with a trough at +0.065 (3.4%), salmon components median ≈ 2,700 m².
+      Number to beat is `--blocks-from-roads` at land_plot IoU 0.262 / cover 0.87. Gates in order:
+      P1 blocks (scored row in EVAL-BASELINE either way) → P2 roads from the cream complement,
+      separated by the `street_name` extractions `to_sam2_seeds.py` currently discards → **P3's null
+      is RETRACTED, same day.** It was measured against the 89 building traces, 72 of which are OCR
+      label boxes; a label box sits on open wash, so it cannot differ from the plot, and 72 of them
+      pulled every axis to chance. Re-measured against the 17 real traces, `r - g` overlap is
+      **0.23**, not 0.64 — next door to the 0.17 that made the green/cream pair separable. Excluding
+      ink from both sides (a building trace carries 0.257 ink against open plot's 0.091, so the
+      outlines were the obvious confound) it **sharpens to 0.18**: the wash inside a building
+      outline is genuinely redder and more saturated (`r - g` p50 0.098 vs 0.027). **There are two
+      reds.** What that does not establish is a threshold beating `building` 0.160 — n=17 on one
+      sheet says an axis exists, not that a splitter works, and that run has not been made. The
+      parcel half is closed by arithmetic: a divider is 1 render px and the hatch period is 4, so
+      any closing that rejoins a block across its hatching must bridge a divider. Orientation is the
+      only route left and the hatch angle is per-block, not per-sheet (40° and 140° in one crop),
+      retaining ~11% of ink with outlines and lettering mixed in — recorded, not built. ~~Colour is
+      now exhausted at the block level; the split is ink geometry, i.e. SAM2.~~ **Not established**
+      — it rested on P3's null, which was contamination. Colour may still have the within-block
+      split in it; the cheap test is a salmon-internal `r - g` threshold at the measured trough,
+      scored against the 17 traces. The handoff is verified: 253 blocks → 246 seeds via
+      `load_seeds_from_prior`, against the modern prior's 950 prompts, and on the ink. Needs one GPU
+      run → P4 write-back with `feature_type`. Unlike every SAM2 row, a threshold is not trained on
+      the 46 traces it is scored against.
+  - **P1 code landed 2026-09-18**, `work/ocr/scripts/colour_blocks.py`: writes `blocks.geojson` (the
+    prior contract) and `blocks.run.json` (seg_eval's shape) from one whole-sheet fetch, CPU only,
+    no GPU and no checkpoint. Both contracts verified. On tile `4142_4032` it returns 44 blocks, 22
+    salmon + 22 blue-grey, polygons on the ink and streets intact. Two architectures were measured
+    and rejected on the way and are written up so they are not re-attempted: not-ink components
+    (2,927 fragments at 1:1, one blob by 6×) and opening the ink by thickness (block outlines are
+    not heavier than building lines). **Scored 2026-09-18 and the gate is NOT cleared**, for a
+    structural reason that reorders the track: 189 blocks on the whole sheet in 5.9 s of CPU, but
+    0.124 mean / 0.003 median / cover 0.01 on the 24 `land_plot` traces against
+    `--blocks-from-roads`' 0.262 / 0.87. **16 of those 24 traces are cream *non affectées* parcels,
+    the one class this pass excludes by design** — the plan had assumed a quarter, it is two thirds.
+    On the 8 pigmented plots it returns 0.352 / cover 0.97, at n=8 on a subset chosen by the
+    classifier under test. Including cream is not the fix and was measured: it collapses the sheet
+    into one 11.91 km² component, 100% of the mask, 0 blocks in band, because the street network
+    welds every cream parcel to every other. **So P2 is a prerequisite for P1's own score, not a
+    follow-on — revised order is P2, re-score P1, then P3.** **P2 done the same day, and the
+    diagnosis was wrong too:** the missing class is not the street, it is the pale grey-green
+    *administrative* parcels under diagonal hatching (*Travaux Publics*, *Procureur Général*,
+    *Conseil de Guerre*) — visible by cropping the sheet around the uncovered traces, which is now
+    twice on this track that the picture beat the metric. Erosion and local ink density both failed;
+    the axis turned out to be `r - g` again, with the hatched class sitting *below* the cream peak
+    where `find_split` never looked, resolvable only at 48 bins. Same primitive mirrored, as
+    `cool_split` does. **land_plot 0.124 → 0.247 mean, 0.003 → 0.161 median, cover 0.01 → 0.98**
+    (target 0.262 / 0.87); the `--close` sweep straddles it at 0.273/k=0 but the 0.027 spread is
+    noise at n=24, so the default stays 5. Class precedence is load-bearing — blue-grey and green
+    both sit low on `r - g`, and claiming green first took blue from 65 blocks to 1. Also found and
+    **since retracted**: "the ground truth is now 118 rows" was contamination, not growth —
+    `load_gt` filtered on `map_id` alone and picked up 72 `sam-auto` rows (run `seg-20260916T1632`)
+    that are OCR label boxes typed `building`, median IoU 0.83 to their own prompt box. The sheet
+    has 46 traces and always did. `seg_eval.load_gt` now filters `source=eq.volunteer`; `land_plot`
+    figures are unaffected (24/24 volunteer), `building` at n=89 is void and re-scored to 0.122 at
+    n=17. And the split must be voted over an 8×8 grid of crops rather than pooled, since sheet-wide
+    the salmon mode decays off the cream peak and `find_split` correctly refuses it. Row:
+    `work/ocr/EVAL-BASELINE.md`.
+  - **P2c the legend key, 2026-09-18.** The reported failures — blue missing blocks, salmon claiming
+    white plots that merely have red buildings, "there's green and grey" — are one finding: **the
+    sheet's legend defines five classes and `classify` implements four.** The missing one is
+    *propriétés domaniales affectées au service local*, drawn as a **black diagonal hatch rather
+    than a tint** (59.6% ink in its swatch against 21.6% for the next densest), so no trough on
+    either axis could ever find it; its `r - b` band 0.047–0.078 straddles the cool split at 0.073,
+    which welds the military blocks to the administrative ones into components the area cap drops
+    whole — that is why blue returns 41. And **communales and service local swap order between the
+    axes** (`r - g`: 0.016 < 0.039; `r - b`: 0.067 < 0.122), so no cascade of 1-D cuts with a fixed
+    precedence can separate them, whatever the order — the existing note about green-first taking
+    blue 65 → 1 was a symptom of this, not a quirk. Separately, salmon claiming white plots is
+    structural: `dominant_class` votes over `PIGMENT_CLASSES` and cream is not a candidate, so a
+    *non affectée* plot with red buildings has no cream pixels to vote for and must come back salmon
+    (88 of 99 salmon blocks are nearer the cream swatch). **`--swatch-labels`** names each finished
+    polygon against the legend, diluted by one fitted scalar (alpha **0.52**, fitted on the
+    pigmented blocks only — the ~800 bare-paper cream parcels drag it to 0.38). Label-only by
+    construction, applied after the geometry is fixed: land_plot 0.350 and building 0.122 unchanged
+    to the digit, which is also why `seg_eval` **cannot score it** — it never reads `feature_type`.
+    Hand check on ten named blocks: **4/10 → 6/10**, *Travaux Publics* and *Palais de Justice* newly
+    correct. The key alone could not hold the cream/green cut (green 470 on a sheet with nothing
+    like 470 communal parcels — the pair sits 0.043 apart on `r - g` and dilution closes that
+    further), so the sheet's own voted `green_split` arbitrates that one boundary while the swatches
+    order the classes the troughs cannot: **green 470 → 53** (the Jardin de la Ville, the Cimetière
+    Européen, the Château d'Eau), cream 261 → 678, named check still 6/10, nothing else moved. The
+    two measures are not interchangeable — a swatch is an all-pixel median because two classes *are*
+    ink, the trough is paper-only — so `wash_points` returns both and the arbitration compares paper
+    to paper. Was still wrong: `admin` took tree stipple in both gardens and part of the Champ de
+    Manœuvres, the same dense-fine-ink confusion the density nulls hit — **closed by P2d below**, on
+    orientation. Two nulls recorded, do not re-attempt as stated: ink density as the hatch detector
+    (0.247 → 0.242) and thin-ink density (→ 0.244). Rows: `work/ocr/EVAL-BASELINE.md`; detail
+    `docs/journals/260918-colour-blocks.md`.
+  - **P2d orientation, 2026-09-18.** The last known-wrong thing in P2c — `admin` taking tree stipple
+    in both gardens and part of the Champ de Manœuvres — closed on the route the journal had priced
+    and left: **a hatch is directional and stipple is not.** Measured as the structure tensor of the
+    greyscale gradient per polygon, the two hatched administrative blocks score **0.738** and
+    **0.589** against the Jardin Botanique's **0.036** and the Cimetière's **0.029** — an order of
+    magnitude, where every density measure managed a few percent, because the ratio is blind to *how
+    much* ink a block holds. `--hatch-coherence` (default 0.30) applies it to the polygons the key
+    has already called `admin`: 61 of 233 fail and fall back to the nearest of the three *tint*
+    classes, matched on their paper. **admin 233 → 172, cream 678 → 735, green 53 → 57, blue
+    unchanged at 42**, geometry untouched (0.350 / 0.122 to the digit), +1.5 s. **The named check
+    does not move — 6/10 before and after — and that is the honest headline**; what moves is the
+    rendered layer, where `admin` no longer claims either garden or the Champ while both hatched
+    blocks keep it. The Botanique now misses `green` by 0.007 on the voted trough, which is the
+    trough's resolution, not this test's. Three measurements rejected on the way, not to be
+    re-attempted as stated: **directional line opening** — the route this journal itself had priced
+    — where the garden's stipple survives *better* than the hatch at 7/11/15 px, because a hatch
+    line is one source pixel of grey and is already broken at `INK_V`; **coherence on the
+    thresholded ink mask** for the same reason (0.215 vs 0.064, both hatched); and **falling back on
+    the all-pixel median**, which scores *better* on the named check (7/10) and paints both gardens
+    military, since a dense black stipple's median *is* the diluted blue prototype. The lesson for
+    the track: three legend classes are a tint and colour names them, two are ink and colour never
+    could — naming those needs a measure of how the ink is laid down. Rows:
+    `work/ocr/EVAL-BASELINE.md`; detail `docs/journals/260918-colour-blocks.md`.
+  - **P2e water, 2026-09-18.** Reported twice from the layers as "blue cannot find the river", and
+    the measurement answers it in one line: **the open river is bare paper** — +0.059/+0.141
+    mid-channel against dry land's +0.047/+0.133. What reads blue is the engraved ripple, genuinely
+    blue ink (r − b +0.031, next to the military class's +0.024) over 0.3–4% of the surface, and
+    `classify` thresholds the *wash*, which the river has none of. Water is the one feature on this
+    sheet drawn rather than washed, so it takes three conditions at once: blue ink
+    (`r - b < 0.060`), sparse (< 15%), over paper with no wash (`r - b > 0.100`). The third is what
+    keeps the naval quarter — Hôpital Maritime's ink is blue (+0.024) and sparse (5.1%) and differs
+    only in having a wash. **`--drop-water`**, off by default and the only flag in this pass that
+    *removes* geometry: 1044 → **989** polygons, ribbons (circ < 0.10) 110 → **76**, ribbon area
+    1.17 → **0.48 km²**, and **land_plot 0.350 / building 0.122 hold to the digit** with cover 1.00
+    and the named check unmoved — `seg_eval` takes the best match per trace, so a drop that touched
+    a real parcel would fall straight out of `land_plot`; all 55 were false positives. **First
+    change on the track that makes the run smaller, and no number in `EVAL-BASELINE.md` rewards
+    that** — the precision blind spot is item 1 of the "no GPU" list, unchanged. It does not find
+    the whole river either; the upgrade is to flood the 16 `hydrology` labels through the blue-ink
+    mask and take the component. Rows: `work/ocr/EVAL-BASELINE.md`; detail
+    `docs/journals/260918-colour-blocks.md`.
+  - **P2f water is a region, 2026-09-18.** P2e's per-polygon test left the river visibly
+    half-claimed, and the diagnosis was structural rather than a threshold: of 48 polygons in one
+    river window, **38 hold 0-17 pixels of ink**, because they sit in the gaps *between* the ruled
+    ripple lines — the thing that makes them water is outside them. The route this journal had
+    proposed (flood the `hydrology` labels through the blue ink) fails in one command: at
+    `V < 0.80, r - b < 0.060` the mask is **12.25% of the sheet and one component**, because black
+    ink is neutral and a threshold loose enough for a pale ripple takes every printed line. What
+    holds is `ink_coherence` — the hatch test's own measure — on a **64 px grid**: cells whose line
+    work runs one way (> 0.45), with no wash (`r - b` > 0.100) and sparse ink (< 25%), componented,
+    keeping the components that hold a `hydrology` label, dropping any polygon more than a third
+    inside. The labels are the safety: the same signature also describes the ruled neatline margin
+    (furniture, fine to lose), and the wash test is what keeps the ruled naval quarter. Plus
+    **`--drop-slivers`**, a different claim — a parcel is compact (`4πA/P²` > 0.2 here) and a ripple
+    is not (< 0.1), with the ceiling measured two steps away (0.15 breaks land_plot to 0.326).
+    Together: **1044 → 832 polygons, ribbons 110 → 0, claimed area 4.85 → 3.51 km² (−28%)**, and
+    `land_plot` 0.350 / `building` 0.122 do not move at all; `waterway` untouched, `road` cover 0.68
+    → 0.59 because dropped ribbons had lain across the quay roads; named check 6/10 throughout.
+    P2e's colour test is **subsumed and removed** — its unique contribution over the region was 21
+    polygons and 0.06 km². Both sweeps here (overlap share, sliver threshold) are **bounded by the
+    rendered picture, not by any number in EVAL-BASELINE**, which is the precision blind spot of
+    item 1 stated for the third time. Rows: `work/ocr/EVAL-BASELINE.md`; detail
+    `docs/journals/260918-colour-blocks.md`.
+  - **P2b cream parcels + furniture drop landed 2026-09-18**, same file, `--cream` and
+    `--drop-furniture`. The recorded "cream is one 11.91 km² component" dead end was an artefact of
+    `INK_V = 0.55` carried over from the block pass: at 0.55 a 2 px divider is grey, so every parcel
+    leaks into the street through its own boundary. `cream_ink` sweeps V up to the sheet's paper
+    peak and keeps the argmax of banded area (0.80 here, block pass stays 0.55), and the street
+    survives as the single oversized component the area band already drops. **land_plot 0.247 →
+    0.346 mean, 0.161 → 0.218 median, missed traces 2 → 0, claimed area 14.4% → 32.9% of the scan**,
+    target 0.262; building 0.093 → 0.114. 850 parcels, +4 s, no GPU. The two passes cannot share
+    knobs — at 0.80 salmon shatters into 10,078 components and hatched green vanishes, because
+    hatching *is* ink there. 1:1 turned out not to be required (0.346 at `--render 6051` against
+    0.342 at full res). `furniture_mask` unions the padded `title`/`legend` OCR label boxes and
+    drops 21 polygons including 11 blocks, against the 10 counted by hand; a convex hull of those
+    boxes is wrong, since `legend` also tags the neatline annotations. Repeat pass byte-for-byte
+    identical. **Was open, half-closed by P2e**: the river stipple fragments into in-band parcels
+    and the 16 `hydrology` labels locate but do not fence it — `--drop-water` removes 55 of them on
+    colour instead; and the legend swatches, sampled at their caption rows, show *service local* at
+    r−b +0.075 against a cool split of +0.073 — it sits on the boundary, so nearest-swatch
+    classification should replace the ordered 1-D troughs and the precedence rule with it. Rows:
+    `work/ocr/EVAL-BASELINE.md`; detail `docs/journals/260918-colour-blocks.md` § P2b.
+- [ ] deferred: gazetteer link, LoRA shot set
+Runs as B1 jobs (`ocr`, `seg`, `join`) once B1 lands — no more copy-paste CLI.
+
+## Track E — Time machine (`docs/time-machine-plan.md`, planned 2026-09-02)
+Label search → temporal fabric → period sources, on the existing jobs + HITL + RPC substrate.
+Measured start: OCR on 1 map, zero SAM2 output, 8-map Saigon series 1878→1968 already georeferenced
+for District 4.
+- [x] E1 Label search (code, 2026-09-02, `feat/label-search`) — mig 065: `pg_trgm` + immutable
+      `unaccent` wrapper, `search_labels` RPC (security definer + explicit `p_public_only`, since
+      /api/search runs on the service client), and `ocr_extractions` read policy now inherits the
+      map's gate (it had been `using (true)` since 040). **No trigram index**: the indexable `<%`
+      reads a GUC Supabase's role may not SET on a function, and 0.6 misses one-letter typos;
+      explicit `word_similarity() ≥ 0.5` seq-scans, fine at 10⁵ rows. `/api/search?include=labels`
+      warps each hit via `transformer.ts`; `LabelHits.svelte` on /catalog (→
+      `/explore?map=&at=lng,lat`) and in /explore's browse pane; `scripts/enqueue_ocr_all.mjs`.
+      Write smoke: typo hit + draft gate + raw-table leak. **Pending, user's shell:**
+      `supabase db push`, then `enqueue_ocr_all` + a worker run — the index is one map until then
+- [ ] E1b Gazetteer view `place_names` (variants · years · maps) — after ≥ 20 maps carry
+      extractions; also feeds `/api/press` every spelling instead of three guessed forms
+- [~] E2 Temporal fabric — **code done 2026-09-02**: the `seg` runner (a Colab GPU session is now
+      just `vma_worker.py --kinds seg`), `--aoi-px` study-area triage, the export upgrade (CSV
+      `map_id`, default `approved`, `year`, ground `bbox=`), and the ⬡ per-layer vectors toggle.
+      **Left:** one real Colab run, the District 4 review, and `work/analysis/district4/` — all
+      human or GPU time, no code. District 4 review is the C5 eval set
+- [x] E2b The engine (B8 re-scoped, 2026-09-02) — mig 066: PostGIS, `geom`/`geom_src`/`geom_rmse`
+      beside the pixel master, warp-on-write in the three server writers that already hold the
+      transformer, a `warp` job kind for re-georeference, `context_at()`/`map_context()` read as
+      jsonb because PostGIS columns type as `unknown`, and public `GET /api/context`. Landed before
+      the seg runner rather than after: labels alone already make the index worth querying
+- [x] E3 Period sources (2026-09-02) — `/api/press?q&year&provider` over Gallica SRU/ContentSearch
+      **and** the National Library of Vietnam's 262k-page archive (no date filter upstream, so the
+      window is applied client-side; a courtesy third-party proxy, so no retry), merged
+      chronologically, edge-cached 24 h · "In the press" panel on /explore from a label pick. No
+      table until pinning is asked for
+- [~] E4 Corpus growth — georef sprint by decade gap (62 drafts, all 1900–1929) · new scout sources
+      (UT PCL, NARA, ANOM) · **the Hanoi/Huế extracts are now one command**
+      (`scripts/pmtiles_extract.sh`, Huế already built)
+- [~] **E6 Sheets on one ground — the overlap floor (2026-09-21)**. Two Saigon plans sixteen years
+      apart, each warped by its own Allmaps GCPs, overlap to **~50–100 m**, and the limit is the
+      scan rather than the transform. Fitting an affine to each annotation's control points
+      reproduces `georef_error.md` exactly on 1882 (RMSE 10.6 m, worst 17.4 m), so: **1882 10 GCPs,
+      rot +89.64°, axis scales 0.3445/0.3393 m/px — 1.5% apart; 1898 3 GCPs, rot −0.26°,
+      0.3415/0.3321 — 2.79% apart.** An affine has one scale per axis, so a 2.79% spread is ~390 px
+      over a 14,000 px sheet that no affine can absorb. **1898's RMSE of 0.0 m is arithmetic, not
+      accuracy** — 3 GCPs are 6 equations for a 6-parameter affine, the same trap `georef_error.md`
+      names on the 1923 sheet — so **more control points on 1898 is the highest-leverage manual task
+      there**. Measured agreement: block centroids 1898→1882 median 78 m (44% within 50 m); 33
+      shared place names, both ends on the ground, median 25 m (Rue de Kerlan 5 m, Rue Turc 9 m) —
+      an upper bound, since text is printed *near* a feature. **A wrong turn kept on purpose:**
+      `work/ocr/scripts/sheet_register.py` registers sheet-to-sheet through shared names (RANSAC
+      similarity + trimmed ICP on block centroids; 50 names, 35 inliers, 25.1 m → 16.1 m), built
+      before I checked that **every** District 4 sheet already has an annotation. It survives as the
+      only route for a sheet with no GCPs, and because the two independent routes bounding each
+      other at 48 m median is a check nothing else gives. **More layers are not blocked by
+      georeference** — all seven sheets carry GCPs (1895 11 · 1923 3 · 1942 12 · 1959 10 · 1968 15);
+      what is missing per sheet is block geometry, and `260920-colour-transfer.md` already shows the
+      colour pass transfers. Also `work/ocr/scripts/clean_blocks.py` (1882 1443→1431, 1898
+      3177→3156) and the stacked presentation `work/proto/fabric/`. **Left:** neither OCR run is
+      reviewed — 1882's reviewed `v1b` is 177 rows against `rr0910`'s 348, so the review wants
+      pointing at a fuller run, not at finishing `v1b`. Detail:
+      `docs/journals/260921-sheet-overlap.md`
+- [ ] E5 Building attributes → OSM tags → LoD2 — deferred until E2 fabric is reviewed on ≥ 3 maps;
+      `tags jsonb` lands with its first writer
+
+## Track F — Time walk (`docs/time-walk-plan.md`, planned 2026-09-12)
+The surface a person walks through: one District 4 route on foot, the warped sheets underneath, the
+old names on top. HACW (the Hội An event PWA) forked for Saigon — it is built to be forked per event
+— with its single modern basemap replaced by a stack of warped historical sheets and a year slider.
+HCMC is the opposite substrate to Hội An: no usable L7014 topo (the series' ungeoreferenced JPGs are
+exactly the sheets over Saigon), but 17 georeferenced city plans and a complete D4 series of 6 (1882
+· 1895 · 1923 · 1942 · 1959 · 1968).
+- [ ] **District 4 change story, after the current georeference pass.** First improve georeference
+      quality using the river-edge colour pass. Then segment and process the District 4 sheets,
+      alongside the 1882 and 1898 map work (1898 remains outside the six-sheet District 4 AOI).
+      Examine the prominent yellow *nhà lá* area between the 1942 and 1959 sheets as a possible sign
+      of temporary, thatched housing; verify the legend and spatial alignment before interpreting
+      the change. Link the resulting place and time evidence to OHM and the panoramic photograph.
+      This is a later interpretation and linkage step, not a claim that those outputs are ready now.
+- [ ] **OHM vector pilot, with the sheet visible in its editor.** Start with one compact 1882 Saigon
+      area and one class, such as buildings or canals. VMA's IIIF image plus its accepted Allmaps
+      georeference can be exposed as a warped XYZ imagery URL via the Allmaps Tile Server; load that
+      URL as a custom background in OHM iD or JOSM so mappers can trace and verify against the sheet
+      directly. IIIF `info.json` alone is source-image tiles, not a georeferenced editor background.
+      Retain the image/annotation URLs and the XYZ URL on the pilot record; cite the map on each
+      feature, with `source:tiles` for the reusable imagery URL. Propose shapes from the
+      sheet-specific colour/ruling pass, OCR and, only where measured helpful, MapSAM2 trained or
+      prompted on that same class. Review printed boundaries and tile seams in source pixels in VMA
+      before warping approved geometry; also inspect them against the imagery in OHM and resolve
+      existing-object duplicates. A map's publication year proves presence by that year, not a
+      construction date: research `start_date`/`end_date` separately and preserve uncertainty. Keep
+      VMA's evidence and review history as the working record. Before any larger OHM upload,
+      document source rights, dates, conflation, validation and community review. Exit: one sourced
+      pilot with working imagery in OHM and no unresolved duplicates or unreviewed machine geometry.
+      Current river masks are not ready for this: the 1942 colour probe selects land
+      (`work/analysis/district4/river-comparison.md`).
+- [ ] F0 Walk the route on a phone and decide whether offline is real — if it is not, this whole
+      track collapses into `/trip/[id]` plus a year slider, and the fork should be deleted rather
+      than maintained
+- [ ] F1 `scripts/sheet_pmtiles.py <mapId> --bbox` — `l7014_mosaic.py` with the Allmaps annotation's
+      GCPs and `tilingCrop()`'s `main_map`; one sheet drawing in MapLibre proves the chain. IIIF
+      level0 tiles are not web-mercator XYZ, which is why every sheet must be warped once,
+      server-side
+  - **The container choice (PMTiles vs COG) is gated here on one question: is on-the-fly rendering —
+    a real IIIF level 2 — ever wanted?** If yes, build COGs (one object serves a byte-range tile
+    server now and a renderer later); if no, PMTiles is simpler. Measured 2026-09-14: PMTiles saves
+    0% of bytes over the raw tiles, only 230 objects → 1, and picking wrong means tiling the corpus
+    twice. Evidence, the codec table and the level0 compliance findings:
+    `docs/journals/260914-iiif-space-efficiency.md`
+- [ ] F2 Warp 1923 + 1968, then the year slider — a raster basemap entry per year, the pattern
+      `l7014` in `BASEMAP_DEFS` already uses
+- [ ] F3 `contracts/story.schema.json` + `GET /api/stories/[id].json`, validated in the write smoke.
+      **Independent of F1/F2, and it jumps `platform-design.md` §6's queue**: it needs neither the
+      engine (1.5) nor `packages/contracts` (2)
+- [ ] F4 Fork HACW → D4 content, Saigon extract, `pull-archive.mjs`, `checkStory()` — links by
+      frozen JSON + PMTiles, never a shared runtime
+- [ ] F5 `gen-hero-fabric --bbox` per sheet → the names layer (1882 today, more as OCR lands)
+- [ ] F6 Stops, quizzes, stamps — content only, machinery unchanged
+
+## Track D — Burn-down (when it hurts)
+- ~~Basemap on a third-party tile server~~ — **done 2026-09-01**: self-hosted PMTiles in R2, served
+  by the existing worker at `iiif.maparchive.vn/basemap/*`, styled in `src/lib/map/basemapStyle.ts`.
+  No key, no quota, no usage policy. Widened 2026-09-06 from the Saigon extract (37 MB) to
+  Hanoi–Mekong (348 MB) — the Saigon bbox left every Huế and Hanoi sheet floating on blank ground.
+  Moved 2026-09-08 off the worker onto `tiles.maparchive.vn`, an R2 custom domain, and the key
+  gained its build date (`vietnam-20260906.pmtiles`) so a long edge TTL cannot strand readers on a
+  rebuild.
+- ~~43 maps `georef_done` but 404 upstream~~ — **not true as of 2026-09-01**. Measured against
+  production: every one of the 39 `georef_done` maps has a mirrored `annotation_url`, and the 62
+  that 404 on allmaps.org all have `georef_done = false`, correctly, because they were never
+  georeferenced. `sync-georef` has nothing to fix.
+- `/scan?mode=shapes&tab=validate` back-link: the round icon button overlaps the "Contribute" label
+- `/explore` Display row: the "Side-by-side" button label is clipped
+- `/explore`: adding a series layer switches the left rail to the Picked tab,
+  which unmounts the browse list — so the "tap again to remove" the hint
+  promises is not reachable from where the reader just tapped. Pre-existing,
+  found driving the merged L7014 row (2026-09-13)
+- API response shapes → `{ ok, data }`
+- tokens.css grey ramp → fold the `color-mix` hacks
+- 69 eslint warnings (mostly unkeyed `{#each}`)
+- Files >400 L: MapEditHostingTab 584, CreateMode 583, OcrSidebar 562 (→ OcrTable, needs OCR test
+  data), MapEditPipelineTab 467, TripPlayback 462, CatalogTable 450, StudioAnimationPanel 412,
+  explore/+page 407, TriageSidebar 407, trip/[id]/+page 405, StudioMode 405
+- ~~Dead theme switcher~~ — **done 2026-09-07**: `tokens.css` carries both faces via `light-dark()`,
+  `NavBar` writes `data-theme`, `app.html` replays it before first paint, and `tests/theme.spec.ts`
+  asserts the contrast of both. Narrowed 2026-09-08 from three states to two — the toggle is light ⇄
+  dark, and the OS is consulted only to seed a first visit.
+- ~~`scripts/tile_map.sh` → B4's `tile_to_r2` job~~ — **done**: `work/worker/vma_worker.py` claims
+  the job and shells out to the script, so it is the job's implementation rather than something to
+  retire. First real run 2026-09-01: 4,625 objects, 64.9 MB.
+
+### OCR setup — from the 1959 re-run (2026-09-10)
+
+Measured in `docs/pipelines.md` §"Reading a sheet's margins". Ordered by what
+it cost us this week, cheapest fix first.
+
+- **Default `--tile-metres 1400`** in `enqueue_ocr_all.mjs` and the Run OCR button. The 1959 sheet
+  at the 2400px default was 5.7 km/call and found ~1 label; at 1.4 km it found 627 rows. The rule
+  already only refines, never coarsens.
+- **Triage must record which image it was computed for.** Re-scanning the 1959 sheet emptied
+  `maps.triage`; had it survived, the saved neatline was in the *old* scan's pixels and would have
+  cropped the wrong ground while looking valid. Store `img_width`/`img_height` in the saved triage
+  and add a `stale` state to `triageState()` (`src/lib/data/maps/triageTypes.ts` + the hand copy in
+  `enqueue_ocr_all.mjs` + `tests/triage-state.spec.ts`).
+- **`/api/admin/status` should report the oldest queued job's age.** One `layout` job sat queued 24
+  h because no worker was up, and nothing on `?tab=status` said so.
+- **The `ocr` job should read the regions the layout pass found**, not just `main_map`. The margins
+  were the best-value calls on the sheet (9.8 rows/call vs 8.7 for a body pass) and the pipeline
+  never made them. `title` → metadata, `legend` → symbol key, `name_list` → the index.
+- **`--legend` fails silently.** Both 1959 passes carried it and it did nothing: it needs a scout
+  cartouche, `--scout` is skipped when a neatline pins the crop, and it aims at the *title* block
+  anyway. Make it fail the job.
+- **`ocr.py index --region`** — the working table reader as a subcommand: ruled columns found
+  locally, one column group per call, contiguity invariant, refuse the write when it fails. Most
+  city plans in the corpus carry a directory like this one's.
+- **Derive the grid from margin ticks, not from a 2048px overview.** `ocr.py grid` read 12 rows
+  where the sheet has 9. With it correct, index entries whose numeral was never found can be placed
+  at cell centre, and the grid arbitrates numeral collisions.
+- **Gate integer extraction per sheet** (`seq-v1-idx` vs `seq-v1`), decided by whether the layout
+  pass found a numbered index — not by a person remembering. Classify bare integers as `legend_ref`
+  by regex; the model ignored an `index_key` category in 114 of 114 cases.
+- **`merge` drops the label box.** 514 of the 1959 rows carry a non-zero `rotation_deg` but no
+  `label_w`/`label_h`, so the review canvas only ever gets a point.
+- Done 2026-09-10: `pipeline_jobs.result` carries `calls`/`tokens`/`extractions`/`per_call`, and
+  `payload.max_calls` stops a plan between steps (`enqueue_ocr_all.mjs --max-calls N`). A run that
+  spends 60 calls to find 4 labels now says so in its own job row.
+
+## Open, as of 2026-09-01
+
+The last three bullets are the evidence behind **N2** and **N6** at the top of this file. They
+stay here because N2/N6 cite them and do not repeat them; the current state of the work is up
+there, not here.
+
+- **Preview environment has no variables.** Production holds all five; Preview holds none, so every
+  preview build fails at the first `$env/static/*` import. Dashboard only — `wrangler pages secret`
+  has no environment flag in any current version.
+- **62 drafts are ungeoreferenced.** All 101 maps are self-hosted (imagery on `iiif.maparchive.vn`,
+  tiles in R2), and 39 have mirrored annotations. The remaining 62 need a human in
+  `/contribute/georef`; publishing each one then enqueues its hosting jobs automatically. This is
+  the last thing between the archive and owning the whole pipeline.
+
+  **A lead on doing 62 by machine rather than by hand (2026-09-11, unverified) — now N6.** They
+  are Service Géographique de l'Indochine Tonkin sheets, and the series prints
+  everything a georeference needs: a graticule in **grades from the Paris meridian**
+  (`grades × 0.9 + 2.337229` = degrees east), each sheet's own number, and an
+  8-neighbour index diagram, on a series grid **7 columns** wide. Evidence is **one
+  sheet read by eye** — Cua Thai Binh 1905, `d2178fe7-c2fa-4ab7-9e48-eb62070ac980` —
+  whose latitude labels were too small to be sure of, so confirm those before building
+  anything. Route: read the graticule on three sheets, derive the grid, cross-check
+  each against its printed neighbours, generate GCPs, gate on `modern_prior.py
+  --sweep`. It would take the corpus from 40 usable sheets to **102**.
+
+- **Named institutions as control points (2026-09-11, a dozen-scale lead, not a
+  pipeline; the cross-check half of N6).** Asking Gemini for polygons on the 1882 sheet returned 28
+  of 100 shapes
+  carrying the sheet's own lettering — GRAND SEMINAIRE DES MISSIONS, COLLEGE D'ADRAN,
+  HÔPITAL MARITIME, POUDRIÈRE, CASERNES — a name bound to a shape with no OCR pass and
+  no join. An institution still standing on its 1863 plot is a far better control point
+  than a road junction, because junctions are interchangeable and a seminary is not,
+  and this is the only source of one anybody has found.
+
+  Checked against the modern POI layer in `hcmc_vector.gpkg` (21,552 named buildings):
+  GRAND SEMINAIRE → *Đại chủng viện Thánh Giuse* (same site, 1863), Notre-Dame → *nhà
+  thờ Đức Bà*, Jardin Botanique → *Thảo Cầm Viên Sài Gòn*. Adran, Ba Son and Dinh Độc
+  Lập matched nothing under those spellings.
+
+  **Do not oversell it.** Three confirmed survivors from one sheet's 28 names is a
+  dozen-scale signal city-wide, so it will never georeference a sheet alone — it is a
+  seed and a check on a fit somebody else made, and it is worth writing down mainly
+  because nothing else in the corpus produces a named point at all. Route, if taken:
+  run the Gemini seg pass on the georeferenced sheets, string-match its names against
+  `label_congtrinhs`, and hand the matches to `--sweep` as candidate points rather than
+  trusting them.
+
+- **Georeference repairs still open** — now **N2** (from the `modern_prior.py --sweep` audit,
+  2026-09-11): five one-point GCP fixes; the 1880 *Plan annamite d'Hanoi* (802 px —
+  needs redoing from scratch); the 1912 Saigon-Cholon (three near-collinear points in
+  one corner); and **12 sheets sitting on exactly 3 points**, whose residual is
+  therefore unmeasurable — a sheet can be wrong there and say nothing.
+
+## Order
+A1–A4 → B1 → B2 → C0 → C1 → B3 → B4 → B5 → C2… ; B6/B7 interleave when a public/moderation need
+shows; A5 alongside B3 (RPCs are what make write tests cheap). D never blocks.
+
+Superseded 2026-09-21 by **N1 → N6** at the top of this file — the foundations pass. E4 still runs
+whenever there is human time (N2 and N6 are its two halves).
+
+Previously: **E1 → E2 → E3**; E4 whenever there is human time; E5 not before E2 is reviewed. F0
+before any of F1–F6 is worth starting; F3 is independent and can run alongside E.

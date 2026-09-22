@@ -22,13 +22,20 @@ Currently **7.4**.
 
 ## What it does
 
-- **Stack sheets over the modern city** — up to ten georeferenced maps at once, each with its own opacity, in three display modes: Stacked, Lens and Side-by-side.
-- **Search inside the maps** — one search box over the catalogue, the gazetteer of attested place names, and the labels read off the sheets themselves. A label hit opens the map at the spot.
-- **A page per place name** — every spelling a place was printed under, grouped, with the sheets that carry it.
-- **Read the names off a sheet** — a prepare pass a person accepts, then Gemini Flash over IIIF tiles, then row-by-row human review. Nothing published is unreviewed.
-- **Trace what is drawn on it** — buildings, roads and waterways, by hand or seeded from a fine-tuned SAM2, both ending in the same review queue.
-- **Tell a story on the map** — author a route with stops and text, publish it, play it back at `/trip/<id>` (which is what printed QR codes point at).
-- **Find more maps** — Scout crawls external IIIF collections (BnF Gallica, David Rumsey, Humazur, AGS Library…) and surfaces candidates for one-click import.
+- **Stack sheets over the modern city** — up to ten georeferenced maps at once, each with its own
+  opacity, in three display modes: Stacked, Lens and Side-by-side.
+- **Search inside the maps** — one search box over the catalogue, the gazetteer of attested place
+  names, and the labels read off the sheets themselves. A label hit opens the map at the spot.
+- **A page per place name** — every spelling a place was printed under, grouped, with the sheets
+  that carry it.
+- **Read the names off a sheet** — a prepare pass a person accepts, then Gemini Flash over IIIF
+  tiles, then row-by-row human review. Nothing published is unreviewed.
+- **Trace what is drawn on it** — buildings, roads and waterways, by hand or seeded from a
+  fine-tuned SAM2, both ending in the same review queue.
+- **Tell a story on the map** — author a route with stops and text, publish it, play it back at
+  `/trip/<id>` (which is what printed QR codes point at).
+- **Find more maps** — Scout crawls external IIIF collections (BnF Gallica, David Rumsey, Humazur,
+  AGS Library…) and surfaces candidates for one-click import.
 
 Everything above is a public read; contributing needs an account, and the
 pipelines need staff.
@@ -65,8 +72,12 @@ to spend money.
 
 Two map surfaces, and every tool is a mode of one of them:
 
-- **`/explore`** — the geographic surface. One OpenLayers map owned by `MapShell`, warped historical sheets over a self-hosted vector basemap. Modes: `browse`, `studio`, `story`.
-- **`/scan`** — the pixel surface. `ImageShell` over a IIIF canvas, for work in a scan's own coordinates. Modes: `prepare`, `text`, `shapes`, and the unlisted `inspect`. The names they shipped under — `triage`, `ocr`, `trace`, `review` — still resolve, because they are in bookmarks and in links already sent.
+- **`/explore`** — the geographic surface. One OpenLayers map owned by `MapShell`, warped historical
+  sheets over a self-hosted vector basemap. Modes: `browse`, `studio`, `story`.
+- **`/scan`** — the pixel surface. `ImageShell` over a IIIF canvas, for work in a scan's own
+  coordinates. Modes: `prepare`, `text`, `shapes`, and the unlisted `inspect`. The names they
+  shipped under — `triage`, `ocr`, `trace`, `review` — still resolve, because they are in bookmarks
+  and in links already sent.
 
 Modes are query parameters rather than routes on purpose: the map, the basemap
 and the warped tiles stay loaded across a mode change instead of being torn down
@@ -124,9 +135,13 @@ Status is the only visibility model: `draft → public → featured`. Publishing
 sheet enqueues its own follow-up work — mirroring the annotation, tiling to R2 —
 rather than leaving someone to remember it.
 
-1. **From a IIIF manifest** (`/catalog`, staff) — paste a manifest URL from Gallica, the Internet Archive, Rumsey, EFEO, Humazur. The server parses it, derives the canonical image-service URL and the Allmaps ID, and probes the annotation server to see whether it is already georeferenced.
-2. **In bulk** (`/admin?tab=bulk` + `scripts/bulk_upload_local.sh`) — for our own scans. Rows, tiles and thumbnail in one pass.
-3. **From Scout** (`/admin?tab=scout`) — `scripts/scout_*.mjs` crawl external IIIF endpoints; a moderator records why a candidate is worth having and imports it.
+1. **From a IIIF manifest** (`/catalog`, staff) — paste a manifest URL from Gallica, the Internet
+   Archive, Rumsey, EFEO, Humazur. The server parses it, derives the canonical image-service URL and
+   the Allmaps ID, and probes the annotation server to see whether it is already georeferenced.
+2. **In bulk** (`/admin?tab=bulk` + `scripts/bulk_upload_local.sh`) — for our own scans. Rows, tiles
+   and thumbnail in one pass.
+3. **From Scout** (`/admin?tab=scout`) — `scripts/scout_*.mjs` crawl external IIIF endpoints; a
+   moderator records why a candidate is worth having and imports it.
 
 Georeferencing happens in the Allmaps Editor, which has no webhook, so a
 `sync_allmaps` job picks the finished work up. `/admin?tab=status` is where you
@@ -148,8 +163,13 @@ credentials** — claiming a job and reporting its results both go through
 `/api/pipeline/*`. It takes whatever kinds the machine can run, so a worker left
 running finishes what publishing enqueued.
 
-- **OCR** — `work/ocr/`, its own venv. Gemini Flash over IIIF tiles into `ocr_extractions`, proposed and accepted at `/scan?mode=prepare`, then checked row by row at `/scan?mode=text`. Prompt changes are gated on a measured quality baseline, not on how the output looks: `work/ocr/EVAL-BASELINE.md`.
-- **Segmentation** — `work/MapSAM2/`, a fine-tuned SAM2 fork. Runs on Colab, where the GPU is, using the same worker with `--kinds seg`. Polygons land in `footprint_submissions` and are validated at `/scan?mode=shapes`.
+- **OCR** — `work/ocr/`, its own venv. Gemini Flash over IIIF tiles into `ocr_extractions`, proposed
+  and accepted at `/scan?mode=prepare`, then checked row by row at `/scan?mode=text`. Prompt changes
+  are gated on a measured quality baseline, not on how the output looks:
+  `work/ocr/EVAL-BASELINE.md`.
+- **Segmentation** — `work/MapSAM2/`, a fine-tuned SAM2 fork. Runs on Colab, where the GPU is, using
+  the same worker with `--kinds seg`. Polygons land in `footprint_submissions` and are validated at
+  `/scan?mode=shapes`.
 
 The two meet on one full-image pixel grid, which is what lets an OCR label be
 joined to the shape it names.
@@ -176,9 +196,13 @@ npx wrangler pages dev .svelte-kit/cloudflare     # local Cloudflare preview
 Three rules, each of which cost a run of dead builds to learn — the full account
 is in [`docs/deploy.md`](docs/deploy.md):
 
-- **There is no root `wrangler.toml`, on purpose.** One that carries `pages_build_output_dir` replaces the dashboard's entire environment, secrets included. The R2 tile worker's own `worker/wrangler.toml` is separate and fine.
-- **Environment lives in the Cloudflare dashboard**, per environment, and resolves at build time through `$env/static/private`. Every environment that builds needs all of it present.
-- **Never import a Node builtin bare.** `import('path')` fails the Functions bundle and publishes nothing; use the `node:` prefix.
+- **There is no root `wrangler.toml`, on purpose.** One that carries `pages_build_output_dir`
+  replaces the dashboard's entire environment, secrets included. The R2 tile worker's own
+  `worker/wrangler.toml` is separate and fine.
+- **Environment lives in the Cloudflare dashboard**, per environment, and resolves at build time
+  through `$env/static/private`. Every environment that builds needs all of it present.
+- **Never import a Node builtin bare.** `import('path')` fails the Functions bundle and publishes
+  nothing; use the `node:` prefix.
 
 A blank page in the minute after a deploy is edge propagation, not a bug. Wait,
 hard-reload, then debug.
@@ -190,7 +214,9 @@ written for both people and coding agents. Then:
 
 | Doc | What it is |
 | --- | --- |
-| `docs/ROADMAP.md` | The one tracker: ship/harden, architecture, the OCR↔SAM2 product, burn-down |
+| `docs/ROADMAP.md` | The one tracker, open work only: the foundations pass, the OCR drain, Tracks C/E/F, burn-down |
+| `docs/roadmap-record.md` | Frozen record of closed passes — what each one measured and what it turned up |
+| `docs/lessons.md` | The rules paid for more than once, each with the failure that taught it |
 | `docs/system-guidelines.md` | Layering rule, page structure, component patterns, known debt (§11) |
 | `docs/db-guidelines.md` | Schema conventions every migration follows, table by table |
 | `docs/api.md` | Every server route, its auth class, its contract |
@@ -224,7 +250,8 @@ The archive is worth more with more sheets in it and more names read off them.
 
 ## Licence
 
-**Code: [MIT](LICENSE). The archive's own data: [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).**
+**Code: [MIT](LICENSE). The archive's own data:
+[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).**
 
 The code is permissive because the people who should be reusing it — libraries,
 universities, other archive projects — all have legal review, and a copyleft

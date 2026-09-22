@@ -9,7 +9,8 @@ vocabulary): `src/lib/CLAUDE.md`. Per-route API reference: `docs/api.md`.
 Modes are query params, not routes — `/explore` is the MapShell surface, `/scan` the ImageShell one,
 each a ~10-line `{#if}` dispatcher. **`/scan` has no default mode** (Sept 2026): the public
 read-only viewer merged into `/catalog/[id]`, so a request with no mode — or a mode that is not in
-`$lib/core/scanModes.ts` — is redirected to `/catalog`, carrying `?map=` as `/catalog/<id>`. `/vi/<path>` is the Vietnamese address of `<path>`
+`$lib/core/scanModes.ts` — is redirected to `/catalog`, carrying `?map=` as `/catalog/<id>`.
+`/vi/<path>` is the Vietnamese address of `<path>`
 (`src/hooks.ts` reroute). Retired paths 301 from `src/hooks.server.ts`.
 
 **The top bar is two tiers**: `Catalog · About · Blog` in the bar, every tool behind one `Tools ▾`
