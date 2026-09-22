@@ -14,6 +14,61 @@ the way, and the reasoning behind decisions that are now just one line in the tr
 
 ---
 
+## Closed after the freeze
+
+**`stale-after-change` (2026-09-22).** The georeference half was already solved, since 2026-09-02:
+`mirror_annotation`/`sync_allmaps` chain into a `warp` job that calls `rewarpMap`
+(`$lib/server/rewarp.ts`), which re-derives `ocr_extractions.geom` and `footprint_submissions.geom`
+from their stored *pixel* positions. A re-place never needed a rebuild list; it already had one,
+running automatically.
+
+The rescan half was the real gap, confirmed in code rather than just remembered:
+`PATCH /api/admin/maps/[id]` (`pickMapFields`, `src/lib/server/mapFields.ts`) can set `iiif_image`
+to a new scan with zero coupling to `maps.triage`, `ocr_extractions`' tile/global columns, or
+`footprint_submissions.pixel_polygon` — the exact shape of the 2026-09-10 incident
+(`docs/lessons.md`). Not turned into an automatic trigger: the same write also fires on a
+same-pixels hosting move (`MapEditHostingTab`'s "Mirror to R2"), which must clear nothing, and the
+two cannot be told apart from a column diff — that needs a person. What was built instead is the
+checklist that person needs, pinned so it cannot drift unnoticed:
+`tests/stale-after-change.spec.ts` names the rebuild set (pixel-space columns + the R2 tile cache)
+and the reusable set (the georeference itself, and OCR text content, conditional on the replacement
+being confirmed the same crop), and pins the gap in `pickMapFields` itself so a future fix has to
+touch this test rather than pass by accident. `docs/lessons.md`'s existing entry was extended with
+the same detail rather than duplicated.
+
+Left open, named but not attempted here: `triage-scan-identity` (docs/ROADMAP.md, OCR setup
+section) — storing `img_width`/`img_height` in the saved triage and refusing one computed against a
+different scan would make the pixel half of this detectable automatically instead of checklist-only,
+but it means fetching live IIIF image info in `enqueue_ocr_all.mjs` and the triage-save route, which
+is a separate, larger change from formalizing the rebuild set.
+
+**`graticule-georef` (machine half only; discovered already closed, 2026-09-22).** The roadmap
+carried this as "the least verified thing on this list," gated on reading three sheets' graticules
+by eye before building anything. That gate had already been cleared and the machine built, on
+**2026-09-15** — before the foundations pass that reopened this item was even written — in five
+commits (`58ab90ac` through `7f99dc99`): `scripts/tonkin_georef.py` reads each sheet's own printed
+corners, arbitrates OCR misreads against the pixel quad's aspect ratio, and cross-checks the whole
+series as one lattice (every west edge on a common 0.20-grade line, every north edge on 0.125,
+sheet numbers running with longitude). 121 sheets placed by detector, then 84 more by hand-measured
+corners or catalogue polygons where the printed frame gave the detector nothing to anchor on — one
+sheet (Hoai Duc Phu 13 West) needed a by-hand correction after the detector locked onto the wrong
+rim line, another (Phuc Nhac 65 West) borrowed its twin half-sheet's already-placed rim offset. Result,
+verified against the series' own consistency rather than any outside source: **205 of 207** sheets
+in "Indochine 1:25,000 — Tonkin & Thanh Hóa" now carry a georeference, 0 lattice rows out of order,
+0 cells claimed twice, 351 tests passing. The 2 that do not (An Thi 1904, Phat Diem 1927) cannot —
+wrong year for the cell, and a half never digitised.
+
+None of this was reflected in `docs/ROADMAP.md`, which still described the item as unverified and
+unbuilt six days later. Verified directly against production rather than trusted from the roadmap
+text: 62 of those 205 sit at `status = draft` with `georef_done = true` — georeferenced, annotated,
+never published. That is `annotate()`'s own design (its docstring: "the last step of this pipeline
+is a person looking at all of them"), not a bug and not this session's to finish by fiat — publishing
+62 production rows on machine say-so, however well cross-checked, is exactly the kind of shared-state
+action that wants a person, and the pipeline was built to wait for one. Closed out the machine half
+and opened `tonkin-review` (docs/ROADMAP.md) for what is actually left.
+
+---
+
 ## The OCR pass — previous first list (2026-09-04)
 
 The actionable list. Everything below it is the reference plan and the record; read the why when you

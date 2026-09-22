@@ -84,7 +84,16 @@ only `lib/cli.mjs`'s own guard.
 **A replaced scan invalidates pixel work; a changed georeference invalidates ground work.** Observed
 once already: re-scanning the 1959 sheet emptied `maps.triage`, and had the triage survived, the
 saved neatline would have cropped the *old* scan's pixels while looking entirely valid
-(2026-09-10). This is `stale-after-change`.
+(2026-09-10). The georeference half was already handled by then (`rewarpMap`, since 2026-09-02,
+chained automatically off `mirror_annotation`/`sync_allmaps`) — it re-derives `ocr_extractions.geom`
+and `footprint_submissions.geom` from the stored *pixel* positions, so a re-place never needs a
+rebuild list. The rescan half had no equivalent and still does not: `PATCH
+/api/admin/maps/[id]` can set `iiif_image` with zero coupling to `maps.triage`,
+`ocr_extractions`' tile/global columns or `footprint_submissions.pixel_polygon` — confirmed, not
+just remembered, in `tests/stale-after-change.spec.ts`, which is also the exact rebuild set. Left
+as a checklist rather than a trigger on purpose: the same write also fires on a same-pixels hosting
+move (`MapEditHostingTab`'s "Mirror to R2"), which must clear nothing, and telling the two apart
+needs a person. This is `stale-after-change`, closed 2026-09-22.
 
 **A sheet number is not a token — four of them contain a space.** A backfill keyed its updates on
 `` `${series_key} ${sheet_number}` `` and split on the space, so `"0 bis"` came back as sheet `"0"`

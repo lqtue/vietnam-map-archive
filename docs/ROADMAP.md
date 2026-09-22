@@ -43,9 +43,20 @@ measurement, metadata that maintains itself, and corpus size.
       hand-carried `sheets: 452` needs updating to 436 (with `tests/series-rows.spec.ts:20,96`) as
       part of that same pass. Separately, **a new bug surfaced while checking this**:
       `series_sheets.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
-      WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — not yet
-      fixed, not yet its own item; do that first if picking this back up. See `.claude/handoff.md`
-      for the full trail.
+      WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — now its
+      own item, `series-sheets-bbox-datum`, below. See `.claude/handoff.md` for the full trail.
+- [ ] **`series-sheets-bbox-datum`** — `series_sheets.bbox` holds the raw, unshifted Indian 1960
+      graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
+      corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
+      of the true lattice position, on the three cells checked (6150-4, 6330-4, 6541-4) — the same
+      direction and rough size as the L7014 datum fault `l7014-rebuild` fixes, but this is a
+      separate bug: it's every unheld cell's ground rectangle, not a warped sheet's position. Affects
+      all 627 cells in the L7014 index, so every gap the coverage page draws is ~470 m off from
+      where the survey actually places it. A database backfill, independent of `l7014-rebuild`'s
+      tile/upload gate — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
+      (`scripts/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
+      `series_sheets` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
+      `CELL_TOL` (150 m) against `lattice.json`.
 - [ ] **`three-point-residuals`** — give the 11 remaining three-point sheets a measurable one. A
       3-GCP affine fit
       has zero degrees of freedom, so its RMSE is identically 0 and a sheet can be badly wrong
@@ -75,32 +86,41 @@ measurement, metadata that maintains itself, and corpus size.
       CC-BY-NC-SA-4.0 into every row it mints. Settle this **before** the ingest run mints 578
       more of them — over-claiming a restriction is cheaper than under-claiming one, but a
       collection of 578 rows carrying the wrong licence string is expensive to correct.
-- [ ] **`stale-after-change`** — mark it. Already bit us once and left no
-      trace: re-scanning the 1959 sheet emptied `maps.triage`, and had the triage survived, the
-      saved neatline would have cropped the **old** scan's pixels while looking entirely valid.
-      Record the two observed dependencies — a replaced scan invalidates triage and all pixel work;
-      a changed georeference invalidates ground coordinates, warps, exports and mosaic checks — and
-      show the rebuild set. Exit: a test correction names exactly what must be redone and keeps
-      what is still reusable.
 - [ ] **`shape-precision`** — measure shapes before tuning them. There is a recall-ish number and
       **no
       precision number at all**, so every segmentation change to date is unfalsifiable. Trace one
-      bounded 1882 window completely, run `seg_eval --window`, keep machine predictions out of the
-      ground truth by construction. Related and blocking the District 4 table: **there are no
-      footprints inside District 4** — all 46 volunteer traces are in District 1, the nearest 68 m
-      north of the Bến Nghé canal. Review is not the blocker; tracing the peninsula is. Exit: a
-      precision figure alongside the recall one, with its sample and limitations recorded beside
-      it.
-- [ ] **`graticule-georef`** — the 62 ungeoreferenced drafts, by machine. Biggest single jump
-      available (40 usable
-      sheets → 102) and the least verified thing on this list. The SGI Tonkin series prints a
-      graticule in **grades from the Paris meridian** (`grades × 0.9 + 2.337229` = degrees east),
-      each sheet's number, and an 8-neighbour index diagram, on a 7-column series grid. **Evidence
-      is one sheet read by eye** (Cua Thai Binh 1905), whose latitude labels were too small to be
-      sure of. Read the graticule on three sheets and confirm the latitudes **before building
-      anything**. Gate on `modern_prior.py --sweep`. The named-institution lead (3 confirmed
-      survivors out of 28 names on one sheet) is a seed and a cross-check, never a fit on its own —
-      do not oversell it.
+      bounded 1882 window completely, run `seg_eval --window` (already built and self-checked —
+      `python work/ocr/scripts/seg_eval.py --self-check`), keep machine predictions out of the
+      ground truth by construction. **A candidate window is scoped, not traced** (2026-09-22): the
+      triangular îlot bounded by Rue Mac, Rue No. 15 and Rue Pellerin, source pixels roughly
+      `4420,3800,650,550` on map `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` (the 1882 cadastral).
+      9 of the sheet's 46 volunteer traces (6 `building`, 3 `land_plot`, all `approved`) already
+      sit inside it — checked against `footprint_submissions` directly, not estimated — against
+      roughly 11 real parcels/buildings visible in an IIIF crop of the same box. That leaves on the
+      order of **one or two features** to add before the window is exhaustive, which is a single
+      sitting at `/scan?mode=shapes`, not a research task — a person has to do the actual tracing
+      and confirm nothing was missed, an LLM producing plausible polygons here would be fabricating
+      the exact ground truth this item exists to make trustworthy. Related and blocking the
+      District 4 table: **there are no footprints inside District 4** — all 46 volunteer traces are
+      in District 1, the nearest 68 m north of the Bến Nghé canal. Review is not the blocker;
+      tracing the peninsula is. Exit: a precision figure alongside the recall one, with its sample
+      and limitations recorded beside it.
+- [ ] **`tonkin-review`** — a person looks at all 62. `graticule-georef` (the machine half of this
+      item) is done and was already shipped before this list existed: `scripts/tonkin_georef.py`
+      reads each sheet's own printed corners (grades from the Paris meridian,
+      `grades × 0.9 + 2.337229` = degrees east), cross-checks against the pixel quad and the
+      series' own lattice, and placed 121 sheets by 2026-09-15, then 84 more by hand-corners and
+      catalogue polygons where the detector had no anchor — **205 of 207** sheets in "Indochine
+      1:25,000 — Tonkin & Thanh Hóa" now carry a georeference (`work/tonkin/*.json` per sheet,
+      committed). The two that do not are the two that cannot: An Thi 1904 (serie 243 does not hold
+      that year) and Phat Diem 1927 (IGN never digitised the east half) — a permanent gap, not a
+      bug. What is left is the pipeline's own last step, by design
+      (`annotate()`'s docstring in `scripts/tonkin_georef.py`): every one of the 62 sits at
+      `status = draft` with `georef_done = true`, visible to a signed-in reviewer at `/explore` and
+      nowhere else, on purpose, because nobody has looked at all of them yet. Exit: each reviewed,
+      then `annotate(write=True, only_new=True)` plus a status flip to `public` for the ones that
+      pass — check tiles and thumbnails actually render before flipping, the way
+      `publish_l7014_city_sheets.mjs` did for L7014, not just the DB gate.
 
 
 ## Also open — cheap, no ordering claim
@@ -221,10 +241,10 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
 
 ## Evidence and legibility (planned 2026-09-19)
 
-Deliberately not first: both compound better once `stale-after-change` means a corrected sheet does
-not silently
-invalidate six downstream artefacts. The three I-items that duplicated live work are gone: they are
-`l7014-rebuild`, `shape-precision` and `stale-after-change` above. Rationale for the whole
+Deliberately not first, but no longer blocked on it either: `stale-after-change` closed 2026-09-22
+(`docs/lessons.md`, `tests/stale-after-change.spec.ts`) — a corrected sheet's rebuild set is now
+named, not remembered. The three I-items that duplicated live work are gone: they were
+`l7014-rebuild`, `shape-precision` and `stale-after-change`. Rationale for the whole
 system — what a result must retain, and the two kinds of check — is in the record.
 
 - [ ] **`next-action-view`** — show the next action for each sheet. Extend the staff status view
@@ -318,12 +338,40 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 ## Search — label search, gazetteer, press, the context API
 
+- [ ] **`doling-review`** — measure the extractor before growing it. Tim Doling's *Historic
+      Vietnam* export (268 posts, 3.1M chars) yielded **89 colonial ↔ modern name pairs** —
+      `work/doling/street-name-pairs.csv`, 43 `street`, 34 `unclear`, 10 `address`, 2 `building`,
+      every row carrying its post title, date and URL. He agreed on 2026-09-22 to be cited. There
+      is no accuracy number for the extraction, which is `shape-precision`'s problem in another
+      corpus: unfalsifiable until measured. The author's own markup is the cheapest ground truth
+      available. Exit: a precision figure with its sample recorded, and his corrections kept as the
+      eval set. Detail: `docs/search-plan.md` §E3b.
+- [ ] **`gallica-text-harvest`** — primary sources, politely, offline. Gallica exposes OCR'd full
+      text; **NLV does not** — verified 2026-09-22, the article view offers `img` only and the
+      issue PDF 404s without a session `key`, so NLV stays a consumer of names
+      (`press-from-gazetteer`) and never a source of them. Its query file is already generated at
+      `work/doling/nlv-queries.txt`. Write a harvester on the `scout_nlv_press.mjs` pattern —
+      resumable, fixtured, `--selftest` — **never through `src/lib/server/gallica.ts`**, which is a
+      per-reader lookup with no rate limiter. Titles: *Annuaires de l'Indochine*, *L'Opinion*,
+      *La Dépêche d'Indochine* — the same three that make the Ian Gregory letter concrete.
+- [ ] **`attested-variants`** — reviewed pairs into `place_names.variants[]` (mig 067), feeding
+      `spellingVariants`' `extra`. One normalisation rule, not a third — see
+      `dictionary-on-place-names`. Exit: `/api/press` for "Đồng Khởi" returns a hit reachable only
+      via "rue Catinat", and says where the variant came from.
+- [ ] **`ocr-suggestions`** — a suggestion side-table, never `text_validated`. That column is what
+      `eval.py ocr` scores against, and a dictionary writing it launders model output as ground
+      truth — the n=89 contamination in `work/ocr/EVAL-BASELINE.md` is the same error already paid
+      for once. Matching needs no new code (`f_unaccent` + `word_similarity`, mig 065). Exit: the
+      eval baseline is unchanged after a suggestion run, and an accepted fix carries its citation.
+- [ ] **`source-agreement`** — a reading attested on a sheet *and* in a dated period source is two
+      sources agreeing. Feeds `ocr-merge-evidence`. Exit: a reviewer sees which sources agree, not
+      a blended score.
 - [ ] **`gazetteer-depth`** — `place_names` exists; the view is only as good as the corpus, so this
       waits on ≥ 20 maps carrying extractions. Same queue as 4b/4c.
 - [~] **`temporal-fabric`** — code done 2026-09-02. Left: one real Colab `seg` run
       (`colab-seg-run`) and review of what it writes.
 - [~] **`corpus-growth`** — the georef sprint by decade gap. `three-point-residuals` and
-      `graticule-georef` are its two halves; runs
+      `tonkin-review` are its two halves; runs
       whenever there is human time.
 - [~] **`sheet-overlap-floor`** — sheets on one ground (2026-09-21). Two Saigon plans sixteen years
       apart, each warped by its own GCPs, overlap to ~50–100 m, and the limit is the scan rather
@@ -427,7 +475,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 ## Order
 
 **Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
-there is human time — `three-point-residuals` and `graticule-georef` are its two halves.
+there is human time — `three-point-residuals` and `tonkin-review` are its two halves.
 `walk-the-route` comes before anything else in Walk is worth starting; `story-contract` is
 independent and can run alongside Search. Debt never blocks.
 
