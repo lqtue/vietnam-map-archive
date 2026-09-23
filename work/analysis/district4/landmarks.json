@@ -1,0 +1,12 @@
+[
+  { "id": "cand-1", "lon": 106.7064, "lat": 10.7753, "status": "candidate", "note": "1882+1923+1942 GCP convergence, 3.2-15.9 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-2", "lon": 106.7021, "lat": 10.7755, "status": "candidate", "note": "1882+1942 GCP convergence, 1.1 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-3", "lon": 106.6894, "lat": 10.7736, "status": "candidate", "note": "1882+1895 GCP convergence, 2.2 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-4", "lon": 106.7084, "lat": 10.7626, "status": "candidate", "note": "1882+1895 GCP convergence, 2.3 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-5", "lon": 106.6592, "lat": 10.7508, "status": "candidate", "note": "1959+1968 GCP convergence, 2.6 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-6", "lon": 106.6974, "lat": 10.7791, "status": "candidate", "note": "1882+1895 GCP convergence, 2.8 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-7", "lon": 106.7064, "lat": 10.7917, "status": "candidate", "note": "1882+1942 GCP convergence, 3.4 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-8", "lon": 106.6367, "lat": 10.8018, "status": "candidate", "note": "1895+1968 GCP convergence, 4.4 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-9", "lon": 106.6959, "lat": 10.7826, "status": "candidate", "note": "1882+1959 GCP convergence, 6.7 m spread", "feature": null, "source": null, "held_out": false },
+  { "id": "cand-10", "lon": 106.71, "lat": 10.7955, "status": "candidate", "note": "1895+1968 GCP convergence, 23.5 m spread (weak)", "feature": null, "source": null, "held_out": false }
+]

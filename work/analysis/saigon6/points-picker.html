@@ -1,0 +1,776 @@
+<title>Saigon Six Tie-Points</title>
+<style>
+  :root {
+    --ink: #16211e;
+    --ink-soft: #46584f;
+    --paper: #eef1ec;
+    --paper-raised: #ffffff;
+    --line: #c7d0c6;
+    --accent: #1f7a6c;
+    --accent-soft: #d8ece7;
+    --marker-1: #d1495b;
+    --marker-2: #de8f2a;
+    --marker-3: #2a6fb0;
+    --marker-4: #6a4fb0;
+    --marker-5: #1f9e6e;
+    --marker-6: #b0562a;
+    --marker-7: #4f8fb0;
+    --marker-8: #a03a8a;
+    --danger: #b0392e;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #e8ede9;
+      --ink-soft: #a9b7ae;
+      --paper: #10231ce8;
+      --paper: #131a17;
+      --paper-raised: #1b2420;
+      --line: #33413a;
+      --accent: #4fc2ac;
+      --accent-soft: #1c332e;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #e8ede9;
+    --ink-soft: #a9b7ae;
+    --paper: #131a17;
+    --paper-raised: #1b2420;
+    --line: #33413a;
+    --accent: #4fc2ac;
+    --accent-soft: #1c332e;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    padding-inline: 16px;
+    padding-block: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 100%;
+  }
+  .mono, .coord, input, textarea, pre, code {
+    font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  }
+
+  header h1 {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.86rem;
+    max-width: 60ch;
+  }
+
+  .help {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .help b { color: var(--ink); }
+  .help ol { margin: 6px 0 0; padding-left: 1.2em; }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .tab {
+    flex: 0 0 auto;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #06201b;
+  }
+
+  .workbench {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 860px) {
+    .workbench { grid-template-columns: 1fr; }
+  }
+
+  .viewer-shell {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0d1310;
+    aspect-ratio: 4 / 3;
+  }
+  #osd { width: 100%; height: 100%; }
+  .viewer-shell .badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .viewer-shell .error {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    background: rgba(20,10,10,0.92);
+    color: #f3d9d5;
+    font-size: 0.82rem;
+    z-index: 10;
+  }
+  .viewer-shell .error a { color: #ffb4a8; }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .field input[type="text"], .field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 0.88rem;
+  }
+  .field textarea { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 0.78rem; resize: vertical; min-height: 60px; }
+  .field input[type="text"]:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .queue-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .hint { font-size: 0.76rem; color: var(--ink-soft); flex: 1 1 auto; min-width: 0; }
+  .hint b { color: var(--ink); }
+  button.ghost {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: none;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--ink); }
+  details.plan { border: 1px solid var(--line); border-radius: 10px; background: var(--paper-raised); padding: 8px 10px; }
+  details.plan summary { cursor: pointer; font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); }
+  details.plan .field { margin-top: 8px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px 10px 3px 6px;
+    font-size: 0.76rem;
+    background: var(--paper-raised);
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .chip.active { border-color: var(--accent); background: var(--accent-soft); }
+
+  table.points {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+  }
+  table.points th, table.points td {
+    border-bottom: 1px solid var(--line);
+    padding: 5px 4px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.points th { color: var(--ink-soft); font-weight: 600; font-size: 0.7rem; }
+  table.points td.empty { color: var(--ink-soft); }
+  table.points .del {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0 3px;
+  }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--paper-raised); }
+  .table-wrap table { min-width: 480px; }
+  .table-wrap .pad { padding: 10px 12px; color: var(--ink-soft); font-size: 0.8rem; }
+  .label-name { cursor: pointer; border-bottom: 1px dotted var(--ink-soft); }
+  .label-name:hover { color: var(--accent); border-color: var(--accent); }
+
+  .json-box {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    overflow: hidden;
+  }
+  .json-box .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .json-box .head span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+  .json-box pre {
+    margin: 0;
+    padding: 10px;
+    font-size: 0.72rem;
+    max-height: 220px;
+    overflow: auto;
+    color: var(--ink);
+  }
+  button.copy {
+    background: var(--accent);
+    color: #06201b;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.copy:active { transform: translateY(1px); }
+  .toast {
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 600;
+    visibility: hidden;
+  }
+  .toast.show { visibility: visible; }
+</style>
+
+<header>
+  <h1>Saigon Six — Tie-Point Picker</h1>
+  <p>Click the same real-world feature on two or more of the six sheets. Each click records the
+  pixel it landed on in that sheet's own full-resolution scan — the space <code>sheet_align.mjs</code>
+  already warps through each sheet's georeference. Copy the JSON out when you're done and drop it
+  into <code>work/analysis/saigon6/points.json</code>.</p>
+</header>
+
+<div class="help">
+  <b>How to use this:</b>
+  <ol>
+    <li>Type a label for the feature you're about to click (e.g. <code>pont tournant</code>) in the box on the right.</li>
+    <li>Find that feature on the sheet showing in the viewer, and click it once — a numbered pin drops.</li>
+    <li>Switch tabs to another sheet. Click the same feature there. Repeat for as many sheets as show it.</li>
+    <li>Click an existing label chip to resume adding points under that same label instead of retyping it.</li>
+    <li>When you've got a handful of points, hit <b>Copy JSON</b> and paste it over the contents of <code>points.json</code> (or just paste it back to me).</li>
+  </ol>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="workbench">
+  <div class="viewer-shell">
+    <div class="badge" id="sheetBadge"></div>
+    <div id="osd"></div>
+    <div class="error" id="err"></div>
+  </div>
+
+  <div class="panel">
+    <details class="plan">
+      <summary>Plan a list of points (paste many, click through fast)</summary>
+      <div class="field">
+        <label for="planInput">One label per line</label>
+        <textarea id="planInput" placeholder="pont tournant swing bridge&#10;rach ben nghe mouth&#10;cho lon market corner"></textarea>
+      </div>
+      <button class="ghost" id="loadPlanBtn" style="margin-top:6px;">Load list</button>
+    </details>
+
+    <div class="field">
+      <label for="labelInput">Point label — click the image to place it</label>
+      <input type="text" id="labelInput" placeholder="e.g. pont tournant swing bridge" autocomplete="off" />
+    </div>
+    <div class="queue-row">
+      <span class="hint" id="nextHint"></span>
+      <button class="ghost" id="skipBtn">Not on this sheet — skip</button>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <div class="table-wrap">
+      <div id="tableHost"></div>
+    </div>
+
+    <div class="json-box">
+      <div class="head">
+        <span>points.json</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="toast" id="toast">copied</span>
+          <button class="copy" id="copyBtn">Copy JSON</button>
+        </div>
+      </div>
+      <pre id="jsonOut" class="coord"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var SHEETS = [
+    { year: 1882, name: "1882 · Plan Cadastral", info: "https://iiif.maparchive.vn/iiif/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/info.json" },
+    { year: 1898, name: "1898 · Saigon Plan", info: "https://gallica.bnf.fr/iiif/ark:/12148/btv1b530297676/f1/info.json" },
+    { year: 1923, name: "1923 · Saigon-Cholon", info: "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53065091z/f1/info.json" },
+    { year: 1942, name: "1942 · Saigon-Cho Lon", info: "https://iiif.maparchive.vn/iiif/eca788e5-6780-4dca-bf23-7651a1c48aba-20260911/info.json" },
+    { year: 1959, name: "1959 · Đô Thành Sài Gòn", info: "https://cdm17272.contentdm.oclc.org/iiif/2/agdm:36015/info.json" },
+    { year: 1968, name: "1968 · Sài Gòn 1:12,500", info: "https://iiif.maparchive.vn/iiif/3a446d85-25a8-4e81-9cfc-8de357c3a5df/info.json" }
+  ];
+  var MARKER_COLORS = ["--marker-1","--marker-2","--marker-3","--marker-4","--marker-5","--marker-6","--marker-7","--marker-8"];
+
+  var STORE_KEY = "saigon6-points-v1";
+  var PLAN_KEY = "saigon6-points-plan-v1";
+  var SKIP_KEY = "saigon6-points-skip-v1";
+  var points = loadJSON(STORE_KEY, {}); // { label: { "1882": [x,y], ... } }
+  var plannedLabels = loadJSON(PLAN_KEY, []); // ordered list, so clicks can auto-advance
+  var skipped = loadJSON(SKIP_KEY, {}); // { "1882": ["label", ...] } — not exported, just steers suggestions
+  var activeSheetIdx = 0;
+  var viewer = null;
+  var overlaysEl = [];
+  var autoCounter = 0;
+
+  function loadJSON(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function savePoints() { try { localStorage.setItem(STORE_KEY, JSON.stringify(points)); } catch (e) {} }
+  function savePlanned() { try { localStorage.setItem(PLAN_KEY, JSON.stringify(plannedLabels)); } catch (e) {} }
+  function saveSkipped() { try { localStorage.setItem(SKIP_KEY, JSON.stringify(skipped)); } catch (e) {} }
+
+  function ensurePlanned(label) {
+    if (plannedLabels.indexOf(label) === -1) {
+      plannedLabels.push(label);
+      savePlanned();
+    }
+  }
+
+  // First planned label that has no point yet — and wasn't skipped — on this sheet.
+  function nextLabelForSheet(year) {
+    for (var i = 0; i < plannedLabels.length; i++) {
+      var l = plannedLabels[i];
+      var has = points[l] && points[l][year];
+      var skip = skipped[year] && skipped[year].indexOf(l) !== -1;
+      if (!has && !skip) return l;
+    }
+    return "";
+  }
+
+  function suggestLabel() {
+    var year = String(SHEETS[activeSheetIdx].year);
+    var next = nextLabelForSheet(year);
+    document.getElementById("labelInput").value = next;
+    renderHint();
+    renderChips();
+  }
+
+  function renderHint() {
+    var year = String(SHEETS[activeSheetIdx].year);
+    var remaining = plannedLabels.filter(function (l) {
+      return !(points[l] && points[l][year]) && !(skipped[year] && skipped[year].indexOf(l) !== -1);
+    }).length;
+    var el = document.getElementById("nextHint");
+    if (!plannedLabels.length) {
+      el.innerHTML = "No planned list yet — type a label and click the image, or paste a list above.";
+    } else {
+      el.innerHTML = "<b>" + remaining + "</b> of " + plannedLabels.length + " planned points left on this sheet.";
+    }
+  }
+
+  function labelColor(label) {
+    var labels = Object.keys(points);
+    var idx = labels.indexOf(label);
+    if (idx === -1) idx = labels.length;
+    return "var(" + MARKER_COLORS[idx % MARKER_COLORS.length] + ")";
+  }
+
+  // --- tabs ---
+  var tabsEl = document.getElementById("tabs");
+  SHEETS.forEach(function (s, i) {
+    var btn = document.createElement("button");
+    btn.className = "tab" + (i === 0 ? " active" : "");
+    btn.textContent = s.name;
+    btn.addEventListener("click", function () { switchSheet(i); });
+    tabsEl.appendChild(btn);
+  });
+
+  function setActiveTabUI() {
+    Array.prototype.forEach.call(tabsEl.children, function (el, i) {
+      el.classList.toggle("active", i === activeSheetIdx);
+    });
+    document.getElementById("sheetBadge").textContent = SHEETS[activeSheetIdx].name;
+  }
+
+  // --- viewer ---
+  function initViewer() {
+    viewer = OpenSeadragon({
+      id: "osd",
+      prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+      showNavigationControl: true,
+      gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
+      gestureSettingsTouch: { clickToZoom: false, dblClickToZoom: true },
+      visibilityRatio: 1,
+      minZoomImageRatio: 0.6
+    });
+    viewer.addHandler("canvas-click", function (e) {
+      if (!e.quick) return;
+      var vp = viewer.viewport.pointFromPixel(e.position);
+      var img = viewer.viewport.viewportToImageCoordinates(vp);
+      recordPoint(Math.round(img.x), Math.round(img.y));
+    });
+    viewer.addHandler("open-failed", function () {
+      showError(true);
+    });
+    viewer.addHandler("open", function () {
+      showError(false);
+      renderMarkersForActiveSheet();
+    });
+    loadSheetIntoViewer(0);
+  }
+
+  function loadSheetIntoViewer(idx) {
+    activeSheetIdx = idx;
+    setActiveTabUI();
+    showError(false);
+    suggestLabel();
+    viewer.open({ tileSource: SHEETS[idx].info });
+  }
+
+  function switchSheet(idx) {
+    if (idx === activeSheetIdx) return;
+    loadSheetIntoViewer(idx);
+  }
+
+  function showError(on) {
+    var el = document.getElementById("err");
+    if (on) {
+      var s = SHEETS[activeSheetIdx];
+      el.innerHTML = "Couldn't load this sheet's scan (" + s.name + ").<br>" +
+        "The source may be blocking automated/cross-origin access.<br>" +
+        "Source: <a href=\"" + s.info + "\" target=\"_blank\" rel=\"noopener\">" + s.info + "</a><br>" +
+        "Tell the person you're working with — it needs a different pixel source for this sheet.";
+      el.style.display = "flex";
+    } else {
+      el.style.display = "none";
+    }
+  }
+
+  function recordPoint(x, y) {
+    var year = String(SHEETS[activeSheetIdx].year);
+    var label = document.getElementById("labelInput").value.trim();
+    if (!label) label = nextLabelForSheet(year);
+    if (!label) {
+      autoCounter++;
+      label = "point " + autoCounter;
+    }
+    ensurePlanned(label);
+    if (!points[label]) points[label] = {};
+    points[label][year] = [x, y];
+    savePoints();
+    renderAll();
+    suggestLabel(); // auto-advance to the next thing to place on this same sheet
+  }
+
+  function removePoint(label, year) {
+    if (points[label]) {
+      delete points[label][year];
+      if (Object.keys(points[label]).length === 0) delete points[label];
+    }
+    savePoints();
+    renderAll();
+  }
+
+  function removeLabel(label) {
+    delete points[label];
+    savePoints();
+    renderAll();
+  }
+
+  // Drag a pin (rotated square) to reposition it; right-click to delete it.
+  // Pointer capture means no document-level listeners are needed.
+  function attachMarkerHandlers(el, label, year) {
+    var dragging = false;
+    el.addEventListener("pointerdown", function (e) {
+      if (e.button === 2) return; // let contextmenu handle right-click
+      e.preventDefault();
+      e.stopPropagation(); // don't let OSD start panning the canvas underneath
+      dragging = true;
+      el.setPointerCapture(e.pointerId);
+      el.style.cursor = "grabbing";
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!dragging) return;
+      e.stopPropagation();
+      var rect = viewer.element.getBoundingClientRect();
+      var webPoint = new OpenSeadragon.Point(e.clientX - rect.left, e.clientY - rect.top);
+      viewer.updateOverlay(el, viewer.viewport.pointFromPixel(webPoint));
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      el.style.cursor = "grab";
+      var rect = viewer.element.getBoundingClientRect();
+      var webPoint = new OpenSeadragon.Point(e.clientX - rect.left, e.clientY - rect.top);
+      var vp = viewer.viewport.pointFromPixel(webPoint);
+      var img = viewer.viewport.viewportToImageCoordinates(vp);
+      points[label][year] = [Math.round(img.x), Math.round(img.y)];
+      savePoints();
+      renderAll();
+    }
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+    el.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      removePoint(label, year);
+    });
+  }
+
+  // --- overlays on the map image ---
+  function renderMarkersForActiveSheet() {
+    overlaysEl.forEach(function (el) {
+      try { viewer.removeOverlay(el); } catch (e) {}
+    });
+    overlaysEl = [];
+    var year = String(SHEETS[activeSheetIdx].year);
+    Object.keys(points).forEach(function (label) {
+      var px = points[label][year];
+      if (!px) return;
+      var el = document.createElement("div");
+      el.title = label + " — drag to move, right-click to delete";
+      el.style.width = "14px";
+      el.style.height = "14px";
+      el.style.marginLeft = "-7px";
+      el.style.marginTop = "-7px";
+      el.style.borderRadius = "50%";
+      el.style.background = labelColor(label);
+      el.style.border = "2px solid white";
+      el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.5)";
+      el.style.cursor = "grab";
+      el.style.touchAction = "none";
+      attachMarkerHandlers(el, label, year);
+      var vp = viewer.viewport.imageToViewportCoordinates(px[0], px[1]);
+      viewer.addOverlay({ element: el, location: vp });
+      overlaysEl.push(el);
+    });
+  }
+
+  // --- side panel: chips, table, json ---
+  function renderChips() {
+    var host = document.getElementById("chips");
+    host.innerHTML = "";
+    var current = document.getElementById("labelInput").value.trim();
+    Object.keys(points).forEach(function (label) {
+      var chip = document.createElement("div");
+      chip.className = "chip" + (label === current ? " active" : "");
+      var dot = document.createElement("span");
+      dot.className = "dot";
+      dot.style.background = labelColor(label);
+      chip.appendChild(dot);
+      chip.appendChild(document.createTextNode(label + " (" + Object.keys(points[label]).length + ")"));
+      chip.addEventListener("click", function () {
+        document.getElementById("labelInput").value = label;
+        renderChips();
+      });
+      host.appendChild(chip);
+    });
+  }
+
+  function renderTable() {
+    var host = document.getElementById("tableHost");
+    var labels = Object.keys(points);
+    if (!labels.length) {
+      host.innerHTML = '<div class="pad">No points yet — click a feature on the map to start.</div>';
+      return;
+    }
+    var html = '<table class="points"><thead><tr><th>label</th>';
+    SHEETS.forEach(function (s) { html += "<th>" + s.year + "</th>"; });
+    html += "<th></th></tr></thead><tbody>";
+    labels.forEach(function (label) {
+      html += '<tr><td><span class="label-name" data-rename="' + escapeAttr(label) +
+        '" title="click to rename">' + escapeHtml(label) + "</span></td>";
+      SHEETS.forEach(function (s) {
+        var year = String(s.year);
+        var px = points[label][year];
+        if (px) {
+          html += '<td class="mono">' + px[0] + "," + px[1] +
+            ' <button class="del" data-label="' + escapeAttr(label) + '" data-year="' + year + '" title="remove">×</button></td>';
+        } else {
+          html += '<td class="empty">—</td>';
+        }
+      });
+      html += '<td><button class="del" data-remove-label="' + escapeAttr(label) + '" title="remove whole point">delete</button></td></tr>';
+    });
+    html += "</tbody></table>";
+    host.innerHTML = html;
+    Array.prototype.forEach.call(host.querySelectorAll("[data-label]"), function (btn) {
+      btn.addEventListener("click", function () {
+        removePoint(btn.getAttribute("data-label"), btn.getAttribute("data-year"));
+      });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll("[data-remove-label]"), function (btn) {
+      btn.addEventListener("click", function () {
+        removeLabel(btn.getAttribute("data-remove-label"));
+      });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll("[data-rename]"), function (span) {
+      span.addEventListener("click", function () {
+        renameLabel(span.getAttribute("data-rename"));
+      });
+    });
+  }
+
+  function renameLabel(oldLabel) {
+    var next = window.prompt("Rename point:", oldLabel);
+    if (next === null) return;
+    next = next.trim();
+    if (!next || next === oldLabel) return;
+    if (points[next]) {
+      window.alert('"' + next + '" is already used by another point.');
+      return;
+    }
+    points[next] = points[oldLabel];
+    delete points[oldLabel];
+    var idx = plannedLabels.indexOf(oldLabel);
+    if (idx !== -1) plannedLabels[idx] = next; else plannedLabels.push(next);
+    Object.keys(skipped).forEach(function (year) {
+      var i = skipped[year].indexOf(oldLabel);
+      if (i !== -1) skipped[year][i] = next;
+    });
+    savePoints();
+    savePlanned();
+    saveSkipped();
+    if (document.getElementById("labelInput").value.trim() === oldLabel) {
+      document.getElementById("labelInput").value = next;
+    }
+    renderAll();
+  }
+
+  function renderJson() {
+    document.getElementById("jsonOut").textContent = JSON.stringify(points, null, 2);
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function escapeAttr(s) { return escapeHtml(s).replace(/'/g, "&#39;"); }
+
+  function renderAll() {
+    renderChips();
+    renderTable();
+    renderJson();
+    renderHint();
+    if (viewer && viewer.isOpen()) renderMarkersForActiveSheet();
+  }
+
+  document.getElementById("labelInput").addEventListener("input", renderChips);
+
+  document.getElementById("loadPlanBtn").addEventListener("click", function () {
+    var lines = document.getElementById("planInput").value.split("\n");
+    lines.forEach(function (line) {
+      var l = line.trim();
+      if (l) ensurePlanned(l);
+    });
+    document.getElementById("planInput").value = "";
+    suggestLabel();
+    renderAll();
+  });
+
+  document.getElementById("skipBtn").addEventListener("click", function () {
+    var year = String(SHEETS[activeSheetIdx].year);
+    var label = document.getElementById("labelInput").value.trim() || nextLabelForSheet(year);
+    if (label) {
+      if (!skipped[year]) skipped[year] = [];
+      if (skipped[year].indexOf(label) === -1) skipped[year].push(label);
+      saveSkipped();
+    }
+    suggestLabel();
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", function () {
+    var text = document.getElementById("jsonOut").textContent;
+    var toast = document.getElementById("toast");
+    function flashToast() {
+      toast.classList.add("show");
+      setTimeout(function () { toast.classList.remove("show"); }, 1400);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flashToast, function () {
+        selectPre();
+      });
+    } else {
+      selectPre();
+    }
+    function selectPre() {
+      var pre = document.getElementById("jsonOut");
+      var range = document.createRange();
+      range.selectNodeContents(pre);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  });
+
+  Object.keys(points).forEach(function (l) {
+    var m = /^point (\d+)$/.exec(l);
+    if (m) autoCounter = Math.max(autoCounter, parseInt(m[1], 10));
+  });
+
+  initViewer();
+  renderAll();
+})();
+</script>
