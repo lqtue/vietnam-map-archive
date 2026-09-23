@@ -64,7 +64,8 @@ def rings(geometry):
 
 def key(text):
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
-    return " ".join(re.sub(r"[^a-z0-9 ]", " ", text.casefold()).split())
+    words = re.sub(r"[^a-z0-9 ]", " ", text.casefold()).split()
+    return " ".join(w[:-1] if len(w) > 3 and w.endswith("s") else w for w in words)
 
 
 def load_doling():
@@ -128,15 +129,36 @@ def main(out, link_max_m):
         M = s["M"]
         matrix = [M[0,0]*scale, -M[0,1]*scale, M[1,0]*scale, -M[1,1]*scale, (M[2,0]-lo[0])*scale, SPAN-(M[2,1]-lo[1])*scale]
         layers.append(dict(year=s["sheet"]["year"], label=s["sheet"]["label"], polys=[put(p).tolist() for p in s["polys"]], n_blocks=s["n_blocks"], n_labels=len(s["labels"]), georef=s["georef"], image=dict(iiif=s["iiif"], width=s["width"], height=s["height"], matrix=[round(float(v),5) for v in matrix])))
-    links = []
+    # Union-find over (sheet, name, occurrence) nodes: a link unions the exact
+    # occurrence pair it matched, so a name that resolves to different physical
+    # spots on different sheet-pairs (a long street, matched at its west end for
+    # one gap and its east end for the next) ends up as separate chains rather
+    # than one name-keyed blob spanning two places.
+    parent = {}
+    def find(n):
+        while parent[n] != n: n = parent[n]
+        return n
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb: parent[rb] = ra
+    links, link_node = [], []
     for i, left in enumerate(sheets[:-1]):
         right = sheets[i + 1]["labels"]
         for name, occ_left in left["labels"].items():
             occ_right = right.get(name)
             if not occ_right: continue
-            (t_a, c_a), (t_b, c_b) = min(((a, b) for a in occ_left for b in occ_right), key=lambda ab: np.linalg.norm(ab[0][1] - ab[1][1]))
+            (ia, (t_a, c_a)), (ib, (t_b, c_b)) = min(
+                ((a, b) for a in enumerate(occ_left) for b in enumerate(occ_right)),
+                key=lambda ab: np.linalg.norm(ab[0][1][1] - ab[1][1][1]))
             distance = float(np.linalg.norm(c_a - c_b))
-            if distance <= link_max_m: links.append(dict(a=i, b=i+1, t=t_a, m=round(distance,1), p=put(c_a).tolist(), q=put(c_b).tolist(), d=DOLING.get(name)))
+            if distance > link_max_m: continue
+            node_a, node_b = (i, name, ia), (i + 1, name, ib)
+            parent.setdefault(node_a, node_a); parent.setdefault(node_b, node_b)
+            union(node_a, node_b)
+            links.append(dict(a=i, b=i+1, t=t_a, m=round(distance,1), p=put(c_a).tolist(), q=put(c_b).tolist(), d=DOLING.get(name)))
+            link_node.append(node_a)
+    roots = {r: idx for idx, r in enumerate(sorted({find(n) for n in parent}, key=str))}
+    for link, node in zip(links, link_node): link["c"] = roots[find(node)]
     links.sort(key=lambda link: link["m"])
     pathlib.Path(out).write_text(json.dumps(dict(layers=layers, links=links), separators=(",", ":")))
     print(f"wrote {len(layers)} independently georeferenced scans and {len(links)} adjacent-sheet name links")
