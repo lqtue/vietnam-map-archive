@@ -527,14 +527,42 @@ def _annotation_source(row: dict[str, Any]) -> str | None:
     )
 
 
+def _paginate(url: str, key: str, table: str, select: str, page: int = 1000):
+    """Every row of one column set, one table, no filter — pipeline_status,
+    ocr_extractions and footprint_submissions are all small enough (hundreds to
+    low thousands of rows) that paging through them beats writing a group-by
+    view for a report that runs by hand."""
+    import requests
+
+    from supabase_client import _headers
+
+    rows, start = [], 0
+    while True:
+        resp = requests.get(
+            f"{url}/rest/v1/{table}",
+            params={"select": select},
+            headers={**_headers(key), "Range": f"{start}-{start + page - 1}"},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        batch = resp.json()
+        rows.extend(batch)
+        if len(batch) < page:
+            return rows
+        start += page
+
+
 def sweep(limit_rms: float = MAX_RMS_PX) -> int:
-    """Fit every georeferenced sheet in the corpus and rank them by residual.
+    """Fit every georeferenced sheet in the corpus and rank them by residual,
+    alongside where each one sits in the OCR/segmentation pipeline — the one
+    table for "is this map done, and what's the next thing to do to it".
 
     Needs no local data at all — a georeference annotation is the whole input —
     so unlike everything else in this file it covers the Huế and Hanoi sheets
     too. One Supabase query for the corpus, then the annotations in parallel,
     because they are ~50 independent HTTP fetches and nothing else here is slow.
     """
+    from collections import Counter
     from concurrent.futures import ThreadPoolExecutor
 
     import requests
@@ -554,6 +582,17 @@ def sweep(limit_rms: float = MAX_RMS_PX) -> int:
     resp.raise_for_status()
     rows = [r for r in resp.json() if _annotation_source(r)]
     print(f"{len(rows)} georeferenced sheets\n")
+
+    pipeline = {
+        p["map_id"]: p
+        for p in _paginate(url, key, "map_pipeline_status", "map_id,stage")
+    }
+    ocr_n = Counter(e["map_id"] for e in _paginate(url, key, "ocr_extractions", "map_id"))
+    fp_n = Counter(f["map_id"] for f in _paginate(url, key, "footprint_submissions", "map_id"))
+
+    def status_cols(map_id: str) -> str:
+        stage = pipeline.get(map_id, {}).get("stage", "idle")
+        return f"{stage:<12} ocr={ocr_n.get(map_id, 0):<5} fp={fp_n.get(map_id, 0):<4}"
 
     def one(row: dict[str, Any]):
         try:
@@ -575,17 +614,21 @@ def sweep(limit_rms: float = MAX_RMS_PX) -> int:
     bad = [(r, g) for r, f, g in results if f is None]
     ok.sort(key=lambda t: -t[1].rms_px)
 
-    head = f"{'rms px':>7} {'rms m':>7} {'worst':>7} {'gcps':>4}  {'year':<5} {'status':<8} {'sheet':<40} outlier"
+    head = (
+        f"{'rms px':>7} {'rms m':>7} {'worst':>7} {'gcps':>4}  {'year':<5} {'status':<8} "
+        f"{'pipeline':<12} {'ocr':<9} {'fp':<8} {'sheet':<40} outlier"
+    )
     print(head)
     print("-" * len(head))
     flagged, blind = [], []
     for row, fit, report in ok:
         year = str(row.get("year") or "????")
         name = (row.get("name") or "")[:40]
+        cols = status_cols(row["id"])
         if not fit.informative:
             blind.append(row)
             print(f"{'—':>7} {'—':>7} {'—':>7} {fit.n_gcps:4d}? {year:<5} "
-                  f"{row['status']:<8} {name:<40} exact fit, nothing measured")
+                  f"{row['status']:<8} {cols} {name:<40} exact fit, nothing measured")
             continue
 
         drop = ""
@@ -597,12 +640,13 @@ def sweep(limit_rms: float = MAX_RMS_PX) -> int:
         mark = "!" if not fit.ok else " "
         print(
             f"{fit.rms_px:7.1f} {rms_m} {fit.max_px:7.1f} {fit.n_gcps:4d}{mark} "
-            f"{year:<5} {row['status']:<8} {name:<40} {drop}"
+            f"{year:<5} {row['status']:<8} {cols} {name:<40} {drop}"
         )
 
     for row, err in bad:
         print(f"{'—':>7} {'—':>7} {'—':>7} {'—':>4}  "
               f"{str(row.get('year') or '????'):<5} {row['status']:<8} "
+              f"{status_cols(row['id']):<31} "
               f"{(row.get('name') or '')[:40]:<40} {err}")
 
     measured = [t for t in ok if t[1].informative]
@@ -633,6 +677,90 @@ def sweep(limit_rms: float = MAX_RMS_PX) -> int:
         for row, err in unusable:
             print(f"\n{row['id']}  {row['status']:<8} {(row.get('name') or '')[:50]}"
                   f"\n  has an annotation but {err} — the warp is unconstrained.")
+    return 0
+
+
+def legend_status() -> int:
+    """Per map: is a numbered legend (legend_entry) joined against the numbered
+    markers scattered across the sheet (legend_ref), and how much of it landed?
+    Also: how many separate OCR runs fed this map, since a sheet assembled from
+    several partial passes is exactly the shape that hides a coverage gap (the
+    1968 body run stopping short of the south band and never being caught is
+    what this flag exists to catch next time, not just that once).
+
+    `legend_entry.notes` carries `n=<N>; grid=<letter>` (written by the join
+    step, see work/ocr/scripts/*legend* callers); `legend_ref.text` is the bare
+    number read off the map body. A ref "matches" when its number is one a
+    legend_entry actually claims -- matching them tells you what fraction of
+    the legend a person could actually click through to on the map, not just
+    that both lists are non-empty.
+    """
+    import re
+
+    import requests
+
+    from supabase_client import _headers, _load_config
+
+    url, key = _load_config()
+
+    resp = requests.get(
+        f"{url}/rest/v1/maps",
+        params={"select": "id,name,year,status", "order": "year.asc.nullsfirst"},
+        headers=_headers(key),
+        timeout=30,
+    )
+    resp.raise_for_status()
+    names = {m["id"]: m for m in resp.json()}
+
+    rows = _paginate(url, key, "ocr_extractions", "map_id,category,status,run_id,notes,text")
+    by_map: dict[str, list[dict]] = {}
+    for r in rows:
+        by_map.setdefault(r["map_id"], []).append(r)
+
+    print(f"{len(by_map)} maps carry OCR extractions\n")
+    head = f"{'runs':>4}  {'legend':>15}  {'institution':>11}  sheet"
+    print(head)
+    print("-" * len(head))
+
+    flagged_missing = []
+    for map_id, ext in sorted(by_map.items(), key=lambda kv: names.get(kv[0], {}).get("year") or 0):
+        row = names.get(map_id, {})
+        active = [e for e in ext if e["status"] != "rejected"]
+        n_runs = len({e["run_id"] for e in ext if e["run_id"]})
+        n_institution = sum(1 for e in active if e["category"] == "institution")
+
+        entries = {}
+        for e in active:
+            if e["category"] != "legend_entry":
+                continue
+            m = re.search(r"n=(\d+)", e.get("notes") or "")
+            if m:
+                entries[int(m.group(1))] = e["text"]
+        refs = [e["text"].strip() for e in active if e["category"] == "legend_ref"]
+        ref_nums = [int(t) for t in refs if t.isdigit()]
+        matched = {n for n in ref_nums if n in entries}
+
+        if entries:
+            legend_col = f"{len(matched)}/{len(entries)} matched"
+        elif n_institution >= 20:
+            legend_col = "none — candidate"
+            flagged_missing.append((row, n_institution))
+        else:
+            legend_col = "—"
+
+        runs_mark = "!" if n_runs > 1 else " "
+        name = (row.get("name") or map_id)[:40]
+        print(f"{n_runs:4d}{runs_mark} {legend_col:>15}  {n_institution:11d}  "
+              f"{str(row.get('year') or '????'):<5} {row.get('status', '?'):<8} {name}")
+
+    print(f"\n`!` on runs = assembled from more than one OCR pass — worth checking "
+          f"the passes' tile/global_bbox extents actually union to the full sheet "
+          f"(the way 1968's body run alone stopped at 73% of the image height).")
+    if flagged_missing:
+        print(f"\n{len(flagged_missing)} sheets carry 20+ institution labels but no "
+              f"legend_entry at all — likely candidates for a legend/numerals pass:")
+        for row, n in sorted(flagged_missing, key=lambda t: -t[1]):
+            print(f"  {row.get('id', '?')}  {n:4d} institutions  {(row.get('name') or '')[:50]}")
     return 0
 
 
@@ -977,6 +1105,8 @@ def main() -> int:
     p.add_argument("--out", help="output directory (default work/ocr/outputs/prior/<map-id>)")
     p.add_argument("--sweep", action="store_true",
                    help="fit every georeferenced sheet in the corpus, worst residual first")
+    p.add_argument("--legend", action="store_true",
+                   help="per map: OCR run count, legend_entry/legend_ref join completeness")
     p.add_argument("--self-check", action="store_true")
     args = p.parse_args()
 
@@ -985,6 +1115,8 @@ def main() -> int:
         return 0
     if args.sweep:
         return sweep()
+    if args.legend:
+        return legend_status()
     if not args.map_id:
         p.error("--map-id is required unless --self-check")
     if not (args.blocks or args.blocks_from_roads or args.roads or args.survivors
