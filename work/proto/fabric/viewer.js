@@ -1,6 +1,8 @@
-// WebGL scene; camera drag/zoom/pan/inertia is entirely OrbitControls' job.
+// WebGL scene; camera drag/zoom/pan/inertia is entirely CameraControls' job.
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import CameraControls from 'camera-controls';
+
+CameraControls.install({ THREE });
 
 const $ = (id) => document.getElementById(id);
 const stage = $('stage');
@@ -51,76 +53,53 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.domElement.style.display = 'block';
 stage.prepend(renderer.domElement);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
+const controls = new CameraControls(camera, renderer.domElement);
+// smoothTime is "seconds to reach the target", not OrbitControls' per-frame
+// dampingFactor — 0.1 lands in the same snappy-but-not-jerky feel.
+controls.smoothTime = 0.1;
+controls.draggingSmoothTime = 0.1;
 controls.minAzimuthAngle = -Infinity;
 controls.maxAzimuthAngle = Infinity;
 controls.minDistance = 150;
 controls.maxDistance = 4000;
-controls.screenSpacePanning = true;
-controls.addEventListener('start', () => play(false));
-controls.addEventListener('change', updateZoomReadout);
+controls.addEventListener('controlstart', () => play(false));
+controls.addEventListener('update', updateZoomReadout);
 
 // 89°, not 90: sheets lie flat, so a near-top-down elevation faces them
 // straight at the camera by default; exactly 90 puts the view axis parallel
-// to OrbitControls' up vector, which is the classic gimbal-lock singularity.
+// to the world up vector, the classic gimbal-lock singularity.
 // At this near-top-down elevation, azimuth is effectively screen roll: world
 // +Z is north (toWorld above), and 180° is the azimuth that puts +Z at the
 // top of the screen — verified against the camera's actual look-at basis,
 // not eyeballed (0° put south on top).
 const REST = { distance: 950, azimuth: THREE.MathUtils.degToRad(180), elevation: THREE.MathUtils.degToRad(89) };
-function applyView({ distance, azimuth, elevation }) {
-  camera.position.set(
+// The pivot is always the world origin, so a view is just a position on a
+// sphere around it — setLookAt does the interpolation itself (enableTransition)
+// instead of a hand-rolled RAF tween, and keeps working correctly if the user
+// drags mid-transition, which the old rewrite-camera.position loop didn't.
+function applyView({ distance, azimuth, elevation }, enableTransition = false) {
+  controls.setLookAt(
     distance * Math.cos(elevation) * Math.sin(azimuth),
     distance * Math.sin(elevation),
     distance * Math.cos(elevation) * Math.cos(azimuth),
+    0, 0, 0,
+    enableTransition,
   );
-  controls.target.set(0, 0, 0);
-  controls.update();
-}
-function currentView() {
-  const offset = camera.position.clone().sub(controls.target);
-  const distance = offset.length();
-  return { distance, azimuth: Math.atan2(offset.x, offset.z), elevation: Math.asin(offset.y / distance) };
-}
-// Shortest way round the circle, so a tween never spins the long way past ±180°.
-const angleDelta = (from, to) => THREE.MathUtils.euclideanModulo(to - from + Math.PI, 2 * Math.PI) - Math.PI;
-const easeInOutCubic = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
-let viewAnimation = null;
-function animateView(target, duration = 900) {
-  cancelAnimationFrame(viewAnimation?.raf);
-  const from = currentView();
-  const dAzimuth = angleDelta(from.azimuth, target.azimuth);
-  const wasEnabled = controls.enabled;
-  controls.enabled = false;
-  const start = performance.now();
-  const anim = {};
-  anim.raf = requestAnimationFrame(function tick(now) {
-    const t = easeInOutCubic(Math.min(1, (now - start) / duration));
-    applyView({
-      distance: THREE.MathUtils.lerp(from.distance, target.distance, t),
-      azimuth: from.azimuth + dAzimuth * t,
-      elevation: THREE.MathUtils.lerp(from.elevation, target.elevation, t),
-    });
-    if (t < 1) anim.raf = requestAnimationFrame(tick);
-    else controls.enabled = wasEnabled;
-  });
-  viewAnimation = anim;
 }
 function updateZoomReadout() {
-  if ($('zoom-value')) $('zoom-value').textContent = `${Math.round((REST.distance / camera.position.distanceTo(controls.target)) * 100)}%`;
+  if ($('zoom-value')) $('zoom-value').textContent = `${Math.round((REST.distance / camera.position.length()) * 100)}%`;
 }
 function zoom(factor) {
-  const offset = camera.position.clone().sub(controls.target);
-  const distance = THREE.MathUtils.clamp(offset.length() / factor, controls.minDistance, controls.maxDistance);
-  camera.position.copy(controls.target).add(offset.setLength(distance));
-  controls.update();
+  play(false);
+  controls.dollyTo(controls.distance / factor, true);
 }
 let playing = false;
+// camera-controls has no built-in autoRotate; this turns the crank on it
+// every frame instead, in the same units OrbitControls' autoRotateSpeed used
+// (speed 4 ≈ 24°/s) so the default motion feels the same as before.
+let autoRotateSpeed = (Math.PI / 30) * Number($('speed')?.value || 4);
 function play(value) {
   playing = value;
-  controls.autoRotate = playing;
   if ($('play')) {
     $('play').textContent = playing ? '⏸' : '▶';
     $('play').setAttribute('aria-label', playing ? 'Pause' : 'Auto rotate');
@@ -137,23 +116,22 @@ if ($('zoom-out')) $('zoom-out').onclick = () => zoom(1 / 1.2);
 if ($('reset')) $('reset').onclick = reset;
 if ($('play')) $('play').onclick = () => play(!playing);
 if ($('top')) $('top').onclick = () => applyView({ ...REST, azimuth: 0, elevation: 0 });
-// Free-drag from the near-top-down default overshoots a true side angle —
-// OrbitControls' inertia carries it straight past the equator to the
-// underside before it settles. This snaps to a fixed raking angle instead.
+// Free-drag from the near-top-down default used to overshoot a true side
+// angle with OrbitControls' inertia; kept as a fixed raking angle rather than
+// letting a drag land anywhere near the equator.
 const SIDE = { azimuth: REST.azimuth, elevation: THREE.MathUtils.degToRad(25) };
 let sideView = false;
 const sideToggle = $('side-toggle');
 if (sideToggle) sideToggle.onclick = () => {
   sideView = !sideView;
   play(false);
-  animateView({ ...(sideView ? SIDE : REST), distance: REST.distance / fitScale() });
+  applyView({ ...(sideView ? SIDE : REST), distance: REST.distance / fitScale() }, true);
   sideToggle.textContent = sideView ? 'Top view' : 'Side view';
   sideToggle.setAttribute('aria-pressed', String(sideView));
 };
 if ($('clean')) $('clean').onclick = () => document.body.classList.toggle('clean');
 if ($('restore')) $('restore').onclick = () => document.body.classList.remove('clean');
-if ($('speed')) $('speed').oninput = (e) => (controls.autoRotateSpeed = Number(e.target.value));
-controls.autoRotateSpeed = Number($('speed')?.value || 4);
+if ($('speed')) $('speed').oninput = (e) => (autoRotateSpeed = (Math.PI / 30) * Number(e.target.value));
 
 // Hand control: an alternative to OrbitControls' mouse drag. Loads
 // MediaPipe's HandLandmarker from CDN only once toggled on (webcam + a
@@ -271,7 +249,13 @@ document.addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'r') reset();
 });
 reset();
-renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const delta = clock.getDelta();
+  if (playing) controls.rotate(autoRotateSpeed * delta, 0, false);
+  controls.update(delta);
+  renderer.render(scene, camera);
+});
 
 // Sheet space stays the same 0..1000, y-down grid build.py already emits
 // (image.matrix and polys share it); this is the one place it becomes world
