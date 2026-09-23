@@ -97,28 +97,45 @@ def fetch_crop(
     if cache_path.exists():
         return Image.open(cache_path).convert("RGB")
 
-    # Try IIIF region endpoint first
-    try:
-        resp = requests.get(region_url, timeout=30)
-        if resp.ok:
-            img = Image.open(BytesIO(resp.content)).convert("RGB")
-            img.save(cache_path)
-            return img
-    except Exception:
-        pass
+    def _try_region():
+        try:
+            resp = requests.get(region_url, timeout=30)
+            if resp.ok:
+                img = Image.open(BytesIO(resp.content)).convert("RGB")
+                img.save(cache_path)
+                return img
+        except Exception:
+            pass
+        return None
 
-    # Fallback 1: a fixed tile pyramid (our R2 host, and any other level0
-    # server). Cheaper than the full-image download below and the only path
-    # that works for a mirrored map, so it goes first.
+    def _try_level0():
+        try:
+            stats: dict = {}
+            img = fetch_crop_level0(iiif_base, x, y, w, h, size, quality, stats=stats)
+            # Only a complete assembly is cacheable — see fetch_crop_level0.
+            if stats.get("coverage", 0) >= 1.0:
+                img.save(cache_path)
+            return img
+        except Exception:
+            return None
+
+    # A tiled pyramid (our R2 mirror, or any other level0 server) never needs
+    # the origin at all — an arbitrary region request against a mirrored map
+    # misses every fixed tile key and gets silently proxied to whatever
+    # origin (archive.org, Gallica, ...) `sources/{mapId}` was frozen at when
+    # the map was tiled, which is exactly the flaky/slow path this order
+    # avoids. A map with no pyramid yet keeps the single-region-request path
+    # first, since walking it as 256px tiles would multiply request count
+    # against a real IIIF server for no benefit.
     try:
-        stats: dict = {}
-        img = fetch_crop_level0(iiif_base, x, y, w, h, size, quality, stats=stats)
-        # Only a complete assembly is cacheable — see fetch_crop_level0.
-        if stats.get("coverage", 0) >= 1.0:
-            img.save(cache_path)
-        return img
+        has_pyramid = bool(_cached_info(iiif_base).get("scale_factors"))
     except Exception:
-        pass
+        has_pyramid = False
+    attempts = [_try_level0, _try_region] if has_pyramid else [_try_region, _try_level0]
+    for attempt in attempts:
+        img = attempt()
+        if img is not None:
+            return img
 
     # Fallback 2: download full image and crop locally (works when IIIF region is broken)
     direct_url = _ia_direct_url(iiif_base)
