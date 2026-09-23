@@ -15,7 +15,7 @@ const statusLabel = document.createElement('p');
 statusLabel.id = 'status';
 statusLabel.textContent = 'Loading scans…';
 $('masthead').append(statusLabel);
-$('instruction').textContent = 'Drag to rotate, scroll to zoom. Click a point to pin its name.';
+$('instruction').textContent = 'Drag to rotate, scroll to zoom, or use Side view. Click a point to pin its name.';
 
 // Theme: OS preference by default, [data-theme] pins it either way (set
 // synchronously in <head> so reload doesn't flash the wrong one). load()
@@ -62,7 +62,14 @@ controls.screenSpacePanning = true;
 controls.addEventListener('start', () => play(false));
 controls.addEventListener('change', updateZoomReadout);
 
-const REST = { distance: 950, azimuth: THREE.MathUtils.degToRad(-60), elevation: THREE.MathUtils.degToRad(55) };
+// 89°, not 90: sheets lie flat, so a near-top-down elevation faces them
+// straight at the camera by default; exactly 90 puts the view axis parallel
+// to OrbitControls' up vector, which is the classic gimbal-lock singularity.
+// At this near-top-down elevation, azimuth is effectively screen roll: world
+// +Z is north (toWorld above), and 180° is the azimuth that puts +Z at the
+// top of the screen — verified against the camera's actual look-at basis,
+// not eyeballed (0° put south on top).
+const REST = { distance: 950, azimuth: THREE.MathUtils.degToRad(180), elevation: THREE.MathUtils.degToRad(89) };
 function applyView({ distance, azimuth, elevation }) {
   camera.position.set(
     distance * Math.cos(elevation) * Math.sin(azimuth),
@@ -71,6 +78,35 @@ function applyView({ distance, azimuth, elevation }) {
   );
   controls.target.set(0, 0, 0);
   controls.update();
+}
+function currentView() {
+  const offset = camera.position.clone().sub(controls.target);
+  const distance = offset.length();
+  return { distance, azimuth: Math.atan2(offset.x, offset.z), elevation: Math.asin(offset.y / distance) };
+}
+// Shortest way round the circle, so a tween never spins the long way past ±180°.
+const angleDelta = (from, to) => THREE.MathUtils.euclideanModulo(to - from + Math.PI, 2 * Math.PI) - Math.PI;
+const easeInOutCubic = t => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+let viewAnimation = null;
+function animateView(target, duration = 900) {
+  cancelAnimationFrame(viewAnimation?.raf);
+  const from = currentView();
+  const dAzimuth = angleDelta(from.azimuth, target.azimuth);
+  const wasEnabled = controls.enabled;
+  controls.enabled = false;
+  const start = performance.now();
+  const anim = {};
+  anim.raf = requestAnimationFrame(function tick(now) {
+    const t = easeInOutCubic(Math.min(1, (now - start) / duration));
+    applyView({
+      distance: THREE.MathUtils.lerp(from.distance, target.distance, t),
+      azimuth: from.azimuth + dAzimuth * t,
+      elevation: THREE.MathUtils.lerp(from.elevation, target.elevation, t),
+    });
+    if (t < 1) anim.raf = requestAnimationFrame(tick);
+    else controls.enabled = wasEnabled;
+  });
+  viewAnimation = anim;
 }
 function updateZoomReadout() {
   if ($('zoom-value')) $('zoom-value').textContent = `${Math.round((REST.distance / camera.position.distanceTo(controls.target)) * 100)}%`;
@@ -91,26 +127,130 @@ function play(value) {
     $('play').setAttribute('aria-pressed', String(playing));
   }
 }
+const fitScale = () => Math.min(1, innerWidth / 1100, innerHeight / 850);
 function reset() {
   play(false);
-  const fit = Math.min(1, innerWidth / 1100, innerHeight / 850);
-  applyView({ ...REST, distance: REST.distance / fit });
+  applyView({ ...REST, distance: REST.distance / fitScale() });
 }
 if ($('zoom-in')) $('zoom-in').onclick = () => zoom(1.2);
 if ($('zoom-out')) $('zoom-out').onclick = () => zoom(1 / 1.2);
 if ($('reset')) $('reset').onclick = reset;
 if ($('play')) $('play').onclick = () => play(!playing);
 if ($('top')) $('top').onclick = () => applyView({ ...REST, azimuth: 0, elevation: 0 });
+// Free-drag from the near-top-down default overshoots a true side angle —
+// OrbitControls' inertia carries it straight past the equator to the
+// underside before it settles. This snaps to a fixed raking angle instead.
+const SIDE = { azimuth: REST.azimuth, elevation: THREE.MathUtils.degToRad(25) };
+let sideView = false;
+const sideToggle = $('side-toggle');
+if (sideToggle) sideToggle.onclick = () => {
+  sideView = !sideView;
+  play(false);
+  animateView({ ...(sideView ? SIDE : REST), distance: REST.distance / fitScale() });
+  sideToggle.textContent = sideView ? 'Top view' : 'Side view';
+  sideToggle.setAttribute('aria-pressed', String(sideView));
+};
 if ($('clean')) $('clean').onclick = () => document.body.classList.toggle('clean');
 if ($('restore')) $('restore').onclick = () => document.body.classList.remove('clean');
 if ($('speed')) $('speed').oninput = (e) => (controls.autoRotateSpeed = Number(e.target.value));
 controls.autoRotateSpeed = Number($('speed')?.value || 4);
+
+// Hand control: an alternative to OrbitControls' mouse drag. Loads
+// MediaPipe's HandLandmarker from CDN only once toggled on (webcam + a
+// few-MB model, not worth paying for on every visit). Wrist position is
+// read as a joystick (not a drag delta, so there's no drift to re-center),
+// pinch distance (thumb tip to index tip) maps to zoom.
+const handToggle = $('hand-toggle'), handVideo = $('hand-video');
+let handLandmarker = null, handStream = null, handRunning = false, OneEuroFilter = null;
+// Raw landmark position is noisy frame-to-frame; the 1€ filter (Casiez &
+// Goguey — the reference implementation, not a homebrew smoother) trades
+// lag for jitter reduction per signal. beta above 0 lets fast moves cut
+// through the lag so it doesn't feel laggy on a deliberate swing.
+let handFilters = null;
+function freshHandFilters() {
+  return {
+    x: new OneEuroFilter(30, 1, 0.6, 1),
+    y: new OneEuroFilter(30, 1, 0.6, 1),
+    pinch: new OneEuroFilter(30, 1, 0.6, 1),
+  };
+}
+async function startHandControl() {
+  handToggle.disabled = true;
+  handToggle.textContent = 'Loading…';
+  if (!handLandmarker) {
+    const [vision, filterModule] = await Promise.all([
+      import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs'),
+      import('https://cdn.jsdelivr.net/npm/1eurofilter@1.3.0/+esm'),
+    ]);
+    OneEuroFilter = filterModule.OneEuroFilter;
+    const fileset = await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    handLandmarker = await vision.HandLandmarker.createFromOptions(fileset, {
+      baseOptions: {
+        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+        delegate: 'GPU',
+      },
+      runningMode: 'VIDEO',
+      numHands: 1,
+    });
+  }
+  handFilters = freshHandFilters();
+  handStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false });
+  handVideo.srcObject = handStream;
+  await handVideo.play();
+  controls.enabled = false;
+  play(false);
+  document.body.classList.add('hand-active');
+  handToggle.disabled = false;
+  handToggle.textContent = 'Stop hand control';
+  handRunning = true;
+  requestAnimationFrame(handLoop);
+}
+function stopHandControl() {
+  handRunning = false;
+  handStream?.getTracks().forEach(t => t.stop());
+  handStream = null;
+  controls.enabled = true;
+  document.body.classList.remove('hand-active');
+  handToggle.disabled = false;
+  handToggle.textContent = 'Hand control';
+}
+// ponytail: pinch-distance-to-zoom range (0.03..0.25, normalized image
+// units) is eyeballed against one webcam at arm's length, not calibrated
+// per hand size or camera distance — retune here if zoom feels dead or
+// pinned at an end.
+function handLoop() {
+  if (!handRunning) return;
+  if (handVideo.readyState >= 2) {
+    const now = performance.now() / 1000; // seconds: what OneEuroFilter expects for its freq estimate
+    const hand = handLandmarker.detectForVideo(handVideo, now * 1000).landmarks?.[0];
+    if (hand) {
+      const rawX = 1 - hand[0].x; // selfie camera: flip so hand-right feels like view-right
+      const mirroredX = handFilters.x.filter(rawX, now);
+      const y = handFilters.y.filter(hand[0].y, now);
+      const rawPinch = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y);
+      const pinch = handFilters.pinch.filter(rawPinch, now);
+      const azimuth = REST.azimuth + THREE.MathUtils.degToRad((mirroredX - 0.5) * 220);
+      const elevation = THREE.MathUtils.clamp(
+        REST.elevation + THREE.MathUtils.degToRad((0.5 - y) * 140),
+        THREE.MathUtils.degToRad(-10), THREE.MathUtils.degToRad(85),
+      );
+      const distance = THREE.MathUtils.lerp(controls.maxDistance, controls.minDistance, THREE.MathUtils.clamp((pinch - 0.03) / 0.22, 0, 1));
+      applyView({ distance, azimuth, elevation });
+    }
+  }
+  requestAnimationFrame(handLoop);
+}
+if (handToggle) handToggle.onclick = () => {
+  if (handRunning) { stopHandControl(); return; }
+  startHandControl().catch(err => { alert(`Hand control needs camera access: ${err.message}`); stopHandControl(); });
+};
 
 const sheet = $('sheet'), sheetHandle = $('sheet-handle');
 function expandSheet(open) {
   if (!sheet) return;
   sheet.classList.toggle('expanded', open);
   sheetHandle.setAttribute('aria-expanded', String(open));
+  document.body.classList.toggle('sheet-expanded', open); // mobile: the expanded sheet covers the toolbar's row, so hide it rather than float over the list
 }
 if (sheetHandle) sheetHandle.onclick = () => expandSheet(!sheet.classList.contains('expanded'));
 renderer.domElement.oncontextmenu = e => e.preventDefault();
@@ -216,11 +356,15 @@ async function load() {
     row.onmouseleave = () => { hovered = null; layers.forEach((_, j) => applyLayerVisual(j)); };
     $('legend').append(row); rows.push(row);
   }
-  // One button per printed name highlights all available links for that name.
+  // One button per chain (a union-find thread of matched occurrences, from
+  // build.py) highlights that name's links across every sheet it survives to,
+  // not just one adjacent pair — and keeps two same-named but differently
+  // located threads (e.g. a long street matched at different ends on
+  // different gaps) as separate buttons instead of merging them.
   const groups = new Map();
   const pickables = [];
   for (const link of links) {
-    const key = link.t.normalize('NFKC').toLocaleLowerCase();
+    const key = link.c;
     if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], years: new Set(), doling: null });
     const group = groups.get(key);
     if (!group.doling && link.d) group.doling = link.d;
