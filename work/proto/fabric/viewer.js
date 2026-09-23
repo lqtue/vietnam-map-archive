@@ -320,6 +320,9 @@ async function load() {
     rows.forEach((el, i) => el.setAttribute('aria-pressed', String(i === focus)));
     const l = layers[focus];
     if (l) expandSheet(true);
+    // Mobile's top pill is the only thing visible with the sheet collapsed,
+    // so the current selection has to surface there too, not just in the list.
+    $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : '';
   }
   for (const [index, l] of layers.entries()) {
     const ly = layerY(l.year);

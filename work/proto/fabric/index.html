@@ -63,6 +63,7 @@ button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}
 h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.18}
 #thesis{margin:9px 0 0;max-width:40ch;color:var(--soft)}
 #status{margin:10px 0 0;font-size:11px;color:var(--mute)}
+#current-sheet{display:none}
 
 .year{display:block;width:100%;padding:8px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}
 .year:first-child,.name:first-child{border-top:0}
@@ -127,7 +128,8 @@ strong{color:var(--ink);font-weight:600}
   #masthead{position:fixed;top:12px;left:12px;right:12px;width:auto;max-height:none;overflow:visible;padding:10px 14px;background:var(--panel);border-radius:16px;box-shadow:0 12px 32px -8px rgba(37,39,37,.22),0 1px 0 rgba(37,39,37,.04);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
   #thesis{display:none}
   h1{font-size:19px;font-weight:600}
-  #status{margin-top:2px;font-size:10px}
+  #status{display:none}
+  #current-sheet{display:block;margin:4px 60px 0 0;font-size:12px;font-weight:600;color:var(--ink)}
 
   /* the sheet: one flowed column of legend → names, clipped to a peek
      height until opened. Its children give up their own fixed positions
@@ -140,12 +142,11 @@ strong{color:var(--ink);font-weight:600}
   .year small{display:block}
   #instruction{margin:6px 0 0;font-size:10px;line-height:1.35}
   #restore{right:12px;bottom:12px}
-  /* #sheet's collapsed strip is 60px tall and spans the full width, so a
-     bottom-left toolbar at bottom:12px sits inside it and steals its taps —
-     clear it instead of overlapping. */
-  #toolbar{bottom:76px}
-  #hand-video{bottom:122px;width:120px}
-  .sheet-expanded #toolbar,.sheet-expanded #hand-video{visibility:hidden}
+  /* Only the theme toggle earns a permanent spot on a phone screen — side
+     view and hand control (webcam-driven) move to the masthead corner
+     instead of a separate bottom-left row, clear of the sheet's tap strip. */
+  #toolbar{left:auto;right:14px;bottom:auto;top:14px}
+  #side-toggle,#hand-toggle,#hand-video{display:none}
 
   .year:active,.name:active,#sheet-handle:active{transform:scale(.96)}
 }
@@ -159,6 +160,7 @@ strong{color:var(--ink);font-weight:600}
 <header id="masthead" class="panel">
   <h1>Saigon,<br>1882–1968</h1>
   <p id="thesis">Six sheets, independently georeferenced and stacked by year.</p>
+  <p id="current-sheet" aria-live="polite"></p>
 </header>
 <div id="sheet" class="panel">
   <button id="sheet-handle" type="button" aria-expanded="false" aria-controls="sheet-body">
