@@ -28,6 +28,17 @@ asked the edge whether a derivative existed using urllib's default User-Agent, g
 script decides what work to do by probing a network service, make the refusal distinguishable from
 the answer (2026-09-13).
 
+**A "primary" flag is not what gets served.** Flipping `map_iiif_sources.is_primary` to `r2` only
+updates `maps.iiif_image` for the admin UI and the annotation — it has zero runtime effect on
+`worker/`. The Worker's actual fallback for any request outside the pre-tiled derivative set is
+`sources/{mapId}`, a flat R2 object `tile_map.sh` writes once at tiling time and never revisits.
+Checked live for all 39 R2-primary maps (2026-09-23): 100% still hold their original tiling-time
+origin (archive.org/Gallica/ContentDM/humazur), so an arbitrary-region request silently proxies
+there regardless of what the database says is primary — the DB was the gate, not the thing.
+`work/ocr/scripts/iiif_tiles.py`'s `fetch_crop()` now checks `info.json` for a tile pyramid and
+tries composing from R2 first when one exists, verified across all 39 (commit `88fc1fe9`); a raw
+region request against `iiif.maparchive.vn` outside that function is still exposed to this.
+
 **A transport error must never report success.** `vma_worker.py --once` caught
 `requests.RequestException` on its claim call, printed "queue empty" and returned 0 — so a DNS blip
 stranded a running job with a dead subprocess while an unattended drain reported it done

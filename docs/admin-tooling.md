@@ -181,14 +181,19 @@ three updates on its way past. Until that is parameterised, a versioned re-tile 
 hand.
 
 `sources/<uuid>`, the proxy-fallback origin, is deliberately left unversioned: the upstream library
-behind a miss is a property of the map, not of a render, and every version wants the same one.
+behind a miss is a property of the map, not of a render, and every version wants the same one. **It
+is also never revisited when `is_primary` changes** — confirmed corpus-wide 2026-09-23: all 39
+R2-primary maps still hold their original tiling-time origin in `sources/<uuid>`, so `is_primary`
+flipping to `r2` in Supabase does not stop a request the pre-tiled derivative set can't answer from
+proxying to archive.org/Gallica/ContentDM/humazur. See `docs/lessons.md`.
 
 ### Why pre-tiled
 
 Historical scans never change, so tiling once means zero compute at request time and no dependency
-on Internet Archive or Gallica staying up. `vips dzsave` takes any JPEG/PNG/TIFF directly — no
-pyramidal TIFF step. R2 egress is free, so tile serving costs storage only (~$0.15/mo at 20 maps ×
-~500 MB; ~$1.50/mo at 200).
+on Internet Archive or Gallica staying up **for anything the pre-tiled derivative set actually
+covers** — an arbitrary region/size outside it still falls through to `sources/<uuid>` above.
+`vips dzsave` takes any JPEG/PNG/TIFF directly — no pyramidal TIFF step. R2 egress is free, so tile
+serving costs storage only (~$0.15/mo at 20 maps × ~500 MB; ~$1.50/mo at 200).
 
 ### Layout and config
 

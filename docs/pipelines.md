@@ -473,6 +473,15 @@ clipped edge tiles. `info.json` said `profile: level2` until 2026-09-14 and does
 reports `level0` and lists only sizes that resolve — but nothing about the addressing changed, and
 `fetch_crop` still 404s. `iiif_tiles.py --self-check` covers the addressing.
 
+**2026-09-23: the 404 was fixed, but `fetch_crop` still tried the raw region URL first** — which,
+for every R2-primary map, no longer 404s but instead silently proxies to whatever origin
+(archive.org/Gallica/ContentDM/humazur) `worker/`'s frozen `sources/{mapId}` snapshot was written
+from at tiling time (see `docs/lessons.md`'s "a 'primary' flag is not what gets served"). So every
+crop still paid for a third-party fetch it didn't need. `fetch_crop` now checks `info.json` for a
+tile pyramid up front and tries `fetch_crop_level0` first when one exists — origin only stays first
+for a map with no pyramid yet. Verified across all 39 R2-primary maps: 39/39 succeeded, 0
+external-host requests on the fast path (commit `88fc1fe9`).
+
 **Overview resolution matters more than it looks.** `compute_tile_densities` measures local 8×8
 std-dev, which at a heavy downscale reads dense city hatching as *smooth*. Measured on the 1882
 Saigon cadastral, centre-tile vs edge-tile mean density was inverted at 600, 1024, 1513 and 1700px
