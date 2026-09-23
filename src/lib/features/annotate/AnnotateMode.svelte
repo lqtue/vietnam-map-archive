@@ -17,6 +17,12 @@
   import type { SearchResult, AnnotationSet, DrawingMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
   import { createGeoMapStores } from '$lib/map/shell/geoMapSetup';
+  import {
+    layersStore,
+    isSheetLayer,
+    toHistoricalRef,
+    topOverlay,
+  } from '$lib/map/stores/layersStore';
   import { createAnnotationHistoryStore } from '$lib/map/annotations/annotationHistory';
   import { createAnnotationStateStore } from '$lib/map/annotations/annotationState';
   import { setAnnotationContext } from '$lib/map/annotations/annotationContext';
@@ -33,6 +39,8 @@
   import AnnotateOverpassController from './AnnotateOverpassController.svelte';
   import BboxSelector from './BboxSelector.svelte';
   import OverpassPreviewLayer from './OverpassPreviewLayer.svelte';
+  import FootprintsLayer from '$lib/features/shared/FootprintsLayer.svelte';
+  import LegendPointsLayer from '$lib/features/shared/LegendPointsLayer.svelte';
   import type { FeatureCollection } from 'geojson';
   import type { Bbox4 } from './overpass';
   import AuthGate from '$lib/ui/AuthGate.svelte';
@@ -70,6 +78,24 @@
   let notice: { text: string; tone: 'info' | 'error' | 'success' } | null = null;
   let keydownHandler: ((event: KeyboardEvent) => void) | null = null;
 
+  // Control / Legend / Info tabs — same "top of the stack" convention
+  // ExplorePage uses for its right rail.
+  $: activeOverlayMapId = $topOverlay?.mapId ?? null;
+  $: activeOverlayMap = activeOverlayMapId
+    ? (mapList.find((m) => m.id === activeOverlayMapId) ?? null)
+    : null;
+  let vectorMapIds: string[] = [];
+  let showLegendPoints = false;
+  let legendN: number | null = null;
+  $: if (!activeOverlayMapId) showLegendPoints = false;
+
+  function handleToggleVectors(e: CustomEvent<{ mapId: string }>) {
+    const { mapId } = e.detail;
+    vectorMapIds = vectorMapIds.includes(mapId)
+      ? vectorMapIds.filter((id) => id !== mapId)
+      : [...vectorMapIds, mapId];
+  }
+
   // Library/Editor view state
   let activeView: 'library' | 'editor' = 'library';
   let projectsLoading = true;
@@ -92,7 +118,29 @@
     mapStore,
     mapList: () => mapList,
     shellMap: () => shellMap,
+    // A Studio project can hold several maps — Browse adds to the stack
+    // rather than swapping the one overlay out.
+    stackOverlays: true,
   });
+
+  /**
+   * Restore the project's saved map stack once the catalog has loaded (it
+   * hasn't, yet, when a project is opened from the library). Runs once per
+   * project: `layersStore` is a global, persisted singleton, so it may still
+   * carry whatever browse mode or the previous project left on it.
+   */
+  let restoredStackFor: string | null = null;
+  function handleMapsLoaded(event: CustomEvent<{ maps: MapListItem[] }>) {
+    if (!currentProject || restoredStackFor === currentProject.id) return;
+    restoredStackFor = currentProject.id;
+    const ids = currentProject.mapIds.length ? currentProject.mapIds : [currentProject.mapId];
+    layersStore.clearOverlays();
+    // addOverlay prepends, so add in reverse to land in saved order.
+    for (const mapId of [...ids].reverse()) {
+      const m = event.detail.maps.find((x) => x.id === mapId);
+      if (m) layersStore.addOverlay(toHistoricalRef(m));
+    }
+  }
 
   // ── Annotation event handlers (delegate to DrawTool) ────────────────
 
@@ -130,7 +178,11 @@
       type: 'FeatureCollection' as const,
       features: [],
     };
-    await projectStore.saveFeatures(currentProject.id, features);
+    // isSheetLayer excludes series rows — their synthetic `series:<key>` id
+    // wouldn't resolve back to a catalog map on reload.
+    const mapIds = $layersStore.overlays.filter(isSheetLayer).map((o) => o.ref.mapId);
+    await projectStore.saveFeatures(currentProject.id, features, mapIds);
+    currentProject = { ...currentProject, mapIds };
     isSaving = false;
     saveSuccess = true;
     setTimeout(() => {
@@ -197,6 +249,7 @@
   // ── Library handlers ──────────────────────────────────────────
 
   function handleSelectProject(project: AnnotationSet) {
+    restoredStackFor = null;
     currentProject = project;
     if (project.features?.features?.length) {
       setTimeout(() => {
@@ -336,12 +389,14 @@
       bind:sidebarCollapsed
       bind:rightSidebarCollapsed
       on:searchnavigate={handleSearchNavigate}
+      on:mapsloaded={handleMapsLoaded}
     >
       <svelte:fragment slot="sidebar">
         <MapViewerSidebar
           {mapList}
           {selectedMap}
           allowDual={false}
+          showControls={false}
           viewMode={$layerStore.viewMode}
           on:toggleCollapse={() => (sidebarCollapsed = true)}
           on:zoomToOverlay={handleZoomToOverlay}
@@ -362,6 +417,12 @@
           {saveSuccess}
           {notice}
           {timelineStore}
+          viewMode={$layerStore.viewMode}
+          mapId={activeOverlayMapId}
+          map={activeOverlayMap}
+          {showLegendPoints}
+          vectorsOn={!!activeOverlayMapId && vectorMapIds.includes(activeOverlayMapId)}
+          bind:selectedN={legendN}
           on:rename={(e) => drawToolRef?.updateAnnotationLabel(e.detail.id, e.detail.label)}
           on:changeColor={(e) => drawToolRef?.updateAnnotationColor(e.detail.id, e.detail.color)}
           on:updateDetails={(e) =>
@@ -379,6 +440,10 @@
           on:renameProject={handleRenameProject}
           on:backToLibrary={handleBackToLibrary}
           on:toggleCollapse={() => (rightSidebarCollapsed = true)}
+          on:changeViewMode={(e) => layerStore.setViewMode(e.detail.mode)}
+          on:pickLocation={handlePickLocation}
+          on:toggleLegendPoints={() => (showLegendPoints = !showLegendPoints)}
+          on:toggleVectors={handleToggleVectors}
           on:addKeyframe={() => timelineStore.addFromCurrent(mapStore)}
           on:removeKeyframe={(e) => timelineStore.remove(e.detail.id)}
           on:reorderKeyframe={(e) => timelineStore.reorder(e.detail.id, e.detail.delta)}
@@ -394,6 +459,8 @@
         <DrawTool bind:this={drawToolRef} {drawingMode} editingEnabled={true} />
         <BboxSelector enabled={bboxPickerActive} bind:bbox={pickerBbox} />
         <OverpassPreviewLayer features={overpassPreview} />
+        <LegendPointsLayer mapId={activeOverlayMapId} enabled={showLegendPoints} />
+        <FootprintsLayer mapIds={vectorMapIds} />
       </svelte:fragment>
     </MapWorkspace>
 

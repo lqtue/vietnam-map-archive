@@ -34,11 +34,13 @@ export function createAnnotationProjectStore(supabase?: SupabaseClient, userId?:
   function createProject(title: string, mapId: string): string {
     const id = crypto.randomUUID();
     const now = Date.now();
+    const mapIds = mapId ? [mapId] : [];
     const emptyFeatures: FeatureCollection = { type: 'FeatureCollection', features: [] };
     const project: AnnotationSet = {
       id,
       title,
       mapId,
+      mapIds,
       authorId: userId ?? '',
       features: emptyFeatures,
       isPublic: false,
@@ -52,6 +54,7 @@ export function createAnnotationProjectStore(supabase?: SupabaseClient, userId?:
         .createAnnotationSet(supabase, {
           title,
           mapId,
+          mapIds,
           userId,
           features: emptyFeatures,
           isPublic: false,
@@ -90,15 +93,15 @@ export function createAnnotationProjectStore(supabase?: SupabaseClient, userId?:
     }
   }
 
-  function saveFeatures(id: string, features: FeatureCollection) {
+  function saveFeatures(id: string, features: FeatureCollection, mapIds?: string[]) {
     store.update((lib) => ({
       projects: lib.projects.map((p) =>
-        p.id === id ? { ...p, features, updatedAt: Date.now() } : p
+        p.id === id ? { ...p, features, mapIds: mapIds ?? p.mapIds, updatedAt: Date.now() } : p
       ),
     }));
 
     if (supabase && userId) {
-      return annotationsApi.updateAnnotationSet(supabase, id, { features });
+      return annotationsApi.updateAnnotationSet(supabase, id, { features, mapIds });
     }
     return Promise.resolve(true);
   }

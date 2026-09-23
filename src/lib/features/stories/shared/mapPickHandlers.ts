@@ -18,10 +18,14 @@ export interface MapPickHandlerOptions {
   layersStore?: typeof globalLayersStore;
   /** When supplied, zoom-to-map also glides the OL view (annotate-mode behaviour). */
   shellMap?: () => OlMap | null;
+  /** A catalog-row click adds to the overlay stack instead of replacing it
+   *  (Studio mode — a project can hold several maps). Off by default: Create
+   *  mode's Browse click means "pin this map here". */
+  stackOverlays?: boolean;
 }
 
 export function createMapPickHandlers(opts: MapPickHandlerOptions) {
-  const { mapStore, mapList, shellMap } = opts;
+  const { mapStore, mapList, shellMap, stackOverlays = false } = opts;
   const layers = opts.layersStore ?? globalLayersStore;
 
   async function resolveBounds(map: MapListItem) {
@@ -49,14 +53,15 @@ export function createMapPickHandlers(opts: MapPickHandlerOptions) {
     if (m) handleZoomToMap(new CustomEvent('zoomToMap', { detail: { map: m } }));
   }
 
-  /** Catalog row click = swap the top overlay to this map, then frame it. */
+  /** Catalog row click = swap the top overlay to this map, then frame it.
+   *  With `stackOverlays`, it adds to the stack instead of replacing it. */
   async function handlePickMap(event: CustomEvent<MapListItem>) {
     const item = event.detail;
     if (!item?.id) return;
     const map = mapList().find((m) => m.id === item.id) ?? ({ ...item } as MapListItem);
     const ref = toHistoricalRef(map);
     if (ref.allmapsId) {
-      layers.clearOverlays();
+      if (!stackOverlays) layers.clearOverlays();
       layers.addOverlay(ref);
     }
     const bounds = await resolveBounds(map);
@@ -66,14 +71,19 @@ export function createMapPickHandlers(opts: MapPickHandlerOptions) {
   }
 
   function handlePickLocation(
-    event: CustomEvent<{ lat: number; lng: number; bbox?: [number, number, number, number] }>
+    event: CustomEvent<{
+      lat: number;
+      lng: number;
+      bbox?: [number, number, number, number];
+      zoom?: number;
+    }>
   ) {
-    const { lat, lng, bbox } = event.detail;
+    const { lat, lng, bbox, zoom } = event.detail;
     if (bbox) {
       const c = boundsCenter(bbox);
       mapStore.setView({ lng: c.lng, lat: c.lat, zoom: boundsZoom(bbox) });
     } else {
-      mapStore.setView({ lng, lat, zoom: 15 });
+      mapStore.setView({ lng, lat, zoom: zoom ?? 15 });
     }
   }
 

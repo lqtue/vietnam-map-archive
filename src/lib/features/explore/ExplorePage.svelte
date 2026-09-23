@@ -30,10 +30,10 @@
   import DualMapPane from '$lib/map/shell/DualMapPane.svelte';
   import GpsTracker from '$lib/map/shell/GpsTracker.svelte';
   import StoryMarkers from '$lib/features/stories/shared/StoryMarkers.svelte';
-  import LegendPointsLayer from '$lib/features/explore/LegendPointsLayer.svelte';
+  import LegendPointsLayer from '$lib/features/shared/LegendPointsLayer.svelte';
   import FocusPulse from '$lib/features/explore/FocusPulse.svelte';
   import GpsDot from '$lib/features/explore/GpsDot.svelte';
-  import FootprintsLayer from '$lib/features/explore/FootprintsLayer.svelte';
+  import FootprintsLayer from '$lib/features/shared/FootprintsLayer.svelte';
   import PressPanel from '$lib/features/explore/PressPanel.svelte';
   import StoryPlayback from '$lib/features/stories/shared/StoryPlayback.svelte';
   import LayerStackPanel from '$lib/features/shared/LayerStackPanel.svelte';

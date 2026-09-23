@@ -26,6 +26,8 @@ export interface AnnotationSet {
   id: string;
   title: string;
   mapId: string;
+  /** Every map in this project's layer stack (mapId is the first/primary one). */
+  mapIds: string[];
   authorId: string;
   features: FeatureCollection;
   isPublic: boolean;

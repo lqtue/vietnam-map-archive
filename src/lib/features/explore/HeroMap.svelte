@@ -26,7 +26,7 @@
   import { setVisibleBasemap } from '$lib/map/shell/basemapLayers';
   import { createMapStore } from '$lib/map/stores/mapStore';
   import { createLayerStore } from '$lib/map/stores/layerStore';
-  import FootprintsLayer from '$lib/features/explore/FootprintsLayer.svelte';
+  import FootprintsLayer from '$lib/features/shared/FootprintsLayer.svelte';
   import HeroSequence from '$lib/features/explore/HeroSequence.svelte';
   import {
     HERO_FOOTPRINTS,

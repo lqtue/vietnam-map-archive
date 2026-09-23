@@ -12,6 +12,7 @@
   const dispatch = createEventDispatcher<{
     renameProject: { title: string };
     save: void;
+    backToLibrary: void;
   }>();
 
   export let project: AnnotationSet | null = null;
@@ -21,6 +22,13 @@
 </script>
 
 <div class="sh-compact">
+  <button
+    type="button"
+    class="sb-btn is-sm is-ghost"
+    on:click={() => dispatch('backToLibrary')}
+    aria-label="Back to library"
+    title="Back to my projects">← Library</button
+  >
   <InlineRename
     compact
     value={project?.title ?? ''}
