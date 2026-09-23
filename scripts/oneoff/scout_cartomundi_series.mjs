@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Put CartoMundi's Indochina series into the scout queue.
 //
-//   node --env-file=.env scripts/oneoff/scout_cartomundi_series.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/scout_cartomundi_series.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/scout_cartomundi_series.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // CartoMundi (MMSH, Aix-Marseille) publishes its union catalogue as open JSON
 // at `/ctmd-services/serie/all`, no key. 25 of its 461 series cover Indochina,
@@ -34,8 +38,9 @@
 // per-item, not per-series, and has to be read per sheet.
 
 import { createClient } from '@supabase/supabase-js';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 const ALL = 'https://www.cartomundi.fr/ctmd-services/serie/all';
 const ZONES = [
   'Indochine',
@@ -167,7 +172,7 @@ for (const r of rows)
   );
 
 if (dry) {
-  console.log('\n--dry: nothing written');
+  console.log('\ndry run — nothing written. Re-run with --apply.');
   process.exit(0);
 }
 

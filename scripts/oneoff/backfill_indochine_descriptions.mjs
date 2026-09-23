@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 // Give the Indochine 1:25,000 sheets a description and their printed diacritics.
 //
-//   node --env-file=.env scripts/oneoff/backfill_indochine_descriptions.mjs --dry
-//   node --env-file=.env scripts/oneoff/backfill_indochine_descriptions.mjs
+//   node --env-file=.env scripts/oneoff/backfill_indochine_descriptions.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/backfill_indochine_descriptions.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // Measured 2026-09-13: 0 of 62 rows carried `dc_description` and 0 carried
 // `source_url`. This fills both — the second only after establishing which of
@@ -41,6 +44,7 @@
 // a licence is the same error as guessing a source. Flagged, not changed.
 
 import { createClient } from '@supabase/supabase-js';
+import { willApply } from '../lib/cli.mjs';
 
 // The description is a plain gap-fill. The renaming is an editorial decision
 // and is opt-in, because the catalogue's spellings are French colonial
@@ -49,7 +53,7 @@ import { createClient } from '@supabase/supabase-js';
 // "Bac Ninh" → "Bac-Ninh" only adds a hyphen; "Yen Dinh" → "Yên-Dinh" is
 // half-accented for Yên Định and may read as an error rather than as period
 // spelling. 58 of these are public titles, so it is a call for a person.
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 const withNames = process.argv.includes('--names');
 // 175 supplies the names (it is the complete cell list); 243 supplies the
 // provenance (it is the edition we actually hold). See the header.
@@ -179,7 +183,7 @@ for (const u of updates.slice(0, 8)) {
 if (updates.length > 8) console.log(`  … and ${updates.length - 8} more`);
 
 if (dry) {
-  console.log('\n--dry: nothing written');
+  console.log('\ndry run — nothing written. Re-run with --apply.');
   process.exit(0);
 }
 

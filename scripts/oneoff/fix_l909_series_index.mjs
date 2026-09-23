@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // File the three AMS L909 city maps as one series.
 //
-//   node --env-file=.env scripts/oneoff/fix_l909_series_index.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/fix_l909_series_index.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/fix_l909_series_index.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // AMS series L909 (Việt Nam City Maps 1:12,500, edition 2-AMS, 1968) is three
 // rows in this archive — Hà Nội, Huế and Sài Gòn — and has never once appeared
@@ -30,8 +34,9 @@
 // "3 of N", which is 084's null-denominator case working as intended.
 
 import { createClient } from '@supabase/supabase-js';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 const COLLECTION = 'AMS L909 — Việt Nam City Maps 1:12,500';
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {

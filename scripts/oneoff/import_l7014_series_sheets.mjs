@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Seed `series_sheets` (mig 083) with the L7014 survey's own index.
 //
-//   node --env-file=.env scripts/oneoff/import_l7014_series_sheets.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/import_l7014_series_sheets.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/import_l7014_series_sheets.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // `work/l7014/coverage.json` is 627 rows, one per cell of the AMS 1:50,000
 // index, and it already knows more than the database does: which cells we
@@ -36,8 +40,9 @@
 
 import fs from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 // series_key('Series L7014 (Vietnam 1:50,000)') per migration 082. Hardcoded
 // because this is a one-off seed; anything recurring should call the function.
 const SERIES = 'series-l7014-vietnam-1-50-000';
@@ -137,7 +142,7 @@ if (unmatched.length)
   );
 
 if (dry) {
-  console.log('\n--dry: nothing written');
+  console.log('\ndry run — nothing written. Re-run with --apply.');
   process.exit(0);
 }
 

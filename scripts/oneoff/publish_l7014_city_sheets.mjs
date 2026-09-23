@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Publish the eight verified L7014 city sheets.
 //
-//   node --env-file=.env scripts/oneoff/publish_l7014_city_sheets.mjs [--dry]
+//   node --env-file=.env scripts/oneoff/publish_l7014_city_sheets.mjs            # dry run
+//   node --env-file=.env scripts/oneoff/publish_l7014_city_sheets.mjs --apply
+//
+// This used to write unless you passed --dry. Nothing in scripts/ writes
+// without --apply now.
 //
 // `Series L7014 (Vietnam 1:50,000)` is the hand-georeferenced half of the AMS
 // 1:50,000 series — the 24 sheets PCL publishes as plain JPGs with no embedded
@@ -30,8 +34,9 @@
 // sheets went live drawing nothing.
 
 import { createClient } from '@supabase/supabase-js';
+import { willApply } from '../lib/cli.mjs';
 
-const dry = process.argv.includes('--dry');
+const dry = !willApply();
 const COLLECTION = 'Series L7014 (Vietnam 1:50,000)';
 const BAD_HUE = '830551ec-0eed-439d-8206-1a64c8b10d4f';
 
@@ -79,7 +84,7 @@ if (blocked) console.log(`\n${blocked} sheet(s) will not be published — their 
 if (!ready.length) process.exit(1);
 
 if (dry) {
-  console.log(`\n--dry: would publish ${ready.length}`);
+  console.log(`\ndry run — would publish ${ready.length}. Re-run with --apply.`);
   process.exit(0);
 }
 

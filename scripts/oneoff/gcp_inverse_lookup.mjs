@@ -1,17 +1,23 @@
-// For each sheet in a map-id list, inverse-transform a set of known-good
-// ground points (lon, lat) through that sheet's OWN current annotation to get
-// an approximate pixel location — so fixing georeference in Allmaps Editor is
-// "zoom to this pixel and nudge to the real feature" instead of hunting a
-// 14,000 px scan by eye from scratch.
+// For each sheet in a map-id list, inverse-transform a curated landmark list
+// (lon, lat) through that sheet's OWN current annotation to get an
+// approximate pixel location — so entering the SAME landmark as a GCP on
+// every sheet that shows it is "zoom to this pixel, confirm the feature by
+// eye, paste" instead of hunting a 14,000 px scan from scratch on each sheet
+// independently. Once every sheet carries the same agreed lon/lat for a
+// landmark, cross-sheet disagreement is attributable to the maps rather than
+// to each sheet picking its own arbitrary points.
 //
-// Ground points are the cross-sheet convergence points found by comparing
-// every District 4 sheet's existing GCPs pairwise (see ROADMAP `sheet-overlap-floor`):
-// coordinates where two or more independently-georeferenced sheets already
-// agree to within ~25 m. Not fabricated — read off the live annotations.
+// Landmarks live in work/analysis/district4/landmarks.json (or --landmarks).
+// Most start as `status: "candidate"` — GCP-convergence guesses, still
+// circular — until a human confirms the same physical feature across sheets
+// and records a `source` for the lon/lat. Only then do they carry any
+// accuracy signal. `held_out: true` landmarks are for scoring a sheet's fit
+// after editing, not for use in the fit itself.
 //
 // Usage:
 //   node --env-file=.env scripts/oneoff/gcp_inverse_lookup.mjs
 //   node --env-file=.env scripts/oneoff/gcp_inverse_lookup.mjs --maps <id1,id2,...>
+//   node --env-file=.env scripts/oneoff/gcp_inverse_lookup.mjs --landmarks <path>
 //
 // Output per sheet: `pixelX pixelY lon lat` lines, ready to paste into the
 // Allmaps Editor's GCP box, plus a flag if the guess falls outside the scan.
@@ -20,6 +26,7 @@ import { createClient } from '@supabase/supabase-js';
 import { GcpTransformer } from '@allmaps/transform';
 import { parseAnnotation } from '@allmaps/annotation';
 import { readFileSync } from 'node:fs';
+import { editorUrlFallback, editorUrlFromAnnotation } from '../lib/allmaps_editor_link.mjs';
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(name);
@@ -34,69 +41,37 @@ const mapIds = (
   .split(',')
   .filter(Boolean);
 
-// [lon, lat, label] — the 10 cross-sheet convergence points.
-const CANDIDATES = [
-  [106.7064, 10.7753, 'seed: 1882+1923+1942 (3-sheet, 3.2-15.9 m spread)'],
-  [106.7021, 10.7755, '1882+1942 (1.1 m)'],
-  [106.6894, 10.7736, '1882+1895 (2.2 m)'],
-  [106.7084, 10.7626, '1882+1895 (2.3 m)'],
-  [106.6592, 10.7508, '1959+1968 (2.6 m)'],
-  [106.6974, 10.7791, '1882+1895 (2.8 m)'],
-  [106.7064, 10.7917, '1882+1942 (3.4 m)'],
-  [106.6367, 10.8018, '1895+1968 (4.4 m)'],
-  [106.6959, 10.7826, '1882+1959 (6.7 m)'],
-  [106.71, 10.7955, '1895+1968 (23.5 m, weak)'],
-];
+// Landmarks: one agreed lon/lat per real-world feature, entered as a GCP on
+// every sheet that shows it. `status: "candidate"` means it's still just a
+// GCP-convergence guess — unverified until a human confirms it's the same
+// physical feature in the editor and names a source for the lon/lat.
+// `held_out: true` marks a landmark to exclude from a sheet's own fit so it
+// can be used to score that sheet's accuracy without the circularity of
+// scoring against points the fit already passes through.
+const LANDMARKS = JSON.parse(
+  readFileSync(
+    arg('--landmarks', new URL('../../work/analysis/district4/landmarks.json', import.meta.url)),
+    'utf8'
+  )
+);
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false },
 });
 
+// Live Allmaps first: maps.annotation_url is a one-time snapshot mirror that
+// nothing re-syncs on edit (4 of 6 District 4 sheets were stale as of
+// 2026-09-22, one by 13 months) — reading it here would silently hide GCP
+// edits made in the Editor. Only fall back to it when there's no allmaps_id.
 function annotationUrlFor(row) {
   return (
-    row.annotation_url ||
-    (row.allmaps_id ? `https://annotations.allmaps.org/images/${row.allmaps_id}` : null)
+    (row.allmaps_id ? `https://annotations.allmaps.org/images/${row.allmaps_id}` : null) ||
+    row.annotation_url
   );
 }
 
 const asJson = process.argv.includes('--json');
 const report = [];
-
-const EDITOR_BASE = 'https://editor.allmaps.org/#/collection?url=';
-const withInfoJson = (u) => (/\.json($|\?)/.test(u) ? u : `${u.replace(/\/$/, '')}/info.json`);
-
-// Baseline mirrors $lib/core/iiif/annotationUrl.ts:allmapsEditorSourceUrl — the
-// editor keys a map off its IIIF resource, not off an annotation, and refuses
-// a self-hosted (R2/Supabase-mirrored) annotation outright ("Only
-// Georeference Annotations loaded from Allmaps are supported"). That helper
-// also skips R2 sources on the assumption R2 is always a redundant mirror of
-// the original — true in general, but 1942 broke it: its GCPs were re-fit to
-// a higher-res R2 rescan after the original scan turned out too coarse, so R2
-// there is the ONLY correct source and the archive.org original is stale.
-// Fixed properly below by matching the annotation's own target.source.id
-// against map_iiif_sources instead of guessing by source_type.
-function editorUrlFallback(row) {
-  if (row.iiif_manifest) return EDITOR_BASE + encodeURIComponent(withInfoJson(row.iiif_manifest));
-  const original = row.map_iiif_sources?.find(
-    (s) => s.source_type !== 'r2' && s.iiif_image
-  )?.iiif_image;
-  if (original) return EDITOR_BASE + encodeURIComponent(withInfoJson(original));
-  if (!row.annotation_url && row.allmaps_id)
-    return (
-      EDITOR_BASE + encodeURIComponent(`https://annotations.allmaps.org/images/${row.allmaps_id}`)
-    );
-  return null;
-}
-
-/** Whichever source's iiif_image the annotation is ACTUALLY fit to, verified by URL match. */
-function editorUrlFromAnnotation(row, sourceId) {
-  if (!sourceId) return null;
-  const stripInfoJson = (u) => u.replace(/\/info\.json$/, '');
-  const match = row.map_iiif_sources?.find(
-    (s) => s.iiif_image && stripInfoJson(sourceId) === stripInfoJson(s.iiif_image)
-  );
-  return match ? EDITOR_BASE + encodeURIComponent(withInfoJson(match.iiif_image)) : null;
-}
 
 for (const id of mapIds) {
   const { data: rows, error } = await db
@@ -162,10 +137,11 @@ for (const id of mapIds) {
   }
   const transformer = GcpTransformer.fromGeoreferencedMap(maps[0]);
 
-  for (const [lon, lat, label] of CANDIDATES) {
+  for (const lm of LANDMARKS) {
+    const label = `${lm.id} [${lm.status}]${lm.held_out ? ' held-out' : ''}: ${lm.feature ?? lm.note}`;
     let px;
     try {
-      px = transformer.transformToResource([lon, lat]);
+      px = transformer.transformToResource([lm.lon, lm.lat]);
     } catch {
       console.log(`  ${label}: transform refused this point`);
       continue;
@@ -173,11 +149,20 @@ for (const id of mapIds) {
     const [x, y] = px;
     const outOfBounds = width && height && (x < 0 || y < 0 || x > width || y > height);
     console.log(
-      `  ${Math.round(x)} ${Math.round(y)} ${lon} ${lat}` +
+      `  ${Math.round(x)} ${Math.round(y)} ${lm.lon} ${lm.lat}` +
         `${outOfBounds ? '   OFF SCAN — not on this sheet' : ''}   # ${label}`
     );
     if (!outOfBounds) {
-      sheet.points.push({ x: Math.round(x), y: Math.round(y), lon, lat, label });
+      sheet.points.push({
+        x: Math.round(x),
+        y: Math.round(y),
+        lon: lm.lon,
+        lat: lm.lat,
+        id: lm.id,
+        status: lm.status,
+        heldOut: !!lm.held_out,
+        label,
+      });
     }
   }
 }
