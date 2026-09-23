@@ -16,6 +16,39 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: 'what-we-are-doing-now-2026-09',
+    title: 'What We Are Doing Now: Fixing the Ground Before Building Higher',
+    date: '2026-09-23',
+    category: 'update',
+    excerpt:
+      'The next stretch of work is deliberately unglamorous: correct a 470-metre datum error, make map and building quality measurable, finish two large surveys, and prepare the OCR corpus that will make search useful. Here is what that means, and where people are still indispensable.',
+    content: `
+<p><strong>The Vietnam Map Archive is in a foundations pass.</strong> The visible ambitions have not changed: search the words printed inside historical maps, compare how the city changed, and let a person move through those changes on the ground. But the work immediately in front of us is more basic. Before building those surfaces higher, we are checking that the maps are in the right place, that a quality number means what it claims to mean, and that the catalogue maintains itself as it grows.</p>
+<p>This turn came from experience rather than caution in the abstract. Recent work found an OCR run that could not read maps from one of our image hosts, a map overview with nearly a third of its area blank that still received a perfect machine score, and published sheets that drew nothing. The lesson is simple: a plausible result is not yet a trustworthy one.</p>
+
+<h2>First: put the maps on the right ground</h2>
+<p>The most urgent repair is <a href="/blog/two-map-series-2026-09">Series L7014</a>, the US Army Map Service survey of Vietnam at 1:50,000. Most of its live mosaic is about <strong>470 metres northwest</strong> of where it belongs. Its sheets use the Indian 1960 datum; one coordinate conversion silently left many of them unchanged.</p>
+<p>The corrected rebuild now contains 436 sheets and has passed its geographic audit with no failures. That audit also found a separate Huế sheet 5.4 kilometres from its printed grid cell; a correctly placed duplicate has replaced it. What remains is to tile and upload the corrected mosaic, verify the delivered result, and only then retire the old one. The old build stays recoverable until the replacement has passed.</p>
+<p>The same investigation found a second, quieter version of the problem. The rectangles used to show all 627 cells in the survey index—including sheets we do not hold—were drawn from the uncorrected datum too. They are not the map images, but they make the coverage diagram look convincingly wrong. Those rectangles will be rebuilt through the same tested conversion as the mosaic.</p>
+
+<h2>Make quality measurable</h2>
+<p>A map placed with three control points can report a perfect fit even when it is badly placed: three points determine an affine transformation exactly, leaving no independent evidence with which to test it. Eleven sheets still have that problem. Adding a fourth point to each will turn a mathematically inevitable zero into a residual we can actually inspect.</p>
+<p>The same principle applies to shapes. We can ask a model to find buildings and parcels on an 1882 cadastral sheet, but today we have no complete hand-traced patch against which to measure false positives. A small block bounded by Rue Mac, Rue No. 15 and Rue Pellerin is almost complete: nine approved traces are already there, with roughly one or two features left for a person to confirm. Once that patch is exhaustive, we can report precision as well as recall. Until then, tuning the model would mostly be tuning our confidence.</p>
+
+<h2>Finish surveys as surveys</h2>
+<p>Two Indochine 1:100,000 surveys are next in the catalogue pipeline: Series 561, covering 1947–59, and Series 325, covering 1900–47. Together their indexes describe 340 grid cells. Thirty-four draft records have been created for Series 561; Series 325 has not started. Before the larger ingest continues, we are resolving the source licence and fixing the catalogue bookkeeping that currently recognises only 20 of those 34 drafts as held.</p>
+<p>The earlier Indochine 1:25,000 survey is much further along. Of 207 known sheets, 205 now have a georeference. Sixty-two remain drafts because placement is not publication: a person still needs to look at each one, check that its image and tiles really render, and publish only those that pass.</p>
+
+<h2>Then read what is printed inside them</h2>
+<p>Search is thin because the source corpus is thin. Only six of 39 georeferenced sheets in the working set currently carry text extractions. The next OCR pass begins with human triage: mark the map frame, identify blank and water areas that should not consume a model call, then queue the prepared sheets. After the run, an alphabetical dictionary will make repeated errors—broken street names, truncated landmarks, or a bare “Rue”—visible in a way that reviewing one bounding box at a time does not.</p>
+<p>That work feeds the public surfaces directly: searching a place name across maps, landing on the occurrence on the sheet, and connecting historical spellings to the gazetteer and the press archive. The goal is not merely more OCR. It is an extraction whose source, run and disagreements remain inspectable.</p>
+
+<h2>Where help matters</h2>
+<p>Several of these jobs cannot honestly be automated away. A human must decide whether the 1882 trace window is complete, inspect the 62 Tonkin sheets, place additional control points, and trace District 4 before we can measure its buildings across time. Those are not chores left over after the “real” technical work. They are the observations that make the technical work testable.</p>
+<p>So that is what we are doing now: fewer new promises, more independent checks; correcting the ground beneath the archive, enlarging the evidence, and recording failure as carefully as success. The next public features will be better for the pause—and, more importantly, we will be able to say how we know.</p>
+`,
+  },
+  {
     slug: 'two-map-series-2026-09',
     title: 'Two Map Series, 536 Sheets: Vietnam at 1:50,000 and 1:25,000 (1903–1989)',
     date: '2026-09-14',
