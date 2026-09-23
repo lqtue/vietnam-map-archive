@@ -3,6 +3,8 @@
 // iiif/iiifImageInfo — can resolve an annotation source without pulling
 // @allmaps/openlayers (and the whole WarpedMapLayer bundle) in with them.
 
+import { generateId } from '@allmaps/id';
+
 /**
  * Builds the Allmaps annotation URL for a given source.
  *
@@ -39,21 +41,27 @@ function withInfoJson(url: string): string {
 /**
  * The URL to hand Allmaps Editor so it reopens an existing map's control points.
  *
- * The editor keys a map off its IIIF resource, not off an annotation, so the
- * source has to be the manifest or image service the map was georeferenced
- * from. An R2 source is skipped by default — `allmaps_id` derives from the
- * image URL, so opening our mirror would usually derive a different id and
- * start a blank map instead of loading the points already placed.
+ * The editor keys a map off its IIIF resource, not off an annotation: it
+ * hashes whatever URL you hand it (`@allmaps/id`'s `generateId`, the same
+ * function `verifiedEditorSourceId` below calls) and looks up the annotation
+ * filed under that hash. Hand it the wrong URL for a given map and it opens a
+ * blank canvas, not an error — that hash simply has nothing behind it yet.
  *
- * "Usually": the whole District 4 series is the exception. Their GCPs were
- * re-fit against the R2-hosted copy after mirroring (1942 most visibly — its
- * R2 copy is a distinct, higher-res rescan the original scan never had), so
- * for those sheets the "skip r2" default is exactly backwards and opens a
- * stale scan. `verifiedSourceId` — the annotation's own `target.source.id`,
- * fetched by the caller — is ground truth and overrides the default whenever
- * it matches one of `sources`, r2 included. Callers that can't fetch the
- * annotation (no caller currently omits it, but the type stays optional so
- * this remains a pure, synchronous fallback) get the old heuristic.
+ * An R2 source is skipped by default — most maps were georeferenced against
+ * their original scan, so R2's URL usually hashes to a different id than
+ * `allmaps_id` and would open blank. `verifiedSourceId` overrides the default
+ * whenever it matches one of `sources`, r2 included, for the sheets where
+ * that default is backwards (the whole District 4 series; 1942 most visibly —
+ * its R2 copy is a distinct, higher-res rescan the original scan never had).
+ *
+ * Pass `verifiedEditorSourceId(map, sources)`'s result as `verifiedSourceId`.
+ * Do not pass a `target.source.id` read out of a stored annotation mirror —
+ * that field records whatever the mirror was last rewritten to, not what
+ * `allmaps_id` is actually keyed to on Allmaps' own server, and the two can
+ * disagree for months without anything flagging it (confirmed 2026-09-23:
+ * every R2-mirrored map but one hashed to a different id than its
+ * `allmaps_id`, because mirroring always rewrites the stored copy's source to
+ * R2 regardless of what's actually live upstream).
  *
  * Returns '' when the map carries nothing the editor can open.
  */
@@ -81,6 +89,27 @@ export function allmapsEditorSourceUrl(
   if (!map.annotation_url && map.allmaps_id)
     return `https://annotations.allmaps.org/images/${map.allmaps_id}`;
   return '';
+}
+
+/**
+ * Ground truth for which of a map's IIIF sources its Allmaps annotation is
+ * actually keyed to. Hashes each candidate the way Allmaps itself does and
+ * returns the one that matches `map.allmaps_id` — no network fetch, and
+ * nothing to go stale, unlike reading `target.source.id` out of a mirror copy
+ * (see `allmapsEditorSourceUrl` above).
+ */
+export async function verifiedEditorSourceId(
+  map: { allmaps_id?: string | null; iiif_manifest?: string | null },
+  sources: { iiif_image?: string | null }[]
+): Promise<string | null> {
+  if (!map.allmaps_id) return null;
+  const candidates = [map.iiif_manifest, ...sources.map((s) => s.iiif_image)].filter(
+    (u): u is string => !!u
+  );
+  for (const url of candidates) {
+    if ((await generateId(url)) === map.allmaps_id) return url;
+  }
+  return null;
 }
 
 /**

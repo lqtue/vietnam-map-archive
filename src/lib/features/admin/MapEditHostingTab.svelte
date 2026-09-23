@@ -25,8 +25,7 @@
     type MirrorR2Result,
   } from '$lib/data/admin/adminApi';
   import NeatlineEditor from './NeatlineEditor.svelte';
-  import { allmapsEditorSourceUrl } from '$lib/core/iiif/annotationUrl';
-  import { fetchAnnotationSourceId } from '$lib/data/maps/georef';
+  import { allmapsEditorSourceUrl, verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 
   export let map: MapRow;
 
@@ -291,19 +290,22 @@
     annotation_url || (allmaps_id ? `https://annotations.allmaps.org/images/${allmaps_id}` : '');
   // Ground truth for which source the annotation is really fit to — r2
   // included, since the District 4 series' GCPs are re-fit against their R2
-  // mirror. Guarded against the map changing mid-fetch (the modal can be
-  // reused for a different row without remounting).
+  // mirror. Hashed against `allmaps_id` the way Allmaps itself keys an
+  // annotation (see verifiedEditorSourceId) rather than read off a stored
+  // mirror copy, which can drift from what's actually live for months
+  // without anything flagging it. Guarded against the map changing mid-hash
+  // (the modal can be reused for a different row without remounting).
   let verifiedSourceId: string | null = null;
   /* eslint-disable svelte/infinite-reactive-loop -- writes verifiedSourceId
-     asynchronously, guarded by URL match; editorAllmapsUrl below only reads
-     it and writes nothing back, so there is no real cycle. */
-  $: if (annotationUrl) {
-    const forUrl = annotationUrl;
-    fetchAnnotationSourceId(forUrl).then((id) => {
-      if (forUrl === annotationUrl) verifiedSourceId = id;
-    });
-  } else {
-    verifiedSourceId = null;
+     asynchronously, guarded by allmaps_id match; editorAllmapsUrl below only
+     reads it and writes nothing back, so there is no real cycle. */
+  $: {
+    const forId = allmaps_id;
+    verifiedEditorSourceId({ allmaps_id, iiif_manifest: map.iiif_manifest }, iiifSources).then(
+      (id) => {
+        if (forId === allmaps_id) verifiedSourceId = id;
+      }
+    );
   }
   /* eslint-enable svelte/infinite-reactive-loop */
   // Shared with the share page's "Fix georeference" link — see

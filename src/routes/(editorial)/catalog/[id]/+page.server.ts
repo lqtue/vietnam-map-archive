@@ -30,7 +30,7 @@ import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { isUuid } from '$lib/core/utils/mapSlug';
 import { localeFromPath } from '$lib/core/i18n';
-import { effectiveAnnotationUrl, fetchAnnotationSourceId } from '$lib/data/maps/georef';
+import { verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 
 const MAP_COLUMNS =
   'id, slug, name, dc_description, year, year_label, creator, dc_publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done, status, bbox, iiif_manifest, source_url, shelfmark, rights, original_title, physical_description, dc_subject, map_iiif_sources(iiif_image, source_type)';
@@ -102,9 +102,8 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
   // What the map's own live annotation is actually fit to, so the "Fix
   // georeference" link opens the right scan even when it's an R2-hosted
-  // rescan rather than the original — see allmapsEditorSourceUrl.
-  const annotationUrl = effectiveAnnotationUrl(map);
-  const editorSourceId = annotationUrl ? await fetchAnnotationSourceId(annotationUrl) : null;
+  // rescan rather than the original — see verifiedEditorSourceId.
+  const editorSourceId = await verifiedEditorSourceId(map, map.map_iiif_sources ?? []);
 
   return { map, places: places ?? [], published, originals: originals ?? [], editorSourceId };
 };

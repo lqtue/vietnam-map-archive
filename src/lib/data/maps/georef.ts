@@ -3,7 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { allmapsEditorSourceUrl, annotationUrlForSource } from '$lib/core/iiif/annotationUrl';
+import { allmapsEditorSourceUrl, verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 
 export interface GeorefMapItem {
   id: string;
@@ -27,40 +27,13 @@ export interface GeorefFixItem {
 
 const EDITOR = 'https://editor.allmaps.org/#/collection?url=';
 
-/** The annotation URL a map's GCPs actually live at — override first, else the bare id. */
-export function effectiveAnnotationUrl(map: {
-  annotation_url?: string | null;
-  allmaps_id?: string | null;
-}): string | null {
-  const source = map.annotation_url || map.allmaps_id;
-  return source ? annotationUrlForSource(source) : null;
-}
-
-/**
- * What the live annotation is actually fit to — `target.source.id` — so the
- * editor link can be verified against ground truth instead of guessed from
- * `source_type`. Null on any failure; callers fall back to the sourceless
- * heuristic in `allmapsEditorSourceUrl`.
- */
-export async function fetchAnnotationSourceId(annotationUrl: string): Promise<string | null> {
-  try {
-    const res = await fetch(annotationUrl);
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.items?.[0]?.target?.source?.id ?? null;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Every georeferenced map, published or not, with the link that reopens its
  * existing control points — the same link the share page builds, so nobody has
  * to find a map id to correct a georeference. Sources come along because an
- * R2 mirror must not be handed to the editor *unless* the annotation itself
- * says otherwise — see `allmapsEditorSourceUrl`; the whole District 4 series
- * is the exception, so this list verifies against the live annotation rather
- * than trusting `source_type` alone.
+ * R2 mirror must not be handed to the editor *unless* it's the one
+ * `allmaps_id` is actually keyed to — see `verifiedEditorSourceId` and
+ * `allmapsEditorSourceUrl`.
  */
 export async function fetchGeorefFixList(
   supabase: SupabaseClient<Database>
@@ -79,8 +52,7 @@ export async function fetchGeorefFixList(
   }
   return Promise.all(
     (data ?? []).map(async (m) => {
-      const annotationUrl = effectiveAnnotationUrl(m);
-      const verifiedSourceId = annotationUrl ? await fetchAnnotationSourceId(annotationUrl) : null;
+      const verifiedSourceId = await verifiedEditorSourceId(m, m.map_iiif_sources ?? []);
       const source = allmapsEditorSourceUrl(m, m.map_iiif_sources ?? [], verifiedSourceId);
       return {
         id: m.id,
