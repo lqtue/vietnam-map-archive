@@ -69,13 +69,26 @@ measurement, metadata that maintains itself, and corpus size.
       promoted the 4-GCP `hue-l7014-6541-4-2` in its place.) Exit: no georeferenced sheet in the
       corpus sits on fewer than 4 points, and `modern_prior.py --sweep` reports a residual for
       every one.
-- [ ] **`indochine-100k-ingest`** — finish it. 578 of 581 half-sheet scans un-ingested; the
-      path is proved on 3 (real rows, tiled, serving). Cheapest corpus growth available — a batch
-      run, not a project. 561 first (100% ready IIIF URLs), then 325 (exercises the constructed
-      `f110IdNakala` path at scale). Grep each run for `TILING FAILED`; the script leaves a
-      pixel-less `draft` row rather than failing loudly. Exit: `/catalog/series` renders both
-      surveys sensibly, and `scripts/check_series_index.mjs` is still clean. See
-      `.claude/handoff.md`.
+- [ ] **`indochine-100k-ingest`** — finish it. Checked against production 2026-09-23: **34 draft
+      rows minted on the 561 series** (1947–1959, of 197 cells), **0 on 325** (1900–1947, of 143
+      cells — its collection key is still an orphan in `series_sheets`, nothing has started).
+      `check_series_index.mjs` only credits 20 of the 34 as held — the other 14 are the
+      `held-by-derived` drift, live. 561 first (100% ready IIIF URLs), then 325 (exercises the
+      constructed `f110IdNakala` path at scale). Grep each run for `TILING FAILED`; the script
+      leaves a pixel-less `draft` row rather than failing loudly. Exit: `/catalog/series` renders
+      both surveys sensibly, and `scripts/check_series_index.mjs` is still clean.
+- [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print,
+      the way `tonkin_georef.py` does for the sibling 1:25,000 survey, so
+      `indochine-100k-ingest`'s rows can leave draft. Not started — planned 2026-09-23:
+      `docs/journals/260923-indochine100k-georef.md` has the investigation (three sample sheets
+      confirm printed grade coordinates, two different frame conventions, a K-grid overlay to
+      avoid locking onto) and the recommended approach, which turns out cheaper than Tonkin's own
+      primary path — `series_sheets.bbox` for both series already carries the CartoMundi UNIMARC
+      catalogue extent per cell (same data Tonkin's `catalogue_boxes()` reads, already parsed by
+      the ingest importer), so this can mirror Tonkin's `from_catalogue()`/`calibrate()` fallback
+      instead of per-sheet OCR. Exit: same as `tonkin-review` — every sheet that clears the gate
+      carries `georef_done = true`, still `status = draft`, and a person reviews before
+      publishing.
 - [ ] **`indochine-100k-licence`** — settle it before the ingest run mints 578 rows.
       Probed 2026-09-21 with the same
       per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also
@@ -278,8 +291,11 @@ system — what a result must retain, and the two kinds of check — is in the r
       and the Mekong delta, top of the scout queue at `/admin?tab=scout`. Pattern is
       `scripts/oneoff/import_indochine_series_sheets.mjs`; union every edition of the survey, not
       one.
-- [ ] **`l909-index`** — AMS L909 has none, so no coverage page and no link from its /explore
-      row. Three sheets; someone must decide what that survey contains.
+- [ ] **`l909-index`** — no coverage page, no /explore link. Narrower than it looks: the DB-filing
+      half is already done in production — `fix_l909_series_index.mjs --apply` has run, all three
+      sheets carry one `collection` string (`AMS L909 — Việt Nam City Maps 1:12,500`) and
+      consistent `extra_metadata.series`/`edition`. What's missing is a `series_sheets` row set —
+      someone still has to decide what the survey contains beyond the three held sheets.
 - [ ] **`titles-from-sheet`** — not from the catalogue. CartoMundi's spellings are
       French colonial transcriptions — `Yên-Dinh` is half-accented for Yên Định and reads as an
       error. Deliberately not applied; it sits behind `--names` in
@@ -376,6 +392,21 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [~] **`sheet-overlap-floor`** — sheets on one ground (2026-09-21). Two Saigon plans sixteen years
       apart, each warped by its own GCPs, overlap to ~50–100 m, and the limit is the scan rather
       than the transform. Detail: `docs/journals/260921-sheet-overlap.md`.
+- [ ] **`district4-mirror-sync`** — three separate faults found chasing "the 1942 sheet looks off"
+      (2026-09-22/23), none yet closed. The tooling bug is fixed (`allmapsEditorSourceUrl` now
+      trusts the annotation's real source instead of always skipping R2, `0607cc26`, shipped but
+      not confirmed deployed) — this item is what's left, which is data, not code. (1) 4 of the 6
+      District 4 sheets' stored annotation mirrors are stale against the live Allmaps annotation
+      (1923 worst: 13 months out of sync, 501 OCR extractions resting on it) — `sync-allmaps` is
+      the fix but is a manual button with no trigger, needs an authenticated admin session to run.
+      (2) `/explore` shows confirmed real (not display-bug) misalignment near "Pont tournant" —
+      the 1942 sheet's genuine 15.9m/27.3m RMSE floor — fixable with one more independent ground
+      point on the actual swing bridge, not yet sourced (satellite cross-reference needed;
+      `drop_1942_gcp1.mjs` is mid-flight on the one known-bad point). (3) the *official*
+      Allmaps-hosted copy of 1942 is broken at 117m RMSE and undecided whether to fix — production
+      doesn't read it (`maps.annotation_url` wins over `allmaps_id`) unless someone clicks "Sync
+      from Allmaps" for that map, so it's a landmine, not live damage. Exit: all three resolved or
+      explicitly deferred with a reason; full trail in the `georef-tooling-district4` memory.
 - [ ] **`building-attributes`** — → OSM tags → LoD2 — deferred until the fabric is reviewed on ≥ 3
       maps. `tags jsonb` lands with its first writer.
 
@@ -388,6 +419,15 @@ Plan: `docs/walk-plan.md`.
       whole
       track collapses into `/trip/[id]` plus a year slider, and the fork should be deleted rather
       than maintained. **Nothing else in Walk is worth starting first.**
+- [ ] **`field-photo-pilot`** — after `walk-the-route`, test geotagging and present-day building
+      height estimates with Quang Huy Nguyen on one short District 4 segment (about 10–20 photos).
+      Record each photo's location, how it was located, positional uncertainty, candidate building
+      match, height estimate, estimation method and validation evidence. Check failures from missing
+      GPS and distant/oblique views before designing any archive write path. These are observations
+      of the **present-day** scene: never attach a height inferred from a current photo to an 1882
+      or other historical footprint as though it described that map year. Exit: a small reviewable
+      dataset and error/uncertainty report; only then decide whether photos belong in Walk and
+      whether validated present-day heights should feed `building-attributes`.
 - [ ] **`sheet-pmtiles`** — `scripts/sheet_pmtiles.py <mapId> --bbox` — one sheet drawing in
       MapLibre proves the
       chain. IIIF level0 tiles are not web-mercator XYZ, which is why every sheet must be warped
