@@ -119,9 +119,9 @@ function syncViewButtons() {
   $('map-toggle').setAttribute('aria-pressed', String(viewMode === 'map'));
   $('side-toggle').setAttribute('aria-pressed', String(viewMode === 'stack'));
   document.body.classList.toggle('stack-view', viewMode === 'stack');
-  const touch = matchMedia('(pointer: coarse)').matches;
+  const touch = matchMedia('(pointer: coarse)').matches || innerWidth <= 720;
   $('instruction').textContent = touch
-    ? 'Drag to move, pinch to zoom, or tap a scan to inspect a place. Choose Stack to see the years in depth.'
+    ? 'Tap a sheet to view it. Tap the same scan again to inspect that place. Drag to move and pinch to zoom.'
     : 'Drag to move, scroll to zoom, Command-drag to rotate, or click a scan to inspect a place. Choose Stack to see the years in depth.';
   $('gesture-hint').textContent = touch
     ? (viewMode === 'stack' ? 'Drag to move · pinch to zoom · Map to return' : 'Drag to move · pinch to zoom · Stack for depth')
@@ -410,7 +410,7 @@ async function load() {
   const mid = (layers.length - 1) / 2;
   const layerY = year => (mid - indexByYear.get(year)) * 130;
   let focus = null, hovered = null, loaded = 0, failed = 0;
-  const rows = [], meshes = [], fabrics = [], lowTextures = [], yearBadges = [];
+  const rows = [], shortcutRows = [], sheetCorners = [], meshes = [], fabrics = [], lowTextures = [], yearBadges = [];
   let crispIndex = null, crispTexture = null, crispRequest = 0;
   function status() { $('status').textContent = `${loaded}/${layers.length} scans ready${failed ? ` · ${failed} unavailable` : ''}`; }
   const scanOpacity = 0.55;
@@ -452,18 +452,56 @@ async function load() {
       if (index !== null) loadCrispTexture(index);
     }
     layers.forEach((_, i) => applyLayerVisual(i));
-    rows.forEach((el, i) => el.setAttribute('aria-pressed', String(i === focus)));
+    for (const list of [rows, shortcutRows]) {
+      list.forEach((el, i) => el.setAttribute('aria-pressed', String(i === focus)));
+    }
     const l = layers[focus];
     if (l && expand) sidebar.expand(true);
     // Mobile's top pill is the only thing visible with the sheet collapsed,
     // so the current selection has to surface there too, not just in the list.
     $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : 'Six sheets in view';
   }
-  function selectYear(index) { setFocusedYear(focus === index ? null : index, true); }
+  function fitSheetInMobileView(index) {
+    const corners = sheetCorners[index];
+    const xs = corners.map(point => point[0]);
+    const zs = corners.map(point => point[2]);
+    const centre = new THREE.Vector3((Math.min(...xs) + Math.max(...xs)) / 2, layerY(layers[index].year),
+      (Math.min(...zs) + Math.max(...zs)) / 2);
+    const top = $('masthead').getBoundingClientRect().bottom + 12;
+    const bottom = $('toolbar').getBoundingClientRect().top - 12;
+    const visibleHeight = Math.max(120, bottom - top);
+    const visibleWidth = innerWidth - 32;
+    const halfFov = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const width = Math.max(...xs) - Math.min(...xs);
+    const height = Math.max(...zs) - Math.min(...zs);
+    const distance = THREE.MathUtils.clamp(Math.max(
+      width * innerHeight / (2 * halfFov * visibleWidth),
+      height * innerHeight / (2 * halfFov * visibleHeight),
+    ) * 1.12, controls.minDistance, controls.maxDistance);
+    const offset = new THREE.Vector3(
+      distance * Math.cos(REST.elevation) * Math.sin(REST.azimuth),
+      distance * Math.sin(REST.elevation),
+      distance * Math.cos(REST.elevation) * Math.cos(REST.azimuth),
+    );
+    const orientation = new THREE.Matrix4().lookAt(centre.clone().add(offset), centre, new THREE.Vector3(0, 1, 0));
+    const screenUp = new THREE.Vector3().setFromMatrixColumn(orientation, 1);
+    centre.addScaledVector(screenUp, ((top + bottom) / 2 - innerHeight / 2) * 2 * distance * halfFov / innerHeight);
+    mapDistance = distance;
+    moveCamera(centre.clone().add(offset), centre, new THREE.Vector3(0, 1, 0), true);
+  }
+  function selectYear(index) {
+    setFocusedYear(focus === index && innerWidth > 720 ? null : index, innerWidth > 720);
+    if (innerWidth <= 720) {
+      sidebar.expand(false);
+      setViewMode('map');
+      fitSheetInMobileView(index);
+    }
+  }
   for (const [index, l] of layers.entries()) {
     const ly = layerY(l.year);
     const corners = [[0, 0], [l.image.width, 0], [l.image.width, l.image.height], [0, l.image.height]]
       .map(([x, y]) => toWorld(affine(l.image.matrix, x, y), ly));
+    sheetCorners.push(corners);
     const positions = new Float32Array([...corners[0], ...corners[1], ...corners[2], ...corners[0], ...corners[2], ...corners[3]]);
     const uvs = new Float32Array([0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0]);
     const imageGeometry = new THREE.BufferGeometry();
@@ -498,6 +536,13 @@ async function load() {
     row.onmouseenter = () => { hovered = index; layers.forEach((_, j) => applyLayerVisual(j)); };
     row.onmouseleave = () => { hovered = null; layers.forEach((_, j) => applyLayerVisual(j)); };
     $('legend').append(row); rows.push(row);
+    const shortcut = document.createElement('button');
+    shortcut.className = 'year'; shortcut.type = 'button'; shortcut.setAttribute('aria-pressed', 'false');
+    const shortcutYear = document.createElement('b'); shortcutYear.textContent = l.year;
+    const shortcutName = document.createElement('small'); shortcutName.textContent = l.label;
+    shortcut.append(shortcutYear, shortcutName);
+    shortcut.onclick = () => selectYear(index);
+    $('sheet-shortcuts').append(shortcut); shortcutRows.push(shortcut);
   }
   restoreHomeContent = () => setFocusedYear(null);
   homeTarget = new THREE.Vector3(...toWorld([innerWidth <= 720 ? 400 : 570, 520], layerY(1923)));
@@ -702,8 +747,16 @@ async function load() {
       const selectedMesh = focus === null ? [] : [meshes[focus]];
       const scanHit = raycaster.intersectObjects(selectedMesh)[0] || raycaster.intersectObjects(meshes)[0];
       if (scanHit) {
+        const index = meshes.indexOf(scanHit.object);
+        if (innerWidth <= 720 && (focus !== index || viewMode !== 'map')) {
+          setFocusedYear(index);
+          setViewMode('map');
+          sidebar.expand(false);
+          fitSheetInMobileView(index);
+          return;
+        }
         const point = [(350 - scanHit.point.x) / .7, (350 - scanHit.point.z) / .7];
-        placeContext.select(point, meshes.indexOf(scanHit.object));
+        placeContext.select(point, index);
         sidebar.show('place');
         sidebar.expand(true);
       }

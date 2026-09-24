@@ -3,6 +3,14 @@ const $ = id => document.getElementById(id);
 export function createSidebar() {
   const sheet = $('sheet');
   const handle = $('sheet-handle');
+  const shortcuts = $('sheet-shortcuts');
+  const updateCollapsedHeight = () => {
+    const height = handle.offsetHeight + shortcuts.offsetHeight;
+    if (height) document.documentElement.style.setProperty('--sheet-collapsed-height', `${height}px`);
+  };
+  const sizeObserver = new ResizeObserver(updateCollapsedHeight);
+  sizeObserver.observe(shortcuts);
+  sizeObserver.observe(handle);
   const tabs = [
     { id: 'sheets', button: $('tab-sheets'), panel: $('legend'), label: 'Sheets' },
     { id: 'names', button: $('tab-names'), panel: $('controls'), label: 'Names' },
@@ -10,6 +18,7 @@ export function createSidebar() {
   ];
 
   function show(id, focusTab = false) {
+    sheet.dataset.tab = id;
     for (const tab of tabs) {
       const active = tab.id === id;
       tab.button.setAttribute('aria-selected', String(active));
