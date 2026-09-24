@@ -59,13 +59,13 @@ const apply = willApply();
 const SERIES = [
   {
     skey: 325,
-    key: 'indochine-1-100-000-1900-1947',
+    key: 'indochine-1-100-000-1st-edition-sgi-1900-1947',
     collection: 'Indochine 1:100,000 — 1st édition SGI (1900–1947)',
     source: 'work/indochine-100k/sources/serie-325.json',
   },
   {
     skey: 561,
-    key: 'indochine-1-100-000-1947-1959',
+    key: 'indochine-1-100-000-2nd-edition-sgi-1947-1959',
     collection: 'Indochine 1:100,000 — 2nd édition SGI (1947–1959)',
     source: 'work/indochine-100k/sources/serie-561.json',
   },

@@ -233,3 +233,311 @@ compare Thanh Hoa with neighbouring sheets. The current evidence rules out apply
 one Tonkin-style global offset to the 446 eligible records. Keep the draft write
 path gated until a correction model passes measured residuals across the full
 range and the placement lattice check.
+
+## 2026-09-24, later — ingest finished, first 561 batch published, a second gate found
+
+Ingest (`indochine-100k-ingest`) finished independently this session: both series fully minted,
+561 at 360/360 cells and 325 at 221/221, 581 rows total. A live-image check of all 360 series-561
+rows (two passes — the first used an invalid IIIF tile-URL shape against this server's `level0`
+profile and false-positived 100% broken; corrected to the real
+`{region}/{w},{h}/0/default.jpg` shape per `level0_tile_url` in `iiif_tiles.py`) found exactly
+**2 genuinely broken**: sheet 12 "Muong Ou Tay" W+E, `source_type: self` but no
+`map_iiif_sources` row at all — the tile-to-R2 step silently failed for just this one sheet,
+matching the failure mode `indochine-100k-ingest` already warned about. Upstream Nakala source
+confirmed reachable (`info.json` 200 on both DOIs), so this was a tiling gap, not a source
+problem. Re-tiled and reconfirmed loadable.
+
+**Decision taken on the Tri Binh question above, not resolved**: rather than investigate further,
+dropped Tri Binh from the calibration set to unblock a first batch. The remaining 6 sheets
+(10.5–20.9°N span, still clears the ≥6-sheet/≥8°-span requirement) fit to **76m mean / 188m max
+residual** — comfortably inside the 250m gate — and this fit is what's now saved to
+`catalogue-offset.json`. This is explicitly a judgement call, not a finding: Tri Binh's own tick
+reads were internally plausible, so excluding it trades a possible real signal (a regional datum
+break) for forward progress. Revisit before leaning on this fit for the full series — the
+original next-step (more sheets at 15–18°N) still stands.
+
+**`place`/`check`/`annotate` run for the first time against real candidates.** `place()` needs no
+Gemini call (`detect()` + the calibrated catalogue edges only), so it's much cheaper per sheet than
+calibration was. Result across 8 attempted sheets: the 3 already used in calibration
+(Ha Tinh W, Son Tây E, Thanh Hoa W) cleared both the per-sheet `verdict()` gate and the
+`check()` lattice self-consistency pass; a 4th calibration sheet (Pursat E) cleared `verdict()`
+alone but failed the lattice's rim-offset-vs-median check at n=4 (dropped, not investigated —
+plausible under a 4-sample median, needs a bigger batch to judge fairly); and **4 fresh sheets
+picked outside the calibration set — Gia Ray, Kratié, Sop Cop, Hà Giang, spread 11–23°N — all
+four held on `verdict()` itself**, three on `rim offsets spread` (15–26%, gate is 12%) and one on
+`axes disagree` (1.8%, gate is 1.5%). This is a **separate bottleneck from calibration**: the
+consensus frame detector's constants (`ACROSS=(190,300)`, `MAXIN=250`, tuned against two sample
+sheets back on 2026-09-23) don't generalize cleanly across the series. 3 clears + 4 holds out of
+7 fresh attempts (43%) matches the ~44% clear rate the calibration pass's own 16-sheet sample saw
+— consistent, not a fluke, and the real blocker for a full-series run.
+
+**Published**: the 3 clearing sheets went through `annotate --apply` (self-hosted annotation to
+Supabase Storage, no Allmaps involvement — `allmaps_id` stays null, sidestepping the whole
+R2-mirror/`allmaps_id` identity mess documented in `georef-tooling-district4`), landing
+`is_georeferenced = true`, `status` still `draft`. Reviewed by: geometry gates, the lattice check,
+and a coarse landmark-in-bbox sanity check (Hà Tĩnh city, Thanh Hóa city, Sơn Tây town each fall
+inside or plausibly outside their sheet's bbox given which half — W/E — was placed) — **not** an
+eyeball check in `/explore`, which the project's own review convention calls for before trusting
+a georeference fully. `source_type` was `self` on these rows despite being genuinely R2-hosted
+(confirmed via the image check above) — corrected to `r2` before publishing, to avoid the mig-058
+publish trigger enqueueing a redundant `tile_to_r2` job. All 3 flipped to `status = public`.
+`map_series` now returns a row for
+`indochine-1-100-000-2nd-edition-sgi-1947-1959` (3 sheets, 3 published, bounds
+18.00–21.17°N) — **series 561 is live on `/catalog/series`** for the first time.
+
+**325 untouched.** No catalogue/frame code exists for it; its own sample sheet (from the
+2026-09-23 investigation above) showed a third frame convention distinct from both of 561's, so
+this is a fresh build, not a port of the 561 script.
+
+**Real next step, now clearer than "widen the calibration sample"**: tune `detect()`'s
+`ACROSS`/`MAXIN`/rim-spread tolerance against a wider, latitude-spread sample before attempting a
+full-series `place()` run — the calibration-side question (Tri Binh) and the detection-side
+question (majority of sheets holding on `verdict()`) are independent and both need real answers
+before this is more than a 3-sheet proof of concept.
+
+## 2026-09-24 — replayed the frame search on cached strips
+
+Replayed `detect()` without network image reads on 20 saved sheets: the 16-sheet
+latitude-stratified calibration sample and the four fresh placement failures.
+Sixteen had a detectable rim with both settings; four still failed or had
+inconsistent rims. Changing `MAXIN` from 250 to 220 lost the calibration sheet
+whose four measured offsets are 237–249 px; raising it to 280 or 300 changed no
+outcome. The existing `ACROSS=(190,300)` contains the observed rim and has no
+evidence yet for expansion. The 12% rim-spread gate was left intact.
+
+The failure was mostly the thick-line search, `NEAR=35`: on Gia Ray, Kratié and
+Hà Giang it sometimes chose a neighbouring line 20–30 px away from the rough
+overview peak, while locating nearly the same rim. Tightening `NEAR` to 12 px
+reduced those three sheets' rim spreads from 26%/15%/15% to 4%/4%/3%; their
+detected corners moved at most 3.6/0.9/0.9 px. Across the 16 detectable sheets,
+rim-spread clears rose from 10 to 14. One calibration sheet that was already
+held for missing ticks changed from a 7% to a 22% rim spread, so this remains a
+sample result, not a series-wide success claim.
+
+For the seven saved placement records, the per-sheet geometry verdict moves
+from 3/7 to 6/7 clear. Sop Cop remains held: its four rim offsets agree within
+1.2%, but the two ground scales differ by 1.8% against a 1.5% ceiling. That
+independent mismatch should be investigated, not waved through. No placement
+JSON was replaced, no annotation was written, and no full-series batch was run.
+Before a batch, check a larger fresh sample visually, inspect the remaining
+detector failures, and revisit the excluded Tri Binh calibration observation.
+
+## 2026-09-24 — reduced overview tile requests during the full placement pass
+
+The first full `place` pass exposed a request cost: `frame()` assembled an entire
+1800px overview, then measured only its central 8%-wide horizontal and vertical
+bands. At a representative 5000×7500px sheet with 256px tiles at scale factor
+2, that is about 150 overview tile requests. Fetching the two bands alone takes
+about 50. The four full-resolution edge strips are unchanged.
+
+`frame()` now fetches that central cross and aligns the vertical band to the
+old overview height before finding peaks. If either horizontal frame profile
+has a competing peak at least 12 overview pixels away within 7% of the
+strongest, it fetches the original whole overview: small resampling differences
+can otherwise select the wrong printed line. Against 20 cached sheets, 11 used
+only the cross and 9 fell back. All 20 retained the same detector failure or
+success, and every detected corner stayed within 1px of the prior method.
+`DETECT_VERSION=3` makes `place()` refresh saved placements from older detectors.
+
+The series-wide pass was restarted with this version in a detached `screen`
+session, logging to `work/indochine-100k/full-place.log`. These numbers measure
+the sample and the overview fetch only; the full-series clear rate and Worker
+request total are not yet known. No annotation or database write occurs in
+`place`.
+
+## 2026-09-24 — bounded tile fetching; early failure diagnosis
+
+The first 27 attempts still held many sheets. Seven "no rim" failures were
+replayed from cached strips with `NEAR` 12/20/35 and `MAXIN` 250/300/350/400;
+none recovered. Their averaged profiles after the selected thick line were
+flat rather than showing a second frame peak. Five rough lines lie near the
+mapped edge implied by the other three sides, suggesting that the overview
+sometimes selects the rim itself; two differ more substantially. This needs
+hand-labelled examples and an alternate frame detector, not a lower
+prominence threshold or a looser geometry gate. Catalogue-span holds are a
+separate source-data issue, and small axis-scale holds need inspection against
+printed ticks.
+
+The tile assembler fetched tiles one at a time within each crop. It now accepts
+an optional bounded `max_workers` argument, defaulting to one for every other
+pipeline; series 561 uses four per crop. The assembler pastes returned tiles
+in grid order and retains its coverage check and disk cache. Its self-check
+pins identical pixels and warm-cache behaviour for serial and parallel paths.
+One untouched sheet's live placement attempt took 24.4 seconds with parallel
+fetching, including a real "no rim" hold. This is a single timing observation,
+not a measured series-wide speedup. The full local-only `place` pass was
+restarted with the faster fetcher and continues in `full-place.log`.
+
+The faster run also produced a geometry-clear placement for Tri Binh (W), the
+sheet excluded from the accepted calibration for its 741.5m residual. Its
+saved local placement was explicitly marked held, and both `placement()` and
+`annotate()` now guard that map ID. A plausible neatline cannot validate the
+catalogue-to-print offset on that outlier.
+
+## 2026-09-24 — full local placement pass completed
+
+`work/indochine-100k/full-place.log` reached 357/357 and the worker exited.
+The completed pass logged 134 geometry clears, 33 abnormal catalogue spans,
+91 rim detection holds, and 99 geometry holds. One of the 134 clears, Tri
+Binh (W), is explicitly held because of its excluded calibration observation.
+That leaves 133 new provisional clears. Three previously published clears also
+have local placement records; neither they nor the new records were annotated
+or written to the database by this pass.
+
+The read-only `check` examined 136 locally clear placements and failed on
+Pursat (E): its four rim offsets agree with each other but differ by more than
+15% from the series median. This suggests a different printed frame convention
+and needs visual review. It leaves at most 132 new provisional clears for
+review; the failed check blocks annotation of the batch. The 223 remaining
+sheets require investigation of the catalogue spans, rim selection, or
+geometry before another placement attempt. Counts come from the completed
+`full-place.log`, saved placement JSON, and the `check` output.
+
+## 2026-09-24 — series 561 catalogue matching grid
+
+`scripts/indochine100k_grid.py --apply` now generates a local matching grid
+from the per-record CartoMundi coordinates and the accepted catalogue
+correction. It queries map rows only to attach UUIDs by their unique
+`cartomundi_fkeys[0]`; it writes no database data. The resulting
+`work/indochine-100k/grid/` has 197 numbered cell features, 394 W/E slot
+features (empty halves have null geometry), and a crosswalk for all 492
+catalogue records. All 360 current series-561 VMA map rows matched exactly
+once. Of the cells, 143 have both normal catalogue halves, 34 have only one
+normal half, 8 use estimated outlines after abnormal source spans, and 12
+have unclassified record extents. Cells 153 and 154 have nearly coincident
+catalogue footprints under distinct numbers; both are flagged for review.
+These polygons locate sheets in the survey index, not approved image
+georeferences. See `work/indochine-100k/grid/README.md` for the file contract.
+
+The first generated GeoJSON mistakenly stored Paris-meridian grades as WGS 84
+degrees, placing the index east of Vietnam in the South China Sea. The output
+conversion is now explicit in `feature()`, with a regional coordinate guard.
+Regenerated cell bounds are 101.465–109.639°E, 10.302–23.423°N; all 136
+locally clear placements have the same centres as their matched grid slots.
+
+## 2026-09-24 — replaced inferred grid with CartoMundi WKT
+
+The user found a CartoMundi collection endpoint exposing `wkt`. Its example,
+collection 297, returns 200 records of **series 233**, not 561. The ordinary
+`/serie/561/feuilles` endpoint returns 843 records with no WKT, but IGN's
+`/public/etablissement/3/serie/561/feuille/exemplaire/all` endpoint returns
+492 records and WKT for every one. Their fkeys match the local 561 catalogue
+exactly. A compact 492-record WKT snapshot is now
+`work/indochine-100k/sources/serie-561-wkt.json`.
+
+The grid generator now uses those published WGS 84 polygons directly. The
+previous inferred rectangles and their geometry-quality categories are
+superseded. It still yields 197 numbered cells, 394 W/E slots, and exactly one
+crosswalk match for each of 360 VMA maps; 50 half slots have no source record.
+The 153/154 conflict is real in CartoMundi's own geometry: their western
+records share `geoKey` 130785, so both remain flagged. Across 136 locally clear
+placements, the WKT centroid differs from the saved placement centre by 189m
+median and 304m maximum. That makes the WKT useful for matching sheets, not
+for replacing the image georeference.
+
+## 2026-09-24 — added the same WKT grid for series 325
+
+CartoMundi's IGN series 325 endpoint returned 514 WKT records. The local
+serie-325 catalogue contains 512 fkeys, all present in that response; the two
+extras are unnumbered Saigon and Rach-Gia records and are excluded from the
+grid. The generalized `scripts/indochine100k_grid.py --series 325 --apply`
+matches those records to the 221 current VMA rows by fkey. It writes 143
+numbered cells, 286 W/E slots, and a 512-record crosswalk under
+`work/indochine-100k/grid-325/`. There are 61 W/E slots without source records
+and no large inter-cell geometry conflicts. Series 561 was regenerated with
+the same schema. No database rows were written.
+
+## 2026-09-24 — published the passing 561 batch
+
+At the user's request, Pursat (E) was explicitly marked held for its series
+rim-offset anomaly, then the existing read-only lattice check passed on 135
+remaining clear placements across 135 half cells. The 132 new eligible
+annotations were uploaded; every public annotation URL returned HTTP 200.
+Those 132 drafts were changed to `status=public`. Together with the prior
+three, series 561 now has 135 public, georeferenced map rows representing 98
+distinct sheet numbers; the other 225 map rows remain drafts. Publishing
+enqueued no pipeline jobs because these scans already use `iiif.maparchive.vn`.
+
+The first public page request still returned 404. `map_series.key` is derived
+from the collection name, while the two `series_cells.series_key` values were
+the older manually abbreviated keys used by the one-off importer. Updated all
+143/197 index rows to the canonical keys and corrected the importer for future
+runs. The public series route now returns HTTP 200 at
+`/catalog/series/indochine-1-100-000-2nd-edition-sgi-1947-1959`; `map_series`
+reports 98 sheets, all 98 published, and 197 total index cells. The same key
+repair was applied to the 325 index rows, but all 221 of its maps remain
+drafts with no image georeferences. The WKT grid alone does not make those
+scans display as warped maps.
+
+## 2026-09-24 — fine-tuned rough edge detection, 35 new clears from the rim-detection-hold bucket
+
+Of the 225 series-561 sheets still pending after the earlier batch, 91 held because `rim_in` could
+not find any rim inward of `frame()`'s detected outer line, on at least one side. Root cause,
+confirmed visually on Russey Chrum (E) and Tam Ky (W) (`work/indochine-100k/.fetch_cache` crops,
+marked and read directly): `frame()` picks the single darkest peak in the outer third of the
+overview band as the neatline, but on these sheets the inner rim line prints bolder than the true
+outer frame line, so the rough pass locked onto the rim itself, one line past the true edge —
+leaving nothing further inward for `rim_in` to find. Nong-Het (W) recovered under the same fix
+without being individually inspected.
+
+Two fix attempts regressed the known-good set and were discarded. Making `frame()` prefer the
+outermost peak clearing a fixed floor above local background regressed a majority of the 135
+known-good placements when checked against saved corners (the exact count is lost — a `tail -60`
+on that run's output cut off the summary line, keeping only the list of regressed sheets).
+Scanner-edge vignetting and title-block text are common and cleared the floor before the real frame
+line on many sheets -- e.g. Attopeu (E), where a title-block peak at 42% of the true line's height
+above baseline still cleared it. Restricting the override to a near-tie with the strongest peak
+still regressed 71 *corner entries* (not 71 sheets — `regress.py` logs one line per corner, so this
+is roughly 20 sheets), always on the bottom or right edge, by 140-400px. The working theory is a
+comparably dark mount- or scan-background artefact just outside the true frame line on those
+sheets, common enough that a near-tie test can't tell it apart from a bolder rim line inside it --
+this was not confirmed by looking at any of them, unlike the two root-cause sheets above.
+
+Landed instead: `frame()` still returns the plain-argmax peak as before (zero change for any side
+that already succeeds), but also records the next-outermost near-tied peak, if one exists, as
+`{side}_alt`. `detect()` only consults it when the primary side is suspect: `side_line`/`rim_in`
+already failed, the found offset falls outside the empirical band the offset-to-height ratio holds
+to across the corpus, or the rim was only found via `rim_relaxed`. A side that is already a clean,
+in-band, non-relaxed hit never reaches the retry branch, so this cannot regress a sheet that
+already places correctly -- verified by re-running `detect()` from cache against every known-good
+placement's saved corners at each stage of the fix (0 regressions each time: against the 135 known
+before this pass, against 162 after the first working version, and against 170 after the version
+below).
+
+The first working version of the retry still missed most of its own targets: `frame_strip` only
+fetches roughly 190px of headroom outward of the primary peak, and the frame-to-rim distance is
+typically 200-220px, so the alt position usually falls outside the strip already fetched (Hon Quan
+(E), Kompong Chhnang (W) both did). Fixed by fetching a new strip centred on the alt position when
+it falls outside the one already in hand. The empirical band itself: pooled `offset / image-height`
+over every side *not* reached via the alt path (636 sides, 170 sheets) is 0.0213-0.0262 (median
+0.0230, std 0.0006) -- tight enough that a side landing on the wrong line reads as a clear outlier,
+not noise. `DETECT_VERSION` bumped to 4 so the cached geometry-hold sheets (not just the
+rim-detection-holds) get re-evaluated under the wider retry trigger.
+
+That bump has a real cost the first pass under it missed: Pursat (E) was manually excluded on
+2026-09-23 for a series-median anomaly that only `check()`'s cross-sheet comparison catches, not
+any per-sheet gate in `detect()`/`verdict()`. That exclusion lived only as a hand-edited JSON, so
+the version bump made `place()` regenerate a fresh, locally-clean record for it and silently undid
+the hold. Fixed by adding Pursat (E) to `CALIBRATION_HOLDS` (the one mechanism, previously used
+only for Tri Binh (W), that survives a `DETECT_VERSION` bump), then re-running `place` on it alone.
+Any other hand-edited hold in this directory's untracked JSON files that isn't in `CALIBRATION_HOLDS`
+would be at the same risk on a future bump.
+
+Reran `place()` across all 225 pending sheets: 35 new clear placements, 156 still HOLD (21 "no rim
+found" where no usable alt peak exists at all, 21 "axes disagree", 16 "relaxed rim disagrees", the
+rest various rim-spread/shape gate failures -- some now reaching the geometry gates for the first
+time because all four sides finally detect something), 33 still HOLD on abnormal catalogue spans
+(unrelated to detection, a `record_box`/CartoMundi data issue). Every one of the 35 new clears used
+the alt path on at least one side; spot-checked two directly (Russey Chrum (E), Tam Ky (W)) against
+the source crop, and for all 35 the four independently-measured side offsets agree with each other
+and with the corpus prior even where alt fired -- a real consistency signal, not proof for the
+other 33. The read-only `check()` now examines 170 half cells with zero holds, once Pursat (E) is
+excluded via `CALIBRATION_HOLDS` as above. No annotation or publish step was run; these are local
+placement records only, per the pattern already established for this series.
+
+The remaining 156 detection/geometry holds need a different fix, not more tuning of this one:
+several of the "no rim found" cases are faint-rim sheets where the true rim line's contrast never
+exceeds the fixed `paper + max(6, 6%-of-peak)` threshold in `rim_in`/`rim_relaxed` at all, which
+`frame()`'s pick has no bearing on either way. The spread/axes-disagree holds have every side
+in-band and non-relaxed, so the alt retry never fires for them at all -- they are a separate
+problem, not more of this one.

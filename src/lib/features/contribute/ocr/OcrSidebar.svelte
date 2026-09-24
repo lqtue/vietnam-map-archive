@@ -2,9 +2,9 @@
   OcrSidebar.svelte — the OCR review table.
 
   Rows come from `ocrApi`; each is editable inline and auto-saves on blur.
-  The confidence/category filters live in OcrFilterBar and the run picker plus
-  write actions in OcrRunBar — this file owns the data, the filter/sort
-  pipeline, and the table itself.
+  The confidence/category filters live in OcrFilterBar and the batch verdict
+  buttons in OcrRunBar — this file owns the data, the filter/sort pipeline,
+  the table itself, and the toolbar's own Save/reload pair.
 -->
 <script lang="ts">
   import { OCR_CATEGORIES } from '../shared/constants';
@@ -162,9 +162,8 @@
    * how a reader would find a line in it.
    */
   $: printedView = isPrintedJob(job);
-  /* The two middle columns are the job's: the Index job reads a printed list,
-     so it answers "which cell, which line"; every other job reads marks on the
-     map, where the question is the category and how sure the model was. */
+  /* The middle columns are the job's: the Index job reads a printed list, so it
+     answers "which cell, which line"; every other job keeps only its category. */
   $: COLUMNS = [
     { key: 'dot', label: '', klass: 'col-dot', srLabel: 'Status', sortable: false },
     { key: 'text', label: 'Text', klass: 'col-text' },
@@ -173,10 +172,7 @@
           { key: 'cell', label: 'Cell', klass: 'col-cat' },
           { key: 'n', label: 'N', klass: 'col-conf num' },
         ]
-      : [
-          { key: 'category', label: 'Cat', klass: 'col-cat' },
-          { key: 'confidence', label: 'Conf', klass: 'col-conf num' },
-        ]),
+      : [{ key: 'category', label: 'Cat', klass: 'col-cat' }]),
     { key: 'actions', label: '', klass: 'col-actions', srLabel: 'Verdict', sortable: false },
   ] satisfies TableColumn[];
 
@@ -350,6 +346,9 @@
   let inputEls: Record<string, HTMLInputElement> = {};
   let rowEls: Record<string, HTMLTableRowElement> = {};
 
+  /** The full shortcut list is read once and then known — fold it away by default. */
+  let hintExpanded = false;
+
   export function getRunId(): string {
     return filterRunId || availableRuns[availableRuns.length - 1] || 'manual';
   }
@@ -423,22 +422,32 @@
       <option value="validated">Validated ({statusCounts['validated'] ?? 0})</option>
       <option value="rejected">Rejected ({statusCounts['rejected'] ?? 0})</option>
     </select>
-    {#if availableRuns.length > 1}
-      <select
-        class="filter-type-select run-select"
-        bind:value={filterRunId}
-        on:change={load}
-        aria-label="Filter by run"
-      >
-        <option value="">All runs</option>
-        {#each availableRuns as r (r)}
-          <option value={r}>{r}</option>
-        {/each}
-      </select>
-    {/if}
     <span class="shapes-count"
       >{visible.length}{visible.length !== extractions.length ? `/${extractions.length}` : ''}</span
     >
+    <button
+      type="button"
+      class="sb-btn is-primary is-sm"
+      on:click={saveAllEdits}
+      disabled={loading || dirtyCount === 0}
+      title="Save all pending text/category edits"
+    >
+      Save{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
+    </button>
+    <button type="button" class="sb-btn is-icon" on:click={load} disabled={loading} title="Reload">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+      </svg>
+    </button>
   </div>
 
   <OcrFilterBar
@@ -448,7 +457,35 @@
     suspectCount={suspects.size}
     counts={categoryCounts}
     hint={JOBS.find((j) => j.key === job)?.hint ?? ''}
-  />
+  >
+    <svelte:fragment slot="sweep">
+      {#if availableRuns.length > 1}
+        <select
+          class="filter-type-select run-select"
+          bind:value={filterRunId}
+          on:change={load}
+          aria-label="Filter by run"
+        >
+          <option value="">All runs</option>
+          {#each availableRuns as r (r)}
+            <option value={r}>{r}</option>
+          {/each}
+        </select>
+      {/if}
+      <OcrRunBar
+        {pendingShown}
+        {loading}
+        batchRunId={filterRunId}
+        on:validateShown={() => batchVerdict('validated')}
+        on:rejectShown={() => batchVerdict('rejected')}
+      />
+      {#if !filterRunId && pendingShown > 0}
+        <div class="batch-scope">Choose one run above to enable a batch verdict.</div>
+      {:else if filterRunId}
+        <div class="batch-scope">Batch scope · {filterRunId} · {pendingShown} pending</div>
+      {/if}
+    </svelte:fragment>
+  </OcrFilterBar>
 
   {#if gaps && (job === 'index' || job === 'numbers')}
     <div class="index-gaps">
@@ -460,24 +497,6 @@
         <span class="gap-list">{gaps.repeated.join(', ')}</span>
       {/if}
     </div>
-  {/if}
-
-  <OcrRunBar
-    {dirtyCount}
-    {pendingShown}
-    {loading}
-    batchRunId={filterRunId}
-    on:change={load}
-    on:save={saveAllEdits}
-    on:validateShown={() => batchVerdict('validated')}
-    on:rejectShown={() => batchVerdict('rejected')}
-    on:reload={load}
-  />
-
-  {#if !filterRunId && pendingShown > 0}
-    <div class="batch-scope">Choose one run above to enable a batch verdict.</div>
-  {:else if filterRunId}
-    <div class="batch-scope">Batch scope · {filterRunId} · {pendingShown} pending</div>
   {/if}
 
   {#if notice}
@@ -542,10 +561,24 @@
   {/if}
 
   <div class="hint-bar">
-    Click row to select · double-click to zoom · <kbd>j</kbd>/<kbd>k</kbd> next/prev ·
-    <kbd>v</kbd> validate · <kbd>x</kbd> reject · <kbd>e</kbd> edit text ·
-    <kbd>,</kbd>/<kbd>.</kbd> turn label · <kbd>r</kbd> turn sheet
+    <kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>v</kbd> validate · <kbd>x</kbd> reject
+    <button
+      type="button"
+      class="sb-btn is-icon is-ghost hint-toggle"
+      on:click={() => (hintExpanded = !hintExpanded)}
+      aria-expanded={hintExpanded}
+      aria-label={hintExpanded ? 'Hide more shortcuts' : 'Show more shortcuts'}
+      title="More shortcuts"
+    >
+      ?
+    </button>
   </div>
+  {#if hintExpanded}
+    <div class="hint-bar">
+      Click row to select · double-click to zoom · <kbd>e</kbd> edit text ·
+      <kbd>,</kbd>/<kbd>.</kbd> turn label · <kbd>r</kbd> turn sheet
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -625,6 +658,11 @@
     color: inherit;
     text-decoration: underline;
     cursor: pointer;
+  }
+  /* Sits inline with the compact hint line rather than on its own row. */
+  .hint-toggle {
+    margin-left: 0.35rem;
+    vertical-align: middle;
   }
   .table-empty code {
     display: block;

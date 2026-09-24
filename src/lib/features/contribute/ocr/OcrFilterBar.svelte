@@ -7,8 +7,9 @@
   Other), and those are the tabs at the foot of the panel — see `jobs.ts`. This
   bar is what refines one job: the confidence floor, the suspect chip, and the
   categories folded into one `<details class="sb-more">`, the same disclosure
-  the /explore rail's facets use. `hint` is the open job's own one-liner, so the
-  bar says what is being checked rather than leaving it to the tab label.
+  the /explore rail's facets use. `hint` is the open job's own one-liner —
+  detail past what the tab label names, so it sits inside the disclosure with
+  the other refinements rather than costing the panel two permanent lines.
 -->
 <script lang="ts">
   import { OCR_CATEGORIES, CAT_COLORS } from '../shared/constants';
@@ -39,13 +40,6 @@
 </script>
 
 <div class="ocr-filters">
-  <div class="conf-filter">
-    <span class="filter-label">Conf ≥ {(minConf * 100).toFixed(0)}%</span>
-    <input type="range" min="0" max="1" step="0.05" bind:value={minConf} class="conf-slider" />
-  </div>
-  {#if hint}
-    <p class="job-hint">{hint}</p>
-  {/if}
   <div class="cat-toggles">
     {#if suspectCount > 0}
       <button
@@ -61,9 +55,16 @@
   </div>
   <details class="sb-more">
     <summary
-      >Categories{#if activeCats < shownCats.length}
-        · {activeCats} of {shownCats.length}{/if}</summary
+      >Filter &amp; batch · {activeCats} of {shownCats.length} categories{#if minConf > 0}
+        · Conf ≥ {(minConf * 100).toFixed(0)}%{/if}</summary
     >
+    {#if hint}
+      <p class="job-hint">{hint}</p>
+    {/if}
+    <div class="conf-filter">
+      <span class="filter-label">Conf ≥ {(minConf * 100).toFixed(0)}%</span>
+      <input type="range" min="0" max="1" step="0.05" bind:value={minConf} class="conf-slider" />
+    </div>
     <div class="cat-toggles">
       <button
         type="button"
@@ -84,6 +85,7 @@
         </button>
       {/each}
     </div>
+    <slot name="sweep" />
   </details>
 </div>
 

@@ -282,6 +282,9 @@
               {markReviewedError}
               reviewTags={$queue.feedback.tags}
               reviewNote={$queue.feedback.note}
+              iiifBase={$queue.iiifBase}
+              imageWidth={$queue.imageWidth}
+              imageHeight={$queue.imageHeight}
               on:select={(e) => queue.select(e.detail.id, e.detail.mode)}
               on:approve={(e) => decideFootprint(e.detail.id, 'approved')}
               on:reject={(e) => decideFootprint(e.detail.id, 'rejected')}

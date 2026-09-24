@@ -8,12 +8,20 @@
   The parent owns the selection; this only reports the click and its modifier.
 
   Emits 'select', 'approve', 'reject', 'approveSelected', 'rejectSelected'.
+
+  Keyboard (matching the OCR side's j/k/v/x, ignored while a text field has
+  focus): j/k walk the list, v approves the anchor row, x rejects it.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { SamFootprint } from '$lib/data/supabase/footprints';
-  import { FEATURE_TYPE_COLORS, FEATURE_TYPE_LABELS } from '$lib/data/maps/footprintTypes';
+  import {
+    FEATURE_TYPE_COLORS,
+    FEATURE_TYPE_LABELS,
+    type PixelCoord,
+  } from '$lib/data/maps/footprintTypes';
   import { REVIEW_TAGS, REVIEW_NOTE_MAX } from '$lib/core/reviewTags';
+  import InkCrop from '$lib/features/contribute/shared/InkCrop.svelte';
 
   export let footprints: SamFootprint[] = [];
   export let selectedId: string | null = null;
@@ -27,6 +35,12 @@
   export let markReviewedError = '';
   export let reviewTags: string[] = [];
   export let reviewNote = '';
+  /** The open sheet's IIIF base + pixel dimensions, from `reviewQueue`'s
+   *  `open()`. Null/0 until resolved, or forever if it couldn't be — the crop
+   *  just stays unmounted rather than guessing. */
+  export let iiifBase: string | null = null;
+  export let imageWidth = 0;
+  export let imageHeight = 0;
 
   const dispatch = createEventDispatcher<{
     select: { id: string; mode: 'replace' | 'toggle' | 'range' };
@@ -76,6 +90,71 @@
     return CLASS_COLORS[ft] ?? CLASS_COLORS.other;
   }
 
+  function classLabel(ft: string) {
+    return ALL_TYPE_LABELS[ft] ?? ft;
+  }
+
+  /** The crop's source region — the axis-aligned box around the polygon, in
+      the same IIIF pixel space it was drawn in (footprintTypes.ts). */
+  function bboxOf(poly: PixelCoord[]) {
+    if (!poly.length) return { x: 0, y: 0, w: 0, h: 0 };
+    const xs = poly.map((p) => p[0]);
+    const ys = poly.map((p) => p[1]);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+    return { x: minX, y: minY, w: Math.max(...xs) - minX, h: Math.max(...ys) - minY };
+  }
+
+  /** j/k/v/x, same as the OCR side (ocrReviewController.ts's `step`/`setStatus`),
+      ignored while focus is in the panel's own text input/textarea. */
+  function isTyping(el: EventTarget | null) {
+    const target = el as HTMLElement | null;
+    return (
+      !!target &&
+      (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+    );
+  }
+
+  function moveSelection(delta: number) {
+    if (!footprints.length) return;
+    const at = selectedId ? footprints.findIndex((f) => f.id === selectedId) : -1;
+    const to =
+      at < 0
+        ? delta > 0
+          ? 0
+          : footprints.length - 1
+        : (at + delta + footprints.length) % footprints.length;
+    dispatch('select', { id: footprints[to].id, mode: 'replace' });
+  }
+
+  function onKeydown(e: KeyboardEvent) {
+    if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'j':
+      case 'ArrowDown':
+        e.preventDefault();
+        moveSelection(1);
+        break;
+      case 'k':
+      case 'ArrowUp':
+        e.preventDefault();
+        moveSelection(-1);
+        break;
+      case 'v':
+        if (selectedId) {
+          e.preventDefault();
+          dispatch('approve', { id: selectedId });
+        }
+        break;
+      case 'x':
+        if (selectedId) {
+          e.preventDefault();
+          dispatch('reject', { id: selectedId });
+        }
+        break;
+    }
+  }
+
   function changeTags(id: string, tag: string) {
     const tags = reviewTags.includes(tag)
       ? reviewTags.filter((value) => value !== tag)
@@ -87,6 +166,8 @@
     dispatch('feedback', { id, tags: reviewTags, note });
   }
 </script>
+
+<svelte:window on:keydown={onKeydown} />
 
 <div class="review-panel">
   <div class="sb-row is-strip">
@@ -152,7 +233,21 @@
             on:click={(e) => dispatch('select', { id: fp.id, mode: clickMode(e) })}
           >
             <span class="swatch" style="background:{classColor(fp.featureType)}"></span>
-            <span class="fp-class">{fp.featureType}</span>
+            <span class="fp-class">{classLabel(fp.featureType)}</span>
+            {#if iiifBase && imageWidth && imageHeight}
+              {@const bbox = bboxOf(fp.pixelPolygon)}
+              <span class="fp-crop">
+                <InkCrop
+                  {iiifBase}
+                  x={bbox.x}
+                  y={bbox.y}
+                  w={bbox.w}
+                  h={bbox.h}
+                  {imageWidth}
+                  {imageHeight}
+                />
+              </span>
+            {/if}
           </button>
 
           <!-- The editor belongs to the anchor alone: retyping is per-row, and a
@@ -216,6 +311,11 @@
       {/each}
     </ul>
   {/if}
+
+  <div class="hint-bar">
+    Click row to select · <kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>v</kbd> approve ·
+    <kbd>x</kbd> reject
+  </div>
 </div>
 
 <style>
@@ -325,6 +425,14 @@
     font-size: 0.8125rem;
     font-weight: var(--font-semibold);
     color: var(--color-text);
+  }
+
+  /* The crop sits at the right of the row, sized by its own canvas — never
+     squeezed by `.fp-class`'s flex:1. */
+  .fp-crop {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
   .fp-extra {

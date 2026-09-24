@@ -65,11 +65,16 @@
   text-align: center;
   padding-left: 0.5rem;
 }
+/* The name is the thing a reviewer reads; the category beside it is one of
+   ten short lowercase words and already ellipsizes (`.cell-cat` below), so the
+   width goes to the column that cannot afford to lose it. TraceSidebar does
+   not use `.col-text` and re-declares `.col-cat`'s width at higher specificity
+   (`.sidebar-content :global(.col-cat)`), so this rebalance is OCR-only. */
 .col-text {
-  min-width: 80px;
+  min-width: 190px;
 }
 .col-cat {
-  min-width: 70px;
+  min-width: 46px;
 }
 .col-conf {
   width: 38px;
@@ -97,7 +102,8 @@
   background: none;
   outline: none;
   font-family: var(--font-family-base);
-  font-size: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: var(--font-semibold);
   color: var(--color-text);
   padding: 0.2rem 0;
 }

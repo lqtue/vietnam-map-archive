@@ -1,0 +1,48 @@
+{
+  "_source": "CartoMundi public/etablissement/3/serie/243/feuille/exemplaire/all, read 2026-09-22 — targeted lookup for cell 35 (An Thi), the one real orphan left by demote_indochine_composites.mjs (its composite had no half-sheet replacement in serie 175/243 as read 2026-09-14; serie 175's own fkey 16717 record for this cell has no Nakala copy at all — f110IdNakala null. Serie 243 has both halves, two printings each.)",
+  "_note": "Not merged into nakala.json on purpose — that file is a pre-filtered read over serie 175 assemblages plus demi-feuille records, and regenerating it broadly is flagged in ingest_indochine_nakala.mjs's own half() docstring as unsafe without teaching it the assemblage case. This is a one-cell, hand-verified addition instead.",
+  "cells": {
+    "35": [
+      {
+        "title": "[Ân-] Thi",
+        "note": "Demi-feuille Est",
+        "year": 1905,
+        "serie": 243,
+        "fkey": 23776,
+        "nakala": "10.34847/nkl.acdb0144",
+        "sha1": "d687964b86cb7d4776fda33c5cb8883aea2d7ecb",
+        "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.acdb0144/d687964b86cb7d4776fda33c5cb8883aea2d7ecb/info.json"
+      },
+      {
+        "title": "[Ân-] Thi",
+        "note": "Demi-feuille Est",
+        "year": 1924,
+        "serie": 243,
+        "fkey": 23777,
+        "nakala": "10.34847/nkl.3bdao54q",
+        "sha1": "7ae3c8b1a497b8f4e6b43948d0d6766a704a16dd",
+        "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.3bdao54q/7ae3c8b1a497b8f4e6b43948d0d6766a704a16dd/info.json"
+      },
+      {
+        "title": "Ân- [Thi]",
+        "note": "Demi-feuille Ouest",
+        "year": 1905,
+        "serie": 243,
+        "fkey": 23888,
+        "nakala": "10.34847/nkl.995d15d1",
+        "sha1": "b522d5c3a5c537220e4da1c340571fd50aacb4ce",
+        "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.995d15d1/b522d5c3a5c537220e4da1c340571fd50aacb4ce/info.json"
+      },
+      {
+        "title": "Ân- [Thi]",
+        "note": "Demi-feuille Ouest",
+        "year": 1924,
+        "serie": 243,
+        "fkey": 23889,
+        "nakala": "10.34847/nkl.1a55914s",
+        "sha1": "0fcbb961d396dc64344b4601c77e687e904a9e49",
+        "iiif": "https://api.nakala.fr/iiif/10.34847/nkl.1a55914s/0fcbb961d396dc64344b4601c77e687e904a9e49/info.json"
+      }
+    ]
+  }
+}

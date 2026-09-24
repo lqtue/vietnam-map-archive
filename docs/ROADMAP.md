@@ -69,26 +69,42 @@ measurement, metadata that maintains itself, and corpus size.
       promoted the 4-GCP `hue-l7014-6541-4-2` in its place.) Exit: no georeferenced sheet in the
       corpus sits on fewer than 4 points, and `modern_prior.py --sweep` reports a residual for
       every one.
-- [ ] **`indochine-100k-ingest`** — finish it. Checked against production 2026-09-23: **34 draft
-      rows minted on the 561 series** (1947–1959, of 197 cells), **0 on 325** (1900–1947, of 143
-      cells — its collection key is still an orphan in `series_sheets`, nothing has started).
-      `check_series_index.mjs` only credits 20 of the 34 as held — the other 14 are the
-      `held-by-derived` drift, live. 561 first (100% ready IIIF URLs), then 325 (exercises the
-      constructed `f110IdNakala` path at scale). Grep each run for `TILING FAILED`; the script
-      leaves a pixel-less `draft` row rather than failing loudly. Exit: `/catalog/series` renders
-      both surveys sensibly, and `scripts/check_series_index.mjs` is still clean.
-- [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print,
-      the way `tonkin_georef.py` does for the sibling 1:25,000 survey, so
-      `indochine-100k-ingest`'s rows can leave draft. Not started — planned 2026-09-23:
-      `docs/journals/260923-indochine100k-georef.md` has the investigation (three sample sheets
-      confirm printed grade coordinates, two different frame conventions, a K-grid overlay to
-      avoid locking onto) and the recommended approach, which turns out cheaper than Tonkin's own
-      primary path — `series_sheets.bbox` for both series already carries the CartoMundi UNIMARC
-      catalogue extent per cell (same data Tonkin's `catalogue_boxes()` reads, already parsed by
-      the ingest importer), so this can mirror Tonkin's `from_catalogue()`/`calibrate()` fallback
-      instead of per-sheet OCR. Exit: same as `tonkin-review` — every sheet that clears the gate
-      carries `georef_done = true`, still `status = draft`, and a person reviews before
-      publishing.
+- [x] **`indochine-100k-ingest`** — done. Both series fully minted: 561 (1947–1959) 360/360 cells,
+      325 (1900–1947) 221/221 cells, 581 rows total. Two rows tiled pixel-less on first run (the
+      known `TILING FAILED`-silent failure mode this item used to warn about — sheet 12 "Muong Ou
+      Tay" W+E, no `map_iiif_sources` row, upstream Nakala source fine) — re-tiled and confirmed
+      loadable 2026-09-24. `check_series_index.mjs` reports 0 adrift/0 dangling/0 unindexed; its
+      `ORPHAN KEY` lines for both 100k series are a pre-existing `series_sheets` key-spelling
+      mismatch against `maps.collection`, not a symptom of anything this item touched — separate
+      cleanup, not blocking.
+- [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print, the
+      way `tonkin_georef.py` does for the sibling 1:25,000 survey. **561: pipeline built and
+      working, first batch published 2026-09-24** — `scripts/indochine100k_georef.py`
+      (`calibrate`/`place`/`check`/`annotate`) mirrors Tonkin's catalogue-driven
+      `from_catalogue()`/`calibrate()` fallback against `extra_metadata.cartomundi_fkeys[0]`'s own
+      UNIMARC bbox (not the unioned `series_sheets.bbox` — see the journal). Calibration accepted
+      on 6 sheets (10.5–20.9°N) after **excluding Tri Binh** (741m residual outlier, judged too
+      clean to be an OCR error but excluded anyway to unblock — an open question, not a resolved
+      one: docs/journals/260923-indochine100k-georef.md). Accepted fit: 76m mean / 188m max
+      residual. **2026-09-24 update:** 132 additional sheets cleared the per-sheet gate and the
+      series lattice check (Pursat E was held for its offset outlier) and were published at the
+      user's request. Together with the first 3, 135 of 360 rows are public; they represent 98
+      distinct cells. The live page is `/catalog/series/indochine-1-100-000-2nd-edition-sgi-1947-1959`.
+      The sheets cleared programmatic gates but were not individually eyeballed in `/explore`.
+      **New finding this pass: the per-sheet frame-detection gate
+      itself holds a majority of sheets**, independent of calibration — 4 of 4 freshly-sampled
+      sheets outside the calibration set (Gia Ray, Kratié, Sop Cop, Hà Giang) held on
+      `rim offsets spread`/`axes disagree`, matching the ~44% clear rate the calibration pass
+      already saw. Tuning `detect()`'s constants (`ACROSS`/`MAXIN`/rim-spread tolerance) against a
+      wider sample is the real remaining work before a full-series batch, not just accepting a
+      calibration. 225 of 357 attempted sheets remain held. **325: WKT matching grid built** from
+      CartoMundi's IGN geometry and matched to all 221 VMA rows, but no image-placement pipeline
+      exists yet; its third frame convention (thick neatline → ticked band → gap → thin inner line,
+      plus a K-grid overlay) still needs its own detector.
+      Exit: same as `tonkin-review` — every sheet that clears the gate carries
+      `is_georeferenced = true`, a person reviews before publishing (the 3 published sheets above
+      were geometry + lattice + landmark-bbox checked, not eyeballed in `/explore` — do that before
+      trusting them fully).
 - [ ] **`indochine-100k-licence`** — settle it before the ingest run mints 578 rows.
       Probed 2026-09-21 with the same
       per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also

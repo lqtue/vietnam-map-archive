@@ -36,6 +36,14 @@
   export let rowEl: HTMLTableRowElement | null = null;
   export let inputEl: HTMLInputElement | null = null;
 
+  /* The categories the model infers from surrounding context. On a one- or
+     two-character read there is no context to infer from, so its answer there
+     is noise — a legend key-letter comes back `building 95%`. The derived
+     classes (legend_ref, legend_entry, title) are not guesses and still show. */
+  const GUESSED_CATS = ['street', 'place', 'building', 'institution', 'hydrology'];
+  $: catIsGuesswork =
+    (ext._editText ?? '').trim().length <= 2 && GUESSED_CATS.includes(ext._editCategory);
+
   const dispatch = createEventDispatcher<{
     select: { id: string };
     zoomToExtraction: { globalX: number; globalY: number; globalW: number; globalH: number };
@@ -80,6 +88,7 @@
       bind:value={ext._editText}
       bind:this={inputEl}
       placeholder="Text…"
+      title={ext._editText}
       on:blur={() => dispatch('commit')}
       on:keydown={(e) => {
         if (e.key === 'Enter') {
@@ -132,19 +141,17 @@
           stroke-linejoin="round"><polyline points="4 6 8 10 12 6" /></svg
         >
       </div>
+    {:else if catIsGuesswork}
+      <span class="cell-cat">—</span>
     {:else}
       <span class="cell-cat">{ext._editCategory}</span>
     {/if}
   </td>
-  <td class="col-conf">
-    {#if printedView}
+  {#if printedView}
+    <td class="col-conf">
       <span class="cell-n">{line?.n ?? ''}</span>
-    {:else}
-      <span class="conf-badge" style="opacity:{0.4 + ext.confidence * 0.6}">
-        {(ext.confidence * 100).toFixed(0)}%
-      </span>
-    {/if}
-  </td>
+    </td>
+  {/if}
   <td class="col-actions">
     {#if ext._saving}
       <span class="saving-dot">…</span>
@@ -234,8 +241,7 @@
   .ref-name {
     display: block;
     font-size: 0.62rem;
-    color: var(--color-text);
-    opacity: 0.6;
+    color: var(--sb-text-meta);
     padding-left: 0.3rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -255,9 +261,8 @@
   .cell-cat {
     display: block;
     padding: 0.15rem 0.3rem;
-    font-size: 0.68rem;
-    color: var(--color-text);
-    opacity: 0.75;
+    font-size: 0.65rem;
+    color: var(--sb-text-meta);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -276,11 +281,6 @@
   .cell-n {
     text-align: right;
     opacity: 0.7;
-  }
-  .conf-badge {
-    font-size: 0.68rem;
-    font-weight: var(--font-bold);
-    font-variant-numeric: tabular-nums;
   }
   .saving-dot {
     font-size: 0.75rem;

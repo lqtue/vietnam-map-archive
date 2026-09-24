@@ -1,0 +1,460 @@
+{
+  "Đồng Khởi": {
+    "variants": [
+      "rue Catinat",
+      "Catinat"
+    ],
+    "source": "https://www.historicvietnam.com/graham-greenes-saigon-revisited/"
+  },
+  "Nguyễn Huệ": {
+    "variants": [
+      "boulevard Charner",
+      "Charner"
+    ],
+    "source": "https://www.historicvietnam.com/arthur-delteil-in-1882-part-3/"
+  },
+  "Hai Bà Trưng": {
+    "variants": [
+      "rue Nationale",
+      "Nationale",
+      "rue National",
+      "National"
+    ],
+    "source": "https://www.historicvietnam.com/saigons-earliest-museums/"
+  },
+  "Hồ Huấn Nghiệp": {
+    "variants": [
+      "rue Turc",
+      "Turc"
+    ],
+    "source": "https://www.historicvietnam.com/louise-bourbonnaud-part-1/"
+  },
+  "Quách Thị Trang": {
+    "variants": [
+      "place Eugène Cuniac",
+      "Eugène Cuniac",
+      "place du Marché",
+      "Marché"
+    ],
+    "source": "https://www.historicvietnam.com/saigon-railway-station/"
+  },
+  "Turtle Lake": {
+    "variants": [
+      "place Maréchal Joffre",
+      "Maréchal Joffre"
+    ],
+    "source": "https://www.historicvietnam.com/saigons-earliest-museums/"
+  },
+  "Art Arcade at 151 Đồng Khởi": {
+    "variants": [
+      "rue Catinat entrance to the Catinat-Ciné",
+      "Catinat entrance to the Catinat-Ciné"
+    ],
+    "source": "https://www.historicvietnam.com/catinat-cine-mosaics/"
+  },
+  "Hồ Tùng Mậu": {
+    "variants": [
+      "rue d’Adran",
+      "Adran",
+      "rue Guynemer",
+      "Guynemer"
+    ],
+    "source": "https://www.historicvietnam.com/saigon-railway-station/"
+  },
+  "Hàm Nghi": {
+    "variants": [
+      "rue de Canton",
+      "Canton",
+      "rue du Canton",
+      "rue Krantz/rue Duperré",
+      "Krantz/rue Duperré"
+    ],
+    "source": "https://www.historicvietnam.com/vietnam-railways-building/"
+  },
+  "Lý Tự Trọng": {
+    "variants": [
+      "rue de La Grandière",
+      "Grandière",
+      "rue de Lagrandière/Gia Long",
+      "Lagrandière/Gia Long"
+    ],
+    "source": "https://www.historicvietnam.com/bot-catinat/"
+  },
+  "Nam Kỳ Khởi Nghĩa": {
+    "variants": [
+      "rue Mac-Mahon",
+      "Mac-Mahon"
+    ],
+    "source": "https://www.historicvietnam.com/the-rainbow-bridge-a-true-eiffel-classic/"
+  },
+  "Trần Bình Trọng": {
+    "variants": [
+      "avenue de l'église de Choquan",
+      "l'église de Choquan"
+    ],
+    "source": "https://www.historicvietnam.com/trinh-khanh-tan-mausoleum/"
+  },
+  "upper Đinh Tiên Hoàng": {
+    "variants": [
+      "avenue de l'Inspection",
+      "l'Inspection"
+    ],
+    "source": "https://www.historicvietnam.com/tour-dinspection/"
+  },
+  "where Lê Lợi": {
+    "variants": [
+      "boulevard Bonard",
+      "Bonard"
+    ],
+    "source": "https://www.historicvietnam.com/graham-greenes-saigon-revisited/"
+  },
+  "meets Nguyễn Huệ": {
+    "variants": [
+      "boulevard Charner",
+      "Charner"
+    ],
+    "source": "https://www.historicvietnam.com/graham-greenes-saigon-revisited/"
+  },
+  "Lê Hồng Phong": {
+    "variants": [
+      "boulevard de Ceinture",
+      "Ceinture"
+    ],
+    "source": "https://www.historicvietnam.com/petrus-ky-mausoleum/"
+  },
+  "Tôn Đức Thắng": {
+    "variants": [
+      "boulevard de la Citadelle",
+      "Citadelle",
+      "quai du Commerce",
+      "Commerce"
+    ],
+    "source": "https://www.historicvietnam.com/st-pauls-convent/"
+  },
+  "Trần Hưng Đạo": {
+    "variants": [
+      "boulevard Galliéni",
+      "Galliéni"
+    ],
+    "source": "https://www.historicvietnam.com/tran-hung-dao-boulevard/"
+  },
+  "Trần Phú": {
+    "variants": [
+      "boulevard Jules Ferry",
+      "Jules Ferry"
+    ],
+    "source": "https://www.historicvietnam.com/dien-hai-citadel/"
+  },
+  "Lê Duẩn": {
+    "variants": [
+      "boulevard Norodom",
+      "Norodom",
+      "route Mandarine",
+      "Mandarine"
+    ],
+    "source": "https://www.historicvietnam.com/foyer-du-soldat-et-du-marin/"
+  },
+  "Kênh Tẻ": {
+    "variants": [
+      "canal de Dérivation",
+      "Dérivation"
+    ],
+    "source": "https://www.historicvietnam.com/pont-tournant/"
+  },
+  "Cửa Nam": {
+    "variants": [
+      "place Neyret",
+      "Neyret"
+    ],
+    "source": "https://www.historicvietnam.com/ha-noi-tramway-network/"
+  },
+  "national monument that we all": {
+    "variants": [
+      "place of burial",
+      "of burial"
+    ],
+    "source": "https://www.historicvietnam.com/historical-note-on-saigon-1917/"
+  },
+  "Mê Linh": {
+    "variants": [
+      "place Rigault de Genouilly",
+      "Rigault de Genouilly"
+    ],
+    "source": "https://www.historicvietnam.com/louise-bourbonnaud-part-3/"
+  },
+  "Kiệu Bridge in Phú Nhuận": {
+    "variants": [
+      "pont de l'Avalanche [Third Avalanche Bridge",
+      "l'Avalanche [Third Avalanche Bridge"
+    ],
+    "source": "https://www.historicvietnam.com/saigon-cholon-in-1868/"
+  },
+  "Long Biên Bridge": {
+    "variants": [
+      "Pont Doumer",
+      "Doumer"
+    ],
+    "source": "https://www.historicvietnam.com/debunking-the-eiffel-myth/"
+  },
+  "Trường Tiền Bridge": {
+    "variants": [
+      "Pont Thành-Thái",
+      "Thành-Thái"
+    ],
+    "source": "https://www.historicvietnam.com/debunking-the-eiffel-myth/"
+  },
+  "Võ Văn Kiệt": {
+    "variants": [
+      "quai Belqique",
+      "Belqique",
+      "quai de Belgique",
+      "Belgique"
+    ],
+    "source": "https://www.historicvietnam.com/leon-caubert-in-1887/"
+  },
+  "Châu Văn Liêm": {
+    "variants": [
+      "quai Testard on the Phố Xếp Canal",
+      "Testard on the Phố Xếp Canal"
+    ],
+    "source": "https://www.historicvietnam.com/lien-thanh-fish-sauce-company-hq/"
+  },
+  "đường Võ Văn Kiệt": {
+    "variants": [
+      "Route basse de Cholon",
+      "basse de Cholon"
+    ],
+    "source": "https://www.historicvietnam.com/truong-van-ben/"
+  },
+  "Cách mạng Tháng 8": {
+    "variants": [
+      "route de Thuan-Kieu",
+      "Thuan-Kieu"
+    ],
+    "source": "https://www.historicvietnam.com/saigon-railway-station/"
+  },
+  "Gạo restaurant at": {
+    "variants": [
+      "rue Barbé/Barbet",
+      "Barbé/Barbet"
+    ],
+    "source": "https://www.historicvietnam.com/saigons-old-french-planter-villas/"
+  },
+  "Đờng Khởi": {
+    "variants": [
+      "rue Catinat",
+      "Catinat"
+    ],
+    "source": "https://www.historicvietnam.com/arthur-delteil-in-1882-part-3/"
+  },
+  "Tôn Thất Đạm": {
+    "variants": [
+      "rue Chaigneau",
+      "Chaigneau"
+    ],
+    "source": "https://www.historicvietnam.com/ham-nghi/"
+  },
+  "An Bình": {
+    "variants": [
+      "rue d’An-Binh",
+      "An-Binh"
+    ],
+    "source": "https://www.historicvietnam.com/tran-hung-dao-boulevard/"
+  },
+  "Lê Thánh Tôn": {
+    "variants": [
+      "rue d’Espagne",
+      "Espagne"
+    ],
+    "source": "https://www.historicvietnam.com/french-masonic-lodge/"
+  },
+  "Triệu Quang Phục": {
+    "variants": [
+      "Rue de Canton",
+      "Canton"
+    ],
+    "source": "https://www.historicvietnam.com/arthur-delteil-in-1882-part-3/"
+  },
+  "Gò Công": {
+    "variants": [
+      "rue de Go-Cong",
+      "Go-Cong"
+    ],
+    "source": "https://www.historicvietnam.com/canal-bonard/"
+  },
+  "Mạc Đĩnh Chi": {
+    "variants": [
+      "rue de Massiges",
+      "Massiges"
+    ],
+    "source": "https://www.historicvietnam.com/former-massiges-cemetery/"
+  },
+  "Lê Văn Tám Park": {
+    "variants": [
+      "rue de Massiges cemetery",
+      "Massiges cemetery"
+    ],
+    "source": "https://www.historicvietnam.com/lang-cha-ca/"
+  },
+  "Minh Phụng": {
+    "variants": [
+      "rue de Minh-Phung",
+      "Minh-Phung"
+    ],
+    "source": "https://www.historicvietnam.com/canal-bonard/"
+  },
+  "Ngô Nhân Tịnh": {
+    "variants": [
+      "rue de Palikao",
+      "Palikao"
+    ],
+    "source": "https://www.historicvietnam.com/canal-bonard/"
+  },
+  "Phùng Hưng": {
+    "variants": [
+      "rue de Paris",
+      "Paris"
+    ],
+    "source": "https://www.historicvietnam.com/historic-memories-3/"
+  },
+  "Trần Hưng Đạo B": {
+    "variants": [
+      "rue des Marins",
+      "Marins"
+    ],
+    "source": "https://www.historicvietnam.com/tran-hung-dao-boulevard/"
+  },
+  "Nguyễn Bỉnh Khiêm": {
+    "variants": [
+      "rue Docteur Angier",
+      "Docteur Angier"
+    ],
+    "source": "https://www.historicvietnam.com/clinique-saint-paul/"
+  },
+  "Bùi Thị Xuân": {
+    "variants": [
+      "rue Duranton",
+      "Duranton"
+    ],
+    "source": "https://www.historicvietnam.com/graham-greenes-saigon-revisited/"
+  },
+  "Tôn Thất Tùng": {
+    "variants": [
+      "rue Frère Guilleraut",
+      "Frère Guilleraut"
+    ],
+    "source": "https://www.historicvietnam.com/huyen-sy-church/"
+  },
+  "Nguyễn Trãi": {
+    "variants": [
+      "rue Frère Louis",
+      "Frère Louis"
+    ],
+    "source": "https://www.historicvietnam.com/huyen-sy-church/"
+  },
+  "Phạm Ngọc Thạch": {
+    "variants": [
+      "Rue Garcerie",
+      "Garcerie"
+    ],
+    "source": "https://www.historicvietnam.com/louise-bourbonnaud-part-3/"
+  },
+  "Nguyễn Tất Thành": {
+    "variants": [
+      "rue Jean-Eudel",
+      "Jean-Eudel"
+    ],
+    "source": "https://www.historicvietnam.com/short-history-saigon-port/"
+  },
+  "Hoàng Văn Thụ": {
+    "variants": [
+      "rue Lacaut/đường Chi Lăng",
+      "Lacaut/đường Chi Lăng"
+    ],
+    "source": "https://www.historicvietnam.com/former-saigon-adventist-hospital/"
+  },
+  "Nguyễn Công Trứ": {
+    "variants": [
+      "rue Lefèbvre",
+      "Lefèbvre"
+    ],
+    "source": "https://www.historicvietnam.com/lost-mep-chapel/"
+  },
+  "Điện Biên Phủ": {
+    "variants": [
+      "rue Legrand de la Liraye",
+      "Legrand de la Liraye"
+    ],
+    "source": "https://www.historicvietnam.com/former-massiges-cemetery/"
+  },
+  "Nguyễn Du": {
+    "variants": [
+      "rue Lucien Mossard",
+      "Lucien Mossard"
+    ],
+    "source": "https://www.historicvietnam.com/nguyen-van-cua-imprimerie-de-lunion-building/"
+  },
+  "Hồ Chí Minh City Children": {
+    "variants": [
+      "rue Mac-Mahon",
+      "Mac-Mahon"
+    ],
+    "source": "https://www.historicvietnam.com/saigons-old-french-planter-villas/"
+  },
+  "Bùi Hữu Nghĩa": {
+    "variants": [
+      "rue Martin-des-Pallières",
+      "Martin-des-Pallières"
+    ],
+    "source": "https://www.historicvietnam.com/tour-dinspection/"
+  },
+  "Võ Thị Sáu": {
+    "variants": [
+      "rue Mayer",
+      "Mayer"
+    ],
+    "source": "https://www.historicvietnam.com/saigons-old-french-planter-villas/"
+  },
+  "corner of rue Paul Blanchy": {
+    "variants": [
+      "rue Nationale",
+      "Nationale"
+    ],
+    "source": "https://www.historicvietnam.com/monograph-of-saigon-parish/"
+  },
+  "Pasteur": {
+    "variants": [
+      "rue Pellerin",
+      "Pellerin"
+    ],
+    "source": "https://www.historicvietnam.com/cochinchina-principal-centres-of-population-1885/"
+  },
+  "Nguyễn Đình Chiểu": {
+    "variants": [
+      "rue Richaud",
+      "Richaud"
+    ],
+    "source": "https://www.historicvietnam.com/lost-mep-chapel/"
+  },
+  "Võ Văn Tần": {
+    "variants": [
+      "rue Testard",
+      "Testard"
+    ],
+    "source": "https://www.historicvietnam.com/86-vo-van-tan/"
+  },
+  "that French influence is completely": {
+    "variants": [
+      "rue that",
+      "that"
+    ],
+    "source": "https://www.historicvietnam.com/the-little-king-1895/"
+  },
+  "Ngô Đức Kế": {
+    "variants": [
+      "rue Vannier",
+      "Vannier"
+    ],
+    "source": "https://www.historicvietnam.com/hotel-de-lunivers/"
+  }
+}

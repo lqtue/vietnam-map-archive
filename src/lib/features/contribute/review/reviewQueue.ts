@@ -11,7 +11,7 @@
  *   $queue.footprints   // in markup
  */
 
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import {
@@ -20,6 +20,7 @@ import {
   type SamFootprint,
 } from '$lib/data/supabase/footprints';
 import type { FeatureType } from '$lib/data/maps/footprintTypes';
+import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
 
 export type QueueRow = Awaited<ReturnType<typeof fetchMapsWithSubmittedFootprints>>[number];
 
@@ -46,6 +47,12 @@ export type ReviewQueueState = {
   /** Id currently being written, so its row can say so. */
   deciding: string | null;
   feedback: ReviewFeedback;
+  /** The open sheet's IIIF base (no `/info.json`) and pixel dimensions, for the
+   *  sidebar's ink crops. Resolved once per `open()`; null/0 until it lands, or
+   *  if it can't be resolved at all — the crop just stays unmounted. */
+  iiifBase: string | null;
+  imageWidth: number;
+  imageHeight: number;
 };
 
 const EMPTY: ReviewQueueState = {
@@ -59,6 +66,9 @@ const EMPTY: ReviewQueueState = {
   error: '',
   deciding: null,
   feedback: { tags: [], note: '' },
+  iiifBase: null,
+  imageWidth: 0,
+  imageHeight: 0,
 };
 
 export function createReviewQueue(supabase: SupabaseClient<Database>) {
@@ -79,15 +89,22 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }
   }
 
+  /** Guards `loadImageInfo` against a sheet switch outrunning its own fetch —
+   *  bumped by every `reset()`, so a resolve that lands after the next `open()`
+   *  is a no-op instead of stamping the wrong sheet's dimensions in. */
+  let imgSeq = 0;
+
   /** Drop the open sheet's rows; the queue itself survives a sheet change. */
   function reset() {
     pendingEdits = {};
     pendingFeedback = {};
+    imgSeq++;
     update((s) => ({ ...EMPTY, queue: s.queue, queueError: s.queueError }));
   }
 
   async function open(mapId: string) {
     reset();
+    const seq = imgSeq;
     update((s) => ({ ...s, loading: true }));
     try {
       const footprints = await fetchSubmittedFootprints(supabase, mapId);
@@ -98,10 +115,37 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
         selectedId: footprints[0]?.id ?? null,
         selectedIds: footprints[0] ? [footprints[0].id] : [],
       }));
+      void loadImageInfo(mapId, seq);
     } catch (e: any) {
       update((s) => ({ ...s, error: e.message }));
     } finally {
       update((s) => ({ ...s, loading: false }));
+    }
+  }
+
+  /**
+   * The sidebar's ink crops need the sheet's own pixel dimensions, to size the
+   * edge tiles correctly — the footprint rows don't carry them. Resolved from
+   * the same `info.json` ImageShell already fetches for the canvas; a second
+   * small request rather than threading the value through props from there.
+   */
+  async function loadImageInfo(mapId: string, seq: number) {
+    const row = get(store).queue.find((m) => m.id === mapId);
+    const infoUrl = await resolveMapIiifInfoUrl(row ?? null).catch(() => null);
+    if (!infoUrl || seq !== imgSeq) return;
+    try {
+      const res = await fetch(infoUrl);
+      if (!res.ok || seq !== imgSeq) return;
+      const info = await res.json();
+      if (seq !== imgSeq) return;
+      update((s) => ({
+        ...s,
+        iiifBase: infoUrl.replace(/\/info\.json$/, ''),
+        imageWidth: info.width ?? 0,
+        imageHeight: info.height ?? 0,
+      }));
+    } catch {
+      // Leave iiifBase null — the crop just stays unmounted, never wrong.
     }
   }
 

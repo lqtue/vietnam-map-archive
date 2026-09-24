@@ -5,7 +5,9 @@ from __future__ import annotations
 import hashlib
 import math
 import os
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Generator
 
@@ -229,12 +231,16 @@ def _pick_scale_factor(info: dict, region_w: int, size: int) -> int:
 def fetch_crop_level0(
     iiif_base: str, x: int, y: int, w: int, h: int, size: int,
     quality: str = "default", stats: dict | None = None,
+    max_workers: int = 1,
 ) -> Image.Image:
     """Compose an arbitrary region out of a fixed tile pyramid.
 
     Fetches every tile overlapping (x, y, w, h) at the coarsest scale factor
     that still satisfies `size`, pastes them, then crops and resizes exactly as
     a level2 server would have. Raises if no tile could be fetched at all.
+
+    `max_workers` bounds concurrent tile downloads; the default keeps existing
+    OCR callers' request rate unchanged. Tiles are pasted in grid order.
 
     `stats`, when given, receives {"coverage": float} — 1.0 when every tile
     landed. The caller must not cache anything below 1.0: a hole is
@@ -251,54 +257,58 @@ def fetch_crop_level0(
         step = ts * sf
         x0, y0 = (x // step) * step, (y // step) * step
         canvas = Image.new("RGB", (math.ceil((full_w - x0) / sf), math.ceil((full_h - y0) / sf)), "white")
-        got = 0
-        wanted = 0
+        tiles = []
         for ty in range(y0, min(y + h, full_h), step):
             for tx in range(x0, min(x + w, full_w), step):
-                wanted += 1
                 tw, th = min(step, full_w - tx), min(step, full_h - ty)
                 url = level0_tile_url(iiif_base, tx, ty, tw, th, sf, quality)
                 at = ((tx - x0) // sf, (ty - y0) // sf)
+                tiles.append((url, at))
 
-                # Per-tile disk cache. `fetch_crop` (the level2 path) has had one
-                # since the start; this path never did, so every pass over a sheet
-                # re-downloaded the same few thousand 256px tiles. Measured
-                # 2026-09-12 on the 1942 sheet: 12.2 min of tile fetching against
-                # 5.1 min of actual model time, repeated in full for each of three
-                # runs over the same crop.
-                #
-                # Only whole tiles are cached, never the assembled crop — a partial
-                # assembly is white paper to everything downstream (see the coverage
-                # check below), and one written to disk would poison every later run.
-                cpath = CACHE_DIR / f"l0_{hashlib.md5(url.encode()).hexdigest()}.jpg"
-                if cpath.exists():
-                    try:
-                        canvas.paste(Image.open(cpath).convert("RGB"), at)
-                        got += 1
-                        continue
-                    except Exception:
-                        cpath.unlink(missing_ok=True)  # truncated write, refetch
+        def read_tile(tile):
+            url, at = tile
+            # Cache only whole tiles: a missing tile must never become blank
+            # paper in a later assembly. Each worker writes its own temp name.
+            cpath = CACHE_DIR / f"l0_{hashlib.md5(url.encode()).hexdigest()}.jpg"
+            if cpath.exists():
+                try:
+                    return Image.open(cpath).convert("RGB"), at
+                except Exception:
+                    cpath.unlink(missing_ok=True)  # truncated write, refetch
 
-                # Retry: measured 2026-09-04, some tiles of a mirrored map hang
-                # rather than 404 — 3 of 8 timed out on an idle host for map
-                # 3a446d85 while 8 of 8 succeeded for 0e02b9d9. A short timeout
-                # with two retries turns most of those into hits; a 30s one just
-                # made a 108-tile overview take twenty minutes.
-                for attempt in range(3):
-                    try:
-                        resp = requests.get(url, timeout=10)
-                        if not resp.ok:
-                            break  # a real 404 will not become a 200 on retry
-                        tile_img = Image.open(BytesIO(resp.content)).convert("RGB")
-                        canvas.paste(tile_img, at)
-                        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-                        tmp = cpath.with_suffix(".part")
-                        tile_img.save(tmp, format="JPEG", quality=90)
-                        tmp.replace(cpath)  # atomic: a killed run leaves no half tile
-                        got += 1
+            # Some mirrored tiles hang rather than 404; retry transport errors
+            # twice, but do not retry a definite non-200 response.
+            for attempt in range(3):
+                try:
+                    resp = requests.get(url, timeout=10)
+                    if not resp.ok:
                         break
-                    except Exception:
-                        continue
+                    tile_img = Image.open(BytesIO(resp.content)).convert("RGB")
+                    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+                    tmp = cpath.with_name(cpath.name + f".{threading.get_ident()}.part")
+                    tile_img.save(tmp, format="JPEG", quality=90)
+                    tmp.replace(cpath)  # atomic: a killed run leaves no half tile
+                    return tile_img, at
+                except Exception:
+                    continue
+            return None, at
+
+        if max_workers > 1:
+            with ThreadPoolExecutor(max_workers=max_workers) as pool:
+                results = pool.map(read_tile, tiles)
+                got = 0
+                for tile_img, at in results:
+                    if tile_img is not None:
+                        canvas.paste(tile_img, at)
+                        got += 1
+        else:
+            got = 0
+            for tile in tiles:
+                tile_img, at = read_tile(tile)
+                if tile_img is not None:
+                    canvas.paste(tile_img, at)
+                    got += 1
+        wanted = len(tiles)
         if got:
             # A hole is white paper to everything downstream: the density pass
             # reads it as blank and the model reads it as nothing there. Silence
@@ -1162,10 +1172,23 @@ def _self_check() -> None:
         c = fetch_crop_level0("http://x/iiif/fake", 0, 0, 512, 512, size=128)
         assert _calls["n"] == first + 1, "a corrupt tile must be refetched once"
         assert c.tobytes() == a.tobytes()
+
+        # Bounded parallel downloads must assemble the same pixels and share
+        # the same warm-cache behaviour as the serial path.
+        _INFO_CACHE["http://x/iiif/parallel"] = _INFO_CACHE["http://x/iiif/fake"]
+        before = _calls["n"]
+        d = fetch_crop_level0("http://x/iiif/parallel", 0, 0, 512, 512, size=128,
+                              max_workers=4)
+        assert _calls["n"] == before + 4, "parallel cold assembly should fetch each tile once"
+        assert d.tobytes() == a.tobytes(), "parallel assembly changed pixels"
+        fetch_crop_level0("http://x/iiif/parallel", 0, 0, 512, 512, size=128,
+                          max_workers=4)
+        assert _calls["n"] == before + 4, "parallel warm assembly must fetch nothing"
     finally:
         requests.get = _real_get
         globals()["CACHE_DIR"] = _real_cache
         _INFO_CACHE.pop("http://x/iiif/fake", None)
+        _INFO_CACHE.pop("http://x/iiif/parallel", None)
         _sh.rmtree(_tmp, ignore_errors=True)
 
     print("[ok] iiif_tiles self-check passed")
