@@ -1,23 +1,13 @@
-// WebGL scene; camera drag/zoom/pan/inertia is entirely CameraControls' job.
+// WebGL scene; TrackballControls keeps rotation free across both poles.
 import * as THREE from 'three';
-import CameraControls from 'camera-controls';
-
-CameraControls.install({ THREE });
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import { createPlaceContext } from './place-context.js';
+import { createSidebar } from './sidebar.js';
 
 const $ = (id) => document.getElementById(id);
 const stage = $('stage');
-const nameSearch = document.createElement('input');
-nameSearch.id = 'name-search';
-nameSearch.type = 'search';
-nameSearch.placeholder = 'Search shared names…';
-nameSearch.setAttribute('aria-label', 'Search shared names');
-const namesNav = $('names');
-namesNav.parentNode.insertBefore(nameSearch, namesNav);
-const statusLabel = document.createElement('p');
-statusLabel.id = 'status';
-statusLabel.textContent = 'Loading scans…';
-$('masthead').append(statusLabel);
-$('instruction').textContent = 'Drag to rotate, scroll to zoom, or use Side view. Click a point to pin its name.';
+const nameSearch = $('name-search');
+const sidebar = createSidebar();
 
 // Theme: OS preference by default, [data-theme] pins it either way (set
 // synchronously in <head> so reload doesn't flash the wrong one). load()
@@ -53,17 +43,18 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.domElement.style.display = 'block';
 stage.prepend(renderer.domElement);
 
-const controls = new CameraControls(camera, renderer.domElement);
-// smoothTime is "seconds to reach the target", not OrbitControls' per-frame
-// dampingFactor — 0.1 lands in the same snappy-but-not-jerky feel.
-controls.smoothTime = 0.1;
-controls.draggingSmoothTime = 0.1;
-controls.minAzimuthAngle = -Infinity;
-controls.maxAzimuthAngle = Infinity;
+const controls = new TrackballControls(camera, renderer.domElement);
+controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
+controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+controls.keys = []; // Command-drag is the single keyboard gesture for rotating.
+controls.panSpeed = 0.65;
+controls.rotateSpeed = 1.5;
+controls.staticMoving = true;
 controls.minDistance = 150;
 controls.maxDistance = 4000;
-controls.addEventListener('controlstart', () => play(false));
-controls.addEventListener('update', updateZoomReadout);
+controls.addEventListener('start', () => { play(false); cameraMove = null; });
+controls.addEventListener('change', updateZoomReadout);
 
 // 89°, not 90: sheets lie flat, so a near-top-down elevation faces them
 // straight at the camera by default; exactly 90 puts the view axis parallel
@@ -73,30 +64,41 @@ controls.addEventListener('update', updateZoomReadout);
 // top of the screen — verified against the camera's actual look-at basis,
 // not eyeballed (0° put south on top).
 const REST = { distance: 950, azimuth: THREE.MathUtils.degToRad(180), elevation: THREE.MathUtils.degToRad(89) };
-// The pivot is always the world origin, so a view is just a position on a
-// sphere around it — setLookAt does the interpolation itself (enableTransition)
-// instead of a hand-rolled RAF tween, and keeps working correctly if the user
-// drags mid-transition, which the old rewrite-camera.position loop didn't.
-function applyView({ distance, azimuth, elevation }, enableTransition = false) {
-  controls.setLookAt(
-    distance * Math.cos(elevation) * Math.sin(azimuth),
-    distance * Math.sin(elevation),
-    distance * Math.cos(elevation) * Math.cos(azimuth),
-    0, 0, 0,
-    enableTransition,
-  );
+let cameraMove = null;
+function moveCamera(position, target, up = camera.up, animate = false) {
+  cameraMove = null;
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    cameraMove = {
+      start: performance.now(), duration: 550,
+      fromPosition: camera.position.clone(), fromTarget: controls.target.clone(), fromUp: camera.up.clone(),
+      toPosition: position.clone(), toTarget: target.clone(), toUp: up.clone(),
+    };
+  } else {
+    camera.position.copy(position);
+    camera.up.copy(up);
+    controls.target.copy(target);
+    camera.lookAt(target);
+    controls.update();
+    updateZoomReadout();
+  }
+}
+function applyView({ distance, azimuth, elevation }, animate = false, target = controls.target.clone()) {
+  moveCamera(new THREE.Vector3(
+    target.x + distance * Math.cos(elevation) * Math.sin(azimuth),
+    target.y + distance * Math.sin(elevation),
+    target.z + distance * Math.cos(elevation) * Math.cos(azimuth),
+  ), target, new THREE.Vector3(0, 1, 0), animate);
 }
 function updateZoomReadout() {
-  if ($('zoom-value')) $('zoom-value').textContent = `${Math.round((REST.distance / camera.position.length()) * 100)}%`;
+  if ($('zoom-value')) $('zoom-value').textContent = `${Math.round((REST.distance / camera.position.distanceTo(controls.target)) * 100)}%`;
 }
 function zoom(factor) {
   play(false);
-  controls.dollyTo(controls.distance / factor, true);
+  const offset = camera.position.clone().sub(controls.target).multiplyScalar(1 / factor);
+  offset.clampLength(controls.minDistance, controls.maxDistance);
+  moveCamera(controls.target.clone().add(offset), controls.target.clone(), camera.up, true);
 }
 let playing = false;
-// camera-controls has no built-in autoRotate; this turns the crank on it
-// every frame instead, in the same units OrbitControls' autoRotateSpeed used
-// (speed 4 ≈ 24°/s) so the default motion feels the same as before.
 let autoRotateSpeed = (Math.PI / 30) * Number($('speed')?.value || 4);
 function play(value) {
   playing = value;
@@ -107,33 +109,54 @@ function play(value) {
   }
 }
 const fitScale = () => Math.min(1, innerWidth / 1100, innerHeight / 850);
-function reset() {
+let viewMode = 'stack';
+let mapDistance = REST.distance;
+let restoreHomeContent = () => {};
+let refreshLayerAppearance = () => {};
+let homeTarget = new THREE.Vector3();
+let homeDistance = REST.distance / fitScale();
+function syncViewButtons() {
+  $('map-toggle').setAttribute('aria-pressed', String(viewMode === 'map'));
+  $('side-toggle').setAttribute('aria-pressed', String(viewMode === 'stack'));
+  document.body.classList.toggle('stack-view', viewMode === 'stack');
+  const touch = matchMedia('(pointer: coarse)').matches;
+  $('instruction').textContent = touch
+    ? 'Drag to move, pinch to zoom, or tap a scan to inspect a place. Choose Stack to see the years in depth.'
+    : 'Drag to move, scroll to zoom, Command-drag to rotate, or click a scan to inspect a place. Choose Stack to see the years in depth.';
+  $('gesture-hint').textContent = touch
+    ? (viewMode === 'stack' ? 'Drag to move · pinch to zoom · Map to return' : 'Drag to move · pinch to zoom · Stack for depth')
+    : (viewMode === 'stack' ? 'Drag to move · Command-drag to rotate freely · Map to return' : 'Drag to move · scroll to zoom · Command-drag to rotate');
+}
+function setViewMode(mode) {
+  if (viewMode === mode) return;
   play(false);
-  applyView({ ...REST, distance: REST.distance / fitScale() });
+  if (mode === 'stack') mapDistance = camera.position.distanceTo(controls.target);
+  viewMode = mode;
+  const distance = mode === 'stack' ? Math.max(camera.position.distanceTo(controls.target), 1200) : mapDistance;
+  applyView({ ...REST, distance, elevation: THREE.MathUtils.degToRad(mode === 'stack' ? 45 : 89) }, true);
+  syncViewButtons();
+  refreshLayerAppearance();
+}
+function reset(animate = false) {
+  play(false);
+  viewMode = 'stack';
+  mapDistance = homeDistance;
+  syncViewButtons();
+  restoreHomeContent();
+  applyView({ ...REST, distance: Math.max(mapDistance, innerWidth <= 720 ? 1500 : 1200), elevation: THREE.MathUtils.degToRad(45) }, animate, homeTarget);
+  refreshLayerAppearance();
 }
 if ($('zoom-in')) $('zoom-in').onclick = () => zoom(1.2);
 if ($('zoom-out')) $('zoom-out').onclick = () => zoom(1 / 1.2);
-if ($('reset')) $('reset').onclick = reset;
 if ($('play')) $('play').onclick = () => play(!playing);
 if ($('top')) $('top').onclick = () => applyView({ ...REST, azimuth: 0, elevation: 0 });
-// Free-drag from the near-top-down default used to overshoot a true side
-// angle with OrbitControls' inertia; kept as a fixed raking angle rather than
-// letting a drag land anywhere near the equator.
-const SIDE = { azimuth: REST.azimuth, elevation: THREE.MathUtils.degToRad(25) };
-let sideView = false;
-const sideToggle = $('side-toggle');
-if (sideToggle) sideToggle.onclick = () => {
-  sideView = !sideView;
-  play(false);
-  applyView({ ...(sideView ? SIDE : REST), distance: REST.distance / fitScale() }, true);
-  sideToggle.textContent = sideView ? 'Top view' : 'Side view';
-  sideToggle.setAttribute('aria-pressed', String(sideView));
-};
+$('map-toggle').onclick = () => setViewMode('map');
+$('side-toggle').onclick = () => setViewMode('stack');
 if ($('clean')) $('clean').onclick = () => document.body.classList.toggle('clean');
 if ($('restore')) $('restore').onclick = () => document.body.classList.remove('clean');
 if ($('speed')) $('speed').oninput = (e) => (autoRotateSpeed = (Math.PI / 30) * Number(e.target.value));
 
-// Hand control: an alternative to OrbitControls' mouse drag. Loads
+// Hand control: an alternative to mouse drag. Loads
 // MediaPipe's HandLandmarker from CDN only once toggled on (webcam + a
 // few-MB model, not worth paying for on every visit). Wrist position is
 // read as a joystick (not a drag delta, so there's no drift to re-center),
@@ -223,21 +246,78 @@ if (handToggle) handToggle.onclick = () => {
   startHandControl().catch(err => { alert(`Hand control needs camera access: ${err.message}`); stopHandControl(); });
 };
 
-const sheet = $('sheet'), sheetHandle = $('sheet-handle');
-function expandSheet(open) {
-  if (!sheet) return;
-  sheet.classList.toggle('expanded', open);
-  sheetHandle.setAttribute('aria-expanded', String(open));
-  document.body.classList.toggle('sheet-expanded', open); // mobile: the expanded sheet covers the toolbar's row, so hide it rather than float over the list
-}
-if (sheetHandle) sheetHandle.onclick = () => expandSheet(!sheet.classList.contains('expanded'));
 renderer.domElement.oncontextmenu = e => e.preventDefault();
+// TrackballControls always rotates on one-finger touch. Keep the map gesture
+// consistent across devices: one finger pans; two fingers pan and pinch zoom.
+const touchPoints = new Map();
+function touchFrame() {
+  const points = [...touchPoints.values()];
+  const x = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+  const y = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+  const distance = points.length > 1 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : null;
+  return { x, y, distance };
+}
+let priorTouchFrame = null;
+renderer.domElement.addEventListener('pointerdown', event => {
+  if (event.pointerType !== 'touch') return;
+  controls.enabled = false;
+  play(false);
+  cameraMove = null;
+  renderer.domElement.setPointerCapture(event.pointerId);
+  touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  priorTouchFrame = touchFrame();
+}, true);
+renderer.domElement.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'touch' || !touchPoints.has(event.pointerId)) return;
+  touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  const frame = touchFrame();
+  if (priorTouchFrame) {
+    const distance = camera.position.distanceTo(controls.target);
+    const unitsPerPixel = 2 * distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / innerHeight;
+    camera.updateMatrixWorld();
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+    const shift = right.multiplyScalar((priorTouchFrame.x - frame.x) * unitsPerPixel)
+      .add(up.multiplyScalar((frame.y - priorTouchFrame.y) * unitsPerPixel));
+    camera.position.add(shift);
+    controls.target.add(shift);
+    if (frame.distance && priorTouchFrame.distance) {
+      const factor = priorTouchFrame.distance / frame.distance;
+      const offset = camera.position.clone().sub(controls.target).multiplyScalar(factor);
+      offset.clampLength(controls.minDistance, controls.maxDistance);
+      camera.position.copy(controls.target).add(offset);
+    }
+    controls.update();
+  }
+  priorTouchFrame = frame;
+}, true);
+function endTouch(event) {
+  if (event.pointerType !== 'touch') return;
+  touchPoints.delete(event.pointerId);
+  priorTouchFrame = touchPoints.size ? touchFrame() : null;
+  if (!touchPoints.size && !handRunning) controls.enabled = true;
+}
+renderer.domElement.addEventListener('pointerup', endTouch, true);
+renderer.domElement.addEventListener('pointercancel', endTouch, true);
+let orbitGesture = false;
+renderer.domElement.addEventListener('pointerdown', event => {
+  if (event.button !== 0) return;
+  orbitGesture = event.metaKey || event.ctrlKey;
+  controls.mouseButtons.LEFT = orbitGesture ? THREE.MOUSE.ROTATE : THREE.MOUSE.PAN;
+}, true); // capture: TrackballControls reads the chosen action during its own pointerdown
+function endPointerGesture() {
+  controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+  orbitGesture = false;
+}
+addEventListener('pointerup', endPointerGesture);
+addEventListener('pointercancel', endPointerGesture);
 renderer.domElement.addEventListener('pointerdown', () => stage.classList.add('grabbing'));
 addEventListener('pointerup', () => stage.classList.remove('grabbing'));
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
+  controls.handleResize();
 });
 document.addEventListener('keydown', e => {
   if (e.target.closest('input,select,button')) return;
@@ -250,10 +330,35 @@ document.addEventListener('keydown', e => {
 });
 reset();
 const clock = new THREE.Clock();
+const screenSpaceSprites = new Set();
 renderer.setAnimationLoop(() => {
   const delta = clock.getDelta();
-  if (playing) controls.rotate(autoRotateSpeed * delta, 0, false);
-  controls.update(delta);
+  if (cameraMove) {
+    const move = cameraMove;
+    const progress = Math.min(1, (performance.now() - move.start) / move.duration);
+    const t = 1 - (1 - progress) ** 3;
+    camera.position.lerpVectors(move.fromPosition, move.toPosition, t);
+    controls.target.lerpVectors(move.fromTarget, move.toTarget, t);
+    camera.up.lerpVectors(move.fromUp, move.toUp, t).normalize();
+    if (camera.up.lengthSq() < .01) camera.up.set(0, 1, 0);
+    camera.lookAt(controls.target);
+    if (progress === 1) cameraMove = null;
+  }
+  if (playing && !cameraMove) {
+    const offset = camera.position.clone().sub(controls.target).applyAxisAngle(new THREE.Vector3(0, 1, 0), autoRotateSpeed * delta);
+    camera.position.copy(controls.target).add(offset);
+  }
+  controls.update();
+  updateZoomReadout();
+  // Dots sit on different sheet heights. Fixed world scales make a nearby
+  // sheet's dot balloon across the map when a name is focused; keep their
+  // visible diameter stable in pixels instead.
+  const worldUnitsPerPixel = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / innerHeight;
+  for (const sprite of screenSpaceSprites) {
+    if (!sprite.visible) continue;
+    const size = camera.position.distanceTo(sprite.position) * worldUnitsPerPixel * sprite.userData.pixelSize;
+    sprite.scale.set(size, size, 1);
+  }
   renderer.render(scene, camera);
 });
 
@@ -274,13 +379,29 @@ function dotTexture() {
   return new THREE.CanvasTexture(c);
 }
 const anchorTexture = dotTexture();
+function yearBadge(year, height) {
+  const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 96;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#397a71'; ctx.fillRect(0, 0, 256, 96);
+  ctx.fillStyle = '#fff'; ctx.font = '700 58px system-ui, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(year), 128, 48);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const badge = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
+  badge.position.set(innerWidth <= 720 ? 250 : 420, height, 0);
+  badge.scale.set(76, 29, 1);
+  badge.renderOrder = 5;
+  badge.visible = false;
+  return badge;
+}
 const textureLoader = new THREE.TextureLoader();
 textureLoader.crossOrigin = 'anonymous';
 
 async function load() {
   const response = await fetch('layers.json');
   if (!response.ok) throw Error(`Layer data: HTTP ${response.status}`);
-  const { layers, links } = await response.json();
+  const { layers, links, meters_per_unit: metersPerUnit, ground_origin_m: groundOrigin,
+    meters_per_degree: metersPerDegree, span } = await response.json();
   // Oldest sheet sits on top of the stack, facing the camera first; newer
   // sheets stack below it, descending in world Y. Spacing is by sheet index,
   // not calendar gap, so a 9-year and a 25-year gap between sheets look the
@@ -289,25 +410,56 @@ async function load() {
   const mid = (layers.length - 1) / 2;
   const layerY = year => (mid - indexByYear.get(year)) * 130;
   let focus = null, hovered = null, loaded = 0, failed = 0;
-  const rows = [], meshes = [], fabrics = [];
+  const rows = [], meshes = [], fabrics = [], lowTextures = [], yearBadges = [];
+  let crispIndex = null, crispTexture = null, crispRequest = 0;
   function status() { $('status').textContent = `${loaded}/${layers.length} scans ready${failed ? ` · ${failed} unavailable` : ''}`; }
   const scanOpacity = 0.55;
   function applyLayerVisual(i) {
     // Hovering a sheet previews it exactly like focusing it; hover just doesn't stick.
     const active = hovered ?? focus, isActive = active === i, isDim = active !== null && !isActive;
-    meshes[i].material.opacity = isActive ? 1 : isDim ? .15 : scanOpacity;
-    fabrics[i].material.opacity = isActive ? 1 : isDim ? .15 : 0;
+    meshes[i].material.opacity = viewMode === 'stack'
+      ? (isActive ? .72 : isDim ? .5 : .62)
+      : (isActive ? 1 : isDim ? .06 : scanOpacity);
+    fabrics[i].material.opacity = isActive ? (viewMode === 'stack' ? .7 : 1) : isDim ? .15 : 0;
   }
-  function selectYear(index) {
-    focus = focus === index ? null : index;
+  refreshLayerAppearance = () => {
+    layers.forEach((_, i) => applyLayerVisual(i));
+    yearBadges.forEach(badge => { badge.visible = viewMode === 'stack'; });
+  };
+  function loadCrispTexture(index) {
+    const request = ++crispRequest;
+    const width = innerWidth <= 720 ? 1600 : 2200;
+    textureLoader.load(`${layers[index].image.iiif}/full/${width},/0/default.jpg`, texture => {
+      if (request !== crispRequest || focus !== index) { texture.dispose(); return; }
+      texture.colorSpace = THREE.SRGBColorSpace;
+      crispTexture = texture;
+      crispIndex = index;
+      meshes[index].material.map = texture;
+      meshes[index].material.needsUpdate = true;
+    }, undefined, () => {}); // the 800px scan remains visible if a larger derivative is unavailable
+  }
+  function setFocusedYear(index, expand = false) {
+    if (focus !== index) {
+      crispRequest++;
+      if (crispTexture) {
+        meshes[crispIndex].material.map = lowTextures[crispIndex];
+        meshes[crispIndex].material.needsUpdate = true;
+        crispTexture.dispose();
+        crispTexture = null;
+        crispIndex = null;
+      }
+      focus = index;
+      if (index !== null) loadCrispTexture(index);
+    }
     layers.forEach((_, i) => applyLayerVisual(i));
     rows.forEach((el, i) => el.setAttribute('aria-pressed', String(i === focus)));
     const l = layers[focus];
-    if (l) expandSheet(true);
+    if (l && expand) sidebar.expand(true);
     // Mobile's top pill is the only thing visible with the sheet collapsed,
     // so the current selection has to surface there too, not just in the list.
-    $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : '';
+    $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : 'Six sheets in view';
   }
+  function selectYear(index) { setFocusedYear(focus === index ? null : index, true); }
   for (const [index, l] of layers.entries()) {
     const ly = layerY(l.year);
     const corners = [[0, 0], [l.image.width, 0], [l.image.width, l.image.height], [0, l.image.height]]
@@ -319,9 +471,12 @@ async function load() {
     imageGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
     const texture = textureLoader.load(`${l.image.iiif}/full/800,/0/default.jpg`, () => { loaded++; status(); }, undefined, () => { failed++; status(); });
     texture.colorSpace = THREE.SRGBColorSpace;
+    lowTextures.push(texture);
     const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: scanOpacity, side: THREE.DoubleSide, depthWrite: false });
     const mesh = new THREE.Mesh(imageGeometry, material);
     scene.add(mesh); meshes.push(mesh);
+    const badge = yearBadge(l.year, ly);
+    scene.add(badge); yearBadges.push(badge);
 
     const fabricPositions = [];
     for (const ring of l.polys) {
@@ -337,12 +492,69 @@ async function load() {
 
     const row = document.createElement('button'); row.className = 'year'; row.setAttribute('aria-pressed', 'false');
     const title = document.createElement('b'); title.textContent = l.year;
-    const desc = document.createElement('small'); desc.textContent = `${l.label} · ${l.polys.length ? `${l.polys.length.toLocaleString()} outlines` : 'scan only'}`;
+    const desc = document.createElement('small'); desc.textContent = l.polys.length
+      ? `${l.label} · ${l.polys.length.toLocaleString()} outlines` : l.label;
     row.append(title, desc); row.onclick = () => selectYear(index);
     row.onmouseenter = () => { hovered = index; layers.forEach((_, j) => applyLayerVisual(j)); };
     row.onmouseleave = () => { hovered = null; layers.forEach((_, j) => applyLayerVisual(j)); };
     $('legend').append(row); rows.push(row);
   }
+  restoreHomeContent = () => setFocusedYear(null);
+  homeTarget = new THREE.Vector3(...toWorld([innerWidth <= 720 ? 400 : 570, 520], layerY(1923)));
+  homeDistance = innerWidth <= 720 ? 700 : 500;
+  reset();
+  // The place module owns the query and sidebar content. The scene owns only
+  // its temporary marks, so a radius change can redraw both from one callback.
+  let nearbyMarks = new THREE.Group();
+  scene.add(nearbyMarks);
+  function clearNearbyMarks() {
+    scene.remove(nearbyMarks);
+    nearbyMarks.traverse(object => {
+      if (object.isSprite) screenSpaceSprites.delete(object);
+      object.geometry?.dispose();
+      object.material?.dispose();
+    });
+    nearbyMarks = new THREE.Group();
+    scene.add(nearbyMarks);
+  }
+  function addNearbyMark(point, year, radiusUnits, hits) {
+    const y = layerY(year) + 3;
+    const centre = toWorld(point, y);
+    const ring = [];
+    for (let i = 0; i <= 48; i++) {
+      const angle = i * Math.PI * 2 / 48;
+      ring.push(new THREE.Vector3(centre[0] + Math.cos(angle) * radiusUnits * .7, y, centre[2] - Math.sin(angle) * radiusUnits * .7));
+    }
+    const circle = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(ring.slice(0, -1)),
+      new THREE.LineBasicMaterial({ color: warmColor, transparent: true, opacity: .8, depthTest: false }));
+    circle.renderOrder = 3;
+    nearbyMarks.add(circle);
+    const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: anchorTexture, color: warmColor, depthTest: false }));
+    marker.position.set(...centre); marker.scale.set(10, 10, 1); marker.renderOrder = 4;
+    marker.userData.pixelSize = 13; screenSpaceSprites.add(marker);
+    nearbyMarks.add(marker);
+    for (const hit of hits.slice(0, 5)) {
+      const spot = toWorld(hit.p, y);
+      const dot = new THREE.Sprite(new THREE.SpriteMaterial({ map: anchorTexture, color: lineColor, depthTest: false }));
+      dot.position.set(...spot); dot.scale.set(6, 6, 1); dot.renderOrder = 4;
+      dot.userData.pixelSize = 8; screenSpaceSprites.add(dot);
+      nearbyMarks.add(dot);
+    }
+  }
+  function drawNearbyMarks(point, context) {
+    clearNearbyMarks();
+    if (!point) return;
+    const radiusUnits = context.radius_m / metersPerUnit;
+    for (const layer of layers) {
+      if (!context.maps.some(map => map.id === layer.map_id)) continue;
+      const hits = context.labels.filter(label => label.map_id === layer.map_id);
+      addNearbyMark(point, layer.year, radiusUnits, hits);
+    }
+  }
+  const placeContext = createPlaceContext({
+    layers, metersPerUnit, groundOrigin, metersPerDegree, span,
+    onChange: drawNearbyMarks,
+  });
   // One button per chain (a union-find thread of matched occurrences, from
   // build.py) highlights that name's links across every sheet it survives to,
   // not just one adjacent pair — and keeps two same-named but differently
@@ -352,16 +564,19 @@ async function load() {
   const pickables = [];
   for (const link of links) {
     const key = link.c;
-    if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], years: new Set(), doling: null });
+    if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], anchors: new Map(), years: new Set(), doling: null });
     const group = groups.get(key);
     if (!group.doling && link.d) group.doling = link.d;
     const a = toWorld(link.p, layerY(layers[link.a].year)), b = toWorld(link.q, layerY(layers[link.b].year));
+    group.anchors.set(`${link.a}:${link.p}`, { position: new THREE.Vector3(...a), index: link.a });
+    group.anchors.set(`${link.b}:${link.q}`, { position: new THREE.Vector3(...b), index: link.b });
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
     const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: .16, depthTest: false }));
     scene.add(line); group.elements.push(line);
     for (const [point, year] of [[a, layers[link.a].year], [b, layers[link.b].year]]) {
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: anchorTexture, color: lineColor, transparent: true, opacity: .2, depthTest: false }));
       sprite.position.set(...point); sprite.scale.set(8, 8, 1);
+      sprite.userData.pixelSize = 10; screenSpaceSprites.add(sprite);
       scene.add(sprite); group.elements.push(sprite); group.years.add(year);
       pickables.push({ sprite, key });
     }
@@ -370,13 +585,12 @@ async function load() {
     for (const el of elements) {
       el.material.opacity = hot ? 1 : el.isSprite ? .2 : .16;
       el.material.color.copy(hot ? warmColor : lineColor);
+      if (el.isSprite) el.userData.pixelSize = hot ? 16 : 10;
     }
   }
-  // Popup: richer detail on the name actually clicked, at the click point —
-  // the sidebar list stays a plain index, it doesn't try to hold this too.
+  // Popup: detail on the name clicked in either the list or the scene.
   const popup = $('popup'), popupBody = $('popup-body');
   function closePopup() { popup.classList.remove('open'); }
-  $('popup-close').onclick = closePopup;
   function popupHTML(group) {
     const years = [...group.years].sort().join(' → ');
     let html = `<h2>${group.name}</h2><p>${years} · tentative match, not a verified rename.</p>`;
@@ -396,34 +610,74 @@ async function load() {
     popup.style.top = `${Math.min(Math.max(8, y + 14), innerHeight - rect.height - 8)}px`;
   }
   let selected = null;
-  function selectGroup(key, x, y) {
-    const group = groups.get(key);
-    selected = selected === key ? null : key;
+  function highlightGroup(key) {
+    selected = key;
     for (const [k, g] of groups) { setHot(g.elements, k === selected); g.button.setAttribute('aria-pressed', String(k === selected)); }
-    if (selected) { showPopup(x, y, group); expandSheet(true); } else closePopup();
+    $('name-clear').hidden = selected === null;
   }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
-  // Canvas clicks are handled by the pointerup picker below (it already knows
-  // whether a name point was actually hit); this only catches clicks on the
-  // rest of the page — anywhere that isn't the popup itself or a name button.
-  document.addEventListener('pointerdown', e => {
-    if (e.target.closest('#stage,#popup,.name')) return;
+  function clearNameSelection() {
+    highlightGroup(null);
     closePopup();
-  });
+  }
+  $('popup-close').onclick = clearNameSelection;
+  $('name-clear').onclick = clearNameSelection;
+  function focusGroup(group) {
+    const anchors = [...group.anchors.values()];
+    if (!anchors.length) return;
+    // Keep the currently visible year when it contains the name. Otherwise
+    // choose its latest printed occurrence so the focused scan stays legible.
+    const anchor = anchors.find(item => item.index === focus) || anchors.at(-1);
+    const target = anchor.position;
+    const distance = Math.min(camera.position.distanceTo(controls.target), viewMode === 'stack' ? 480 : 250);
+    const direction = camera.position.clone().sub(controls.target).normalize();
+    play(false);
+    setFocusedYear(anchor.index);
+    moveCamera(new THREE.Vector3(
+      target.x + direction.x * distance,
+      target.y + direction.y * distance,
+      target.z + direction.z * distance,
+    ), target, camera.up, true);
+  }
+  function selectNameFromList(key, button) {
+    const group = groups.get(key);
+    if (selected === key) { clearNameSelection(); return; }
+    highlightGroup(key);
+    focusGroup(group);
+    const rect = button.getBoundingClientRect();
+    const mobile = matchMedia('(max-width:720px)').matches;
+    showPopup(mobile ? rect.left : rect.left - 282, mobile ? innerHeight * .24 : rect.top, group);
+    if (matchMedia('(max-width:720px)').matches) sidebar.expand(false);
+  }
+  function selectPointInScene(key, x, y) {
+    if (selected === key) { clearNameSelection(); return; }
+    highlightGroup(key);
+    showPopup(x, y, groups.get(key));
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') clearNameSelection(); });
+  // Canvas clicks clear selection in the picker below. Sidebar and toolbar
+  // controls should not silently discard the name being inspected.
   for (const [key, group] of groups) {
     const button = document.createElement('button'); button.className = 'name'; button.textContent = group.name;
+    button.title = `Highlight and zoom to ${group.name}`;
     group.button = button; button.setAttribute('aria-pressed', 'false');
     button.onmouseenter = () => { if (selected !== key) setHot(group.elements, true); };
     button.onmouseleave = () => { if (selected !== key) setHot(group.elements, false); };
-    button.onclick = (e) => selectGroup(key, e.clientX, e.clientY);
+    button.onclick = () => selectNameFromList(key, button);
     $('names').append(button);
   }
-  nameSearch.addEventListener('input', () => {
+  function updateNameResults() {
     const query = nameSearch.value.trim().toLocaleLowerCase();
-    for (const group of groups.values()) group.button.hidden = query !== '' && !group.name.toLocaleLowerCase().includes(query);
-  });
-  // Clicking (not dragging) a link's anchor point in the scene acts exactly
-  // like clicking its sidebar name button — same selection, same highlight.
+    let visible = 0;
+    for (const group of groups.values()) {
+      group.button.hidden = query !== '' && !group.name.toLocaleLowerCase().includes(query);
+      if (!group.button.hidden) visible++;
+    }
+    $('name-count').textContent = query ? `${visible} of ${groups.size} names` : `${groups.size} linked names`;
+    $('name-empty').hidden = visible > 0;
+  }
+  nameSearch.addEventListener('input', updateNameResults);
+  updateNameResults();
+  // Clicking (not dragging) an anchor in the scene opens its source detail.
   const spriteObjects = pickables.map(p => p.sprite);
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -439,10 +693,21 @@ async function load() {
   renderer.domElement.addEventListener('pointerdown', e => { downPoint = [e.clientX, e.clientY]; });
   renderer.domElement.addEventListener('pointerup', e => {
     const start = downPoint; downPoint = null;
+    if (orbitGesture) return;
     if (!start || Math.hypot(e.clientX - start[0], e.clientY - start[1]) > 6) return;
     const picked = pickAt(e.clientX, e.clientY);
-    if (picked) selectGroup(picked.key, e.clientX, e.clientY);
-    else closePopup();
+    if (picked) selectPointInScene(picked.key, e.clientX, e.clientY);
+    else {
+      clearNameSelection();
+      const selectedMesh = focus === null ? [] : [meshes[focus]];
+      const scanHit = raycaster.intersectObjects(selectedMesh)[0] || raycaster.intersectObjects(meshes)[0];
+      if (scanHit) {
+        const point = [(350 - scanHit.point.x) / .7, (350 - scanHit.point.z) / .7];
+        placeContext.select(point, meshes.indexOf(scanHit.object));
+        sidebar.show('place');
+        sidebar.expand(true);
+      }
+    }
   });
   renderer.domElement.addEventListener('pointermove', e => {
     if (downPoint) return;
@@ -465,8 +730,8 @@ async function load() {
     warmColor.set(s.getPropertyValue('--warm').trim());
     fabrics.forEach(f => f.material.color.copy(warmColor));
     for (const [key, g] of groups) setHot(g.elements, key === selected);
+    placeContext.refresh();
   };
   status();
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) play(true);
 }
 load().catch(error => { $('status').textContent = `Could not load maps: ${error.message}. Serve this folder over HTTP.`; });

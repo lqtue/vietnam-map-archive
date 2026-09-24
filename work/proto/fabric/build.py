@@ -103,7 +103,7 @@ def read(sheet):
         n_blocks = len(features)
         features.sort(key=lambda f: -(f["properties"].get("area_px") or 0))
         polys = [warp(M, ring) for f in features[:KEEP] for ring in rings(f["geometry"])]
-    seen = {}
+    seen, labels = {}, []
     ocr_path = ROOT / sheet.get("ocr", "")
     if ocr_path.is_file():
         for extraction in json.loads(ocr_path.read_text())["extractions"]:
@@ -111,8 +111,10 @@ def read(sheet):
             name = key(extraction["text"])
             if len(name) < 5: continue
             x, y, w, h = extraction["global_bbox"]
-            seen.setdefault(name, []).append((extraction["text"], warp(M, [[x + w / 2, y + h / 2]])[0]))
-    return dict(sheet=sheet, M=M, georef=georef, polys=polys, n_blocks=n_blocks, labels=seen, width=source["width"], height=source["height"], iiif=source["id"])
+            point = warp(M, [[x + w / 2, y + h / 2]])[0]
+            seen.setdefault(name, []).append((extraction["text"], point))
+            labels.append(dict(text=extraction["text"], category=extraction["category"], point=point))
+    return dict(sheet=sheet, M=M, georef=georef, polys=polys, n_blocks=n_blocks, labels=seen, all_labels=labels, width=source["width"], height=source["height"], iiif=source["id"])
 
 
 def main(out, link_max_m):
@@ -128,7 +130,8 @@ def main(out, link_max_m):
     for s in sheets:
         M = s["M"]
         matrix = [M[0,0]*scale, -M[0,1]*scale, M[1,0]*scale, -M[1,1]*scale, (M[2,0]-lo[0])*scale, SPAN-(M[2,1]-lo[1])*scale]
-        layers.append(dict(year=s["sheet"]["year"], label=s["sheet"]["label"], polys=[put(p).tolist() for p in s["polys"]], n_blocks=s["n_blocks"], n_labels=len(s["labels"]), georef=s["georef"], image=dict(iiif=s["iiif"], width=s["width"], height=s["height"], matrix=[round(float(v),5) for v in matrix])))
+        labels = [dict(t=l["text"], k=l["category"], p=put(l["point"]).tolist()) for l in s["all_labels"]]
+        layers.append(dict(year=s["sheet"]["year"], label=s["sheet"]["label"], map_id=s["sheet"].get("annotation_id", s["sheet"]["map_id"]), polys=[put(p).tolist() for p in s["polys"]], labels=labels, n_blocks=s["n_blocks"], n_labels=len(s["labels"]), georef=s["georef"], image=dict(iiif=s["iiif"], width=s["width"], height=s["height"], matrix=[round(float(v),5) for v in matrix])))
     # Union-find over (sheet, name, occurrence) nodes: a link unions the exact
     # occurrence pair it matched, so a name that resolves to different physical
     # spots on different sheet-pairs (a long street, matched at its west end for
@@ -160,7 +163,7 @@ def main(out, link_max_m):
     roots = {r: idx for idx, r in enumerate(sorted({find(n) for n in parent}, key=str))}
     for link, node in zip(links, link_node): link["c"] = roots[find(node)]
     links.sort(key=lambda link: link["m"])
-    pathlib.Path(out).write_text(json.dumps(dict(layers=layers, links=links), separators=(",", ":")))
+    pathlib.Path(out).write_text(json.dumps(dict(layers=layers, links=links, meters_per_unit=1 / scale, ground_origin_m=lo.tolist(), meters_per_degree=K.tolist(), span=SPAN), separators=(",", ":")))
     print(f"wrote {len(layers)} independently georeferenced scans and {len(links)} adjacent-sheet name links")
 
 

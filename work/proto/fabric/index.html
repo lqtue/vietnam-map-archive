@@ -33,23 +33,24 @@
    it. position:fixed here is the standard cross-browser lock for that. */
 html,body{position:fixed;inset:0;width:100%;height:100%;overscroll-behavior:none}
 body{margin:0;background:var(--paper);color:var(--ink);overflow:hidden;font:13px/1.5 -apple-system,BlinkMacSystemFont,ui-sans-serif,system-ui,sans-serif}
+body.stack-view{background:radial-gradient(circle at 42% 45%,#eef0ec,#d6d9d5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body.stack-view{background:radial-gradient(circle at 42% 45%,#343833,#222522)}}
+:root[data-theme="dark"] body.stack-view{background:radial-gradient(circle at 42% 45%,#343833,#222522)}
 button{font:inherit}
 button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}
+a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
 
-/* stage: WebGL canvas fills it; OrbitControls owns drag/zoom/pan/inertia */
+/* stage: WebGL canvas fills it; TrackballControls owns pan/zoom/rotation */
 #stage{position:fixed;inset:0;cursor:grab;touch-action:none}
 #stage.grabbing{cursor:grabbing}
 #stage.pointable{cursor:pointer}
 #stage canvas{display:block}
 
-/* panels: on a wide screen, one right-hand column (#sheet) holds source
-   sheets → shared names, stacked in flow order; #sheet-body's children give
-   up any position of their own and become plain stacked blocks with a rule
-   between each. Mobile below re-styles #sheet into a slide-up bottom card
-   instead. */
+/* One right-hand card holds the title and one sidebar view at a time.
+   Mobile below turns the sidebar into a slide-up bottom card. */
 .panel{position:fixed;z-index:2;background:var(--panel);border-radius:16px;box-shadow:0 12px 32px -8px rgba(37,39,37,.22),0 1px 0 rgba(37,39,37,.04);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
-#masthead,#legend,#controls,#names,#sheet-body{overscroll-behavior:contain}
-/* #column is the one visible card (title → sheets → names); #masthead and
+#masthead,#legend,#controls,#names,#nearby-results,#sheet-body{overscroll-behavior:contain}
+/* #column is the one visible card (title → sidebar); #masthead and
    #sheet give up their own box entirely and become plain stacked sections
    inside it. Mobile below makes #column inert (display:contents) so its
    two children go back to being independent fixed panels there. */
@@ -59,15 +60,20 @@ button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}
 #sheet-body{padding:0}
 #sheet-handle{display:none}
 #sheet-body>*{position:static;background:none;box-shadow:none;padding:0;width:auto;max-height:none;overflow:visible;right:auto;left:auto;bottom:auto;top:auto;border:0}
-#sheet-body>*+*{margin-top:14px;padding-top:14px;border-top:1px solid var(--faint)}
+.sidebar-view[hidden]{display:none}
+#sidebar-tabs{display:flex;gap:3px;margin-bottom:11px;padding:3px!important;border:1px solid var(--faint)!important;border-radius:9px;background:var(--paper)!important}
+#sidebar-tabs button{flex:1;border:0;border-radius:6px;background:none;color:var(--mute);font-size:11px;font-weight:600;padding:6px 3px;cursor:pointer}
+#sidebar-tabs button[aria-selected=true]{background:var(--panel);box-shadow:0 1px 4px rgba(37,39,37,.12);color:var(--ink)}
 h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.18}
 #thesis{margin:9px 0 0;max-width:40ch;color:var(--soft)}
 #status{margin:10px 0 0;font-size:11px;color:var(--mute)}
 #current-sheet{display:none}
 
-.year{display:block;width:100%;padding:8px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}
+.year{display:block;width:100%;padding:8px;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);text-align:left;cursor:pointer}
 .year:first-child,.name:first-child{border-top:0}
 .year:hover,.year[aria-pressed=true]{color:var(--ink)}
+.year:hover{background:rgba(57,122,113,.06)}
+.year[aria-pressed=true]{background:rgba(57,122,113,.1);box-shadow:inset 3px 0 var(--line)}
 .year b{display:block;font-size:11px;font-weight:650;letter-spacing:.12em}
 .year small{display:block;margin-top:2px;font-size:11px;line-height:1.35}
 .year[aria-pressed=true] b{color:var(--line)}
@@ -75,16 +81,55 @@ h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.1
 strong{color:var(--ink);font-weight:600}
 
 #name-search{width:100%;margin:0 0 7px;padding:5px 7px;border:1px solid var(--faint);border-radius:6px;background:var(--paper);color:var(--ink);font-size:11px}
-#names{display:block;max-height:calc(var(--vh) * 31);overflow:auto;padding-right:2px}
-.name{display:block;width:100%;padding:7px 0;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);font-size:11px;line-height:1.3;text-align:left;cursor:pointer}
+#name-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 5px;color:var(--mute);font-size:10px}
+#name-clear{border:0;background:none;color:var(--line);font-size:10px;cursor:pointer;padding:2px 0}
+#name-clear[hidden],#name-empty[hidden]{display:none}
+#name-empty{margin:14px 0;color:var(--mute);font-size:11px;line-height:1.45}
+#names{display:block;max-height:calc(var(--vh) * 50);overflow:auto;padding-right:2px}
+.name{display:block;width:100%;padding:7px 8px;border:0;border-top:1px solid var(--faint);background:none;color:var(--mute);font-size:11px;line-height:1.3;text-align:left;cursor:pointer}
 .name:hover,.name[aria-pressed=true]{color:var(--ink)}
-.name[aria-pressed=true]{color:var(--warm)}
+.name:hover{background:rgba(182,103,54,.06)}
+.name[aria-pressed=true]{color:var(--warm);background:rgba(182,103,54,.1);box-shadow:inset 3px 0 var(--warm)}
 .name[hidden]{display:none}
 #instruction{margin:7px 0 0;color:var(--mute);font-size:11px}
+#nearby h2{margin:0 0 5px;font-size:13px;font-weight:650}
+#nearby p{margin:5px 0;color:var(--mute);font-size:11px;line-height:1.4}
+#nearby a{color:var(--line);text-decoration:none}
+#nearby a:hover{text-decoration:underline}
+#nearby-summary{font-weight:600;color:var(--ink)!important}
+#nearby-location{font-variant-numeric:tabular-nums}
+#nearby-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0}
+#nearby-controls label{color:var(--soft);font-size:11px}
+#nearby-radius{max-width:110px;padding:4px;border:1px solid var(--faint);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-size:11px}
+#nearby-clear{border:0;background:none;color:var(--line);font-size:11px;cursor:pointer;padding:2px 0}
+#nearby-results{max-height:calc(var(--vh) * 49);overflow:auto;padding-right:2px}
+.nearby-year{border-top:1px solid var(--faint)}
+.nearby-year summary{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:7px 0;cursor:pointer;list-style:none}
+.nearby-year summary::-webkit-details-marker{display:none}
+.nearby-year summary::after{content:'⌄';color:var(--mute)}
+.nearby-year[open] summary::after{transform:rotate(180deg)}
+.nearby-year b{font-size:11px;color:var(--ink)}
+.nearby-year small{color:var(--mute);font-size:10px}
+.nearby-year-body{padding:0 0 9px}
+.nearby-year-body small{display:block}
+.nearby-source{display:inline-block;font-size:10px}
+.nearby-hit{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:3px 0;color:var(--soft);font-size:11px}
+.nearby-hit span{color:var(--mute);white-space:nowrap}
 
-#toolbar{position:fixed;left:12px;bottom:12px;z-index:5;display:flex;gap:8px}
-#toolbar button{border:1px solid var(--faint);border-radius:8px;background:var(--panel);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:0 8px 20px -6px rgba(37,39,37,.25);color:var(--ink);font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;white-space:nowrap}
-#toolbar button:hover,#toolbar button:focus-visible{border-color:var(--warm)}
+#toolbar{position:fixed;left:12px;bottom:12px;z-index:5;display:flex;align-items:center;gap:7px}
+#toolbar button,#more-controls summary{border:1px solid var(--faint);border-radius:8px;background:var(--panel);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:0 8px 20px -6px rgba(37,39,37,.25);color:var(--ink);font-size:11px;font-weight:600;padding:8px 12px;cursor:pointer;white-space:nowrap}
+#toolbar button:hover,#toolbar button:focus-visible,#more-controls summary:hover{border-color:var(--warm)}
+#view-modes{display:flex;gap:2px;padding:3px;border:1px solid var(--faint);border-radius:10px;background:var(--panel);box-shadow:0 8px 20px -6px rgba(37,39,37,.25)}
+#view-modes button{border:0;box-shadow:none;background:none;padding:5px 11px}
+#view-modes button[aria-pressed=true]{background:var(--paper);color:var(--line);box-shadow:0 1px 4px rgba(37,39,37,.12)}
+#zoom-in,#zoom-out{min-width:33px;padding:8px!important;font-size:14px!important;line-height:1!important}
+#more-controls{position:relative}
+#more-controls summary{display:block;list-style:none}
+#more-controls summary::-webkit-details-marker{display:none}
+#more-menu{position:absolute;left:0;bottom:40px;min-width:130px;padding:7px;background:var(--panel);border:1px solid var(--faint);border-radius:10px}
+#more-menu button{width:100%;box-shadow:none;text-align:left}
+#gesture-hint{position:fixed;left:50%;bottom:17px;z-index:4;transform:translateX(-50%);margin:0;padding:6px 10px;border-radius:8px;background:var(--panel);color:var(--soft);font-size:11px;white-space:nowrap;pointer-events:none}
+.sheet-expanded #gesture-hint{visibility:hidden}
 #hand-toggle[disabled]{opacity:.6;cursor:wait}
 .clean #toolbar{visibility:hidden}
 /* preview so the user can see what the tracker sees; mirrored like a mirror,
@@ -101,8 +146,7 @@ strong{color:var(--ink);font-weight:600}
 .clean #restore{display:block}
 #restore:hover,#restore:focus{opacity:1}
 
-/* popup: detail on the one name just clicked, at the click point — the
-   sidebar list stays a plain index and never grows this content itself */
+/* popup: detail on the one name just clicked, from either the map or list */
 #popup{position:fixed;z-index:6;width:260px;padding:12px 14px;border-radius:10px;box-shadow:0 8px 30px rgba(37,39,37,.18);display:none}
 #popup.open{display:block}
 #popup h2{margin:0;font-size:13px;font-weight:650;color:var(--ink);padding-right:18px}
@@ -131,9 +175,7 @@ strong{color:var(--ink);font-weight:600}
   #status{display:none}
   #current-sheet{display:block;margin:4px 60px 0 0;font-size:12px;font-weight:600;color:var(--ink)}
 
-  /* the sheet: one flowed column of legend → names, clipped to a peek
-     height until opened. Its children give up their own fixed positions
-     and become ordinary flow content inside it. */
+  /* The sidebar stays one view at a time inside the slide-up sheet. */
   #sheet{display:block;position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;z-index:3;background:var(--panel);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(37,39,37,.1);max-height:60px;overflow:hidden;transition:max-height .4s cubic-bezier(.32,.72,0,1)}
   #sheet.expanded{max-height:calc(var(--vh) * 72)}
   #sheet-handle{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:10px 16px 12px;border:0;background:none;color:var(--mute);font:inherit;text-align:center;cursor:pointer}
@@ -142,11 +184,11 @@ strong{color:var(--ink);font-weight:600}
   .year small{display:block}
   #instruction{margin:6px 0 0;font-size:10px;line-height:1.35}
   #restore{right:12px;bottom:12px}
-  /* Only the theme toggle earns a permanent spot on a phone screen — side
-     view and hand control (webcam-driven) move to the masthead corner
-     instead of a separate bottom-left row, clear of the sheet's tap strip. */
-  #toolbar{left:auto;right:14px;bottom:auto;top:14px}
-  #side-toggle,#hand-toggle,#hand-video{display:none}
+  #toolbar{left:12px;right:12px;bottom:72px;top:auto;justify-content:center;gap:5px}
+  #toolbar button{padding:7px 9px}
+  #view-modes button{padding:4px 8px}
+  #more-controls,#hand-video{display:none}
+  #gesture-hint{bottom:120px;font-size:10px}
 
   .year:active,.name:active,#sheet-handle:active{transform:scale(.96)}
 }
@@ -161,26 +203,54 @@ strong{color:var(--ink);font-weight:600}
   <h1>Saigon,<br>1882–1968</h1>
   <p id="thesis">Six sheets, independently georeferenced and stacked by year.</p>
   <p id="current-sheet" aria-live="polite"></p>
+  <p id="status">Loading scans…</p>
 </header>
 <div id="sheet" class="panel">
   <button id="sheet-handle" type="button" aria-expanded="false" aria-controls="sheet-body">
     <span class="bar" aria-hidden="true"></span>
-    <span>Sheets &amp; names</span>
+    <span id="sheet-handle-label">Sheets</span>
   </button>
   <div id="sheet-body">
-    <aside id="legend" class="panel" aria-label="Map layers"></aside>
-    <section id="controls" class="panel" aria-label="Shared place names">
+    <nav id="sidebar-tabs" role="tablist" aria-label="Explore the maps">
+      <button id="tab-sheets" type="button" role="tab" aria-controls="legend" aria-selected="true">Sheets</button>
+      <button id="tab-names" type="button" role="tab" aria-controls="controls" aria-selected="false" tabindex="-1">Names</button>
+      <button id="tab-place" type="button" role="tab" aria-controls="nearby" aria-selected="false" tabindex="-1">Place</button>
+    </nav>
+    <section id="legend" class="sidebar-view" role="tabpanel" aria-labelledby="tab-sheets" aria-label="Map layers">
+      <p id="instruction">Drag to move, scroll to zoom, Command-drag to rotate, or click a scan to inspect a place. Choose Stack to see the years in depth.</p>
+    </section>
+    <section id="controls" class="sidebar-view" role="tabpanel" aria-labelledby="tab-names" hidden>
+      <input id="name-search" type="search" placeholder="Search shared names…" aria-label="Search shared names">
+      <div id="name-meta"><span id="name-count" aria-live="polite"></span><button id="name-clear" type="button" hidden>Clear selection</button></div>
       <nav id="names" aria-label="Select a shared historical name"></nav>
-      <p id="instruction">Drag to rotate; click a year or a name to isolate it.</p>
+      <p id="name-empty" hidden>No matching names. Try another spelling.</p>
+    </section>
+    <section id="nearby" class="sidebar-view" role="tabpanel" aria-labelledby="tab-place" hidden>
+      <p id="nearby-hint">Click a spot on a scan to see what its maps name nearby.</p>
+      <p id="nearby-summary" hidden></p>
+      <p id="nearby-location" hidden></p>
+      <div id="nearby-controls">
+        <label for="nearby-radius">Within</label>
+        <select id="nearby-radius" aria-label="Search radius"><option value="100">100 m</option><option value="200" selected>200 m</option><option value="400">400 m</option></select>
+        <button id="nearby-clear" type="button" hidden>Clear</button>
+      </div>
+      <div id="nearby-results" aria-live="polite"></div>
+      <p id="nearby-note" hidden>Local OCR extracts may contain unreviewed readings. The archive context also includes reviewed footprints and stories.</p>
     </section>
   </div>
 </div>
 </div>
 <div id="toolbar">
+  <div id="view-modes" role="group" aria-label="View angle">
+    <button id="map-toggle" type="button" aria-pressed="false">Map</button>
+    <button id="side-toggle" type="button" aria-pressed="true">Stack</button>
+  </div>
+  <button id="zoom-in" type="button" aria-label="Zoom in">+</button>
+  <button id="zoom-out" type="button" aria-label="Zoom out">−</button>
   <button id="theme-toggle" type="button">Dark</button>
-  <button id="side-toggle" type="button">Side view</button>
-  <button id="hand-toggle" type="button">Hand control</button>
+  <details id="more-controls"><summary>More</summary><div id="more-menu"><button id="hand-toggle" type="button">Hand control</button></div></details>
 </div>
+<p id="gesture-hint">Drag to move · Command-drag to rotate freely · Map to return</p>
 <video id="hand-video" muted playsinline aria-hidden="true"></video>
 <button id="restore" type="button" aria-label="Show panels">Show panels</button>
 <div id="popup" class="panel" role="dialog" aria-label="Name detail">
@@ -188,7 +258,7 @@ strong{color:var(--ink);font-weight:600}
   <div id="popup-body"></div>
 </div>
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/","camera-controls":"https://cdn.jsdelivr.net/npm/camera-controls@2.10.1/dist/camera-controls.module.js"}}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
 </script>
 <script type="module" src="viewer.js"></script>
 </body></html>
