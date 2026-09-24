@@ -3,8 +3,8 @@ import type { Database } from './types';
 import type { FootprintSubmission, PixelCoord, FeatureType, LegendItem } from '$lib/data/maps/footprintTypes';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
 
-type Json = Database['public']['Tables']['footprint_submissions']['Row']['pixel_polygon'];
-type FootprintUpdate = Database['public']['Tables']['footprint_submissions']['Update'];
+type Json = Database['public']['Tables']['footprints']['Row']['pixel_polygon'];
+type FootprintUpdate = Database['public']['Tables']['footprints']['Update'];
 
 type LabelMapRow = Pick<
 	Database['public']['Tables']['maps']['Row'],
@@ -16,7 +16,7 @@ type LabelMapRow = Pick<
 	| 'triage'
 	| 'year'
 	| 'location'
-	| 'dc_description'
+	| 'description'
 >;
 
 // ── Label Maps ────────────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@ export interface LabelMapInfo {
 export async function fetchLabelMaps(supabase: SupabaseClient<Database>): Promise<LabelMapInfo[]> {
 	const { data, error } = await supabase
 		.from('maps')
-		.select('id, name, allmaps_id, iiif_image, label_config, triage, year, location, dc_description')
-		.eq('georef_done', true)
+		.select('id, name, allmaps_id, iiif_image, label_config, triage, year, location, description')
+		.eq('is_georeferenced', true)
 		.order('priority', { ascending: false })
 		.order('name');
 
@@ -55,7 +55,7 @@ export async function fetchLabelMaps(supabase: SupabaseClient<Database>): Promis
 
 	// One extra round trip for the whole pass, rather than a count per row: the
 	// picker only needs to know *whether* a sheet has been read, not how much.
-	const { data: done } = await supabase.from('ocr_extractions').select('map_id');
+	const { data: done } = await supabase.from('ocr_labels').select('map_id');
 	const ocrd = new Set((done ?? []).map((r) => r.map_id));
 
 	return ((data ?? []) as LabelMapRow[])
@@ -79,7 +79,7 @@ export async function fetchLabelMaps(supabase: SupabaseClient<Database>): Promis
 				triage:     Object.keys((r.triage ?? {}) as object).length ? (r.triage as SavedTriage) : null,
 				year:        r.year ?? undefined,
 				location:    r.location ?? undefined,
-				description: r.dc_description ?? undefined,
+				description: r.description ?? undefined,
 				hasOcr:      ocrd.has(r.id),
 			};
 		});
@@ -88,8 +88,8 @@ export async function fetchLabelMaps(supabase: SupabaseClient<Database>): Promis
 // ── Footprint Submissions ─────────────────────────────────────────────────────
 
 type DbFootprint = Pick<
-	Database['public']['Tables']['footprint_submissions']['Row'],
-	'id' | 'map_id' | 'user_id' | 'pixel_polygon' | 'name' | 'category' | 'feature_type' | 'status'
+	Database['public']['Tables']['footprints']['Row'],
+	'id' | 'map_id' | 'user_id' | 'pixel_polygon' | 'name' | 'category' | 'feature_type' | 'review_status'
 >;
 
 function toFootprint(row: DbFootprint): FootprintSubmission {
@@ -101,7 +101,7 @@ function toFootprint(row: DbFootprint): FootprintSubmission {
 		name:         row.name,
 		category:     row.category,
 		featureType:  (row.feature_type ?? 'building') as FeatureType,
-		status:       row.status as FootprintSubmission['status']
+		status:       row.review_status as FootprintSubmission['status']
 	};
 }
 
@@ -110,8 +110,8 @@ export async function fetchMapFootprints(
 	mapId: string
 ): Promise<FootprintSubmission[]> {
 	const { data, error } = await supabase
-		.from('footprint_submissions')
-		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, status')
+		.from('footprints')
+		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, review_status')
 		.eq('map_id', mapId)
 		.order('created_at', { ascending: true });
 
@@ -164,7 +164,7 @@ export async function updateFootprint(
 	pixelPolygon: PixelCoord[]
 ): Promise<boolean> {
 	const { error } = await supabase
-		.from('footprint_submissions')
+		.from('footprints')
 		.update({ pixel_polygon: pixelPolygon as unknown as Json })
 		.eq('id', footprintId);
 	if (error) { console.error('Failed to update footprint:', error); return false; }
@@ -182,7 +182,7 @@ export async function updateFootprintMeta(
 	if (meta.category !== undefined)    update.category     = meta.category;
 
 	const { error } = await supabase
-		.from('footprint_submissions')
+		.from('footprints')
 		.update(update)
 		.eq('id', footprintId);
 	if (error) { console.error('Failed to update footprint meta:', error); return false; }
@@ -194,7 +194,7 @@ export async function deleteFootprint(
 	footprintId: string
 ): Promise<boolean> {
 	const { error } = await supabase
-		.from('footprint_submissions')
+		.from('footprints')
 		.delete()
 		.eq('id', footprintId);
 	if (error) { console.error('Failed to delete footprint:', error); return false; }
@@ -223,10 +223,10 @@ export async function fetchSubmittedFootprints(
 	mapId: string
 ): Promise<SamFootprint[]> {
 	const { data, error } = await supabase
-		.from('footprint_submissions')
-		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, status')
+		.from('footprints')
+		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, review_status')
 		.eq('map_id', mapId)
-		.in('status', REVIEW_QUEUE_STATUSES)
+		.in('review_status', REVIEW_QUEUE_STATUSES)
 		.order('created_at', { ascending: true });
 
 	if (error) throw new Error(error.message);
@@ -237,9 +237,9 @@ export async function fetchMapsWithSubmittedFootprints(
 	supabase: SupabaseClient<Database>
 ): Promise<{ id: string; name: string; allmapsId: string; iiifImage: string | null; pendingCount: number }[]> {
 	const { data, error } = await supabase
-		.from('footprint_submissions')
+		.from('footprints')
 		.select('map_id, maps!inner(id, name, allmaps_id, iiif_image)')
-		.in('status', REVIEW_QUEUE_STATUSES);
+		.in('review_status', REVIEW_QUEUE_STATUSES);
 
 	if (error) throw new Error(error.message);
 

@@ -25,20 +25,23 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   ] as const;
   const patch: Database['public']['Tables']['scout_candidates']['Update'] = {};
   for (const k of allowed) {
-    if (body[k] !== undefined) patch[k] = body[k];
+    if (body[k] === undefined) continue;
+    // `status` stays the request body's field name; the column is `review_status`.
+    if (k === 'status') patch.review_status = body[k];
+    else patch[k] = body[k];
   }
-  if (patch.status && !['pending', 'approved', 'rejected'].includes(patch.status)) {
+  if (patch.review_status && !['pending', 'approved', 'rejected'].includes(patch.review_status)) {
     throw error(400, 'invalid status (use ingest endpoint to mark ingested)');
   }
-  if (patch.status) {
-    patch.reviewer_id = user.id;
+  if (patch.review_status) {
+    patch.reviewed_by = user.id;
     patch.reviewed_at = new Date().toISOString();
   }
   const { data, error: err } = await adminClient()
     .from('scout_candidates')
     .update(patch)
     .eq('id', candidateId)
-    .select()
+    .select('*, status:review_status')
     .single();
   if (err) dbError(err, 'Could not update scout candidate');
   return json(data);

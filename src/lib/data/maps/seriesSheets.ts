@@ -117,7 +117,7 @@ export async function fetchSeriesSheetIndex(
   const out: SeriesSheet[] = [];
   for (let from = 0; ; from += page) {
     const { data, error } = await db
-      .from('series_sheets')
+      .from('series_cells')
       .select(COLUMNS)
       .eq('series_key', seriesKey)
       .range(from, from + page - 1);
@@ -136,7 +136,7 @@ export async function fetchSeriesSheet(
   sheetNumber: string
 ): Promise<SeriesSheetView | null> {
   const { data, error } = await db
-    .from('series_sheets')
+    .from('series_cells')
     .select(COLUMNS)
     .eq('series_key', seriesKey)
     .eq('sheet_number', sheetNumber)

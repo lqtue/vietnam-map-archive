@@ -156,7 +156,6 @@
       ['Place', m.location],
       ['Type', m.map_type],
       ['Format', m.physical_description],
-      ['Subject', m.dc_subject],
     ].filter(([, v]) => v) as [string, string][];
 </script>
 

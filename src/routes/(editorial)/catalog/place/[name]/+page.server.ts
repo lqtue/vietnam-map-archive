@@ -51,7 +51,11 @@ export const load: PageServerLoad = async ({ params }) => {
   // must not learn a draft's title from a place page.
   const { data: maps } = await supabase
     .from('maps')
-    .select('id, name, year, year_label, thumbnail, holding_institution, location, status')
+    // `year_label` stays this page's own field name; the column moved to
+    // `date_label` (mig 095).
+    .select(
+      'id, name, year, year_label:date_label, thumbnail, holding_institution, location, status'
+    )
     .in('id', (place.map_ids as string[]) ?? [])
     .in('status', ['public', 'featured'])
     .order('year');

@@ -2,10 +2,10 @@
  * POST /api/pipeline/results — everything a worker writes back.
  *
  * Body (all parts optional, applied in this order):
- *   extractions:     ocr_extractions rows to upsert (max 500 per request)
+ *   extractions:     ocr_labels rows to upsert (max 500 per request)
  *   map_id + triage_regions: the layout pass's answer, merged into maps.triage
  *   map_id + triage_grid:    the sheet's printed reference grid, likewise merged
- *   footprints:      footprint_submissions rows to insert (max 500 per request)
+ *   footprints:      footprints rows to insert (max 500 per request)
  *   job_id + status: closes the job out via finish_job (done | failed | running)
  *
  * Bundling them means a worker can report "rows written, job done" in one round
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const { error: err, count } = await supabase
-      .from('ocr_extractions')
+      .from('ocr_labels')
       .upsert(rows, { onConflict: UPSERT_KEY, count: 'exact' });
     if (err) dbError(err, 'Could not write extractions');
     // Report what the database accepted *and* what was offered. They differed
@@ -209,7 +209,7 @@ export const POST: RequestHandler = async ({ request }) => {
         // Not the worker's to choose. A machine's output enters the review
         // queue; letting a job name its own status would let it write straight
         // to `approved` and skip the person the queue exists for.
-        status: 'needs_review',
+        review_status: 'needs_review',
         confidence: typeof row.confidence === 'number' ? row.confidence : null,
         run_id: (row.run_id as string) ?? null,
         name: (row.name as string) ?? null,
@@ -221,7 +221,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // work, and it already does footprints (migration 066). Publishing a
     // polygon here with no ground geometry is the same state the 46 volunteer
     // traces were in before their warp ran.
-    const { error: err } = await supabase.from('footprint_submissions').insert(insert);
+    const { error: err } = await supabase.from('footprints').insert(insert);
     if (err) dbError(err, 'Could not write the footprints');
     applied.footprints = insert.length;
   }

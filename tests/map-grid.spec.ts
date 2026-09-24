@@ -113,7 +113,7 @@ test('a run resolves on whichever axis carries those labels', () => {
 });
 
 test('every reference in the real index resolves', () => {
-  // Sampled verbatim from the 244 rows already in ocr_extractions. A parser
+  // Sampled verbatim from the 244 rows already in ocr_labels. A parser
   // that returns null for these is the bug this file exists to catch.
   for (const ref of ['J 6', 'H 8', 'K 7', 'J 5,6', 'G H 10', 'A 1', 'O 13']) {
     expect(cellCentre(saigon1968, ref), ref).not.toBeNull();

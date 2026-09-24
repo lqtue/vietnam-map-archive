@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -39,47 +34,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      annotation_sets: {
+      cell_printings: {
         Row: {
           created_at: string
-          features: Json
+          edition: string | null
           id: string
-          is_public: boolean
-          map_id: string | null
-          title: string
+          institution: string
+          note: string | null
+          part: string | null
+          rights: string | null
+          series_key: string
+          sheet_number: string
+          source_ref: string
+          title: string | null
           updated_at: string
-          user_id: string
+          url: string | null
+          year: number | null
         }
         Insert: {
           created_at?: string
-          features?: Json
+          edition?: string | null
           id?: string
-          is_public?: boolean
-          map_id?: string | null
-          title?: string
+          institution: string
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key: string
+          sheet_number: string
+          source_ref: string
+          title?: string | null
           updated_at?: string
-          user_id: string
+          url?: string | null
+          year?: number | null
         }
         Update: {
           created_at?: string
-          features?: Json
+          edition?: string | null
           id?: string
-          is_public?: boolean
-          map_id?: string | null
-          title?: string
+          institution?: string
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key?: string
+          sheet_number?: string
+          source_ref?: string
+          title?: string | null
           updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          map_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          map_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          map_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "annotation_sets_map_id_fk"
+            foreignKeyName: "user_favorites_map_id_fkey"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "map_pipeline_status"
             referencedColumns: ["map_id"]
           },
           {
-            foreignKeyName: "annotation_sets_map_id_fk"
+            foreignKeyName: "user_favorites_map_id_fkey"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"
@@ -87,7 +121,7 @@ export type Database = {
           },
         ]
       }
-      footprint_submissions: {
+      footprints: {
         Row: {
           category: string | null
           confidence: number | null
@@ -102,12 +136,12 @@ export type Database = {
           name: string | null
           pixel_polygon: Json
           review_note: string | null
+          review_status: string
           review_tags: string[]
           reviewed_at: string | null
           reviewed_by: string | null
           run_id: string | null
           source: string
-          status: string
           temporal_status: string
           updated_at: string | null
           user_id: string | null
@@ -128,12 +162,12 @@ export type Database = {
           name?: string | null
           pixel_polygon: Json
           review_note?: string | null
+          review_status?: string
           review_tags?: string[]
           reviewed_at?: string | null
           reviewed_by?: string | null
           run_id?: string | null
           source?: string
-          status?: string
           temporal_status?: string
           updated_at?: string | null
           user_id?: string | null
@@ -154,12 +188,12 @@ export type Database = {
           name?: string | null
           pixel_polygon?: Json
           review_note?: string | null
+          review_status?: string
           review_tags?: string[]
           reviewed_at?: string | null
           reviewed_by?: string | null
           run_id?: string | null
           source?: string
-          status?: string
           temporal_status?: string
           updated_at?: string | null
           user_id?: string | null
@@ -231,7 +265,7 @@ export type Database = {
           },
         ]
       }
-      map_iiif_sources: {
+      map_images: {
         Row: {
           created_at: string | null
           id: string
@@ -275,39 +309,6 @@ export type Database = {
           },
           {
             foreignKeyName: "map_iiif_sources_map_id_fkey"
-            columns: ["map_id"]
-            isOneToOne: false
-            referencedRelation: "maps"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      map_opens: {
-        Row: {
-          created_at: string | null
-          id: string
-          map_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          map_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          map_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "map_opens_map_id_fkey"
-            columns: ["map_id"]
-            isOneToOne: false
-            referencedRelation: "map_pipeline_status"
-            referencedColumns: ["map_id"]
-          },
-          {
-            foreignKeyName: "map_opens_map_id_fkey"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"
@@ -387,139 +388,166 @@ export type Database = {
           },
         ]
       }
+      map_views: {
+        Row: {
+          created_at: string | null
+          id: string
+          map_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          map_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          map_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_opens_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "map_opens_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maps: {
         Row: {
           allmaps_id: string | null
           annotation_url: string | null
           bbox: number[] | null
           collection: string | null
-          created_at: string | null
+          created_at: string
           created_by: string | null
           creator: string | null
-          dc_coverage: string | null
-          dc_description: string | null
-          dc_publisher: string | null
-          dc_subject: string | null
+          date_label: string | null
+          description: string | null
           extra_metadata: Json | null
-          georef_done: boolean
-          help_needed: boolean
           holding_institution: string | null
-          ia_identifier: string | null
           id: string
           iiif_image: string | null
-          iiif_manifest: string | null
+          is_georeferenced: boolean
           label_config: Json
           language: string | null
-          legend_done: boolean
           location: string | null
           map_type: string | null
           name: string
           original_title: string | null
           physical_description: string | null
           priority: number
+          publisher: string | null
           rights: string | null
           search_vector: unknown
+          sheet_half: string | null
+          sheet_number: string | null
           shelfmark: string | null
           slug: string
-          source_type: string | null
+          source_type: string
           source_url: string | null
-          status: string | null
+          status: string
           thumbnail: string | null
           triage: Json
-          updated_at: string | null
+          triage_reviewed_at: string | null
+          triage_reviewed_by: string | null
+          updated_at: string
           year: number | null
-          year_label: string | null
         }
         Insert: {
           allmaps_id?: string | null
           annotation_url?: string | null
           bbox?: number[] | null
           collection?: string | null
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           creator?: string | null
-          dc_coverage?: string | null
-          dc_description?: string | null
-          dc_publisher?: string | null
-          dc_subject?: string | null
+          date_label?: string | null
+          description?: string | null
           extra_metadata?: Json | null
-          georef_done?: boolean
-          help_needed?: boolean
           holding_institution?: string | null
-          ia_identifier?: string | null
           id?: string
           iiif_image?: string | null
-          iiif_manifest?: string | null
+          is_georeferenced?: boolean
           label_config?: Json
           language?: string | null
-          legend_done?: boolean
           location?: string | null
           map_type?: string | null
           name: string
           original_title?: string | null
           physical_description?: string | null
           priority?: number
+          publisher?: string | null
           rights?: string | null
           search_vector?: unknown
+          sheet_half?: string | null
+          sheet_number?: string | null
           shelfmark?: string | null
           slug?: string
-          source_type?: string | null
+          source_type?: string
           source_url?: string | null
-          status?: string | null
+          status?: string
           thumbnail?: string | null
           triage?: Json
-          updated_at?: string | null
+          triage_reviewed_at?: string | null
+          triage_reviewed_by?: string | null
+          updated_at?: string
           year?: number | null
-          year_label?: string | null
         }
         Update: {
           allmaps_id?: string | null
           annotation_url?: string | null
           bbox?: number[] | null
           collection?: string | null
-          created_at?: string | null
+          created_at?: string
           created_by?: string | null
           creator?: string | null
-          dc_coverage?: string | null
-          dc_description?: string | null
-          dc_publisher?: string | null
-          dc_subject?: string | null
+          date_label?: string | null
+          description?: string | null
           extra_metadata?: Json | null
-          georef_done?: boolean
-          help_needed?: boolean
           holding_institution?: string | null
-          ia_identifier?: string | null
           id?: string
           iiif_image?: string | null
-          iiif_manifest?: string | null
+          is_georeferenced?: boolean
           label_config?: Json
           language?: string | null
-          legend_done?: boolean
           location?: string | null
           map_type?: string | null
           name?: string
           original_title?: string | null
           physical_description?: string | null
           priority?: number
+          publisher?: string | null
           rights?: string | null
           search_vector?: unknown
+          sheet_half?: string | null
+          sheet_number?: string | null
           shelfmark?: string | null
           slug?: string
-          source_type?: string | null
+          source_type?: string
           source_url?: string | null
-          status?: string | null
+          status?: string
           thumbnail?: string | null
           triage?: Json
-          updated_at?: string | null
+          triage_reviewed_at?: string | null
+          triage_reviewed_by?: string | null
+          updated_at?: string
           year?: number | null
-          year_label?: string | null
         }
         Relationships: []
       }
-      ocr_extractions: {
+      ocr_labels: {
         Row: {
           category: string
-          category_validated: string | null
+          category_corrected: string | null
           confidence: number
           created_at: string
           footprint_id: string | null
@@ -539,21 +567,21 @@ export type Database = {
           model: string | null
           notes: string | null
           prompt: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           rotation_deg: number | null
           run_id: string
-          status: string
           text: string
-          text_validated: string | null
+          text_corrected: string | null
           tile_h: number
           tile_w: number
           tile_x: number
           tile_y: number
-          validated_at: string | null
-          validated_by: string | null
         }
         Insert: {
           category: string
-          category_validated?: string | null
+          category_corrected?: string | null
           confidence?: number
           created_at?: string
           footprint_id?: string | null
@@ -573,21 +601,21 @@ export type Database = {
           model?: string | null
           notes?: string | null
           prompt?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           rotation_deg?: number | null
           run_id: string
-          status?: string
           text: string
-          text_validated?: string | null
+          text_corrected?: string | null
           tile_h: number
           tile_w: number
           tile_x: number
           tile_y: number
-          validated_at?: string | null
-          validated_by?: string | null
         }
         Update: {
           category?: string
-          category_validated?: string | null
+          category_corrected?: string | null
           confidence?: number
           created_at?: string
           footprint_id?: string | null
@@ -607,17 +635,17 @@ export type Database = {
           model?: string | null
           notes?: string | null
           prompt?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           rotation_deg?: number | null
           run_id?: string
-          status?: string
           text?: string
-          text_validated?: string | null
+          text_corrected?: string | null
           tile_h?: number
           tile_w?: number
           tile_x?: number
           tile_y?: number
-          validated_at?: string | null
-          validated_by?: string | null
         }
         Relationships: [
           {
@@ -625,6 +653,13 @@ export type Database = {
             columns: ["footprint_id"]
             isOneToOne: false
             referencedRelation: "footprint_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_extractions_footprint_id_fkey"
+            columns: ["footprint_id"]
+            isOneToOne: false
+            referencedRelation: "footprints"
             referencedColumns: ["id"]
           },
           {
@@ -754,14 +789,14 @@ export type Database = {
           raw: Json | null
           reasons: string | null
           review_note: string | null
+          review_status: string
           reviewed_at: string | null
-          reviewer_id: string | null
+          reviewed_by: string | null
           rights: string | null
           score: number
           search_vector: unknown
           source: string
           source_url: string | null
-          status: string
           thumbnail: string | null
           title: string
           year: number | null
@@ -783,14 +818,14 @@ export type Database = {
           raw?: Json | null
           reasons?: string | null
           review_note?: string | null
+          review_status?: string
           reviewed_at?: string | null
-          reviewer_id?: string | null
+          reviewed_by?: string | null
           rights?: string | null
           score?: number
           search_vector?: unknown
           source: string
           source_url?: string | null
-          status?: string
           thumbnail?: string | null
           title: string
           year?: number | null
@@ -812,14 +847,14 @@ export type Database = {
           raw?: Json | null
           reasons?: string | null
           review_note?: string | null
+          review_status?: string
           reviewed_at?: string | null
-          reviewer_id?: string | null
+          reviewed_by?: string | null
           rights?: string | null
           score?: number
           search_vector?: unknown
           source?: string
           source_url?: string | null
-          status?: string
           thumbnail?: string | null
           title?: string
           year?: number | null
@@ -841,7 +876,7 @@ export type Database = {
           },
         ]
       }
-      series_sheets: {
+      series_cells: {
         Row: {
           bbox: number[] | null
           created_at: string
@@ -904,57 +939,6 @@ export type Database = {
           },
         ]
       }
-      sheet_sources: {
-        Row: {
-          created_at: string
-          edition: string | null
-          id: string
-          institution: string
-          note: string | null
-          part: string | null
-          rights: string | null
-          series_key: string
-          sheet_number: string
-          source_ref: string
-          title: string | null
-          updated_at: string
-          url: string | null
-          year: number | null
-        }
-        Insert: {
-          created_at?: string
-          edition?: string | null
-          id?: string
-          institution: string
-          note?: string | null
-          part?: string | null
-          rights?: string | null
-          series_key: string
-          sheet_number: string
-          source_ref: string
-          title?: string | null
-          updated_at?: string
-          url?: string | null
-          year?: number | null
-        }
-        Update: {
-          created_at?: string
-          edition?: string | null
-          id?: string
-          institution?: string
-          note?: string | null
-          part?: string | null
-          rights?: string | null
-          series_key?: string
-          sheet_number?: string
-          source_ref?: string
-          title?: string | null
-          updated_at?: string
-          url?: string | null
-          year?: number | null
-        }
-        Relationships: []
-      }
       stories: {
         Row: {
           created_at: string
@@ -962,9 +946,9 @@ export type Database = {
           id: string
           mode: string
           region: Json
+          review_status: string
           reviewed_at: string | null
           reviewed_by: string | null
-          status: string
           title: string
           updated_at: string
           user_id: string | null
@@ -975,9 +959,9 @@ export type Database = {
           id?: string
           mode?: string
           region?: Json
+          review_status?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
-          status?: string
           title: string
           updated_at?: string
           user_id?: string | null
@@ -988,9 +972,9 @@ export type Database = {
           id?: string
           mode?: string
           region?: Json
+          review_status?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
-          status?: string
           title?: string
           updated_at?: string
           user_id?: string | null
@@ -1070,35 +1054,47 @@ export type Database = {
           },
         ]
       }
-      user_favorites: {
+      user_layers: {
         Row: {
-          created_at: string | null
+          created_at: string
+          features: Json
           id: string
-          map_id: string
+          is_public: boolean
+          map_id: string | null
+          title: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          features?: Json
           id?: string
-          map_id: string
+          is_public?: boolean
+          map_id?: string | null
+          title?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          features?: Json
           id?: string
-          map_id?: string
+          is_public?: boolean
+          map_id?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_favorites_map_id_fkey"
+            foreignKeyName: "annotation_sets_map_id_fk"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "map_pipeline_status"
             referencedColumns: ["map_id"]
           },
           {
-            foreignKeyName: "user_favorites_map_id_fkey"
+            foreignKeyName: "annotation_sets_map_id_fk"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"
@@ -1138,6 +1134,234 @@ export type Database = {
       }
     }
     Views: {
+      annotation_sets: {
+        Row: {
+          created_at: string | null
+          features: Json | null
+          id: string | null
+          is_public: boolean | null
+          map_id: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          features?: Json | null
+          id?: string | null
+          is_public?: boolean | null
+          map_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          features?: Json | null
+          id?: string | null
+          is_public?: boolean | null
+          map_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "annotation_sets_map_id_fk"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "annotation_sets_map_id_fk"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      footprint_submissions: {
+        Row: {
+          category: string | null
+          confidence: number | null
+          created_at: string | null
+          feature_type: string | null
+          geom: unknown
+          geom_rmse: number | null
+          geom_src: string | null
+          id: string | null
+          iiif_canvas: string | null
+          map_id: string | null
+          name: string | null
+          pixel_polygon: Json | null
+          review_note: string | null
+          review_tags: string[] | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          run_id: string | null
+          source: string | null
+          status: string | null
+          temporal_status: string | null
+          updated_at: string | null
+          user_id: string | null
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          category?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          feature_type?: string | null
+          geom?: unknown
+          geom_rmse?: number | null
+          geom_src?: string | null
+          id?: string | null
+          iiif_canvas?: string | null
+          map_id?: string | null
+          name?: string | null
+          pixel_polygon?: Json | null
+          review_note?: string | null
+          review_tags?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          source?: string | null
+          status?: string | null
+          temporal_status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          category?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          feature_type?: string | null
+          geom?: unknown
+          geom_rmse?: number | null
+          geom_src?: string | null
+          id?: string | null
+          iiif_canvas?: string | null
+          map_id?: string | null
+          name?: string | null
+          pixel_polygon?: Json | null
+          review_note?: string | null
+          review_tags?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          source?: string | null
+          status?: string | null
+          temporal_status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "footprint_submissions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "footprint_submissions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_iiif_sources: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          iiif_image: string | null
+          iiif_manifest: string | null
+          is_primary: boolean | null
+          label: string | null
+          map_id: string | null
+          sort_order: number | null
+          source_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          iiif_image?: string | null
+          iiif_manifest?: string | null
+          is_primary?: boolean | null
+          label?: string | null
+          map_id?: string | null
+          sort_order?: number | null
+          source_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          iiif_image?: string | null
+          iiif_manifest?: string | null
+          is_primary?: boolean | null
+          label?: string | null
+          map_id?: string | null
+          sort_order?: number | null
+          source_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_iiif_sources_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "map_iiif_sources_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_opens: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          map_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          map_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          map_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_opens_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "map_opens_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       map_pipeline_status: {
         Row: {
           exported_at: string | null
@@ -1169,6 +1393,140 @@ export type Database = {
         }
         Relationships: []
       }
+      ocr_extractions: {
+        Row: {
+          category: string | null
+          category_validated: string | null
+          confidence: number | null
+          created_at: string | null
+          footprint_id: string | null
+          geom: unknown
+          geom_rmse: number | null
+          geom_src: string | null
+          global_h: number | null
+          global_w: number | null
+          global_x: number | null
+          global_xi: number | null
+          global_y: number | null
+          global_yi: number | null
+          id: string | null
+          label_h: number | null
+          label_w: number | null
+          map_id: string | null
+          model: string | null
+          notes: string | null
+          prompt: string | null
+          rotation_deg: number | null
+          run_id: string | null
+          status: string | null
+          text: string | null
+          text_validated: string | null
+          tile_h: number | null
+          tile_w: number | null
+          tile_x: number | null
+          tile_y: number | null
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          category_validated?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          footprint_id?: string | null
+          geom?: unknown
+          geom_rmse?: number | null
+          geom_src?: string | null
+          global_h?: number | null
+          global_w?: number | null
+          global_x?: number | null
+          global_xi?: number | null
+          global_y?: number | null
+          global_yi?: number | null
+          id?: string | null
+          label_h?: number | null
+          label_w?: number | null
+          map_id?: string | null
+          model?: string | null
+          notes?: string | null
+          prompt?: string | null
+          rotation_deg?: number | null
+          run_id?: string | null
+          status?: string | null
+          text?: string | null
+          text_validated?: string | null
+          tile_h?: number | null
+          tile_w?: number | null
+          tile_x?: number | null
+          tile_y?: number | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          category_validated?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          footprint_id?: string | null
+          geom?: unknown
+          geom_rmse?: number | null
+          geom_src?: string | null
+          global_h?: number | null
+          global_w?: number | null
+          global_x?: number | null
+          global_xi?: number | null
+          global_y?: number | null
+          global_yi?: number | null
+          id?: string | null
+          label_h?: number | null
+          label_w?: number | null
+          map_id?: string | null
+          model?: string | null
+          notes?: string | null
+          prompt?: string | null
+          rotation_deg?: number | null
+          run_id?: string | null
+          status?: string | null
+          text?: string | null
+          text_validated?: string | null
+          tile_h?: number | null
+          tile_w?: number | null
+          tile_x?: number | null
+          tile_y?: number | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_extractions_footprint_id_fkey"
+            columns: ["footprint_id"]
+            isOneToOne: false
+            referencedRelation: "footprint_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_extractions_footprint_id_fkey"
+            columns: ["footprint_id"]
+            isOneToOne: false
+            referencedRelation: "footprints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_extractions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "ocr_extractions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       place_names: {
         Row: {
           category: string | null
@@ -1186,6 +1544,156 @@ export type Database = {
           years: number[] | null
         }
         Relationships: []
+      }
+      series_sheets: {
+        Row: {
+          bbox: number[] | null
+          created_at: string | null
+          edition: string | null
+          held_by: string | null
+          map_id: string | null
+          name: string | null
+          note: string | null
+          series_key: string | null
+          sheet_number: string | null
+          source: string | null
+          source_ref: string | null
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          bbox?: number[] | null
+          created_at?: string | null
+          edition?: string | null
+          held_by?: string | null
+          map_id?: string | null
+          name?: string | null
+          note?: string | null
+          series_key?: string | null
+          sheet_number?: string | null
+          source?: string | null
+          source_ref?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          bbox?: number[] | null
+          created_at?: string | null
+          edition?: string | null
+          held_by?: string | null
+          map_id?: string | null
+          name?: string | null
+          note?: string | null
+          series_key?: string | null
+          sheet_number?: string | null
+          source?: string | null
+          source_ref?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "series_sheets_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "series_sheets_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sheet_sources: {
+        Row: {
+          created_at: string | null
+          edition: string | null
+          id: string | null
+          institution: string | null
+          note: string | null
+          part: string | null
+          rights: string | null
+          series_key: string | null
+          sheet_number: string | null
+          source_ref: string | null
+          title: string | null
+          updated_at: string | null
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          edition?: string | null
+          id?: string | null
+          institution?: string | null
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key?: string | null
+          sheet_number?: string | null
+          source_ref?: string | null
+          title?: string | null
+          updated_at?: string | null
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          edition?: string | null
+          id?: string | null
+          institution?: string | null
+          note?: string | null
+          part?: string | null
+          rights?: string | null
+          series_key?: string | null
+          sheet_number?: string | null
+          source_ref?: string | null
+          title?: string | null
+          updated_at?: string | null
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          map_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          map_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          map_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "user_favorites_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -1354,12 +1862,12 @@ export type Database = {
           name: string | null
           pixel_polygon: Json
           review_note: string | null
+          review_status: string
           review_tags: string[]
           reviewed_at: string | null
           reviewed_by: string | null
           run_id: string | null
           source: string
-          status: string
           temporal_status: string
           updated_at: string | null
           user_id: string | null
@@ -1368,7 +1876,7 @@ export type Database = {
         }
         SetofOptions: {
           from: "*"
-          to: "footprint_submissions"
+          to: "footprints"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -1397,9 +1905,9 @@ export type Database = {
           id: string
           mode: string
           region: Json
+          review_status: string
           reviewed_at: string | null
           reviewed_by: string | null
-          status: string
           title: string
           updated_at: string
           user_id: string | null
@@ -1433,12 +1941,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1462,11 +1970,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1487,11 +1995,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends (DefaultSchemaTableNameOrOptions extends {
+  TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1512,11 +2020,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never) = never,
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1529,11 +2037,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never) = never,
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1550,3 +2058,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

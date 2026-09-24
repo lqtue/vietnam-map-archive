@@ -23,8 +23,8 @@ Measured against production, 2026-09-02:
 
 | Fact | Value | Consequence |
 |------|-------|-------------|
-| `ocr_extractions` | 1,404 rows, **1 map**, 14 validated | E1 is empty until OCR runs on the corpus |
-| `footprint_submissions` | 46 rows, 1 map, all `submitted/volunteer`, **zero SAM2** | E2 needs the `seg` runner first |
+| `ocr_labels` | 1,404 rows, **1 map**, 14 validated | E1 is empty until OCR runs on the corpus |
+| `footprints` | 46 rows, 1 map, all `submitted/volunteer`, **zero SAM2** | E2 needs the `seg` runner first |
 | Georeferenced Saigon city plans | 1799 · 1862 · 1863 · 1864 · 1878 · 1882 (cadastral) · 1882 · 1895 · 1898 · 1900 · 1912 · 1922 · 1923 · 1930 (Gia Định) · 1942 · 1959 · 1968 | District 4 series is already there: **1882 → 1895 → 1923 → 1942 → 1959 → 1968**. The 1878 and 1898 plans are wholly north of the Bến Nghé canal. |
 | Drafts, ungeoreferenced | 62, all 1900–1929 | E4 is a georef sprint, not an ingest problem |
 | Corpus scope | Saigon **plus Hanoi and Huế** sheets already georeferenced | Basemap PMTiles is a Saigon extract only; a Hanoi view needs a second extract |
@@ -33,8 +33,8 @@ Measured against production, 2026-09-02:
 
 ## E1 — Label search
 
-**Data.** `ocr_extractions(text, text_validated, category, global_x/y/w/h, map_id, run_id, status)`.
-Read `coalesce(text_validated, text)`, skip `rejected`. Categories worth indexing:
+**Data.** `ocr_labels(text, text_corrected, category, global_x/y/w/h, map_id, run_id, review_status)`.
+Read `coalesce(text_corrected, text)`, skip `rejected`. Categories worth indexing:
 `street hydrology place building institution`; drop `legend* title other` (noise).
 
 **Why trigram, not tsvector.** Labels are 1–3 words, OCR'd (typos), French *and*
@@ -49,10 +49,10 @@ create or replace function public.f_unaccent(text) returns text
   language sql immutable parallel safe strict
   as $$ select public.unaccent('public.unaccent', $1) $$;
 create index ocr_extractions_label_trgm
-  on ocr_extractions using gin (lower(f_unaccent(coalesce(text_validated, text))) gin_trgm_ops);
+  on ocr_labels using gin (lower(f_unaccent(coalesce(text_corrected, text))) gin_trgm_ops);
 -- rpc: search_labels(q text, lim int) → (map_id, text, category, x, y, w, h, sim)
---   where f_unaccent(lower(q)) % f_unaccent(lower(coalesce(text_validated,text)))
---   and status <> 'rejected' and category in (…)
+--   where f_unaccent(lower(q)) % f_unaccent(lower(coalesce(text_corrected,text)))
+--   and review_status <> 'rejected' and category in (…)
 --   and (maps.status in ('public','featured') or auth.uid() is not null)   -- mig 063 rule
 --   order by sim desc, confidence desc; dedupe (map_id, lower(f_unaccent(text))) keep best
 ```
@@ -74,7 +74,7 @@ per distinct map, ≤ 20 maps per query; mirror URLs live on Storage so this is 
   and a 3 s pulse marker. One param, one reader, done.
 
 **Feeder.** E1 is worth nothing on one map. `scripts/enqueue_ocr_all.mjs`: for every
-`georef_done` map with no `ocr` job, insert one `pipeline_jobs` row (worker already
+`is_georeferenced` map with no `ocr` job, insert one `pipeline_jobs` row (worker already
 runs `ocr,join`). Gemini Flash cost is cents per map. Run the worker on M1 overnight.
 
 **Gazetteer (E1b, after E1 ships).** A view, no table:
@@ -93,7 +93,7 @@ query anon → draft label absent, typo'd query still hits.
 `building / land_plot / road / waterway / water_body / green_space` → morphology metrics
 (built-area %, block size, road density, canal length) → figures + a slider on /explore.
 
-**What exists.** `footprint_submissions.pixel_polygon` + `feature_type`; SAM2 writer fixed
+**What exists.** `footprints.pixel_polygon` + `feature_type`; SAM2 writer fixed
 (C0); `join` job; `/api/export/footprints?format=geojson` **already warps** px→geo via the
 same transformer. `/scan?mode=shapes&tab=validate` is the HITL.
 
@@ -165,12 +165,95 @@ Vietnamese label with diacritics.
 
 ---
 
+## E3b — Period text sources and the attested gazetteer (planned 2026-09-22)
+
+E3 queries two archives with **three guessed spellings** of a place name. This section is how
+they stop being guesses. It was opened by one thing arriving: Tim Doling's *Historic Vietnam*
+export (268 posts, 3.1M chars, 2013–2026), given by the author, who agreed on 2026-09-22 to be
+cited.
+
+`src/lib/server/gallica.ts:60` had already named the gap and the fix:
+
+> Historical *renamings* ("rue de Canton" → "Triệu Quang Phục") are still not derivable from
+> spelling and this function does not pretend otherwise — those come from the gazetteer too,
+> **once someone links them.**
+
+`scripts/oneoff/extract_doling_placenames.mjs` produced `rue de Canton → Hàm Nghi boulevard` on
+its first run. This is that link.
+
+### The two archives are not the same kind of source
+
+Verified by request on 2026-09-22, not inferred:
+
+| | Gallica (BnF) | NLV (`baochi.nlv.gov.vn`) |
+|---|---|---|
+| Full text | **Yes** — SRU + `ContentSearch`, OCR mostly unaccented | **Not retrievable.** Search is full-text, so the OCR exists server-side; the article view offers `img` mode only, and `imageserver.pl?...&getpdf=true` without a session `key` returns **404** |
+| Role here | a **source** of names, and a corpus to harvest | a **consumer** of names — `press-from-gazetteer`, nothing more |
+| Feed shape | `spellingVariants(name, extra)`, keyed by modern name | quoted phrases, because Veridian's `txq` ANDs an unquoted query |
+
+NLV carries French colonial titles too (a probe hit *Journal officiel de l'Indochine Française*,
+6 Aug 1896), so the colonial forms are worth querying on **both**.
+
+Getting NLV's Vietnamese text would mean OCR'ing page images ourselves (~220 kB/page at 2000px).
+That is a project, not a script, and the pipeline we own is tuned for map sheets, not newsprint
+columns. **Not planned.** Revisit only if E3b's extraction proves worth scaling.
+
+### Phases, in order, each gated
+
+- [ ] **`doling-review`** — send the 89-row sheet (`work/doling/street-name-pairs.csv`) to its
+      author. 43 `street`, 34 `unclear`, 10 `address`, 2 `building`; the `unclear` bucket is where
+      the value and the errors both are. **This is the measurement, and it comes first for the same
+      reason `shape-precision` exists**: there is a name-extraction pipeline with no accuracy
+      number, so every change to it is currently unfalsifiable. Exit: a precision figure for the
+      extractor with its sample and limitations recorded beside it, and his corrections kept as the
+      eval set for any later pass.
+
+- [ ] **`gallica-text-harvest`** — polite, offline, its own script. **Not through
+      `src/lib/server/gallica.ts`**, which is a live per-reader lookup with a 6 s deadline, three
+      snippets and no rate limiter; harvesting through it would be rude to BnF and wrong for the
+      job. Model it on `scripts/scout_nlv_press.mjs`: sequential, resumable offsets, a saved
+      fixture, `--selftest` pinning the parser so a template change fails loudly. Titles, and they
+      are the three `docs/private/network.md` names as Ian Gregory's material: *Annuaires de
+      l'Indochine*, *L'Opinion*, *La Dépêche d'Indochine*. Exit: text on disk with per-document
+      provenance, and the same pair extractor run over **primary** sources rather than Doling's
+      secondary prose.
+
+- [ ] **`attested-variants`** — the reviewed pairs into the gazetteer, not beside it.
+      `work/doling/gallica-variants.json` feeds `spellingVariants`' `extra`; the store of record is
+      `place_names.variants[]` (mig 067). **One normalisation rule, not a third** —
+      `dictionary-on-place-names` already records that two will drift. Exit: `/api/press` for
+      "Đồng Khởi" returns a hit reachable only via "rue Catinat", and the response cites where the
+      variant came from.
+
+- [ ] **`ocr-suggestions`** — a suggestion side-table (`suggested_text`, `source`, `score`,
+      `evidence_url`), reviewed by a person, and **nothing writes `text_corrected` but a human**.
+      That column is what `eval.py ocr` scores against; a dictionary writing it launders model
+      output as ground truth. This archive has already paid for that error once — 72 `sam-auto`
+      rows in `footprints` voided every `building` figure at n=89
+      (`work/ocr/EVAL-BASELINE.md`, corrected 2026-09-18), which is why `shape-precision` says *by
+      construction*. The matching needs no new code: `f_unaccent` + `word_similarity` ship in mig
+      065. Target the class the roadmap already names — `ARSENAL DE L`, `HOTEL DU GNRAL`, a bare
+      `Rue` seen 14 times. Exit: the eval baseline is **unchanged** after a suggestion run, and an
+      accepted fix carries its citation.
+
+- [ ] **`source-agreement`** — the better half. A name read off a sheet that also appears in a
+      dated period source is two independent sources agreeing, which is a quality signal the corpus
+      does not have today. Feeds `ocr-merge-evidence`'s "store agreement as structured data".
+      Exit: a reviewer can see *which* sources agree on a reading, not a single blended score.
+
+### Scope, stated so it stops competing
+
+63 place names against 1,544 extractions cleans a handful, not a corpus. The value is that each
+fix is citable and that agreement becomes measurable — not volume. And **none of this is on the
+critical path.** `docs/private/priority-2026q4.md` still runs: the traced window → `seg_eval
+--window` → the Zenodo DOI → the letter-writer packet. E3b is good work that must not displace it.
+
 ## E4 — Corpus growth
 
 **Bottleneck is georef, not ingest.** Scout already covers gallica / rumsey / loc /
 humazur; 62 drafts wait for a human in `/contribute/georef`.
 
-- **Sprint list, by value:** `select year, name from maps where not georef_done order by year`
+- **Sprint list, by value:** `select year, name from maps where not is_georeferenced order by year`
   filtered to sheets covering the District 4 peninsula; target ≥ 3 georeferenced city plans per
   decade 1860–1975.
 - **Series propagation** (proven on L7014) for any uniform series in the drafts.
@@ -187,7 +270,7 @@ humazur; 62 drafts wait for a human in `/contribute/georef`.
 Needs per-building imagery: Flickr *manhhai* collection (huge, CC), Gallica postcards, 1960s
 NARA aerials. Pipeline: photo ↔ footprint link (HITL "which building is this"), VLM
 extract `building:levels`, `roof:shape`, `building:material`, `start_date`, human
-verify, write `footprint_submissions.tags jsonb`. LoD2 = footprint × levels × 3 m + roof
+verify, write `footprints.tags jsonb`. LoD2 = footprint × levels × 3 m + roof
 shape → CityJSON. **Add the `tags` column with the first writer, not before.**
 Start only after E2 shows stable, reviewed fabric on ≥ 3 maps.
 

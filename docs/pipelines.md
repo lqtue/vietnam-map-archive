@@ -88,7 +88,7 @@ node scripts/catalog_audit.mjs --self-check         # no database, no network
 Exits 1 on any FAIL. Read-only, no network, about a second — so it can run after
 every ingest. Three checkers divide the archive and none should grow into
 another: `geo_audit.mjs` asks whether the paper is where the annotation says,
-`check_series_index.mjs` whether `series_sheets` still agrees with `maps`, and
+`check_series_index.mjs` whether `series_cells` still agrees with `maps`, and
 this whether a row contradicts the rest of its own table.
 
 | check | level |
@@ -101,13 +101,13 @@ this whether a row contradicts the rest of its own table.
 | one `iiif_image` serving two maps | FAIL |
 | 2–3 maps sharing one `source_url` | WARN |
 | `source_type` outside mig 027/041; an impossible `year` | FAIL |
-| `year` appearing nowhere in `year_label`; one holder spelled two ways | WARN |
+| `year` appearing nowhere in `date_label`; one holder spelled two ways | WARN |
 | two primary IIIF sources, none primary, or a primary disagreeing with `maps.iiif_image` | FAIL |
 | a published map with no non-r2 IIIF source, so the Allmaps Editor cannot open it | WARN |
 | a job out of retries, held past 3 h, or pointing at a deleted map | WARN / FAIL |
 
 **What it deliberately does not report.** A map carrying `allmaps_id` with
-`georef_done` false reads like a fault: the id is a SHA-1 of the canonical IIIF
+`is_georeferenced` false reads like a fault: the id is a SHA-1 of the canonical IIIF
 URL, minted locally by `bulk_upload_local.sh` whether or not a control point
 exists, and migration 062 gates publishing on `annotation_url is not null or
 allmaps_id is not null` — so on paper a sheet satisfies the gate with a hash of
@@ -115,8 +115,8 @@ its own URL. This file called that a finding, over 21 L7014 drafts, until the
 code that consumes the pair turned up.
 
 It is a **work queue**. `POST /api/admin/maps/sync-georef` selects exactly
-`allmaps_id is not null and georef_done = false`, probes
-annotations.allmaps.org and flips `georef_done` on a hit; the admin *Sync georef
+`allmaps_id is not null and is_georeferenced = false`, probes
+annotations.allmaps.org and flips `is_georeferenced` on a hit; the admin *Sync georef
 from Allmaps* button is its trigger. The id is how the archive remembers a sheet
 is uploaded and waiting for someone to place control points. Clearing it, or not
 writing it at upload, would empty the queue — a volunteer's georeference would
@@ -144,7 +144,7 @@ is how `check_series_index` once reported clean over 79 sheets it could not see.
 **Reading today's run (15 Sept 2026).** 274 maps, 131 published, **0 fail, 53
 warn**: 24 published maps the Allmaps Editor cannot be opened on, 13 with no
 `holding_institution` and 3 with no `source_url`, 6 layout jobs out of retries, 5
-`year`/`year_label` disagreements, one holder spelled two ways (Perry-Castañeda,
+`year`/`date_label` disagreements, one holder spelled two ways (Perry-Castañeda,
 word order), and the duplicate Huế pair. Plus a status line: **21 maps queued for
 georeferencing**, which is the sync button's backlog, not a fault.
 
@@ -355,7 +355,7 @@ from the environment, because they describe the machine rather than the job; a j
 override either.
 
 `--write-supabase` writes `pixel_polygon` (the outer ring, full-image source px — the same grid
-`ocr_extractions.global_*` uses), `confidence` from SAM2's IoU, `source='sam-auto'` and the run id.
+`ocr_labels.global_*` uses), `confidence` from SAM2's IoU, `source='sam-auto'` and the run id.
 Holes are dropped: the column holds one ring. Before migration 055/057 this path could not insert at
 all — it posted three columns that do not exist and a `source` the check constraint refused.
 
@@ -394,7 +394,7 @@ python work/ocr/scripts/ocr.py scout --map-id <uuid> --iiif-base <url> --run-id 
 # Batch over all tiles (row-sequence is ON by default)
 python work/ocr/scripts/ocr.py batch --map-id <uuid> --iiif-base <url> --scout --run-id <name> [--db]
 
-# Fuzzy dedup + spatial fragment join → ocr_extractions
+# Fuzzy dedup + spatial fragment join → ocr_labels
 python work/ocr/scripts/ocr.py clean \
   --local work/ocr/outputs/<map-id>/runs/<run-id> \
   --map-id <uuid> --run-id <clean-run-id> --min-confidence 0.1 [--apply]
@@ -645,11 +645,11 @@ python work/ocr/scripts/join_labels.py <map-id>       # link
 python work/ocr/scripts/join_labels.py --self-check   # PIP + nesting assertions, no DB
 ```
 
-Point-in-polygon assignment of each `ocr_extractions` row to the `footprint_submissions` polygon it
-names, writing `ocr_extractions.footprint_id` (migration `050_ocr_footprint_link.sql`,
+Point-in-polygon assignment of each `ocr_labels` row to the `footprints` polygon it
+names, writing `ocr_labels.footprint_id` (migration `050_ocr_footprint_link.sql`,
 `ON DELETE SET NULL`). Level-aware: a bare numeral routes to a `building`, a name routes to the
 enclosing block; ties break to the **smallest** containing polygon. Rejected extractions never link;
-`category_validated` (the human fix) wins over `category`.
+`category_corrected` (the human fix) wins over `category`.
 
 ### Reading a sheet's margins: index, numerals, grid (measured 2026-09-10, 1959 Đô thành Sài Gòn)
 
@@ -991,7 +991,7 @@ it before touching the core loop.
 ### Design notes
 
 - Gemini bboxes are **0–1000 normalized space**; render with `img_dim / 1000`.
-- `ocr_extractions.global_x/y/w/h` already store full-image pixel coords.
+- `ocr_labels.global_x/y/w/h` already store full-image pixel coords.
 - Model: `DEFAULT_MODEL = "gemini-3.8-flash"` (`work/ocr/scripts/gemini_client.py`), overridable
   per-subcommand with `--model`. Key in `.env` as `GEMINI_API_KEY` / `GEMINI_API_KEYS`
   (comma-separated for rotation). `ocr.py list-models` enumerates what the key can actually reach.
@@ -1012,7 +1012,7 @@ it before touching the core loop.
   caller now composes `PROMPTS[<version>] + sequence_frame_rules(n)`, `user_prompt` has no default,
   and `test_prompt_plumbing.py` fails if either regresses. Every run before that date was v8 in name
   only; do not read `_meta.prompt` on an older run as evidence of which prompt was sent.
-- `clean` writes to `ocr_extractions` (correct target for the digitalize review UI); legacy `dedup`
+- `clean` writes to `ocr_labels` (correct target for the digitalize review UI); legacy `dedup`
   writes to `label_pins`.
 
 ### Sizing a grid from the sheet's own scale (2026-09-10)
@@ -1384,7 +1384,7 @@ under the prose rather than instead of it.
 
 ## MapSAM2 inference (`work/MapSAM2/`)
 
-SAM2/MapSAM2 segmentation: IIIF tiles → masks → polygons → `footprint_submissions`. Colab (GPU) or
+SAM2/MapSAM2 segmentation: IIIF tiles → masks → polygons → `footprints`. Colab (GPU) or
 local M1 (base SAM2 only).
 
 An offline colour-pass `blocks.geojson` is also reviewable: import it as a named
@@ -1430,7 +1430,7 @@ Modes: `automatic` = SAM2AutomaticMaskGenerator grid-scan; `prompted` = SAM2Imag
 seeds, which need **`--ocr-run-id` or `--prior` or both** (best with LoRA).
 
 **Two seed sources, and on any sheet so far the second is the larger one.**
-`--ocr-run-id` seeds from `ocr_extractions`, area categories only, and those
+`--ocr-run-id` seeds from `ocr_labels`, area categories only, and those
 seeds carry their label so the polygon is named at birth. `--prior` seeds from
 `modern_prior.py --blocks` — 2023 buildings buffer-dissolved into blocks and
 warped into the sheet's own pixel grid — and those arrive nameless, so nothing
@@ -1450,9 +1450,9 @@ a prior passes it by hand.
 Scripts: `inference_tiles_as_video.py` (orchestrator; `--write-supabase` also advances
 `map_pipeline_status` seg_queued → seg_done), `masks_to_polygons.py` (`mask_to_polygon`,
 `masks_to_polygons` IoU dedup, `shift_polygons`), `evaluate.py` (F1 + geometric quality vs
-`footprint_submissions` status=verified).
+`footprints` review_status=verified).
 
-Polygons written to `footprint_submissions.coords` as `[[x,y],...]` pixel-space arrays.
+Polygons written to `footprints.coords` as `[[x,y],...]` pixel-space arrays.
 
 ## Pipeline stages (`map_pipeline_status.stage`)
 
@@ -1531,7 +1531,7 @@ instead. VMA substitutes Gemini:
   the same pass;
 - on a corpus of ~46 annotated Saigon footprints, a 10-shot YOLO is the weaker option.
 
-**Status: shipped.** `--mode prompted --ocr-run-id <run>` seeds SAM2 from `ocr_extractions` bboxes,
+**Status: shipped.** `--mode prompted --ocr-run-id <run>` seeds SAM2 from `ocr_labels` bboxes,
 and `--prior <blocks.geojson>` adds the modern block prior beside them. `--text-mask` erases those
 regions from the image so label ink is not segmented as building.
 
@@ -1613,8 +1613,8 @@ digitalize Triage UI writes the same decisions as `--tile-overrides`.
 ## Coordinate contract
 
 Everything downstream of Gemini is **pixel space on the full source image**, which is also SAM2's
-input space and `footprint_submissions.pixel_polygon`'s space. Gemini returns 0–1000 normalized
-boxes per tile; `_to_global()` converts to full-image px; `ocr_extractions.global_x/y/w/h` stores
+input space and `footprints.pixel_polygon`'s space. Gemini returns 0–1000 normalized
+boxes per tile; `_to_global()` converts to full-image px; `ocr_labels.global_x/y/w/h` stores
 that. Georeferencing to WGS84 happens later, via the Allmaps transform, not in the pipeline.
 
 Note for anyone porting Google's spatial-understanding patterns: their notebook uses

@@ -12,7 +12,7 @@
  *
  * The survey's identity and name come from `map_series` (migration 082/084),
  * which is gated to what this reader may see; the sheet list comes from
- * `series_sheets` (083), which carries no gate of its own because a gap in a
+ * `series_cells` (083), which carries no gate of its own because a gap in a
  * survey is catalogue information. Reading them together is safe in that
  * order — a survey with nothing published has no `map_series` row, so this
  * route 404s before it ever reaches the sheet list.
@@ -50,10 +50,11 @@ const HALF_IN_NAME = /\((W|E)\)\s*$/;
 /**
  * Which piece of paper a record is.
  *
- * `extra_metadata.sheet_half` is the authority: `ingest_indochine_nakala.mjs`
- * derives it from the Cartomundi note ("Demi-feuille Ouest") and cross-checks it
- * against the brackets in the title before it will insert a row, so it is the
- * value that was actually verified. The name marker is the fallback, for a row
+ * `maps.sheet_half` (backfilled from `extra_metadata.sheet_half`, mig 095) is
+ * the authority: `ingest_indochine_nakala.mjs` derives it from the Cartomundi
+ * note ("Demi-feuille Ouest") and cross-checks it against the brackets in the
+ * title before it will insert a row, so it is the value that was actually
+ * verified. The name marker is the fallback, for a row
  * that reached `maps` by some other route — a hand edit in the catalogue
  * editor, or a survey cut the same way that nobody has written an ingest for.
  *
@@ -152,7 +153,7 @@ export const load: PageServerLoad = async ({ params }) => {
   /**
    * Which printings of each cell the archive publishes.
    *
-   * `series_sheets` is keyed `(series_key, sheet_number)` — one row per cell —
+   * `series_cells` is keyed `(series_key, sheet_number)` — one row per cell —
    * so it can name the printing it serves and cannot enumerate the others. Ten
    * cells are held in more than one record, and a page that silently showed one
    * of them would be making a claim about the archive that is not true.
@@ -166,27 +167,27 @@ export const load: PageServerLoad = async ({ params }) => {
   const { data: rows } = series.collection
     ? await supabase
         .from('maps')
-        .select('id,name,year,extra_metadata')
+        .select('id,name,year,sheet_number,sheet_half,extra_metadata')
         .eq('collection', series.collection)
         .in('status', ['public', 'featured'])
-        .not('extra_metadata->>sheet_number', 'is', null)
+        .not('sheet_number', 'is', null)
         .order('year', { ascending: true })
     : { data: [] };
 
   const printings: Record<string, SheetPrinting[]> = {};
   for (const row of rows ?? []) {
+    if (!row.sheet_number) continue;
+    // `edition`/`scan_provenance` have no columns of their own (mig 095) — only
+    // `sheet_number`/`sheet_half` moved off `extra_metadata`.
     const meta = (row.extra_metadata ?? {}) as {
-      sheet_number?: string;
-      sheet_half?: string;
       edition?: string;
       scan_provenance?: string;
     };
-    if (!meta.sheet_number) continue;
-    (printings[meta.sheet_number] ??= []).push({
+    (printings[row.sheet_number] ??= []).push({
       institution: null,
       year: row.year,
       edition: meta.edition ?? null,
-      part: sheetPart(meta.sheet_half, row.name, meta.scan_provenance),
+      part: sheetPart(row.sheet_half, row.name, meta.scan_provenance),
       url: `/catalog/${row.id}`,
       rights: null,
       held: true,

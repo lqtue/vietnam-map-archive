@@ -99,7 +99,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 
   const supabase = adminClient();
   let query = supabase
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('run_id, category, confidence', { count: 'exact' })
     .eq('map_id', mapId);
 

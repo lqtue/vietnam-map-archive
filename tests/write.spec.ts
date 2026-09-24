@@ -103,14 +103,12 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  for (const runId of created.runIds)
-    await admin.from('ocr_extractions').delete().eq('run_id', runId);
-  for (const id of created.footprintIds)
-    await admin.from('footprint_submissions').delete().eq('id', id);
+  for (const runId of created.runIds) await admin.from('ocr_labels').delete().eq('run_id', runId);
+  for (const id of created.footprintIds) await admin.from('footprints').delete().eq('id', id);
   for (const id of created.storyIds) await admin.from('stories').delete().eq('id', id);
   for (const id of created.jobIds) await admin.from('pipeline_jobs').delete().eq('id', id);
   for (const key of created.seriesKeys)
-    await admin.from('series_sheets').delete().eq('series_key', key);
+    await admin.from('series_cells').delete().eq('series_key', key);
   for (const id of created.mapIds) await admin.from('maps').delete().eq('id', id);
   await staffRequest?.dispose();
 });
@@ -204,7 +202,7 @@ test('a signed-in user can submit a footprint and it lands as submitted', async 
   await asUser.auth.setSession(session);
 
   const { data, error } = await asUser
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       user_id: session.user.id,
@@ -217,20 +215,16 @@ test('a signed-in user can submit a footprint and it lands as submitted', async 
       name: 'write-smoke building',
       feature_type: 'building',
     })
-    .select('id, status')
+    .select('id, review_status')
     .single();
 
   expect(error, error?.message).toBeNull();
   created.footprintIds.push(data!.id);
-  expect(data!.status).toBe('submitted');
+  expect(data!.review_status).toBe('submitted');
 
   // The map is public, so the row is readable without a session (RLS mig 038).
   const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
-  const { data: readBack } = await anon
-    .from('footprint_submissions')
-    .select('id')
-    .eq('id', data!.id)
-    .single();
+  const { data: readBack } = await anon.from('footprints').select('id').eq('id', data!.id).single();
   expect(readBack?.id).toBe(data!.id);
 });
 
@@ -241,11 +235,11 @@ test('publishing a story makes it readable by anonymous visitors', async () => {
   const { data: story, error } = await asUser
     .from('stories')
     .insert({ user_id: session.user.id, title: 'Write-smoke tour', mode: 'guided' })
-    .select('id, status')
+    .select('id, review_status')
     .single();
   expect(error, error?.message).toBeNull();
   created.storyIds.push(story!.id);
-  expect(story!.status).toBe('draft');
+  expect(story!.review_status).toBe('draft');
 
   const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   const draftRead = await anon.from('stories').select('id').eq('id', story!.id).maybeSingle();
@@ -254,7 +248,7 @@ test('publishing a story makes it readable by anonymous visitors', async () => {
   // Publishing submits for review; an author cannot approve their own story.
   const { error: subErr } = await asUser
     .from('stories')
-    .update({ status: 'submitted' })
+    .update({ review_status: 'submitted' })
     .eq('id', story!.id);
   expect(subErr, subErr?.message).toBeNull();
   expect(
@@ -263,7 +257,7 @@ test('publishing a story makes it readable by anonymous visitors', async () => {
 
   const selfApprove = await asUser
     .from('stories')
-    .update({ status: 'approved' })
+    .update({ review_status: 'approved' })
     .eq('id', story!.id);
   expect(selfApprove.error, 'an author must not be able to approve their own story').not.toBeNull();
 
@@ -430,7 +424,7 @@ test('a worker key claims a job and reports back through /api/pipeline', async (
   expect(finished!.status).toBe('done');
   expect(finished!.finished_at).toBeTruthy();
 
-  const { data: rows } = await admin.from('ocr_extractions').select('text').eq('run_id', runId);
+  const { data: rows } = await admin.from('ocr_labels').select('text').eq('run_id', runId);
   expect(rows).toHaveLength(1);
 
   // Nothing wrote a stage: map_pipeline_status is a view (mig 056), so closing
@@ -480,7 +474,7 @@ test('the pipeline endpoints refuse a missing or unknown worker token', async ()
 
 test('reviewing a footprint moves it out of the queue exactly once', async () => {
   const { data: fp, error: fpErr } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       user_id: session.user.id,
@@ -490,7 +484,7 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
         [10, 10],
       ],
       feature_type: 'building',
-      status: 'needs_review',
+      review_status: 'needs_review',
       source: 'sam-auto',
     })
     .select('id')
@@ -514,14 +508,14 @@ test('reviewing a footprint moves it out of the queue exactly once', async () =>
   expect(approve.ok(), await approve.text()).toBe(true);
 
   const { data: reviewed } = await admin
-    .from('footprint_submissions')
-    .select('status, source, review_tags, review_note, reviewed_by, reviewed_at')
+    .from('footprints')
+    .select('review_status, source, review_tags, review_note, reviewed_by, reviewed_at')
     .eq('id', fp!.id)
     .single();
   // `approved` is what /api/export/footprints filters on. This used to assert
   // `submitted`, which is the inbox the row was already in — so nothing in the
   // archive could ever reach the state the export reads (migration 090).
-  expect(reviewed!.status).toBe('approved');
+  expect(reviewed!.review_status).toBe('approved');
   // An edited polygon is machine output a human fixed, and exports care.
   expect(reviewed!.source).toBe('sam-corrected');
   expect(reviewed!.review_tags).toEqual(['boundary_too_wide', 'needs_split']);
@@ -544,7 +538,7 @@ test('a volunteer trace is reviewable, not only machine output', async () => {
   // and the panel answered 409 on a row it had just listed. 46 of them sat on
   // the 1882 cadastral like that.
   const { data: fp, error: fpErr } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       user_id: session.user.id,
@@ -554,7 +548,7 @@ test('a volunteer trace is reviewable, not only machine output', async () => {
         [8, 8],
       ],
       feature_type: 'building',
-      status: 'submitted',
+      review_status: 'submitted',
       source: 'volunteer',
     })
     .select('id')
@@ -568,18 +562,18 @@ test('a volunteer trace is reviewable, not only machine output', async () => {
   expect(approve.ok(), await approve.text()).toBe(true);
 
   const { data: reviewed } = await admin
-    .from('footprint_submissions')
-    .select('status, source')
+    .from('footprints')
+    .select('review_status, source')
     .eq('id', fp!.id)
     .single();
-  expect(reviewed!.status).toBe('approved');
+  expect(reviewed!.review_status).toBe('approved');
   // Untouched geometry stays a volunteer trace rather than becoming corrected.
   expect(reviewed!.source).toBe('volunteer');
 });
 
 test('submitted is an inbox, not a verdict', async () => {
   const { data: fp } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       user_id: session.user.id,
@@ -589,7 +583,7 @@ test('submitted is an inbox, not a verdict', async () => {
         [4, 4],
       ],
       feature_type: 'building',
-      status: 'needs_review',
+      review_status: 'needs_review',
       source: 'sam-auto',
     })
     .select('id')
@@ -610,8 +604,8 @@ test('publishing a map queues its hosting jobs, once', async () => {
       name: 'Publish-smoke fixture',
       status: 'draft',
       // Both jobs are wanted here, so the fixture has to earn both: an upstream
-      // annotation to mirror (georef_done) and imagery not yet on our host.
-      georef_done: true,
+      // annotation to mirror (is_georeferenced) and imagery not yet on our host.
+      is_georeferenced: true,
       iiif_image: 'https://example.invalid/iiif/publish-smoke',
     })
     .select('id')
@@ -645,7 +639,7 @@ test('publishing queues neither job when neither would accomplish anything', asy
       allmaps_id: `noop${Date.now()}`.slice(0, 16),
       name: 'Publish-smoke no-op fixture',
       status: 'draft',
-      georef_done: false,
+      is_georeferenced: false,
       iiif_image: 'https://iiif.maparchive.vn/iiif/publish-smoke-noop',
     })
     .select('id')
@@ -658,7 +652,7 @@ test('publishing queues neither job when neither would accomplish anything', asy
 
   // Georeferencing it later is what earns the mirror.
   await admin.from('maps').update({ status: 'draft' }).eq('id', draft!.id);
-  await admin.from('maps').update({ georef_done: true }).eq('id', draft!.id);
+  await admin.from('maps').update({ is_georeferenced: true }).eq('id', draft!.id);
   await admin.from('maps').update({ status: 'public' }).eq('id', draft!.id);
 
   const { data: after } = await admin.from('pipeline_jobs').select('kind').eq('map_id', draft!.id);
@@ -669,7 +663,7 @@ test('publishing queues neither job when neither would accomplish anything', asy
 
 test('finishing the georeference of an already-published map queues the mirror', async () => {
   // The sync-georef path (mig 080): a volunteer georeferences a map that is
-  // already public, so only `georef_done` moves. Under 058+064 the trigger
+  // already public, so only `is_georeferenced` moves. Under 058+064 the trigger
   // returned early on an unchanged status and the mirror was never queued, so
   // the map served its georeference from allmaps.org forever.
   const { data: draft } = await admin
@@ -678,7 +672,7 @@ test('finishing the georeference of an already-published map queues the mirror',
       allmaps_id: `flip${Date.now()}`.slice(0, 16),
       name: 'Georef-flip fixture',
       status: 'draft',
-      georef_done: false,
+      is_georeferenced: false,
       // Off our host on purpose: publishing earns the tile job, which lets the
       // assertions below prove the flip does *not* earn a second one.
       iiif_image: 'https://example.invalid/iiif/georef-flip',
@@ -698,7 +692,7 @@ test('finishing the georeference of an already-published map queues the mirror',
   // a re-queue — only the trigger's own publish-path gate can.
   await admin.from('pipeline_jobs').update({ status: 'done' }).eq('id', onPublish![0].id);
 
-  await admin.from('maps').update({ georef_done: true }).eq('id', draft!.id);
+  await admin.from('maps').update({ is_georeferenced: true }).eq('id', draft!.id);
 
   const { data: afterFlip } = await admin
     .from('pipeline_jobs')
@@ -794,14 +788,14 @@ test('tracing submits through the API, which stamps the author', async () => {
   created.footprintIds.push(id);
 
   const { data: row } = await admin
-    .from('footprint_submissions')
-    .select('user_id, source, status')
+    .from('footprints')
+    .select('user_id, source, review_status')
     .eq('id', id)
     .single();
   expect(row!.user_id).toBe(session.user.id);
   // 'volunteer' is the schema's word for hand-traced; 'manual' was never valid.
   expect(row!.source).toBe('volunteer');
-  expect(row!.status).toBe('submitted');
+  expect(row!.review_status).toBe('submitted');
 
   const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
   const rejected = await anon.post('/api/contribute/footprints', {
@@ -905,7 +899,7 @@ test("label search finds a typo'd label on a public map and hides draft-map labe
     confidence: 0.9,
   });
   const { error: insErr } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .insert([row(mapId, 'Rue de Khánh-Hội', 0), row(draft!.id, 'Khanh Hoi (draft)', 1)]);
   expect(insErr, insErr?.message).toBeNull();
 
@@ -931,7 +925,7 @@ test("label search finds a typo'd label on a public map and hides draft-map labe
   // And the raw table no longer leaks draft labels to the publishable key (mig 065 RLS).
   const anonDb = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   const { data: leaked } = await anonDb
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('id')
     .eq('run_id', runId)
     .eq('map_id', draft!.id);
@@ -947,14 +941,14 @@ test('the footprint export defaults to approved, filters by year and by ground b
     [10 + dx, 30],
   ];
   const { data: made, error: mkErr } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert([
       {
         map_id: mapId,
         pixel_polygon: ring(0),
         name: 'export-smoke approved',
         feature_type: 'building',
-        status: 'approved',
+        review_status: 'approved',
         source: 'volunteer',
       },
       {
@@ -962,11 +956,11 @@ test('the footprint export defaults to approved, filters by year and by ground b
         pixel_polygon: ring(100),
         name: 'export-smoke submitted',
         feature_type: 'building',
-        status: 'submitted',
+        review_status: 'submitted',
         source: 'volunteer',
       },
     ])
-    .select('id, status');
+    .select('id, review_status');
   expect(mkErr, mkErr?.message).toBeNull();
   for (const r of made!) created.footprintIds.push(r.id);
 
@@ -1032,7 +1026,7 @@ test('the place-time index warps on write, gates drafts, and rewarps on demand',
   expect(post.ok(), await post.text()).toBe(true);
   const { id: unwarpedId } = await post.json();
   const { data: unwarped } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('geom, geom_src')
     .eq('id', unwarpedId)
     .single();
@@ -1043,7 +1037,7 @@ test('the place-time index warps on write, gates drafts, and rewarps on demand',
   // job would, then ask the index what is there.
   const HERE = { lng: 106.70098, lat: 10.77653 };
   await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .update({
       geom: `SRID=4326;POINT(${HERE.lng} ${HERE.lat})`,
       geom_src: 'smoke-src',
@@ -1074,7 +1068,7 @@ test('the place-time index warps on write, gates drafts, and rewarps on demand',
     .select('id')
     .single();
   created.mapIds.push(draft!.id);
-  await admin.from('ocr_extractions').insert({
+  await admin.from('ocr_labels').insert({
     map_id: draft!.id,
     run_id: runId,
     tile_x: 0,
@@ -1149,7 +1143,7 @@ test('the published contracts match what the API actually returns', async () => 
 
   const HERE = { lng: 106.70098, lat: 10.77653 };
   const { data: label } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .insert({
       map_id: mapId,
       run_id: runId,
@@ -1172,7 +1166,7 @@ test('the published contracts match what the API actually returns', async () => 
     .single();
 
   const { data: print } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       pixel_polygon: [
@@ -1182,7 +1176,7 @@ test('the published contracts match what the API actually returns', async () => 
       ],
       name: 'contract-smoke building',
       feature_type: 'building',
-      status: 'approved',
+      review_status: 'approved',
       source: 'volunteer',
       geom: 'SRID=4326;POLYGON((106.7008 10.7764, 106.7012 10.7764, 106.7012 10.7767, 106.7008 10.7764))',
       geom_src: 'contract-smoke',
@@ -1259,7 +1253,7 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
   // The same street written three ways: hyphenated, spaced, and accented. The
   // gazetteer's key folds punctuation, so all three are one place.
   const { error: insErr } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .insert([row('Rue de Cây-Mai', 51), row('Rue de Cay Mai', 52), row('Rue de Cay Mai', 53)]);
   expect(insErr, insErr?.message).toBeNull();
 
@@ -1291,13 +1285,13 @@ test('a place page groups every spelling and hides unpublished sheets', async ()
     .select('id')
     .single();
   created.mapIds.push(draft!.id);
-  await admin.from('ocr_extractions').insert({ ...row('Rue Introuvable', 54), map_id: draft!.id });
+  await admin.from('ocr_labels').insert({ ...row('Rue Introuvable', 54), map_id: draft!.id });
   expect((await anon.get('/catalog/place/rue-introuvable')).status()).toBe(404);
 
   // And a name on BOTH a published and a draft sheet must not leak the draft
   // through the aggregate. The page loader reads the gazetteer on the service
   // client, which bypasses RLS, so the view itself has to be the gate.
-  await admin.from('ocr_extractions').insert({ ...row('Rue de Cay Mai', 55), map_id: draft!.id });
+  await admin.from('ocr_labels').insert({ ...row('Rue de Cay Mai', 55), map_id: draft!.id });
   const { data: agg } = await admin
     .from('place_names')
     .select('map_ids, years, mentions')
@@ -1384,10 +1378,10 @@ test('geometry writes are batched, capped, and ordered correctly', async () => {
     category: 'street',
     confidence: 0.5,
   }));
-  const { error: insErr } = await admin.from('ocr_extractions').insert(rows);
+  const { error: insErr } = await admin.from('ocr_labels').insert(rows);
   expect(insErr, insErr?.message).toBeNull();
 
-  const { data: ids } = await admin.from('ocr_extractions').select('id').eq('run_id', runId);
+  const { data: ids } = await admin.from('ocr_labels').select('id').eq('run_id', runId);
   expect(ids!.length).toBe(600);
 
   // One call moves all of them.
@@ -1404,7 +1398,7 @@ test('geometry writes are batched, capped, and ordered correctly', async () => {
   expect(moved).toBe(600);
 
   const { count } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('id', { count: 'exact', head: true })
     .eq('run_id', runId)
     .eq('geom_src', 'batch-smoke');
@@ -1417,7 +1411,7 @@ test('geometry writes are batched, capped, and ordered correctly', async () => {
   });
   expect(cleared.error).toBeNull();
   const { data: back } = await admin
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('geom')
     .eq('id', ids![0].id)
     .single();
@@ -1475,9 +1469,13 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
         name,
         collection,
         status,
-        georef_done: true,
+        is_georeferenced: true,
         year: 1910,
         bbox,
+        // map_series (mig 095) groups by the real column now, not
+        // extra_metadata->>'sheet_number' — write both so a fixture reads
+        // the same either way.
+        sheet_number: (extra as { sheet_number?: string }).sheet_number ?? null,
         extra_metadata: extra,
         allmaps_id: `se${Math.random().toString(16).slice(2, 16)}`.slice(0, 16),
       } as never)
@@ -1521,19 +1519,19 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   // say because it only holds successes. Five cells, of which we hold two.
   const pubKeyForIndex = pubSeries.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   created.seriesKeys.push(pubKeyForIndex);
-  const { error: idxError } = await admin.from('series_sheets').insert(
+  const { error: idxError } = await admin.from('series_cells').insert(
     ['1', '2', '3', '4', '5'].map((n) => ({
       series_key: pubKeyForIndex,
       sheet_number: n,
       held_by: n === '1' || n === '2' ? 'map' : null,
     })) as never
   );
-  if (idxError) throw new Error(`series_sheets fixture failed: ${idxError.message}`);
+  if (idxError) throw new Error(`series_cells fixture failed: ${idxError.message}`);
 
   // 083's check constraint, which had never been shown to fire: a row pointing
   // at a map must say it is held by one, or it is a held sheet that would not
   // be counted — the exact miscount that table exists to prevent.
-  const { error: badHold } = await admin.from('series_sheets').insert({
+  const { error: badHold } = await admin.from('series_cells').insert({
     series_key: pubKeyForIndex,
     sheet_number: 'unheld-with-a-map',
     map_id: created.mapIds[0],

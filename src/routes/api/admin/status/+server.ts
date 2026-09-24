@@ -26,25 +26,22 @@ export const GET: RequestHandler = async ({ locals }) => {
     /*  0 */ db.from('maps').select('*', head),
     /*  1 */ db.from('maps').select('*', head).in('status', ['public', 'featured']),
     /*  2 */ db.from('maps').select('*', head).eq('status', 'draft'),
-    /*  3 */ db.from('maps').select('*', head).eq('georef_done', true),
+    /*  3 */ db.from('maps').select('*', head).eq('is_georeferenced', true),
     /*  4 */ db.from('maps').select('*', head).not('bbox', 'is', null),
     // A map counts as read when its OCR job closed. Extractions cannot be
     // counted distinctly through PostgREST, and every route into the table
     // goes through a `pipeline_jobs` row, so the view is the honest proxy.
     /*  5 */ db.from('map_pipeline_status').select('*', head).not('ocr_finished_at', 'is', null),
-    /*  6 */ db.from('ocr_extractions').select('*', head),
-    /*  7 */ db.from('ocr_extractions').select('*', head).not('geom', 'is', null),
+    /*  6 */ db.from('ocr_labels').select('*', head),
+    /*  7 */ db.from('ocr_labels').select('*', head).not('geom', 'is', null),
     /*  8 */ db.from('place_names').select('*', head),
-    /*  9 */ db.from('footprint_submissions').select('*', head),
-    /* 10 */ db
-      .from('footprint_submissions')
-      .select('*', head)
-      .in('source', ['sam-auto', 'sam-corrected']),
-    /* 11 */ db.from('footprint_submissions').select('*', head).eq('status', 'approved'),
+    /*  9 */ db.from('footprints').select('*', head),
+    /* 10 */ db.from('footprints').select('*', head).in('source', ['sam-auto', 'sam-corrected']),
+    /* 11 */ db.from('footprints').select('*', head).eq('review_status', 'approved'),
     /* 12 */ db
-      .from('footprint_submissions')
+      .from('footprints')
       .select('*', head)
-      .in('status', ['submitted', 'needs_review']),
+      .in('review_status', ['submitted', 'needs_review']),
     /* 13 */ db.from('pipeline_jobs').select('*', head).eq('status', 'queued'),
     /* 14 */ db.from('pipeline_jobs').select('*', head).in('status', ['claimed', 'running']),
     /* 15 */ db.from('pipeline_jobs').select('*', head).eq('status', 'failed'),
@@ -57,7 +54,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     // looking like it worked. The crop is proposed automatically now (the
     // layout pass adopts its own main_map region), so what is scarce is the
     // acceptance, not the crop.
-    /* 16 */ db.from('maps').select('*', head).not('triage->>validated_at', 'is', null),
+    /* 16 */ db.from('maps').select('*', head).not('triage_reviewed_at', 'is', null),
     /* 17 */ db.from('maps').select('*', head).not('triage->>regions', 'is', null),
     // Proposed but not accepted: a crop exists and nobody has looked at it.
     // This is the queue a person actually works through.
@@ -65,7 +62,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       .from('maps')
       .select('*', head)
       .not('triage->>neatline', 'is', null)
-      .is('triage->>validated_at', null),
+      .is('triage_reviewed_at', null),
   ]);
 
   const broken = results.find((r) => r.error);

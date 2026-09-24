@@ -2,9 +2,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import type { AnnotationSet } from '$lib/map/types';
 
-type DbAnnotationSet = Database['public']['Tables']['annotation_sets']['Row'];
-type AnnotationSetInsert = Database['public']['Tables']['annotation_sets']['Insert'];
-type AnnotationSetUpdate = Database['public']['Tables']['annotation_sets']['Update'];
+type DbAnnotationSet = Database['public']['Tables']['user_layers']['Row'];
+type AnnotationSetInsert = Database['public']['Tables']['user_layers']['Insert'];
+type AnnotationSetUpdate = Database['public']['Tables']['user_layers']['Update'];
 
 /**
  * `mapIds` rides as a foreign member on the `features` jsonb blob rather than
@@ -44,7 +44,7 @@ export async function fetchUserAnnotationSets(
 	userId: string
 ): Promise<AnnotationSet[]> {
 	const { data, error } = await supabase
-		.from('annotation_sets')
+		.from('user_layers')
 		.select('*')
 		.eq('user_id', userId)
 		.order('updated_at', { ascending: false });
@@ -70,7 +70,7 @@ export async function createAnnotationSet(
 	}
 ): Promise<string | null> {
 	const { data, error } = await supabase
-		.from('annotation_sets')
+		.from('user_layers')
 		.insert({
 			title: params.title,
 			map_id: params.mapId,
@@ -104,7 +104,7 @@ export async function updateAnnotationSet(
 	const payload =
 		rest.features && mapIds ? { ...rest, features: withMapIds(rest.features, mapIds) } : rest;
 	const { error } = await supabase
-		.from('annotation_sets')
+		.from('user_layers')
 		.update({ ...payload, updated_at: new Date().toISOString() } as AnnotationSetUpdate)
 		.eq('id', id);
 
@@ -120,7 +120,7 @@ export async function deleteAnnotationSet(
 	id: string
 ): Promise<boolean> {
 	const { error } = await supabase
-		.from('annotation_sets')
+		.from('user_layers')
 		.delete()
 		.eq('id', id);
 

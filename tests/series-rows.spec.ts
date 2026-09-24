@@ -114,7 +114,7 @@ test('a merged row prints one year span, not two', () => {
 test('the coverage link points at the database series, not the raster archive', () => {
   // `row.key` for a folded row is the ARCHIVE's key (`l7014`), because the row
   // is named and toggled by the archive. The coverage page lives in
-  // `series_sheets`, which is keyed by `series_key` — so a link built from
+  // `series_cells`, which is keyed by `series_key` — so a link built from
   // `row.key` would 404 on exactly the survey that needs the page most.
   const [row] = buildSeriesRows([series()], false, [mosaic]);
   expect(row.key).toBe('l7014');
@@ -127,7 +127,7 @@ test('a standalone survey links to itself', () => {
 });
 
 test('an archive that is half of nothing offers no coverage page', () => {
-  // Its index is not in `series_sheets` — there is no page to link to, and a
+  // Its index is not in `series_cells` — there is no page to link to, and a
   // link to one would be a 404 offered from a row that works.
   const orphan: RasterSeries = { ...mosaic, halfOf: undefined };
   const [row] = buildSeriesRows([], false, [orphan]);
@@ -136,7 +136,7 @@ test('an archive that is half of nothing offers no coverage page', () => {
 
 test('a survey with no imported index offers no coverage link', () => {
   // `map_series` has a row for every survey with georeferenced sheets, but
-  // `series_sheets` is seeded per survey by hand — AMS L909 has three sheets
+  // `series_cells` is seeded per survey by hand — AMS L909 has three sheets
   // and no index, so /catalog/series/<key> is a 404 for it. A link offered
   // from a row that otherwise works is worse than no link at all.
   const l909 = series({ key: 'l909', sheets: 3, publishedSheets: 3, surveySheets: undefined });

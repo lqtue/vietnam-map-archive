@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     throw error(400, `feature_type must be one of ${FEATURE_TYPES.join(', ')}`);
   }
 
-  await assertUnderRateLimit('footprint_submissions', user.id, MAX_PER_HOUR);
+  await assertUnderRateLimit('footprints', user.id, MAX_PER_HOUR);
 
   const admin = adminClient();
 
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   const geom = warp ? polygonEwkt(warp, polygon) : null;
 
   const { data, error: err } = await admin
-    .from('footprint_submissions')
+    .from('footprints')
     .insert({
       map_id: mapId,
       user_id: user.id, // from the session, never from the body
@@ -58,7 +58,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       name: body.name ?? null,
       category: body.category ?? null,
       feature_type: body.feature_type ?? 'building',
-      status: 'submitted',
+      review_status: 'submitted',
       source: 'volunteer',
     })
     .select('id')

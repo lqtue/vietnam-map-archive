@@ -29,10 +29,10 @@ change; facet chips filter and re-tally client-side so chip toggles are instant.
 
 | Tab | Component | Content |
 |-----|-----------|---------|
-| **About** | `MapEditAboutTab.svelte` | name, original_title, year, year_label, creator, dc_publisher, location, map_type, dc_coverage, dc_subject, dc_description, physical_description, language, custom `extra_metadata` pairs |
-| **Source** | `MapEditSourceTab.svelte` | source_type, holding_institution, collection, shelfmark, ia_identifier, source_url, rights |
+| **About** | `MapEditAboutTab.svelte` | name, original_title, year, date_label, creator, publisher, location, map_type, description, physical_description, language, custom `extra_metadata` pairs |
+| **Source** | `MapEditSourceTab.svelte` | source_type, holding_institution, collection, shelfmark, source_url, rights |
 | **Hosting & Georef** | `MapEditHostingTab.svelte` | IIIF source list (primary indicator), Mirror to R2, Allmaps ID + annotation_url + Fetch-from-Allmaps + Editor link, IA image upload, `NeatlineEditor` |
-| **Pipeline** | `MapEditPipelineTab.svelte` | georef_done / legend_done flags, legend mode + text, label categories, OCR pipeline controls |
+| **Pipeline** | `MapEditPipelineTab.svelte` | is_georeferenced flag, legend mode + text, label categories, OCR pipeline controls |
 
 Supporting modules in `src/lib/features/admin/`: `NeatlineEditor.svelte`, `neatlineDatum.ts`,
 `neatlineViewport.ts`, `GeorefSyncPanel.svelte`, `ScoutCard.svelte`. The admin API client is
@@ -50,7 +50,7 @@ tiling, "Backfill thumbnails" fetches each map's info.json and PATCHes `thumbnai
 
 Companion CLI scripts:
 - `scripts/bulk_upload_local.sh <file-list.txt> [--collection ...]` — tiles + inserts `maps` +
-  `map_iiif_sources` rows in one pass. Logs to `scripts/bulk_upload_<timestamp>.log`.
+  `map_images` rows in one pass. Logs to `scripts/bulk_upload_<timestamp>.log`.
 
 ## R2 / IIIF worker
 
@@ -64,7 +64,7 @@ Self-hosted IIIF tile serving via Cloudflare R2 + Worker at `https://iiif.maparc
   id to put in the database — see *Re-tiling a mirrored map* below. `--dry-run` prints the keys and
   the service id and stops. The mirror-r2 API and `/admin?tab=bulk` return the exact command, always
   unversioned: they only ever mint a first tiling.
-- After mirroring: `maps.iiif_image` and the primary `map_iiif_sources` row point to
+- After mirroring: `maps.iiif_image` and the primary `map_images` row point to
   `https://iiif.maparchive.vn/iiif/<map-uuid>`; `maps.annotation_url` becomes the Supabase Storage
   public URL of the updated annotation JSON (mig 047 — earlier code overloaded `allmaps_id` for
   this; the column now holds only bare image IDs).
@@ -169,7 +169,7 @@ four move together:
 |------|-----------|
 | `maps.iiif_image` | `<base>/v<N>` |
 | `maps.thumbnail` | `<base>/v<N>/full/800,/0/default.jpg` |
-| the primary `map_iiif_sources` row (`source_type = 'r2'`) | `<base>/v<N>` |
+| the primary `map_images` row (`source_type = 'r2'`) | `<base>/v<N>` |
 | the annotation JSON at `maps.annotation_url` | its source URL rewritten to `<base>/v<N>` |
 
 The last is the one that gets forgotten, and it fails silently: the georeference still resolves and
@@ -327,7 +327,7 @@ open https://<host>/admin?tab=scout
 
 - `GET /api/admin/scout?status=pending&source=humazur&category=urban_plan&minScore=40&q=Saigon&limit=60&offset=0`
   — paginated list with facet counts on first page.
-- `PATCH /api/admin/scout/[id]` — approve/reject/revert (sets `reviewer_id` + `reviewed_at`).
+- `PATCH /api/admin/scout/[id]` — approve/reject/revert (sets `reviewed_by` + `reviewed_at`).
 - `POST /api/admin/scout` `{ ids: [...] }` — bulk-ingest approved candidates → `maps` rows (only
   operates on `status=approved`; sets `status=ingested` + `map_id` on success). Maps
   holding-institution string to `source_type`: "David Rumsey" → `rumsey`; "Bibliothèque nationale" →
@@ -341,7 +341,7 @@ it**.
 | Column | Meaning | Example |
 |--------|---------|---------|
 | `creator` | Who made the map | `Service Géographique de l'Indochine` |
-| `dc_publisher` | Who published it | same as creator for govt maps, or `Imprimerie d'Extrême-Orient` |
+| `publisher` | Who published it | same as creator for govt maps, or `Imprimerie d'Extrême-Orient` |
 | `holding_institution` | Where the original lives now | `Bibliothèque nationale de France`, `Humazur, Université Côte d'Azur`, `David Rumsey Map Collection (Stanford)` |
 | `collection` | Archival sub-collection | `Département Cartes et plans`, `Cartothèque ASEMI`, `AMS Series L7014` |
 | `shelfmark` | Catalog ID at the holder | `GE C-2144` |

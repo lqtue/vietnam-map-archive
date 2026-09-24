@@ -167,11 +167,11 @@ export const GET: RequestHandler = async ({ url }) => {
   const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
   let fpQuery = supabase
-    .from('footprint_submissions')
+    .from('footprints')
     // `annotation_url` is the self-hosted mirror, and for this catalogue it is
     // the only annotation that resolves — see `getAnnotationData`.
     .select('*, maps(allmaps_id, annotation_url, name, year)')
-    .eq('status', status);
+    .eq('review_status', status);
 
   if (mapIds.length === 1) fpQuery = fpQuery.eq('map_id', mapIds[0]);
   else if (mapIds.length > 1) fpQuery = fpQuery.in('map_id', mapIds);
@@ -238,7 +238,7 @@ export const GET: RequestHandler = async ({ url }) => {
           source: row.source,
           valid_from: row.valid_from,
           confidence: row.confidence,
-          status: row.status,
+          status: row.review_status,
           pixel_polygon: pixelRing,
           // The source map's GCP residual in metres, when the row has been
           // warped. The analysis notebook reports it beside every figure.

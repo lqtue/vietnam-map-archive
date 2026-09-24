@@ -67,11 +67,14 @@ function withInfoJson(url: string): string {
  */
 export function allmapsEditorSourceUrl(
   map: {
-    iiif_manifest?: string | null;
     annotation_url?: string | null;
     allmaps_id?: string | null;
   },
-  sources: { iiif_image?: string | null; source_type?: string | null }[] = [],
+  sources: {
+    iiif_image?: string | null;
+    iiif_manifest?: string | null;
+    source_type?: string | null;
+  }[] = [],
   verifiedSourceId?: string | null
 ): string {
   if (verifiedSourceId) {
@@ -81,7 +84,12 @@ export function allmapsEditorSourceUrl(
     )?.iiif_image;
     if (matched) return withInfoJson(matched);
   }
-  if (map.iiif_manifest) return withInfoJson(map.iiif_manifest);
+  // maps.iiif_manifest was dropped (mig 095, dead/duplicated) — a manifest now
+  // only lives per-source, on map_images (was map_iiif_sources).
+  const manifest =
+    sources.find((s) => s.source_type !== 'r2' && s.iiif_manifest)?.iiif_manifest ??
+    sources.find((s) => s.iiif_manifest)?.iiif_manifest;
+  if (manifest) return withInfoJson(manifest);
   const original = sources.find((s) => s.source_type !== 'r2' && s.iiif_image)?.iiif_image;
   if (original) return withInfoJson(original);
   // An annotation URL is not a IIIF resource, so it never takes /info.json —
@@ -99,13 +107,14 @@ export function allmapsEditorSourceUrl(
  * (see `allmapsEditorSourceUrl` above).
  */
 export async function verifiedEditorSourceId(
-  map: { allmaps_id?: string | null; iiif_manifest?: string | null },
-  sources: { iiif_image?: string | null }[]
+  map: { allmaps_id?: string | null },
+  sources: { iiif_image?: string | null; iiif_manifest?: string | null }[]
 ): Promise<string | null> {
   if (!map.allmaps_id) return null;
-  const candidates = [map.iiif_manifest, ...sources.map((s) => s.iiif_image)].filter(
-    (u): u is string => !!u
-  );
+  const candidates = [
+    ...sources.map((s) => s.iiif_manifest),
+    ...sources.map((s) => s.iiif_image),
+  ].filter((u): u is string => !!u);
   for (const url of candidates) {
     if ((await generateId(url)) === map.allmaps_id) return url;
   }

@@ -1,7 +1,7 @@
 /**
  * POST /api/admin/maps/[id]/ocr/apply
  *
- * Reads ocr_extractions for a map (optionally filtered by run_id) and
+ * Reads ocr_labels for a map (optionally filtered by run_id) and
  * inserts label_pins for extractions above the confidence threshold.
  *
  * Pixels: bbox center (global_x + global_w/2, global_y + global_h/2) in
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
   // Fetch OCR extractions above threshold
   let query = supabase
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select(
       'id, run_id, category, text, confidence, global_x, global_y, global_w, global_h, rotation_deg, notes'
     )

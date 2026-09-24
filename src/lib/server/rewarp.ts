@@ -75,7 +75,7 @@ export async function rewarpMap(mapId: string): Promise<RewarpResult> {
    * some. `id` is a uuid, so the order is arbitrary but total and stable.
    */
   async function pass<T extends { id: string; geom_src: string | null }>(
-    table: 'ocr_extractions' | 'footprint_submissions',
+    table: 'ocr_labels' | 'footprints',
     columns: string,
     rpc: 'set_extraction_geom' | 'set_footprint_geom',
     toEwkt: (row: T, w: MapWarp) => string | null
@@ -128,7 +128,7 @@ export async function rewarpMap(mapId: string): Promise<RewarpResult> {
     global_w: number | null;
     global_h: number | null;
   }>(
-    'ocr_extractions',
+    'ocr_labels',
     'id, geom_src, global_x, global_y, global_w, global_h',
     'set_extraction_geom',
     (row, w) => {
@@ -141,7 +141,7 @@ export async function rewarpMap(mapId: string): Promise<RewarpResult> {
     id: string;
     geom_src: string | null;
     pixel_polygon: unknown;
-  }>('footprint_submissions', 'id, geom_src, pixel_polygon', 'set_footprint_geom', (row, w) => {
+  }>('footprints', 'id, geom_src, pixel_polygon', 'set_footprint_geom', (row, w) => {
     const ring = row.pixel_polygon as [number, number][] | null;
     return ring ? polygonEwkt(w, ring) : null;
   });

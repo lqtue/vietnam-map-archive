@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
   const mapId = assertUuid(params.id, 'map id');
 
   const { data, error: err } = await adminClient()
-    .from('map_iiif_sources')
+    .from('map_images')
     .select('*')
     .eq('map_id', mapId)
     .order('sort_order');
@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
   // If making this primary, the DB trigger handles demoting others
   const { data, error: err } = await adminClient()
-    .from('map_iiif_sources')
+    .from('map_images')
     .insert({
       map_id: mapId,
       label: label || null,

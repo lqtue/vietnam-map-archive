@@ -71,8 +71,8 @@ const footprints = (fc.features ?? [])
 
 const rows = await (
   await fetch(
-    `${url}/rest/v1/ocr_extractions?select=text,geom&map_id=eq.${MAP_ID}` +
-      `&status=eq.validated&geom=not.is.null&limit=150`,
+    `${url}/rest/v1/ocr_labels?select=text,geom&map_id=eq.${MAP_ID}` +
+      `&review_status=eq.validated&geom=not.is.null&limit=150`,
     { headers: { apikey: key, Authorization: `Bearer ${key}` } }
   )
 ).json();

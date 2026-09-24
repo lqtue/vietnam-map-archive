@@ -256,7 +256,7 @@ async function loadFromDb() {
       .filter((l) => l && !l.startsWith('#'))
       .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()])
   );
-  const url = `${env.PUBLIC_SUPABASE_URL}/rest/v1/ocr_extractions?select=map_id,text,text_validated,status&category=eq.legend_entry&limit=2000`;
+  const url = `${env.PUBLIC_SUPABASE_URL}/rest/v1/ocr_labels?select=map_id,text,text_corrected,review_status&category=eq.legend_entry&limit=2000`;
   const res = await fetch(url, {
     headers: {
       apikey: env.SUPABASE_SERVICE_KEY,
@@ -265,8 +265,8 @@ async function loadFromDb() {
   });
   if (!res.ok) throw new Error(`supabase http ${res.status}`);
   return (await res.json())
-    .filter((r) => r.status !== 'rejected' && SHEETS[r.map_id])
-    .map((r) => ({ year: SHEETS[r.map_id], raw: (r.text_validated ?? r.text ?? '').trim() }));
+    .filter((r) => r.review_status !== 'rejected' && SHEETS[r.map_id])
+    .map((r) => ({ year: SHEETS[r.map_id], raw: (r.text_corrected ?? r.text ?? '').trim() }));
 }
 
 function selftest() {

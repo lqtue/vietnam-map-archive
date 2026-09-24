@@ -116,10 +116,7 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1];
 };
 
-const D4_IDS = readFileSync(
-  new URL('../work/analysis/district4/maps.txt', import.meta.url),
-  'utf8'
-)
+const D4_IDS = readFileSync(new URL('../work/analysis/district4/maps.txt', import.meta.url), 'utf8')
   .trim()
   .split(',')
   .filter(Boolean);
@@ -174,7 +171,7 @@ async function loadSheet(id) {
   const { data: rows, error } = await db
     .from('maps')
     .select(
-      'id,year,name,slug,allmaps_id,annotation_url,iiif_manifest,map_iiif_sources(iiif_image,source_type)'
+      'id,year,name,slug,allmaps_id,annotation_url,map_images(iiif_image,iiif_manifest,source_type)'
     )
     .eq('id', id);
   if (error || !rows?.length) return { id, error: error?.message ?? 'no row' };
@@ -207,10 +204,10 @@ async function loadSheet(id) {
   }
 
   let query = db
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('text,category,global_x,global_y,global_w,global_h,run_id')
     .eq('map_id', id)
-    .neq('status', 'rejected');
+    .neq('review_status', 'rejected');
   const pinnedRun = runIdOverride.get(id);
   if (pinnedRun) query = query.eq('run_id', pinnedRun);
   const { data: extractions, error: ocrError } = await query;
@@ -239,9 +236,7 @@ async function loadSheet(id) {
   for (const [k, occurrences] of seen) {
     const cx = occurrences.reduce((s, o) => s + o.px[0], 0) / occurrences.length;
     const cy = occurrences.reduce((s, o) => s + o.px[1], 0) / occurrences.length;
-    const maxDist = Math.max(
-      ...occurrences.map((o) => Math.hypot(o.px[0] - cx, o.px[1] - cy))
-    );
+    const maxDist = Math.max(...occurrences.map((o) => Math.hypot(o.px[0] - cx, o.px[1] - cy)));
     if (maxDist > CLUSTER_PX) continue; // genuinely printed more than once — ambiguous
     const px = [cx, cy];
     const text = occurrences[0].text;
@@ -270,7 +265,9 @@ console.log(
 
 // ------------------------------------------------------------- pairwise check
 
-console.log('\n### Pairwise ground disagreement (shared unique names, each warped by its own sheet)\n');
+console.log(
+  '\n### Pairwise ground disagreement (shared unique names, each warped by its own sheet)\n'
+);
 // median_all/max_all are over EVERY shared name, unfiltered — the honest
 // number. median_within/n_within describe only the sub-150m subset for
 // comparison with the journal's method. Reporting median_within alone would
@@ -312,8 +309,12 @@ for (let i = 0; i < ok.length; i++) {
         `${within.length} | ${within.length ? Math.round(median(within.map((x) => x.d))) : '—'} |`
     );
     pairwise.push({
-      a: a.row.year, b: b.row.year, aName: a.row.name, bName: b.row.name,
-      shared: shared.length, medianAllM: Math.round(median(dists.map((x) => x.d))),
+      a: a.row.year,
+      b: b.row.year,
+      aName: a.row.name,
+      bName: b.row.name,
+      shared: shared.length,
+      medianAllM: Math.round(median(dists.map((x) => x.d))),
       maxAllM: Math.round(Math.max(...dists.map((x) => x.d))),
       nWithin: within.length,
       medianWithinM: within.length ? Math.round(median(within.map((x) => x.d))) : null,
@@ -332,11 +333,17 @@ const allAnchors = [...anchorTally.entries()]
     ];
     const spread = Math.max(...v.points.map((p) => haversineM(p.lonlat, centroid)));
     return {
-      key, text: v.text, spread,
+      key,
+      text: v.text,
+      spread,
       points: v.points.map((p) => ({
-        year: p.sheet.row.year, name: p.sheet.row.name,
-        px: p.px.map(Math.round), lon: p.lonlat[0], lat: p.lonlat[1],
-        editorUrl: p.sheet.editorLink?.url ?? null, verified: !!p.sheet.editorLink?.verified,
+        year: p.sheet.row.year,
+        name: p.sheet.row.name,
+        px: p.px.map(Math.round),
+        lon: p.lonlat[0],
+        lat: p.lonlat[1],
+        editorUrl: p.sheet.editorLink?.url ?? null,
+        verified: !!p.sheet.editorLink?.verified,
       })),
     };
   })
@@ -344,22 +351,40 @@ const allAnchors = [...anchorTally.entries()]
 
 if (asJson) {
   console.log('\n---JSON---');
-  console.log(JSON.stringify({ sheets: ok.map((s) => ({
-    id: s.id, year: s.row.year, name: s.row.name, source: s.source,
-    nUniqueNames: s.names.size, nGcps: s.nGcps,
-  })), pairwise, anchors: allAnchors }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        sheets: ok.map((s) => ({
+          id: s.id,
+          year: s.row.year,
+          name: s.row.name,
+          source: s.source,
+          nUniqueNames: s.names.size,
+          nGcps: s.nGcps,
+        })),
+        pairwise,
+        anchors: allAnchors,
+      },
+      null,
+      2
+    )
+  );
 }
 
 if (!showAnchors) {
   if (!asJson) {
-    console.log('\n(run with --anchors for editor-ready per-sheet points, --json for structured output)');
+    console.log(
+      '\n(run with --anchors for editor-ready per-sheet points, --json for structured output)'
+    );
   }
   process.exit(0);
 }
 
 console.log('\n### Best multi-sheet anchors — editor-ready\n');
 for (const anchor of allAnchors.slice(0, 10)) {
-  console.log(`\n## "${anchor.text}" — ${anchor.points.length} sheets, spread ${anchor.spread.toFixed(1)} m`);
+  console.log(
+    `\n## "${anchor.text}" — ${anchor.points.length} sheets, spread ${anchor.spread.toFixed(1)} m`
+  );
   for (const p of anchor.points) {
     const [px, py] = p.px;
     const verified = p.verified ? '' : '  [unverified link]';

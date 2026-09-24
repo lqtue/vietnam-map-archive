@@ -44,7 +44,7 @@ function rowToStory(row: StoryWithPoints): Story {
 			row.region && Object.keys(row.region).length
 				? (row.region as unknown as Story['region'])
 				: undefined,
-		status: row.status as Story['status'],
+		status: row.review_status as Story['status'],
 		points,
 		createdAt: new Date(row.created_at).getTime(),
 		updatedAt: new Date(row.updated_at).getTime(),
@@ -68,7 +68,7 @@ export async function fetchPublicStories(supabase: SupabaseClient<Database>): Pr
 	const { data, error } = await supabase
 		.from('stories')
 		.select('*, story_points(*)')
-		.eq('status', 'approved')
+		.eq('review_status', 'approved')
 		.order('updated_at', { ascending: false });
 
 	if (error) { console.error('fetchPublicStories:', error); return []; }
@@ -97,7 +97,7 @@ export async function syncStoryToSupabase(
 		description: story.description || null,
 		mode: story.mode ?? 'guided',
 		region: (story.region ?? {}) as unknown as Json,
-		status: story.status
+		review_status: story.status
 	});
 	if (storyErr) { console.error('syncStoryToSupabase (story):', storyErr); return false; }
 

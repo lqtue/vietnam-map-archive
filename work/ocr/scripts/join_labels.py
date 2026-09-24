@@ -7,9 +7,9 @@ point falls inside several nested polygons (a building inside a block inside a
 plot), the OCR category picks the level — a bare numeral wants a building, a
 name wants the coarse block/plot/line — and the smallest matching polygon wins.
 
-Coordinate space: ocr_extractions.global_* and footprint_submissions.pixel_polygon
+Coordinate space: ocr_labels.global_* and footprints.pixel_polygon
 are both source-image pixels, y-down. No transform needed. Writes footprint_id
-back to ocr_extractions (migration 050).
+back to ocr_labels (migration 050).
 
 Usage:
     python join_labels.py <map_id>          # link one map
@@ -86,7 +86,7 @@ def assign_footprints(
 
     out: dict[str, str] = {}
     for ext in extractions:
-        if ext.get("status") == "rejected":
+        if ext.get("review_status") == "rejected":
             continue  # never link a label a human threw out
         gx, gy = ext.get("global_x"), ext.get("global_y")
         if gx is None or gy is None:
@@ -95,8 +95,8 @@ def assign_footprints(
         cy = gy + (ext.get("global_h") or 0) / 2.0
 
         # Prefer the human-corrected text/category over raw model output.
-        text = (ext.get("text_validated") or ext.get("text") or "").strip()
-        category = ext.get("category_validated") or ext.get("category") or ""
+        text = (ext.get("text_corrected") or ext.get("text") or "").strip()
+        category = ext.get("category_corrected") or ext.get("category") or ""
         # Gemini often returns a bare parcel numeral with trailing punctuation
         # ('12.'); strip it so the numeral still routes to the building level.
         if text.rstrip(".,").isdigit():
@@ -190,14 +190,14 @@ def _self_check() -> None:
     assert "o1" not in got, "outside point must not link"
 
     # Rejected labels never link; a corrected category routes by the fix.
-    rejected = {"id": "r1", "text": "12", "category": "other", "status": "rejected",
+    rejected = {"id": "r1", "text": "12", "category": "other", "review_status": "rejected",
                 "global_x": 49, "global_y": 49, "global_w": 2, "global_h": 2}
     fixed = {"id": "f1", "text": "Marché", "category": "building",
-             "category_validated": "place", "global_x": 49, "global_y": 49,
+             "category_corrected": "place", "global_x": 49, "global_y": 49,
              "global_w": 2, "global_h": 2}
     got2 = assign_footprints([rejected, fixed], footprints)
     assert "r1" not in got2, "rejected label must not link"
-    assert got2.get("f1") == "block", f"category_validated 'place' → block, got {got2.get('f1')}"
+    assert got2.get("f1") == "block", f"category_corrected 'place' → block, got {got2.get('f1')}"
     # Run pinning: the newest run wins, and hand-traced rows survive it.
     rows = [
         {"id": "old", "run_id": "r1", "created_at": "2026-01-01T00:00:00Z"},

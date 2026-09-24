@@ -224,7 +224,7 @@ def gt_boxes(map_id: str) -> list[tuple[float, float, float, float]]:
     url = os.environ["PUBLIC_SUPABASE_URL"]
     key = os.environ["SUPABASE_SERVICE_KEY"]
     rows = requests.get(
-        f"{url}/rest/v1/footprint_submissions",
+        f"{url}/rest/v1/footprints",
         params={"select": "pixel_polygon", "map_id": f"eq.{map_id}"},
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
         timeout=30,

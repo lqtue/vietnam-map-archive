@@ -19,7 +19,6 @@
 
   // Bindable — committed by parent's handleSave
   export let georef_done: boolean = false;
-  export let legend_done: boolean = false;
   export let labelLegendMode: 'simple' | 'list' = 'simple';
   export let labelLegendText: string = '';
   export let labelCategories: string = '';
@@ -190,10 +189,6 @@
       <label class="form-label checkbox-label">
         <input type="checkbox" bind:checked={georef_done} />
         <span>Georef done <span class="form-hint">(available in Label Studio)</span></span>
-      </label>
-      <label class="form-label checkbox-label">
-        <input type="checkbox" bind:checked={legend_done} />
-        <span>Legend done <span class="form-hint">(pin legend validated)</span></span>
       </label>
     </div>
   </div>

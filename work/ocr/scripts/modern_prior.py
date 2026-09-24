@@ -45,7 +45,7 @@ segments in the 1882 extent because the Charner and Bonard canals were filled;
 masking on it would erase exactly the water the old sheets are most useful for.
 
 Everything is written in **source-pixel coordinates, y-down** — the same grid
-`ocr_extractions.global_x/global_y` and the MapSAM2 polygons already share, so
+`ocr_labels.global_x/global_y` and the MapSAM2 polygons already share, so
 the output drops straight into `to_sam2_seeds.py` or the review UI.
 
 Pure geometry plus two file reads and one annotation fetch. Self-check at the
@@ -529,7 +529,7 @@ def _annotation_source(row: dict[str, Any]) -> str | None:
 
 def _paginate(url: str, key: str, table: str, select: str, page: int = 1000):
     """Every row of one column set, one table, no filter — pipeline_status,
-    ocr_extractions and footprint_submissions are all small enough (hundreds to
+    ocr_labels and footprints are all small enough (hundreds to
     low thousands of rows) that paging through them beats writing a group-by
     view for a report that runs by hand."""
     import requests
@@ -587,8 +587,8 @@ def sweep(limit_rms: float = MAX_RMS_PX) -> int:
         p["map_id"]: p
         for p in _paginate(url, key, "map_pipeline_status", "map_id,stage")
     }
-    ocr_n = Counter(e["map_id"] for e in _paginate(url, key, "ocr_extractions", "map_id"))
-    fp_n = Counter(f["map_id"] for f in _paginate(url, key, "footprint_submissions", "map_id"))
+    ocr_n = Counter(e["map_id"] for e in _paginate(url, key, "ocr_labels", "map_id"))
+    fp_n = Counter(f["map_id"] for f in _paginate(url, key, "footprints", "map_id"))
 
     def status_cols(map_id: str) -> str:
         stage = pipeline.get(map_id, {}).get("stage", "idle")
@@ -712,7 +712,7 @@ def legend_status() -> int:
     resp.raise_for_status()
     names = {m["id"]: m for m in resp.json()}
 
-    rows = _paginate(url, key, "ocr_extractions", "map_id,category,status,run_id,notes,text")
+    rows = _paginate(url, key, "ocr_labels", "map_id,category,review_status,run_id,notes,text")
     by_map: dict[str, list[dict]] = {}
     for r in rows:
         by_map.setdefault(r["map_id"], []).append(r)
@@ -725,7 +725,7 @@ def legend_status() -> int:
     flagged_missing = []
     for map_id, ext in sorted(by_map.items(), key=lambda kv: names.get(kv[0], {}).get("year") or 0):
         row = names.get(map_id, {})
-        active = [e for e in ext if e["status"] != "rejected"]
+        active = [e for e in ext if e["review_status"] != "rejected"]
         n_runs = len({e["run_id"] for e in ext if e["run_id"]})
         n_institution = sum(1 for e in active if e["category"] == "institution")
 

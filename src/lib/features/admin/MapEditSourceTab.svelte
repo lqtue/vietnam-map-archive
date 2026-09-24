@@ -8,7 +8,6 @@
   export let holding_institution: string;
   export let collection: string;
   export let shelfmark: string;
-  export let ia_identifier: string;
   export let source_url: string;
   export let rights: string;
 </script>
@@ -54,15 +53,6 @@
       bind:value={shelfmark}
       class="form-input mono"
       placeholder="e.g. GE D-10312"
-    />
-  </label>
-  <label class="form-label">
-    <span>IA identifier <span class="field-hint">Internet Archive item</span></span>
-    <input
-      type="text"
-      bind:value={ia_identifier}
-      class="form-input mono"
-      placeholder="e.g. vma-map-1882-saigon"
     />
   </label>
   <label class="form-label full-width">

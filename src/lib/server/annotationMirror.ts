@@ -119,7 +119,6 @@ export async function mirrorAnnotation(
       iiif_image: newIiifBase,
       annotation_url: publicAnnotationUrl,
       thumbnail: `${newIiifBase}/full/800,/0/default.jpg`,
-      collection: 'Vietnam Map Archive',
     })
     .eq('id', mapId);
 
@@ -156,7 +155,7 @@ async function upsertR2Source(mapId: string, newIiifBase: string): Promise<void>
   const supabase = adminClient();
 
   const { data: existingSources } = await supabase
-    .from('map_iiif_sources')
+    .from('map_images')
     .select('id, iiif_image, sort_order')
     .eq('map_id', mapId);
 
@@ -164,14 +163,14 @@ async function upsertR2Source(mapId: string, newIiifBase: string): Promise<void>
 
   // One primary per map is a partial unique index, so demote before promoting.
   await supabase
-    .from('map_iiif_sources')
+    .from('map_images')
     .update({ is_primary: false })
     .eq('map_id', mapId)
     .eq('is_primary', true);
 
   if (r2Source) {
     const { error: upErr } = await supabase
-      .from('map_iiif_sources')
+      .from('map_images')
       .update({ iiif_image: newIiifBase, is_primary: true })
       .eq('id', r2Source.id);
     if (upErr) throw error(500, 'IIIF source update failed');
@@ -179,7 +178,7 @@ async function upsertR2Source(mapId: string, newIiifBase: string): Promise<void>
   }
 
   const maxOrder = (existingSources ?? []).reduce((max, s) => Math.max(max, s.sort_order ?? 0), 0);
-  const { error: insErr } = await supabase.from('map_iiif_sources').insert({
+  const { error: insErr } = await supabase.from('map_images').insert({
     map_id: mapId,
     label: 'Cloudflare R2',
     source_type: 'r2',

@@ -84,9 +84,12 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
   const rows = await pageAll(
     (from, to) => {
       let q = supabase
-        .from('ocr_extractions')
+        .from('ocr_labels')
         .select(
-          'id, run_id, tile_x, tile_y, tile_w, tile_h, global_x, global_y, global_w, global_h, category, text, text_validated, category_validated, confidence, rotation_deg, label_w, label_h, notes, status, validated_at, model, prompt'
+          // Client-side field names stay `text_validated`/`category_validated`/
+          // `status`/`validated_at` (the OCR review UI's own vocabulary) — only
+          // the columns they read from renamed (mig 095).
+          'id, run_id, tile_x, tile_y, tile_w, tile_h, global_x, global_y, global_w, global_h, category, text, text_validated:text_corrected, category_validated:category_corrected, confidence, rotation_deg, label_w, label_h, notes, status:review_status, validated_at:reviewed_at, model, prompt'
         )
         .eq('map_id', mapId)
         .order('category', { ascending: true })
@@ -97,7 +100,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         .order('id', { ascending: true })
         .range(offset + from, offset + to);
       if (runId) q = q.eq('run_id', runId);
-      if (status) q = q.eq('status', status);
+      if (status) q = q.eq('review_status', status);
       return q;
     },
     limit,
@@ -108,7 +111,11 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
   // page above. Two small columns, paged the same way.
   const meta = await pageAll(
     (from, to) =>
-      supabase.from('ocr_extractions').select('status, run_id').eq('map_id', mapId).range(from, to),
+      supabase
+        .from('ocr_labels')
+        .select('status:review_status, run_id')
+        .eq('map_id', mapId)
+        .range(from, to),
     Infinity,
     'Could not count OCR extractions'
   );
@@ -158,14 +165,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     category: body.category ?? 'other',
     text: body.text ?? '',
     confidence: 1.0,
-    status: 'pending',
+    review_status: 'pending',
     model: 'manual',
     prompt: 'manual',
   };
 
   const supabase = adminClient();
   const { data, error: err } = await supabase
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .insert({ ...row, ...(await warpFields(supabase, mapId, row)) })
     .select('id')
     .single();
@@ -212,10 +219,10 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
   }
 
   // Corrections are plain column writes; the status transition is not, because
-  // it carries the validated_at/validated_by stamp — that lives in the RPC.
-  const update: Database['public']['Tables']['ocr_extractions']['Update'] = {};
-  if (text !== undefined) update.text_validated = text;
-  if (category !== undefined) update.category_validated = category;
+  // it carries the reviewed_at/reviewed_by stamp — that lives in the RPC.
+  const update: Database['public']['Tables']['ocr_labels']['Update'] = {};
+  if (text !== undefined) update.text_corrected = text;
+  if (category !== undefined) update.category_corrected = category;
   if (notes !== undefined) update.notes = notes;
   if (global_x !== undefined) update.global_x = global_x;
   if (global_y !== undefined) update.global_y = global_y;
@@ -241,7 +248,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     global_h !== undefined
   ) {
     const { data: current } = await supabase
-      .from('ocr_extractions')
+      .from('ocr_labels')
       .select('global_x, global_y, global_w, global_h')
       .eq('id', extractionId)
       .eq('map_id', mapId)
@@ -251,7 +258,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 
   if (Object.keys(update).length) {
     const { error: err } = await supabase
-      .from('ocr_extractions')
+      .from('ocr_labels')
       .update(update)
       .eq('id', extractionId)
       .eq('map_id', mapId);

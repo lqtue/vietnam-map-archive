@@ -32,8 +32,15 @@ import { isUuid } from '$lib/core/utils/mapSlug';
 import { localeFromPath } from '$lib/core/i18n';
 import { verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 
+// Field names here are this page's own vocabulary, carried over from before
+// mig 095 (`dc_description`, `year_label`, `dc_publisher`, `georef_done`,
+// `map_iiif_sources`) — `+page.svelte` reads them under those names, so only
+// the column/table each is aliased from moved. `iiif_manifest` and
+// `dc_subject` were dropped outright: a manifest now lives per source
+// (`map_images`, aliased back to `map_iiif_sources` below), and nothing
+// replaces the subject field.
 const MAP_COLUMNS =
-  'id, slug, name, dc_description, year, year_label, creator, dc_publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done, status, bbox, iiif_manifest, source_url, shelfmark, rights, original_title, physical_description, dc_subject, map_iiif_sources(iiif_image, source_type)';
+  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type)';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const ref = decodeURIComponent(params.id);
@@ -96,9 +103,9 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
   // true for them.
   const { data: originals } = await supabase
     .from('maps')
-    .select('id, slug, name, year, georef_done, extra_metadata')
+    .select('id, slug, name, year, sheet_half')
     .eq('extra_metadata->>mirrors_original_for', map.id)
-    .order('extra_metadata->>sheet_half');
+    .order('sheet_half');
 
   // What the map's own live annotation is actually fit to, so the "Fix
   // georeference" link opens the right scan even when it's an R2-hosted

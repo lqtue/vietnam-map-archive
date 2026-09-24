@@ -23,17 +23,13 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
 
-  /** IGN's own sheets, as the loader read them off `mirrors_original_for`.
-   *
-   * `extra_metadata` is `Json` in the generated types — it may legitimately be a
-   * string or a number — so it arrives as `unknown` and is narrowed here rather
-   * than asserted at the call site. */
+  /** IGN's own sheets, as the loader read them off `mirrors_original_for`. */
   export let originals: Array<{
     id: string;
     slug: string | null;
     name: string;
     year: number | null;
-    extra_metadata: unknown;
+    sheet_half: string | null;
   }> = [];
 
   const PART_LABEL: Record<string, string> = {
@@ -42,14 +38,11 @@
   };
 
   /** The half a row covers, for a reader who cannot be expected to read a uuid. */
-  function half(row: { extra_metadata: unknown }): string {
-    const meta = row.extra_metadata;
-    if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return '';
-    const value = (meta as Record<string, unknown>).sheet_half;
-    return typeof value === 'string' ? value : '';
+  function half(row: { sheet_half: string | null }): string {
+    return row.sheet_half ?? '';
   }
 
-  const part = (row: { extra_metadata: unknown }) => PART_LABEL[half(row)] ?? half(row);
+  const part = (row: { sheet_half: string | null }) => PART_LABEL[half(row)] ?? half(row);
 
   // West before east, so the two links read in the order the paper does. The
   // loader already orders by `sheet_half`, which happens to agree; sorting here

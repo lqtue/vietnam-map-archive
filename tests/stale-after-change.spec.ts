@@ -6,7 +6,7 @@
  * Re-georeferencing is already handled: `mirror_annotation`/`sync_allmaps`
  * chain into a `warp` job (`src/routes/api/pipeline/execute/+server.ts`),
  * which calls `rewarpMap` (`$lib/server/rewarp.ts`) to re-derive
- * `ocr_extractions.geom` and `footprint_submissions.geom` from their stored
+ * `ocr_labels.geom` and `footprints.geom` from their stored
  * *pixel* positions. Nothing here needs building — this file just pins that
  * the ground-space columns it writes are exactly these two, so a schema
  * change there is a deliberate edit to this test, not a silent drift.
@@ -26,27 +26,27 @@ import { pickMapFields } from '../src/lib/server/mapFields';
  *  disjointness checks below mean what they say. */
 const RESCAN_INVALIDATES = new Set([
   'maps.triage', // neatline + regions, source pixel coords
-  'ocr_extractions.tile_x',
-  'ocr_extractions.tile_y',
-  'ocr_extractions.tile_w',
-  'ocr_extractions.tile_h',
-  'ocr_extractions.global_x',
-  'ocr_extractions.global_y',
-  'ocr_extractions.global_w',
-  'ocr_extractions.global_h',
-  'footprint_submissions.pixel_polygon', // traced against the old scan
+  'ocr_labels.tile_x',
+  'ocr_labels.tile_y',
+  'ocr_labels.tile_w',
+  'ocr_labels.tile_h',
+  'ocr_labels.global_x',
+  'ocr_labels.global_y',
+  'ocr_labels.global_w',
+  'ocr_labels.global_h',
+  'footprints.pixel_polygon', // traced against the old scan
 ]);
 /** Not a column — the R2 object cache of the old pixels. Redo it too. */
 const RESCAN_ALSO_REDO = ['tile_to_r2 output (R2 tiles)'];
 
 const REGEOREF_INVALIDATES = new Set([
   'maps.bbox',
-  'ocr_extractions.geom',
-  'ocr_extractions.geom_src',
-  'ocr_extractions.geom_rmse',
-  'footprint_submissions.geom',
-  'footprint_submissions.geom_src',
-  'footprint_submissions.geom_rmse',
+  'ocr_labels.geom',
+  'ocr_labels.geom_src',
+  'ocr_labels.geom_rmse',
+  'footprints.geom',
+  'footprints.geom_src',
+  'footprints.geom_rmse',
 ]);
 
 /** Reusable after a rescan, IF the replacement is confirmed to be the same
@@ -54,17 +54,17 @@ const REGEOREF_INVALIDATES = new Set([
 const RESCAN_REUSABLE_IF_SAME_CROP = new Set([
   'maps.annotation_url',
   'maps.allmaps_id',
-  'ocr_extractions.text',
-  'ocr_extractions.category',
-  'ocr_extractions.confidence',
+  'ocr_labels.text',
+  'ocr_labels.category',
+  'ocr_labels.confidence',
 ]);
 
 /** Reusable after a re-place, unconditionally: none of it is pixel-derived. */
 const REGEOREF_REUSABLE = new Set([
   'maps.triage',
-  'ocr_extractions.tile_x',
-  'ocr_extractions.text',
-  'footprint_submissions.pixel_polygon',
+  'ocr_labels.tile_x',
+  'ocr_labels.text',
+  'footprints.pixel_polygon',
 ]);
 
 test('a rescan and a re-place never claim the same column', () => {
@@ -84,7 +84,7 @@ test('every pixel-space column a re-place leaves alone is one a rescan invalidat
   // The two are complementary by construction: what a georeference change
   // cannot touch (pixel space) is exactly what a rescan does touch.
   for (const col of REGEOREF_REUSABLE) {
-    if (col === 'maps.triage' || col === 'footprint_submissions.pixel_polygon') {
+    if (col === 'maps.triage' || col === 'footprints.pixel_polygon') {
       expect(RESCAN_INVALIDATES.has(col)).toBe(true);
     }
   }

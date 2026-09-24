@@ -184,13 +184,13 @@ def build_text_mask(
     params: dict[str, str] = {
         "map_id": f"eq.{map_id}",
         "select": "global_x,global_y,global_w,global_h",
-        "status": "neq.rejected",
+        "review_status": "neq.rejected",
     }
     if ocr_run_id:
         params["run_id"] = f"eq.{ocr_run_id}"
 
     r = requests.get(
-        f"{url}/rest/v1/ocr_extractions",
+        f"{url}/rest/v1/ocr_labels",
         params=params,
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
     )
@@ -615,7 +615,7 @@ def write_to_supabase(
     source: str = "sam-auto",
     run_id: str | None = None,
 ) -> int:
-    """Insert polygons into footprint_submissions. Returns inserted count."""
+    """Insert polygons into footprints. Returns inserted count."""
     import os
     import requests
 
@@ -627,19 +627,19 @@ def write_to_supabase(
         "Content-Type": "application/json",
         "Prefer": "return=minimal",
     }
-    endpoint = f"{url}/rest/v1/footprint_submissions"
+    endpoint = f"{url}/rest/v1/footprints"
 
     rows = []
     for p in polys:
-        # Column names are footprint_submissions', not PolygonResult's: the
+        # Column names are footprints', not PolygonResult's: the
         # outer ring is `pixel_polygon` (full-image source px, same grid as
-        # ocr_extractions.global_*), and SAM2's IoU is the row's confidence.
+        # ocr_labels.global_*), and SAM2's IoU is the row's confidence.
         # Holes are dropped — the column holds one ring.
         row: dict[str, Any] = {
             "map_id":        map_id,
             "pixel_polygon": p.coords,
             "feature_type":  feature_type,
-            "status":        "needs_review",
+            "review_status": "needs_review",
             "source":        source,
             "confidence":    round(p.iou, 4),
         }
@@ -716,8 +716,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--mode",        default="automatic",
                    choices=["automatic", "prompted"],
                    help="automatic=grid-scan, prompted=OCR-seeded")
-    p.add_argument("--ocr-run-id",  help="ocr_extractions run_id for seed bboxes (prompted mode)")
-    p.add_argument("--run-id",      help="run_id stamped on every footprint_submissions row. The "
+    p.add_argument("--ocr-run-id",  help="ocr_labels run_id for seed bboxes (prompted mode)")
+    p.add_argument("--run-id",      help="run_id stamped on every footprints row. The "
                                          "worker always passes one (enqueue_seg.mjs mints it), and "
                                          "without this argparse rejected the whole job.")
     p.add_argument("--prior",       help="modern_prior.py blocks.geojson to prompt from as well as "
@@ -986,7 +986,7 @@ def main() -> None:
         # `source` is constrained to volunteer | sam-auto | sam-corrected |
         # import (mig 055); the prompted/automatic distinction lives in the run.
         n = write_to_supabase(all_polys, args.map_id, args.feature_type, "sam-auto", seg_run_id)
-        print(f"Supabase: inserted {n} rows into footprint_submissions")
+        print(f"Supabase: inserted {n} rows into footprints")
 
         update_pipeline_status(args.map_id, "seg_done",
                                seg_run_id=seg_run_id,

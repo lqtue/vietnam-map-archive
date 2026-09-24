@@ -36,7 +36,7 @@ from shapely.geometry import shape, box
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import transform as shapely_transform, unary_union
 
-# What counts as what. `feature_type` comes from footprint_submissions and is
+# What counts as what. `feature_type` comes from footprints and is
 # the only classification a traced polygon carries.
 BUILT = {"building"}
 PLOT = {"land_plot"}

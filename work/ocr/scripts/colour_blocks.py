@@ -704,7 +704,7 @@ def labels_matching(map_id: str, needle: str,
     """(text, category, x, y) for every OCR label whose text contains `needle`.
 
     Every match, deliberately. Several labels on the 1882 sheet have duplicate
-    `ocr_extractions` rows at different positions, and which one you take
+    `ocr_labels` rows at different positions, and which one you take
     changes the verdict — a check built on "the first row" is not reproducible
     and the journal has a 6/10-against-7/10 to prove it.
     """
@@ -882,7 +882,7 @@ def ocr_rows(map_id: str, run_id: str | None = None) -> list:
 
     **A table a pipeline writes into is not a fixed input**, and this function
     is where that bites. The water seeds, the furniture mask, the legend panel
-    and `--explain` all read `ocr_extractions`, and with no run filter they read
+    and `--explain` all read `ocr_labels`, and with no run filter they read
     whatever runs happen to be in it. The 1882 sheet's 499 placed labels are
     three runs pooled — `post0910` 287, `v1b` 177 and `2026-09-04T0527` 35 —
     so the same object is seeded up to three times and re-OCR'ing the sheet

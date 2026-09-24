@@ -9,7 +9,7 @@ import { test, expect } from '@playwright/test';
 
 import { parsePointHex } from '../src/lib/core/geo/wkb';
 
-// Three rows copied from `ocr_extractions` on the 1882 Plan Cadastral.
+// Three rows copied from `ocr_labels` on the 1882 Plan Cadastral.
 const SAIGON = [
   { hex: '0101000020E6100000F2F122769AAC5A40D685270D98882540', lng: 106.696928, lat: 10.766785 },
   { hex: '0101000020E610000050EAE46F2FAD5A4031962BB45A8D2540', lng: 106.70602, lat: 10.776083 },

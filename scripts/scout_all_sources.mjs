@@ -58,13 +58,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- Existing VMA arks for dedup ----
 async function fetchExistingKeys() {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/maps?select=iiif_manifest,iiif_image,source_url`, {
-    headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-  });
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/maps?select=iiif_image,source_url,map_images(iiif_manifest)`,
+    { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
+  );
   const rows = await r.json();
   const keys = new Set();
   for (const m of rows) {
-    for (const v of [m.iiif_manifest, m.iiif_image, m.source_url]) {
+    const manifests = (m.map_images ?? []).map((s) => s.iiif_manifest);
+    for (const v of [...manifests, m.iiif_image, m.source_url]) {
       if (!v) continue;
       const a = v.match(/ark:\/[0-9]+\/[a-z0-9]+/i);
       if (a) keys.add(`ark:${a[0]}`);

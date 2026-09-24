@@ -11,7 +11,7 @@
  * into another:
  *
  *   geo_audit.mjs           is the paper where the annotation says it is?
- *   check_series_index.mjs  does `series_sheets` still agree with `maps`?
+ *   check_series_index.mjs  does `series_cells` still agree with `maps`?
  *   this                    is a row consistent with the rest of its own table?
  *
  * Everything here is answerable from the tables alone — no fetch, no geometry.
@@ -20,13 +20,13 @@
  * things no existing check looked at.
  *
  * What this deliberately does NOT report: a map carrying `allmaps_id` with
- * `georef_done` false. It reads like a fault — the id is a SHA-1 of the
+ * `is_georeferenced` false. It reads like a fault — the id is a SHA-1 of the
  * canonical IIIF URL, minted locally by `bulk_upload_local.sh` whether or not a
  * control point exists — and this file called it one, over 21 L7014 drafts,
  * until the code that consumes it turned up.
  *
  * It is a work queue. `POST /api/admin/maps/sync-georef` selects exactly that
- * pair, probes annotations.allmaps.org and flips `georef_done` on a hit; the
+ * pair, probes annotations.allmaps.org and flips `is_georeferenced` on a hit; the
  * admin "Sync georef from Allmaps" button is its trigger. The id is how the
  * archive remembers that a sheet is uploaded and waiting for someone to place
  * control points. Clearing it, or not writing it at upload, would empty that
@@ -115,10 +115,10 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (!m.thumbnail) say('WARN', 'publish', who(m), 'published with no thumbnail');
     // Legitimate but worth seeing: the map is live and draws nothing until the
     // georeference lands (mig 080's publish-then-georeference path).
-    if (!m.georef_done)
+    if (!m.is_georeferenced)
       say('WARN', 'publish', who(m), 'published but not yet georeferenced — it draws nothing yet');
-    if (!m.year && !m.year_label)
-      say('WARN', 'publish', who(m), 'published with no year and no year_label');
+    if (!m.year && !m.date_label)
+      say('WARN', 'publish', who(m), 'published with no year and no date_label');
     if (!m.holding_institution) say('WARN', 'provenance', who(m), 'no holding_institution');
     if (!m.source_url)
       say('WARN', 'provenance', who(m), 'no source_url — nothing links back to the holder');
@@ -195,12 +195,12 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     // names no year in common with the column, one of the two is wrong. A
     // "YYYY-YYYY" range is checked numerically — a year in the middle of one
     // (1880 in "1876-1883") is not a substring of the label, but is still in it.
-    if (m.year != null && m.year_label && !yearInLabel(m.year, m.year_label))
+    if (m.year != null && m.date_label && !yearInLabel(m.year, m.date_label))
       say(
         'WARN',
         'metadata',
         who(m),
-        `year ${m.year} appears nowhere in year_label '${m.year_label}'`
+        `year ${m.year} appears nowhere in date_label '${m.date_label}'`
       );
     if (m.holding_institution) {
       const k = foldName(m.holding_institution);
@@ -223,7 +223,7 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
   const srcByMap = new Map();
   for (const s of sources) {
     if (!ids.has(s.map_id))
-      say('FAIL', 'iiif', s.id, `map_iiif_sources row points at missing map ${s.map_id}`);
+      say('FAIL', 'iiif', s.id, `map_images row points at missing map ${s.map_id}`);
     else push(srcByMap, s.map_id, s);
   }
   for (const m of maps) {
@@ -255,7 +255,7 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (
       published(m) &&
       m.iiif_image &&
-      !m.iiif_manifest &&
+      !ss.some((s) => s.iiif_manifest) &&
       !ss.some((s) => s.source_type !== 'r2' && s.iiif_image)
     )
       say(
@@ -334,46 +334,58 @@ function selfCheck() {
     iiif_image: 'https://iiif/a',
     annotation_url: 'https://anno/a',
     allmaps_id: null,
-    georef_done: true,
+    is_georeferenced: true,
     thumbnail: 'https://t/a',
     source_type: 'r2',
     holding_institution: 'BnF',
     source_url: 'https://bnf/a',
-    year_label: '1920',
-    iiif_manifest: 'https://m/a',
+    date_label: '1920',
   };
+  // The iiif checks read map_images rows, not a maps column, so `run` gives
+  // every case a healthy primary source by default; override `sources` to
+  // exercise the "cannot open" path.
+  const defaultSources = [
+    {
+      id: 's1',
+      map_id: 'a',
+      is_primary: true,
+      iiif_image: 'https://iiif/a',
+      iiif_manifest: 'https://m/a',
+      source_type: 'other',
+    },
+  ];
   const run = (over, extra = {}) =>
-    auditCatalog({ maps: [{ ...good, ...over }], now: NOW, ...extra });
+    auditCatalog({ maps: [{ ...good, ...over }], sources: defaultSources, now: NOW, ...extra });
   const has = (findings, check, level) =>
     findings.some((f) => f.check === check && f.level === level);
 
   ok(run({}).length === 0, 'a healthy published map produces nothing');
 
   // The queue, which must stay silent. A draft with a minted allmaps_id and
-  // georef_done false is a sheet waiting for control points, not a fault --
+  // is_georeferenced false is a sheet waiting for control points, not a fault --
   // /api/admin/maps/sync-georef selects exactly that pair and flips it on a hit.
   ok(
     run({
       status: 'draft',
       annotation_url: null,
       allmaps_id: '9c3624b9f48a27e0',
-      georef_done: false,
+      is_georeferenced: false,
     }).length === 0,
     'a draft queued for georeferencing produces nothing'
   );
   ok(
     !has(
-      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', georef_done: true }),
+      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', is_georeferenced: true }),
       'publish',
       'WARN'
     ),
-    'a published map on an allmaps_id backed by georef_done produces nothing'
+    'a published map on an allmaps_id backed by is_georeferenced produces nothing'
   );
   // mig 080's path: published first, georeferenced later. Allowed, but the map
   // draws nothing meanwhile, so it is worth one line.
   ok(
     has(
-      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', georef_done: false }),
+      run({ annotation_url: null, allmaps_id: '9c3624b9f48a27e0', is_georeferenced: false }),
       'publish',
       'WARN'
     ),
@@ -469,15 +481,15 @@ function selfCheck() {
     'a source_type no migration allows is rejected'
   );
   ok(
-    has(run({ year: 1819, year_label: '1931' }), 'metadata', 'WARN'),
+    has(run({ year: 1819, date_label: '1931' }), 'metadata', 'WARN'),
     'a year its label never mentions is flagged'
   );
   ok(
-    !has(run({ year: 1880, year_label: '1876-1883' }), 'metadata', 'WARN'),
+    !has(run({ year: 1880, date_label: '1876-1883' }), 'metadata', 'WARN'),
     'a year inside a range label is accepted'
   );
   ok(
-    has(run({ year: 1885, year_label: '1876-1883' }), 'metadata', 'WARN'),
+    has(run({ year: 1885, date_label: '1876-1883' }), 'metadata', 'WARN'),
     'a year outside a range label is still flagged'
   );
   ok(
@@ -536,7 +548,7 @@ function selfCheck() {
     'a source row pointing at a deleted map is rejected'
   );
   ok(
-    has(run({ iiif_manifest: null }, { sources: [] }), 'iiif', 'WARN'),
+    has(run({}, { sources: [] }), 'iiif', 'WARN'),
     'a published map the Allmaps Editor cannot open is flagged'
   );
 
@@ -674,10 +686,10 @@ async function main() {
     readAll(
       db,
       'maps',
-      'id,slug,name,status,year,year_label,bbox,iiif_image,iiif_manifest,annotation_url,allmaps_id,georef_done,thumbnail,source_type,source_url,holding_institution,collection'
+      'id,slug,name,status,year,date_label,bbox,iiif_image,annotation_url,allmaps_id,is_georeferenced,thumbnail,source_type,source_url,holding_institution,collection'
     ),
     readAll(db, 'map_slug_aliases', 'slug,map_id', 'slug'),
-    readAll(db, 'map_iiif_sources', 'id,map_id,source_type,is_primary,iiif_image'),
+    readAll(db, 'map_images', 'id,map_id,source_type,is_primary,iiif_image,iiif_manifest'),
     readAll(
       db,
       'pipeline_jobs',
@@ -702,7 +714,9 @@ async function main() {
 
   // Status, not a finding. See the header: this pair is the georeference queue,
   // and `geo_audit.mjs` is what says whether the annotations resolve.
-  const queued = maps.filter((m) => !m.annotation_url && m.allmaps_id && !m.georef_done).length;
+  const queued = maps.filter(
+    (m) => !m.annotation_url && m.allmaps_id && !m.is_georeferenced
+  ).length;
   if (queued)
     console.log(
       `  ${queued} maps queued for georeferencing — admin \u2192 "Sync georef from Allmaps" promotes any that landed`

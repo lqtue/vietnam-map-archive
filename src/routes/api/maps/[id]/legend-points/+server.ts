@@ -52,23 +52,24 @@ export const GET: RequestHandler = async ({ params }) => {
   // Skip rows a human rejected; prefer their corrected text over the raw model
   // output so HITL fixes actually reach the public map.
   const { data: entries } = await supabase
-    .from('ocr_extractions')
-    .select('text, text_validated, notes, tile_x, tile_y, tile_w, tile_h')
+    .from('ocr_labels')
+    .select('text, text_corrected, notes, tile_x, tile_y, tile_w, tile_h')
     .eq('map_id', mapId)
     .eq('category', 'legend_entry')
-    .neq('status', 'rejected');
+    .neq('review_status', 'rejected');
 
   const nameByN = new Map<number, { name: string; vn: string | null; grid: string | null }>();
   let rect: { x: number; y: number; w: number; h: number } | null = null;
   for (const e of entries ?? []) {
-    const eText = e.text_validated ?? e.text;
+    const eText = e.text_corrected ?? e.text;
     const m = /^(\d+)\.\s*(.*)$/.exec(eText ?? '');
     const n = m ? parseInt(m[1], 10) : parseInt(/n=(\d+)/.exec(e.notes ?? '')?.[1] ?? '', 10);
     if (!Number.isFinite(n)) continue;
     const grid = /grid=([^;]+)/.exec(e.notes ?? '')?.[1]?.trim() ?? null;
     const vn = /vn=([^;]+)/.exec(e.notes ?? '')?.[1]?.trim() ?? null;
     nameByN.set(n, { name: m ? m[2] : (eText ?? ''), vn, grid });
-    if (!rect && e.tile_w) rect = { x: e.tile_x, y: e.tile_y, w: e.tile_w, h: e.tile_h };
+    if (!rect && e.tile_w)
+      rect = { x: e.tile_x ?? 0, y: e.tile_y ?? 0, w: e.tile_w, h: e.tile_h ?? 0 };
   }
   const maxN = nameByN.size ? Math.max(...nameByN.keys()) : 0;
 
@@ -76,11 +77,11 @@ export const GET: RequestHandler = async ({ params }) => {
   // tags them 'other'; the old Tesseract pass used 'legend_ref'. Either way the
   // digit + ≤maxN + outside-legend-box filters below isolate the real refs.
   const { data: refs } = await supabase
-    .from('ocr_extractions')
-    .select('text, text_validated, global_x, global_y, global_w, global_h')
+    .from('ocr_labels')
+    .select('text, text_corrected, global_x, global_y, global_w, global_h')
     .eq('map_id', mapId)
     .in('category', ['legend_ref', 'other'])
-    .neq('status', 'rejected');
+    .neq('review_status', 'rejected');
 
   // Build the pixel→geo transformer from the stored annotation (mirror override
   // first, else the public Allmaps annotation).
@@ -130,7 +131,7 @@ export const GET: RequestHandler = async ({ params }) => {
   };
   const byN = new Map<number, Point>();
   for (const r of refs ?? []) {
-    const t = (r.text_validated ?? r.text ?? '').trim();
+    const t = (r.text_corrected ?? r.text ?? '').trim();
     if (!/^\d+$/.test(t)) continue;
     const n = parseInt(t, 10);
     if (n < 1 || n > maxN) continue; // only numerals that name a legend entry

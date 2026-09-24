@@ -7,7 +7,7 @@
  *
  * Nine queries, cached at the edge for an hour: nothing here changes faster.
  *
- * The seventh is `series_sheets`, and it is here because `maps` alone gives a
+ * The seventh is `series_cells`, and it is here because `maps` alone gives a
  * false floor. 452 of the L7014 1:50,000's held sheets are cells of a pre-tiled
  * mosaic with no `maps` row at all, so the honest answer to "how much of this
  * survey can you draw" lives in the survey's own index, not in the catalogue.
@@ -41,17 +41,17 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     // Not a head count: the same rows give the year range and the city split.
     db.from('maps').select('year, location').in('status', ['public', 'featured']),
     db.from('maps').select('id', head).eq('status', 'draft'),
-    db.from('ocr_extractions').select('id', head),
-    db.from('ocr_extractions').select('id', head).eq('status', 'validated'),
-    db.from('footprint_submissions').select('id', head),
-    db.from('footprint_submissions').select('id', head).eq('status', 'approved'),
+    db.from('ocr_labels').select('id', head),
+    db.from('ocr_labels').select('id', head).eq('review_status', 'validated'),
+    db.from('footprints').select('id', head),
+    db.from('footprints').select('id', head).eq('review_status', 'approved'),
     // One row per sheet a survey contains, held or not. `held_by` says how it
     // reaches a reader — `'map'` for a catalogue record, `'raster:<key>'` for
     // a mosaic cell — and null means the archive has not got it.
-    db.from('series_sheets').select('series_key', head),
-    db.from('series_sheets').select('series_key', head).not('held_by', 'is', null),
+    db.from('series_cells').select('series_key', head),
+    db.from('series_cells').select('series_key', head).not('held_by', 'is', null),
     // `survey_sheets` is non-null for exactly the surveys whose own index has
-    // been imported, which is the same set `series_sheets` has rows for.
+    // been imported, which is the same set `series_cells` has rows for.
     db.from('map_series').select('key', head).not('survey_sheets', 'is', null),
   ]);
 

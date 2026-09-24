@@ -13,11 +13,15 @@ const withInfoJson = (u) => (/\.json($|\?)/.test(u) ? u : `${u.replace(/\/$/, ''
 
 /** Best-effort link when the annotation hasn't been fetched yet, or has no usable target. */
 export function editorUrlFallback(row) {
-  if (row.iiif_manifest) return EDITOR_BASE + encodeURIComponent(withInfoJson(row.iiif_manifest));
-  const original = row.map_iiif_sources?.find((s) => s.source_type !== 'r2' && s.iiif_image)?.iiif_image;
+  const manifestSource = row.map_images?.find((s) => s.iiif_manifest);
+  if (manifestSource)
+    return EDITOR_BASE + encodeURIComponent(withInfoJson(manifestSource.iiif_manifest));
+  const original = row.map_images?.find((s) => s.source_type !== 'r2' && s.iiif_image)?.iiif_image;
   if (original) return EDITOR_BASE + encodeURIComponent(withInfoJson(original));
   if (!row.annotation_url && row.allmaps_id)
-    return EDITOR_BASE + encodeURIComponent(`https://annotations.allmaps.org/images/${row.allmaps_id}`);
+    return (
+      EDITOR_BASE + encodeURIComponent(`https://annotations.allmaps.org/images/${row.allmaps_id}`)
+    );
   return null;
 }
 
@@ -25,7 +29,7 @@ export function editorUrlFallback(row) {
 export function editorUrlFromAnnotation(row, sourceId) {
   if (!sourceId) return null;
   const stripInfoJson = (u) => u.replace(/\/info\.json$/, '');
-  const match = row.map_iiif_sources?.find(
+  const match = row.map_images?.find(
     (s) => s.iiif_image && stripInfoJson(sourceId) === stripInfoJson(s.iiif_image)
   );
   return match ? EDITOR_BASE + encodeURIComponent(withInfoJson(match.iiif_image)) : null;

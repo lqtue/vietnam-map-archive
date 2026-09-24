@@ -26,9 +26,35 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **091** (090 pushed 2026-09-16, 091 still local). 090 made the footprint review queue
-two states and its verdict `approved | rejected`; 091 adds the reviewer's diagnosis
-(`review_tags`, `review_note`, `reviewed_by`, `reviewed_at`). Drop a new
+Head is **096**, local (094 pushed 2026-09-23; 095/096 not yet pushed). 092 nulls out the
+`'Vietnam Map Archive'` placeholder in `maps.collection` (it meant "no series," not a series —
+collapsed a live bug in `annotationMirror.ts` that was stomping real series membership on every
+re-mirror); 093 collapses spelling/language duplicates in `language`/`dc_publisher`/`rights`; 094
+adds the CHECK constraint `map_type` never had. 095 is the schema half of one review vocabulary:
+renames `ocr_extractions`→`ocr_labels`, `footprint_submissions`→`footprints`,
+`series_sheets`→`series_cells`, `sheet_sources`→`cell_printings`, `map_iiif_sources`→`map_images`,
+`map_opens`→`map_views`, `user_favorites`→`favorites`, `annotation_sets`→`user_layers` (compat views
+under the old names bridge `db push` to deploy — drop them in a later migration, not yet written);
+renames the `status`/`validated_*`/`reviewer_id` columns onto one vocabulary
+(`review_status`/`reviewed_by`/`reviewed_at`) across `ocr_labels`, `footprints`, `scout_candidates`,
+`stories`; drops `maps.iiif_manifest`/`ia_identifier`/`dc_coverage`/`dc_subject`/`legend_done`/
+`help_needed`; renames `maps.georef_done`→`is_georeferenced`, `dc_publisher`→`publisher`,
+`dc_description`→`description`, `year_label`→`date_label`; adds `maps.sheet_number`/`sheet_half`
+and `triage_reviewed_at`/`triage_reviewed_by` as typed columns backfilled from the
+`extra_metadata`/`triage` JSON (the JSON keys stay, for old deployed code — see the migration
+header); sets `created_by default auth.uid()`; sets `status`/`created_at`/`updated_at`/`source_type`
+`NOT NULL` (`source_type` also gets `default 'other'`) — `iiif_image`/`thumbnail` deliberately do
+NOT get `NOT NULL`, because BulkUpload's create-then-tile flow and several `write.spec.ts` fixtures
+insert without them; recreates every function whose body referenced a renamed/dropped name.
+**Unrenamed table, column renamed, no compat view: `maps` (`georef_done` etc.), `stories.status`,
+`scout_candidates.status`/`.reviewer_id`.** A view can't share a table's name, so these four have no
+bridge — any code still using the old column name breaks the moment 095 is pushed, which is why 095
+has to ship in the same deploy as the app-code update, not ahead of it. 096 is the data half: the
+series-sheet name cleanup (Indochine 1:100,000 "Est/Ouest" suffixes, Tonkin transcription fixes,
+L7014/L909 sheet-code suffixes, hyphen spacing — `collection is not null` only, 303 rows on the
+production corpus, 0 slug moves), nulls `maps.location` where it only duplicated the series, and
+collapses rights/language spelling variants on `scout_candidates` and `cell_printings` the way 093
+did for `maps`. Drop a new
 `supabase/migrations/NNN_*.sql`
 incrementing from head, `supabase db push`, then regenerate types:
 

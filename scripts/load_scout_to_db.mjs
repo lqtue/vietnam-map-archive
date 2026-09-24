@@ -227,7 +227,7 @@ const rows = candidates
       category: sc.category,
       reasons: sc.reasons,
       found_via: (rec.foundVia || []).join(';'),
-      status: 'pending',
+      review_status: 'pending',
       // A source with no reachable Presentation manifest can still have an
       // Image API endpoint (LoC). Ingest reads it from here — see /api/admin/scout.
       raw: (() => {
@@ -260,7 +260,7 @@ async function sb(path, opts = {}) {
 
 if (RESET) {
   console.log('Resetting: deleting existing pending rows...');
-  await sb(`/scout_candidates?status=eq.pending`, {
+  await sb(`/scout_candidates?review_status=eq.pending`, {
     method: 'DELETE',
     headers: { Prefer: 'return=minimal' },
   });
@@ -290,7 +290,7 @@ console.log(`\nDone: ${ok} inserted/upserted, ${fail} failed.`);
 
 // Summary
 const { count: pending } = await fetch(
-  `${SUPABASE_URL}/rest/v1/scout_candidates?status=eq.pending&select=id`,
+  `${SUPABASE_URL}/rest/v1/scout_candidates?review_status=eq.pending&select=id`,
   {
     headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, Prefer: 'count=exact' },
   }

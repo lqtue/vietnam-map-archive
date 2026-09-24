@@ -8,10 +8,12 @@ import {
 // The editor opens a IIIF resource, not an annotation. Getting the source wrong
 // is silent: it starts a blank map instead of loading the points already placed.
 test('editor source prefers the manifest, and suffixes info.json', () => {
-  expect(allmapsEditorSourceUrl({ iiif_manifest: 'https://x/manifest' })).toBe(
+  // maps.iiif_manifest was dropped (mig 095) — the manifest now lives per
+  // source, on map_images (was map_iiif_sources), so it arrives via `sources`.
+  expect(allmapsEditorSourceUrl({}, [{ iiif_manifest: 'https://x/manifest' }])).toBe(
     'https://x/manifest/info.json'
   );
-  expect(allmapsEditorSourceUrl({ iiif_manifest: 'https://x/manifest.json' })).toBe(
+  expect(allmapsEditorSourceUrl({}, [{ iiif_manifest: 'https://x/manifest.json' }])).toBe(
     'https://x/manifest.json'
   );
 });

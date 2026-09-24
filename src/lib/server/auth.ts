@@ -81,7 +81,7 @@ export async function requireUser(locals: App.Locals): Promise<{ user: User; rol
  * limiter if a single count query ever shows up in the slow log.
  */
 export async function assertUnderRateLimit(
-  table: 'footprint_submissions' | 'stories',
+  table: 'footprints' | 'stories',
   userId: string,
   maxPerHour: number
 ): Promise<void> {

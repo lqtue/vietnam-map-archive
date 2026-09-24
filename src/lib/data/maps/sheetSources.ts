@@ -153,11 +153,11 @@ function isHeld(cell: SeriesSheetView | undefined, row: SheetSourceRow): boolean
  * the very first load would have been truncated, and the truncation would have
  * looked like the Indochine survey simply having fewer printings.
  *
- * `sheet_sources` is not in the generated `Database` type (it is newer than the
- * last `supabase gen types` run), so `db` is a bare `SupabaseClient` and the
- * rows are cast once, here, to `SheetSourceRow` — the same shape
- * `seriesSheets.ts` uses. One cast at the boundary rather than `as any` at
- * every field; regenerate the types and the cast is the only line to delete.
+ * `db` is a bare `SupabaseClient` and the rows are cast once, here, to
+ * `SheetSourceRow` — the same shape `seriesSheets.ts` uses. One cast at the
+ * boundary rather than `as any` at every field. (Renamed to `cell_printings`
+ * in mig 095; the name `SheetSourceRow` and this module's own vocabulary stay
+ * — only the table read from moved.)
  */
 export async function fetchSheetSources(
   db: SupabaseClient,
@@ -167,7 +167,7 @@ export async function fetchSheetSources(
   const rows: SheetSourceRow[] = [];
   for (let from = 0; ; from += page) {
     const { data, error } = await db
-      .from('sheet_sources')
+      .from('cell_printings')
       .select(COLUMNS)
       .eq('series_key', seriesKey)
       .range(from, from + page - 1);

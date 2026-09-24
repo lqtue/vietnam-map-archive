@@ -155,16 +155,16 @@ def geometric_quality(coords_list: list[list[list[float]]]) -> dict:
 
 
 def fetch_gt_from_supabase(map_id: str) -> list[list[list[float]]]:
-    """Fetch verified/submitted footprint_submissions as ground truth."""
+    """Fetch verified/submitted footprints as ground truth."""
     import requests
 
     url = os.environ["PUBLIC_SUPABASE_URL"]
     key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("PUBLIC_SUPABASE_ANON_KEY", "")
     r = requests.get(
-        f"{url}/rest/v1/footprint_submissions",
+        f"{url}/rest/v1/footprints",
         params={
             "map_id": f"eq.{map_id}",
-            "status": "in.(submitted,consensus,verified)",
+            "review_status": "in.(submitted,consensus,verified)",
             "select": "coords",
         },
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
@@ -177,7 +177,7 @@ def main():
     p = argparse.ArgumentParser(description="Evaluate MapSAM2 predictions")
     p.add_argument("--predictions", required=True, help="Path to inference JSON output")
     p.add_argument("--ground-truth", help="Path to ground-truth JSON (coords list)")
-    p.add_argument("--map-id", help="Fetch GT from Supabase footprint_submissions")
+    p.add_argument("--map-id", help="Fetch GT from Supabase footprints")
     p.add_argument("--iou-thresholds", default="0.5,0.75", help="IoU thresholds (comma-separated)")
     args = p.parse_args()
 

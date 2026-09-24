@@ -21,10 +21,7 @@ const arg = (name, fallback) => {
 // Default set: the District 4 six, plus 1898 — the seven sheets
 // docs/journals/260921-sheet-overlap.md already has hand-measured figures
 // for, so a driver built against these can self-check against real numbers.
-const D4_IDS = readFileSync(
-  new URL('../work/analysis/district4/maps.txt', import.meta.url),
-  'utf8'
-)
+const D4_IDS = readFileSync(new URL('../work/analysis/district4/maps.txt', import.meta.url), 'utf8')
   .trim()
   .split(',')
   .filter(Boolean);
@@ -80,7 +77,9 @@ function bboxFromGcps(ann) {
 }
 
 function overlaps(a, b) {
-  return a.maxLon >= b.minLon && b.maxLon >= a.minLon && a.maxLat >= b.minLat && b.maxLat >= a.minLat;
+  return (
+    a.maxLon >= b.minLon && b.maxLon >= a.minLon && a.maxLat >= b.minLat && b.maxLat >= a.minLat
+  );
 }
 
 async function countRows(table, mapId, extra = {}) {
@@ -103,12 +102,14 @@ for (const id of mapIds) {
   const row = rows[0];
   const { ann, source } = await liveAnnotation(row);
   const box = ann ? bboxFromGcps(ann) : null;
-  const ocr = await countRows('ocr_extractions', id);
-  const footprints = await countRows('footprint_submissions', id, { status: 'approved' });
+  const ocr = await countRows('ocr_labels', id);
+  const footprints = await countRows('footprints', id, { review_status: 'approved' });
   sheets.push({ ...row, box, source, ocr, footprints });
 }
 
-console.log('| year | sheet | GCPs (live) | transform | annotation source | ocr_extractions | approved footprints |');
+console.log(
+  '| year | sheet | GCPs (live) | transform | annotation source | ocr_labels | approved footprints |'
+);
 console.log('|---|---|---:|---|---|---:|---:|');
 for (const s of sheets) {
   console.log(
@@ -116,7 +117,7 @@ for (const s of sheets) {
   );
 }
 
-console.log('\n### Pairwise footprint overlap (bbox of each sheet\'s own GCPs)\n');
+console.log("\n### Pairwise footprint overlap (bbox of each sheet's own GCPs)\n");
 for (let i = 0; i < sheets.length; i++) {
   for (let j = i + 1; j < sheets.length; j++) {
     const [a, b] = [sheets[i], sheets[j]];

@@ -32,7 +32,7 @@ const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SE
 const { data: maps, error } = await db
   .from('maps')
   .select('id, name, year')
-  .eq('georef_done', true)
+  .eq('is_georeferenced', true)
   .order('year');
 if (error) throw error;
 
@@ -45,7 +45,7 @@ const inFlight = new Set((live ?? []).map((r) => r.map_id));
 
 /** Maps holding at least one row with no geometry yet. */
 async function needsWarp(mapId) {
-  for (const table of ['ocr_extractions', 'footprint_submissions']) {
+  for (const table of ['ocr_labels', 'footprints']) {
     const { count } = await db
       .from(table)
       .select('id', { count: 'exact', head: true })

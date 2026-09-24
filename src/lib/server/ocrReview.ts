@@ -44,12 +44,12 @@ export async function bulkSetStatus(opts: {
 /** Rows this user validated on this map inside the window. */
 function recentQuery(mapId: string, userId: string, threshold: string) {
   return adminClient()
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('id', { count: 'exact' })
     .eq('map_id', mapId)
-    .eq('status', 'validated')
-    .eq('validated_by', userId)
-    .gt('validated_at', threshold);
+    .eq('review_status', 'validated')
+    .eq('reviewed_by', userId)
+    .gt('reviewed_at', threshold);
 }
 
 /** How many of this user's validations on this map fall inside the window. */

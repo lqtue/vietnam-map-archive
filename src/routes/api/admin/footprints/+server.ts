@@ -23,12 +23,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   if (!statuses.length) throw error(400, 'status must name at least one state');
 
   const { data, error: err } = await adminClient()
-    .from('footprint_submissions')
+    .from('footprints')
     .select(
-      'id, map_id, iiif_canvas, pixel_polygon, feature_type, name, category, confidence, status, created_at'
+      // `status` stays the response field name (this endpoint's own external
+      // consumers) — only the column read from renamed (mig 095).
+      'id, map_id, iiif_canvas, pixel_polygon, feature_type, name, category, confidence, status:review_status, created_at'
     )
     .eq('map_id', mapId)
-    .in('status', statuses)
+    .in('review_status', statuses)
     .order('confidence', { ascending: false });
 
   if (err) dbError(err, 'Could not list footprints');

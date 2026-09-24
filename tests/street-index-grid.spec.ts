@@ -6,7 +6,7 @@
  * `/api/maps/[id]/legend-points`. `_cell_rect` in `work/ocr/scripts/ocr.py`
  * does it headless, because `ocr street-index` reads a sheet's printed street
  * directory and has to write each street's position at upsert time — the
- * `ocr_extractions` box columns are NOT NULL, so there is nothing to defer.
+ * `ocr_labels` box columns are NOT NULL, so there is nothing to defer.
  *
  * A drift between the two does not look like a bug. It looks like a street a
  * few hundred metres from where it belongs, on a map where everything is a few

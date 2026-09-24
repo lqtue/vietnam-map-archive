@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Clean up ocr_extractions: normalise whitespace, drop empty labels, and collapse
+// Clean up ocr_labels: normalise whitespace, drop empty labels, and collapse
 // the duplicates left behind by OCR-ing the same sheet under several run_ids.
 //
 // Dry-run by default. `--apply` writes. Nothing is deleted: losers are moved to
@@ -31,7 +31,7 @@ async function fetchAll() {
   const rows = [];
   for (let from = 0; ; from += 1000) {
     const q = `select=*&order=id${MAP ? `&map_id=eq.${MAP}` : ''}`;
-    const res = await fetch(`${URL_}/rest/v1/ocr_extractions?${q}`, {
+    const res = await fetch(`${URL_}/rest/v1/ocr_labels?${q}`, {
       headers: { ...H, Range: `${from}-${from + 999}` },
     });
     if (!res.ok) throw new Error(`fetch ${res.status}: ${await res.text()}`);
@@ -44,7 +44,7 @@ async function fetchAll() {
 // Same folding as Postgres's place_key (migration 067): strip accents, lowercase,
 // every run of non-alphanumerics becomes one space. "Rue de Khánh-Hội" and
 // "Rue de Khanh Hoi" have to land on the same key or nothing gets deduped.
-const label = (r) => r.text_validated || r.text;
+const label = (r) => r.text_corrected || r.text;
 // đ has no canonical decomposition, so NFD leaves it and the a-z filter below
 // would drop it outright: "ĐƯỜNG" folded to "ng" instead of "duong", which is
 // why a bare "Đường" slipped past the generic-word rule. Same handling as
@@ -126,7 +126,7 @@ const broken = (s) => (s.match(CTRL) || []).length;
 // mangled bytes; then the spelling that kept the most non-ASCII characters;
 // then the longer text; then the newest run.
 function better(a, b) {
-  const rank = (r) => (r.status === 'validated' ? 2 : r.status === 'pending' ? 1 : 0);
+  const rank = (r) => (r.review_status === 'validated' ? 2 : r.review_status === 'pending' ? 1 : 0);
   return (
     rank(a) - rank(b) ||
     broken(label(b)) - broken(label(a)) ||
@@ -179,7 +179,7 @@ async function setStatus(ids, status) {
 }
 
 const rows = await fetchAll();
-const live = rows.filter((r) => r.status !== 'rejected');
+const live = rows.filter((r) => r.review_status !== 'rejected');
 
 // 1 — whitespace, plus the handful of rows where the write path stored a raw
 // control byte in place of an accented letter. U+0001 is not one letter: it
@@ -343,7 +343,7 @@ for (const r of survivors) {
 for (const v of bySheet5.values()) {
   for (const a of v) {
     if (gone.has(a.id)) continue;
-    if (a.status === 'validated') continue; // a person signed off on this one
+    if (a.review_status === 'validated') continue; // a person signed off on this one
     if (generic(a)) {
       gone.add(a.id);
       residue.push({ loser: a, winner: null, why: 'names a kind of thing, not a place' });
@@ -505,7 +505,7 @@ if (!APPLY) {
 }
 
 for (const { r, text } of renames) {
-  const res = await fetch(`${URL_}/rest/v1/ocr_extractions?id=eq.${r.id}`, {
+  const res = await fetch(`${URL_}/rest/v1/ocr_labels?id=eq.${r.id}`, {
     method: 'PATCH',
     headers: H,
     body: JSON.stringify({ text }),

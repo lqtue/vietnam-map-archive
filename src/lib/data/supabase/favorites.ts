@@ -6,7 +6,7 @@ export async function fetchFavorites(
   userId: string
 ): Promise<string[]> {
   const { data, error } = await supabase
-    .from('user_favorites')
+    .from('favorites')
     .select('map_id')
     .eq('user_id', userId);
 
@@ -24,7 +24,7 @@ export async function addFavorite(
   mapId: string
 ): Promise<boolean> {
   const { error } = await supabase
-    .from('user_favorites')
+    .from('favorites')
     .upsert({ user_id: userId, map_id: mapId }, { onConflict: 'user_id,map_id' });
 
   if (error) {
@@ -41,7 +41,7 @@ export async function removeFavorite(
   mapId: string
 ): Promise<boolean> {
   const { error } = await supabase
-    .from('user_favorites')
+    .from('favorites')
     .delete()
     .eq('user_id', userId)
     .eq('map_id', mapId);

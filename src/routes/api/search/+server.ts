@@ -72,9 +72,14 @@ export interface LabelHit {
   other_sheets: number;
 }
 
-/** Everything a catalog card, the facet rail and the admin editor read. */
+/**
+ * Everything a catalog card, the facet rail and the admin editor read.
+ * `dc_description`/`year_label`/`georef_done`/`dc_publisher` stay this
+ * response's own field names (`mapsOut` below) — only the column read from
+ * renamed (mig 095).
+ */
 const FULL_MAP_COLUMNS =
-  'id,slug,name,location,map_type,dc_description,thumbnail,year,year_label,collection,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done,creator,holding_institution,original_title,dc_publisher,shelfmark,physical_description,rights,language,source_url';
+  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -82,7 +87,7 @@ const FULL_MAP_COLUMNS =
  * source fields are most of a map row and no slim caller renders one of them.
  */
 const SLIM_MAP_COLUMNS =
-  'id,slug,name,year,year_label,status,map_type,source_type,holding_institution,allmaps_id';
+  'id,slug,name,year,year_label:date_label,status,map_type,source_type,holding_institution,allmaps_id';
 
 // No pagination UI on the catalog/sidebar yet, so the page slice must be able
 // to hold the whole archive. Raw queries keep their own 2000-row safety ceiling.
@@ -175,9 +180,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     let qScout = supabase
       .from('scout_candidates')
       .select(
-        'id,title,creator,publisher,date,year,holding_institution,collection,source,external_id,source_url,manifest_url,thumbnail,score,category,status,rights,language'
+        // `status` stays this endpoint's own field name; the column read moved
+        // to `review_status` (mig 095).
+        'id,title,creator,publisher,date,year,holding_institution,collection,source,external_id,source_url,manifest_url,thumbnail,score,category,status:review_status,rights,language'
       )
-      .neq('status', 'ingested'); // ingested rows already show up under maps
+      .neq('review_status', 'ingested'); // ingested rows already show up under maps
     if (q) qScout = qScout.textSearch('search_vector', q, { config: 'simple', type: 'plain' });
     qScout = qScout.limit(2000);
     const { data, error: err } = await qScout;

@@ -13,7 +13,7 @@ import type { Database } from './types';
  */
 export function recordMapOpen(supabase: SupabaseClient<Database>, mapId: string): void {
   void supabase
-    .from('map_opens')
+    .from('map_views')
     .insert({ map_id: mapId })
     .then(({ error }) => {
       if (error) console.warn('recordMapOpen:', error.message);

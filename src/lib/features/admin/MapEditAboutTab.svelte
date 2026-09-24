@@ -12,12 +12,12 @@
   export let dc_publisher: string;
   export let location: string;
   export let map_type: string;
-  export let dc_coverage: string;
-  export let dc_subject: string;
   export let dc_description: string;
   export let physical_description: string;
   export let language: string;
   export let extraPairs: { key: string; value: string }[];
+  export let sheet_number: string;
+  export let sheet_half: string;
 </script>
 
 <!-- ── Title & Date ───────────────────────────── -->
@@ -98,22 +98,17 @@
     </select>
   </label>
   <label class="form-label">
-    <span>Coverage <span class="field-hint">geographic extent</span></span>
-    <input
-      type="text"
-      bind:value={dc_coverage}
-      class="form-input"
-      placeholder="e.g. Saigon and surroundings"
-    />
+    <span>Sheet number <span class="field-hint">series cell, e.g. 6330-4</span></span>
+    <input type="text" bind:value={sheet_number} class="form-input" placeholder="e.g. 6330-4" />
   </label>
   <label class="form-label">
-    <span>Subjects <span class="field-hint">keywords, comma-separated</span></span>
-    <input
-      type="text"
-      bind:value={dc_subject}
-      class="form-input"
-      placeholder="cadastre, urban planning, colonial"
-    />
+    <span>Sheet half</span>
+    <select bind:value={sheet_half} class="form-input">
+      <option value="">— whole / not applicable —</option>
+      <option value="E">East (E)</option>
+      <option value="W">West (W)</option>
+      <option value="whole">Whole</option>
+    </select>
   </label>
 </div>
 
@@ -156,7 +151,7 @@
 
 <!-- ── Custom fields ───────────────────────────── -->
 <div class="section-heading">
-  Custom fields <span class="field-hint">e.g. sheet_number</span>
+  Custom fields <span class="field-hint">e.g. edition, mirrors_original_for</span>
 </div>
 <div class="extra-meta-section">
   {#each extraPairs as pair, i (pair)}

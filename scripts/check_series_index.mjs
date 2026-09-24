@@ -1,7 +1,7 @@
 /**
  * check_series_index.mjs — does the survey index still agree with `maps`?
  *
- * `series_sheets` (mig 083) is one row per sheet a survey CONTAINS, held or
+ * `series_cells` (mig 083) is one row per sheet a survey CONTAINS, held or
  * not, and `held_by` / `map_id` say how the archive reaches each one. Nothing
  * maintains those two columns: there is no trigger and no function, and the
  * only writers in the tree are the one-off importers. So the day anyone
@@ -55,7 +55,7 @@ export function findDrift(sheets, maps, keyOf) {
   const unresolved = new Set();
   const claimed = [];
   for (const m of maps) {
-    const n = m.extra_metadata?.sheet_number;
+    const n = m.sheet_number;
     if (!n || !m.collection) continue;
     const key = keyOf(m.collection);
     if (!key) {
@@ -78,11 +78,12 @@ export function findDrift(sheets, maps, keyOf) {
   );
   const orphanKeys = [...new Set(sheets.map((s) => s.series_key))].filter((k) => !known.has(k));
 
-  // The typo, seen from the map's side. `sheet_number` is a free-text key in
-  // `extra_metadata` — no column, no index, no vocabulary — and six migrations
-  // plus two route queries join on it. Mistype one and nothing errors: the sheet
-  // drops out of the series page, out of the coverage denominator (mig 084) and
-  // out of `search_vector` (mig 046), while the map itself still looks fine.
+  // The typo, seen from the map's side. `sheet_number` (mig 095: a real
+  // column now, indexed with `collection`, but still free text — no
+  // vocabulary) is joined on by six migrations plus two route queries.
+  // Mistype one and nothing errors: the sheet drops out of the series page,
+  // out of the coverage denominator (mig 084) and out of `search_vector`
+  // (mig 046), while the map itself still looks fine.
   // `drift` cannot see it, because drift walks the index and a typo is precisely
   // a cell the index does not contain.
   //
@@ -129,7 +130,7 @@ function selfCheck() {
       name: 'Sai Gon',
       collection: 'Series L7014 (Vietnam 1:50,000)',
       status: 'public',
-      extra_metadata: { sheet_number: '6330-4' },
+      sheet_number: '6330-4',
     },
   ];
   // The failure this exists to catch: someone published 6330-4 and the index
@@ -205,9 +206,9 @@ function selfCheck() {
   // sheet and its two halves, and two years of the same sheet, all share a
   // sheet_number. 70 of the archive's 103 cells look like this.
   const printings = [
-    { ...maps[0], id: 'p1', extra_metadata: { sheet_number: '6330-4', sheet_half: 'E' } },
-    { ...maps[0], id: 'p2', extra_metadata: { sheet_number: '6330-4', sheet_half: 'W' } },
-    { ...maps[0], id: 'p3', extra_metadata: { sheet_number: '6330-4' } },
+    { ...maps[0], id: 'p1', sheet_number: '6330-4', sheet_half: 'E' },
+    { ...maps[0], id: 'p2', sheet_number: '6330-4', sheet_half: 'W' },
+    { ...maps[0], id: 'p3', sheet_number: '6330-4' },
   ];
   if (findDrift(fixed, printings, keyOf).unindexed.length !== 0)
     throw new Error('several printings of one indexed cell must not be unindexed');
@@ -223,7 +224,7 @@ function selfCheck() {
       name: 'Thanh Hoa',
       collection: 'Indochine 1:25,000 — Tonkin & Thanh Hóa',
       status: 'public',
-      extra_metadata: { sheet_number: '71' },
+      sheet_number: '71',
     },
   ];
   const unindexed = [
@@ -297,8 +298,8 @@ async function main() {
     process.exit(2);
   }
   const db = createClient(url, key, { auth: { persistSession: false } });
-  const sheets = await readAll(db, 'series_sheets', 'series_key,sheet_number,held_by,map_id');
-  const maps = await readAll(db, 'maps', 'id,name,collection,status,extra_metadata');
+  const sheets = await readAll(db, 'series_cells', 'series_key,sheet_number,held_by,map_id');
+  const maps = await readAll(db, 'maps', 'id,name,collection,status,sheet_number');
 
   const keyOf = await resolveKeys(db, maps);
 
@@ -325,7 +326,7 @@ async function main() {
   );
   if (drift.length || dangling.length || unresolved.length || unindexed.length) {
     console.log('Re-run the survey importer for that series, or mark the cell held by hand.');
-    console.log('An UNINDEXED line is usually a mistyped extra_metadata.sheet_number.');
+    console.log('An UNINDEXED line is usually a mistyped sheet_number.');
     process.exit(1);
   }
 }

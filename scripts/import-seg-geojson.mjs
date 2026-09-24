@@ -33,7 +33,7 @@ if (document.type !== 'FeatureCollection' || !Array.isArray(document.features)) 
   throw new Error('--input must be a GeoJSON FeatureCollection');
 }
 
-// The colour pass names a cadastral wash, while footprint_submissions uses a
+// The colour pass names a cadastral wash, while footprints uses a
 // cross-map geometry taxonomy. Keep both: `feature_type` is reviewable across
 // sheets and `category` preserves the source classifier's evidence.
 const COLOUR_CLASSES = {
@@ -87,7 +87,7 @@ const rows = document.features.flatMap((feature, index) => {
       feature_type: mapped.featureType,
       category: mapped.category,
       source: 'import',
-      status: 'needs_review',
+      review_status: 'needs_review',
       run_id: runId,
     },
   ];
@@ -114,7 +114,7 @@ if (mapError) throw mapError;
 if (!map) throw new Error(`map ${mapId} does not exist`);
 
 const { count, error: existingError } = await db
-  .from('footprint_submissions')
+  .from('footprints')
   .select('id', { count: 'exact', head: true })
   .eq('map_id', mapId)
   .eq('run_id', runId);
@@ -134,7 +134,7 @@ if (dry) {
 // PostgREST's default insert batch is generous, but chunks make this safe for
 // the 1,443-polygon 1882 audit and for bigger sheets without relying on it.
 for (let start = 0; start < rows.length; start += 250) {
-  const { error } = await db.from('footprint_submissions').insert(rows.slice(start, start + 250));
+  const { error } = await db.from('footprints').insert(rows.slice(start, start + 250));
   if (error) throw error;
 }
 

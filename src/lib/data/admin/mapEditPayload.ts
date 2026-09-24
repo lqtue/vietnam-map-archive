@@ -17,18 +17,17 @@ export interface MapEditForm {
   dc_publisher: string;
   location: string;
   map_type: string;
-  dc_coverage: string;
-  dc_subject: string;
   dc_description: string;
   physical_description: string;
   language: string;
   extraPairs: { key: string; value: string }[];
+  sheet_number: string;
+  sheet_half: string;
   // Source
   source_type: string;
   holding_institution: string;
   collection: string;
   shelfmark: string;
-  ia_identifier: string;
   source_url: string;
   rights: string;
   // Hosting / georef
@@ -37,8 +36,6 @@ export interface MapEditForm {
   // Quick bar + pipeline flags. Visibility is `status` alone (mig 060).
   priority: number;
   georef_done: boolean;
-  legend_done: boolean;
-  help_needed: boolean;
   status: string;
   // Label Studio config (Pipeline tab)
   labelLegendMode: 'simple' | 'list';
@@ -59,29 +56,26 @@ export interface MapEditPayload {
   location?: string;
   map_type?: string;
   year: number | null;
-  dc_description?: string;
+  description?: string;
   extra_metadata: Record<string, string>;
   source_type?: string;
   collection?: string;
   source_url?: string;
   original_title?: string;
   creator?: string;
-  year_label?: string;
+  date_label?: string;
   language?: string;
   rights?: string;
   shelfmark?: string;
   physical_description?: string;
-  dc_publisher?: string;
-  dc_subject?: string;
-  dc_coverage?: string;
+  publisher?: string;
   holding_institution?: string;
+  sheet_number?: string;
+  sheet_half?: string;
   label_config: LabelConfig;
   priority: number;
-  georef_done: boolean;
-  legend_done: boolean;
-  help_needed: boolean;
+  is_georeferenced: boolean;
   status: string;
-  ia_identifier?: string;
 }
 
 /** `''` → `undefined` so the API leaves the column alone rather than blanking it. */
@@ -136,33 +130,30 @@ export function toMapEditPayload(form: MapEditForm): MapEditPayload {
     location: opt(form.location),
     map_type: opt(form.map_type),
     year: form.year ? Number(form.year) : null,
-    dc_description: opt(form.dc_description),
+    description: opt(form.dc_description),
     extra_metadata,
     source_type: opt(form.source_type),
     collection: opt(form.collection),
     source_url: opt(form.source_url),
     original_title: opt(form.original_title),
     creator: opt(form.creator),
-    year_label: opt(form.year_label),
+    date_label: opt(form.year_label),
     language: opt(form.language),
     rights: opt(form.rights),
     shelfmark: opt(form.shelfmark),
     physical_description: opt(form.physical_description),
-    dc_publisher: opt(form.dc_publisher),
-    dc_subject: opt(form.dc_subject),
-    dc_coverage: opt(form.dc_coverage),
+    publisher: opt(form.dc_publisher),
     holding_institution: opt(form.holding_institution),
+    sheet_number: opt(form.sheet_number),
+    sheet_half: opt(form.sheet_half),
     label_config: parseLabelConfig(
       form.labelLegendMode,
       form.labelLegendText,
       form.labelCategories
     ),
     priority: form.priority,
-    georef_done: form.georef_done,
-    legend_done: form.legend_done,
-    help_needed: form.help_needed,
+    is_georeferenced: form.georef_done,
     status: form.status,
-    ia_identifier: opt(form.ia_identifier),
   };
 }
 

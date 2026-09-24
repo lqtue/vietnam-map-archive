@@ -29,26 +29,25 @@
   let name = map.name;
   let original_title = map.original_title || '';
   let year = map.year?.toString() || '';
-  let year_label = map.year_label || '';
+  let year_label = map.date_label || '';
   let creator = map.creator || '';
-  let dc_publisher = map.dc_publisher || '';
+  let dc_publisher = map.publisher || '';
   let location = map.location || '';
   let map_type = map.map_type || '';
-  let dc_coverage = map.dc_coverage || '';
-  let dc_subject = map.dc_subject || '';
-  let dc_description = map.dc_description || '';
+  let dc_description = map.description || '';
   let physical_description = map.physical_description || '';
   let language = map.language || '';
   let extraPairs: { key: string; value: string }[] = Object.entries(
     (map.extra_metadata as Record<string, string>) || {}
   ).map(([k, v]) => ({ key: k, value: String(v ?? '') }));
+  let sheet_number = map.sheet_number || '';
+  let sheet_half = map.sheet_half || '';
 
   // Source
   let source_type = map.source_type || '';
   let holding_institution = map.holding_institution || '';
   let collection = map.collection || '';
   let shelfmark = map.shelfmark || '';
-  let ia_identifier = map.ia_identifier ?? '';
   let source_url = map.source_url || '';
   let rights = map.rights || '';
 
@@ -59,9 +58,7 @@
   // Quick bar + workflow flags. Visibility is the status select alone: the
   // is_public / is_featured checkboxes went with migration 060.
   let priority: number = map.priority ?? 0;
-  let georef_done: boolean = map.georef_done ?? false;
-  let legend_done: boolean = map.legend_done ?? false;
-  let help_needed: boolean = map.help_needed ?? false;
+  let georef_done: boolean = map.is_georeferenced ?? false;
   let status: string = map.status ?? 'draft';
 
   // Label Studio config (edited on the Pipeline tab)
@@ -137,25 +134,22 @@
         dc_publisher,
         location,
         map_type,
-        dc_coverage,
-        dc_subject,
         dc_description,
         physical_description,
         language,
         extraPairs,
+        sheet_number,
+        sheet_half,
         source_type,
         holding_institution,
         collection,
         shelfmark,
-        ia_identifier,
         source_url,
         rights,
         allmaps_id,
         annotation_url,
         priority,
         georef_done,
-        legend_done,
-        help_needed,
         status,
         labelLegendMode,
         labelLegendText,
@@ -223,10 +217,6 @@
           <option value="featured">Featured</option>
         </select>
       </label>
-      <label class="quick-toggle" title="Flag for community help">
-        <input type="checkbox" bind:checked={help_needed} />
-        <span>⚠ Help needed</span>
-      </label>
       <label class="quick-priority" title="Higher = surfaced first in tools">
         Priority
         <input type="number" bind:value={priority} class="priority-input" min="0" step="1" />
@@ -260,12 +250,12 @@
           bind:dc_publisher
           bind:location
           bind:map_type
-          bind:dc_coverage
-          bind:dc_subject
           bind:dc_description
           bind:physical_description
           bind:language
           bind:extraPairs
+          bind:sheet_number
+          bind:sheet_half
         />
       {:else if activeTab === 'source'}
         <MapEditSourceTab
@@ -273,7 +263,6 @@
           bind:holding_institution
           bind:collection
           bind:shelfmark
-          bind:ia_identifier
           bind:source_url
           bind:rights
         />
@@ -301,7 +290,6 @@
           mapId={map.id}
           iiifImage={map.iiif_image}
           bind:georef_done
-          bind:legend_done
           bind:labelLegendMode
           bind:labelLegendText
           bind:labelCategories

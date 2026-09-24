@@ -76,10 +76,10 @@ if (live?.length) {
 let runTally = {};
 if (!ocrRunId && !automatic) {
   const { data: rows } = await db
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('run_id')
     .eq('map_id', mapId)
-    .eq('status', 'validated');
+    .eq('review_status', 'validated');
   for (const r of rows ?? []) runTally[r.run_id] = (runTally[r.run_id] ?? 0) + 1;
   const best = Object.entries(runTally).sort((a, b) => b[1] - a[1])[0];
   ocrRunId = best?.[0];

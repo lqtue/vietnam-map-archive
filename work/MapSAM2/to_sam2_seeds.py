@@ -144,15 +144,15 @@ def load_seeds_for_map(map_id: str, ocr_run_id: str | None = None) -> list[dict]
 
     params = {
         "map_id": f"eq.{map_id}",
-        "select": "id,text,text_validated,category,category_validated,confidence,status,"
+        "select": "id,text,text_corrected,category,category_corrected,confidence,review_status,"
                   "global_x,global_y,global_w,global_h",
-        "status": "neq.rejected",
+        "review_status": "neq.rejected",
     }
     if ocr_run_id:
         params["run_id"] = f"eq.{ocr_run_id}"
 
     resp = requests.get(
-        f"{url}/rest/v1/ocr_extractions",
+        f"{url}/rest/v1/ocr_labels",
         params=params,
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
         timeout=60,
@@ -174,11 +174,11 @@ def rows_to_seeds(rows: list[dict]) -> list[dict]:
     """Filter and normalise extraction rows into seeds. Pure — see the self-check."""
     seeds: list[dict] = []
     for row in rows:
-        category = row.get("category_validated") or row.get("category") or "other"
+        category = row.get("category_corrected") or row.get("category") or "other"
         if category not in AREA_CATEGORIES:
             continue
         # A validated row was looked at by a human, so its confidence is moot.
-        if row.get("status") != "validated" and (row.get("confidence") or 0) < MIN_CONFIDENCE:
+        if row.get("review_status") != "validated" and (row.get("confidence") or 0) < MIN_CONFIDENCE:
             continue
         x, y, w, h = (row.get("global_x"), row.get("global_y"),
                       row.get("global_w"), row.get("global_h"))
@@ -187,7 +187,7 @@ def rows_to_seeds(rows: list[dict]) -> list[dict]:
 
         seeds.append({
             "extraction_id": row.get("id"),
-            "text": row.get("text_validated") or row.get("text") or "",
+            "text": row.get("text_corrected") or row.get("text") or "",
             "category": category,
             "bbox": [float(x), float(y), float(w), float(h)],       # full-image px
             "centroid": [float(x) + float(w) / 2, float(y) + float(h) / 2],
@@ -267,7 +267,7 @@ def blocks_to_seeds(features: list[dict]) -> list[dict]:
         # what SAM2 returns; dropping it here made that unreachable.
         klass = ((feat or {}).get("properties") or {}).get("feature_type")
         seeds.append({
-            "extraction_id": None,      # nothing in ocr_extractions to point at
+            "extraction_id": None,      # nothing in ocr_labels to point at
             "text": "",
             "category": str(klass) if klass else "block",
             "bbox": [x0, y0, w, h],     # full-image px, y-down
@@ -461,18 +461,18 @@ def partition_seeds(
 def _self_check() -> None:
     rows = [
         # kept: a validated building, human text wins
-        {"id": "a", "text": "Marche", "text_validated": "Marché", "category": "other",
-         "category_validated": "building", "confidence": 0.1, "status": "validated",
+        {"id": "a", "text": "Marche", "text_corrected": "Marché", "category": "other",
+         "category_corrected": "building", "confidence": 0.1, "review_status": "validated",
          "global_x": 100, "global_y": 100, "global_w": 40, "global_h": 20},
         # dropped: street names label a line, not an area
         {"id": "b", "text": "Rue Catinat", "category": "street_name", "confidence": 0.9,
-         "status": "pending", "global_x": 200, "global_y": 200, "global_w": 80, "global_h": 10},
+         "review_status": "pending", "global_x": 200, "global_y": 200, "global_w": 80, "global_h": 10},
         # dropped: unvalidated and under the confidence floor
-        {"id": "c", "text": "?", "category": "building", "confidence": 0.2, "status": "pending",
+        {"id": "c", "text": "?", "category": "building", "confidence": 0.2, "review_status": "pending",
          "global_x": 300, "global_y": 300, "global_w": 10, "global_h": 10},
         # kept: confident enough without review
         {"id": "d", "text": "Hôpital", "category": "institution", "confidence": 0.8,
-         "status": "pending", "global_x": 1200, "global_y": 80, "global_w": 60, "global_h": 20},
+         "review_status": "pending", "global_x": 1200, "global_y": 80, "global_w": 60, "global_h": 20},
     ]
     seeds = rows_to_seeds(rows)
     assert [s["extraction_id"] for s in seeds] == ["a", "d"], seeds
@@ -489,7 +489,7 @@ def _self_check() -> None:
 
     # Centroid ownership: a box straddling the edge belongs to one tile only.
     straddler = rows_to_seeds([
-        {"id": "e", "text": "Edge", "category": "building", "confidence": 0.9, "status": "pending",
+        {"id": "e", "text": "Edge", "category": "building", "confidence": 0.9, "review_status": "pending",
          "global_x": 980, "global_y": 100, "global_w": 40, "global_h": 20},
     ])
     left = seeds_for_tile(straddler, (0, 0, 1000, 1000))
@@ -501,7 +501,7 @@ def _self_check() -> None:
 
     # A row with no category is no longer prompt-worthy: `other` left the set.
     assert rows_to_seeds([
-        {"id": "f", "text": "Ge_ B. 9", "confidence": 0.9, "status": "pending",
+        {"id": "f", "text": "Ge_ B. 9", "confidence": 0.9, "review_status": "pending",
          "global_x": 100, "global_y": 8500, "global_w": 200, "global_h": 60},
     ]) == []
 
@@ -518,9 +518,9 @@ def _self_check() -> None:
 
     # Clipping is by centroid, and no crop means no filtering.
     marginal = rows_to_seeds([
-        {"id": "g", "text": "In", "category": "building", "confidence": 0.9, "status": "pending",
+        {"id": "g", "text": "In", "category": "building", "confidence": 0.9, "review_status": "pending",
          "global_x": 500, "global_y": 500, "global_w": 40, "global_h": 20},
-        {"id": "h", "text": "Out", "category": "building", "confidence": 0.9, "status": "pending",
+        {"id": "h", "text": "Out", "category": "building", "confidence": 0.9, "review_status": "pending",
          "global_x": 100, "global_y": 8500, "global_w": 40, "global_h": 20},
     ])
     crop = [459.0, 413.0, 11073.0, 7913.0]          # the 1882 sheet's own main_map

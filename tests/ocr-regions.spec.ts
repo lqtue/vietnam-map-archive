@@ -119,7 +119,7 @@ test('the printed index reports its own holes and repeats', () => {
 });
 
 /**
- * Both printed blocks put their position in `notes`, because `ocr_extractions`
+ * Both printed blocks put their position in `notes`, because `ocr_labels`
  * has no column for a grid cell — the legend writes `n=37; grid=B10` and the
  * street index `street index; grid=K6→K8; cells=2`. Reading both back is what
  * lets the review table show either as the table it is, ordered the way the

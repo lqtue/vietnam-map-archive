@@ -1,11 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// Opening a map tallies a row in the production map_opens table (migration 049),
+// Opening a map tallies a row in the production map_views table (migration 049),
 // which would pollute the real per-map counts with test traffic. Any test that
 // opens a map must call this first. Returns a live counter of blocked inserts.
 async function blockMapOpenTally(page: Page): Promise<() => number> {
   let n = 0;
-  await page.route('**/rest/v1/map_opens*', (route) => {
+  await page.route('**/rest/v1/map_views*', (route) => {
     if (route.request().method() === 'POST') n++;
     return route.abort();
   });

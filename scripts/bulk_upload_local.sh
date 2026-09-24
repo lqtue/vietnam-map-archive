@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bulk upload local JPEGs → R2 IIIF tiles + insert maps/map_iiif_sources rows.
+# Bulk upload local JPEGs → R2 IIIF tiles + insert maps/map_images rows.
 #
 # Usage:
 #   ./scripts/bulk_upload_local.sh <file-list.txt> [--collection "Service Géographique de l'Indochine"]
@@ -100,17 +100,17 @@ while IFS= read -r path; do
 
   IIIF_URL="$WORKER_BASE/$MAP_ID"
 
-  # 3) Insert map_iiif_sources row (primary, self-hosted)
+  # 3) Insert map_images row (primary, self-hosted)
   src_payload=$(jq -n --arg map_id "$MAP_ID" --arg url "$IIIF_URL" \
     '{ map_id: $map_id, label: "R2 (self-hosted)", source_type: "self",
        iiif_image: $url, is_primary: true, sort_order: 0 }')
-  resp=$(curl -s -w "\n%{http_code}" -X POST "$SB_URL/rest/v1/map_iiif_sources" \
+  resp=$(curl -s -w "\n%{http_code}" -X POST "$SB_URL/rest/v1/map_images" \
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" \
     -H "Content-Type: application/json" -H "Prefer: return=representation" \
     -d "$src_payload")
   body=$(echo "$resp" | sed '$d'); code=$(echo "$resp" | tail -1)
   if [[ "$code" != "201" ]]; then
-    echo "   ✗ map_iiif_sources insert failed ($code): $body" | tee -a "$LOG"
+    echo "   ✗ map_images insert failed ($code): $body" | tee -a "$LOG"
     fail=$((fail+1)); continue
   fi
 
@@ -135,7 +135,7 @@ while IFS= read -r path; do
   # 5) Derive allmaps_id via @allmaps/id (SHA-1 hex first 16 of canonical IIIF URL).
   ALLMAPS_ID=$(node -e "import('@allmaps/id').then(async m => { const u = process.argv[1].replace(/\/(info\.json)?\$/, '').replace(/\/+\$/, ''); process.stdout.write(await m.generateId(u)); })" "$IIIF_URL" 2>/dev/null || echo "")
 
-  # 6) Update maps.iiif_image (+ thumbnail + allmaps_id). Trigger on map_iiif_sources also syncs iiif_image; redundant but safe.
+  # 6) Update maps.iiif_image (+ thumbnail + allmaps_id). Trigger on map_images also syncs iiif_image; redundant but safe.
   patch_payload=$(jq -nc --arg url "$IIIF_URL" --arg thumb "$THUMB_URL" --arg aid "$ALLMAPS_ID" \
     '{iiif_image: $url}
      + (if $thumb == "" then {} else {thumbnail: $thumb} end)

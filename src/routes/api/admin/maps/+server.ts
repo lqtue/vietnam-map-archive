@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     annotation_url: body.annotation_url || null,
     location: body.location || null,
     year: body.year ? Number(body.year) : null,
-    dc_description: body.dc_description || null,
+    description: body.description || null,
   };
 
   const { data, error: err } = await adminClient()

@@ -30,7 +30,7 @@ Admin map CRUD:
   probe.
 - `/api/admin/maps/lookup-allmaps-id/` — POST `{ iiifImage }` → derive Allmaps image ID + probe.
 - `/api/admin/maps/sync-georef/` — POST: probe the Allmaps annotation server for every map with
-  `allmaps_id` and `georef_done = false`, flip on hits. Idempotent; cron-safe. Returns
+  `allmaps_id` and `is_georeferenced = false`, flip on hits. Idempotent; cron-safe. Returns
   `{ checked, flipped, ids }`. The flip itself enqueues `mirror_annotation` for an already-published
   map (mig 080's trigger), so no separate mirror call is needed.
 
@@ -48,7 +48,7 @@ Pipeline:
   GET the saved regions plus the latest layout job. The worker runs `ocr.py scout --save-triage`.
 - `/api/admin/maps/[id]/ocr/` — GET run summaries + the latest `pipeline_jobs` row for the map; POST
   enqueues an `ocr` job (202 `{ job_id, run_id, status }`, or 409 when one is already in flight).
-- `/api/admin/maps/[id]/ocr/apply/` — POST: turn `ocr_extractions` above a confidence threshold into
+- `/api/admin/maps/[id]/ocr/apply/` — POST: turn `ocr_labels` above a confidence threshold into
   `label_pins` (bbox centre in source-image px). Body `{ run_id?, min_confidence? }`.
 - `/api/admin/maps/[id]/ocr-review/` — GET extractions + runs; POST manual bbox; PATCH update
   text/category/status/coords/`rotation_deg`/`label_w`/`label_h` (the label rectangle and the box
@@ -131,7 +131,7 @@ Public / other:
   `$lib/server/facets.ts` ("all-but-this-dimension"). Public users get
   `status IN ('public','featured')` server-enforced; `include=scout` is silently dropped for
   non-admin/mod. **`include=labels`** searches *inside* the maps: the `search_labels` RPC (mig 065,
-  `pg_trgm` word-similarity ≥ 0.5 over unaccented `ocr_extractions` text, one row per map × label,
+  `pg_trgm` word-similarity ≥ 0.5 over unaccented `ocr_labels` text, one row per map × label,
   drafts gated by role) and each hit's bbox centre warped to lng/lat via
   `$lib/server/transformer.ts`. Rendered by `LabelHits.svelte` on /catalog (links to
   `/explore?map=<id>&at=<lng>,<lat>`) and in /explore's browse pane (stacks the map, lands on the

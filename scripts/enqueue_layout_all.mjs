@@ -40,7 +40,7 @@ const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SE
 const { data: maps, error } = await db
   .from('maps')
   .select('id, name, year, iiif_image, triage')
-  .eq('georef_done', true)
+  .eq('is_georeferenced', true)
   .not('iiif_image', 'is', null)
   .order('year');
 if (error) throw error;

@@ -21,9 +21,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   const { data, error: err } = await adminClient()
     .from('stories')
     .select(
-      'id, title, description, mode, status, user_id, created_at, updated_at, story_points(id)'
+      'id, title, description, mode, status:review_status, user_id, created_at, updated_at, story_points(id)'
     )
-    .eq('status', status)
+    .eq('review_status', status)
     .order('updated_at', { ascending: false });
 
   if (err) dbError(err, 'Could not list stories');

@@ -140,8 +140,8 @@ if [[ -z "${2:-}" ]]; then
   fi
 
   # 1. Fetch manifest/info to determine original IIIF image
-  # We fetch from the map_iiif_sources to find the non-R2 primary source
-  DB_RES=$(curl -s "$SB_URL/rest/v1/map_iiif_sources?map_id=eq.$MAP_ID&is_primary=eq.true" \
+  # We fetch from the map_images to find the non-R2 primary source
+  DB_RES=$(curl -s "$SB_URL/rest/v1/map_images?map_id=eq.$MAP_ID&is_primary=eq.true" \
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY")
   
   ORIGINAL_IIIF=$(echo "$DB_RES" | jq -r '.[0].iiif_image' | grep -v "null")
@@ -335,7 +335,7 @@ else
   echo "           thumbnail  = '$SERVICE_URL/full/800,/0/default.jpg'"
   echo "     where id = '$MAP_ID';"
   echo ""
-  echo "    update map_iiif_sources"
+  echo "    update map_images"
   echo "       set iiif_image = '$SERVICE_URL'"
   echo "     where map_id = '$MAP_ID'"
   echo "       and iiif_image like '%maparchive.vn%';"

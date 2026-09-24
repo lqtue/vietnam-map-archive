@@ -31,17 +31,13 @@ export const MAP_WRITABLE_FIELDS: Record<string, Coerce> = {
   annotation_url: orNull,
   location: orNull,
   year: asYear,
-  year_label: orNull,
-  dc_description: orNull,
-  dc_publisher: orNull,
-  dc_subject: orNull,
-  dc_coverage: orNull,
+  date_label: orNull,
+  description: orNull,
+  publisher: orNull,
   thumbnail: orNull,
   // source / IIIF
   source_type: asIs,
-  iiif_manifest: orNull,
   iiif_image: orNull,
-  ia_identifier: orNull,
   original_title: orNull,
   creator: orNull,
   language: orNull,
@@ -57,11 +53,11 @@ export const MAP_WRITABLE_FIELDS: Record<string, Coerce> = {
   extra_metadata: asObject,
   label_config: asIs,
   triage: asObject,
+  sheet_number: orNull,
+  sheet_half: orNull,
   // contribution flags
   priority: asCount,
-  georef_done: asBool,
-  legend_done: asBool,
-  help_needed: asBool,
+  is_georeferenced: asBool,
 };
 
 /**

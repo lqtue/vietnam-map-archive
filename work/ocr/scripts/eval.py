@@ -1,9 +1,9 @@
 """Eval CLI — score an OCR run or a seg run against held-out ground truth.
 
 Ground truth comes from the HITL review that already exists:
-  OCR  — extractions a human validated (status='validated'); text is the
-         corrected text_validated when present.
-  Seg  — footprints a human verified (status in verified/consensus).
+  OCR  — extractions a human validated (review_status='validated'); text is the
+         corrected text_corrected when present.
+  Seg  — footprints a human verified (review_status in verified/consensus).
 
 Predictions are a machine run to score against that truth:
   OCR  — one run_id's rows (default: all non-validated rows for the map).
@@ -71,8 +71,8 @@ def _ocr_rows_to_items(rows: list[dict], use_validated_text: bool) -> list[dict]
         gx, gy, gw, gh = r.get("global_x"), r.get("global_y"), r.get("global_w"), r.get("global_h")
         if None in (gx, gy, gw, gh):
             continue
-        text = (r.get("text_validated") or r.get("text")) if use_validated_text else r.get("text")
-        cat = (r.get("category_validated") or r.get("category")) if use_validated_text else r.get("category")
+        text = (r.get("text_corrected") or r.get("text")) if use_validated_text else r.get("text")
+        cat = (r.get("category_corrected") or r.get("category")) if use_validated_text else r.get("category")
         items.append({"bbox": (gx, gy, gw, gh), "text": text or "", "category": cat,
                       "rotation_deg": r.get("rotation_deg")})
     return items
@@ -82,7 +82,7 @@ def _run_dir_to_items(run_dir: str) -> list[dict]:
     """Predictions read straight out of a run directory's `all_extractions.json`.
 
     The DB should not be the only place a run can be scored from. Scoring a candidate
-    prompt by writing its rows into the shared `ocr_extractions` table pollutes the
+    prompt by writing its rows into the shared `ocr_labels` table pollutes the
     corpus the review UI reads and then has to be dedup'd back out again — a real cost
     for a measurement that throws its predictions away. `batch` already writes
     `global_bbox` on every extraction, which is all `score_ocr` needs.
@@ -109,7 +109,7 @@ def _cmd_ocr(args: argparse.Namespace) -> None:
         if not args.map_id:
             raise SystemExit("Provide --map-id (or --pred-file + --gt-file)")
         base = {"map_id": f"eq.{args.map_id}", "select": "*"}
-        gt_rows = _rest_get("ocr_extractions", {**base, "status": "eq.validated"})
+        gt_rows = _rest_get("ocr_labels", {**base, "review_status": "eq.validated"})
         gts = _ocr_rows_to_items(gt_rows, use_validated_text=True)
         if args.pred_run_dir:
             preds = _run_dir_to_items(args.pred_run_dir)
@@ -118,8 +118,8 @@ def _cmd_ocr(args: argparse.Namespace) -> None:
             if args.run_id:
                 pred_params["run_id"] = f"eq.{args.run_id}"
             else:
-                pred_params["status"] = "neq.validated"
-            pred_rows = _rest_get("ocr_extractions", pred_params)
+                pred_params["review_status"] = "neq.validated"
+            pred_rows = _rest_get("ocr_labels", pred_params)
             preds = _ocr_rows_to_items(pred_rows, use_validated_text=False)
 
     if not gts:
@@ -145,12 +145,12 @@ def _cmd_seg(args: argparse.Namespace) -> None:
     else:
         if not args.map_id:
             raise SystemExit("Provide --map-id (or --pred-file + --gt-file)")
-        base = {"map_id": f"eq.{args.map_id}", "select": "pixel_polygon,status,feature_type"}
+        base = {"map_id": f"eq.{args.map_id}", "select": "pixel_polygon,review_status,feature_type"}
         gt_statuses = args.gt_status.split(",")
-        gt_rows = _rest_get("footprint_submissions",
-                            {**base, "status": f"in.({','.join(gt_statuses)})"})
-        pred_rows = _rest_get("footprint_submissions",
-                              {**base, "status": f"eq.{args.pred_status}"})
+        gt_rows = _rest_get("footprints",
+                            {**base, "review_status": f"in.({','.join(gt_statuses)})"})
+        pred_rows = _rest_get("footprints",
+                              {**base, "review_status": f"eq.{args.pred_status}"})
         gts = _seg_rows_to_items(gt_rows)
         preds = _seg_rows_to_items(pred_rows)
 
@@ -213,8 +213,8 @@ def _cmd_index_agreement(args: argparse.Namespace) -> None:
         )
     cell = (grid["bbox"][2] / len(grid["columns"]), grid["bbox"][3] / len(grid["rows"]))
 
-    base = {"map_id": f"eq.{args.map_id}", "select": "*", "status": "neq.rejected"}
-    rows = _rest_get("ocr_extractions", base)
+    base = {"map_id": f"eq.{args.map_id}", "select": "*", "review_status": "neq.rejected"}
+    rows = _rest_get("ocr_labels", base)
     gt_rows = [r for r in rows if r.get("prompt") == INDEX_PROMPT]
     if not gt_rows:
         raise SystemExit(
@@ -227,7 +227,7 @@ def _cmd_index_agreement(args: argparse.Namespace) -> None:
             gx, gy, gw, gh = r.get("global_x"), r.get("global_y"), r.get("global_w"), r.get("global_h")
             if None in (gx, gy, gw, gh):
                 continue
-            out.append({"name": name_key(r.get("text_validated") or r.get("text") or ""),
+            out.append({"name": name_key(r.get("text_corrected") or r.get("text") or ""),
                         "bbox": (gx, gy, gw, gh)})
         return out
 

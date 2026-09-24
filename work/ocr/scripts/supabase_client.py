@@ -90,7 +90,7 @@ def check_write_complete(intended: int, present: int, map_id: str, run_id: str) 
     The chunk loop below posts 50 rows per request and is **not** transactional,
     so chunk 4 of 7 failing leaves the first 150 rows in place and raises. A
     retry re-upserts everything and heals it, because the upsert is idempotent —
-    but once `max_attempts` is spent, a partial run sits in `ocr_extractions`
+    but once `max_attempts` is spent, a partial run sits in `ocr_labels`
     with nothing marking it partial. The stage no longer claims otherwise (a
     failed job reads as `idle`, not `ocr_done`), yet the rows themselves look
     exactly like a complete run.
@@ -103,13 +103,13 @@ def check_write_complete(intended: int, present: int, map_id: str, run_id: str) 
     if present < intended:
         raise RuntimeError(
             f"partial write: sent {intended} rows for run {run_id!r} on map {map_id}, "
-            f"but only {present} are in ocr_extractions. The upsert is idempotent — "
+            f"but only {present} are in ocr_labels. The upsert is idempotent — "
             f"re-run the same run_id to finish it."
         )
 
 
 def upsert_ocr_extractions(map_id: str, run_id: str, rows: list[dict[str, Any]]) -> int:
-    """Upsert a batch of extraction rows into ocr_extractions.
+    """Upsert a batch of extraction rows into ocr_labels.
 
     Each row should have: tile_x, tile_y, tile_w, tile_h, category, text,
     confidence, global_x, global_y, global_w, global_h, rotation_deg, notes,
@@ -178,7 +178,7 @@ def upsert_ocr_extractions(map_id: str, run_id: str, rows: list[dict[str, Any]])
 
     url, key = _load_config()
     # PostgREST requires on_conflict param to resolve conflicts on non-PK unique indexes
-    endpoint = f"{url}/rest/v1/ocr_extractions?on_conflict={_CONFLICT_COLS}"
+    endpoint = f"{url}/rest/v1/ocr_labels?on_conflict={_CONFLICT_COLS}"
     total = 0
     for i in range(0, len(payload), _CHUNK_SIZE):
         chunk = payload[i : i + _CHUNK_SIZE]
@@ -198,7 +198,7 @@ def upsert_ocr_extractions(map_id: str, run_id: str, rows: list[dict[str, Any]])
     # This path has the service key, so ask the table how many rows it really
     # holds for the run rather than trusting the loop's own arithmetic.
     count = requests.get(
-        f"{url}/rest/v1/ocr_extractions",
+        f"{url}/rest/v1/ocr_labels",
         headers={**_headers(key), "Prefer": "count=exact", "Range": "0-0"},
         params={"map_id": f"eq.{map_id}", "run_id": f"eq.{run_id}", "select": "id"},
         timeout=30,
@@ -224,7 +224,7 @@ def fetch_ocr_extractions(map_id: str, run_id: str | None = None) -> list[dict[s
     the label join, the furniture mask and the water seeds alike.
     """
     url, key = _load_config()
-    endpoint = f"{url}/rest/v1/ocr_extractions?map_id=eq.{map_id}"
+    endpoint = f"{url}/rest/v1/ocr_labels?map_id=eq.{map_id}"
     if run_id:
         endpoint += f"&run_id=eq.{run_id}"
 
@@ -253,11 +253,11 @@ def fetch_ocr_extractions(map_id: str, run_id: str | None = None) -> list[dict[s
 
 
 def fetch_footprints(map_id: str) -> list[dict[str, Any]]:
-    """Fetch footprint_submissions polygons for a map (for the label join)."""
+    """Fetch footprints polygons for a map (for the label join)."""
     url, key = _load_config()
     endpoint = (
-        f"{url}/rest/v1/footprint_submissions?map_id=eq.{map_id}"
-        "&select=id,pixel_polygon,feature_type,category,name,run_id,created_at,status"
+        f"{url}/rest/v1/footprints?map_id=eq.{map_id}"
+        "&select=id,pixel_polygon,feature_type,category,name,run_id,created_at,review_status"
     )
     resp = requests.get(
         endpoint,
@@ -270,7 +270,7 @@ def fetch_footprints(map_id: str) -> list[dict[str, Any]]:
 
 
 def link_extractions_to_footprints(assignments: dict[str, str]) -> int:
-    """Write footprint_id back to ocr_extractions (migration 050).
+    """Write footprint_id back to ocr_labels (migration 050).
 
     assignments = {extraction_id: footprint_id}. Grouped by footprint so a whole
     building's labels update in one PATCH — one request per distinct footprint.
@@ -289,7 +289,7 @@ def link_extractions_to_footprints(assignments: dict[str, str]) -> int:
             chunk = ext_ids[i : i + _CHUNK_SIZE]
             id_list = ",".join(chunk)
             resp = requests.patch(
-                f"{url}/rest/v1/ocr_extractions?id=in.({id_list})",
+                f"{url}/rest/v1/ocr_labels?id=in.({id_list})",
                 headers=_headers(key),
                 data=json.dumps({"footprint_id": fp_id}),
                 timeout=30,

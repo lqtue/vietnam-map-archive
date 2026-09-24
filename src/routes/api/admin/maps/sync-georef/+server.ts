@@ -7,7 +7,7 @@ import { probeAllmapsAnnotation } from '$lib/server/allmaps';
 
 /**
  * POST — probe the Allmaps annotation server for every map with allmaps_id
- * set and georef_done=false, and flip georef_done=true on hits. Idempotent;
+ * set and is_georeferenced=false, and flip is_georeferenced=true on hits. Idempotent;
  * safe to run on a cron or as a button click. Returns { checked, flipped, ids }.
  *
  * Optional body: { mapId?: string } to probe a single row.
@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     .from('maps')
     .select('id, name, allmaps_id')
     .not('allmaps_id', 'is', null)
-    .eq('georef_done', false);
+    .eq('is_georeferenced', false);
   if (mapId) q = q.eq('id', mapId);
 
   const { data: rows, error: err } = await q;
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     if (await probeAllmapsAnnotation(r.allmaps_id!, 'HEAD')) {
       const { error: updErr } = await supabase
         .from('maps')
-        .update({ georef_done: true })
+        .update({ is_georeferenced: true })
         .eq('id', r.id);
       if (!updErr) flippedIds.push(r.id);
     }

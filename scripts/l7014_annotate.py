@@ -123,7 +123,7 @@ def main():
 
     base, key = env()
     pins = json.loads((WORK / "pins.json").read_text())
-    rows = req(f"{base}/rest/v1/maps?select=id,name,iiif_image,annotation_url,georef_done"
+    rows = req(f"{base}/rest/v1/maps?select=id,name,iiif_image,annotation_url,is_georeferenced"
                f"&collection=eq.Series%20L7014%20(Vietnam%201:50,000)", key)
     # A cell can now carry two rows — PCL's scan and Texas Tech's, which are
     # different editions of the same sheet number. They are told apart by the
@@ -165,7 +165,7 @@ def main():
             req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
         public = f"{base}/storage/v1/object/public/{BUCKET}/{m['id']}.json"
         req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
-            {"annotation_url": public, "georef_done": True})
+            {"annotation_url": public, "is_georeferenced": True})
         print(note + "   uploaded, row updated")
         done += 1
     print(f"\n{done if args.write else len(by_sheet)} sheets "

@@ -12,20 +12,19 @@ export interface MapRecord {
   original_title?: string; // title as in source / on the map
   creator?: string;
   year?: number;
-  year_label?: string; // e.g. "c. 1882", "1898–1902"
+  date_label?: string; // e.g. "c. 1882", "1898–1902" (renamed from `year_label`, mig 095)
   language?: string; // ISO 639-1
   rights?: string;
-  dc_description?: string; // dc:description (migrated from `summary`)
+  description?: string; // dc:description (renamed from `dc_description`, mig 095)
   thumbnail?: string;
 
   // Source
   source_type?: MapSourceType;
   source_url?: string; // canonical URL at institution
   collection?: string; // e.g. "BnF Gallica", "EFEO"
-  ia_identifier?: string; // Internet Archive item ID
 
-  // IIIF
-  iiif_manifest?: string; // manifest URL
+  // IIIF — `iiif_manifest` dropped (mig 095, dead/duplicated); a manifest now
+  // lives per source, on `map_images` (was `map_iiif_sources`).
   iiif_image?: string; // image service base URL
 
   // Georeferencing
@@ -55,11 +54,11 @@ export interface MapListItem {
   name: string;
   location?: string; // city / region (renamed from `type`)
   map_type?: string; // cartographic type: cadastral, topographic, city_plan, panorama
-  dc_description?: string; // dc:description (migrated from `summary`)
+  dc_description?: string; // dc:description — read from maps.description (renamed mig 095)
   thumbnail?: string;
   isFeatured?: boolean;
   year?: number;
-  year_label?: string;
+  year_label?: string; // read from maps.date_label (renamed mig 095)
   collection?: string;
   source_type?: MapSourceType;
   status?: MapStatus;
@@ -67,7 +66,10 @@ export interface MapListItem {
   bounds?: [number, number, number, number]; // Runtime-enriched in useMapList; equivalent to bbox once resolved.
   extra_metadata?: Record<string, string>;
   iiif_image?: string; // IIIF image service base URL (present once ingested)
-  georef_done?: boolean; // DB column maps.georef_done — an Allmaps annotation exists.
+  // An Allmaps annotation exists. Field name kept — this is also what
+  // /api/search hands the browser — read from maps.is_georeferenced (renamed
+  // mig 095).
+  georef_done?: boolean;
   // Distinguishes a map that can be laid on the world from one that is only viewable
   // as a scan; `allmaps_id` is not the same test, since every map carries one.
   creator?: string; // present in search results

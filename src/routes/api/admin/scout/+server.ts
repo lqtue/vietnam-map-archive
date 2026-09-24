@@ -20,8 +20,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   const orderBy = url.searchParams.get('order') || 'score';
   const orderDir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
 
-  let q = supabase.from('scout_candidates').select('*', { count: 'exact' });
-  if (status !== 'all') q = q.eq('status', status);
+  // `status` stays the response field name (the admin Scout UI's own
+  // vocabulary) — `*` gives every real column, the alias adds `status`
+  // alongside `review_status` (mig 095).
+  let q = supabase.from('scout_candidates').select('*, status:review_status', { count: 'exact' });
+  if (status !== 'all') q = q.eq('review_status', status);
   if (source) q = q.eq('source', source);
   if (category) q = q.eq('category', category);
   if (minScore) q = q.gte('score', minScore);
@@ -36,9 +39,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
   if (offset === 0) {
     const facetBase = supabase.from('scout_candidates');
     const [bySource, byCategory, byStatus] = await Promise.all([
-      facetBase.select('source').eq('status', status),
-      facetBase.select('category').eq('status', status),
-      facetBase.select('status'),
+      facetBase.select('source').eq('review_status', status),
+      facetBase.select('category').eq('review_status', status),
+      facetBase.select('status:review_status'),
     ]);
     const opts = { emptyLabel: '(none)' };
     facets = {
@@ -63,7 +66,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     .from('scout_candidates')
     .select('*')
     .in('id', ids)
-    .eq('status', 'approved');
+    .eq('review_status', 'approved');
   if (fetchErr) dbError(fetchErr, 'Could not load scout candidates');
 
   const results: { id: string; map_id?: string; error?: string }[] = [];
@@ -80,7 +83,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       const insertPayload = {
         name: (c.title || '(untitled)').slice(0, 240),
         year: c.year ?? null,
-        year_label: c.date ?? null,
+        date_label: c.date ?? null,
         status: 'draft',
         source_type: holdingInst.includes('David Rumsey')
           ? 'rumsey'
@@ -91,10 +94,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         collection: c.collection ?? null,
         original_title: c.title ?? null,
         creator: c.creator ?? null,
-        dc_publisher: c.publisher ?? null,
+        publisher: c.publisher ?? null,
         language: c.language ?? null,
         rights: c.rights ?? null,
-        iiif_manifest: c.manifest_url ?? null,
         // A source with no reachable Presentation manifest can still expose an
         // Image API endpoint; scoutDerive.mjs parks it here (LoC is the case).
         iiif_image: imageUrl,
@@ -116,12 +118,26 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       if (insErr) throw new Error(insErr.message);
       const mapId = newMap.id;
 
+      // The manifest now lives per-source, on map_images (was map_iiif_sources,
+      // mig 095) rather than on maps directly. map_images.iiif_image is
+      // NOT NULL, so a manifest-only candidate (no Image API endpoint) has
+      // nothing to record here — its source can still be added by hand in the
+      // Hosting tab.
+      if (c.manifest_url && imageUrl) {
+        await supabase.from('map_images').insert({
+          map_id: mapId,
+          iiif_manifest: c.manifest_url,
+          iiif_image: imageUrl,
+          is_primary: true,
+        });
+      }
+
       await supabase
         .from('scout_candidates')
         .update({
-          status: 'ingested',
+          review_status: 'ingested',
           map_id: mapId,
-          reviewer_id: user.id,
+          reviewed_by: user.id,
           reviewed_at: new Date().toISOString(),
         })
         .eq('id', c.id);

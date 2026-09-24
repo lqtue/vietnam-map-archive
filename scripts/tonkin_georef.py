@@ -805,8 +805,8 @@ def sheets():
     url, key = os.environ["PUBLIC_SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"]
     r = requests.get(f"{url}/rest/v1/maps", timeout=30,
                      headers={"apikey": key, "Authorization": f"Bearer {key}"},
-                     params={"select": "id,name,year_label,extra_metadata",
-                             "georef_done": "eq.false", "collection": f"eq.{COLLECTION}",
+                     params={"select": "id,name,date_label,sheet_number,sheet_half",
+                             "is_georeferenced": "eq.false", "collection": f"eq.{COLLECTION}",
                              "order": "name"})
     r.raise_for_status()
     return r.json()
@@ -914,7 +914,7 @@ def annotation(iiif, w, h, got):
 def annotate(write=False, only_new=False):
     """Write an annotation per sheet that cleared the gate; optionally publish it.
 
-    `georef_done` goes true and `status` is left alone. Every one of these rows is
+    `is_georeferenced` goes true and `status` is left alone. Every one of these rows is
     a draft, so turning the flag on puts the sheet on /explore for a signed-in
     reviewer and nowhere else -- which is the point: the last step of this pipeline
     is a person looking at all of them, and they cannot look at what the viewer
@@ -944,7 +944,7 @@ def annotate(write=False, only_new=False):
     done = skipped = 0
     if only_new:
         r = requests.get(f"{url}/rest/v1/maps", headers=H, timeout=60,
-                         params={"select": "id", "georef_done": "is.true",
+                         params={"select": "id", "is_georeferenced": "is.true",
                                  "collection": f"eq.{COLLECTION}"})
         r.raise_for_status()
         already = {m["id"] for m in r.json()}
@@ -976,7 +976,7 @@ def annotate(write=False, only_new=False):
         r.raise_for_status()
         public = f"{url}/storage/v1/object/public/{BUCKET}/{mid}.json"
         r = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}", headers=H, timeout=30,
-                           json={"annotation_url": public, "georef_done": True,
+                           json={"annotation_url": public, "is_georeferenced": True,
                                  "bbox": bbox})
         r.raise_for_status()
         print(f"  {got['name']:22.22s} written")
@@ -1011,7 +1011,7 @@ def check():
         if got.get("verdict"):
             continue
         g, row = got["grades"], rows.get(got["id"], {})
-        n = (row.get("extra_metadata") or {}).get("sheet_number", "??")
+        n = row.get("sheet_number") or "??"
         cells.setdefault(g["NW"][1], {}).setdefault(g["NW"][0], []).append(
             (n, got["name"], f))
         (half_lons if got.get("cut") else whole_lons).add(g["NW"][0])
@@ -1199,15 +1199,15 @@ def catalogue_boxes():
     return out
 
 
-def catalogue_key(meta):
-    """`C_20E` out of a row's `extra_metadata`, or None if it does not name a cell."""
-    cell = str((meta or {}).get("sheet_number") or "").strip().lower()
+def catalogue_key(row):
+    """`C_20E` out of a maps row's `sheet_number`/`sheet_half`, or None if it names no cell."""
+    cell = str((row or {}).get("sheet_number") or "").strip().lower()
     if not cell:
         return None
     m = re.match(r"\[?(\d+)\s*(bis)?", cell)
     if not m:
         return None
-    half = (meta or {}).get("sheet_half")
+    half = (row or {}).get("sheet_half")
     return "C_%02d%s%s" % (int(m.group(1)), "b" if m.group(2) else "",
                            half if half in ("W", "E") else "")
 
@@ -1256,7 +1256,7 @@ def calibrate(write=True):
         row = rows.get(got.get("id"))
         if not row:
             continue
-        key = catalogue_key(row.get("extra_metadata"))
+        key = catalogue_key(row)
         box = boxes.get(key) if key else None
         if not box:
             continue
@@ -1346,7 +1346,7 @@ def all_sheets():
     url, key = os.environ["PUBLIC_SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"]
     r = requests.get(f"{url}/rest/v1/maps", timeout=30,
                      headers={"apikey": key, "Authorization": f"Bearer {key}"},
-                     params={"select": "id,name,year,year_label,status,extra_metadata",
+                     params={"select": "id,name,year,date_label,status,sheet_number,sheet_half",
                              "collection": f"eq.{COLLECTION}", "order": "name"})
     r.raise_for_status()
     return r.json()
@@ -1380,12 +1380,11 @@ def cell_footprints():
         row = rows.get(got.get("id"))
         if not row:
             continue
-        meta = row.get("extra_metadata") or {}
         # Only whole-cell sheets define a cell's footprint; a half would define
         # half of one and then vouch for itself.
-        if meta.get("sheet_half") in ("W", "E"):
+        if row.get("sheet_half") in ("W", "E"):
             continue
-        cell = str(meta.get("sheet_number") or "").strip()
+        cell = str(row.get("sheet_number") or "").strip()
         if not cell:
             continue
         w = got["wgs84"]
@@ -1447,9 +1446,8 @@ def from_catalogue(map_id=None, write=False):
           f"{'' if write else '  -- DRY RUN, nothing is written'}\n")
     ok = held = failed = 0
     for row in rows:
-        meta = row.get("extra_metadata") or {}
         name = f"{row['name']} {row.get('year') or ''}".strip()
-        given, err = catalogue_edges(meta, boxes, cal)
+        given, err = catalogue_edges(row, boxes, cal)
         if err:
             print(f"  {name:28} SKIP  {err}")
             failed += 1
@@ -1462,7 +1460,7 @@ def from_catalogue(map_id=None, write=False):
         # buys a check the footprint cannot: if a sheet will only detect with the
         # OTHER edge cut, then the half it claims to be is the wrong one, and that
         # is exactly the error CartoMundi makes on cells 25 and 74.
-        half = meta.get("sheet_half")
+        half = row.get("sheet_half")
         want_cut = {"E": "L", "W": "R"}.get(half)
         base = f"https://iiif.maparchive.vn/iiif/{row['id']}"
         try:
@@ -1492,8 +1490,8 @@ def from_catalogue(map_id=None, write=False):
             continue
         got["id"], got["name"] = row["id"], row["name"]
         got["placed_from"] = "catalogue"
-        got["catalogue_key"] = catalogue_key(meta)
-        outside = footprint_check(meta, got["wgs84"], cells)
+        got["catalogue_key"] = catalogue_key(row)
+        outside = footprint_check(row, got["wgs84"], cells)
         got["verdict"] = got.get("verdict", []) + outside
         mx, my = got["m_per_px"]
         if got["verdict"]:

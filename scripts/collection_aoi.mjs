@@ -49,7 +49,7 @@ const flag = (name, fallback) => {
 const dry = args.includes('--dry');
 const enqueue = args.includes('--enqueue-ocr');
 // Re-queue sheets that already hold extractions. Additive, not destructive:
-// `ocr_extractions` is keyed by (map_id, run_id, tile_x, tile_y, text), so a
+// `ocr_labels` is keyed by (map_id, run_id, tile_x, tile_y, text), so a
 // new run sits beside the old ones and the series picks a run_id. Needed
 // because the two sheets already OCR'd were read whole-sheet at the 2.34x
 // downsample, and one of them across five separate experimental runs.
@@ -568,7 +568,7 @@ const inFlight = new Set((live ?? []).map((r) => r.map_id));
 const hasOcr = new Set();
 for (const r of picked) {
   const { count, error: cErr } = await db
-    .from('ocr_extractions')
+    .from('ocr_labels')
     .select('*', { count: 'exact', head: true })
     .eq('map_id', r.id);
   if (cErr) throw cErr;

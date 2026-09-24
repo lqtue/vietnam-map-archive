@@ -9,7 +9,7 @@
  * from a misread 87.
  *
  * The parsing is the fragile half: the number and the grid cell live inside
- * `notes` as "n=..; grid=.." because `ocr_extractions` has no column for
+ * `notes` as "n=..; grid=.." because `ocr_labels` has no column for
  * either, and a human correction lands in `text_validated` / `category_validated`
  * rather than over the model's own fields.
  */

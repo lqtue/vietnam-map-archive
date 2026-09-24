@@ -3,7 +3,7 @@
 
 Why this exists: `legend1968/legend.json` (244 entries) and
 `numerals1968/numerals.json` (712 markers, deduped) were both run and written
-to disk on 2026-09-10/11 but never upserted to `ocr_extractions` — the map's
+to disk on 2026-09-10/11 but never upserted to `ocr_labels` — the map's
 `ocr --legend`/`ocr --numerals` DB-write step was skipped that day, and nothing
 since has re-run either (both call Gemini/local Tesseract, and this data is
 already paid for). `modern_prior.py --legend` is what caught it: the sheet

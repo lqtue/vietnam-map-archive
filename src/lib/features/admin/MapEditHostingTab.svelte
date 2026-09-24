@@ -143,12 +143,16 @@
     }
   }
 
-  // True when maps.iiif_image points to R2 but no map_iiif_sources row exists for it
+  // True when maps.iiif_image points to R2 but no map_images row exists for it
   $: orphanR2 = !!(
     map.iiif_image?.includes('maparchive.vn') &&
     iiifSources.length > 0 &&
     !iiifSources.some((s) => s.iiif_image?.includes('maparchive.vn'))
   );
+
+  // maps.iiif_manifest was dropped (mig 095) — the manifest now lives per
+  // source, on map_images (was map_iiif_sources).
+  $: manifestSourceUrl = iiifSources.find((s) => !!s.iiif_manifest)?.iiif_manifest ?? '';
 
   // ── Auto-fill IIIF manifest metadata ───────────────────────────────
   let fetchingManifest = false;
@@ -156,7 +160,7 @@
 
   async function handleFetchManifestMeta() {
     const manifestUrl = (
-      map.iiif_manifest ||
+      manifestSourceUrl ||
       iiifSources.find((s) => !!s.iiif_image)?.iiif_image ||
       ''
     ).trim();
@@ -301,11 +305,9 @@
      reads it and writes nothing back, so there is no real cycle. */
   $: {
     const forId = allmaps_id;
-    verifiedEditorSourceId({ allmaps_id, iiif_manifest: map.iiif_manifest }, iiifSources).then(
-      (id) => {
-        if (forId === allmaps_id) verifiedSourceId = id;
-      }
-    );
+    verifiedEditorSourceId({ allmaps_id }, iiifSources).then((id) => {
+      if (forId === allmaps_id) verifiedSourceId = id;
+    });
   }
   /* eslint-enable svelte/infinite-reactive-loop */
   // Shared with the share page's "Fix georeference" link — see
@@ -331,13 +333,13 @@
       type="button"
       class="btn is-sm"
       on:click={handleFetchManifestMeta}
-      disabled={fetchingManifest || !map.iiif_manifest}
+      disabled={fetchingManifest || !manifestSourceUrl}
     >
       {fetchingManifest ? 'Fetching…' : 'Fetch metadata from IIIF manifest'}
     </button>
-    {#if !map.iiif_manifest}
+    {#if !manifestSourceUrl}
       <span class="lookup-status lookup-status--dim">
-        Set the IIIF manifest URL on this map first.
+        Add an IIIF source with a manifest URL first.
       </span>
     {/if}
     {#if fetchManifestStatus}

@@ -10,7 +10,6 @@ export interface GeorefMapItem {
   name: string;
   allmaps_id: string | null;
   iiif_image: string | null;
-  iiif_manifest: string | null;
   georef_done: boolean;
   year: number | null;
 }
@@ -41,9 +40,9 @@ export async function fetchGeorefFixList(
   const { data, error } = await supabase
     .from('maps')
     .select(
-      'id, name, year, status, iiif_manifest, annotation_url, allmaps_id, map_iiif_sources(iiif_image, source_type)'
+      'id, name, year, status, annotation_url, allmaps_id, map_images(iiif_image, iiif_manifest, source_type)'
     )
-    .eq('georef_done', true)
+    .eq('is_georeferenced', true)
     .order('name');
 
   if (error) {
@@ -52,8 +51,8 @@ export async function fetchGeorefFixList(
   }
   return Promise.all(
     (data ?? []).map(async (m) => {
-      const verifiedSourceId = await verifiedEditorSourceId(m, m.map_iiif_sources ?? []);
-      const source = allmapsEditorSourceUrl(m, m.map_iiif_sources ?? [], verifiedSourceId);
+      const verifiedSourceId = await verifiedEditorSourceId(m, m.map_images ?? []);
+      const source = allmapsEditorSourceUrl(m, m.map_images ?? [], verifiedSourceId);
       return {
         id: m.id,
         name: m.name,
@@ -71,7 +70,9 @@ export async function fetchGeorefQueue(
 ): Promise<GeorefMapItem[]> {
   const { data, error } = await supabase
     .from('maps')
-    .select('id, name, allmaps_id, iiif_image, iiif_manifest, georef_done, year')
+    // `georef_done` stays the field name below (this module's own vocabulary);
+    // only the column read from renamed (mig 095).
+    .select('id, name, allmaps_id, iiif_image, georef_done:is_georeferenced, year')
     .eq('status', 'draft')
     .order('priority', { ascending: false })
     .order('name');
@@ -94,12 +95,13 @@ export function annotationStorageUrl(allmapsId: string): string {
 }
 
 /**
- * Deep-link into the Allmaps Editor. Prefers the manifest (multi-image
- * collections), then the image service, then an existing annotation.
+ * Deep-link into the Allmaps Editor. Prefers the image service, then an
+ * existing annotation. (`maps.iiif_manifest` was dropped, mig 095 — dead,
+ * duplicated by the per-source manifest on `map_images` — and this queue
+ * never carried one anyway: it is unpublished, self-hosted scans.)
  */
 export function allmapsEditorUrl(map: GeorefMapItem): string {
   const base = 'https://editor.allmaps.org/#/collection?url=';
-  if (map.iiif_manifest) return base + encodeURIComponent(map.iiif_manifest);
   if (map.iiif_image) return base + encodeURIComponent(withInfoJson(map.iiif_image));
   if (map.allmaps_id) return base + encodeURIComponent(annotationStorageUrl(map.allmaps_id));
   return 'https://editor.allmaps.org/';

@@ -13,7 +13,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   const supabase = adminClient();
   const body = await request.json();
 
-  const updateData: Database['public']['Tables']['map_iiif_sources']['Update'] = {};
+  const updateData: Database['public']['Tables']['map_images']['Update'] = {};
   if (body.label !== undefined) updateData.label = body.label;
   if (body.source_type !== undefined) updateData.source_type = body.source_type;
   if (body.iiif_manifest !== undefined) updateData.iiif_manifest = body.iiif_manifest;
@@ -26,7 +26,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   // The trigger would do this too, but it runs AFTER the constraint check.
   if (updateData.is_primary === true) {
     const { error: clearErr } = await supabase
-      .from('map_iiif_sources')
+      .from('map_images')
       .update({ is_primary: false })
       .eq('map_id', mapId)
       .eq('is_primary', true)
@@ -35,7 +35,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   }
 
   const { data, error: err } = await supabase
-    .from('map_iiif_sources')
+    .from('map_images')
     .update(updateData)
     .eq('id', sourceId)
     .eq('map_id', mapId)
@@ -55,7 +55,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
   // Guard: don't delete the primary if it's the only source
   const { data: sources } = await supabase
-    .from('map_iiif_sources')
+    .from('map_images')
     .select('id, is_primary')
     .eq('map_id', mapId);
 
@@ -66,7 +66,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
   }
 
   const { error: err } = await supabase
-    .from('map_iiif_sources')
+    .from('map_images')
     .delete()
     .eq('id', sourceId)
     .eq('map_id', mapId);

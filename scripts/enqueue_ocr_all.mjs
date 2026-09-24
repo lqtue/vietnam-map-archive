@@ -195,7 +195,7 @@ const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SE
 const { data: maps, error } = await db
   .from('maps')
   .select('id, name, year, iiif_image, allmaps_id, annotation_url, triage')
-  .eq('georef_done', true)
+  .eq('is_georeferenced', true)
   .not('iiif_image', 'is', null)
   .order('year');
 if (error) throw error;
@@ -207,10 +207,7 @@ if (error) throw error;
 // by the number of *maps*, not the number of rows.
 const hasOcr = new Set();
 {
-  const { data: rows, error: exErr } = await db
-    .from('ocr_extractions')
-    .select('map_id')
-    .limit(1000);
+  const { data: rows, error: exErr } = await db.from('ocr_labels').select('map_id').limit(1000);
   if (exErr) throw exErr;
   for (const r of rows ?? []) hasOcr.add(r.map_id);
   // The cap above is a silent truncation, so confirm per map rather than
@@ -218,7 +215,7 @@ const hasOcr = new Set();
   for (const m of maps) {
     if (hasOcr.has(m.id)) continue;
     const { count, error: cErr } = await db
-      .from('ocr_extractions')
+      .from('ocr_labels')
       .select('*', { count: 'exact', head: true })
       .eq('map_id', m.id);
     if (cErr) throw cErr;

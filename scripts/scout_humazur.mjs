@@ -166,14 +166,16 @@ const recs = [...allItems.values()];
 console.log(`\nFetched ${totalSeen} raw items → ${totalKept} kept (media + Vietnam filter)\n`);
 
 // VMA dedup
-const r = await fetch(`${SUPABASE_URL}/rest/v1/maps?select=iiif_manifest,iiif_image,source_url`, {
-  headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-});
+const r = await fetch(
+  `${SUPABASE_URL}/rest/v1/maps?select=iiif_image,source_url,map_images(iiif_manifest)`,
+  { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
+);
 const existing = await r.json();
 const existingArks = new Set();
 const existingHumazurIds = new Set();
 for (const m of existing) {
-  for (const v of [m.iiif_manifest, m.iiif_image, m.source_url]) {
+  const manifests = (m.map_images ?? []).map((s) => s.iiif_manifest);
+  for (const v of [...manifests, m.iiif_image, m.source_url]) {
     if (!v) continue;
     const a = v.match(/ark:\/17103\/[a-z0-9]+/i);
     if (a) existingArks.add(a[0]);

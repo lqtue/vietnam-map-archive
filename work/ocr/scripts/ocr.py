@@ -1186,7 +1186,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
         # row (shared unique key) — same ceiling the old raw path had. Fix with a
         # location suffix in the key only if it ever bites.
         n_written = upsert_ocr_extractions(map_label, out_dir.name, db_rows)
-        print(f"DB: upserted {n_written} deduped rows ({raw_n} raw per-tile) to ocr_extractions")
+        print(f"DB: upserted {n_written} deduped rows ({raw_n} raw per-tile) to ocr_labels")
 
         try:
             from supabase_client import update_pipeline_status
@@ -2398,7 +2398,7 @@ def cmd_merge(args: argparse.Namespace) -> None:
                 "prompt": e.get("_prompt"),
             })
         n_written = upsert_ocr_extractions(args.map_id, args.run_id, db_rows)
-        print(f"DB: upserted {n_written} merged rows to ocr_extractions")
+        print(f"DB: upserted {n_written} merged rows to ocr_labels")
         try:
             from supabase_client import update_pipeline_status
             update_pipeline_status(args.map_id, "ocr_done", ocr_run_id=args.run_id,
@@ -2633,7 +2633,7 @@ def cmd_clean(args: argparse.Namespace) -> None:
     }, indent=2, ensure_ascii=False))
     print(f"\nSaved → {out_path}")
 
-    # ── Apply → ocr_extractions ─────────────────────────────────────────────────
+    # ── Apply → ocr_labels ─────────────────────────────────────────────────
     if args.apply:
         if not args.map_id:
             raise SystemExit("Provide --map-id for --apply")
@@ -2663,11 +2663,11 @@ def cmd_clean(args: argparse.Namespace) -> None:
                 "notes": (e.get("notes") or "").replace("\x00", ""),
                 "model": e.get("model", ""),
                 "prompt": e.get("prompt", ""),
-                "status": "pending",
+                "review_status": "pending",
             })
-        print(f"\nUpserting {len(rows)} rows to ocr_extractions (run_id={args.run_id}) ...")
+        print(f"\nUpserting {len(rows)} rows to ocr_labels (run_id={args.run_id}) ...")
         n = upsert_ocr_extractions(args.map_id, args.run_id, rows)
-        print(f"Done — {n} rows in ocr_extractions.")
+        print(f"Done — {n} rows in ocr_labels.")
 
 
 def cmd_scout(args: argparse.Namespace) -> None:
@@ -2701,7 +2701,7 @@ def cmd_scout(args: argparse.Namespace) -> None:
         raise SystemExit(
             f"Sheet is {full_w}×{full_h} px, under the {SCOUT_MIN_WIDTH} px the scout "
             "needs to read a label. That is the scan itself, not the mirror: find a "
-            "larger source (map_iiif_sources) before running layout or OCR on this map."
+            "larger source (map_images) before running layout or OCR on this map."
         )
     print(f"  Using {len(levels)} scale level(s): "
           + ", ".join(f"{l['width']}×{l['height']}" for l in levels))
@@ -3343,7 +3343,7 @@ def _write_legend_rows(map_id: str, run_id: str, region: tuple[int, int, int, in
     are byte-identical to what they were, and a reviewer looking at a
     two-table sheet can see which table a name is from.
 
-    ponytail: ocr_extractions has no number/grid columns, so the number + grid
+    ponytail: ocr_labels has no number/grid columns, so the number + grid
     live in `notes` (parseable "n=..; grid=..") and `text` carries "n. name" —
     that keeps the row key unique (duplicate names exist) and carries the
     body-numeral join key. Add real columns if the number-join gets clumsy.
@@ -3892,7 +3892,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_batch.add_argument("--min-confidence", type=float, default=0.4,
                          help="Min confidence for deduped master output (default 0.4)")
     p_batch.add_argument("--db", action="store_true",
-                         help="Upsert deduped extractions to Supabase ocr_extractions table")
+                         help="Upsert deduped extractions to Supabase ocr_labels table")
     p_batch.add_argument("--scout", action="store_true", help="Run a macro-level Scout Pass first")
     p_batch.add_argument("--legend", action="store_true",
                          help="After tiles, auto-extract the legend region (scout cartouche → local box finder) into legend_entry rows")
@@ -3978,7 +3978,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_clean.add_argument("--map-id", help="Supabase maps.id UUID")
     p_clean.add_argument("--run-id", help="Filter by specific run_id")
     p_clean.add_argument("--local", help="Path to a run directory containing per-tile .json files")
-    p_clean.add_argument("--db", action="store_true", help="Fetch from Supabase ocr_extractions table")
+    p_clean.add_argument("--db", action="store_true", help="Fetch from Supabase ocr_labels table")
     p_clean.add_argument("--apply", action="store_true", help="Apply results as Map Pins in Supabase")
     p_clean.add_argument("--user-id", help="User ID for pin attribution (default: system admin)")
     p_clean.add_argument("--min-confidence", type=float, default=0.1, help="Min confidence to include (default 0.1 — V1 recall mode)")
@@ -3991,7 +3991,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_dedup.add_argument("--map-id", help="Supabase maps.id UUID")
     p_dedup.add_argument("--run-id", help="Filter by specific run_id")
     p_dedup.add_argument("--local", help="Path to a run directory containing per-tile .json files")
-    p_dedup.add_argument("--db", action="store_true", help="Fetch labels from Supabase ocr_extractions table")
+    p_dedup.add_argument("--db", action="store_true", help="Fetch labels from Supabase ocr_labels table")
     p_dedup.add_argument("--apply", action="store_true", help="Apply deduped labels as Map Pins in Supabase")
     p_dedup.add_argument("--user-id", help="User ID for Map Pins attribution (default: system admin)")
     p_dedup.add_argument("--min-confidence", type=float, default=0.4, help="Min confidence to include (default 0.4; uncertain tier = 0.4–0.7, confirmed = ≥0.7)")
@@ -4003,7 +4003,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_merge.add_argument("--runs", required=True, help="Comma-separated run ids under outputs/<map>/runs/")
     p_merge.add_argument("--run-id", required=True, help="Name of the merged run to write")
     p_merge.add_argument("--tile-size", type=int, default=2400, help="Recorded on the DB rows' tile_w/h (default 2400)")
-    p_merge.add_argument("--db", action="store_true", help="Upsert the merged rows to ocr_extractions")
+    p_merge.add_argument("--db", action="store_true", help="Upsert the merged rows to ocr_labels")
     p_merge.set_defaults(func=cmd_merge)
 
     # scout
@@ -4115,7 +4115,7 @@ def build_parser() -> argparse.ArgumentParser:
                        help="IoU threshold for cross-tile dedup (default 0.15)")
     p_num.add_argument("--limit", type=int, help="Max tiles (for testing)")
     p_num.add_argument("--db", action="store_true",
-                       help="Upsert results into ocr_extractions as category='legend_ref'")
+                       help="Upsert results into ocr_labels as category='legend_ref'")
     p_num.add_argument("--run-id", help="Run identifier (default: timestamp)")
     p_num.set_defaults(func=cmd_numerals)
 
@@ -4137,7 +4137,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_leg.add_argument("--consensus", type=int, default=1,
                        help="Cross-check grid cells across N models; flag disagreements (default 1)")
     p_leg.add_argument("--db", action="store_true",
-                       help="Upsert into ocr_extractions as category='legend_entry'")
+                       help="Upsert into ocr_labels as category='legend_entry'")
     p_leg.add_argument("--run-id", help="Run identifier (default: timestamp)")
     p_leg.set_defaults(func=cmd_legend)
 
@@ -4162,7 +4162,7 @@ def build_parser() -> argparse.ArgumentParser:
                       help="Rendered crop width (default 1500)")
     p_si.add_argument("--model", default=DEFAULT_MODEL, help="Gemini model")
     p_si.add_argument("--db", action="store_true",
-                      help="Upsert into ocr_extractions, positioned on the T\u1eeb\u2192\u0110\u1ebfn cell span")
+                      help="Upsert into ocr_labels, positioned on the T\u1eeb\u2192\u0110\u1ebfn cell span")
     p_si.add_argument("--run-id", help="Run identifier (default: timestamp)")
     p_si.set_defaults(func=cmd_street_index)
 

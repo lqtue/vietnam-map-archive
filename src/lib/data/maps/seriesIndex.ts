@@ -70,7 +70,7 @@ export async function fetchSeriesIndex(
      `seriesSheets.ts` owns the rule, and `sheetStatus` is called here rather
      than reimplemented — including the half that separates two kinds of
      *unheld*, which the drawer draws as a coverage bar. */
-  const { data: cells } = await supabase.from('series_sheets').select('series_key,held_by,source');
+  const { data: cells } = await supabase.from('series_cells').select('series_key,held_by,source');
 
   const held = new Map<string, SeriesTally>();
   for (const c of cells ?? []) {

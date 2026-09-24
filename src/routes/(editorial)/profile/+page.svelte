@@ -47,7 +47,7 @@
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id),
         supabase
-          .from('footprint_submissions')
+          .from('footprints')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id),
       ]);

@@ -11,7 +11,7 @@ key (case, whitespace and edge punctuation folded); diacritics are preserved,
 because "Sài Gòn" and "Sai Gon" are different readings and the difference is the
 kind of thing this file exists to show.
 
-`text_validated` / `category_validated` (what a human fixed in the OCR Review
+`text_corrected` / `category_corrected` (what a human fixed in the OCR Review
 tab) win over the model's `text` / `category`. Rejected rows are dropped unless
 --include-rejected.
 
@@ -94,28 +94,28 @@ def build(
     include_furniture: bool = False,
 ) -> dict[str, Any]:
     extractions = _fetch_all(
-        "ocr_extractions",
-        "map_id,run_id,text,text_validated,category,category_validated,"
-        "confidence,status,global_x,global_y",
+        "ocr_labels",
+        "map_id,run_id,text,text_corrected,category,category_corrected,"
+        "confidence,review_status,global_x,global_y",
     )
     maps = {
         m["id"]: m
-        for m in _fetch_all("maps", "id,name,year,year_label,status")
+        for m in _fetch_all("maps", "id,name,year,date_label,status")
     }
 
     entries: dict[str, dict[str, Any]] = {}
     skipped = Counter()
 
     for row in extractions:
-        if not include_rejected and row["status"] == "rejected":
+        if not include_rejected and row["review_status"] == "rejected":
             skipped["rejected"] += 1
             continue
         if (row.get("confidence") or 0) < min_confidence:
             skipped["low_confidence"] += 1
             continue
 
-        surface = (row.get("text_validated") or row["text"] or "").strip()
-        category = row.get("category_validated") or row["category"]
+        surface = (row.get("text_corrected") or row["text"] or "").strip()
+        category = row.get("category_corrected") or row["category"]
         if not include_furniture and category in FURNITURE:
             skipped["furniture"] += 1
             continue
@@ -142,7 +142,7 @@ def build(
         )
         e["surface_forms"][surface] += 1
         e["categories"][category] += 1
-        e["validated"] += row["status"] == "validated"
+        e["validated"] += row["review_status"] == "validated"
         e["sightings"].append(
             {
                 "map_id": row["map_id"],

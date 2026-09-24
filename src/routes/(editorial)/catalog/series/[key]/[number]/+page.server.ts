@@ -52,9 +52,9 @@ export const load: PageServerLoad = async ({ params }) => {
   const { data: rows } = series.collection
     ? await supabase
         .from('maps')
-        .select('id,name,year,status,extra_metadata')
+        .select('id,name,year,status,sheet_half')
         .eq('collection', series.collection)
-        .eq('extra_metadata->>sheet_number', number)
+        .eq('sheet_number', number)
         .in('status', ['public', 'featured'])
         .order('year', { ascending: true })
     : { data: [] };
@@ -66,8 +66,7 @@ export const load: PageServerLoad = async ({ params }) => {
     // What distinguishes this record from its siblings: which half of the cell
     // it draws, or nothing when the cell is held whole and the year is the only
     // thing telling two records apart.
-    half: ((m.extra_metadata as { sheet_half?: string } | null)?.sheet_half ?? null) as
-      string | null,
+    half: m.sheet_half,
   }));
 
   return {

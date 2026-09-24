@@ -59,7 +59,7 @@ allmaps_id text  -- service credential used as join key
 Never use `submitted_by`, `author_id`, `owner_id` — always `user_id`.
 
 Table names are plural snake_case matching the domain, not the feature that happens to use them
-(`maps`, `footprint_submissions`, `story_points` — not `hunts`, which was dropped in migration 034
+(`maps`, `footprints`, `story_points` — not `hunts`, which was dropped in migration 034
 when the feature was renamed).
 
 ---
@@ -137,7 +137,7 @@ Denormalized columns are only permitted when:
 2. A trigger keeps the copy in sync
 3. Both the column and the trigger have SQL comments documenting the relationship
 
-Example: `maps.iiif_image` is a cache of the primary `map_iiif_sources` row, synced by
+Example: `maps.iiif_image` is a cache of the primary `map_images` row, synced by
 `sync_primary_iiif_to_map` trigger.
 
 Never denormalize FKs. If you need `maps.allmaps_id` in a child table, join through
@@ -196,29 +196,40 @@ All tables must have `alter table ... enable row level security`.
 
 ---
 
-## 11. Current schema (migration head 077)
+## 11. Current schema (migration head 096)
+
+Table/column names below were renamed in mig 095 (`ocr_extractions`→`ocr_labels`,
+`footprint_submissions`→`footprints`, `series_sheets`→`series_cells`, `sheet_sources`→
+`cell_printings`, `map_iiif_sources`→`map_images`, `map_opens`→`map_views`, `user_favorites`→
+`favorites`, `annotation_sets`→`user_layers`; `status`/`validated_*`/`reviewer_id` columns onto
+`review_status`/`reviewed_by`/`reviewed_at`; `maps.georef_done`→`is_georeferenced`,
+`dc_publisher`→`publisher`, `dc_description`→`description`, `year_label`→`date_label`). Compat
+views under the old table names exist until the deploy carrying this rename has shipped —
+`supabase/CLAUDE.md` has the full list and what has no such bridge.
 
 Moved here from `CLAUDE.md` in September 2026. The table lists what exists; the paragraphs after it
 are the rules a migration must not undo.
 
 | Table | Purpose | Notes |
 |-------|---------|-------|
-| `maps` | Map catalogue | `id` (uuid), `slug` (mig 088 — unique, minted by trigger, never moved by a rename), `allmaps_id`, `annotation_url` (mig 047), `iiif_image`, `iiif_manifest`, `source_type`, `holding_institution` (mig 044), `collection`, `map_type`, `bbox`, `status`, `thumbnail`, full DC fields, plus `georef_done`, `help_needed`, `legend_done`, `priority`, `label_config`, `triage` (mig 069, `regions` added by 070) |
+| `maps` | Map catalogue | `id` (uuid), `slug` (mig 088 — unique, minted by trigger, never moved by a rename), `allmaps_id`, `annotation_url` (mig 047), `iiif_image`, `source_type`, `holding_institution` (mig 044), `collection`, `map_type`, `bbox`, `status`, `thumbnail`, DC fields (`publisher`, `description`, mig 095), `date_label` (mig 095), plus `is_georeferenced` (mig 095, was `georef_done`), `sheet_number`/`sheet_half` (mig 095, typed columns backfilled from `extra_metadata`), `priority`, `label_config`, `triage` (mig 069, `regions` added by 070; `triage_reviewed_at`/`triage_reviewed_by` are mig 095's typed columns backfilled from `triage`) |
 | `map_slug_aliases` | Addresses a sheet used to answer on (mig 088) | `slug` PK, `map_id → maps.id`. Written by the trigger when a sheet is demoted off a bare name or deliberately re-minted; `/catalog/[id]` 301s them. A slug is never both canonical and an alias |
 | `profiles` | Per-user role | `user`, `mod`, `admin`; read via `fetchUserRole` |
-| `scout_candidates` | External discoveries (mig 045) | `source`, `external_id` (unique with source), `manifest_url`, `score`, `category`, `status` (`pending/approved/rejected/ingested`), `map_id` on ingest, `raw` JSONB |
-| `map_iiif_sources` | Multiple IIIF sources per map | `map_id → maps.id`, `source_type`, `is_primary`, `sort_order`. Partial unique index = one primary per map; trigger syncs primary to `maps.iiif_image` |
-| `map_opens` | Per-map open tally (mig 049) | Fire-and-forget insert from /explore |
+| `scout_candidates` | External discoveries (mig 045) | `source`, `external_id` (unique with source), `manifest_url`, `score`, `category`, `review_status` (mig 095, was `status`; `pending/approved/rejected/ingested`), `reviewed_by` (mig 095, was `reviewer_id`), `map_id` on ingest, `raw` JSONB |
+| `map_images` | Multiple IIIF sources per map (mig 095, was `map_iiif_sources`) | `map_id → maps.id`, `source_type`, `is_primary`, `sort_order`. Partial unique index = one primary per map; trigger syncs primary to `maps.iiif_image` |
+| `map_views` | Per-map open tally (mig 049; mig 095, was `map_opens`) | Fire-and-forget insert from /explore |
 | `label_pins` | Point annotations | `map_id → maps.id`, pixel coords. `label_tasks` was dropped in mig 038 |
-| `footprint_submissions` | Polygon traces + SAM2 output | `map_id → maps.id`; status ∈ `draft/submitted/needs_review/approved/rejected`, source ∈ `volunteer/sam-auto/sam-corrected/import` (both widened in mig 055 — 038's lists rejected every SAM2 write); `pixel_polygon`; `run_id` (mig 057) pins a segmentation run so the OCR join cannot mix runs |
-| `annotation_sets` | User GeoJSON | `map_id → maps.id` nullable, `user_id → auth.users` |
-| `ocr_extractions` | OCR bbox results | `(map_id, run_id, tile_x, tile_y, text, global_xi, global_yi)` unique (mig 077 — the key was position-blind, so eight distinct `Rue` labels in one tile collapsed to one row; `global_xi`/`global_yi` are generated `round(global_x/y)` and exist only because PostgREST cannot name an expression index in `on_conflict`). `global_x`/`global_y` are now `not null`; `global_*` are full-image px — the **derived** axis-aligned box around a label that may run at any angle, whose own rectangle is `rotation_deg` + `label_w`/`label_h` (mig 076; null on pipeline rows, where the size is inverted out of the box instead, and unrecoverable within ~2° of 45°). Every geometry write sends both; `status` ∈ `pending/validated/rejected`; `footprint_id` (mig 050) is the OCR↔footprint join. Read policy inherits the map's gate since mig 065 (published, or any signed-in user) |
+| `footprints` | Polygon traces + SAM2 output (mig 095, was `footprint_submissions`) | `map_id → maps.id`; `review_status` (mig 095, was `status`) ∈ `draft/submitted/needs_review/approved/rejected`, source ∈ `volunteer/sam-auto/sam-corrected/import` (both widened in mig 055 — 038's lists rejected every SAM2 write); `pixel_polygon`; `run_id` (mig 057) pins a segmentation run so the OCR join cannot mix runs |
+| `user_layers` | User GeoJSON (mig 095, was `annotation_sets`) | `map_id → maps.id` nullable, `user_id → auth.users` |
+| `ocr_labels` | OCR bbox results (mig 095, was `ocr_extractions`) | `(map_id, run_id, tile_x, tile_y, text, global_xi, global_yi)` unique (mig 077 — the key was position-blind, so eight distinct `Rue` labels in one tile collapsed to one row; `global_xi`/`global_yi` are generated `round(global_x/y)` and exist only because PostgREST cannot name an expression index in `on_conflict`). `global_x`/`global_y` are now `not null`; `global_*` are full-image px — the **derived** axis-aligned box around a label that may run at any angle, whose own rectangle is `rotation_deg` + `label_w`/`label_h` (mig 076; null on pipeline rows, where the size is inverted out of the box instead, and unrecoverable within ~2° of 45°). Every geometry write sends both; `review_status` (mig 095, was `status`) ∈ `pending/validated/rejected`; `text_corrected`/`category_corrected` (mig 095, was `text_validated`/`category_validated`); `reviewed_by`/`reviewed_at` (mig 095, was `validated_by`/`validated_at`); `footprint_id` (mig 050) is the OCR↔footprint join. Read policy inherits the map's gate since mig 065 (published, or any signed-in user) |
 | `pipeline_jobs` | Work queue between web and workers (mig 053) | `kind` (10 values incl. `join` mig 061, `layout` mig 070) · `status` (`queued/claimed/running/done/failed/cancelled`) · `payload` jsonb · retry via `attempts < max_attempts`. Partial unique index = one live job per (kind, map). Service-role only. Claim/close with the `claim_job` / `finish_job` RPCs — since mig 077 `claim_job` also reclaims a job held in `claimed`/`running` for over 3 hours with attempts left, because nothing else ever un-stuck one and that partial index then blocked its map for good |
 | `worker_keys` | Per-machine revocable worker credentials (mig 053) | `token_hash` (sha256), `kinds`, `revoked_at`. Written in step 2; the table exists now |
 | `map_pipeline_status` | Per-map pipeline state — **a view since mig 056** | Machine stages derived from `pipeline_jobs`, human stages from `map_review_marks`. Read-only; nothing writes it |
 | `map_review_marks` | The three stages a person asserts (mig 056) | `reviewed_at`, `seg_reviewed_at`, `exported_at`. Written only by the `set_review_mark` RPC |
-| `stories`, `story_points` | Stories/tours | `hunts` / `hunt_stops` were dropped in mig 034, `story_progress` in mig 075 — /trip/[id] keeps progress in localStorage. Since mig 059 a story has `status` (`draft/submitted/approved/rejected`) + `reviewed_by`/`reviewed_at`, and **`is_public` is gone** — publishing submits for review, and only `approved` is publicly readable |
-| `user_favorites` | Saved maps | via `data/supabase/favorites.ts` |
+| `stories`, `story_points` | Stories/tours | `hunts` / `hunt_stops` were dropped in mig 034, `story_progress` in mig 075 — /trip/[id] keeps progress in localStorage. Since mig 059 a story has `review_status` (mig 095, was `status`; `draft/submitted/approved/rejected`) + `reviewed_by`/`reviewed_at`, and **`is_public` is gone** — publishing submits for review, and only `approved` is publicly readable |
+| `favorites` | Saved maps (mig 095, was `user_favorites`) | via `data/supabase/favorites.ts` |
+| `series_cells` | One row per sheet a survey contains, held or not (mig 083; mig 095, was `series_sheets`) | `(series_key, sheet_number)` PK; `held_by`, `source`/`source_ref`, `map_id → maps.id` nullable |
+| `cell_printings` | One row per known printing of a cell at an institution (mig 087; mig 095, was `sheet_sources`) | `(institution, source_ref)` unique; `series_key`/`sheet_number`, `year`, `edition`, `part` |
 
 `maps.status` (mig 038): `draft | public | featured`. Inserts default to `draft`. The older
 `pending_georef → georeferenced → processing → published` values fail `maps_status_check`.
@@ -234,7 +245,7 @@ direct client all share. All are `security definer`, granted to `service_role` o
 
 **One visibility model on `maps`** (mig 060): the `status` enum. `is_public` / `is_featured` were
 dropped and the four RLS policies that read them rewritten onto `status`. The only `is_public` left
-is `annotation_sets.is_public`, a per-user sharing flag, not map visibility. Do not add a second
+is `user_layers.is_public`, a per-user sharing flag, not map visibility. Do not add a second
 model.
 
 `source_type` (mig 027, extended by mig 041): `ia | bnf | efeo | gallica | rumsey | self | other | r2`.
@@ -255,7 +266,8 @@ job, not the constraint's.
 `enqueue_publish_jobs()`, which queues `mirror_annotation` (when `annotation_url` is null) and
 `tile_to_r2` (when `source_type` isn't already `r2`). `on conflict do nothing` rides the
 one-live-job index, so re-publishing never duplicates. **Mig 080** widened the trigger to
-`update of status, georef_done` and added a second entry condition: `georef_done` going false → true
+`update of status, is_georeferenced` (mig 095, was `georef_done`) and added a second entry
+condition: `is_georeferenced` going false → true
 on an already-published map queues `mirror_annotation` too, because georeferencing usually happens
 *after* publishing and the old early-return on an unchanged status meant the sync-georef flip queued
 nothing. `tile_to_r2` stays on the publish path only — a georeference does not move tiles. Since
@@ -274,6 +286,7 @@ intentional — the corpus is multilingual French/Vietnamese/English. Query via
 
 | Item | Location | Fix |
 |------|---------|-----|
-| `label_pins` outlives its feature | `label_tasks` was dropped in mig 038 but `label_pins` remains, now written only by `POST /api/admin/maps/[id]/ocr/apply` | Either fold into `ocr_extractions` or document it as the OCR-applied point layer |
-| Generated types drift silently | `src/lib/data/supabase/types.ts` | Nothing regenerates them. Head is **091** (090 pushed 2026-09-16, 091 local) and the types are current against it — checked 2026-09-19. Re-run after every push: `supabase gen types typescript --linked`. This row named head 075 for five migrations, which is the drift it exists to warn about |
+| `label_pins` outlives its feature | `label_tasks` was dropped in mig 038 but `label_pins` remains, now written only by `POST /api/admin/maps/[id]/ocr/apply` | Either fold into `ocr_labels` or document it as the OCR-applied point layer |
+| Generated types drift silently | `src/lib/data/supabase/types.ts` | Nothing regenerates them. Head is **096** (094 pushed 2026-09-23; 095/096 local) and the types are current against it — regenerated 2026-09-23 against the local stack. Re-run after every push: `supabase gen types typescript --linked`. This row named head 075 for five migrations once, which is the drift it exists to warn about |
+| Compat views for 095's table renames need dropping | `public.ocr_extractions`, `.footprint_submissions`, `.series_sheets`, `.sheet_sources`, `.map_iiif_sources`, `.map_opens`, `.user_favorites`, `.annotation_sets` | Drop once the deploy that reads the new names has shipped. `maps`/`stories`/`scout_candidates`'s renamed *columns* have no such bridge — see `supabase/CLAUDE.md` |
 | Production drifted from the migrations once | `pipeline_jobs_kind_check` allowed `warp` with no migration saying so; corrected in 070 | Nothing to fix now — but it means the migrations are not provably the whole schema. A `db pull` diff would settle it, and needs the direct DB password |

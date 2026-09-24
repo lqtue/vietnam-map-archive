@@ -31,18 +31,18 @@ rather than the job.
 
 ## OCR (`work/ocr/`)
 
-Gemini Flash → `ocr_extractions`; `join_labels.py` writes the `footprint_id` join (mig 050).
+Gemini Flash → `ocr_labels`; `join_labels.py` writes the `footprint_id` join (mig 050).
 Own venv at `work/ocr/.venv`. `EVAL-BASELINE.md` is the measured quality gate.
 
 ## MapSAM2 (`work/MapSAM2/`)
 
 Fine-tuned SAM2 fork (LoRA, training notes) in `TECHNICAL.md` + `VMA_SETUP.md`. IIIF tiles →
-polygons → `footprint_submissions`. `--mode prompted --ocr-run-id <run>` seeds SAM2 from OCR boxes
+polygons → `footprints`. `--mode prompted --ocr-run-id <run>` seeds SAM2 from OCR boxes
 via `to_sam2_seeds.py` (area categories only, one owner per seed by centroid, clipped to the tile);
 those polygons are written with the label already attached. Runs on Colab against an upstream clone;
 there is no local venv for it.
 
-Its polygons and `ocr_extractions.global_*` share **one full-image pixel grid** (both scale
+Its polygons and `ocr_labels.global_*` share **one full-image pixel grid** (both scale
 tile-render → source px and offset by the tile origin, off the same `info.json`), which is what
 makes the C1 join possible; tile sizes differ and do not matter.
 
