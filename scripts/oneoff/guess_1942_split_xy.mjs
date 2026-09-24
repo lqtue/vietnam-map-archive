@@ -55,21 +55,21 @@ const NEW_SCAN = {
 // (1942 excluded -- it's the sheet being replaced). From work/analysis/saigon6/points.json
 // via sheet_align.mjs --json, computed 2026-09-23.
 const LANDMARKS = [
-  ["Entrance of Jardin Botanique", 106.70685, 10.78544],
-  ["Thi Nghe Bridge", 106.706193, 10.791626],
-  ["Rond Point", 106.706352, 10.775297],
-  ["Mat de Signaux", 106.70629, 10.769774],
-  ["Norodom", 106.695943, 10.777655],
+  ['Entrance of Jardin Botanique', 106.70685, 10.78544],
+  ['Thi Nghe Bridge', 106.706193, 10.791626],
+  ['Rond Point', 106.706352, 10.775297],
+  ['Mat de Signaux', 106.70629, 10.769774],
+  ['Norodom', 106.695943, 10.777655],
   ["Chateau D'eau", 106.69591, 10.782604],
-  ["Citadel Edge", 106.69757, 10.78649],
-  ["Marche Cau Ong Lanh", 106.698788, 10.764724],
-  ["Edge of town", 106.689433, 10.773653],
-  ["D4", 106.708152, 10.762419],
-  ["End D4", 106.72067, 10.757752],
-  ["Cholon Canal", 106.659137, 10.750558],
-  ["Station radioelectrique", 106.656061, 10.7781],
-  ["Out of town top", 106.653374, 10.792995],
-  ["Double canal", 106.634081, 10.723269],
+  ['Citadel Edge', 106.69757, 10.78649],
+  ['Marche Cau Ong Lanh', 106.698788, 10.764724],
+  ['Edge of town', 106.689433, 10.773653],
+  ['D4', 106.708152, 10.762419],
+  ['End D4', 106.72067, 10.757752],
+  ['Cholon Canal', 106.659137, 10.750558],
+  ['Station radioelectrique', 106.656061, 10.7781],
+  ['Out of town top', 106.653374, 10.792995],
+  ['Double canal', 106.634081, 10.723269],
 ];
 
 const { data: row, error } = await db
@@ -120,7 +120,17 @@ const results = LANDMARKS.map(([name, lon, lat]) => {
   const editorUrl =
     `https://editor.allmaps.org/#/collection?url=` +
     encodeURIComponent(`https://gallica.bnf.fr/iiif/ark:/12148/${scan.ark}/f1/info.json`);
-  return { name, panel, lon, lat, guessX, guessY, outOfBounds, editorUrl, compositePx: [Math.round(cx), Math.round(cy)] };
+  return {
+    name,
+    panel,
+    lon,
+    lat,
+    guessX,
+    guessY,
+    outOfBounds,
+    editorUrl,
+    compositePx: [Math.round(cx), Math.round(cy)],
+  };
 });
 
 if (process.argv.includes('--json')) {

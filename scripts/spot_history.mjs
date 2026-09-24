@@ -51,8 +51,7 @@ function haversineM([lon1, lat1], [lon2, lat2]) {
 // GeoJSON Polygon (or MultiPolygon) → centroid of its outer ring's vertices.
 // Not area-weighted — fine for clustering, this is not the export path.
 function centroid(geometry) {
-  const ring =
-    geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
+  const ring = geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
   let x = 0,
     y = 0,
     n = 0;
@@ -89,7 +88,9 @@ function groupLabels(labels) {
 }
 
 function report({ at, radius_m, labels, footprints, maps }) {
-  console.log(`\nspot ${at[0]}, ${at[1]} — radius ${radius_m} m — ${maps.length} covering sheet(s)`);
+  console.log(
+    `\nspot ${at[0]}, ${at[1]} — radius ${radius_m} m — ${maps.length} covering sheet(s)`
+  );
   console.log(maps.map((m) => `  ${m.year ?? '?'} · ${m.name}`).join('\n'));
 
   const byKey = groupLabels(labels);
@@ -107,7 +108,9 @@ function report({ at, radius_m, labels, footprints, maps }) {
     const years = cl.items
       .map((it) => `${it.year ?? '?'}:${it.feature_type}${it.name ? ` "${it.name}"` : ''}`)
       .join('  ');
-    console.log(`  cluster @${cl.centroid[0].toFixed(5)},${cl.centroid[1].toFixed(5)} × ${cl.items.length} — ${years}`);
+    console.log(
+      `  cluster @${cl.centroid[0].toFixed(5)},${cl.centroid[1].toFixed(5)} × ${cl.items.length} — ${years}`
+    );
   }
 }
 
@@ -156,15 +159,63 @@ async function main() {
 }
 
 function selftest() {
-  console.assert(placeKey('Rue de Khánh-Hội') === placeKey('Rue de Khanh Hoi'), 'placeKey folds accents+case+punct');
+  console.assert(
+    placeKey('Rue de Khánh-Hội') === placeKey('Rue de Khanh Hoi'),
+    'placeKey folds accents+case+punct'
+  );
   console.assert(placeKey('Đường') === 'duong', `placeKey đ: ${placeKey('Đường')}`);
   const d = haversineM([106.7, 10.77], [106.7, 10.77 + 1 / 111]);
   console.assert(Math.abs(d - 1000) < 20, `haversine off: ${d}`);
   const clusters = clusterFootprints(
     [
-      { year: 1923, feature_type: 'building', geometry: { type: 'Polygon', coordinates: [[[0, 0], [0, 0.0001], [0.0001, 0.0001], [0.0001, 0], [0, 0]]] } },
-      { year: 1942, feature_type: 'building', geometry: { type: 'Polygon', coordinates: [[[0.00002, 0], [0.00002, 0.0001], [0.00012, 0.0001], [0.00012, 0], [0.00002, 0]]] } },
-      { year: 1959, feature_type: 'building', geometry: { type: 'Polygon', coordinates: [[[1, 1], [1, 1.0001], [1.0001, 1.0001], [1.0001, 1], [1, 1]]] } },
+      {
+        year: 1923,
+        feature_type: 'building',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [0, 0.0001],
+              [0.0001, 0.0001],
+              [0.0001, 0],
+              [0, 0],
+            ],
+          ],
+        },
+      },
+      {
+        year: 1942,
+        feature_type: 'building',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0.00002, 0],
+              [0.00002, 0.0001],
+              [0.00012, 0.0001],
+              [0.00012, 0],
+              [0.00002, 0],
+            ],
+          ],
+        },
+      },
+      {
+        year: 1959,
+        feature_type: 'building',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [1, 1],
+              [1, 1.0001],
+              [1.0001, 1.0001],
+              [1.0001, 1],
+              [1, 1],
+            ],
+          ],
+        },
+      },
     ],
     25
   );

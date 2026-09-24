@@ -45,12 +45,13 @@ const CHOLON_CANDIDATE = {
   score: 75,
   category: 'urban_plan',
   reasons: '+place +colonial:1942 +map_kw +iiif +pairs-with-held-saigon-plate',
-  found_via: 'manual: companion lookup for eca788e5 (1942 Plan de Saigon-Cho Lon) sheet-to-sheet fix',
+  found_via:
+    'manual: companion lookup for eca788e5 (1942 Plan de Saigon-Cho Lon) sheet-to-sheet fix',
   status: 'pending',
   review_note:
     'Companion sheet to GE C-17229 "Plan de Saïgon" 1942 (scout_candidates row added same day). ' +
     'Already an unused (is_primary:false) secondary source on map eca788e5-6780-4dca-bf23-7651a1c48aba; ' +
-    'this record gives it its own maps row instead. See that row\'s review_note for the full ' +
+    "this record gives it its own maps row instead. See that row's review_note for the full " +
     'rationale (sheet-to-sheet drift on the stitched composite).',
   raw: {
     subject: ['Chợ Lớn'],

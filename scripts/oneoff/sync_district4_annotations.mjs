@@ -39,7 +39,8 @@ const DISTRICT4 = [
 ];
 
 function extractSourceUrl(annotation) {
-  const items = annotation.type === 'Annotation' ? [annotation] : (annotation.items ?? annotation.maps ?? []);
+  const items =
+    annotation.type === 'Annotation' ? [annotation] : (annotation.items ?? annotation.maps ?? []);
   for (const item of items) {
     const target = item.target;
     if (!target) continue;
@@ -59,7 +60,10 @@ function rewriteSourceUrl(annotation, oldUrl, newUrl) {
 }
 
 function declaredSourceSize(annotation) {
-  const items = annotation?.type === 'Annotation' ? [annotation] : (annotation?.items ?? annotation?.maps ?? []);
+  const items =
+    annotation?.type === 'Annotation'
+      ? [annotation]
+      : (annotation?.items ?? annotation?.maps ?? []);
   for (const item of items) {
     const source = item?.target?.source;
     if (typeof source?.width === 'number' && typeof source?.height === 'number') {
@@ -121,7 +125,11 @@ async function upsertR2Source(mapId, newIiifBase) {
 
   const r2Source = (existingSources ?? []).find((s) => s.iiif_image?.includes('maparchive.vn'));
 
-  await db.from('map_iiif_sources').update({ is_primary: false }).eq('map_id', mapId).eq('is_primary', true);
+  await db
+    .from('map_iiif_sources')
+    .update({ is_primary: false })
+    .eq('map_id', mapId)
+    .eq('is_primary', true);
 
   if (r2Source) {
     const { error } = await db
@@ -157,7 +165,9 @@ async function syncOne(mapId) {
   }
 
   const sourceUrl = `${ALLMAPS_ANNOTATIONS}/${map.allmaps_id}`;
-  const annotationRes = await fetch(sourceUrl + '?_t=' + Date.now(), { headers: { Accept: 'application/json' } });
+  const annotationRes = await fetch(sourceUrl + '?_t=' + Date.now(), {
+    headers: { Accept: 'application/json' },
+  });
   if (!annotationRes.ok) {
     console.log(`  ${map.name}: failed to fetch live annotation (${annotationRes.status}). SKIP`);
     return;
@@ -166,7 +176,9 @@ async function syncOne(mapId) {
 
   const oldSourceUrl = extractSourceUrl(annotation);
   const newIiifBase = r2MirrorBase(map.iiif_image, `${R2_BASE}/${mapId}`);
-  const updated = oldSourceUrl ? rewriteSourceUrl(annotation, oldSourceUrl, newIiifBase) : annotation;
+  const updated = oldSourceUrl
+    ? rewriteSourceUrl(annotation, oldSourceUrl, newIiifBase)
+    : annotation;
 
   console.log(`  ${map.name}`);
   console.log(`    live source:  ${oldSourceUrl}`);
@@ -202,7 +214,9 @@ async function syncOne(mapId) {
 }
 
 const targets = onlyMap ? [onlyMap] : DISTRICT4;
-console.log(`${targets.length} sheet(s) to sync${dry ? ' (dry run — pass --apply to write)' : ''}\n`);
+console.log(
+  `${targets.length} sheet(s) to sync${dry ? ' (dry run — pass --apply to write)' : ''}\n`
+);
 for (const id of targets) {
   await syncOne(id);
   console.log();

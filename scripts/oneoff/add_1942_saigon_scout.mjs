@@ -35,7 +35,8 @@ const row = {
   score: 75,
   category: 'urban_plan',
   reasons: '+place +colonial:1942 +map_kw +iiif +pairs-with-held-cholon-plate',
-  found_via: 'manual: companion lookup for eca788e5 (1942 Plan de Saigon-Cho Lon) sheet-to-sheet fix',
+  found_via:
+    'manual: companion lookup for eca788e5 (1942 Plan de Saigon-Cho Lon) sheet-to-sheet fix',
   status: 'pending',
   review_note:
     'Companion sheet to GE C-17230 "Plan de Cholon" 1942, already a secondary (unused, ' +
@@ -45,7 +46,7 @@ const row = {
     'composite drifts 45-70m south of the other five D4-series sheets on every point north of ' +
     'the river, tapering to ~0 near it — consistent with one transform stretched across two ' +
     'panels rather than a mosaic defect (already ruled out: georef_error.md found the panel ' +
-    "seam geometrically sound to a few pixels). Plan: import this sheet, split the map into " +
+    'seam geometrically sound to a few pixels). Plan: import this sheet, split the map into ' +
     'two independently-georeferenced rows (Saigon + Cholon), each fit with its own local GCPs.',
   raw: {
     subject: ['Saïgon'],
@@ -64,6 +65,8 @@ if (!apply) {
   process.exit(0);
 }
 
-const { error } = await db.from('scout_candidates').upsert([row], { onConflict: 'source,external_id' });
+const { error } = await db
+  .from('scout_candidates')
+  .upsert([row], { onConflict: 'source,external_id' });
 if (error) throw error;
 console.log('\nupserted 1 row into scout_candidates (source=gallica, ark btv1b53197000p)');

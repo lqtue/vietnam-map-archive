@@ -54,7 +54,11 @@ const features = item.body.features;
 
 console.log(`${m.name}: ${features.length} GCPs in the stored mirror`);
 const bad = features[BAD_INDEX];
-console.log(`dropping index ${BAD_INDEX}:`, bad.properties?.resourceCoords, bad.geometry?.coordinates);
+console.log(
+  `dropping index ${BAD_INDEX}:`,
+  bad.properties?.resourceCoords,
+  bad.geometry?.coordinates
+);
 
 item.body.features = features.filter((_, i) => i !== BAD_INDEX);
 console.log(`${item.body.features.length} GCPs after drop`);
