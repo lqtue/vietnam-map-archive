@@ -239,4 +239,6 @@ update public.maps
  where annotation_url ~ (
    '/storage/v1/object/public/annotations/' || id::text || '[.]json$'
  );
-update storage.buckets set public = false where id = 'annotations';
+insert into storage.buckets (id, name, public)
+values ('annotations', 'annotations', false)
+on conflict (id) do update set public = false;
