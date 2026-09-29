@@ -17,6 +17,7 @@ export function annotationUrlForSource(source: string): string {
     const url = new URL(trimmed);
     if (
       typeof window !== 'undefined' &&
+      ['localhost', '127.0.0.1'].includes(window.location.hostname) &&
       url.origin === 'https://maparchive.vn' &&
       /^\/api\/maps\/[0-9a-f-]{36}\/annotation$/.test(url.pathname)
     ) {
