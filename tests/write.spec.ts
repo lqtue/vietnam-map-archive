@@ -831,6 +831,22 @@ test('the server-side executor only takes the kinds it can run', async () => {
     extraHTTPHeaders: { Authorization: `Bearer ${TEST_WORKER_TOKEN}` },
   });
 
+  // A queued job is not authority to execute, even with a valid worker key.
+  const unclaimed = await asWorker.post('/api/pipeline/execute', { data: { job_id: job!.id } });
+  expect(unclaimed.status()).toBe(403);
+
+  const { data: workerKey } = await admin
+    .from('worker_keys')
+    .select('id')
+    .eq('name', 'write-smoke-worker')
+    .single();
+  expect(workerKey?.id).toBeTruthy();
+  const { error: claimError } = await admin
+    .from('pipeline_jobs')
+    .update({ status: 'claimed', worker_key_id: workerKey!.id })
+    .eq('id', job!.id);
+  expect(claimError).toBeNull();
+
   // ocr has real compute behind it: the worker runs it and reports results.
   const wrongKind = await asWorker.post('/api/pipeline/execute', { data: { job_id: job!.id } });
   expect(wrongKind.status()).toBe(400);
