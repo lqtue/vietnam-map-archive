@@ -230,3 +230,13 @@ create policy "profiles_select_own" on public.profiles for select
       or (select auth.jwt()->>'aal') = 'aal2'
     )
   );
+
+-- Annotation objects were public even while their map was a draft. The app
+-- serves the same stable object path through a status-aware endpoint; keep
+-- the object bucket private so a guessed UUID cannot bypass that endpoint.
+update public.maps
+   set annotation_url = 'https://maparchive.vn/api/maps/' || id || '/annotation'
+ where annotation_url ~ (
+   '/storage/v1/object/public/annotations/' || id::text || '[.]json$'
+ );
+update storage.buckets set public = false where id = 'annotations';

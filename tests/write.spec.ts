@@ -76,6 +76,7 @@ const created = {
   jobIds: [] as string[],
   mapIds: [] as string[],
   seriesKeys: [] as string[],
+  annotationPaths: [] as string[],
 };
 
 test.beforeAll(async () => {
@@ -141,6 +142,8 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
+  if (created.annotationPaths.length)
+    await admin.storage.from('annotations').remove(created.annotationPaths);
   for (const runId of created.runIds) await admin.from('ocr_labels').delete().eq('run_id', runId);
   for (const id of created.footprintIds) await admin.from('footprints').delete().eq('id', id);
   for (const id of created.storyIds) await admin.from('stories').delete().eq('id', id);
@@ -149,6 +152,44 @@ test.afterAll(async () => {
     await admin.from('series_cells').delete().eq('series_key', key);
   for (const id of created.mapIds) await admin.from('maps').delete().eq('id', id);
   await staffRequest?.dispose();
+});
+
+test('private annotation objects follow map publication', async ({ request }) => {
+  const { data: draft, error: draftError } = await admin
+    .from('maps')
+    .insert({ name: 'Private annotation fixture', status: 'draft' })
+    .select('id')
+    .single();
+  expect(draftError).toBeNull();
+  created.mapIds.push(draft!.id);
+
+  for (const id of [mapId, draft!.id]) {
+    const path = `${id}.json`;
+    const { error: uploadError } = await admin.storage
+      .from('annotations')
+      .upload(path, JSON.stringify({ type: 'AnnotationPage', items: [] }), {
+        contentType: 'application/json',
+        upsert: true,
+      });
+    expect(uploadError).toBeNull();
+    created.annotationPaths.push(path);
+    const direct = await request.get(
+      `${SUPABASE_URL}/storage/v1/object/public/annotations/${path}`
+    );
+    expect(direct.ok()).toBe(false);
+  }
+
+  const published = await request.get(`http://localhost:5199/api/maps/${mapId}/annotation`);
+  expect(published.status()).toBe(200);
+  expect((await published.json()).type).toBe('AnnotationPage');
+  const hidden = await request.get(`http://localhost:5199/api/maps/${draft!.id}/annotation`);
+  expect(hidden.status()).toBe(404);
+  const signedIn = await staffRequest.get(`/api/maps/${draft!.id}/annotation`);
+  expect(signedIn.status()).toBe(200);
+  await admin.storage.from('annotations').remove(created.annotationPaths);
+  created.annotationPaths = [];
+  await admin.from('maps').delete().eq('id', draft!.id);
+  created.mapIds = created.mapIds.filter((id) => id !== draft!.id);
 });
 
 test('staff can create and validate an OCR bbox through the review API', async () => {

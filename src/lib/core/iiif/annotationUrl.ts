@@ -15,6 +15,13 @@ export function annotationUrlForSource(source: string): string {
   const trimmed = source.trim();
   try {
     const url = new URL(trimmed);
+    if (
+      typeof window !== 'undefined' &&
+      url.origin === 'https://maparchive.vn' &&
+      /^\/api\/maps\/[0-9a-f-]{36}\/annotation$/.test(url.pathname)
+    ) {
+      return new URL(url.pathname + url.search, window.location.origin).toString();
+    }
     if (url.protocol === 'http:' || url.protocol === 'https:') return trimmed;
   } catch {
     // not a URL — treat as Allmaps image ID

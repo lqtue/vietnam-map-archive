@@ -107,6 +107,9 @@ Public / other:
 
 - `/api/maps/[id]/open/` — **public** POST. Records one published-map view through the bounded
   `record_map_view` RPC and returns `{ recorded }`; direct table inserts are closed.
+- `/api/maps/[id]/annotation/` — **public for published maps** GET; drafts require a signed-in
+  session. Streams the stable annotation from the private Storage bucket. A `?version=` history
+  request requires staff MFA. Direct Storage object URLs are no longer public.
 - `/api/maps/[id]/legend-points/` — **public** GET. Numbered-legend references placed on the ground:
   each body numeral (`category = 'legend_ref'`) warped to lng/lat via the map's Allmaps
   georeference, joined to its `legend_entry` for a name. Legend-internal numbers are dropped.

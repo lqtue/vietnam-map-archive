@@ -109,8 +109,10 @@ export async function mirrorAnnotation(
 
   // History first: if the second write fails, we have still kept the version.
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const historyUrl = await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
-  const publicAnnotationUrl = await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
+  await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  const publicAnnotationUrl = `https://maparchive.vn/api/maps/${mapId}/annotation`;
+  const historyUrl = `${publicAnnotationUrl}?version=${stamp}`;
 
   // Keep allmaps_id intact — it is the bare image ID, not a URL.
   await supabase

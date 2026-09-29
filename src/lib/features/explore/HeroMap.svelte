@@ -20,7 +20,6 @@
   import { onDestroy, onMount } from 'svelte';
   import type OlMap from 'ol/Map';
   import { transformExtent } from 'ol/proj';
-  import { PUBLIC_SUPABASE_URL } from '$env/static/public';
   import { fade, fly } from 'svelte/transition';
   import MapShell from '$lib/map/shell/MapShell.svelte';
   import { setVisibleBasemap } from '$lib/map/shell/basemapLayers';
@@ -42,7 +41,7 @@
    * Derived rather than passed, so changing which sheet the hero plays is one
    * uuid on the home page.
    */
-  $: source = `${PUBLIC_SUPABASE_URL}/storage/v1/object/public/annotations/${mapId}.json`;
+  $: source = `https://maparchive.vn/api/maps/${mapId}/annotation`;
   /**
    * What to frame: the sheet's own `maps.bbox` and the angle to hold it at.
    *
