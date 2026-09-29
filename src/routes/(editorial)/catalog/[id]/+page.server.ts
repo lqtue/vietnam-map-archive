@@ -68,6 +68,12 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     ({ data: map } = await anyStatus().eq('id', id).maybeSingle());
     if (!map) throw error(404, 'No published map at that address');
 
+    // Check visibility before revealing the canonical address of a draft.
+    if (map.status !== 'public' && map.status !== 'featured') {
+      const { session } = await locals.safeGetSession();
+      if (!session) throw error(404, 'No published map at that address');
+    }
+
     // The reader stays in the language they arrived in: `/vi/catalog/<uuid>` is
     // rerouted to this loader with the prefix still on `url.pathname`, so
     // rebuilding the target without it would silently drop them into English.
@@ -97,14 +103,13 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
   // of — so this is the reverse read, and it is empty for all but the 58 cells
   // that have one.
   //
-  // RLS carries the disclosure: while the originals are drafts, an anonymous
-  // reader gets none and the page says nothing. It starts telling readers the
-  // moment the halves are published, which is exactly when the claim becomes
-  // true for them.
+  // The service client bypasses RLS; enforce publication explicitly for an
+  // anonymous reader before including original halves in the page payload.
   const { data: originals } = await supabase
     .from('maps')
     .select('id, slug, name, year, sheet_half')
     .eq('extra_metadata->>mirrors_original_for', map.id)
+    .in('status', ['public', 'featured'])
     .order('sheet_half');
 
   // What the map's own live annotation is actually fit to, so the "Fix

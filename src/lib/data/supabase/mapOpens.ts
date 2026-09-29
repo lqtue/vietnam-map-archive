@@ -1,6 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './types';
-
 /**
  * Tally one row per map open (migration 049).
  *
@@ -8,14 +5,11 @@ import type { Database } from './types';
  * Analytics reports requestPath and has no query-string dimension, so
  * /explore's `?map=` is invisible to it.
  *
- * Fire-and-forget by design — a dropped tally must never interrupt opening a
- * map, so nothing awaits the insert and failures only warn.
+ * The server checks publication and hourly caps before writing. Fire-and-forget
+ * by design — a dropped tally must never interrupt opening a map.
  */
-export function recordMapOpen(supabase: SupabaseClient<Database>, mapId: string): void {
-  void supabase
-    .from('map_views')
-    .insert({ map_id: mapId })
-    .then(({ error }) => {
-      if (error) console.warn('recordMapOpen:', error.message);
-    });
+export function recordMapOpen(mapId: string): void {
+  void fetch(`/api/maps/${encodeURIComponent(mapId)}/open`, { method: 'POST' }).then((response) => {
+    if (!response.ok) console.warn('recordMapOpen:', response.status);
+  }).catch(() => {});
 }

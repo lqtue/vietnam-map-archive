@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { adminClient } from '$lib/server/supabaseAdmin';
 
 /**
  * Guard, and the validated user for the page to render.
@@ -13,5 +14,13 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
   const { session, user } = await locals.safeGetSession();
   if (!session || !user) throw redirect(303, '/login');
-  return { user };
+  const { data: profile } = await adminClient()
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  return {
+    user,
+    role: profile?.role === 'admin' || profile?.role === 'mod' ? profile.role : 'user',
+  };
 };

@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { error, redirect, type Handle } from '@sveltejs/kit';
 import type { Database } from '$lib/data/supabase/types';
 import { LOCALE_COOKIE, isLocale, localeFromPath, stripLocale } from '$lib/core/i18n';
 import { resolveScanMode } from '$lib/core/scanModes';
@@ -158,19 +158,8 @@ const PAGES_DEV_HOST = 'vmabeta.pages.dev';
  * correct (the fonts carried the headers) while `/` carried nothing. Keep the
  * two lists in step; between them they cover the whole site.
  *
- * The CSP is Report-Only on purpose. /explore reaches several origins for
- * tiles and annotations, and an enforcing policy written before reading the
- * reports would break the map. Tighten `connect-src`/`img-src` to the hosts
- * that actually appear, then drop the `-Report-Only` suffix here and there.
- *
- * **Two directives must survive that tightening or /explore stops working
- * entirely**, and neither is about hosts, which is why reading the reports for
- * origins alone would miss them. `@allmaps/render` compiles its WebGL
- * transformer at runtime, so `script-src` needs `'unsafe-eval'`; it warps in a
- * worker built from a blob, so `worker-src blob:` (and `child-src blob:` for
- * older engines) has to be there too. Both show in the console as report-only
- * violations today — nothing is blocked, so the map works and the warnings
- * look like noise. They are the enforcement bill, itemised in advance.
+ * SvelteKit emits the enforcing CSP in svelte.config.js with a per-response
+ * nonce for its bootstrap script. Do not override that dynamic header here.
  *
  * `X-Frame-Options: DENY` is safe: nothing in src/ renders an iframe, and the
  * Allmaps Editor is opened in a new tab rather than embedded.
@@ -181,13 +170,33 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   'Permissions-Policy': 'geolocation=(self), camera=(), microphone=(), payment=()',
-  'Content-Security-Policy-Report-Only':
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https:; connect-src 'self' https:; font-src 'self'; " +
-    "frame-ancestors 'none'; base-uri 'self'; object-src 'none'",
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
+  // All API writes are same-origin. JSON routes must have a JSON Content-Type:
+  // request.json() alone also accepts a no-cors Blob body, which can carry a
+  // SameSite cookie from a sibling origin without a CORS preflight.
+  if (
+    event.url.pathname.startsWith('/api/') &&
+    !['GET', 'HEAD', 'OPTIONS'].includes(event.request.method)
+  ) {
+    const origin = event.request.headers.get('origin');
+    if (origin && origin !== event.url.origin) throw error(403, 'Cross-origin write refused');
+    const mediaType = event.request.headers
+      .get('content-type')
+      ?.split(';', 1)[0]
+      ?.trim()
+      .toLowerCase();
+    const isImageUpload = /^\/api\/admin\/maps\/[^/]+\/image$/.test(event.url.pathname);
+    const emptyBody = event.request.body === null && !mediaType;
+    if (emptyBody && event.request.headers.has('cookie') && !origin) {
+      throw error(403, 'Origin required for a session write');
+    }
+    if (!emptyBody && mediaType !== (isImageUpload ? 'multipart/form-data' : 'application/json')) {
+      throw error(415, 'Unsupported request content type');
+    }
+  }
+
   if (event.url.hostname === PAGES_DEV_HOST) {
     const canonical = new URL(event.url);
     canonical.hostname = CANONICAL_HOST;

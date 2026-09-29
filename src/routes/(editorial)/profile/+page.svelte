@@ -2,8 +2,8 @@
   import { t, locale, setLocale, splitHighlight } from '$lib/core/i18n';
   import { onMount } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
-  import { fetchUserRole } from '$lib/data/supabase/role';
   import PageHero from '$lib/ui/PageHero.svelte';
+  import MfaPanel from '$lib/features/account/MfaPanel.svelte';
   import type { PageData } from './$types';
   import '$styles/pages/profile.css';
 
@@ -26,7 +26,7 @@
         .toUpperCase()
     : '?';
 
-  let role = 'user';
+  const role = data.role;
   let stats = { pins: 0, traces: 0, reviews: 0 };
   let loading = true;
   // No reload: `t` is a derived store, so every string on screen re-renders
@@ -37,10 +37,7 @@
 
   onMount(async () => {
     try {
-      // 1. Get role
-      role = (await fetchUserRole(supabase, user.id)) ?? role;
-
-      // 2. Get counts
+      // Get counts
       const [pinsRes, tracesRes] = await Promise.all([
         supabase
           .from('label_pins')
@@ -122,6 +119,7 @@
       </div>
 
       {#if role === 'admin' || role === 'mod'}
+        <MfaPanel />
         <div class="settings-section">
           <h3 class="section-title">{$t('Staff tools')}</h3>
           <p class="staff-blurb">

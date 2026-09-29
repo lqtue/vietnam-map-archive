@@ -9,11 +9,8 @@
 # `frame-ancestors 'none'` is the modern X-Frame-Options; both are sent
 # because Safari still honours only the older header.
 #
-# The CSP is Report-Only on purpose. /explore loads OpenLayers, PMTiles and
-# Allmaps and reaches several origins for tiles and annotations; an enforcing
-# policy written blind would break the map. Read the reports, tighten
-# connect-src and img-src to the hosts that actually appear, then drop the
-# -Report-Only suffix.
+# HTML pages receive SvelteKit's nonce-bearing CSP; this fixed policy applies
+# to static responses only, where no inline bootstrap runs.
 
 /*
   X-Frame-Options: DENY
@@ -21,7 +18,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https:; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https:; connect-src 'self' https:; font-src 'self'; worker-src 'self' blob:; child-src blob:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 
 # Cloudflare Pages serves everything under static/ with `max-age=0,
 # must-revalidate` by default, so on a repeat visit the browser spends a

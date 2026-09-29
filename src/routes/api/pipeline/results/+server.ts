@@ -23,7 +23,7 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { requireWorker } from '$lib/server/workerAuth';
+import { requireClaimedJob } from '$lib/server/workerJob';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
 import { bboxCentre, pointEwkt, resolveMapWarp, type MapWarp } from '$lib/server/warp';
@@ -38,10 +38,44 @@ const MAX_ROWS = 500;
 // PostgREST cannot reference an expression index in on_conflict.
 const UPSERT_KEY = 'map_id,run_id,tile_x,tile_y,text,global_xi,global_yi';
 const JOB_STATUSES = ['running', 'done', 'failed'];
+const OCR_FIELDS = [
+  'map_id',
+  'run_id',
+  'tile_x',
+  'tile_y',
+  'tile_w',
+  'tile_h',
+  'category',
+  'text',
+  'confidence',
+  'global_x',
+  'global_y',
+  'global_w',
+  'global_h',
+  'rotation_deg',
+  'notes',
+  'model',
+  'prompt',
+] as const;
 
 export const POST: RequestHandler = async ({ request }) => {
-  await requireWorker(request);
   const body = await request.json().catch(() => ({}));
+  const { worker, job } = await requireClaimedJob(request, body.job_id);
+  if (!job.map_id) throw error(400, 'Job has no map_id');
+  const jobRunId =
+    typeof job.payload === 'object' && job.payload !== null && !Array.isArray(job.payload)
+      ? job.payload.run_id
+      : null;
+  const outputKinds = [
+    Array.isArray(body.extractions) && body.extractions.length > 0 ? 'ocr' : null,
+    Array.isArray(body.footprints) && body.footprints.length > 0 ? 'seg' : null,
+    Array.isArray(body.triage_regions) || body.triage_grid ? 'layout' : null,
+  ].filter(Boolean);
+  if (!body.status && !outputKinds.length) throw error(400, 'No result or status supplied');
+  if (outputKinds.some((kind) => kind !== job.kind))
+    throw error(403, 'Result kind does not match job');
+  if (body.map_id && body.map_id !== job.map_id) throw error(403, 'Result map does not match job');
+  if (body.status && !JOB_STATUSES.includes(body.status)) throw error(400, 'Invalid job status');
   const supabase = adminClient();
   const applied: Record<string, unknown> = {};
 
@@ -50,7 +84,10 @@ export const POST: RequestHandler = async ({ request }) => {
     if (rows.length > MAX_ROWS) throw error(413, `At most ${MAX_ROWS} extractions per request`);
     for (const row of rows) {
       assertUuid(row.map_id, 'extraction map_id');
-      if (!row.run_id) throw error(400, 'Every extraction needs a run_id');
+      if (row.map_id !== job.map_id) throw error(403, 'Extraction map does not match job');
+      if (!row.run_id || (typeof jobRunId === 'string' && row.run_id !== jobRunId)) {
+        throw error(403, 'Extraction run does not match job');
+      }
     }
     // Warp per map, not per row: a batch is normally one map's tiles, and
     // resolving the annotation is a network fetch.
@@ -64,25 +101,30 @@ export const POST: RequestHandler = async ({ request }) => {
         .single();
       warps.set(row.map_id, map ? await resolveMapWarp(map.allmaps_id, map.annotation_url) : null);
     }
-    for (const row of rows) {
-      const warp = warps.get(row.map_id);
+    const cleanRows = rows.map((row: Record<string, unknown>) => {
+      const clean: Record<string, unknown> = {};
+      for (const field of OCR_FIELDS) if (field in row) clean[field] = row[field];
+      const warp = warps.get(row.map_id as string);
       const centre = warp ? bboxCentre(row) : null;
       const geom = warp && centre ? pointEwkt(warp, centre) : null;
-      row.geom = geom;
-      row.geom_src = geom ? warp!.src : null;
-      row.geom_rmse = geom ? warp!.rmse : null;
-    }
+      clean.geom = geom;
+      clean.geom_src = geom ? warp!.src : null;
+      clean.geom_rmse = geom ? warp!.rmse : null;
+      clean.review_status = 'pending';
+      return clean;
+    });
 
     const { error: err, count } = await supabase
       .from('ocr_labels')
-      .upsert(rows, { onConflict: UPSERT_KEY, count: 'exact' });
+      .upsert(cleanRows as any, { onConflict: UPSERT_KEY, ignoreDuplicates: true, count: 'exact' });
     if (err) dbError(err, 'Could not write extractions');
     // Report what the database accepted *and* what was offered. They differed
     // silently before migration 077: the key was (map_id, run_id, tile_x,
     // tile_y, text), so 18 of a 337-row merge collapsed into each other and the
     // count came back 319 with nothing to compare it against.
-    applied.extractions = count ?? rows.length;
-    if (count != null && count < rows.length) applied.extractions_offered = rows.length;
+    applied.extractions = rows.length;
+    if (count != null && count < rows.length)
+      applied.extractions_already_present = rows.length - count;
   }
 
   // The layout job's output. Merged, not replaced: the neatline and tile grid
@@ -90,6 +132,7 @@ export const POST: RequestHandler = async ({ request }) => {
   // not silently discard a person's triage.
   if (Array.isArray(body.triage_regions)) {
     const mapId = assertUuid(body.map_id, 'map_id');
+    if (mapId !== job.map_id) throw error(403, 'Triage map does not match job');
     const regions = body.triage_regions
       .map(parseRegion)
       .filter((r: ReturnType<typeof parseRegion>) => r !== null);
@@ -156,6 +199,7 @@ export const POST: RequestHandler = async ({ request }) => {
   // are: everything else in the triage belongs to whoever put it there.
   if (body.triage_grid) {
     const mapId = assertUuid(body.map_id, 'map_id');
+    if (mapId !== job.map_id) throw error(403, 'Grid map does not match job');
     const grid = parseGrid(body.triage_grid);
     if (!grid) throw error(400, 'triage_grid needs a bbox and at least two columns and rows');
 
@@ -192,6 +236,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const insert = rows.map((row: Record<string, unknown>) => {
       assertUuid(row.map_id as string, 'footprint map_id');
+      if (row.map_id !== job.map_id) throw error(403, 'Footprint map does not match job');
+      if (typeof jobRunId === 'string' && row.run_id !== jobRunId) {
+        throw error(403, 'Footprint run does not match job');
+      }
       const ring = row.pixel_polygon;
       if (!Array.isArray(ring) || ring.length < 3) {
         throw error(400, 'pixel_polygon must be a ring of at least three points');
@@ -226,19 +274,17 @@ export const POST: RequestHandler = async ({ request }) => {
     applied.footprints = insert.length;
   }
 
-  if (body.job_id) {
-    const jobId = assertUuid(body.job_id, 'job_id');
-    if (!JOB_STATUSES.includes(body.status)) {
-      throw error(400, `status must be one of ${JOB_STATUSES.join(', ')}`);
-    }
+  if (body.status) {
+    const jobId = job.id;
     const { data, error: err } = await supabase.rpc('finish_job', {
       p_id: jobId,
       p_status: body.status,
+      p_worker_key_id: worker.id,
       p_result: body.result ?? {},
       p_error: body.error ?? null,
     });
     if (err) dbError(err, 'Could not update the job');
-    if (!data || !(data as { id: string | null }).id) throw error(404, 'No such job');
+    if (!data || !(data as { id: string | null }).id) throw error(409, 'Job claim expired');
     applied.job = (data as { status: string }).status;
   }
 

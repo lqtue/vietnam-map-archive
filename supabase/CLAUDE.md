@@ -26,7 +26,7 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **096**, local (094 pushed 2026-09-23; 095/096 not yet pushed). 092 nulls out the
+Head is **097**, local (094 pushed 2026-09-23; 095–097 not yet pushed). 092 nulls out the
 `'Vietnam Map Archive'` placeholder in `maps.collection` (it meant "no series," not a series —
 collapsed a live bug in `annotationMirror.ts` that was stomping real series membership on every
 re-mirror); 093 collapses spelling/language duplicates in `language`/`dc_publisher`/`rights`; 094
@@ -54,7 +54,9 @@ series-sheet name cleanup (Indochine 1:100,000 "Est/Ouest" suffixes, Tonkin tran
 L7014/L909 sheet-code suffixes, hyphen spacing — `collection is not null` only, 303 rows on the
 production corpus, 0 slug moves), nulls `maps.location` where it only duplicated the series, and
 collapses rights/language spelling variants on `scout_candidates` and `cell_printings` the way 093
-did for `maps`. Drop a new
+did for `maps`. 097 closes the moderation, worker-claim, map visibility, slug, and direct-write
+security gaps; it must ship alongside the API changes and its generated types must be refreshed
+from the linked project after `db push`. Drop a new
 `supabase/migrations/NNN_*.sql`
 incrementing from head, `supabase db push`, then regenerate types:
 

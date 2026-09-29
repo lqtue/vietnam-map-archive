@@ -663,6 +663,9 @@ def write_to_supabase(
     api_url = os.environ.get("VMA_API_URL", "").rstrip("/")
     api_key = os.environ.get("VMA_WORKER_KEY", "")
     if api_url and api_key:
+        job_id = os.environ.get("VMA_JOB_ID")
+        if not job_id:
+            raise RuntimeError("VMA_JOB_ID is required when reporting worker results")
         # MAX_ROWS on the endpoint is 500.
         written = 0
         for i in range(0, len(rows), 500):
@@ -671,7 +674,7 @@ def write_to_supabase(
                 f"{api_url}/api/pipeline/results",
                 headers={"Authorization": f"Bearer {api_key}",
                          "Content-Type": "application/json"},
-                json={"footprints": chunk},
+                json={"job_id": job_id, "footprints": chunk},
                 timeout=120,
             )
             resp.raise_for_status()

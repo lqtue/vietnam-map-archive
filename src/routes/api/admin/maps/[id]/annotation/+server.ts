@@ -4,6 +4,7 @@ import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid } from '$lib/server/http';
 import { uploadJson } from '$lib/server/storage';
+import { fetchAnnotationJson } from '$lib/server/safeAnnotation';
 
 interface GCP {
   resourceCoords: [number, number];
@@ -40,13 +41,12 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
     throw error(400, 'This map does not use a self-hosted annotation URL');
   }
 
-  // Fetch current annotation JSON — bypass any server-side cache
-  const bustUrl = annotationUrl + (annotationUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
-  const fetchRes = await fetch(bustUrl, { cache: 'no-store' });
-  if (!fetchRes.ok) {
-    throw error(502, `Failed to fetch annotation: ${fetchRes.statusText}`);
+  let annotation: any;
+  try {
+    annotation = await fetchAnnotationJson(annotationUrl);
+  } catch {
+    throw error(502, 'Failed to fetch annotation');
   }
-  const annotation = await fetchRes.json();
 
   // Extract source info for SVG dimensions
   const item = annotation.items?.[0];

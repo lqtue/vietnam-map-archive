@@ -36,7 +36,7 @@ export interface ExploreUrl {
   tallyMapOpen(mapId: string): void;
 }
 
-export function createExploreUrl({ supabase, role, markApplied }: ExploreUrlOptions): ExploreUrl {
+export function createExploreUrl({ role, markApplied }: ExploreUrlOptions): ExploreUrl {
   /**
    * Writes the topmost overlay into `?map=` so the selection is shareable and,
    * more importantly, so each opened map shows up as its own path+query in
@@ -75,7 +75,7 @@ export function createExploreUrl({ supabase, role, markApplied }: ExploreUrlOpti
    */
   function tallyMapOpen(mapId: string) {
     if (role() !== 'user') return;
-    recordMapOpen(supabase, mapId);
+    recordMapOpen(mapId);
   }
 
   /**
