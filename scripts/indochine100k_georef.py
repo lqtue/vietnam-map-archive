@@ -2275,7 +2275,12 @@ def annotate(write=False, only_new=True, only_ids=None):
             response = requests.put(obj, headers={**headers, "Content-Type": "application/json",
                                                   "x-upsert": "true"}, data=body, timeout=60)
         response.raise_for_status()
-        public = f"{url}/storage/v1/object/public/{BUCKET}/{mid}.json"
+        # Not a raw storage URL: the "annotations" bucket has no working public
+        # path (confirmed 2026-09-30 -- it 400s "Bucket not found" for every
+        # sheet written this way). Every sheet published before this one uses
+        # the app's own route, which serves the same bucket through the
+        # service-role client regardless of the bucket's own public flag.
+        public = f"https://maparchive.vn/api/maps/{mid}/annotation"
         response = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}&status=eq.draft&is_georeferenced=is.false",
                                   headers=headers, timeout=30,
                                   json={"annotation_url": public, "is_georeferenced": True, "bbox": bbox})
