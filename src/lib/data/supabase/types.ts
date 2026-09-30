@@ -1734,10 +1734,6 @@ export type Database = {
     }
     Functions: {
       canonicalise_category: { Args: { raw: string }; Returns: string }
-      consume_contribution_quota: {
-        Args: { p_user_id: string; p_kind: string; p_limit: number }
-        Returns: boolean
-      }
       claim_job: {
         Args: { p_kinds: string[]; p_worker: string; p_worker_key_id: string }
         Returns: {
@@ -1839,7 +1835,6 @@ export type Database = {
         Args: { p_except: string; p_slug: string }
         Returns: boolean
       }
-      record_map_view: { Args: { p_map_id: string }; Returns: boolean }
       place_core_key: {
         Args: { p_text: string; p_validated: string }
         Returns: string
