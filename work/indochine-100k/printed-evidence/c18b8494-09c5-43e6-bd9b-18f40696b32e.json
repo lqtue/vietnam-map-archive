@@ -1,0 +1,52 @@
+{
+ "id": "c18b8494-09c5-43e6-bd9b-18f40696b32e",
+ "name": "Muong Soui (E)",
+ "fkey": 60188,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.42094952280264,
+   "east": 111.81954566313914,
+   "north": 21.983868869276595,
+   "south": 21.481342115296886
+  },
+  "read": {
+   "longitude": [
+    [
+     2330,
+     111.6
+    ],
+    [
+     4552,
+     111.8
+    ]
+   ],
+   "latitude": [
+    [
+     2913,
+     21.8
+    ],
+    [
+     5270,
+     21.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.005488681239368877,
+ "candidate_aspect_err": 0.005518973123612926,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

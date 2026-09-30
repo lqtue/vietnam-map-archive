@@ -22,6 +22,18 @@ time. A sheet placed 470 m out, a coverage bar drawing a held cell as a gap, a s
 hundred metres off — none of them throw, and all of them read as a fact about the corpus. Most of
 the test suite exists to catch exactly this class.
 
+**Fit quality cannot tell a ruled interior line from a hand-set neatline — a straighter fit is not
+a more correct one.** Three separate times on the Indochine 1:100,000 boundary review (Kratié's
+rejected 363px candidate, Beng Lovéa's rejected decorative band, and Muong Phine/Muong-Song-Khone's
+version-29 pins), the detector's chosen line was a kilometre-grid rule or decorative band sitting
+tens of pixels inside the true printed edge — and twice it fit *straighter* (residual 0.3–0.5px
+over 24 patches) than the real engraved frame (residual ~3.2px), because a ruled grid line is
+mathematically straighter than a hand-set neatline. Neither a resized contact-strip image nor a
+fixed-window native crop caught the Muong Phine/Muong-Song-Khone case; only a per-pixel profile
+(`pixels.mean(axis=0)`, or `pixels[k-100:k+100].mean(axis=0)` localised to the anchor to avoid slope
+smear) did, by showing exactly where the blank-paper plateau ends. The check that generalizes: find
+where paper ends, not which candidate line fits best or looks darkest (2026-09-29).
+
 **A refused probe reads exactly like a probe that was answered "no".** `backfill_iiif_widths.py`
 asked the edge whether a derivative existed using urllib's default User-Agent, got 403, and its
 "not 200 means missing" rule turned that into 93 phantom gaps. Curl, same URLs, same second: 6. If a

@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/0d2bc33e-f09b-4a3f-8263-075611bd265b/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/0d2bc33e-f09b-4a3f-8263-075611bd265b",
+     "type": "ImageService3",
+     "width": 5140,
+     "height": 7514
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"5140\" height=\"7514\"><polygon points=\"355,689 4772,694 4766,6615 349,6610\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        355,
+        689
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.9320635,
+        15.73376
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4772,
+        694
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        108.286508,
+        15.73376
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4766,
+        6615
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        108.286508,
+        15.2779266
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        349,
+        6610
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.9320635,
+        15.2779266
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

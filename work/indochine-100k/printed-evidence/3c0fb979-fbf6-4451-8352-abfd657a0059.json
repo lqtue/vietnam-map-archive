@@ -1,0 +1,52 @@
+{
+ "id": "3c0fb979-fbf6-4451-8352-abfd657a0059",
+ "name": "Muong Het (W)",
+ "fkey": 60125,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 112.59330347674829,
+   "east": 112.99412580595107,
+   "north": 23.505044149687325,
+   "south": 23.003215621924763
+  },
+  "read": {
+   "longitude": [
+    [
+     1497,
+     112.7
+    ],
+    [
+     3698,
+     112.9
+    ]
+   ],
+   "latitude": [
+    [
+     1891,
+     23.4
+    ],
+    [
+     4249,
+     23.2
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.006483975057438381,
+ "candidate_aspect_err": 0.00652629136788533,
+ "independent_error": "ReadError: [Errno 54] Connection reset by peer"
+}

@@ -1,0 +1,52 @@
+{
+ "id": "e7cc411f-63a5-46c8-81da-719ec613014b",
+ "name": "Muong Ou Tay (E)",
+ "fkey": 60038,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 110.54570803035924,
+   "east": 110.9504460337977,
+   "north": 24.980328701553166,
+   "south": 24.478960837545802
+  },
+  "read": {
+   "longitude": [
+    [
+     897,
+     110.6
+    ],
+    [
+     3087,
+     110.8
+    ]
+   ],
+   "latitude": [
+    [
+     2867,
+     24.8
+    ],
+    [
+     5222,
+     24.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0009619359699671045,
+ "candidate_aspect_err": 0.0009628621817338761,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

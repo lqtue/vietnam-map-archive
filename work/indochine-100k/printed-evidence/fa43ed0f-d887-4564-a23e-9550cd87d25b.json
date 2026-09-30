@@ -1,0 +1,7 @@
+{
+ "id": "fa43ed0f-d887-4564-a23e-9550cd87d25b",
+ "name": "Phong Th\u00f4 (W)",
+ "fkey": 60027,
+ "detector_version": 16,
+ "error": "T: read Noneg at expected 111.9g tick; B: read Noneg at expected 111.9g tick; T: read Noneg at expected 112.0g tick; B: read Noneg at expected 112.0g tick"
+}

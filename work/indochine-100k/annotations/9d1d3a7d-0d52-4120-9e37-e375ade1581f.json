@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/9d1d3a7d-0d52-4120-9e37-e375ade1581f/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/9d1d3a7d-0d52-4120-9e37-e375ade1581f",
+     "type": "ImageService3",
+     "width": 5032,
+     "height": 7074
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"5032\" height=\"7074\"><polygon points=\"315,582 4736,591 4725,6487 304,6479\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        315,
+        582
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.9214449,
+        21.6145404
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4736,
+        591
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.2867227,
+        21.6145404
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4725,
+        6487
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        107.2867227,
+        21.1606515
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        304,
+        6479
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        106.9214449,
+        21.1606515
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

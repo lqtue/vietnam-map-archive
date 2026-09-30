@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/1369db8c-1c56-420f-8e8b-ba8b43b166f3/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/1369db8c-1c56-420f-8e8b-ba8b43b166f3",
+     "type": "ImageService3",
+     "width": 5130,
+     "height": 7370
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"5130\" height=\"7370\"><polygon points=\"350,626 4762,633 4753,6541 342,6534\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        350,
+        626
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        103.0714407,
+        13.01825
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4762,
+        633
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        103.4214407,
+        13.01825
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4753,
+        6541
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        103.4214407,
+        12.561861
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        342,
+        6534
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        103.0714407,
+        12.561861
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

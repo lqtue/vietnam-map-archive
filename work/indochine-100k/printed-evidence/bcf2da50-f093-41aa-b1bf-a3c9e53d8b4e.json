@@ -1,0 +1,52 @@
+{
+ "id": "bcf2da50-f093-41aa-b1bf-a3c9e53d8b4e",
+ "name": "Muong Khoua (W)",
+ "fkey": 60119,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 110.98847846366418,
+   "east": 111.39004547730201,
+   "north": 23.482627981134694,
+   "south": 22.981022394217625
+  },
+  "read": {
+   "longitude": [
+    [
+     1533,
+     111.1
+    ],
+    [
+     3730,
+     111.3
+    ]
+   ],
+   "latitude": [
+    [
+     2934,
+     23.3
+    ],
+    [
+     5293,
+     23.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.008844245934908783,
+ "candidate_aspect_err": 0.008923164597123525,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

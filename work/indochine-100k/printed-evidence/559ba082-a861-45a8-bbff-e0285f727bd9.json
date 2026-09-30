@@ -1,0 +1,7 @@
+{
+ "id": "559ba082-a861-45a8-bbff-e0285f727bd9",
+ "name": "Mon-Cay (E)",
+ "fkey": 60113,
+ "detector_version": 16,
+ "error": "L: read Noneg at expected 23.9g tick; R: read Noneg at expected 23.9g tick; L: read Noneg at expected 24.0g tick; R: read Noneg at expected 24.0g tick"
+}

@@ -1,0 +1,94 @@
+{
+ "id": "ab99db79-58e1-4535-928e-49fe6c7723e8",
+ "name": "Lai Ch\u00e2u (W)",
+ "fkey": 60047,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.7607978443351,
+   "east": 112.16391728589826,
+   "north": 25.000209428377826,
+   "south": 24.498545966459055
+  },
+  "read": {
+   "longitude": [
+    [
+     1845,
+     111.9
+    ],
+    [
+     2939,
+     112.0
+    ]
+   ],
+   "latitude": [
+    [
+     1897,
+     24.9
+    ],
+    [
+     4253,
+     24.7
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.002169865217092975,
+ "candidate_aspect_err": 0.0021745837707788573,
+ "independent": {
+  "grades": {
+   "west": 111.77066386177016,
+   "east": 112.17452161732885,
+   "north": 25.00583039796465,
+   "south": 24.503527331122054
+  },
+  "read": {
+   "longitude": [
+    [
+     1738,
+     111.9
+    ],
+    [
+     2830,
+     112.0
+    ]
+   ],
+   "latitude": [
+    [
+     1959,
+     24.9
+    ],
+    [
+     4312,
+     24.7
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.010604331430585034
+}

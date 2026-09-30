@@ -1,0 +1,94 @@
+{
+ "id": "6eca3a2a-3c32-4a95-8fc6-21934716ac48",
+ "name": "M?ong Sai (E)",
+ "fkey": 60861,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 110.58793475853565,
+   "east": 110.98944874338363,
+   "north": 23.482790376682004,
+   "south": 22.980764089944152
+  },
+  "read": {
+   "longitude": [
+    [
+     1532,
+     110.7
+    ],
+    [
+     3731,
+     110.9
+    ]
+   ],
+   "latitude": [
+    [
+     2809,
+     23.3
+    ],
+    [
+     5168,
+     23.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.007942240751584747,
+ "candidate_aspect_err": 0.008005824940678561,
+ "independent": {
+  "grades": {
+   "west": 110.60055638504535,
+   "east": 111.00079630013181,
+   "north": 23.482790376682004,
+   "south": 22.980764089944152
+  },
+  "read": {
+   "longitude": [
+    [
+     1395,
+     110.7
+    ],
+    [
+     3601,
+     110.9
+    ]
+   ],
+   "latitude": [
+    [
+     2809,
+     23.3
+    ],
+    [
+     5168,
+     23.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.012621626509698558
+}

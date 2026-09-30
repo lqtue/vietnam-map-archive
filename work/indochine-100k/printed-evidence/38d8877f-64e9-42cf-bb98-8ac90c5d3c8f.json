@@ -1,0 +1,53 @@
+{
+ "id": "38d8877f-64e9-42cf-bb98-8ac90c5d3c8f",
+ "name": "Khang Khai (W)",
+ "fkey": 60195,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.81850178859021,
+   "east": 112.21657444264783,
+   "north": 21.98965369073418,
+   "south": 21.487465360580632
+  },
+  "read": {
+   "longitude": [
+    [
+     2305,
+     112.0
+    ],
+    [
+     4520,
+     112.2
+    ]
+   ],
+   "latitude": [
+    [
+     2951,
+     21.8
+    ],
+    [
+     5307,
+     21.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [
+  "rim offsets spread 52%"
+ ],
+ "candidate_scale_gap": 0.00816757353179025,
+ "candidate_aspect_err": 0.008234832128723571
+}

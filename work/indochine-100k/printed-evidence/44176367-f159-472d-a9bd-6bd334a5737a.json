@@ -1,0 +1,94 @@
+{
+ "id": "44176367-f159-472d-a9bd-6bd334a5737a",
+ "name": "Ban Nam Bac (W)",
+ "fkey": 60150,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.0010411173416,
+   "east": 111.40015681912065,
+   "north": 22.980897027916242,
+   "south": 22.479288911531896
+  },
+  "read": {
+   "longitude": [
+    [
+     1392,
+     111.1
+    ],
+    [
+     3603,
+     111.3
+    ]
+   ],
+   "latitude": [
+    [
+     2713,
+     22.8
+    ],
+    [
+     5070,
+     22.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.004682580146616609,
+ "candidate_aspect_err": 0.004704609859341506,
+ "independent": {
+  "grades": {
+   "west": 111.012481613493,
+   "east": 111.41069678345396,
+   "north": 22.98719312899878,
+   "south": 22.485585012614433
+  },
+  "read": {
+   "longitude": [
+    [
+     1272,
+     111.1
+    ],
+    [
+     3488,
+     111.3
+    ]
+   ],
+   "latitude": [
+    [
+     2784,
+     22.8
+    ],
+    [
+     5141,
+     22.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.011440496151394086
+}

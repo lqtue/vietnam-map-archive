@@ -269,6 +269,52 @@ So the defensible corpus claims are:
 
 ---
 
+## 5b. New segmentation and corpus work — checked 2026-09-30
+
+Field moved since this file was written. Three items change what §1/§5 should say next time either
+gets a real rewrite; none flip a verdict on their own.
+
+- **SMOL-MapSeg** (Yuan, Thiemann, Dahms, Sester — arXiv 2508.05501, v2 Nov 2025) — "Show Me One
+  Label": segments from **one** labelled example per class via legend-oriented prompting, evaluated
+  against SAM and MapSAM. This undercuts MapSAM2's 10-shot framing as *the* few-shot reference point
+  in §1 — it is not, it is one of at least three. **No IoU/PQ number extracted yet** — the PDF's text
+  layer did not yield clean figures on this pass. Needs a real read before it goes in the table.
+- **Sterzinger, Peer & Sablatnig, ICDAR 2025** (arXiv 2506.21826) — linear-probes a frozen vision
+  foundation model instead of fine-tuning it (689k trainable params, 0.21% of the backbone). On
+  Siegfried, 10-shot: **+5% relative mIoU vineyard, +13% railway** over their baseline; ~+20% at
+  5-shot. On ICDAR 2021 building blocks: **67.3% mean PQ**, despite the method not being tuned for
+  that metric. This is a second, cheaper axis than MapSAM2's fine-tuning route, in the same low-data
+  regime we're in — worth checking against our 46 traces before MapSAM2 specifically.
+- **Petitpierre, "Generalizable Multiscale Segmentation of Heterogeneous Map Collections"** (solo,
+  submitted 2026-03-05) — this reads as a newer, single-author writeup of the Semap work already
+  cited as Petitpierre & Guhennec 2023 (DSH), same 1,439-annotation benchmark, same synthetic-data +
+  multi-level generalization approach. **Not confirmed to be a strict update** — the 2023 co-author
+  is absent here and the fetch could not resolve authorship beyond Petitpierre. Cite both until
+  checked; do not assume the 2026 one supersedes.
+- **"Segmenting France Across Four Centuries" / FRAx4** (López-Rauhut, Zhou, Aubry, Landrieu — ICDAR
+  2025, arXiv 2505.24824) — nationwide dataset, **548,305 km² of metropolitan France**, three
+  map collections spanning the 18th–20th centuries, 22,878 km² hand-annotated for the 18th/19th-c.
+  maps. This is the closest thing yet to a long-timespan, national-scale French segmentation corpus
+  — and it says **metropolitan France** in its own abstract, nothing colonial. It narrows the general
+  "single period, single map type" gap the field had; it does **not** touch the "no Vietnamese, no
+  French-colonial Indochina corpus" claim in §5, which still stands unchallenged.
+- **Rabehi, Le Texier & Lemoy, "Mapping Historic Urban Footprints in France"** (preprint, arXiv
+  2510.02097) — production-scale dual-pass U-Net over IGN's Scan Histo 1925–1950 series, **941
+  high-res tiles covering all of metropolitan France**, first open urban-footprint pass on 24 that
+  period. Overall accuracy **73%**; first pass trained to find confusable classes (text, roads),
+  second pass retrained on cleaned/augmented data using the first pass's binarized output to cut
+  false positives. Code, training data and the resulting raster are released open. This is the
+  clearest "industry-adjacent, full-country production run" comparator for §4 — closer to what an
+  eventual full-archive VMA segmentation pass would need to look like than any of the few-shot papers
+  in §1.
+
+None of this changes the §6 verdict. It does mean: next time §1 is touched, MapSAM2 should stop
+being cited as *the* few-shot bar — it's one of at least three recent routes (fine-tune, one-shot
+prompt, linear-probe) at similar or lower annotation cost, and the field's national-scale production
+answer (Rabehi et al.) uses none of them, just a two-pass U-Net.
+
+---
+
 ## 6. Verdict, by axis
 
 | axis | standing | what would change it |
@@ -366,3 +412,14 @@ is not, and the measurement gap is a tracing job rather than a research problem.
 - [Automated Extraction of Human Settlement Patterns From Historical Topographic Map Series Using
   Weakly Supervised CNNs](https://doi.org/10.1109/access.2019.2963213) — Uhl, Leyk & Chiang, IEEE
   Access 2020 — contemporary data as ancillary labels
+- [SMOL-MapSeg: Show Me One Label](https://arxiv.org/pdf/2508.05501) — Yuan, Thiemann, Dahms, Sester,
+  arXiv 2508.05501 (v2 Nov 2025) — one-shot legend-prompted segmentation
+- [Few-Shot Segmentation of Historical Maps via Linear Probing of Vision Foundation
+  Models](https://arxiv.org/abs/2506.21826) — Sterzinger, Peer & Sablatnig, ICDAR 2025
+- [Generalizable Multiscale Segmentation of Heterogeneous Map
+  Collections](https://arxiv.org/abs/2603.05037) — Petitpierre, submitted 2026-03-05 — possibly a
+  newer writeup of the Semap work already cited above; authorship not yet confirmed to match
+- [Segmenting France Across Four Centuries](https://arxiv.org/abs/2505.24824) — López-Rauhut, Zhou,
+  Aubry, Landrieu, ICDAR 2025 · [code](https://github.com/Archiel19/FRAx4) — metropolitan France only
+- [Mapping Historic Urban Footprints in France: Balancing Quality, Scalability and AI
+  Techniques](https://arxiv.org/pdf/2510.02097) — Rabehi, Le Texier & Lemoy, preprint 2026

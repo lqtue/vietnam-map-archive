@@ -1,0 +1,94 @@
+{
+ "id": "2b289c7e-b8fb-4f91-8718-7baa688f6db4",
+ "name": "Luang Prabang (E)",
+ "fkey": 60173,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 110.6138070720182,
+   "east": 111.012569492202,
+   "north": 22.47877129409945,
+   "south": 21.9773929142952
+  },
+  "read": {
+   "longitude": [
+    [
+     1287,
+     110.7
+    ],
+    [
+     3503,
+     110.9
+    ]
+   ],
+   "latitude": [
+    [
+     2750,
+     22.3
+    ],
+    [
+     5111,
+     22.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.007045911604968274,
+ "candidate_aspect_err": 0.007095908750783385,
+ "independent": {
+  "grades": {
+   "west": 110.626065640498,
+   "east": 111.02375129447069,
+   "north": 22.47877129409945,
+   "south": 21.9773929142952
+  },
+  "read": {
+   "longitude": [
+    [
+     1151,
+     110.7
+    ],
+    [
+     3373,
+     110.9
+    ]
+   ],
+   "latitude": [
+    [
+     2750,
+     22.3
+    ],
+    [
+     5111,
+     22.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.012258568479794008
+}

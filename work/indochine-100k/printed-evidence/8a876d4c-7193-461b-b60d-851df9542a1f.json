@@ -1,0 +1,94 @@
+{
+ "id": "8a876d4c-7193-461b-b60d-851df9542a1f",
+ "name": "Di\u00ean Bi\u00ean Phu (E)",
+ "fkey": 60089,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 112.18315663195315,
+   "east": 112.58557932990747,
+   "north": 24.006169788554054,
+   "south": 23.50492395624048
+  },
+  "read": {
+   "longitude": [
+    [
+     1646,
+     112.3
+    ],
+    [
+     3840,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     760,
+     24.0
+    ],
+    [
+     5482,
+     23.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.00784773023856361,
+ "candidate_aspect_err": 0.007909804248545984,
+ "independent": {
+  "grades": {
+   "west": 112.19169622533401,
+   "east": 112.59320391033255,
+   "north": 24.006169788554054,
+   "south": 23.50492395624048
+  },
+  "read": {
+   "longitude": [
+    [
+     1564,
+     112.3
+    ],
+    [
+     3763,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     760,
+     24.0
+    ],
+    [
+     5482,
+     23.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.008539593380859856
+}

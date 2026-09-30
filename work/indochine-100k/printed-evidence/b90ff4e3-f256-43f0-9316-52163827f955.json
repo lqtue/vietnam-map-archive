@@ -1,0 +1,94 @@
+{
+ "id": "b90ff4e3-f256-43f0-9316-52163827f955",
+ "name": "Lu\u00e2n Ch\u00e2u (E)",
+ "fkey": 60068,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 112.18349715154689,
+   "east": 112.58579038843703,
+   "north": 24.504120611719724,
+   "south": 24.001898020782143
+  },
+  "read": {
+   "longitude": [
+    [
+     1694,
+     112.3
+    ],
+    [
+     3891,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     1879,
+     24.4
+    ],
+    [
+     4234,
+     24.2
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0008370404173315716,
+ "candidate_aspect_err": 0.0008377416409443204,
+ "independent": {
+  "grades": {
+   "west": 112.18349715154689,
+   "east": 112.58579038843703,
+   "north": 24.508107598947078,
+   "south": 24.006736593581245
+  },
+  "read": {
+   "longitude": [
+    [
+     1694,
+     112.3
+    ],
+    [
+     3891,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     1933,
+     24.4
+    ],
+    [
+     4292,
+     24.2
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.004838572799101826
+}

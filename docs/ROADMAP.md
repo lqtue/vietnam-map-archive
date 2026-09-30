@@ -97,7 +97,8 @@ measurement, metadata that maintains itself, and corpus size.
       `rim offsets spread`/`axes disagree`, matching the ~44% clear rate the calibration pass
       already saw. Tuning `detect()`'s constants (`ACROSS`/`MAXIN`/rim-spread tolerance) against a
       wider sample is the real remaining work before a full-series batch, not just accepting a
-      calibration. 225 of 357 attempted sheets remain held. **325: WKT matching grid built** from
+      calibration. Of the 225 unpublished sheets, 168 now clear locally and 57 remain held.
+      **325: WKT matching grid built** from
       CartoMundi's IGN geometry and matched to all 221 VMA rows, but no image-placement pipeline
       exists yet; its third frame convention (thick neatline → ticked band → gap → thin inner line,
       plus a K-grid overlay) still needs its own detector.
@@ -105,6 +106,27 @@ measurement, metadata that maintains itself, and corpus size.
       `is_georeferenced = true`, a person reviews before publishing (the 3 published sheets above
       were geometry + lattice + landmark-bbox checked, not eyeballed in `/explore` — do that before
       trusting them fully).
+      **Local detection update 2026-09-28:** the last-blank-run rim search skipped visible borders
+      on some held sheets, and the overview sometimes picked the printed scale bar as the bottom
+      frame. Gated edge retries, patch-supported rim candidates, a direct-boundary check, and a
+      source-transition check for spread outliers, source-reviewed special cuts, and four-edge
+      printed-tick placements bring the read-only lattice to 303 clear placements, up from 170;
+      33 non-span holds remain, including explicit exclusions. Kompong Sralao (W) recovered
+      per-sheet but overlaps another cell and has a persistent hold. The pending local records
+      have not been published; see the 2026-09-28 journal entry. Thirty-three scale holds now have eight
+      source-checked ticks and a skewed four-corner placement: catalogue extrema had exaggerated
+      their frame spans. Nine unusual cuts/full sheets have source-pinned span exceptions. The
+      remaining 3 scale-only, 30 mixed, and 24 catalogue-span holds require further sheet-level
+      investigation. Version 28 passes the lattice and regression checks (303 placements, zero
+      conflicts or corner movements over 2px).
+      **2026-09-29 update:** 11 of the 13 version-28 boundary trials landed (version 31); one
+      (Muong Ou Tay W) stayed held on an isolated 2.0% axis-scale gap now that its boundary is
+      fixed, and one (Lang Son E) was found wrong on re-review — a second interior-grid-line
+      pick that passed two visual review methods and was caught only by a per-pixel profile —
+      and reverted to held. 314 placements clear, zero lattice conflicts, zero corner movements
+      over 2px against a version-28 snapshot. 46 holds remain: 24 catalogue-span, 4 axis-scale-only,
+      12 mixed, 3 shape/aspect, 3 persistent exclusions. Resume from
+      `docs/journals/260929-series561-handoff.md`.
 - [ ] **`indochine-100k-licence`** — settle it before the ingest run mints 578 rows.
       Probed 2026-09-21 with the same
       per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also

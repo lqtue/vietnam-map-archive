@@ -1,0 +1,52 @@
+{
+ "id": "5dfc24fb-b2c5-43fe-b74a-6d5abb564f62",
+ "name": "Muong Son (W)",
+ "fkey": 60152,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.80046805436375,
+   "east": 112.20026452828061,
+   "north": 22.9934553919433,
+   "south": 22.49175772157759
+  },
+  "read": {
+   "longitude": [
+    [
+     1399,
+     111.9
+    ],
+    [
+     3607,
+     112.1
+    ]
+   ],
+   "latitude": [
+    [
+     2856,
+     22.8
+    ],
+    [
+     5214,
+     22.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0063808729934940415,
+ "candidate_aspect_err": 0.006421850002744573,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

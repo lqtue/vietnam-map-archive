@@ -1,0 +1,7 @@
+{
+ "id": "6bdd9ab8-22dd-460d-b511-0a29d5dd843f",
+ "name": "Bun-Tai (E)",
+ "fkey": 60084,
+ "detector_version": 16,
+ "error": "L: read 25.6g at expected 23.6g tick; R: read 25.8g at expected 23.8g tick; L: read 25.6g at expected 23.6g tick; R: read 25.8g at expected 23.8g tick"
+}
