@@ -53,7 +53,9 @@ for (const [id, name] of IDS) {
     console.log(`MISSING from maps table: ${id} (${name})`);
     continue;
   }
-  console.log(`${row.status.padEnd(8)} -> public  ${name}  (georeferenced=${row.is_georeferenced})`);
+  console.log(
+    `${row.status.padEnd(8)} -> public  ${name}  (georeferenced=${row.is_georeferenced})`
+  );
 }
 
 if (!apply) process.exit(0);
