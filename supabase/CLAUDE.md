@@ -26,8 +26,9 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **101**, not yet pushed (100 is what's live in production, verified 2026-09-30 via
-`supabase migration list`). 101 narrows `map_images` and `map_slug_aliases`'s read policies from
+Head is **102**, local (101 is live in production, verified 2026-09-30 via
+`supabase migration list`). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
+trigger function 097 added and 099 missed. 101 narrows `map_images` and `map_slug_aliases`'s read policies from
 "published or any signed-in user" to "published, the map's creator, or staff" — the two
 draft-visibility gates copying 063's wording that nothing non-staff actually reads that broadly —
 and revokes anon's SELECT on `footprints.review_note`/`.review_tags`/`.reviewed_by`/`.user_id` (and
