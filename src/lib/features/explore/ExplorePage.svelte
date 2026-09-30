@@ -446,7 +446,6 @@
         {mapList}
         {matches}
         {role}
-        forceBrowseExpanded={mode === 'all'}
         bind:tab={sidebarTab}
         tourActive={tourOpen || tourPending}
         on:zoomToOverlay={handleZoomToOverlay}
@@ -510,7 +509,6 @@
         <ExploreBrowsePanel
           {matches}
           {role}
-          forceExpanded={mode === 'all'}
           on:pick={handlePickMap}
           on:pickLabel={handlePickLabel}
           on:remove={handleRemoveOverlay}

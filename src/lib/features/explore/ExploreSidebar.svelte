@@ -47,7 +47,6 @@
   export let mapList: MapListItem[] = [];
   /** Map ids whose traced fabric is drawn; owned by the page. */
   export let matches: ResolvedMap[] = [];
-  export let forceBrowseExpanded = false;
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** True while the product tour is pending or open. It sets `tab` itself, per
    *  step, so the auto-switch below must stand aside for it. */
@@ -170,7 +169,6 @@
           {matches}
           {role}
           {search}
-          forceExpanded={forceBrowseExpanded || filterActive}
           on:pick={(e) => pickMap(e.detail)}
           on:pickLabel={(e) => dispatch('pickLabel', e.detail)}
           on:remove={(e) => dispatch('removeOverlay', e.detail)}
