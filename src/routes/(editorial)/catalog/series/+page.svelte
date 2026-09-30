@@ -29,6 +29,9 @@
     A survey is one map printed as many sheets. These are the ones the archive holds part of — each
     page lists every sheet the survey contains, held or not.
   </p>
+  <p class="lead">
+    <a href="/catalog/cartomundi">Browse CartoMundi's Vietnam-related series →</a>
+  </p>
 
   {#if series.length}
     <SeriesList {series} />
