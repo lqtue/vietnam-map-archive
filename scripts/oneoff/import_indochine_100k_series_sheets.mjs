@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 // Seed `series_sheets` (mig 083) with the two Indochine 1:100,000 series —
 // CartoMundi skey 325 (1st éd. SGI, 1900-1947, 252 declared sheets) and skey
-// 561 (2nd éd. SGI "L 605", 1947-1959, 413 declared sheets, civil+military
-// editions interleaved).
+// 561 (2nd éd. SGI "L 605", 1947-1959, civil+military editions interleaved).
+//
+// 561's own CartoMundi series page declares 843 sheets total, but IGN's own
+// "Exemplaire disponible" count on that page says only 492 have ever been
+// digitized -- confirmed 2026-09-30 by reading that panel directly, not by
+// re-deriving it from the API. The 351-sheet gap (most of it the Mekong
+// Delta south of Ho Chi Minh City, e.g. Can Tho, Bac Lieu, Soc Trang) has no
+// scan anywhere to fetch, on this endpoint or any other -- this file only
+// ever ingests the 492 that exist as images, which is all `serie-561.json`
+// holds.
 //
 //   node --env-file=.env scripts/oneoff/import_indochine_100k_series_sheets.mjs [--apply]
 //

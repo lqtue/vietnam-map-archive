@@ -1,0 +1,103 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/0c592559-86c5-4c4e-994a-6c255a614f60/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/0c592559-86c5-4c4e-994a-6c255a614f60",
+     "type": "ImageService3",
+     "width": 5050,
+     "height": 7140
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"5050\" height=\"7140\"><polygon points=\"310,657 4731,645 4747,6565 326,6577\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": [
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        310,
+        657
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        104.8064925,
+        11.22393
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4731,
+        645
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.150937,
+        11.22393
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        4747,
+        6565
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        105.150937,
+        10.7703188
+       ]
+      }
+     },
+     {
+      "type": "Feature",
+      "properties": {
+       "resourceCoords": [
+        326,
+        6577
+       ]
+      },
+      "geometry": {
+       "type": "Point",
+       "coordinates": [
+        104.8064925,
+        10.7703188
+       ]
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

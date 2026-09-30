@@ -79,3 +79,12 @@ docs/private/
 
 # LaTeX build log — the PDF and .tex are the artifacts, the log is not
 docs/paper/*.log
+
+# indochine100k working data: raw IGN dumps (141 MB), fetched strips/corners, Gemini cache, run logs
+work/indochine-100k/sources/ign-serie-*.json
+work/indochine-100k/strips/
+work/indochine-100k/corners/
+work/indochine-100k/gemini_cache/
+work/indochine-100k/full-place*.log
+work/indochine-100k/sample-*.jpg
+work/indochine-100k/__pycache__/

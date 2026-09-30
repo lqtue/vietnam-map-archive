@@ -1,0 +1,52 @@
+{
+ "id": "03973ced-e945-4fa1-923b-b66a526eabf8",
+ "name": "Pak Seng (E)",
+ "fkey": 60174,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.42164407206604,
+   "east": 111.8182481544831,
+   "north": 22.485492712785685,
+   "south": 21.984141284995772
+  },
+  "read": {
+   "longitude": [
+    [
+     1215,
+     111.5
+    ],
+    [
+     3442,
+     111.7
+    ]
+   ],
+   "latitude": [
+    [
+     2771,
+     22.3
+    ],
+    [
+     5130,
+     22.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "B",
+    "SW",
+    "SE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0012320373781868948,
+ "candidate_aspect_err": 0.001233557166724456,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

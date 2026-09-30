@@ -1,0 +1,94 @@
+{
+ "id": "db0171f6-564e-4d7c-94a6-cde0f8b4198f",
+ "name": "Ban-Calan (E)",
+ "fkey": 60024,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.34403211821711,
+   "east": 111.74996698665507,
+   "north": 25.500230148054705,
+   "south": 24.999992649116574
+  },
+  "read": {
+   "longitude": [
+    [
+     900,
+     111.4
+    ],
+    [
+     3074,
+     111.6
+    ]
+   ],
+   "latitude": [
+    [
+     1834,
+     25.4
+    ],
+    [
+     6564,
+     25.0
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.009067507762777136,
+ "candidate_aspect_err": 0.00915047980948279,
+ "independent": {
+  "grades": {
+   "west": 111.34403211821711,
+   "east": 111.74996698665507,
+   "north": 25.500230148054705,
+   "south": 24.999992649116574
+  },
+  "read": {
+   "longitude": [
+    [
+     900,
+     111.4
+    ],
+    [
+     3074,
+     111.6
+    ]
+   ],
+   "latitude": [
+    [
+     1834,
+     25.4
+    ],
+    [
+     6564,
+     25.0
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.0
+}

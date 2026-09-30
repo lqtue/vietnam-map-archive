@@ -1,0 +1,7 @@
+{
+ "id": "10e6a00f-2aea-42d1-8c41-370fc0993099",
+ "name": "Muong-T\u00e8 (W)",
+ "fkey": 60043,
+ "detector_version": 16,
+ "error": "T: read Noneg at expected 111.1g tick; B: read Noneg at expected 111.1g tick; T: read Noneg at expected 111.0g tick; B: read Noneg at expected 111.0g tick"
+}

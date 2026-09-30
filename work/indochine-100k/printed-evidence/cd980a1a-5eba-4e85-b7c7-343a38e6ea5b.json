@@ -1,0 +1,7 @@
+{
+ "id": "cd980a1a-5eba-4e85-b7c7-343a38e6ea5b",
+ "name": "Ban Khana (W)",
+ "fkey": 60086,
+ "detector_version": 16,
+ "error": "T: read 111.1g at expected 111.5g tick; B: no tick near 111.5g; T: read 111.0g at expected 111.4g tick; B: read 111.0g at expected 111.4g tick"
+}

@@ -1,0 +1,52 @@
+{
+ "id": "0d026129-f521-48eb-8cd9-b86a1a256fa3",
+ "name": "Muong Hun Xieng Hung (E)",
+ "fkey": 60062,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.3671530593781,
+   "east": 111.77119789553699,
+   "north": 24.492389978106683,
+   "south": 23.991326526282364
+  },
+  "read": {
+   "longitude": [
+    [
+     1760,
+     111.5
+    ],
+    [
+     2852,
+     111.6
+    ]
+   ],
+   "latitude": [
+    [
+     2897,
+     24.3
+    ],
+    [
+     5257,
+     24.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.008923946810617443,
+ "candidate_aspect_err": 0.009004300711231254,
+ "independent_error": "ReadError: [Errno 54] Connection reset by peer"
+}

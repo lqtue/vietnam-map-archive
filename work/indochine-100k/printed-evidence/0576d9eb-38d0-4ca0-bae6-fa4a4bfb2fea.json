@@ -1,0 +1,52 @@
+{
+ "id": "0576d9eb-38d0-4ca0-bae6-fa4a4bfb2fea",
+ "name": "Muong May (W)",
+ "fkey": 60230,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.83554791080257,
+   "east": 112.23208423222003,
+   "north": 20.986032593351833,
+   "south": 20.484420889728742
+  },
+  "read": {
+   "longitude": [
+    [
+     2207,
+     112.0
+    ],
+    [
+     4431,
+     112.2
+    ]
+   ],
+   "latitude": [
+    [
+     2859,
+     20.8
+    ],
+    [
+     5219,
+     20.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.011305141865203991,
+ "candidate_aspect_err": 0.01143440948659498,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

@@ -1,0 +1,52 @@
+{
+ "id": "3b2b62bb-5557-477e-888f-bed1fa477fe2",
+ "name": "Than-Poun (W)",
+ "fkey": 60083,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 116.61671827003752,
+   "east": 117.01673205621454,
+   "north": 24.515757300683568,
+   "south": 24.013519958641123
+  },
+  "read": {
+   "longitude": [
+    [
+     2390,
+     116.8
+    ],
+    [
+     4595,
+     117.0
+    ]
+   ],
+   "latitude": [
+    [
+     2077,
+     24.4
+    ],
+    [
+     4434,
+     24.2
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0020204156547257014,
+ "candidate_aspect_err": 0.0020204156547257448,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

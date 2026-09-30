@@ -1,0 +1,52 @@
+{
+ "id": "562fd87b-b04a-4d17-a06b-6f5f6b9e68d2",
+ "name": "Vang Vieng (E)",
+ "fkey": 60205,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.43125081854932,
+   "east": 111.8275536532412,
+   "north": 21.481665186397386,
+   "south": 20.98035731185225
+  },
+  "read": {
+   "longitude": [
+    [
+     2201,
+     111.6
+    ],
+    [
+     4426,
+     111.8
+    ]
+   ],
+   "latitude": [
+    [
+     1563,
+     21.4
+    ],
+    [
+     6278,
+     21.0
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.007138506165108654,
+ "candidate_aspect_err": 0.007189830816719909,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

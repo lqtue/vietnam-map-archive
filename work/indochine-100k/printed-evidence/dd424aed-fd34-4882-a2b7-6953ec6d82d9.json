@@ -1,0 +1,7 @@
+{
+ "id": "dd424aed-fd34-4882-a2b7-6953ec6d82d9",
+ "name": "Ban-Calan (W)",
+ "fkey": 60025,
+ "detector_version": 16,
+ "error": "T: read Noneg at expected 111.1g tick; B: read Noneg at expected 111.1g tick; T: read Noneg at expected 111.2g tick; B: read 111.0g at expected 111.2g tick"
+}

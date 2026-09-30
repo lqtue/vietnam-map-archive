@@ -1,0 +1,52 @@
+{
+ "id": "70951e24-876e-4b5f-8a7b-1a440ec2fd37",
+ "name": "Sop Cop (E)",
+ "fkey": 60120,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 112.1917547734037,
+   "east": 112.59288231577173,
+   "north": 23.500467984779164,
+   "south": 22.998804841874403
+  },
+  "read": {
+   "longitude": [
+    [
+     1503,
+     112.3
+    ],
+    [
+     3704,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     1865,
+     23.4
+    ],
+    [
+     4225,
+     23.2
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.007353048841392898,
+ "candidate_aspect_err": 0.00740751667328497,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

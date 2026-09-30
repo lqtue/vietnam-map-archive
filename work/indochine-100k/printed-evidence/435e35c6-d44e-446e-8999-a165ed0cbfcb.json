@@ -1,0 +1,52 @@
+{
+ "id": "435e35c6-d44e-446e-8999-a165ed0cbfcb",
+ "name": "Xieng Khouang est (E)",
+ "fkey": 60208,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 112.22500465513707,
+   "east": 112.61921146276424,
+   "north": 21.492906877981966,
+   "south": 20.990996230210413
+  },
+  "read": {
+   "longitude": [
+    [
+     2280,
+     112.4
+    ],
+    [
+     3398,
+     112.5
+    ]
+   ],
+   "latitude": [
+    [
+     2867,
+     21.3
+    ],
+    [
+     5225,
+     21.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.0023814115365183596,
+ "candidate_aspect_err": 0.002387096194935763,
+ "independent_error": "RuntimeError: All API keys exhausted for today"
+}

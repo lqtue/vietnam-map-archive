@@ -1,0 +1,52 @@
+{
+ "id": "7ec6dcc4-ba07-4fb3-87ff-78ae548fcf17",
+ "name": "Sop Cop (W)",
+ "fkey": 60122,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.79100113369235,
+   "east": 112.19217186071432,
+   "north": 23.494785328283793,
+   "south": 22.993336526172435
+  },
+  "read": {
+   "longitude": [
+    [
+     1608,
+     111.9
+    ],
+    [
+     3807,
+     112.1
+    ]
+   ],
+   "latitude": [
+    [
+     2954,
+     23.3
+    ],
+    [
+     5313,
+     23.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.007868250398550979,
+ "candidate_aspect_err": 0.007930650744431639,
+ "independent_error": "ConnectError: [Errno 54] Connection reset by peer"
+}

@@ -1,0 +1,94 @@
+{
+ "id": "d1db5882-a158-43d8-8ae8-420b57f13919",
+ "name": "Blao (W)",
+ "fkey": 60731,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 116.52802162315247,
+   "east": 116.9113276877979,
+   "north": 12.968947593712857,
+   "south": 12.481397947959618
+  },
+  "read": {
+   "longitude": [
+    [
+     2281,
+     116.7
+    ],
+    [
+     3433,
+     116.8
+    ]
+   ],
+   "latitude": [
+    [
+     2563,
+     12.8
+    ],
+    [
+     4919,
+     12.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.008615007215856302,
+ "candidate_aspect_err": 0.00868987051303085,
+ "independent": {
+  "grades": {
+   "west": 116.52802162315247,
+   "east": 116.9113276877979,
+   "north": 12.968136457370152,
+   "south": 12.477462828410463
+  },
+  "read": {
+   "longitude": [
+    [
+     2281,
+     116.7
+    ],
+    [
+     3433,
+     116.8
+    ]
+   ],
+   "latitude": [
+    [
+     2544,
+     12.8
+    ],
+    [
+     4885,
+     12.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "independent_max_delta_g": 0.00393511954915482
+}

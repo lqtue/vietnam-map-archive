@@ -1,0 +1,53 @@
+{
+ "id": "ae3c2983-9710-416b-82e6-7448c1414c78",
+ "name": "Di\u00ean Bi\u00ean Phu (W)",
+ "fkey": 60091,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 111.7783004564953,
+   "east": 112.18510573406995,
+   "north": 24.002189633242775,
+   "south": 23.50014899183834
+  },
+  "read": {
+   "longitude": [
+    [
+     608,
+     111.8
+    ],
+    [
+     2778,
+     112.0
+    ]
+   ],
+   "latitude": [
+    [
+     3172,
+     23.8
+    ],
+    [
+     5529,
+     23.6
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "R",
+    "NE",
+    "SE"
+   ]
+  }
+ },
+ "candidate_verdict": [
+  "axes disagree 1.7%"
+ ],
+ "candidate_scale_gap": 0.0170622145814418,
+ "candidate_aspect_err": 0.017358387107050042
+}

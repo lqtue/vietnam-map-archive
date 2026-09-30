@@ -1,0 +1,52 @@
+{
+ "id": "8a518936-b23a-4f7d-983e-a12288fd2ffa",
+ "name": "Muong H\u00f9n Xi\u00eang Hung (W)",
+ "fkey": 60065,
+ "detector_version": 16,
+ "printed": {
+  "grades": {
+   "west": 110.96377378602014,
+   "east": 111.36762434421382,
+   "north": 24.48604905780603,
+   "south": 23.98389285961388
+  },
+  "read": {
+   "longitude": [
+    [
+     1892,
+     111.1
+    ],
+    [
+     2987,
+     111.2
+    ]
+   ],
+   "latitude": [
+    [
+     2818,
+     24.3
+    ],
+    [
+     5176,
+     24.1
+    ]
+   ]
+  },
+  "read_sides": {
+   "longitude": [
+    "T",
+    "NW",
+    "NE"
+   ],
+   "latitude": [
+    "L",
+    "NW",
+    "SW"
+   ]
+  }
+ },
+ "candidate_verdict": [],
+ "candidate_scale_gap": 0.005401827503632696,
+ "candidate_aspect_err": 0.005431165724017515,
+ "independent_error": "ReadError: [Errno 54] Connection reset by peer"
+}

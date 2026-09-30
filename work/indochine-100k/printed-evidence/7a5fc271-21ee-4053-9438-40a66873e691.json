@@ -1,0 +1,7 @@
+{
+ "id": "7a5fc271-21ee-4053-9438-40a66873e691",
+ "name": "Phong-Saly (E)",
+ "fkey": 60060,
+ "detector_version": 16,
+ "error": "L: read Noneg at expected 24.3g tick; R: read Noneg at expected 24.3g tick; L: read Noneg at expected 24.0g tick; R: read Noneg at expected 24.0g tick"
+}
