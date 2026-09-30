@@ -26,7 +26,7 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **097**, local (094 pushed 2026-09-23; 095–097 not yet pushed). 092 nulls out the
+Head is **100**, pushed to production (verified 2026-09-30 via `supabase migration list`). 092 nulls out the
 `'Vietnam Map Archive'` placeholder in `maps.collection` (it meant "no series," not a series —
 collapsed a live bug in `annotationMirror.ts` that was stomping real series membership on every
 re-mirror); 093 collapses spelling/language duplicates in `language`/`dc_publisher`/`rights`; 094
@@ -56,7 +56,15 @@ production corpus, 0 slug moves), nulls `maps.location` where it only duplicated
 collapses rights/language spelling variants on `scout_candidates` and `cell_printings` the way 093
 did for `maps`. 097 closes the moderation, worker-claim, map visibility, slug, and direct-write
 security gaps; it must ship alongside the API changes and its generated types must be refreshed
-from the linked project after `db push`. Drop a new
+from the linked project after `db push`. 098 sets `security_invoker = true` on the
+`map_pipeline_status` view, making explicit that it runs as the querying role now that 097 has
+already revoked `select` from anon/authenticated. 099 revokes `PUBLIC`'s default `EXECUTE` grant
+on the four `security definer` trigger-only functions (`handle_new_user`,
+`maps_assign_slug`, `maps_demote_bare_slug`, `enqueue_publish_jobs`), so they can no longer be
+called directly via RPC — trigger execution itself is unaffected, since a trigger always runs as
+its owner. 100 wraps every bare `auth.uid()`/`auth.role()` call inside an RLS policy's
+`USING`/`WITH CHECK` in `(select auth.uid())`, so Postgres evaluates it once per query (an
+InitPlan) instead of once per row; access rules are unchanged. Drop a new
 `supabase/migrations/NNN_*.sql`
 incrementing from head, `supabase db push`, then regenerate types:
 
