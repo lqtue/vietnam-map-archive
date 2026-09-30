@@ -327,11 +327,6 @@ export const vi: Record<string, string> = {
     'Căn giữa vị trí hiện tại và hiển thị bản đồ phủ quanh khu vực.',
   'What happens when I share my location?': 'Điều gì xảy ra khi chia sẻ vị trí?',
   'Remember my choice on this device': 'Ghi nhớ lựa chọn trên thiết bị này',
-  'No archival map here': 'Không có bản đồ lưu trữ tại đây',
-  'Tap a row to add it as a layer · tap again to remove.':
-    'Nhấn vào một hàng để thêm lớp bản đồ · nhấn lần nữa để xóa.',
-  '← Back to maps at this location': '← Quay lại bản đồ tại vị trí này',
-  'Browse the full archive →': 'Duyệt toàn bộ kho lưu trữ →',
   'Search maps…': 'Tìm kiếm bản đồ…',
   Layers: 'Các lớp',
   Browse: 'Duyệt',
