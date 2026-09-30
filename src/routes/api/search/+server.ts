@@ -112,6 +112,23 @@ function csvParam(v: string | null): string[] {
     : [];
 }
 
+/**
+ * The query as a prefix tsquery: `192` → `192:*`, which is what finds 1920–1929
+ * (the year is a token of `search_vector`), and `hano` finds Hanoi. `plain`
+ * matched whole tokens only, so a half-typed word or year found nothing. A
+ * decade written `1920s` folds to its prefix. Tokens are letters and digits
+ * only, so nothing here can be tsquery syntax. Null when there is nothing to
+ * match (a query of pure punctuation).
+ */
+function prefixQuery(q: string): string | null {
+  const tokens = q
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+    .map((t) => (/^\d{3}0s$/.test(t) ? t.slice(0, 3) : t));
+  return tokens.length ? tokens.map((t) => `${t}:*`).join(' & ') : null;
+}
+
 function periodOf(year: number | null | undefined): string | null {
   if (year == null) return null;
   for (const p of PERIODS) if (year >= p.from && year <= p.to) return p.key;
@@ -164,7 +181,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       // Public users only see public/featured.
       qMaps = qMaps.in('status', ['public', 'featured']);
     }
-    if (q) qMaps = qMaps.textSearch('search_vector', q, { config: 'simple', type: 'plain' });
+    const tsq = prefixQuery(q);
+    if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
     // Slim callers get no facets, so there is nothing to tally the broad set
     // for — Postgres can do the cutting. Everyone else fetches broadly and
     // filters in JS, because a facet count needs the unfiltered set.
@@ -185,7 +203,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         'id,title,creator,publisher,date,year,holding_institution,collection,source,external_id,source_url,manifest_url,thumbnail,score,category,status:review_status,rights,language'
       )
       .neq('review_status', 'ingested'); // ingested rows already show up under maps
-    if (q) qScout = qScout.textSearch('search_vector', q, { config: 'simple', type: 'plain' });
+    const tsq = prefixQuery(q);
+    if (tsq) qScout = qScout.textSearch('search_vector', tsq, { config: 'simple' });
     qScout = qScout.limit(2000);
     const { data, error: err } = await qScout;
     if (err) dbError(err, 'Scout search failed');
