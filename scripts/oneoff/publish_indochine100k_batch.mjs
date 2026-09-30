@@ -34,7 +34,7 @@ const IDS = [
 ];
 
 const apply = willApply();
-dryNotice(apply);
+if (!apply) dryNotice();
 
 const db = serviceClient();
 const { data, error } = await db
