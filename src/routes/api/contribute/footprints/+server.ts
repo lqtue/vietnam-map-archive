@@ -16,7 +16,19 @@ import { assertUuid, dbError } from '$lib/server/http';
 /** Generous enough for a good tracing session, low enough to stop a script. */
 const MAX_PER_HOUR = 300;
 
+/** Generous enough for a hand-traced polygon, low enough to stop a script. */
+const MAX_POLYGON_POINTS = 5000;
+
+const MAX_TEXT_LEN = 200;
+
 const FEATURE_TYPES = ['building', 'land_plot', 'road', 'waterway', 'block', 'other'];
+
+function assertShortString(value: unknown, field: string) {
+  if (value == null) return;
+  if (typeof value !== 'string' || value.length > MAX_TEXT_LEN) {
+    throw error(400, `${field} must be a string of at most ${MAX_TEXT_LEN} characters`);
+  }
+}
 
 export const POST: RequestHandler = async ({ locals, request }) => {
   const { user } = await requireUser(locals);
@@ -27,9 +39,19 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   if (!Array.isArray(polygon) || polygon.length < 2) {
     throw error(400, 'pixel_polygon must have at least two points');
   }
+  if (polygon.length > MAX_POLYGON_POINTS) {
+    throw error(400, `pixel_polygon must have at most ${MAX_POLYGON_POINTS} points`);
+  }
+  for (const pt of polygon) {
+    if (!Array.isArray(pt) || pt.length < 2 || !pt.slice(0, 2).every(Number.isFinite)) {
+      throw error(400, 'pixel_polygon points must be [x, y] numbers');
+    }
+  }
   if (body.feature_type && !FEATURE_TYPES.includes(body.feature_type)) {
     throw error(400, `feature_type must be one of ${FEATURE_TYPES.join(', ')}`);
   }
+  assertShortString(body.name, 'name');
+  assertShortString(body.category, 'category');
 
   await assertUnderRateLimit('footprints', user.id, MAX_PER_HOUR);
 

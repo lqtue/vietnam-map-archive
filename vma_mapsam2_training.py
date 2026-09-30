@@ -40,8 +40,10 @@ import os
 os.environ['PYTORCH_ALLOC_CONF'] = 'expandable_segments:True'
 
 # ── Supabase (public read-only) ───────────────────────────────────────────────
+# Set PUBLIC_SUPABASE_ANON_KEY in the Colab environment (Secrets, or `os.environ[...] = '...'`
+# in a cell you don't commit) before running — never hardcode the key here.
 SUPABASE_URL      = 'https://trioykjhhwrruwjsklfo.supabase.co'
-SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRyaW95a2poaHdycnV3anNrbGZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0OTQwNzMsImV4cCI6MjA4NjA3MDA3M30.iGYrRXPlkHmeBhJa4T41tOteyTBtJ5x-B2_96Dpg3cE'
+SUPABASE_ANON_KEY = os.environ['PUBLIC_SUPABASE_ANON_KEY']
 
 # ── Category Config ──────────────────────────────────────────────────────────
 CATEGORY_FILTER = 'building' # Change this to 'land_plot' as needed

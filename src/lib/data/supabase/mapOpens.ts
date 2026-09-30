@@ -9,7 +9,14 @@
  * by design — a dropped tally must never interrupt opening a map.
  */
 export function recordMapOpen(mapId: string): void {
-  void fetch(`/api/maps/${encodeURIComponent(mapId)}/open`, { method: 'POST' }).then((response) => {
+  // A JSON body, not none: on Cloudflare a body-less POST still arrives with a
+  // non-null `request.body`, so hooks.server.ts's empty-body exemption never
+  // matches and the tally was refused with 415.
+  void fetch(`/api/maps/${encodeURIComponent(mapId)}/open`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  }).then((response) => {
     if (!response.ok) console.warn('recordMapOpen:', response.status);
   }).catch(() => {});
 }

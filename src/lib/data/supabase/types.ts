@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -82,6 +87,27 @@ export type Database = {
           updated_at?: string
           url?: string | null
           year?: number | null
+        }
+        Relationships: []
+      }
+      contribution_quotas: {
+        Row: {
+          kind: string
+          used: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          kind: string
+          used: number
+          user_id: string
+          window_start: string
+        }
+        Update: {
+          kind?: string
+          used?: number
+          user_id?: string
+          window_start?: string
         }
         Relationships: []
       }
@@ -749,6 +775,13 @@ export type Database = {
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_jobs_worker_key_id_fkey"
+            columns: ["worker_key_id"]
+            isOneToOne: false
+            referencedRelation: "worker_keys"
             referencedColumns: ["id"]
           },
         ]
@@ -1701,10 +1734,6 @@ export type Database = {
     }
     Functions: {
       canonicalise_category: { Args: { raw: string }; Returns: string }
-      consume_contribution_quota: {
-        Args: { p_user_id: string; p_kind: string; p_limit: number }
-        Returns: boolean
-      }
       claim_job: {
         Args: { p_kinds: string[]; p_worker: string; p_worker_key_id: string }
         Returns: {
@@ -1732,6 +1761,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      consume_contribution_quota: {
+        Args: { p_kind: string; p_limit: number; p_user_id: string }
+        Returns: boolean
       }
       context_at: {
         Args: {
@@ -1802,7 +1835,6 @@ export type Database = {
         Args: { p_except: string; p_slug: string }
         Returns: boolean
       }
-      record_map_view: { Args: { p_map_id: string }; Returns: boolean }
       place_core_key: {
         Args: { p_text: string; p_validated: string }
         Returns: string
@@ -1812,6 +1844,7 @@ export type Database = {
         Args: { p_text: string; p_validated: string }
         Returns: string
       }
+      record_map_view: { Args: { p_map_id: string }; Returns: boolean }
       revert_recent_validations: {
         Args: { p_map_id: string; p_user: string; p_window_mins?: number }
         Returns: number
@@ -1952,12 +1985,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1981,11 +2014,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2006,11 +2039,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2031,11 +2064,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2048,11 +2081,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

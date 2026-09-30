@@ -26,7 +26,20 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **097**, local (094 pushed 2026-09-23; 095–097 not yet pushed). 092 nulls out the
+Head is **101**, not yet pushed (100 is what's live in production, verified 2026-09-30 via
+`supabase migration list`). 101 narrows `map_images` and `map_slug_aliases`'s read policies from
+"published or any signed-in user" to "published, the map's creator, or staff" — the two
+draft-visibility gates copying 063's wording that nothing non-staff actually reads that broadly —
+and revokes anon's SELECT on `footprints.review_note`/`.review_tags`/`.reviewed_by`/`.user_id` (and
+the matching columns on the `footprint_submissions` compat view), since RLS gates rows, not columns,
+and a public map's `footprints` rows were handing the anon key a reviewer's private notes and both
+parties' user ids. `maps` and `ocr_labels` keep the wider "published or any signed-in user" read
+policy on purpose — `/scan?mode=inspect` (no role gate) and `fetchGeorefQueue`/`fetchLabelMaps`
+(`src/lib/data/maps/georef.ts`, `src/lib/data/supabase/footprints.ts`) depend on any signed-in
+volunteer being able to read *any* draft, not only their own, which is what the open-contribution
+model in 063/079 means. **Deploy the app before pushing 101**: the old export route selects
+`footprints.*` on the anon key and would 42501 against the new grants. 101's own header has the full per-table audit trail.
+092 nulls out the
 `'Vietnam Map Archive'` placeholder in `maps.collection` (it meant "no series," not a series —
 collapsed a live bug in `annotationMirror.ts` that was stomping real series membership on every
 re-mirror); 093 collapses spelling/language duplicates in `language`/`dc_publisher`/`rights`; 094
@@ -56,7 +69,15 @@ production corpus, 0 slug moves), nulls `maps.location` where it only duplicated
 collapses rights/language spelling variants on `scout_candidates` and `cell_printings` the way 093
 did for `maps`. 097 closes the moderation, worker-claim, map visibility, slug, and direct-write
 security gaps; it must ship alongside the API changes and its generated types must be refreshed
-from the linked project after `db push`. Drop a new
+from the linked project after `db push`. 098 sets `security_invoker = true` on the
+`map_pipeline_status` view, making explicit that it runs as the querying role now that 097 has
+already revoked `select` from anon/authenticated. 099 revokes `PUBLIC`'s default `EXECUTE` grant
+on the four `security definer` trigger-only functions (`handle_new_user`,
+`maps_assign_slug`, `maps_demote_bare_slug`, `enqueue_publish_jobs`), so they can no longer be
+called directly via RPC — trigger execution itself is unaffected, since a trigger always runs as
+its owner. 100 wraps every bare `auth.uid()`/`auth.role()` call inside an RLS policy's
+`USING`/`WITH CHECK` in `(select auth.uid())`, so Postgres evaluates it once per query (an
+InitPlan) instead of once per row; access rules are unchanged. Drop a new
 `supabase/migrations/NNN_*.sql`
 incrementing from head, `supabase db push`, then regenerate types:
 

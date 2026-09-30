@@ -169,8 +169,15 @@ export const GET: RequestHandler = async ({ url }) => {
   let fpQuery = supabase
     .from('footprints')
     // `annotation_url` is the self-hosted mirror, and for this catalogue it is
-    // the only annotation that resolves — see `getAnnotationData`.
-    .select('*, maps(allmaps_id, annotation_url, name, year)')
+    // the only annotation that resolves — see `getAnnotationData`. Explicit
+    // columns, not `select('*')`: migration 101 revokes anon's SELECT on
+    // review_note/review_tags/reviewed_by/user_id, and this endpoint runs on
+    // the anon key on purpose (see below), so `*` would error.
+    .select(
+      'id, map_id, pixel_polygon, name, category, feature_type, source, ' +
+        'review_status, valid_from, confidence, geom_rmse, created_at, ' +
+        'maps(allmaps_id, annotation_url, name, year)'
+    )
     .eq('review_status', status);
 
   if (mapIds.length === 1) fpQuery = fpQuery.eq('map_id', mapIds[0]);

@@ -105,18 +105,31 @@ function toFootprint(row: DbFootprint): FootprintSubmission {
 	};
 }
 
+// Columns every reader gets, plus `user_id` for a signed-in one. Migration 101
+// revokes anon's SELECT on `footprints.user_id` (a reviewer-only column list,
+// but `user_id` rides along since it's a bare auth.users id) — this page
+// renders for anonymous visitors too (`/scan?mode=shapes`, draw tab, no sign
+// -in gate), so the anon key would 42501 on a select naming that column.
+async function footprintColumns(supabase: SupabaseClient<Database>): Promise<string> {
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
+	const base = 'id, map_id, pixel_polygon, name, category, feature_type, review_status';
+	return session ? `${base}, user_id` : base;
+}
+
 export async function fetchMapFootprints(
 	supabase: SupabaseClient<Database>,
 	mapId: string
 ): Promise<FootprintSubmission[]> {
 	const { data, error } = await supabase
 		.from('footprints')
-		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, review_status')
+		.select(await footprintColumns(supabase))
 		.eq('map_id', mapId)
 		.order('created_at', { ascending: true });
 
 	if (error) { console.error('fetchMapFootprints:', error); return []; }
-	return (data as DbFootprint[]).map(toFootprint);
+	return (data as unknown as DbFootprint[]).map(toFootprint);
 }
 
 /**
@@ -224,13 +237,13 @@ export async function fetchSubmittedFootprints(
 ): Promise<SamFootprint[]> {
 	const { data, error } = await supabase
 		.from('footprints')
-		.select('id, map_id, user_id, pixel_polygon, name, category, feature_type, review_status')
+		.select(await footprintColumns(supabase))
 		.eq('map_id', mapId)
 		.in('review_status', REVIEW_QUEUE_STATUSES)
 		.order('created_at', { ascending: true });
 
 	if (error) throw new Error(error.message);
-	return (data as DbFootprint[]).map(toFootprint);
+	return (data as unknown as DbFootprint[]).map(toFootprint);
 }
 
 export async function fetchMapsWithSubmittedFootprints(

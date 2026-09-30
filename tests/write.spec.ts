@@ -980,6 +980,21 @@ test('tracing submits through the API, which stamps the author', async () => {
   await anon.dispose();
 });
 
+test('a footprint submission with an over-long name is rejected', async () => {
+  const res = await staffRequest.post('/api/contribute/footprints', {
+    data: {
+      map_id: mapId,
+      pixel_polygon: [
+        [1, 1],
+        [5, 1],
+        [5, 5],
+      ],
+      name: 'x'.repeat(201),
+    },
+  });
+  expect(res.status(), await res.text()).toBe(400);
+});
+
 test('a published map must be georeferenceable', async () => {
   // Neither annotation_url nor allmaps_id: nothing to warp with, so publishing
   // is refused (mig 062) rather than shipping a map that cannot render.
