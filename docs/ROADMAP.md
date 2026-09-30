@@ -314,6 +314,16 @@ system — what a result must retain, and the two kinds of check — is in the r
       a random audit of apparently easy rows retained. Do not call a score calibrated until it has
       been tested against human outcomes. Exit: reviewers find more confirmed errors in the same
       time without raising residual error.
+- [ ] **`evidence-chain`** — one reviewed feature on the 1882 cadastral sheet, cited from claim to
+      pixels, then a frozen research packet. Most of the chain exists — pixel-master geometry
+      (mig 016/066), `geom_src`, `ocr_labels.footprint_id`, `cell_printings` — so the pilot adds
+      `subjects`/`claims`/`claim_evidence` and closes three gaps: an approved footprint can be
+      deleted by its owner (cited rows get `ON DELETE RESTRICT` plus a `cited_value` snapshot),
+      `rights` is normalised not verbatim (mig 096), and nothing records which image the pixels
+      were measured on. Not blocked by `ocr-merge-evidence`; `source-agreement` and
+      `attested-variants` build on its `claim_evidence` rather than beside it. Exit: a public
+      claim opens its exact source region; the packet survives an OCR or georeference correction;
+      draft evidence stays private. Plan: `docs/evidence-chain-plan.md`.
 
 ## Survey layer and catalog
 
@@ -555,7 +565,9 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 **Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
 there is human time — `three-point-residuals` and `tonkin-review` are its two halves.
 `walk-the-route` comes before anything else in Walk is worth starting; `story-contract` is
-independent and can run alongside Search. Debt never blocks.
+independent and can run alongside Search. `evidence-chain` needs only the 1882 sheet, whose
+evidence is already reviewed, so it waits on nothing above it — but its step 1 must confirm the
+1882 annotation mirror against `district4-mirror-sync` first. Debt never blocks.
 
 Previously: A1–A4 → B1 → B2 → C0 → C1 → B3 → B4 → B5 → C2, then E1 → E2 → E3. Those codes are
 history; they still name the closed items in `docs/roadmap-record.md`, and the map from them to
