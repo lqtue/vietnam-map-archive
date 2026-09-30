@@ -27,7 +27,9 @@ plain **Text** variables in Settings → Variables and Secrets; `SUPABASE_SERVIC
 `IA_S3_ACCESS_KEY` and `IA_S3_SECRET_KEY` are **Secret** there. Build command, output
 directory (`.svelte-kit/cloudflare`) and `nodejs_compat` are dashboard settings too.
 Each environment (Production, Preview) holds its own copy — a preview deployment with
-no secrets returns 500 from every route that needs one, and nothing inherits.
+no secrets fails at build time, and nothing inherits. Preview uses disabled placeholder
+Secrets for the three private values, so a PR build can render public pages without
+receiving production credentials. Privileged server actions are unavailable there.
 
 `npm run deploy` therefore passes the directory explicitly:
 `wrangler pages deploy .svelte-kit/cloudflare --project-name vmabeta`.
@@ -36,8 +38,8 @@ Secrets are read through `$env/static/private`, which resolves them at **build**
 `$env/dynamic/private` was tried and does not work here — the three secrets came back
 undefined in Pages Functions (`Error: supabaseKey is required.` on every route using
 `adminClient()`), both with and without a Wrangler config. Consequence: every environment
-that builds needs all three present, Preview included, or the build fails on the first
-import. CI has no dashboard, so
+that builds needs all three names present, Preview included, or the build fails on the first
+import. Preview's values are deliberately nonfunctional; CI has no dashboard, so
 `.github/workflows` does `cp .env.test .env` before `check` and `build` — which is why CI
 stayed green through all ten build failures.
 

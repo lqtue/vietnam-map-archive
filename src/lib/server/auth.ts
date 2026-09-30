@@ -7,7 +7,7 @@
  */
 
 import { error } from '@sveltejs/kit';
-import type { User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { adminClient } from './supabaseAdmin';
 
 export type Role = 'admin' | 'mod' | 'user';
@@ -16,7 +16,9 @@ export type Role = 'admin' | 'mod' | 'user';
  * Resolve the signed-in user and their profile role.
  * Returns null when there is no valid session.
  */
-async function resolve(locals: App.Locals): Promise<{ user: User; role: Role } | null> {
+async function resolve(
+  locals: App.Locals
+): Promise<{ user: User; role: Role; session: Session } | null> {
   const { session, user } = await locals.safeGetSession();
   if (!session || !user) return null;
 
@@ -28,7 +30,14 @@ async function resolve(locals: App.Locals): Promise<{ user: User; role: Role } |
 
   const raw = profile?.role;
   const role: Role = raw === 'admin' || raw === 'mod' ? raw : 'user';
-  return { user, role };
+  return { user, role, session };
+}
+
+async function hasStaffMfa(locals: App.Locals, session: Session): Promise<boolean> {
+  const { data, error: mfaError } = await locals.supabase.auth.mfa.getAuthenticatorAssuranceLevel(
+    session.access_token
+  );
+  return !mfaError && data.currentLevel === 'aal2';
 }
 
 /**
@@ -42,7 +51,13 @@ export async function requireRole(
   const resolved = await resolve(locals);
   if (!resolved) throw error(401, 'Unauthorized');
   if (!roles.includes(resolved.role)) throw error(403, 'Forbidden');
-  return resolved;
+  if (
+    (resolved.role === 'admin' || resolved.role === 'mod') &&
+    !(await hasStaffMfa(locals, resolved.session))
+  ) {
+    throw error(403, 'Staff MFA required. Set it up on your profile.');
+  }
+  return { user: resolved.user, role: resolved.role };
 }
 
 /**
@@ -53,7 +68,13 @@ export async function requireRole(
 export async function getRole(locals: App.Locals): Promise<Role | null> {
   try {
     const resolved = await resolve(locals);
-    return resolved?.role ?? null;
+    if (!resolved) return null;
+    if (
+      (resolved.role === 'admin' || resolved.role === 'mod') &&
+      !(await hasStaffMfa(locals, resolved.session))
+    )
+      return 'user';
+    return resolved.role;
   } catch {
     return null;
   }
@@ -70,34 +91,22 @@ export async function requireUser(locals: App.Locals): Promise<{ user: User; rol
   return resolved;
 }
 
-/**
- * Cheap abuse brake for open contribution: how many rows this user has already
- * created in `table` within the window.
- *
- * ponytail: counts the target table directly rather than keeping a separate
- * rate-limit store — the data needed is already there, and a counter table
- * would need its own writer, its own cleanup and its own migration. Trades
- * exactness under bursts for having no moving parts; swap it for a real
- * limiter if a single count query ever shows up in the slow log.
- */
+/** Reserve an hourly slot atomically; a failed quota check must fail closed. */
 export async function assertUnderRateLimit(
-  table: 'footprints' | 'stories',
+  table: 'footprints',
   userId: string,
   maxPerHour: number
 ): Promise<void> {
-  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { count, error: err } = await adminClient()
-    .from(table)
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gt('created_at', since);
-
-  // A failed count must not become a closed door: log and let the write through.
+  const { data: allowed, error: err } = await adminClient().rpc('consume_contribution_quota', {
+    p_user_id: userId,
+    p_kind: table,
+    p_limit: maxPerHour,
+  });
   if (err) {
-    console.error('[auth] rate-limit count failed:', err.message);
-    return;
+    console.error('[auth] rate-limit reservation failed:', err.message);
+    throw error(503, 'Contribution quota unavailable');
   }
-  if ((count ?? 0) >= maxPerHour) {
+  if (!allowed) {
     throw error(429, `Rate limit: at most ${maxPerHour} ${table.replace(/_/g, ' ')} per hour`);
   }
 }

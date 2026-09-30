@@ -12,7 +12,7 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { requireWorker } from '$lib/server/workerAuth';
+import { requireClaimedJob } from '$lib/server/workerJob';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
 import { mirrorAnnotation } from '$lib/server/annotationMirror';
@@ -24,16 +24,9 @@ export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json().catch(() => ({}));
   const jobId = assertUuid(body.job_id, 'job_id');
 
+  const { worker, job } = await requireClaimedJob(request, jobId);
+  if (job.status !== 'claimed') throw error(409, 'Job has already started');
   const supabase = adminClient();
-  const { data: job, error: err } = await supabase
-    .from('pipeline_jobs')
-    .select('id, kind, map_id, status')
-    .eq('id', jobId)
-    .maybeSingle();
-  if (err) dbError(err, 'Could not read the job');
-  if (!job) throw error(404, 'No such job');
-
-  await requireWorker(request, job.kind);
 
   if (!SERVER_KINDS.includes(job.kind as (typeof SERVER_KINDS)[number])) {
     throw error(
@@ -43,7 +36,14 @@ export const POST: RequestHandler = async ({ request }) => {
   }
   if (!job.map_id) throw error(400, `${job.kind} job has no map_id`);
 
-  await supabase.rpc('finish_job', { p_id: job.id, p_status: 'running', p_result: {} });
+  const { data: started, error: startError } = await supabase.rpc('finish_job', {
+    p_id: job.id,
+    p_status: 'running',
+    p_worker_key_id: worker.id,
+    p_result: {},
+  });
+  if (startError) dbError(startError, 'Could not start job');
+  if (!started) throw error(409, 'Job claim expired');
 
   try {
     if (job.kind === 'warp') {
@@ -51,6 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
       await supabase.rpc('finish_job', {
         p_id: job.id,
         p_status: 'done',
+        p_worker_key_id: worker.id,
         p_result: { ...result },
       });
       return json({ ok: true, job_id: job.id, result });
@@ -72,6 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
     await supabase.rpc('finish_job', {
       p_id: job.id,
       p_status: 'done',
+      p_worker_key_id: worker.id,
       p_result: { annotation_url: result.annotation_url, history_url: result.history_url },
     });
     return json({ ok: true, job_id: job.id, result });
@@ -82,6 +84,7 @@ export const POST: RequestHandler = async ({ request }) => {
     await supabase.rpc('finish_job', {
       p_id: job.id,
       p_status: 'failed',
+      p_worker_key_id: worker.id,
       p_result: {},
       p_error: message.slice(0, 2000),
     });

@@ -8,6 +8,7 @@
 
 import { GcpTransformer } from '@allmaps/transform';
 import { parseAnnotation } from '@allmaps/annotation';
+import { fetchAnnotationJson } from './safeAnnotation';
 
 export interface AnnotationTransform {
   transformer: GcpTransformer;
@@ -42,9 +43,7 @@ export async function getTransformer(
   if (!url) return null;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const annotation = await res.json();
+    const annotation = (await fetchAnnotationJson(url)) as any;
     const maps = parseAnnotation(annotation);
     if (!maps.length) return null;
 

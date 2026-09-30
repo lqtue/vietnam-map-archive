@@ -13,7 +13,7 @@
          reloads the document, because the stylesheet's default is
          `color-scheme: light dark` and the attribute only lands once the
          bundle runs. Raw string, same key as $lib/core/utils/theme.ts. -->
-    <script>
+    <script nonce="%sveltekit.nonce%">
       try {
         var t = localStorage.getItem('vma-theme');
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;

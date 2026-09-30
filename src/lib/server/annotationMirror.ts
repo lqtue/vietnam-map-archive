@@ -14,6 +14,7 @@
 import { error } from '@sveltejs/kit';
 import { adminClient } from './supabaseAdmin';
 import { uploadJson } from './storage';
+import { fetchAnnotationJson } from './safeAnnotation';
 import { r2MirrorBase, sourceSizeMismatch } from '$lib/core/iiif/sourceSize';
 
 const R2_BASE = 'https://iiif.maparchive.vn/iiif';
@@ -90,13 +91,12 @@ export async function mirrorAnnotation(
       ? `${ALLMAPS_ANNOTATIONS}/${map.allmaps_id}`
       : map.annotation_url;
 
-  const annotationRes = await fetch(sourceUrl + '?_t=' + Date.now(), {
-    headers: { Accept: 'application/json' },
-  });
-  if (!annotationRes.ok) {
-    throw error(502, `Failed to fetch annotation: ${annotationRes.statusText}`);
+  let annotation: any;
+  try {
+    annotation = await fetchAnnotationJson(sourceUrl);
+  } catch {
+    throw error(502, 'Failed to fetch annotation');
   }
-  const annotation = await annotationRes.json();
 
   const oldSourceUrl = extractSourceUrl(annotation);
   const newIiifBase = r2MirrorBase(map.iiif_image, `${R2_BASE}/${mapId}`);
@@ -109,8 +109,10 @@ export async function mirrorAnnotation(
 
   // History first: if the second write fails, we have still kept the version.
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const historyUrl = await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
-  const publicAnnotationUrl = await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
+  await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  const publicAnnotationUrl = `https://maparchive.vn/api/maps/${mapId}/annotation`;
+  const historyUrl = `${publicAnnotationUrl}?version=${stamp}`;
 
   // Keep allmaps_id intact — it is the bare image ID, not a URL.
   await supabase

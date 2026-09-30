@@ -23,6 +23,17 @@ const CORS_HEADERS = {
   'Access-Control-Expose-Headers': 'Content-Length, Content-Range, ETag',
 };
 
+function safeResponse(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Content-Security-Policy', "default-src 'none'; sandbox");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 /**
  * Serve a whole R2 object with Range support.
  *
@@ -110,7 +121,7 @@ export default {
     // range read. Putting this file behind an R2 custom domain would let
     // Cloudflare's CDN serve the ranges itself — see docs/admin-tooling.md.
     const basemap = url.pathname.match(/^\/basemap\/([A-Za-z0-9._-]+)$/);
-    if (basemap) return serveRange(env, `basemap/${basemap[1]}`, request);
+    if (basemap) return safeResponse(await serveRange(env, `basemap/${basemap[1]}`, request));
 
     // /iiif/{mapId}[/v{N}]/info.json
     // /iiif/{mapId}[/v{N}]/{region}/{size}/{rotation}/{quality}.{format}
@@ -153,10 +164,12 @@ export default {
 
     if (cacheable) {
       const hit = await cache.match(request);
-      if (hit) return hit;
+      if (hit) return safeResponse(hit);
     }
 
-    const response = await this.serveIiif(request, env, url, mapId, version, rest, key);
+    const response = safeResponse(
+      await this.serveIiif(request, env, url, mapId, version, rest, key)
+    );
 
     // Only success: a 404 here means the tile is missing from R2 *and* the
     // origin refused it, and both of those can stop being true.
@@ -361,6 +374,16 @@ export default {
     }
 
     const contentType = proxyRes.headers.get('Content-Type') ?? 'image/jpeg';
+    const mediaType = contentType.split(';', 1)[0].trim().toLowerCase();
+    const jsonResource = rest.endsWith('.json');
+    if (
+      jsonResource
+        ? mediaType !== 'application/json' && !mediaType.endsWith('+json')
+        : !['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(mediaType)
+    ) {
+      await proxyRes.body?.cancel();
+      return new Response('Unsupported upstream content', { status: 502, headers: CORS_HEADERS });
+    }
 
     // ── Metadata Splicing (info.json / manifest.json) ────────────────────────
     if (contentType.includes('json') || rest.endsWith('.json') || rest.endsWith('info.json')) {

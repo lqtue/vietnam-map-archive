@@ -30,6 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const { data, error: err } = await adminClient().rpc('claim_job', {
     p_kinds: allowed,
     p_worker: name,
+    p_worker_key_id: worker.id,
   });
   if (err) dbError(err, 'Could not claim a job');
 

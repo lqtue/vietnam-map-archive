@@ -1,11 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// Opening a map tallies a row in the production map_views table (migration 049),
+// Opening a map tallies a row through the production map-view API,
 // which would pollute the real per-map counts with test traffic. Any test that
 // opens a map must call this first. Returns a live counter of blocked inserts.
 async function blockMapOpenTally(page: Page): Promise<() => number> {
   let n = 0;
-  await page.route('**/rest/v1/map_views*', (route) => {
+  await page.route('**/api/maps/*/open', (route) => {
     if (route.request().method() === 'POST') n++;
     return route.abort();
   });
@@ -183,8 +183,8 @@ test('picking a map writes ?map= and tallies the open', async ({ page }) => {
   // /explore used to be one opaque URL, so analytics could not attribute which
   // map anyone opened. syncMapParam() + recordMapOpen() fix that — assert both.
 
-  // Aborting the insert still proves the call was made; that the server accepts
-  // it is enforced by the RLS policies in migration 049.
+  // Aborting the request still proves the call was made without altering the
+  // production tally. The write contract is checked in the local write suite.
   const tallied = await blockMapOpenTally(page);
 
   // The first-run tour's driver.js overlay swallows clicks on the browse rows,

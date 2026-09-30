@@ -568,7 +568,7 @@ def _run_job(job: dict, python_bin: str) -> None:
     # nothing at all until it exits — the operator cannot tell a working run
     # from a wedged one, which is the whole reason the last one was killed.
     env = {**os.environ, "VMA_API_URL": api_url, "VMA_WORKER_KEY": api_key,
-           "PYTHONUNBUFFERED": "1"}
+           "VMA_JOB_ID": job["id"], "PYTHONUNBUFFERED": "1"}
 
     proc = None
     for step, cmd in enumerate(plan, 1):

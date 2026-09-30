@@ -64,6 +64,10 @@ def _api_config() -> tuple[str, str] | None:
 def _post_results(payload: dict[str, Any]) -> dict[str, Any]:
     """POST one bundle to /api/pipeline/results. Caller has checked _api_config()."""
     url, key = _api_config()  # type: ignore[misc]
+    job_id = os.environ.get("VMA_JOB_ID")
+    if not job_id:
+        raise RuntimeError("VMA_JOB_ID is required when reporting worker results")
+    payload = {**payload, "job_id": job_id}
     resp = requests.post(
         f"{url}/api/pipeline/results",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},

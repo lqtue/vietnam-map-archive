@@ -8,6 +8,7 @@ import { createClient, type Session } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { loadSchema, unsupportedKeywords, validate } from './schemaCheck';
 import { placeCoreKey } from '../src/lib/core/utils/placeKey';
+import { createHmac } from 'node:crypto';
 
 /**
  * Write-path smokes (roadmap-record A5). Unlike smoke.spec.ts these DO write rows, so
@@ -45,6 +46,28 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: 
 let session: Session;
 let mapId: string;
 let staffRequest: APIRequestContext;
+
+function totpCode(secret: string): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = 0;
+  let value = 0;
+  const decoded: number[] = [];
+  for (const char of secret.toUpperCase().replace(/=+$/, '')) {
+    const digit = alphabet.indexOf(char);
+    if (digit < 0) continue;
+    value = (value << 5) | digit;
+    bits += 5;
+    if (bits >= 8) {
+      decoded.push((value >>> (bits - 8)) & 255);
+      bits -= 8;
+    }
+  }
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000)));
+  const digest = createHmac('sha1', Buffer.from(decoded)).update(counter).digest();
+  const offset = digest[digest.length - 1] & 15;
+  return String((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, '0');
+}
 /** Everything this file inserts, so afterAll can take it back out. */
 const created = {
   runIds: [] as string[],
@@ -53,6 +76,7 @@ const created = {
   jobIds: [] as string[],
   mapIds: [] as string[],
   seriesKeys: [] as string[],
+  annotationPaths: [] as string[],
 };
 
 test.beforeAll(async () => {
@@ -66,7 +90,22 @@ test.beforeAll(async () => {
       `Could not sign in as ${TEST_EMAIL} — run: node --env-file=.env.test scripts/seed-test-db.mjs (${error?.message})`
     );
   }
-  session = data.session;
+  const { data: oldFactors } = await admin.auth.admin.mfa.listFactors({
+    userId: data.session.user.id,
+  });
+  for (const factor of oldFactors?.factors ?? []) {
+    await admin.auth.admin.mfa.deleteFactor({ userId: data.session.user.id, id: factor.id });
+  }
+  const enrolled = await auth.auth.mfa.enroll({ factorType: 'totp' });
+  if (enrolled.error || !enrolled.data?.totp) throw enrolled.error ?? new Error('MFA setup failed');
+  const verified = await auth.auth.mfa.challengeAndVerify({
+    factorId: enrolled.data.id,
+    code: totpCode(enrolled.data.totp.secret),
+  });
+  if (verified.error) throw verified.error;
+  const refreshed = await auth.auth.getSession();
+  if (!refreshed.data.session) throw new Error('MFA verification did not return a session');
+  session = refreshed.data.session;
 
   const { data: map, error: mapErr } = await admin
     .from('maps')
@@ -103,6 +142,8 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
+  if (created.annotationPaths.length)
+    await admin.storage.from('annotations').remove(created.annotationPaths);
   for (const runId of created.runIds) await admin.from('ocr_labels').delete().eq('run_id', runId);
   for (const id of created.footprintIds) await admin.from('footprints').delete().eq('id', id);
   for (const id of created.storyIds) await admin.from('stories').delete().eq('id', id);
@@ -111,6 +152,44 @@ test.afterAll(async () => {
     await admin.from('series_cells').delete().eq('series_key', key);
   for (const id of created.mapIds) await admin.from('maps').delete().eq('id', id);
   await staffRequest?.dispose();
+});
+
+test('private annotation objects follow map publication', async ({ request }) => {
+  const { data: draft, error: draftError } = await admin
+    .from('maps')
+    .insert({ name: 'Private annotation fixture', status: 'draft' })
+    .select('id')
+    .single();
+  expect(draftError).toBeNull();
+  created.mapIds.push(draft!.id);
+
+  for (const id of [mapId, draft!.id]) {
+    const path = `${id}.json`;
+    const { error: uploadError } = await admin.storage
+      .from('annotations')
+      .upload(path, JSON.stringify({ type: 'AnnotationPage', items: [] }), {
+        contentType: 'application/json',
+        upsert: true,
+      });
+    expect(uploadError).toBeNull();
+    created.annotationPaths.push(path);
+    const direct = await request.get(
+      `${SUPABASE_URL}/storage/v1/object/public/annotations/${path}`
+    );
+    expect(direct.ok()).toBe(false);
+  }
+
+  const published = await request.get(`http://localhost:5199/api/maps/${mapId}/annotation`);
+  expect(published.status()).toBe(200);
+  expect((await published.json()).type).toBe('AnnotationPage');
+  const hidden = await request.get(`http://localhost:5199/api/maps/${draft!.id}/annotation`);
+  expect(hidden.status()).toBe(404);
+  const signedIn = await staffRequest.get(`/api/maps/${draft!.id}/annotation`);
+  expect(signedIn.status()).toBe(200);
+  await admin.storage.from('annotations').remove(created.annotationPaths);
+  created.annotationPaths = [];
+  await admin.from('maps').delete().eq('id', draft!.id);
+  created.mapIds = created.mapIds.filter((id) => id !== draft!.id);
 });
 
 test('staff can create and validate an OCR bbox through the review API', async () => {
@@ -197,15 +276,40 @@ test('an anonymous caller cannot reach the staff review API', async () => {
   await anon.dispose();
 });
 
-test('a signed-in user can submit a footprint and it lands as submitted', async () => {
+test('JSON write routes reject simple cross-origin content types before parsing', async () => {
+  const res = await staffRequest.post('/api/admin/maps', {
+    headers: { 'Content-Type': 'text/plain' },
+    data: JSON.stringify({ name: 'should never be created' }),
+  });
+  expect(res.status()).toBe(415);
+  const sibling = await staffRequest.post('/api/admin/maps', {
+    headers: { Origin: 'https://iiif.maparchive.vn', 'Content-Type': 'application/json' },
+    data: JSON.stringify({ name: 'should never be created' }),
+  });
+  expect(sibling.status()).toBe(403);
+});
+
+test('a signed-in user submits through the API; direct footprint inserts are denied', async () => {
   const asUser = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   await asUser.auth.setSession(session);
 
-  const { data, error } = await asUser
-    .from('footprints')
-    .insert({
+  const direct = await asUser.from('footprints').insert({
+    map_id: mapId,
+    user_id: session.user.id,
+    pixel_polygon: [
+      [10, 10],
+      [30, 10],
+      [30, 30],
+      [10, 30],
+    ],
+    name: 'write-smoke building',
+    feature_type: 'building',
+  });
+  expect(direct.error, 'direct PostgREST insert bypasses the API quota').not.toBeNull();
+
+  const submitted = await staffRequest.post('/api/contribute/footprints', {
+    data: {
       map_id: mapId,
-      user_id: session.user.id,
       pixel_polygon: [
         [10, 10],
         [30, 10],
@@ -214,23 +318,32 @@ test('a signed-in user can submit a footprint and it lands as submitted', async 
       ],
       name: 'write-smoke building',
       feature_type: 'building',
-    })
-    .select('id, review_status')
-    .single();
+    },
+  });
+  expect(submitted.ok(), await submitted.text()).toBe(true);
+  const { id } = await submitted.json();
+  created.footprintIds.push(id);
+  const { data } = await admin.from('footprints').select('id, review_status').eq('id', id).single();
 
-  expect(error, error?.message).toBeNull();
-  created.footprintIds.push(data!.id);
   expect(data!.review_status).toBe('submitted');
 
   // The map is public, so the row is readable without a session (RLS mig 038).
   const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
-  const { data: readBack } = await anon.from('footprints').select('id').eq('id', data!.id).single();
-  expect(readBack?.id).toBe(data!.id);
+  const { data: readBack } = await anon.from('footprints').select('id').eq('id', id).single();
+  expect(readBack?.id).toBe(id);
 });
 
 test('publishing a story makes it readable by anonymous visitors', async () => {
   const asUser = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   await asUser.auth.setSession(session);
+
+  const selfApproveInsert = await asUser.from('stories').insert({
+    user_id: session.user.id,
+    title: 'Unreviewed tour',
+    mode: 'guided',
+    review_status: 'approved',
+  });
+  expect(selfApproveInsert.error, 'INSERT must not bypass moderation').not.toBeNull();
 
   const { data: story, error } = await asUser
     .from('stories')
@@ -240,6 +353,18 @@ test('publishing a story makes it readable by anonymous visitors', async () => {
   expect(error, error?.message).toBeNull();
   created.storyIds.push(story!.id);
   expect(story!.review_status).toBe('draft');
+
+  const { data: point, error: pointError } = await asUser
+    .from('story_points')
+    .insert({
+      story_id: story!.id,
+      title: 'First stop',
+      lon: 106.7,
+      lat: 10.8,
+    })
+    .select('id')
+    .single();
+  expect(pointError, pointError?.message).toBeNull();
 
   const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   const draftRead = await anon.from('stories').select('id').eq('id', story!.id).maybeSingle();
@@ -269,6 +394,17 @@ test('publishing a story makes it readable by anonymous visitors', async () => {
 
   const publishedRead = await anon.from('stories').select('id').eq('id', story!.id).maybeSingle();
   expect(publishedRead.data?.id).toBe(story!.id);
+
+  const changed = await asUser
+    .from('story_points')
+    .update({ title: 'Unreviewed change' })
+    .eq('id', point!.id)
+    .select('id');
+  expect(changed.data).toEqual([]);
+  const deleted = await asUser.from('story_points').delete().eq('id', point!.id).select('id');
+  expect(deleted.data).toEqual([]);
+  const after = await admin.from('story_points').select('title').eq('id', point!.id).single();
+  expect(after.data?.title).toBe('First stop');
 
   const { data: stamped } = await admin
     .from('stories')
@@ -387,6 +523,11 @@ test('a worker key claims a job and reports back through /api/pipeline', async (
   expect(claimed.status).toBe('claimed');
   expect(claimed.payload.run_id).toBe(runId);
 
+  const foreignMap = await asWorker.post('/api/pipeline/results', {
+    data: { job_id: job!.id, extractions: [{ map_id: crypto.randomUUID(), run_id: runId }] },
+  });
+  expect(foreignMap.status()).toBe(403);
+
   // One round trip carries the rows, the stage and the job's own outcome.
   const results = await asWorker.post('/api/pipeline/results', {
     data: {
@@ -410,6 +551,8 @@ test('a worker key claims a job and reports back through /api/pipeline', async (
           confidence: 0.9,
           model: 'write-smoke',
           prompt: 'write-smoke',
+          review_status: 'validated',
+          reviewed_by: session.user.id,
         },
       ],
     },
@@ -424,8 +567,18 @@ test('a worker key claims a job and reports back through /api/pipeline', async (
   expect(finished!.status).toBe('done');
   expect(finished!.finished_at).toBeTruthy();
 
-  const { data: rows } = await admin.from('ocr_labels').select('text').eq('run_id', runId);
+  const { data: rows } = await admin
+    .from('ocr_labels')
+    .select('text, review_status, reviewed_by')
+    .eq('run_id', runId);
   expect(rows).toHaveLength(1);
+  expect(rows![0].review_status).toBe('pending');
+  expect(rows![0].reviewed_by).toBeNull();
+
+  const replay = await asWorker.post('/api/pipeline/results', {
+    data: { job_id: job!.id, status: 'done' },
+  });
+  expect(replay.status()).toBe(403);
 
   // Nothing wrote a stage: map_pipeline_status is a view (mig 056), so closing
   // the job is what advances it.
@@ -718,6 +871,22 @@ test('the server-side executor only takes the kinds it can run', async () => {
     baseURL: 'http://localhost:5199',
     extraHTTPHeaders: { Authorization: `Bearer ${TEST_WORKER_TOKEN}` },
   });
+
+  // A queued job is not authority to execute, even with a valid worker key.
+  const unclaimed = await asWorker.post('/api/pipeline/execute', { data: { job_id: job!.id } });
+  expect(unclaimed.status()).toBe(403);
+
+  const { data: workerKey } = await admin
+    .from('worker_keys')
+    .select('id')
+    .eq('name', 'write-smoke-worker')
+    .single();
+  expect(workerKey?.id).toBeTruthy();
+  const { error: claimError } = await admin
+    .from('pipeline_jobs')
+    .update({ status: 'claimed', worker_key_id: workerKey!.id })
+    .eq('id', job!.id);
+  expect(claimError).toBeNull();
 
   // ocr has real compute behind it: the worker runs it and reports results.
   const wrongKind = await asWorker.post('/api/pipeline/execute', { data: { job_id: job!.id } });

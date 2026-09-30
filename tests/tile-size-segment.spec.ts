@@ -10,6 +10,17 @@ import {
   widthOnlySizeToExplicit,
 } from '../worker/src/iiifKeys';
 
+test('encoded separators cannot escape the IIIF source path', () => {
+  const id = '0423bba3-e5ee-4e4b-b4a2-7a10079698a1';
+  expect(splitIiifPath(`/iiif/${id}/%2e%2e%2fuploads%2fevil.html`)).toBeNull();
+  expect(splitIiifPath(`/iiif/${id}/%252e%252e%252fuploads`)).toBeNull();
+  expect(splitIiifPath(`/iiif/${id}/info.json`)).toEqual({
+    mapId: id,
+    version: '',
+    rest: '/info.json',
+  });
+});
+
 /**
  * The IIIF size segment, and the 404 that hid behind it.
  *
@@ -44,7 +55,7 @@ test('an edge tile rounds the way dzsave rounded — up, not to nearest', () => 
   // …but .875 rounds up under *every* rule, so the case above cannot tell
   // `ceil` from `round`, and for a year it did not: the bottom row of the
   // Indochine sheets lands below .5, where round becomes floor. Real key from
-  // 0775a31e (2652 x 3753) at factor 8: 1705 / 8 = 213.125, bucket holds
+  // 0775a31e-0000-4000-8000-000000000001 (2652 x 3753) at factor 8: 1705 / 8 = 213.125, bucket holds
   // `256,214`. Math.round asks 213 and misses.
   expect(widthOnlySizeToExplicit('/0,2048,2048,1705/256,/0/default.jpg')).toBe(
     '/0,2048,2048,1705/256,214/0/default.jpg'
@@ -178,43 +189,61 @@ test('non-region paths are left alone', () => {
  */
 
 test('an unversioned path lands on exactly the key it always did', () => {
-  const p = splitIiifPath('/iiif/0775a31e/0,0,512,512/256,256/0/default.jpg');
+  const p = splitIiifPath(
+    '/iiif/0775a31e-0000-4000-8000-000000000001/0,0,512,512/256,256/0/default.jpg'
+  );
   expect(p).toEqual({
-    mapId: '0775a31e',
+    mapId: '0775a31e-0000-4000-8000-000000000001',
     version: '',
     rest: '/0,0,512,512/256,256/0/default.jpg',
   });
   expect(iiifR2Key(p!.mapId, p!.version, p!.rest)).toBe(
-    'tiles/0775a31e/0,0,512,512/256,256/0/default.jpg'
+    'tiles/0775a31e-0000-4000-8000-000000000001/0,0,512,512/256,256/0/default.jpg'
   );
 
-  const info = splitIiifPath('/iiif/0775a31e/info.json');
-  expect(iiifR2Key(info!.mapId, info!.version, info!.rest)).toBe('tiles/0775a31e/info.json');
+  const info = splitIiifPath('/iiif/0775a31e-0000-4000-8000-000000000001/info.json');
+  expect(iiifR2Key(info!.mapId, info!.version, info!.rest)).toBe(
+    'tiles/0775a31e-0000-4000-8000-000000000001/info.json'
+  );
 });
 
 test('a version segment becomes a key prefix and leaves the rest alone', () => {
-  const p = splitIiifPath('/iiif/0775a31e/v2/0,0,512,512/256,256/0/default.jpg');
+  const p = splitIiifPath(
+    '/iiif/0775a31e-0000-4000-8000-000000000001/v2/0,0,512,512/256,256/0/default.jpg'
+  );
   expect(p).toEqual({
-    mapId: '0775a31e',
+    mapId: '0775a31e-0000-4000-8000-000000000001',
     version: '/v2',
     rest: '/0,0,512,512/256,256/0/default.jpg',
   });
   expect(iiifR2Key(p!.mapId, p!.version, p!.rest)).toBe(
-    'tiles/0775a31e/v2/0,0,512,512/256,256/0/default.jpg'
+    'tiles/0775a31e-0000-4000-8000-000000000001/v2/0,0,512,512/256,256/0/default.jpg'
   );
 
-  const info = splitIiifPath('/iiif/0775a31e/v12/info.json');
+  const info = splitIiifPath('/iiif/0775a31e-0000-4000-8000-000000000001/v12/info.json');
   expect(info!.version).toBe('/v12');
-  expect(iiifR2Key(info!.mapId, info!.version, info!.rest)).toBe('tiles/0775a31e/v12/info.json');
+  expect(iiifR2Key(info!.mapId, info!.version, info!.rest)).toBe(
+    'tiles/0775a31e-0000-4000-8000-000000000001/v12/info.json'
+  );
 });
 
 test('only /v<digits> is a version', () => {
   // A map whose first path segment merely starts with a v is not versioned.
-  expect(splitIiifPath('/iiif/abc/video/256,256/0/default.jpg')!.version).toBe('');
-  expect(splitIiifPath('/iiif/abc/v/256,256/0/default.jpg')!.version).toBe('');
-  expect(splitIiifPath('/iiif/abc/v2x/info.json')!.version).toBe('');
+  expect(
+    splitIiifPath('/iiif/aaaaaaaa-0000-4000-8000-000000000002/video/256,256/0/default.jpg')!.version
+  ).toBe('');
+  expect(
+    splitIiifPath('/iiif/aaaaaaaa-0000-4000-8000-000000000002/v/256,256/0/default.jpg')!.version
+  ).toBe('');
+  expect(splitIiifPath('/iiif/aaaaaaaa-0000-4000-8000-000000000002/v2x/info.json')!.version).toBe(
+    ''
+  );
   // …and a bare /v2 with nothing after it is still a version, not a rest.
-  expect(splitIiifPath('/iiif/abc/v2')).toEqual({ mapId: 'abc', version: '/v2', rest: '' });
+  expect(splitIiifPath('/iiif/aaaaaaaa-0000-4000-8000-000000000002/v2')).toEqual({
+    mapId: 'aaaaaaaa-0000-4000-8000-000000000002',
+    version: '/v2',
+    rest: '',
+  });
   // Anything that is not an /iiif path at all.
   expect(splitIiifPath('/basemap/vietnam.pmtiles')).toBeNull();
   expect(splitIiifPath('/iiif/')).toBeNull();
@@ -222,36 +251,38 @@ test('only /v<digits> is a version', () => {
 
 test('both rewrites still fire behind a version prefix', () => {
   // This is the whole reason the prefix is peeled rather than left on `rest`.
-  const p = splitIiifPath('/iiif/0775a31e/v3/0,0,2652,3753/166,/0/default.jpg')!;
+  const p = splitIiifPath(
+    '/iiif/0775a31e-0000-4000-8000-000000000001/v3/0,0,2652,3753/166,/0/default.jpg'
+  )!;
   expect(p.version).toBe('/v3');
 
   const explicit = widthOnlySizeToExplicit(p.rest);
   expect(explicit).toBe('/0,0,2652,3753/166,235/0/default.jpg');
   expect(iiifR2Key(p.mapId, p.version, explicit as string)).toBe(
-    'tiles/0775a31e/v3/0,0,2652,3753/166,235/0/default.jpg'
+    'tiles/0775a31e-0000-4000-8000-000000000001/v3/0,0,2652,3753/166,235/0/default.jpg'
   );
 
   const full = wholeRegionToFull(explicit as string, 2652, 3753);
   expect(full).toBe('/full/166,235/0/default.jpg');
   expect(iiifR2Key(p.mapId, p.version, full as string)).toBe(
-    'tiles/0775a31e/v3/full/166,235/0/default.jpg'
+    'tiles/0775a31e-0000-4000-8000-000000000001/v3/full/166,235/0/default.jpg'
   );
 });
 
 /**
  * `sizes`, and the array that was fiction.
  *
- * It used to be synthesised from `scaleFactors`, and on 0775a31e every entry it
+ * It used to be synthesised from `scaleFactors`, and on 0775a31e-0000-4000-8000-000000000001 every entry it
  * produced 404d — `full/2652,3753`, `full/1326,1877`, `full/663,939`,
  * `full/332,470` — while the one `w,h` derivative that does exist,
  * `full/166,235`, went unadvertised. The array is now read out of the bucket.
  */
 
 const PREFIXES = [
-  'tiles/0775a31e/full/166,235/',
-  'tiles/0775a31e/full/200,/',
-  'tiles/0775a31e/full/400,/',
-  'tiles/0775a31e/full/800,/',
+  'tiles/0775a31e-0000-4000-8000-000000000001/full/166,235/',
+  'tiles/0775a31e-0000-4000-8000-000000000001/full/200,/',
+  'tiles/0775a31e-0000-4000-8000-000000000001/full/400,/',
+  'tiles/0775a31e-0000-4000-8000-000000000001/full/800,/',
 ];
 
 test('the full/ listing is parsed in both spellings, widest last', () => {
@@ -290,7 +321,7 @@ test('an explicit size is taken from its name, never recomputed', () => {
 });
 
 test('a width-only size derives the height the bucket really holds', () => {
-  // Measured against the live derivatives of 0775a31e (2652 x 3753):
+  // Measured against the live derivatives of 0775a31e-0000-4000-8000-000000000001 (2652 x 3753):
   // full/200, is 200x283, full/400, is 400x566, full/800, is 800x1132.
   expect(fullSizeOf({ name: '200,', width: 200, height: null }, 2652, 3753)).toEqual({
     width: 200,

@@ -70,13 +70,15 @@ Worker-authenticated (`Authorization: Bearer <worker_keys token>`, **not** a use
 `$lib/server/workerAuth.ts`):
 
 - `/api/pipeline/claim/` — POST `{ kinds, worker }` → the claimed job or `{ job: null }`. A key
-  scoped to certain kinds cannot claim outside them.
-- `/api/pipeline/results/` — POST `extractions` (≤500 rows, upserted on
-  `(map_id, run_id, tile_x, tile_y, text, global_xi, global_yi)`; the reply carries
-  `extractions_offered` too whenever the database accepted fewer than were sent), `map_id` +
+  scoped to certain kinds cannot claim outside them; the claim is bound to the key ID.
+- `/api/pipeline/results/` — POST with a required `job_id`. Results must match the claimed job's
+  owner, kind, map and OCR run. `extractions` (≤500 rows) accept only machine-output fields and
+  are inserted on `(map_id, run_id, tile_x, tile_y, text, global_xi, global_yi)` without
+  overwriting existing reviewed rows. The reply reports offered and already-present counts.
+  The body may also carry `map_id` +
   `triage_regions` / `triage_grid` (the layout pass, written one key at a time through the
   `set_triage_key` RPC so it cannot clobber a hand-drawn neatline — and regions whose `source` is
-  `human` are kept, so a second **Detect** no longer discards every correction), and/or `job_id` +
+  `human` are kept, so a second **Detect** no longer discards every correction), and/or
   `status` (→ `finish_job`). There is no stage field: closing the job advances the stage.
 - `/api/pipeline/execute/` — POST `{ job_id }` for the kinds whose work belongs on the server
   (`mirror_annotation`, `sync_allmaps`): they need the service key, which a worker deliberately
@@ -103,6 +105,11 @@ and only the sha256 is stored. Revoke by setting `worker_keys.revoked_at`.
 
 Public / other:
 
+- `/api/maps/[id]/open/` — **public** POST. Records one published-map view through the bounded
+  `record_map_view` RPC and returns `{ recorded }`; direct table inserts are closed.
+- `/api/maps/[id]/annotation/` — **public for published maps** GET; drafts require a signed-in
+  session. Streams the stable annotation from the private Storage bucket. A `?version=` history
+  request requires staff MFA. Direct Storage object URLs are no longer public.
 - `/api/maps/[id]/legend-points/` — **public** GET. Numbered-legend references placed on the ground:
   each body numeral (`category = 'legend_ref'`) warped to lng/lat via the map's Allmaps
   georeference, joined to its `legend_entry` for a name. Legend-internal numbers are dropped.

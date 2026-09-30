@@ -696,6 +696,7 @@ export type Database = {
           status: string
           updated_at: string
           worker: string | null
+          worker_key_id: string | null
         }
         Insert: {
           attempts?: number
@@ -714,6 +715,7 @@ export type Database = {
           status?: string
           updated_at?: string
           worker?: string | null
+          worker_key_id?: string | null
         }
         Update: {
           attempts?: number
@@ -732,6 +734,7 @@ export type Database = {
           status?: string
           updated_at?: string
           worker?: string | null
+          worker_key_id?: string | null
         }
         Relationships: [
           {
@@ -1698,8 +1701,12 @@ export type Database = {
     }
     Functions: {
       canonicalise_category: { Args: { raw: string }; Returns: string }
+      consume_contribution_quota: {
+        Args: { p_user_id: string; p_kind: string; p_limit: number }
+        Returns: boolean
+      }
       claim_job: {
-        Args: { p_kinds: string[]; p_worker: string }
+        Args: { p_kinds: string[]; p_worker: string; p_worker_key_id: string }
         Returns: {
           attempts: number
           claimed_at: string | null
@@ -1717,6 +1724,7 @@ export type Database = {
           status: string
           updated_at: string
           worker: string | null
+          worker_key_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1744,6 +1752,7 @@ export type Database = {
           p_id: string
           p_result?: Json
           p_status: string
+          p_worker_key_id: string
         }
         Returns: {
           attempts: number
@@ -1762,6 +1771,7 @@ export type Database = {
           status: string
           updated_at: string
           worker: string | null
+          worker_key_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1792,6 +1802,7 @@ export type Database = {
         Args: { p_except: string; p_slug: string }
         Returns: boolean
       }
+      record_map_view: { Args: { p_map_id: string }; Returns: boolean }
       place_core_key: {
         Args: { p_text: string; p_validated: string }
         Returns: string
@@ -2058,4 +2069,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

@@ -4,6 +4,7 @@ import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid } from '$lib/server/http';
 import { uploadJson } from '$lib/server/storage';
+import { fetchAnnotationJson } from '$lib/server/safeAnnotation';
 
 interface GCP {
   resourceCoords: [number, number];
@@ -26,27 +27,27 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
     throw error(400, 'Expected exactly 4 GCPs');
   }
 
-  // Fetch map to get allmaps_id (must be a URL for self-hosted)
+  // Fetch the stored mirror, never an arbitrary URL supplied by the caller.
   const { data: map } = await adminClient()
     .from('maps')
-    .select('allmaps_id')
+    .select('allmaps_id, annotation_url')
     .eq('id', mapId)
     .single();
 
   if (!map) throw error(404, 'Map not found');
 
-  const annotationUrl = map.allmaps_id;
-  if (!annotationUrl?.startsWith('http')) {
+  const annotationUrl =
+    map.annotation_url ?? (map.allmaps_id?.startsWith('http') ? map.allmaps_id : null);
+  if (!annotationUrl) {
     throw error(400, 'This map does not use a self-hosted annotation URL');
   }
 
-  // Fetch current annotation JSON — bypass any server-side cache
-  const bustUrl = annotationUrl + (annotationUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
-  const fetchRes = await fetch(bustUrl, { cache: 'no-store' });
-  if (!fetchRes.ok) {
-    throw error(502, `Failed to fetch annotation: ${fetchRes.statusText}`);
+  let annotation: any;
+  try {
+    annotation = await fetchAnnotationJson(annotationUrl);
+  } catch {
+    throw error(502, 'Failed to fetch annotation');
   }
-  const annotation = await fetchRes.json();
 
   // Extract source info for SVG dimensions
   const item = annotation.items?.[0];
@@ -97,20 +98,11 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
     };
   }
 
-  // Extract Supabase Storage bucket + path from the URL.
-  // Strip query params first, then parse:
-  // https://<project>.supabase.co/storage/v1/object/public/<bucket>/<path>
-  const cleanUrl = annotationUrl.split('?')[0];
-  const storageMarker = '/object/public/';
-  const markerIdx = cleanUrl.indexOf(storageMarker);
-  if (markerIdx === -1) {
-    throw error(400, 'Cannot determine storage path from annotation URL');
-  }
-  const storagePath = cleanUrl.slice(markerIdx + storageMarker.length);
-  const bucketEnd = storagePath.indexOf('/');
-  if (bucketEnd === -1) throw error(400, 'Cannot parse bucket from storage path');
-
-  await uploadJson(storagePath.slice(0, bucketEnd), storagePath.slice(bucketEnd + 1), annotation);
+  await uploadJson('annotations', `${mapId}.json`, annotation);
+  await adminClient()
+    .from('maps')
+    .update({ annotation_url: `https://maparchive.vn/api/maps/${mapId}/annotation` })
+    .eq('id', mapId);
 
   return json({ success: true });
 };

@@ -137,12 +137,22 @@ export function splitIiifPath(
 ): { mapId: string; version: string; rest: string } | null {
   const match = pathname.match(/^\/iiif\/([^/]+)(\/.*)?$/);
   if (!match) return null;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(match[1]))
+    return null;
   let rest = match[2] || '';
   try {
     rest = decodeURIComponent(rest);
   } catch {
-    // Keep the raw text: a bad escape is a bad request, not a crash.
+    return null;
   }
+  // Never let an encoded separator or dot segment escape the configured IIIF
+  // path when URL normalization runs in fetch(). Reject a second escape layer.
+  if (
+    rest.includes('\\') ||
+    rest.includes('%') ||
+    rest.split('/').some((s) => s === '.' || s === '..')
+  )
+    return null;
   const v = rest.match(/^\/v(\d+)(\/.*)?$/);
   return v
     ? { mapId: match[1], version: `/v${v[1]}`, rest: v[2] || '' }
