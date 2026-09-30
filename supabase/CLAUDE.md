@@ -26,7 +26,20 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **100**, pushed to production (verified 2026-09-30 via `supabase migration list`). 092 nulls out the
+Head is **101**, not yet pushed (100 is what's live in production, verified 2026-09-30 via
+`supabase migration list`). 101 narrows `map_images` and `map_slug_aliases`'s read policies from
+"published or any signed-in user" to "published, the map's creator, or staff" — the two
+draft-visibility gates copying 063's wording that nothing non-staff actually reads that broadly —
+and revokes anon's SELECT on `footprints.review_note`/`.review_tags`/`.reviewed_by`/`.user_id` (and
+the matching columns on the `footprint_submissions` compat view), since RLS gates rows, not columns,
+and a public map's `footprints` rows were handing the anon key a reviewer's private notes and both
+parties' user ids. `maps` and `ocr_labels` keep the wider "published or any signed-in user" read
+policy on purpose — `/scan?mode=inspect` (no role gate) and `fetchGeorefQueue`/`fetchLabelMaps`
+(`src/lib/data/maps/georef.ts`, `src/lib/data/supabase/footprints.ts`) depend on any signed-in
+volunteer being able to read *any* draft, not only their own, which is what the open-contribution
+model in 063/079 means. **Deploy the app before pushing 101**: the old export route selects
+`footprints.*` on the anon key and would 42501 against the new grants. 101's own header has the full per-table audit trail.
+092 nulls out the
 `'Vietnam Map Archive'` placeholder in `maps.collection` (it meant "no series," not a series —
 collapsed a live bug in `annotationMirror.ts` that was stomping real series membership on every
 re-mirror); 093 collapses spelling/language duplicates in `language`/`dc_publisher`/`rights`; 094
