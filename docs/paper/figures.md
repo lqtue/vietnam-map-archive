@@ -202,6 +202,35 @@ Bình's lattice cell. `allmaps-series-note.md` §2.
 | why it survived a year | the one real key the old test pinned (`3758*256/4096 = 234.875`) rounds the same under `ceil` and `round` | ibid |
 | test | `tests/tile-size-segment.spec.ts`, 29 checks against keys read out of the bucket | `docs/testing.md` |
 
+### 3.7 Series 561 — automated placement from catalogue extents (added 2026-09-30)
+
+Indochine 1:100,000, 2nd éd. SGI 1947–59 (Cartomundi series 561). All rows are **measured**,
+recorded runs; none was re-run for this ledger (claim-audit label **B**). `J` =
+`docs/journals/260923-indochine100k-georef.md`, `H` = `docs/journals/260930-series561-handoff.md`.
+
+| figure | value | source |
+|---|---|---|
+| catalogue records / VMA map rows | **492** records (per-half UNIMARC extents); **360** VMA rows, each matched to exactly one record | J, 2026-09-24 "ingest finished" and "catalogue matching grid" |
+| records inside the standard span band (lon 0.36–0.43ᵍ, lat 0.48–0.53ᵍ) | **446 / 492** (90.7%) | J, 2026-09-24 "catalogue-shortcut confirmed viable" |
+| calibration sample | **16** sheets (12 latitude-stratified + 4 targeted); **7** full observations cleared; printed graticule ticks located against the neatline, values read | J, 2026-09-24 "first real latitude-stratified calibration" |
+| calibration fit, all 7 | linear-in-latitude, **235.2 m mean / 741.5 m max** residual; fails the 250 m gate; the max is Tri Binh (W) | ibid |
+| calibration fit, Tri Binh excluded | **6** sheets, 10.5–20.9°N, **76 m mean / 188 m max** — the accepted fit; exclusion recorded as a judgement call, not a finding | J, 2026-09-24 "ingest finished, first 561 batch published" |
+| Tri Binh (W) under the per-sheet gates | four sides 169–172 px offset, 2.2–3.8 px residual, aspect/scale error **0.69%** — geometry-clear | J, 2026-09-30 "the last four held Vietnam sheets" |
+| Tri Binh (W), printed ticks re-read (3 per axis, no OCR model) | catalogue **west +509 m, south +544 m** wrong; east −59 m, north +50 m (reading noise); aspect/scale error 0.69% → **0.43%** under the corrected box | ibid |
+| Tri Binh (W), relative size of that error (**derived**) | **~1.3%** of width, **~1.1%** of height, against a nominal 0.4ᵍ × 0.5ᵍ half-sheet at 15.4°N (38.6 × 49.8 km, WGS 84 radii) — both axes enlarged by similar proportions, so the shape barely changes | computed 2026-09-30 from the row above |
+| Quang Ngai, frame aspect | detected pixel aspect implied a **0.428ᵍ** longitude span against the declared 0.5235ᵍ | J, 2026-09-30 "the last four held Vietnam sheets" |
+| tick labels | printed every **0.1ᵍ**; northern sheets include **0.2ᵍ** labels | J, 2026-09-24 "first real latitude-stratified calibration" |
+| Quang Ngai, printed ticks | catalogue east edge off by **~9.2 km**; declared lon span 0.5235ᵍ → printed 0.4281ᵍ; held by the span gate before any tick was read | ibid |
+| wrong-line landing (v29) | two sheets pinned on a kilometre-grid line **~52 px** inside the neatline; that line fit **0.28–0.48 px** residual vs **~3.2 px** for the engraved frame (24 patches); caught only by a per-pixel profile | J, 2026-09-29 "thirteen more boundary trials"; `docs/lessons.md` 2026-09-29 |
+| detector versions | `DETECT_VERSION` **3 → 39**, 2026-09-24 to 2026-09-30 | J; H |
+| public, georeferenced | **314** of 360 rows, DB state verified before/after the write, 2026-09-29 | J, 2026-09-29 "publishing the clear backlog" |
+| lattice `check()` | **328** clean placements, zero conflicts, 2026-09-30; 9 later local clears not re-checked | H |
+| scale of a pixel | the ~175 px frame-to-neatline gap is ~1.3 km on the ground | J, 2026-09-24 "catalogue-shortcut confirmed viable" |
+
+**Not established, do not quote as a rate:** how many of the 314 public sheets carry a
+shape-preserving catalogue error like Tri Binh's. Printed ticks were read on the calibration
+sample and on held sheets only. No random sample of cleared sheets has been tick-read or reviewed.
+
 ---
 
 ## 4. Cited figures — verified through scite, 2026-09-19
@@ -252,6 +281,9 @@ two). `REGEN.md`'s "Against the paper's claims" table had already marked both **
 than silently rewritten, per the `note:` convention.
 
 ## Changelog of this file
+
+- **2026-09-30** — §3.7 added: series 561 as the paper's third case. Every row is a recorded run
+  (label B), sourced to the 561 journal and handoff; none re-run for this ledger.
 
 - **2026-09-20** — Applied the ARS integrity-correction round (`technical-revision-proposal.json`,
   now `APPLIED`) to keep this ledger in step with `draft.md`: the 452-sheet publication constant is
