@@ -196,9 +196,9 @@
       sortRows={byYear}
       {search}
       showFilters={search === null}
+      showLabels={false}
       on:pick
       on:remove
-      on:pickLabel
     />
   {:else if visibleMatches.length}
     <ArchiveMapRows rows={visibleMatches} on:pick on:remove />
