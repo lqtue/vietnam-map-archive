@@ -207,6 +207,16 @@ within 22 px: **the edge sits outside the bank, never inside it.** The bias is o
 a placement fault (closing radius, core cells, hole filling), not a detection fault. Quays, the
 canal and creeks all show it. Both batches are now spent on this version.
 
-Not done: the edge fix (tune on calibrate windows, score on a third batch), the 1898 transfer.
-No layer is approved. This task is tracked under `river-reconstruction` in
+**v2 and a third batch (seed 3, 2026-10-01).** On the calibrate windows the visible outward
+fault was landing stages filled as water; v2 (`27fd4197`) cuts solid dark structures out. Scored
+once on 102 fresh points (90 within 30 px of the v2 edge): **92.9% [86–97], identical to v1 on
+the same points, error for error.** The pier fix touched no labelled point. Missed water is again
+0/32. Of 7 false-water points, 6 are quay points in seen held-out windows; the unseen held-out
+windows score 98.7% [93–100] (1 error). Across the three batches the false water collects at the
+quay windows of the seen set, which in practice means the Arsenal quay, the leak case from the
+first 0.09 sweep. The calibrate quay (`quay_primauguet`) does not show it, so it cannot be fixed
+there.
+
+Not done: the Arsenal quay fault (its window has been `seen` since the first sweep, so it is not a
+clean test either way), the 1898 transfer. No layer is approved. This task is tracked under `river-reconstruction` in
 [ROADMAP.md](ROADMAP.md).
