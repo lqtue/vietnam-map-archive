@@ -28,10 +28,20 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **103**, **not yet pushed — push 103 *before* deploying the app.** The new routes record a
+Head is **104**, pushed 2026-10-01 (103 too: `supabase migration list` shows both on both sides). 104 adds
+`maps.series_key`, a generated column (`series_key(collection)`, mig 082's function), and rebuilds
+`map_series` on it. The series coverage page and `fetchSheetEditions` now filter on it, so an app
+deployed ahead of the push would have answered 500 on every `/catalog/series/<key>` — and the read-only suite,
+which reads production, fails the same way until it lands. 104 also copies `extra_metadata.sheet_number`
+/ `sheet_half` into their typed columns for the 188 first-edition rows 095's one-off backfill missed;
+`ingest_indochine_100k_nakala.mjs` now writes the columns itself. `collection` is still the only
+input: the key is not independent of the label until a `series` table exists (`series-identity`).
+Regenerate types after the push (104's `series_key` was hand-typed, Row only).
+
+103 (pushed; its routes record a
 row after writing each history file and answer 500 if the table is missing, so an app deployed
 ahead of the migration fails every publish, sync and neatline save *after* its history file is
-already written. (The reverse of 101's order; 102 below is live.) 102 is live in production (verified 2026-10-01 via
+already written — the reverse of 101's order). 102 is live in production (verified 2026-10-01 via
 `supabase migration list`). 103 adds `georef_versions` (anon/authenticated lose `user_id`, as 101 did for footprints), one row per stored georeference version
 (`annotations/<map>/<stamp>.json`), and the `map_georef_current` view (newest stamp per map). Every
 writer records its row right after the history file and before the live file moves:

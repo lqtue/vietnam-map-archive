@@ -543,6 +543,7 @@ export type Database = {
           publisher: string | null
           rights: string | null
           search_vector: unknown
+          series_key: string | null
           sheet_half: string | null
           sheet_number: string | null
           shelfmark: string | null
