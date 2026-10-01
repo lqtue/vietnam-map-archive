@@ -22,7 +22,20 @@ is source pixels from `iiif.maparchive.vn` fixed tiles.
   mean shoreline distance in px, pooled per sheet, case and split. `--selfcheck` runs the
   synthetic checks.
 
-Not built: the trace editor (any tool that exports source-pixel polygons works; QGIS with an
-engineering CRS is enough), the bank-aware proposal, and the multi-reviewer agreement check.
+## Tracing in QGIS
+
+1. `python3 qgis.py prep` (writes a `.pgw` beside each crop; y is negated because QGIS is y-up).
+2. New project, CRS an **engineering CRS** (Project → Properties → CRS → *Engineering*,
+   any cartesian, metres). Drag in the `crops/<sheet>-*.pgw`-paired PNGs: they land at source pixels.
+3. Per sheet make one GeoJSON polygon layer (`1882.geojson`, `1898.geojson`) with a text field
+   `class`. Draw water as `water`; bridges, lettering, folds as `ignore`; a land island inside water is
+   a ring (Edit → *Add Ring*). A polygon may cross its window edge; it is filed by centroid and the
+   scorer clips it.
+4. Export both layers to one directory, then
+   `python3 qgis.py import <dir> [--dry dry_blue_parcels,dry_city_blocks,dry_blue,dry_salmon]`
+   writes `traces/*.geojson` with `"reviewed": true`. Windows with no polygons are left untouched
+   unless named in `--dry`. Re-import any time; it rewrites every window that has features.
+
+Not built: the bank-aware proposal, and the multi-reviewer agreement check.
 Two people tracing the same window is what tells you whether 5 px of shoreline error is the
 method or the tracing.
