@@ -1,6 +1,6 @@
 """Score river proposals against hand traces, per window, case and sheet.
 
-    work/ocr/.venv/bin/python work/analysis/river_ref/score.py <proposal_dir>
+    work/ocr/.venv/bin/python work/analysis/river_ref/score.py <proposal_dir> [--layer road]
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py --selfcheck
 
 Truth: traces/<sheet>-<id>.geojson, Polygon features in SOURCE pixels, property
@@ -59,10 +59,12 @@ def pct(a, b):
     return "n/a" if not b else f"{100 * a / b:.1f}%"
 
 
-def main(prop_dir):
+def main(prop_dir, layer="water"):
     spec = json.loads((HERE / "windows.json").read_text())
     rows, skipped = [], []
     for w in spec["windows"]:
+        if w.get("layer", "water") != layer:
+            continue
         name = f"{w['sheet']}-{w['id']}"
         trace = json.loads((HERE / "traces" / f"{name}.geojson").read_text())
         pf = Path(prop_dir) / f"{name}.png"
@@ -72,12 +74,13 @@ def main(prop_dir):
         feats = trace["features"]
         pred = np.array(Image.open(pf).convert("L")) > 0
         assert pred.shape == (w["box"][3], w["box"][2]), (name, pred.shape)
-        r = score(rasterise(feats, w["box"], "water"), pred, rasterise(feats, w["box"], "ignore"))
+        truth = rasterise(feats, w["box"], "water") if layer == "water" else ~rasterise(feats, w["box"], "block")
+        r = score(truth, pred, rasterise(feats, w["box"], "ignore"))
         rows.append((w, r))
     groups = defaultdict(list)
     for w, r in rows:
         groups[(w["sheet"], w["case"], w["split"] + ("*" if w["seen"] else ""))].append(r)
-    print("sheet case split(*=seen)  n  IoU    missed  false-water  bank px")
+    print(f"[{layer}] sheet case split(*=seen)  n  IoU    missed  false  edge px")
     for key, rs in sorted(groups.items()):
         tp, fn, fp = (sum(r[k] for r in rs) for k in ("tp", "fn", "fp"))
         land = sum(r["land"] for r in rs)
@@ -111,4 +114,8 @@ def selfcheck():
 
 
 if __name__ == "__main__":
-    selfcheck() if sys.argv[1:] == ["--selfcheck"] else main(sys.argv[1])
+    a = sys.argv[1:]
+    if a == ["--selfcheck"]:
+        selfcheck()
+    else:
+        main(a[0], a[a.index("--layer") + 1] if "--layer" in a else "water")
