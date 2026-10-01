@@ -22,6 +22,8 @@ export interface GeorefFixItem {
   status: string;
   /** '' when the map carries nothing the Allmaps Editor can open (R2-only, no manifest). */
   editorUrl: string;
+  /** Made by our own pipeline, not on Allmaps (`allmaps_id` null, `annotation_url` set). */
+  pipelineMade: boolean;
 }
 
 const EDITOR = 'https://editor.allmaps.org/#/collection?url=';
@@ -59,6 +61,7 @@ export async function fetchGeorefFixList(
         year: m.year,
         status: m.status ?? 'draft',
         editorUrl: source ? EDITOR + encodeURIComponent(source) : '',
+        pipelineMade: !m.allmaps_id && !!m.annotation_url,
       };
     })
   );

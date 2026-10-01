@@ -31,12 +31,14 @@ SHEETS = [
 def annotation(map_id):
     path = ANN / f"{map_id}.json"
     if not path.exists():
-        # Public production mirror. These inputs are archive data, not secrets.
-        base = "https://trioykjhhwrruwjsklfo.supabase.co"
-        url = f"{base.rstrip('/')}/storage/v1/object/public/annotations/{map_id}.json"
+        # The app's route: the annotations bucket is private (mig 097), and the
+        # route serves published maps' copies without a session.
+        url = f"https://maparchive.vn/api/maps/{map_id}/annotation"
         print(f"fetching annotation: {map_id}")
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(urllib.request.urlopen(url, timeout=30).read())
+        # Cloudflare 403s urllib's default User-Agent.
+        req = urllib.request.Request(url, headers={"User-Agent": "vma-fabric-build"})
+        path.write_bytes(urllib.request.urlopen(req, timeout=30).read())
     return json.loads(path.read_text())["items"][0]
 
 

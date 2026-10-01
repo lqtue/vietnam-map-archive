@@ -46,7 +46,10 @@ export const GET: RequestHandler = async ({ params }) => {
   // Public route on the service-role client: never serve draft maps.
   if (!map || !['public', 'featured'].includes(map.status ?? ''))
     return json({ points: [], reason: 'not public' });
-  if (!map.allmaps_id) return json({ points: [], reason: 'not georeferenced' });
+  // Either source counts: pipeline-made georeferences (the Indochine 1:100,000
+  // halves) carry an `annotation_url` and no `allmaps_id` — Allmaps never held them.
+  if (!map.allmaps_id && !map.annotation_url)
+    return json({ points: [], reason: 'not georeferenced' });
 
   // Legend entries → number→name map + the legend box rect (shared tile bbox).
   // Skip rows a human rejected; prefer their corrected text over the raw model

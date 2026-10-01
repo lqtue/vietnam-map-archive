@@ -36,7 +36,6 @@ async function uploadJson(bucket, path, obj) {
     body: JSON.stringify(obj, null, 2),
   });
   if (!res.ok) throw new Error(`Storage upload failed (${res.status}): ${await res.text()}`);
-  return `${process.env.PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
 const { data: m, error: mErr } = await db

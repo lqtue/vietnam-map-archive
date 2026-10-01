@@ -114,7 +114,6 @@ async function uploadJson(bucket, path, obj) {
     const errText = await res.text().catch(() => String(res.status));
     throw new Error(`Storage upload failed (${res.status}): ${errText}`);
   }
-  return `${process.env.PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
 async function upsertR2Source(mapId, newIiifBase) {
@@ -165,8 +164,8 @@ async function syncOne(mapId) {
   }
 
   const sourceUrl = `${ALLMAPS_ANNOTATIONS}/${map.allmaps_id}`;
-  const annotationRes = await fetch(sourceUrl + '?_t=' + Date.now(), {
-    headers: { Accept: 'application/json' },
+  const annotationRes = await fetch(sourceUrl, {
+    headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
   });
   if (!annotationRes.ok) {
     console.log(`  ${map.name}: failed to fetch live annotation (${annotationRes.status}). SKIP`);
@@ -197,7 +196,10 @@ async function syncOne(mapId) {
 
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
-  const publicAnnotationUrl = await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
+  // Same URL the production path writes (annotationMirror.ts): the bucket is
+  // private (mig 097), so a storage URL here is a dead link.
+  const publicAnnotationUrl = `https://maparchive.vn/api/maps/${mapId}/annotation`;
 
   const { error: upErr } = await db
     .from('maps')
