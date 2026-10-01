@@ -52,6 +52,11 @@ GABOR_SIGMA, RULE_PX = 4, 45     # ruling share per pixel: calibrate dry_blue_pa
                                  # open_bank 90th pct 0.4, river_label 90th 19 (lettering, before smoothing)
 LINE_PX, BLUE_ODR = 0.9, 1.0     # red / paper red below this is a line; OD blue/red below this is blue ink
 CLOSE_R, HOLE_MAX, MIN_PX = 6, 40_000, 2_000
+CORE_ERODE = 1                   # cells; 2 was tried: it cut real river at the frame and moved no held-out edge
+SOLID_INK, SOLID_CLOSE, SOLID_OPEN, SOLID_PAD = 0.45, 2, 4, 3
+                                 # grey / paper below SOLID_INK, closed then opened: a solid dark block
+                                 # (landing stage, pier, bridge, bold lettering) is not water. Piers measure
+                                 # grey 0.37-0.41, ripples 0.52-0.57 (calibrate quay_primauguet, open_bank)
 TILE, MARGIN = 1024, 48
 
 
@@ -110,9 +115,11 @@ def cells_to_water(spacing, rule, loge, coh, blue, marked, inside):
 
 
 def refine(rgb, paper_at, zone_cells, core_cells):
-    """Native mask from cell masks: line pixels in the zone, closed; eroded core is water outright."""
+    """Native mask from cell masks: line pixels in the zone, closed; eroded core is water outright;
+    solid dark structures are cut out and never refilled as holes."""
     h, w, _ = rgb.shape
-    out = np.zeros((h, w), bool)
+    out, solid_px = np.zeros((h, w), bool), np.zeros((h, w), bool)
+    dk = lambda r: np.hypot(*np.mgrid[-r:r + 1, -r:r + 1]) <= r
     disk = np.hypot(*np.mgrid[-CLOSE_R:CLOSE_R + 1, -CLOSE_R:CLOSE_R + 1]) <= CLOSE_R
     full = lambda m: np.pad(np.repeat(np.repeat(m, CELL, 0), CELL, 1), ((0, h - m.shape[0] * CELL), (0, w - m.shape[1] * CELL)))
     zone_px, core_px = full(zone_cells), full(core_cells)
@@ -129,9 +136,12 @@ def refine(rgb, paper_at, zone_cells, core_cells):
             rel = s[..., 0] / p[..., 0]
             line = (rel < LINE_PX) & (od[..., 2] < BLUE_ODR * od[..., 0]) & (gabor_rule(rel) < RULE_PX)
             zone = zone_px[a:b, c:d]
-            m = (nd.binary_closing(line & zone, disk) | core_px[a:b, c:d]) & zone
+            solid = s.mean(2) / p.mean(2) < SOLID_INK
+            solid = nd.binary_dilation(nd.binary_opening(nd.binary_closing(solid, dk(SOLID_CLOSE)), dk(SOLID_OPEN)), dk(SOLID_PAD))
+            m = (nd.binary_closing(line & zone, disk) | core_px[a:b, c:d]) & zone & ~solid
             out[y0:y1, x0:x1] = m[y0 - a:y1 - a, x0 - c:x1 - c]
-    holes = nd.binary_fill_holes(out) & ~out
+            solid_px[y0:y1, x0:x1] = solid[y0 - a:y1 - a, x0 - c:x1 - c]
+    holes = nd.binary_fill_holes(out) & ~out & ~solid_px
     hl, hn = nd.label(holes)
     small = np.isin(hl, 1 + np.where(nd.sum(holes, hl, range(1, hn + 1)) <= HOLE_MAX)[0])
     out |= small
@@ -194,7 +204,7 @@ def main():
     sq = np.ones((3, 3))
     mask = np.zeros((h, w), np.uint8)
     for val, cells in ((128, review), (255, network)):
-        m = refine(rgb, pa, nd.binary_dilation(cells, sq), nd.binary_erosion(cells, sq))
+        m = refine(rgb, pa, nd.binary_dilation(cells, sq), nd.binary_erosion(cells, sq, iterations=CORE_ERODE))
         mask[m] = val
     Image.fromarray(mask).save(out / "water.png", compress_level=6)
     np.savez_compressed(out / "cells.npz", spacing=spacing, rule=rule, loge=loge, blue=blue, marked=marked,
@@ -213,7 +223,8 @@ def main():
                                                   "TEX_LOG_E", "BLUE_SHARE", "MARKED", "COH", "RULE_MAX", "RULE_NEAR",
                                                   "SEED_SPACING", "SEED_COH", "SEED_RULE", "COMP_SEEDS", "COMP_AREA",
                                                   "COMP_SEED_SHARE", "LINK", "GABOR_SIGMA", "RULE_PX", "LINE_PX",
-                                                  "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "MIN_PX")},
+                                                  "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "MIN_PX", "CORE_ERODE",
+                                                  "SOLID_INK", "SOLID_CLOSE", "SOLID_OPEN", "SOLID_PAD")},
            "cells": {"candidate": int(cand.sum()), "seed": int(seed.sum()), "network": int(network.sum()), "review": int(review.sum())},
            "water_px": int((mask == 255).sum()), "review_px": int((mask == 128).sum()),
            "confirmed": {"water": settled[True], "dry": settled[False], "stale": stale},
@@ -247,6 +258,13 @@ def self_check():
     sp2[2:6, 30:36] = 5
     _, _, net, rev = cells_to_water(sp2, np.zeros_like(one), c * 5.0, one * 0.9, one, one, np.ones_like(c))
     assert net[10, 10] and not net[33, 33] and rev[33, 33] and not rev[3, 31] and not net[3, 31]
+    # refine: blue ripples are water, a solid dark pier inside them is cut out and not refilled as a hole
+    img = np.full((224, 224, 3), 220, np.uint8)
+    img[::9] = (120, 140, 170)                                   # blue lines 9 px apart
+    img[80:130, 90:120] = (60, 60, 60)                           # pier
+    on = np.ones((224 // CELL, 224 // CELL), bool)
+    m = refine(img, lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32), on, on)
+    assert m[40, 40] and m[150, 60] and not m[105, 105], (m[40, 40], m[150, 60], m[105, 105])
     print("self-check ok")
 
 
