@@ -487,7 +487,7 @@ async function load() {
       dl.append(dt, dd);
     }
     const more = document.createElement('a'); more.href = 'https://github.com/lqtue/vietnam-map-archive/blob/main/docs/system-graph.md';
-    more.target = '_blank'; more.rel = 'noopener'; more.textContent = 'All seven steps ↗';
+    more.target = '_blank'; more.rel = 'noopener'; more.textContent = 'All five steps ↗';
     box.replaceChildren(h, dl, more);
   }
   function fitSheetInMobileView(index) {

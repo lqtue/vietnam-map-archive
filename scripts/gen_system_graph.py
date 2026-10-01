@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render docs/system-graph.svg: the plain-language picture, for readers who are not engineers.
 
-Seven steps a map goes through, each with why it matters, what is done, and what is open now. No
+Five steps a map goes through, each with why it matters, what is done, and what is open now. No
 code names. The engineer view (tools, branches, files) is gen_system_graph_technical.py.
 Open-task counts are parsed from docs/knowledge-system-plan.md §9; the prose is written here from
 CHANGELOG.md, the /changelog headlines and docs/knowledge-system-plan.md. Run:
@@ -14,47 +14,44 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# (plan key, title, why it matters, technical name, done [(when, text)], doing [plain tasks])
+# The five layers of docs/knowledge-system-plan.md §9 folded to what a visitor can follow, the same five
+# the animation (work/proto/fabric/journey.html) uses. "Keep it running" stays apart: it is not a layer.
+# (group id, title, why it matters, technical name, done [(when, text)], doing [plain tasks])
 STEPS = [
-    ("0.", "Find the maps", "We first need to know which maps exist, who made them, who holds them and whether we may show them.",
-     "Layer 0 · Sources",
+    ("find", "Find the maps and keep them safe", "We first need to know which maps exist and whether we may show them. Then we keep our own copy at a lasting address, because a scan on someone else's website can disappear.",
+     "Layers 0 and 1 · Sources, Holdings",
      [("Apr 2025", "The first scanned sheets of Saigon went online."),
+      ("Feb 2026", "The list of maps moved from a file into a proper database."),
       ("May 2026", "Volunteers can upload sheets in batches, and a search tool looks for more in other libraries."),
-      ("Sep 2026", "Whole map series appear as one layer, including sheets we do not hold yet.")],
-     ["Record every printing of a sheet", "Settle the licence for the Indochine 1:100,000 series"]),
-    ("1.", "Keep them safe and online", "A scan on someone else's website can disappear. We keep our own copy and give each map a lasting web address.",
-     "Layer 1 · Holdings",
-     [("Feb 2026", "The list of maps moved from a file into a proper database."),
       ("Apr–Aug 2026", "Scans are copied to our own storage, and publishing a map now starts its processing by itself."),
-      ("Sep 2026", "Every sheet has an address made from its name, and old links still work.")],
-     ["Prove that old sheet links never break", "Fill in missing titles from the sheet itself"]),
-    ("2.", "Pin each map to the real ground", "An old map only becomes a measuring tool once it lies exactly over today's city.",
+      ("Sep 2026", "Whole map series appear as one layer, and every sheet has an address made from its name; old links still work.")],
+     ["Record every printing of a sheet", "Settle the licence for the Indochine 1:100,000 series", "Prove that old sheet links never break", "Fill in missing titles from the sheet itself"]),
+    ("place", "Pin each map to the real ground", "An old map only becomes a measuring tool once it lies exactly over today's city.",
      "Layer 2 · Placement",
      [("Dec 2025", "Sheets can be turned square to the page."),
       ("Aug 2026", "A map cannot be published until it can be placed."),
       ("Sep 2026", "The 1942 Saigon–Cholon sheet went from 112 m off to 34 m off.")],
      ["Keep a history of every placement, so a mistake can be undone", "Re-place the 1:50,000 US Army survey after a 470 m offset was found"]),
-    ("3.", "Read what is printed on them", "Street names, numbers and legends are the history. A program reads them and people check its work.",
-     "Layer 3 · Readings",
+    ("read", "Read what is printed, and make names comparable", "Street names, numbers and legends are the history. A program reads them and people check its work. Then a street's different names across the years are linked, so one search finds all.",
+     "Layers 3 and 4 · Readings, Entities",
      [("Apr 2026", "The first program that reads printed names off a sheet; shapes traced by hand."),
+      ("May 2026", "Search across the whole catalogue, later merged into one search engine."),
+      ("Aug 2026", "Printed legends are read and shown as numbered points on the map."),
       ("Sep 2026", "Reading quality can be scored against a sheet's own printed street index."),
       ("Now", "22 maps have been read, and 118 of their labels checked by a person.")],
-     ["Read the whole placed archive", "Find city blocks and rivers from the ink colours"]),
-    ("4.", "Make names comparable across years", "A street changes name; a place is spelled several ways. We link them so one search finds all.",
-     "Layer 4 · Entities",
-     [("May 2026", "Search across the whole catalogue, later merged into one search engine."),
-      ("Aug 2026", "Printed legends are read and shown as numbered points on the map.")],
-     ["Build a place-name dictionary that spans the years", "Pair old and new street names"]),
-    ("5.", "Make claims we can prove", "A statement such as \"this street was here in 1882\" should lead to the exact spot on the exact sheet.",
-     "Layer 5 · Assertions",
-     [("Feb 2026", "Stories: routes across the map with text and stops."),
-      ("Sep 2026", "One sheet (1882) taken all the way from scan to traced shapes; a research paper is under way.")],
-     ["Link each statement to its trail of evidence", "Compare what different sheets say about the same place"]),
-    ("Surfaces", "Show it to people", "All of the above matters only if a visitor can explore it.",
+     ["Read the whole placed archive", "Find city blocks and rivers from the ink colours", "Build a place-name dictionary that spans the years", "Pair old and new street names"]),
+    ("show", "Show it to people", "All of the above matters only if a visitor can explore it.",
      "Surfaces",
-     [("Jun 2026", "A map page you can search, and a trip page that a printed QR code opens."),
-      ("Sep 2026", "The site went from 23 pages to 16, with a dark theme and one Tools menu.")],
-     ["A walking tour of District 4", "A year slider to move through time", "A 3D stack of six District 4 maps, with how each was made (prototype, not published)"]),
+     [("Jun 2025", "A time slider, so the maps could be moved through instead of picked from a list."),
+      ("Feb 2026", "Stories: routes across the map with text and stops."),
+      ("Jun 2026", "A map page you can search, and a trip page that a printed QR code opens."),
+      ("Sep 2026", "The site went from 23 pages to 16, with a dark theme and one Tools menu."),
+      ("Oct 2026", "A prototype stacks six District 4 maps by year and shows how each was made; it is not on the main site yet.")],
+     ["Check that searching a place name finds it on the live site", "Show staff the next step for each sheet", "Decide whether the old inspect page is still needed"]),
+    ("ahead", "Not started yet", "Nothing here is built. Each piece rests on the steps above, so it waits for them.",
+     "Layer 5, and the planned Surfaces",
+     [("Sep 2026", "Only groundwork: one sheet (1882) taken all the way from scan to traced shapes, and a research paper under way.")],
+     ["Link each statement to its trail of evidence", "Compare what different sheets say about the same place", "A walking tour of District 4", "A year slider over the placed sheets", "Building heights and a 3D city"]),
     ("Outside", "Keep it running", "Building, publishing and testing the site, and the language of its screens.",
      "Outside the model",
      [("Aug 2026", "Dead code removed; the machines that read sheets hold no database password."),
@@ -65,11 +62,20 @@ GROWTH = [("Apr 2025", "one web page of scans"), ("Oct 2025", "rebuilt as a real
           ("Apr 2026", "catalogue, tracing, first text reading"), ("Aug 2026", "automatic processing queue"), ("Sep 2026", "one site, names as addresses")]
 
 plan = (ROOT / "docs/knowledge-system-plan.md").read_text()
-counts = {}
+rows = {}
 for line in plan.split("## 9.")[1].split("\n"):
     m = re.match(r"\| \*\*(\d\.|Surfaces|Outside)", line)
     if m:
-        counts[m.group(1)] = len(re.findall(r"`[a-z0-9-]+`", line.split("|")[3]))
+        rows[m.group(1)] = re.findall(r"`([a-z0-9-]+)`", line.split("|")[3])
+# "Not started" = layer 5, the Walk section of ROADMAP (planned, nothing shipped) and building-attributes.
+roadmap = (ROOT / "docs/ROADMAP.md").read_text()
+walk = roadmap.split("\n## Walk")[1].split("\n## ")[0]
+ahead = set(rows["5."]) | set(re.findall(r"^- \[ \] \*\*`([^`]+)`", walk, re.M)) | {"building-attributes"}
+ahead &= {n for r in rows.values() for n in r}
+pick = lambda *keys: [n for k in keys for n in rows[k] if n not in ahead]
+counts = {"find": len(pick("0.", "1.")), "place": len(pick("2.")), "read": len(pick("3.", "4.")),
+          "show": len(pick("Surfaces")), "ahead": len(ahead), "Outside": len(rows["Outside"])}
+assert sum(counts.values()) == sum(len(r) for r in rows.values())
 
 WIDTH, M = 1240, 28
 XS, WS = M, 340          # step card
@@ -84,7 +90,7 @@ def wrap(t, n):
 
 
 o, y = [], 128
-o.append(f'<text class="h1" x="{M}" y="44">How the archive is built, in seven steps</text>')
+o.append(f'<text class="h1" x="{M}" y="44">How the archive is built, in five steps</text>')
 o.append(f'<text class="mut" x="{M}" y="70">Each step depends on the one before it, so a mistake early on carries into everything after.</text>')
 o.append(f'<text class="mut" x="{M}" y="90">We fix the earliest broken step first. Read from the top down.</text>')
 for x, t in [(XS, "THE STEP"), (XD, "WHAT IS DONE"), (XN, "WHAT IS OPEN NOW")]:
@@ -167,7 +173,7 @@ text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fon
 rect.card{fill:var(--card);stroke:var(--line)}rect.card2{fill:var(--card2);stroke:var(--line)}rect.card3{fill:var(--card3);stroke:var(--line)}
 circle.dot{fill:var(--acc)}.arr{stroke:var(--fg);stroke-width:1.6}.div{stroke:var(--line);stroke-dasharray:6 5}.div2{stroke:var(--line);stroke-width:2}
 """
-svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {H_TOTAL}" width="{WIDTH}" role="img" aria-label="Seven steps a map goes through in the Vietnam Map Archive, from finding the maps to showing them to people, with what is done and what is open at each step">
+svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {H_TOTAL}" width="{WIDTH}" role="img" aria-label="Five steps a map goes through in the Vietnam Map Archive, from finding the maps to showing them to people, with what is done and what is open at each step">
 <style>{css}</style>
 <defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--fg)"/></marker></defs>
 <rect width="{WIDTH}" height="{H_TOTAL}" fill="var(--bg)"/>
