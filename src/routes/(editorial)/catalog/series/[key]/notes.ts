@@ -69,6 +69,11 @@ export const SERIES_NOTES: Record<string, SeriesNote> = {
         label: 'Scans come from',
         value: 'IGN scans catalogued through CartoMundi and deposited in Nakala.',
       },
+      {
+        label: 'Sheet list',
+        value:
+          "CartoMundi's catalogue: 843 records, which group into 220 numbered cells. A cell with no digitised copy is listed as not held. Seventeen cells have only one of their two half-sheets catalogued; the other half is listed as not held, its position inferred from the half that is. Sheet 155 is not in the catalogue at all and is listed as not held, placed in the one cell-sized space between 154 and 156. CartoMundi's own extents for 154 and for the east half of 157 repeat those of 153 and 156, and are moved one cell east. A number the catalogue never lists and that leaves no gap is not counted, so the list is the catalogue's census and not necessarily the survey's.",
+      },
     ],
   },
 

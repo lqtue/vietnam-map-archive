@@ -11,9 +11,10 @@
   import DataTable from '$lib/ui/DataTable.svelte';
   import { matchesAllTerms } from '$lib/core/utils/unaccent';
   import { applySort, type SortState } from '$lib/core/utils/tableSort';
-  import { cellCamera, printing } from '$lib/data/maps/seriesSheets';
+  import { cellCamera, hasDenominator, printing } from '$lib/data/maps/seriesSheets';
+  import SeriesCoverageMap from '$lib/features/catalog/SeriesCoverageMap.svelte';
   import type { PageData } from './$types';
-  import type { SeriesSheetView } from '$lib/data/maps/seriesSheets';
+  import type { SeriesSheetView, SheetStatus } from '$lib/data/maps/seriesSheets';
   import type { SeriesNote } from './notes';
 
   export let data: PageData;
@@ -37,9 +38,10 @@
 
   // Fit the sheets this archive actually serves. `map_series.bounds` only
   // covers the nine catalogue rows of L7014, not its larger raster mosaic.
-  $: heldBoxes = sheets
-    .filter((sheet) => sheet.status === 'held' && sheet.bbox?.length === 4)
-    .map((sheet) => sheet.bbox as number[]);
+  $: coverage = data.coverage as { bbox: number[] | null; status: SheetStatus }[];
+  $: heldBoxes = coverage
+    .filter((cell) => cell.status === 'held' && cell.bbox?.length === 4)
+    .map((cell) => cell.bbox as number[]);
   $: mapBounds = heldBoxes.length
     ? [
         Math.min(...heldBoxes.map((box) => box[0])),
@@ -76,6 +78,7 @@
       : `${Math.min(...years)}–${Math.max(...years)}`
     : '';
 
+  $: known = hasDenominator(counts);
   $: pct = counts.total ? Math.round((counts.held / counts.total) * 100) : 0;
 
   const STATUS_LABEL: Record<string, string> = {
@@ -266,43 +269,62 @@
 
   <section class="section-card coverage">
     <h2>Coverage</h2>
-    <p class="lead">
-      The archive holds <strong>{counts.held}</strong> of this survey's
-      <strong>{counts.total}</strong> sheets — {pct}%.
-    </p>
+    {#if known}
+      <p class="lead">
+        The archive holds <strong>{counts.held}</strong> of this survey's
+        <strong>{counts.total}</strong> sheets — {pct}%.
+      </p>
+    {:else}
+      <p class="lead">
+        The archive holds <strong>{counts.held}</strong> sheets of this survey. Its full sheet list is
+        not imported yet, so how much that is of the whole is not known.
+      </p>
+    {/if}
+    <!-- Where the cells sit, tinted like the bar below. A held-only index still
+         draws: it is the footprint of what the archive has. -->
+    <div class="cov-map">
+      <SeriesCoverageMap
+        cells={coverage}
+        seriesKey={series.key}
+        label="{series.name}: where the sheets are"
+      />
+    </div>
+    <p class="cov-credit">Basemap © OpenStreetMap contributors, Protomaps</p>
     <!-- A bar rather than three numbers: the point of this page is the shape of
          what is missing, and three integers do not have a shape. -->
-    <div
-      class="bar"
-      role="img"
-      aria-label="{counts.held} held, {counts.obtainable} located elsewhere but not served, {counts.no_scan} with no known scan"
-    >
-      <span class="seg is-held" style:flex-grow={counts.held}></span>
-      <span class="seg is-obtainable" style:flex-grow={counts.obtainable}></span>
-      <span class="seg is-none" style:flex-grow={counts.no_scan}></span>
-    </div>
-    <ul class="legend">
-      <li><span class="dot is-held"></span>{counts.held} held</li>
-      <!-- "not yet fetched" was false for 116 of L7014's 123: 73 are PCL GeoPDFs
+    {#if known}
+      <div
+        class="bar"
+        role="img"
+        aria-label="{counts.held} held, {counts.obtainable} located elsewhere but not served, {counts.no_scan} with no known scan"
+      >
+        <span class="seg is-held" style:flex-grow={counts.held}></span>
+        <span class="seg is-obtainable" style:flex-grow={counts.obtainable}></span>
+        <span class="seg is-none" style:flex-grow={counts.no_scan}></span>
+      </div>
+      <ul class="legend">
+        <li><span class="dot is-held"></span>{counts.held} held</li>
+        <!-- "not yet fetched" was false for 116 of L7014's 123: 73 are PCL GeoPDFs
            that carry no usable georeference and 43 are Texas Tech scans already
            mirrored. What those cells lack is not the pixels, it is a place on
            the ground — 083's three states have no term for a scan held and
            unplaceable, so the wording claimed the one thing it could say, and
            sent the next reader to download files the archive already has. -->
-      <li>
-        <span class="dot is-obtainable"></span>{counts.obtainable} scan located elsewhere, not served
-        here
-      </li>
-      <li><span class="dot is-none"></span>{counts.no_scan} no known scan</li>
-    </ul>
+        <li>
+          <span class="dot is-obtainable"></span>{counts.obtainable} scan located elsewhere, not served
+          here
+        </li>
+        <li><span class="dot is-none"></span>{counts.no_scan} no known scan</li>
+      </ul>
+    {/if}
   </section>
 
   <div class="sheet-tools">
     <label class="sb-search is-page">
-      <span class="sr-only">Search this survey</span>
       <input
         class="sb-search-input"
         type="search"
+        aria-label="Search this survey"
         bind:value={q}
         placeholder="Search by sheet number, name or source…"
       />
@@ -529,6 +551,15 @@
     border-radius: 999px;
     overflow: hidden;
     background: var(--color-border);
+  }
+  .cov-map {
+    height: clamp(320px, 65vh, 640px);
+  }
+  .cov-credit {
+    margin: var(--space-1) 0 var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    text-align: right;
   }
   .seg {
     display: block;

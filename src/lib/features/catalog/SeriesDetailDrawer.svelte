@@ -19,7 +19,7 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-  import { cellCamera } from '$lib/data/maps/seriesSheets';
+  import { cellCamera, hasDenominator } from '$lib/data/maps/seriesSheets';
   import type { SeriesIndexEntry } from '$lib/data/maps/seriesIndex';
 
   export let series: SeriesIndexEntry | null = null;
@@ -39,6 +39,7 @@
   onDestroy(() => typeof window !== 'undefined' && window.removeEventListener('keydown', onKey));
 
   $: counts = series?.index ?? { total: 0, held: 0, obtainable: 0, no_scan: 0 };
+  $: known = hasDenominator(counts);
   $: pct = counts.total ? Math.round((counts.held / counts.total) * 100) : 0;
 
   /**
@@ -97,32 +98,41 @@
 
     <section class="coverage">
       <p class="lead">
-        {$t('The archive holds {held} of this survey’s {total} sheets — {pct}%.', {
-          held: counts.held,
-          total: counts.total,
-          pct,
-        })}
-      </p>
-      <!-- A bar rather than three numbers: the point of a survey page is the
-           shape of what is missing, and three integers do not have a shape. -->
-      <div
-        class="bar"
-        role="img"
-        aria-label="{counts.held} held, {counts.obtainable} identified but not fetched, {counts.no_scan} with no known scan"
-      >
-        <span class="seg is-held" style:flex-grow={counts.held}></span>
-        <span class="seg is-obtainable" style:flex-grow={counts.obtainable}></span>
-        <span class="seg is-none" style:flex-grow={counts.no_scan}></span>
-      </div>
-      <ul class="legend">
-        <li><span class="dot is-held"></span>{$t('{N} held', { N: counts.held })}</li>
-        <li>
-          <span class="dot is-obtainable"></span>{$t('{N} scan identified, not yet fetched', {
-            N: counts.obtainable,
+        {#if known}
+          {$t('The archive holds {held} of this survey’s {total} sheets — {pct}%.', {
+            held: counts.held,
+            total: counts.total,
+            pct,
           })}
-        </li>
-        <li><span class="dot is-none"></span>{$t('{N} no known scan', { N: counts.no_scan })}</li>
-      </ul>
+        {:else}
+          {$t(
+            'The archive holds {held} sheets of this survey. Its full sheet list is not imported yet, so how much that is of the whole is not known.',
+            { held: counts.held }
+          )}
+        {/if}
+      </p>
+      {#if known}
+        <!-- A bar rather than three numbers: the point of a survey page is the
+           shape of what is missing, and three integers do not have a shape. -->
+        <div
+          class="bar"
+          role="img"
+          aria-label="{counts.held} held, {counts.obtainable} identified but not fetched, {counts.no_scan} with no known scan"
+        >
+          <span class="seg is-held" style:flex-grow={counts.held}></span>
+          <span class="seg is-obtainable" style:flex-grow={counts.obtainable}></span>
+          <span class="seg is-none" style:flex-grow={counts.no_scan}></span>
+        </div>
+        <ul class="legend">
+          <li><span class="dot is-held"></span>{$t('{N} held', { N: counts.held })}</li>
+          <li>
+            <span class="dot is-obtainable"></span>{$t('{N} scan identified, not yet fetched', {
+              N: counts.obtainable,
+            })}
+          </li>
+          <li><span class="dot is-none"></span>{$t('{N} no known scan', { N: counts.no_scan })}</li>
+        </ul>
+      {/if}
     </section>
 
     <dl class="meta">

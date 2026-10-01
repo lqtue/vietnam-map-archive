@@ -13,11 +13,18 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import type { MapListItem } from '$lib/data/maps/types';
+import type { SeriesIndexEntry } from '$lib/data/maps/seriesIndex';
 import { fetchMapsByIds } from '$lib/data/maps/service';
 import { fetchFavorites } from '$lib/data/supabase/favorites';
 import { annotationUrlForSource } from '$lib/core/iiif/annotationUrl';
 
 type Client = SupabaseClient<Database>;
+
+/** A survey standing in the front page's strip, with one of its own scans as the picture. */
+export interface FeaturedSeries {
+  entry: SeriesIndexEntry;
+  thumbnail?: string;
+}
 
 export interface HomeFavorites {
   maps: MapListItem[];
