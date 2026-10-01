@@ -379,4 +379,21 @@ to be dry, but they are the owner's to call: a confirmed answer is a point in `c
 80 points, seed 1, `label.py points 1898 --seed 1 --per 8 --edge water-b7ff0618.png --edge-per 10
 --band 30`: 8 uniform in each of the five heldout windows and 10 within 30 px of the proposal's
 edge in each that has one (`quay_canal`, `creek_north`, `bridge_label`, `hatched_bank`: 18 each;
-`dry_salmon` has no edge, 8). Not viewed, not served, not scored. **Batch 1 pending owner labels.**
+`dry_salmon` has no edge, 8). Owner-labelled 2026-10-02; 2 unsure dropped. The pass is v3 with the 1898 ruling and `structure`
+settings, `water-b7ff0618.png`, scored once; nothing in 1898 was tuned on these points.
+
+| 1898 batch 1 | accuracy | missed water | false water |
+|---|---|---|---|
+| all (heldout) | **97.4% [91-99] (76/78)** | 0/28 | 2/50 (4.0%) |
+| edge stratum | 94.7% [83-99] (36/38) | 0/18 | 2/20 |
+| uniform | 100% [91-100] (40/40) | 0/10 | 0/30 |
+| `quay` | 97.1% (33/34) | 0/13 | 1/21 |
+| `creek` | 94.4% (17/18) | 0/5 | 1/13 |
+| `bridge_gap`, `dry_land` | 100% (18/18, 8/8) | | |
+
+Both errors are false water 4 and 9 px outward of the proposal's edge: edge placement, not a missed
+or invented body. 1898 reaches the 1882 level (96.5% on its first batch) with only the ruling
+period and angle changed plus the black-hatch `structure` step. The 7 review bodies are still
+unanswered by the owner; scoring counts them as not water, and no labelled point fell in one.
+Not done: the narrow creek heads, the hatched "Canal de ceinture", a fresh 1898 batch after any
+edge fix. No layer is approved.
