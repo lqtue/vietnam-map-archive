@@ -1,7 +1,7 @@
 """Score river proposals against hand traces, per window, case and sheet.
 
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py <proposal_dir> [--layer road]
-    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road]
+    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road] [--seed N]
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py --selfcheck
 
 --points scores against the point labels (label.py), the reference that replaced tracing on
@@ -103,8 +103,9 @@ def wilson(k, n, z=1.96):
     return f"{100 * p:.1f}% [{max(0, 100 * (c - h)):.0f}-{min(100, 100 * (c + h)):.0f}] ({k}/{n})"
 
 
-def points(sheet, mask_path, layer="water"):
-    """Score a whole-sheet mask (255 = positive) against labels/<sheet>.jsonl; unsure points dropped."""
+def points(sheet, mask_path, layer="water", seed=None):
+    """Score a whole-sheet mask (255 = positive) against labels/<sheet>.jsonl; unsure points dropped.
+    seed = one batch only: a version is scored honestly only on a batch nothing was tuned or scored on."""
     Image.MAX_IMAGE_PIXELS = None
     mask = np.array(Image.open(mask_path)) == 255
     pts = {p["id"]: p for p in json.loads((HERE / f"points-{sheet}.json").read_text())}
@@ -115,9 +116,9 @@ def points(sheet, mask_path, layer="water"):
     win = {w["id"]: w for w in json.loads((HERE / "windows.json").read_text())["windows"] if w["sheet"] == sheet}
     groups = defaultdict(list)
     for pid, lab in labels.items():
-        if lab == "unsure":
-            continue
         p = pts[pid]
+        if lab == "unsure" or (seed is not None and p["seed"] != seed):
+            continue
         w = win[p["window"]]
         truth, pred = lab == layer, bool(mask[p["y"], p["x"]])
         # how far a wrong point sits from the proposal's edge, px: small = edge placement, large = a missed body
@@ -127,7 +128,7 @@ def points(sheet, mask_path, layer="water"):
             crop = mask[max(0, p["y"] - r):p["y"] + r + 1, max(0, p["x"] - r):p["x"] + r + 1]
             cy, cx = min(r, p["y"]), min(r, p["x"])
             far = float(distance_transform_edt(crop == pred)[cy, cx]) if (crop != pred).any() else float(r)
-        for key in ("all", f"{w['split']}{'*' if w['seen'] else ''}", w["case"]):
+        for key in ("all", f"{w['split']}{'*' if w['seen'] else ''}", w["case"], f"stratum:{p['stratum']}"):
             groups[key].append((truth, pred, far))
     print(f"[{layer}] {sheet}: {len(labels)} labelled, {sum(v == 'unsure' for v in labels.values())} unsure dropped")
     print("group  accuracy [95% CI]  |  missed (of true)  |  false (of not-true)  |  wrong points: px to edge")
@@ -169,6 +170,7 @@ if __name__ == "__main__":
     if a == ["--selfcheck"]:
         selfcheck()
     elif a[:1] == ["--points"]:
-        points(a[1], a[2], a[a.index("--layer") + 1] if "--layer" in a else "water")
+        points(a[1], a[2], a[a.index("--layer") + 1] if "--layer" in a else "water",
+               int(a[a.index("--seed") + 1]) if "--seed" in a else None)
     else:
         main(a[0], a[a.index("--layer") + 1] if "--layer" in a else "water")

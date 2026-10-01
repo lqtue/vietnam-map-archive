@@ -2398,5 +2398,1361 @@
 "window": "blue_domain",
 "stratum": "uniform",
 "seed": 1
+},
+{
+"id": "1882-0300",
+"x": 7878,
+"y": 6783,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0301",
+"x": 7870,
+"y": 6769,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0302",
+"x": 6957,
+"y": 5993,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0303",
+"x": 6986,
+"y": 6269,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0304",
+"x": 7470,
+"y": 6338,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0305",
+"x": 6970,
+"y": 6501,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0306",
+"x": 7391,
+"y": 6424,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0307",
+"x": 7281,
+"y": 6380,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0308",
+"x": 7408,
+"y": 6195,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0309",
+"x": 7281,
+"y": 6329,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0310",
+"x": 7545,
+"y": 6643,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0311",
+"x": 7003,
+"y": 6607,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0312",
+"x": 7305,
+"y": 6823,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0313",
+"x": 7072,
+"y": 6585,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0314",
+"x": 7011,
+"y": 6661,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0315",
+"x": 7206,
+"y": 6793,
+"window": "arsenal_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0316",
+"x": 4574,
+"y": 3736,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0317",
+"x": 5191,
+"y": 3728,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0318",
+"x": 4672,
+"y": 4176,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0319",
+"x": 4626,
+"y": 4089,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0320",
+"x": 2633,
+"y": 5713,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0321",
+"x": 3105,
+"y": 5338,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0322",
+"x": 2368,
+"y": 5373,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0323",
+"x": 2381,
+"y": 5041,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0324",
+"x": 2414,
+"y": 5123,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0325",
+"x": 2672,
+"y": 4861,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0326",
+"x": 2810,
+"y": 5066,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0327",
+"x": 2852,
+"y": 5246,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0328",
+"x": 2769,
+"y": 5063,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0329",
+"x": 2311,
+"y": 5030,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0330",
+"x": 2993,
+"y": 5583,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0331",
+"x": 2585,
+"y": 5584,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0332",
+"x": 2530,
+"y": 5307,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0333",
+"x": 2653,
+"y": 5590,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0334",
+"x": 3048,
+"y": 5672,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0335",
+"x": 2840,
+"y": 5071,
+"window": "chinois_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0336",
+"x": 4415,
+"y": 3056,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0337",
+"x": 4315,
+"y": 3024,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0338",
+"x": 4252,
+"y": 3137,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0339",
+"x": 4428,
+"y": 3530,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0340",
+"x": 4100,
+"y": 2836,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0341",
+"x": 3756,
+"y": 2926,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0342",
+"x": 4160,
+"y": 2832,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0343",
+"x": 4152,
+"y": 2835,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0344",
+"x": 3970,
+"y": 2864,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0345",
+"x": 3925,
+"y": 2742,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0346",
+"x": 3919,
+"y": 2849,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0347",
+"x": 3887,
+"y": 2870,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0348",
+"x": 3778,
+"y": 2963,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0349",
+"x": 3779,
+"y": 2898,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0350",
+"x": 4096,
+"y": 2788,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0351",
+"x": 3980,
+"y": 2881,
+"window": "creek_nw",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0352",
+"x": 10085,
+"y": 6447,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0353",
+"x": 10310,
+"y": 6012,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0354",
+"x": 10327,
+"y": 6351,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0355",
+"x": 10615,
+"y": 5862,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0356",
+"x": 9816,
+"y": 6257,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0357",
+"x": 9940,
+"y": 5961,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0358",
+"x": 9862,
+"y": 5968,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0359",
+"x": 9947,
+"y": 5892,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0360",
+"x": 10244,
+"y": 6107,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0361",
+"x": 10394,
+"y": 6093,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0362",
+"x": 9954,
+"y": 5963,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0363",
+"x": 10406,
+"y": 5994,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0364",
+"x": 9801,
+"y": 6254,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0365",
+"x": 10007,
+"y": 5809,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0366",
+"x": 9942,
+"y": 5878,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0367",
+"x": 10283,
+"y": 5714,
+"window": "bridge_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0368",
+"x": 9297,
+"y": 7729,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0369",
+"x": 9031,
+"y": 7074,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0370",
+"x": 9191,
+"y": 7733,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0371",
+"x": 8891,
+"y": 7116,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0372",
+"x": 8880,
+"y": 7479,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0373",
+"x": 8914,
+"y": 7769,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0374",
+"x": 8768,
+"y": 7786,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0375",
+"x": 8859,
+"y": 7773,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0376",
+"x": 9152,
+"y": 7630,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0377",
+"x": 8535,
+"y": 7492,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0378",
+"x": 8419,
+"y": 7335,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0379",
+"x": 9135,
+"y": 7750,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0380",
+"x": 8583,
+"y": 7779,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0381",
+"x": 8676,
+"y": 7573,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0382",
+"x": 9090,
+"y": 6969,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0383",
+"x": 9150,
+"y": 7534,
+"window": "arsenal_basin",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0384",
+"x": 4443,
+"y": 5008,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0385",
+"x": 4629,
+"y": 5834,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0386",
+"x": 3895,
+"y": 5762,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0387",
+"x": 3808,
+"y": 5060,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0388",
+"x": 3948,
+"y": 5908,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0389",
+"x": 4525,
+"y": 5204,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0390",
+"x": 4248,
+"y": 5499,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0391",
+"x": 3873,
+"y": 5932,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0392",
+"x": 4399,
+"y": 5441,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0393",
+"x": 4546,
+"y": 5279,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0394",
+"x": 3937,
+"y": 5837,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0395",
+"x": 4352,
+"y": 5313,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0396",
+"x": 4230,
+"y": 5490,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0397",
+"x": 4290,
+"y": 5464,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0398",
+"x": 4290,
+"y": 5418,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0399",
+"x": 4487,
+"y": 5222,
+"window": "charner_canal",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0400",
+"x": 10633,
+"y": 3919,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0401",
+"x": 10934,
+"y": 3777,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0402",
+"x": 10232,
+"y": 3058,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0403",
+"x": 10571,
+"y": 3368,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0404",
+"x": 10643,
+"y": 3196,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0405",
+"x": 10331,
+"y": 3257,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0406",
+"x": 10764,
+"y": 3796,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0407",
+"x": 10894,
+"y": 3035,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0408",
+"x": 10951,
+"y": 3082,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0409",
+"x": 10760,
+"y": 3134,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0410",
+"x": 10866,
+"y": 3069,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0411",
+"x": 10808,
+"y": 3037,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0412",
+"x": 10819,
+"y": 3049,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0413",
+"x": 10899,
+"y": 3916,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0414",
+"x": 10855,
+"y": 3033,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0415",
+"x": 10478,
+"y": 3360,
+"window": "avalanche_head",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0416",
+"x": 8861,
+"y": 3830,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0417",
+"x": 9432,
+"y": 4658,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0418",
+"x": 8760,
+"y": 4452,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0419",
+"x": 8788,
+"y": 4235,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0420",
+"x": 5508,
+"y": 5501,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0421",
+"x": 5194,
+"y": 6103,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0422",
+"x": 4844,
+"y": 6313,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0423",
+"x": 5053,
+"y": 5655,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0424",
+"x": 4837,
+"y": 6120,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0425",
+"x": 4804,
+"y": 6104,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0426",
+"x": 5308,
+"y": 6163,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0427",
+"x": 5761,
+"y": 6295,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0428",
+"x": 5364,
+"y": 6193,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0429",
+"x": 5500,
+"y": 6195,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0430",
+"x": 5487,
+"y": 6224,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0431",
+"x": 5568,
+"y": 6225,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0432",
+"x": 5163,
+"y": 6138,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0433",
+"x": 5154,
+"y": 6157,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0434",
+"x": 5415,
+"y": 6162,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0435",
+"x": 5318,
+"y": 6179,
+"window": "quay_rondpoint",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0436",
+"x": 2231,
+"y": 2715,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0437",
+"x": 2659,
+"y": 2964,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0438",
+"x": 2984,
+"y": 3019,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0439",
+"x": 2957,
+"y": 2446,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0440",
+"x": 2510,
+"y": 3380,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0441",
+"x": 2658,
+"y": 3391,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0442",
+"x": 2672,
+"y": 3369,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0443",
+"x": 2623,
+"y": 3397,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0444",
+"x": 2646,
+"y": 3376,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0445",
+"x": 2523,
+"y": 3363,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0446",
+"x": 2632,
+"y": 3384,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0447",
+"x": 2525,
+"y": 3364,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0448",
+"x": 2520,
+"y": 3353,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0449",
+"x": 2612,
+"y": 3395,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0450",
+"x": 2509,
+"y": 3367,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0451",
+"x": 2493,
+"y": 3391,
+"window": "outskirts_rail",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "../../ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/river/water.png"
+},
+{
+"id": "1882-0452",
+"x": 8398,
+"y": 5227,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0453",
+"x": 8235,
+"y": 4847,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0454",
+"x": 8249,
+"y": 4965,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1882-0455",
+"x": 8168,
+"y": 5320,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 2
 }
 ]

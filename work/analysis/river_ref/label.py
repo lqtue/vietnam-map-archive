@@ -2,6 +2,9 @@
 
   label.py points SHEET [--per 25] [--seed 1]   random points in the sheet's heldout windows,
                                                 appended to points-<sheet>.json (stratum "uniform")
+           [--edge MASK --edge-per 12 --band 30]  plus points near MASK's water edge (stratum "edge")
+                                                A batch is a seed; score a new version on a batch it
+                                                has not been scored on (score.py --seed).
   label.py serve SHEET [--port 8791]            labelling page at http://127.0.0.1:8791
 
 The page shows each point as a crosshair on the native raster, close up and in context. It never
@@ -23,19 +26,37 @@ CLASSES = {"w": "water", "r": "road", "l": "land", "s": "unsure"}
 CLOSE, CONTEXT = 120, 900   # source px either side shown; close-up at 4x, context at 1/2
 
 
-def points(sheet, per, seed):
+def points(sheet, per, seed, edge=None, edge_per=0, band=30):
+    """A batch is a seed. --edge MASK adds edge_per points per window within `band` px of that mask's
+    water edge (either side), where wrong edges live; a window with no edge gets none."""
     path = HERE / f"points-{sheet}.json"
     pts = json.loads(path.read_text()) if path.exists() else []
+    if any(p["seed"] == seed for p in pts):
+        sys.exit(f"seed {seed} already used: a batch is a seed, pick a new one")
     rng = random.Random(seed)
     wins = [w for w in json.loads((HERE / "windows.json").read_text())["windows"]
             if w["sheet"] == sheet and w["split"] == "heldout"]
+    if edge:
+        import numpy as np
+        from PIL import Image
+        from scipy.ndimage import distance_transform_edt
+        Image.MAX_IMAGE_PIXELS = None
+        water = np.asarray(Image.open(edge)) == 255
+    add = lambda w, x, y, stratum: pts.append({"id": f"{sheet}-{len(pts):04d}", "x": x, "y": y, "window": w["id"],
+                                               "stratum": stratum, "seed": seed, **({"edge_of": str(edge)} if stratum == "edge" else {})})
     for w in wins:
         x, y, bw, bh = w["box"]
         for _ in range(per):
-            pts.append({"id": f"{sheet}-{len(pts):04d}", "x": x + rng.randrange(bw), "y": y + rng.randrange(bh),
-                        "window": w["id"], "stratum": "uniform", "seed": seed})
+            add(w, x + rng.randrange(bw), y + rng.randrange(bh), "uniform")
+        if edge and edge_per:
+            m = water[y:y + bh, x:x + bw]
+            ys = xs = ()
+            if m.any() and not m.all():   # distance to the other side, inside water and out
+                ys, xs = np.nonzero(np.where(m, distance_transform_edt(m), distance_transform_edt(~m)) <= band)
+            for i in rng.sample(range(len(ys)), min(edge_per, len(ys))):
+                add(w, x + int(xs[i]), y + int(ys[i]), "edge")
     path.write_text(json.dumps(pts, indent=0) + "\n")
-    print(f"{len(pts)} points in {path.name} ({len(wins)} heldout windows)")
+    print(f"{len(pts)} points in {path.name}; seed {seed}: {sum(p['seed'] == seed for p in pts)} new")
 
 
 def latest(sheet):
@@ -123,7 +144,8 @@ if __name__ == "__main__":
     a = sys.argv[1:]
     opt = lambda k, d: int(a[a.index(k) + 1]) if k in a else d
     if a[:1] == ["points"] and len(a) >= 2:
-        points(a[1], opt("--per", 25), opt("--seed", 1))
+        points(a[1], opt("--per", 25), opt("--seed", 1), a[a.index("--edge") + 1] if "--edge" in a else None,
+               opt("--edge-per", 0), opt("--band", 30))
     elif a[:1] == ["serve"] and len(a) >= 2:
         serve(a[1], opt("--port", 8791))
     else:
