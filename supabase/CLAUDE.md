@@ -28,8 +28,27 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **102**, live in production (verified 2026-10-01 via
-`supabase migration list`). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
+Head is **104**, pushed 2026-10-01 (103 too: `supabase migration list` shows both on both sides). 104 adds
+`maps.series_key`, a generated column (`series_key(collection)`, mig 082's function), and rebuilds
+`map_series` on it. The series coverage page and `fetchSheetEditions` now filter on it, so an app
+deployed ahead of the push would have answered 500 on every `/catalog/series/<key>` — and the read-only suite,
+which reads production, fails the same way until it lands. 104 also copies `extra_metadata.sheet_number`
+/ `sheet_half` into their typed columns for the 188 first-edition rows 095's one-off backfill missed;
+`ingest_indochine_100k_nakala.mjs` now writes the columns itself. `collection` is still the only
+input: the key is not independent of the label until a `series` table exists (`series-identity`).
+Regenerate types after the push (104's `series_key` was hand-typed, Row only).
+
+103 (pushed; its routes record a
+row after writing each history file and answer 500 if the table is missing, so an app deployed
+ahead of the migration fails every publish, sync and neatline save *after* its history file is
+already written — the reverse of 101's order). 102 is live in production (verified 2026-10-01 via
+`supabase migration list`). 103 adds `georef_versions` (anon/authenticated lose `user_id`, as 101 did for footprints), one row per stored georeference version
+(`annotations/<map>/<stamp>.json`), and the `map_georef_current` view (newest stamp per map). Every
+writer records its row right after the history file and before the live file moves:
+`mirrorAnnotation`, the neatline `PATCH`, `sync_district4_annotations.mjs`. `geom_src` comes from
+`$lib/core/georef/version.ts`, the one hash implementation, which the scripts import by path. After
+the push, run `node --env-file=.env scripts/backfill_georef_versions.mjs --apply` to record what
+Storage already holds, and regenerate the types (103's were hand-typed). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
 trigger function 097 added and 099 missed. 101 narrows `map_images` and `map_slug_aliases`'s read policies from
 "published or any signed-in user" to "published, the map's creator, or staff" — the two
 draft-visibility gates copying 063's wording that nothing non-staff actually reads that broadly —
@@ -98,7 +117,7 @@ password; use the Dashboard SQL Editor or `db push` instead of pulling. Repair m
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 33 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 37 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done

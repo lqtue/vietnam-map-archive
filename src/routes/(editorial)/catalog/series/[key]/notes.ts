@@ -29,6 +29,49 @@ export interface SeriesNote {
 }
 
 export const SERIES_NOTES: Record<string, SeriesNote> = {
+  'indochine-1-100-000-1st-edition-sgi-1900-1947': {
+    summary: [
+      "The first edition of the Service Géographique de l'Indochine's 1:100,000 survey, issued from 1900 to 1947. It is the earlier part of the mapping programme continued by the second edition.",
+      'Many numbered cells were printed as separate western and eastern half-sheets. The index groups those halves under one cell and shows which scans the archive holds.',
+    ],
+    facts: [
+      { label: 'Made by', value: "Service Géographique de l'Indochine." },
+      { label: 'Dates', value: '1900–1947.' },
+      {
+        label: 'Sheet numbers',
+        value: 'A number identifies a cell; East and West identify its two possible half-sheets.',
+      },
+      {
+        label: 'Scans come from',
+        value: 'IGN scans catalogued through CartoMundi and deposited in Nakala.',
+      },
+    ],
+  },
+
+  'indochine-1-100-000-2nd-edition-sgi-1947-1959': {
+    summary: [
+      "The second edition of the Service Géographique de l'Indochine's 1:100,000 survey, issued from 1947 to 1959 and also catalogued as L 605. It follows the earlier edition with new and revised printings across Indochina.",
+      'Some sheets are civil editions; others carry military grid and bilingual overprints. A numbered cell may have western and eastern halves, or several printings. The index brings their scans together without treating each half as a separate place.',
+    ],
+    facts: [
+      { label: 'Made by', value: "Service Géographique de l'Indochine." },
+      { label: 'Dates', value: '1947–1959.' },
+      {
+        label: 'Sheet numbers',
+        value: 'A number identifies a cell; East and West identify its two possible half-sheets.',
+      },
+      {
+        label: 'Editions',
+        value:
+          'Civil sheets and military overprints appear in the same series; some cells have more than one printing.',
+      },
+      {
+        label: 'Scans come from',
+        value: 'IGN scans catalogued through CartoMundi and deposited in Nakala.',
+      },
+    ],
+  },
+
   'series-l7014-vietnam-1-50-000': {
     summary: [
       'The standard tactical sheet of the Vietnam War: U.S. Army Map Service 1:50,000 topographic coverage, printed in English and Vietnamese, with relief by contour and spot height in metres and hydrography by contour and sounding.',

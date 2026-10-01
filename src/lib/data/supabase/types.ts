@@ -243,6 +243,75 @@ export type Database = {
           },
         ]
       }
+      georef_versions: {
+        Row: {
+          allmaps_id: string | null
+          created_at: string
+          gcp_count: number
+          geom_src: string
+          id: string
+          map_id: string
+          origin: string
+          rmse_m: number | null
+          rmse_method: string
+          source_height: number | null
+          source_id: string | null
+          source_width: number | null
+          stamp: string
+          transformation: string
+          user_id: string | null
+        }
+        Insert: {
+          allmaps_id?: string | null
+          created_at?: string
+          gcp_count: number
+          geom_src: string
+          id?: string
+          map_id: string
+          origin: string
+          rmse_m?: number | null
+          rmse_method: string
+          source_height?: number | null
+          source_id?: string | null
+          source_width?: number | null
+          stamp: string
+          transformation: string
+          user_id?: string | null
+        }
+        Update: {
+          allmaps_id?: string | null
+          created_at?: string
+          gcp_count?: number
+          geom_src?: string
+          id?: string
+          map_id?: string
+          origin?: string
+          rmse_m?: number | null
+          rmse_method?: string
+          source_height?: number | null
+          source_id?: string | null
+          source_width?: number | null
+          stamp?: string
+          transformation?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       label_pins: {
         Row: {
           created_at: string | null
@@ -474,6 +543,7 @@ export type Database = {
           publisher: string | null
           rights: string | null
           search_vector: unknown
+          series_key: string | null
           sheet_half: string | null
           sheet_number: string | null
           shelfmark: string | null
@@ -1307,6 +1377,40 @@ export type Database = {
           },
           {
             foreignKeyName: "footprint_submissions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_georef_current: {
+        Row: {
+          allmaps_id: string | null
+          created_at: string | null
+          gcp_count: number | null
+          geom_src: string | null
+          id: string | null
+          map_id: string | null
+          origin: string | null
+          rmse_m: number | null
+          rmse_method: string | null
+          source_height: number | null
+          source_id: string | null
+          source_width: number | null
+          stamp: string | null
+          transformation: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"

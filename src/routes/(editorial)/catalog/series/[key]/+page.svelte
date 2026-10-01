@@ -6,11 +6,12 @@
   627 was the claim this page exists to replace.
 -->
 <script lang="ts">
+  import { t } from '$lib/core/i18n';
   import PageHero from '$lib/ui/PageHero.svelte';
   import DataTable from '$lib/ui/DataTable.svelte';
   import { matchesAllTerms } from '$lib/core/utils/unaccent';
   import { applySort, type SortState } from '$lib/core/utils/tableSort';
-  import { printing } from '$lib/data/maps/seriesSheets';
+  import { cellCamera, printing } from '$lib/data/maps/seriesSheets';
   import type { PageData } from './$types';
   import type { SeriesSheetView } from '$lib/data/maps/seriesSheets';
   import type { SeriesNote } from './notes';
@@ -24,6 +25,7 @@
     published_sheets: number;
     first_year: number | null;
     last_year: number | null;
+    bounds: number[] | null;
   };
   $: sheets = data.sheets as SeriesSheetView[];
   $: counts = data.counts as {
@@ -32,6 +34,25 @@
     obtainable: number;
     no_scan: number;
   };
+
+  // Fit the sheets this archive actually serves. `map_series.bounds` only
+  // covers the nine catalogue rows of L7014, not its larger raster mosaic.
+  $: heldBoxes = sheets
+    .filter((sheet) => sheet.status === 'held' && sheet.bbox?.length === 4)
+    .map((sheet) => sheet.bbox as number[]);
+  $: mapBounds = heldBoxes.length
+    ? [
+        Math.min(...heldBoxes.map((box) => box[0])),
+        Math.min(...heldBoxes.map((box) => box[1])),
+        Math.max(...heldBoxes.map((box) => box[2])),
+        Math.max(...heldBoxes.map((box) => box[3])),
+      ]
+    : series.bounds;
+  $: camera = mapBounds ? cellCamera(mapBounds) : null;
+  $: mapHref = camera
+    ? `/explore?series=${encodeURIComponent(series.key)}&solo=1` +
+      `#@${camera.lat.toFixed(4)},${camera.lng.toFixed(4)},${camera.zoom}z,0r`
+    : `/explore?series=${encodeURIComponent(series.key)}&solo=1`;
 
   /**
    * The span of the survey, read off the sheets themselves.
@@ -174,13 +195,6 @@
   };
 
   /**
-   * A stable `{#each}` key. The record URL is unique and is what every held
-   * printing has; an externally-known printing may have none, and then the
-   * institution, year and half are what tell it from its siblings.
-   */
-  const printingKey = (p: SheetPrinting) => p.url ?? `${p.institution}|${p.year}|${p.part}`;
-
-  /**
    * The years behind a cell whose own `series_sheets` row records no printing.
    *
    * Every half-sheet cell is in that state — migration 086's backfill follows
@@ -217,7 +231,9 @@
 <PageHero
   title={series.name}
   sub={span ? `${counts.total} sheets · ${span}` : `${counts.total} sheets`}
-/>
+>
+  <a slot="actions" class="btn is-lg is-primary" href={mapHref}>{$t('Open in map')}</a>
+</PageHero>
 
 <div class="page-wrap">
   {#if note}
@@ -226,7 +242,7 @@
          the coverage bar answers a question they have not asked yet. -->
     <section class="section-card about">
       <h2>About this survey</h2>
-      {#each note.summary as para}
+      {#each note.summary as para (para)}
         <p class="lead">{para}</p>
       {/each}
 
@@ -350,7 +366,7 @@
               </summary>
 
               <ul class="printings">
-                {#each heldHere as p (printingKey(p))}
+                {#each heldHere as p, i (i)}
                   <li>
                     <span class="p-when"
                       >{p.year ?? '—'}{p.edition ? ` · ed. ${p.edition}` : ''}</span
@@ -372,7 +388,7 @@
               {#if elsewhere.length}
                 <p class="p-head">Known elsewhere</p>
                 <ul class="printings">
-                  {#each elsewhere as p (printingKey(p))}
+                  {#each elsewhere as p, i (i)}
                     <li>
                       <span class="p-when"
                         >{p.year ?? '—'}{p.edition ? ` · ed. ${p.edition}` : ''}</span

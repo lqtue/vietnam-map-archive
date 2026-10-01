@@ -43,6 +43,12 @@ Five months, one corpus, one sheet carrying almost all of the evidence.
 claim from *that sheet* — and it is not the archive's floor: the 1942 sheet, which carries 31.7% of
 all extractions, measures **72.3 m RMSE with a worst point of 193.7 m**.
 
+> **Placement update, 2026-10-01.** Those are the historical ten-point 1882 and old 1942
+> annotations, not the current fits. After the annotation sync and repair, 1882 has **8 GCPs,
+> 12.3 m similarity RMSE**, and 1942 has **8 GCPs, 33.6 m** (`docs/ROADMAP.md`,
+> `georef-figures-refresh`). The pixel-space segmentation comparisons in §3 use the same pinned
+> scan and do not change when ground coordinates are re-warped.
+
 > **note 2026-09-19 — this paragraph read "RMSE 11.3 m, worst point 23.0 m; a 6-dof affine buys
 > 10.6 m, so the scan is undistorted and more control points buy little. That 11 m is the floor on
 > every ground claim from the sheet."** Two corrections. The pair moved to 12.7 / 27.7 because the
@@ -136,6 +142,64 @@ Three readings that the table alone does not give:
   text identical to polygon name *because the name came from the seed that prompted the polygon*.
   Independent corroborations went **19 → 8**. The archive gained 49 links and lost 11 pieces of
   independent evidence; only one of those is visible in the headline.
+
+### 1882 by feature: what each method can support
+
+**Review as of 2026-10-01.** The common reference is the 1882 cadastral scan in source pixels,
+with **46 approved volunteer traces**: 2 `waterway`, 3 `road`, 24 `land_plot`, 17 `building`.
+The colour scores below use the later within-parcel split (1,443 proposals); the earlier 888-row
+run remains the reference for diagnosing the river and road trade-offs. `seg_eval` takes the best
+proposal for each trace, so these are *not precision figures*. The SAM2 LoRA was trained on these
+same 46 traces, so its scores are training-set results. Sources: `work/ocr/EVAL-BASELINE.md`
+§2026-09-19, `docs/journals/260919-seg-audit.md` §§1, W6–W9.
+
+| Feature | Colour pass | MapSAM2 | Hand tracing and present verdict |
+|---|---|---|---|
+| **River and other water** | Earlier local-image runs found parts of the open river; `waterway` best-match mean IoU **0.582** on only **2** traces. A corrected VMA IIIF render reveals a larger miss: the current mask covers just **0.08%** of an all-water open-river core. `--recut` bounds the Arsenal water region but loses parts of small creeks. The Jardin Botanique lake and Arsenal basins remain missed; a proposed enclosed-water rule also coloured dry city blocks as water and was reverted. | No evaluated water-specific run on a colour prior. The existing OCR-box and modern-block SAM2 comparisons do not establish a river result. | Two waterway traces cannot measure shore accuracy across the sheet. The river is a partially useful proposal, not a finished boundary. |
+| **Roads** | `road` best-match mean IoU **0.137**, cover **0.14**, on **3** traced centrelines. Those figures compare line traces with mostly area proposals. The cream street space joins into one city-wide component; a hull would cover blocks. | Street-name OCR is deliberately omitted from SAM2 seeds. No evaluated street-surface or named-road run. | The three centreline traces are not a street-surface reference. Roads have not had a valid feature-level test. |
+| **Blocks and parcels** | `land_plot` best-match mean/median IoU **0.343 / 0.232** on **24** traces after the building split. Colour separates pigmented blocks, while cream unassigned plots require the road-space complement. Some hulls cross streets or miss printed plot edges. | SAM2 prompted from modern blocks scored **0.249** mean on the same 24 traces; it has **not** been run on the colour prior. This is a prompt-source comparison, not a head-to-head colour-prior test. | The traces cover a small, selected part of the sheet. A bounded window is scoped for exhaustive tracing; until it is complete, false-positive rate is unknown. |
+| **Buildings** | Splitting inside each parcel moved best-match mean/median IoU from **0.122 / 0.050** to **0.355 / 0.314** on **17** traces, and IoU ≥0.5 from **1 to 5** traces. Four dark-filled and three visually weak buildings remain hard cases. | SAM2 on modern-block prompts scored **0.160** mean on the 17 traces. OCR-box prompting scored **0.089 pooled over all 46 traces**, not a building-only number; many masks redrew their prompt boxes. No colour-prior GPU run has been recorded. | All 17 building traces helped train the LoRA. Neither method has a held-out building score or measured precision. |
+
+The [VMA IIIF river pilot](../work/analysis/1882/README.md) fixes the source/render
+scale, exports the actual colour-pass water mask, and tests three hand-checked
+binary controls. Raising the blue-ink cut from 0.07 to 0.09 covers **60.70%** of
+the all-water core while both dry city controls stay at **0%**; 0.11 covers the
+whole core but visibly floods Arsenal streets. The 0.09 mask is saved as a
+diagnostic proposal. No cut is promoted yet: the bank, creek and quay need
+traced water/land masks to measure false water and shoreline error.
+
+The [1882/1898 paired river EDA](../work/analysis/river_pair/README.md) uses
+native VMA IIIF tiles for both polychrome plans. Their water ink and blue-grey
+land overlap in colour, and the water-to-land `(R−B)/255` ordering reverses
+between the sheets. The VMA pyramid also shifts the median river-ink colour
+substantially by scale. Share the bank-aware method and evaluation windows
+across the two plans, but calibrate colour separately and work at native
+source resolution. The consolidated decision, hard cases and acceptance gate
+are in [River reconstruction on 1882 and 1898](river-reconstruction.md).
+
+**Work in feature order, with a check at each hand-off:**
+
+1. **River:** pin one scan and OCR run; trace an open-river shoreline window, an Arsenal quay/basin
+   window, and dry-land controls. Check boundary placement, missed water and false water separately.
+   The failed enclosed-water rule must not be revived by reading its unchanged IoU as success.
+2. **Roads:** trace road *surfaces* at one junction and one quay, keeping the existing centrelines
+   as a separate kind of truth. Test a street mask made from the cream component minus reviewed
+   blocks; only then split it into named streets using OCR labels. A line-to-area IoU is not the
+   acceptance test.
+3. **Blocks:** finish the scoped `4420,3800,650,550` window (`docs/ROADMAP.md`,
+   `shape-precision`) so every parcel, street and water surface there is accounted for. Run
+   `seg_eval --window` on the colour proposals, then a MapSAM2 run **prompted by that same colour
+   prior** on the pinned image. Record proposal count, precision, recall, and boundary failures by
+   feature; do not treat a colour proposal as hand truth. This window already contains nine of the
+   LoRA's training traces, so its MapSAM2 result remains a training-area check.
+4. **Buildings:** evaluate within the same complete window, separating red-wash, dark-fill and
+   indistinct examples. For an independent SAM2 result, trace a separate window or sheet whose
+   features were absent from LoRA training and keep them out of later tuning. Only then can the
+   colour split and MapSAM2 be compared as building methods rather than as training-set fits.
+
+The order is a review order, not four independent pipelines: water and road boundaries constrain
+the blocks; blocks provide the local area in which to seek buildings. Machine polygons remain
+proposals until a person accepts their type and printed boundary.
 
 ---
 

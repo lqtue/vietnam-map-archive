@@ -157,14 +157,21 @@ SOURCE_REVIEWED_RIMS = {
     # what was reviewed" gate. Anchor positions as `detect()` actually computes
     # them post-fix, not the raw target values.
     "85967c9c-9bb7-4acb-9688-2eaf3d93216b": (300.3, 4708.1, 616.3, 6723.9),  # Sam-Neua (E)
-    # 2026-09-30: Phu Diên Châu (E)'s B side sits ~23px outside the
+    # 2026-09-30 (superseded 2026-09-30, later): the B side was locked at 6787.56,
+    # which is the caption text under the sheet, ~200px below the map's own bottom
+    # line (the "1200K" grid line at y=6589, per-pixel profile on empty sea). Left
+    # as a strip too tall by 3.4%, it showed as a wrong bottom edge on the map and
+    # as the y scale (8.18 m/px) disagreeing with x (8.47) — which was then
+    # explained away as "real printed-sheet distortion". Corrected to 6589.5.
+    # The earlier note follows, and is wrong about which line is "the only real line":
+    # Phu Diên Châu (E)'s B side sits ~23px outside the
     # ~166-171px family band on L/R/T (193.5px). Native crop of the strip
     # confirmed the tick label's own ink is what a naive full-width column
     # scan picks up as a weak secondary peak inside the family band -- no
     # competing frame/grid line actually sits there; the strong, wide peak at
     # the detected offset is the only real line. Same "genuinely wider
     # margin on this side" case as Phan Rang (E) above.
-    "65366fa5-092a-4225-a576-69e83bf4c647": (374.83, 6003.26, 669.38, 6787.56),  # Phu Diên Châu (E)
+    "65366fa5-092a-4225-a576-69e83bf4c647": (374.83, 6003.26, 669.38, 6589.5),  # Phu Diên Châu (E)
     # 2026-09-30: Lang Son (E) -- required so the SOURCE_REVIEWED_BOUNDARIES
     # direct fix above (both R and B corrected) can pass the "still reproduces
     # what was reviewed" gate. Anchor positions as `detect()` actually computes
@@ -274,7 +281,7 @@ SOURCE_REVIEWED_SPECIAL_SPANS = {
     # outside the standard 0.36-0.43g longitude band (that's the whole point
     # -- these are a genuine third span family, not a transcription slip back
     # into standard range) -- register the corrected span so it passes.
-    "65366fa5-092a-4225-a576-69e83bf4c647": ("60219", 0.503770000000006, 0.502160493827163, 6414, 7134, (374.83, 6003.26, 669.38, 6787.56)),  # Phu Diên Châu E
+    "65366fa5-092a-4225-a576-69e83bf4c647": ("60219", 0.503770000000006, 0.502160493827163, 6414, 7134, (374.83, 6003.26, 669.38, 6589.5)),  # Phu Diên Châu E
     "ba3f38a6-78ed-49d6-a656-8390961cab3b": ("60498", 0.48978111111109807, 0.5111111111111121, 6258, 7442, (309.79, 5900.22, 649.88, 6565.16)),  # Qui Nhon E
     "7bf1330c-2cf2-4974-9daa-dded9ed72d00": ("60546", 0.49369555555554395, 0.5111111111111101, 6236, 7032, (336.18, 5913.78, 588.43, 6490.32)),  # Söng Cau E
     "e8b02c15-5e15-4bc5-bf99-b5d4e2c008e2": ("60651", 0.48656555555556086, 0.5111111111111121, 6234, 7540, (300.82, 5893.72, 606.37, 6525.0)),  # Nha Trang E

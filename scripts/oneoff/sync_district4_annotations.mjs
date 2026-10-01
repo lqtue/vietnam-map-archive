@@ -17,6 +17,7 @@
 // every control point. Default is --dry; --apply is required to write.
 
 import { createClient } from '@supabase/supabase-js';
+import { recordGeorefVersion } from '../lib/georef_versions.mjs';
 
 const args = process.argv.slice(2);
 const dry = !args.includes('--apply');
@@ -196,6 +197,7 @@ async function syncOne(mapId) {
 
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
+  await recordGeorefVersion(db, mapId, stamp, updated, 'allmaps', { allmapsId: map.allmaps_id });
   await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
   // Same URL the production path writes (annotationMirror.ts): the bucket is
   // private (mig 097), so a storage URL here is a dead link.

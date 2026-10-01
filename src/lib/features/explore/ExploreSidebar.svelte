@@ -24,6 +24,7 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { page } from '$app/stores';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
   import { layersStore } from '$lib/map/stores/layersStore';
@@ -88,9 +89,12 @@
    *     owns it outright while running. That is what `tourActive` is for: the
    *     two assignments raced and made `tests/smoke.spec.ts:125` flap, passing
    *     or failing on whichever landed last;
-   *   - anything at all after the first switch.
+   *   - anything at all after the first switch;
+   *   - a `?series=` link. The browse panel is what applies it, so it has to
+   *     mount, and a reader who already has a stack would otherwise land on
+   *     Picked and never run it.
    */
-  let tabSettled = false;
+  let tabSettled = $page.url.searchParams.has('series');
   function chooseTab(next: Tab) {
     tabSettled = true;
     tab = next;

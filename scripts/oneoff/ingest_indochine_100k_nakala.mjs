@@ -183,6 +183,9 @@ for (const { skey, SERIES_KEY, collection, description, cell, half, r, asset } o
     source_type: 'self',
     status: 'draft',
     collection,
+    // The typed columns map_series counts (mig 104); extra_metadata alone left 188 rows uncounted.
+    sheet_number: cell,
+    sheet_half: half,
     creator: "Service Géographique de l'Indochine",
     publisher: "Service Géographique de l'Indochine",
     description,

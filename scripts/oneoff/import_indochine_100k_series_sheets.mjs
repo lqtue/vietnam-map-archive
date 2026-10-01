@@ -34,10 +34,11 @@
 //   325: 514 half-sheet records over 143 cells. 223 halves (43%) carry a
 //        digitized asset; 135 cells (89%) have at least one half scanned.
 //   561: 492 half-sheet records over 197 cells. ALL 492 (100%) are digitized.
-// Licence on both: CC-BY-NC-SA-4.0, Nakala collection 10.34847/nkl.d2a82952 --
-// noncommercial, unlike the CC-BY-4.0 on the 25,000 series. Checked per-copy
-// `tr38Licence`: always null on both series, so this is the collection-level
-// licence, not a per-sheet override.
+// RIGHTS CORRECTION (2026-09-30): the earlier NC-SA inference from null
+// `tr38Licence` fields was wrong. The item-level Nakala license is CC-BY-4.0
+// on all 713 linked scans from these two series; see
+// work/cartomundi-rights/sheets.csv. This records the posted license, not
+// independent proof that the depositor controlled every right.
 //
 // NUMBERING. This scale's `f100NumeroOuCode` is NOT the 25,000 series'
 // convention (bracket = catalogue-inferred, part comes from the NOTE field).
