@@ -132,7 +132,8 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   `YYMMDD-slug.md`), `paper/` (the manuscript, outline and claim audit — LaTeX and Markdown sources)
 - **The object model:** `knowledge-system-plan.md` — every object, its link fill rates, the ranked
   gaps, and §9, the index of every open ROADMAP item by layer. When an item is added to or closed in
-  ROADMAP, move its name in §9 in the same commit
+  ROADMAP, move its name in §9 in the same commit. `system-graph.md` draws it twice: a plain-language
+  seven-step picture for non-engineers and an engineer view with tools, research and branches
 - **Outward-facing prose, not engineering reference:** `strategy.md`, `theory.md`, `user-guide.md`
 
 Special rules:

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How the archive grew — Saigon</title>
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+/* Same palette as index.html. No library: each keystone is a data-step on the stage and
+   CSS transitions do the moving. Sheets are placed with the affine layers.json already carries. */
+:root{--ink:#252725;--line:#397a71;--warm:#b66736;--paper:#f8f7f3;--mute:#797870;--faint:#d9d6ce;--panel:rgba(248,247,243,.92);--soft:#50514d;--bg1:#eef0ec;--bg2:#d6d9d5}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#ece9e1;--line:#6fc2b0;--warm:#e0925c;--paper:#1b1a17;--mute:#9c9a90;--faint:#37352f;--panel:rgba(27,26,23,.88);--soft:#c7c4b9;--bg1:#343833;--bg2:#222522}}
+:root[data-theme="dark"]{--ink:#ece9e1;--line:#6fc2b0;--warm:#e0925c;--paper:#1b1a17;--mute:#9c9a90;--faint:#37352f;--panel:rgba(27,26,23,.88);--soft:#c7c4b9;--bg1:#343833;--bg2:#222522}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+#area{overflow:hidden}
+body{background:radial-gradient(circle at 42% 45%,var(--bg1),var(--bg2));color:var(--ink);font:13px/1.5 -apple-system,BlinkMacSystemFont,ui-sans-serif,system-ui,sans-serif;display:grid;grid-template-columns:1fr 380px}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid var(--warm);outline-offset:3px}
+
+#area{position:relative;min-width:0;min-height:0}
+#fit{position:absolute;left:50%;top:50%;width:1000px;height:1000px;margin:-500px 0 0 -500px;transform:scale(var(--k,.7))}
+#view{position:absolute;inset:0;perspective:1800px;perspective-origin:50% 38%}
+#world{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:500px 500px;transition:transform 1.4s cubic-bezier(.4,0,.2,1)}
+.sheet{position:absolute;left:0;top:0;transform-origin:0 0;transition:transform 1.4s cubic-bezier(.4,0,.2,1),opacity .9s;opacity:0;box-shadow:0 0 0 2px rgba(37,39,37,.25)}
+.sheet img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sheet svg{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .9s}
+.sheet circle{fill:var(--warm)}
+.link{position:absolute;left:0;top:0;width:2px;transform-origin:0 0;background:var(--line);opacity:0;transition:opacity 1s}
+.ghost{position:absolute;left:150px;top:230px;width:700px;height:420px;border:3px dashed var(--mute);border-radius:14px;background:rgba(121,120,112,.08);opacity:0;transition:opacity 1s,transform 1.4s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--soft);font-size:40px;font-weight:650;letter-spacing:-.01em;padding:30px;line-height:1.2}
+.ghost small{display:block;margin-top:10px;font-size:26px;font-weight:500;color:var(--mute)}
+#year{position:absolute;left:24px;top:22px;font-size:54px;font-weight:650;letter-spacing:-.03em;color:var(--ink);opacity:0;transition:opacity .5s}
+#view{pointer-events:none}
+
+/* steps */
+[data-step="3"] .sheet svg,[data-step="4"] .sheet svg,[data-step="5"] .sheet svg,[data-step="6"] .sheet svg,[data-step="2"] .sheet svg{opacity:1}
+[data-step="5"] .link,[data-step="6"] .link{opacity:.5}
+[data-step="1"] #year{opacity:1}
+[data-step="6"] .ghost{opacity:1}
+
+/* layers strip */
+#layers{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;z-index:2}
+.chip{padding:6px 11px;border:1px solid var(--faint);border-radius:8px;background:var(--panel);color:var(--mute);font-size:11px;font-weight:600;transition:all .4s}
+.chip small{display:block;font-weight:400;font-size:10px}
+.chip.on{color:var(--ink);border-color:var(--line)}
+.chip.now{background:var(--line);color:#fff;border-color:var(--line)}
+.chip.now small{color:rgba(255,255,255,.85)}
+.chip.ahead{border-style:dashed}
+
+/* caption */
+#side{display:flex;flex-direction:column;padding:28px 28px 20px 0;min-height:0}
+#card{background:var(--panel);border-radius:16px;box-shadow:0 12px 32px -8px rgba(37,39,37,.22);padding:22px;backdrop-filter:blur(18px);flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
+#when{display:inline-block;align-self:flex-start;padding:2px 9px;border-radius:99px;background:rgba(57,122,113,.12);color:var(--line);font-size:11px;font-weight:650;letter-spacing:.04em}
+#when.proto{background:rgba(182,103,54,.13);color:var(--warm)}
+h1{margin:12px 0 8px;font-size:24px;line-height:1.15;letter-spacing:-.02em}
+#text{margin:0;color:var(--soft);font-size:13.5px}
+#note{margin:12px 0 0;color:var(--mute);font-size:11.5px}
+#src{margin:auto 0 0;padding-top:14px;color:var(--mute);font-size:10.5px}
+#controls{display:flex;align-items:center;gap:8px;margin-top:16px}
+#controls button{border:1px solid var(--faint);border-radius:8px;background:var(--paper);padding:7px 12px;cursor:pointer;font-size:12px;font-weight:600}
+#controls button:hover{border-color:var(--warm)}
+#dots{display:flex;gap:6px;margin-left:auto}
+#dots button{width:12px;height:12px;padding:0;border-radius:50%;border:2px solid var(--mute);background:none;cursor:pointer}
+#dots button[aria-current=true]{background:var(--warm);border-color:var(--warm)}
+#back{position:absolute;left:16px;top:16px;z-index:3;color:var(--line);text-decoration:none;font-size:12px;font-weight:600}
+
+@media(max-width:820px){
+  body{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  #side{padding:0 12px 12px}
+  #card{padding:16px;max-height:44vh}
+  h1{font-size:20px}
+  #layers{display:none}
+}
+@media(prefers-reduced-motion:reduce){#world,.sheet,.ghost{transition:none}}
+</style>
+<body>
+<div id="area" data-step="0">
+  <a id="back" href="index.html">← the stack</a>
+  <div id="fit"><div id="view"><div id="world"></div></div><div id="year"></div></div>
+  <nav id="layers" aria-label="Layers"></nav>
+</div>
+<aside id="side">
+  <div id="card" aria-live="polite">
+    <span id="when"></span>
+    <h1 id="title"></h1>
+    <p id="text"></p>
+    <p id="note"></p>
+    <p id="src"></p>
+    <div id="controls">
+      <button id="prev" type="button" aria-label="Previous">←</button>
+      <button id="play" type="button">Pause</button>
+      <button id="next" type="button" aria-label="Next">→</button>
+      <div id="dots" role="group" aria-label="Keystones"></div>
+    </div>
+  </div>
+</aside>
+<script type="module">
+const $ = id => document.getElementById(id);
+const { layers, links, span } = await (await fetch('layers.json')).json();
+const byYear = y => layers.findIndex(l => l.year === y);
+const nDoling = links.filter(k => k.d).length;
+
+// Layers, shortened from the plan's eight to five. "ahead" is whatever has a plan but no shipped code.
+const GROUPS = [
+  ['find', 'Find & keep', 'sources, scans, addresses'],
+  ['place', 'Place', 'pin to the real ground'],
+  ['read', 'Read & name', 'printed text, one name across years'],
+  ['show', 'Show', 'pages people use'],
+  ['ahead', 'Not started yet', 'planned, nothing built'],
+];
+// Each keystone cites its CHANGELOG version. The two prototype steps are not releases, so carry no number.
+const STEPS = [
+  { when: '1.0 · Apr 2025', group: 'find', title: 'One map on a page',
+    text: 'A single index.html and a folder of scanned sheets. The maps were the content; the site was only the wrapper.',
+    note: 'Drawn with today’s 1923 sheet, not a screenshot of the first site.', src: 'CHANGELOG 1.0' },
+  { when: '2.1 · Jun 2025', group: 'show', title: 'Move through the years',
+    text: 'A time slider, so the maps could be moved through instead of picked from a list.',
+    note: 'Illustration: today’s six District 4 sheets, unplaced, in year order.', src: 'CHANGELOG 2.1' },
+  { when: '5.0 · Apr 2026', group: 'read', title: 'Read what is printed',
+    text: () => `The first pipeline that reads printed names off a sheet. This one gave ${layers[byYear(1923)].labels.length} labels.`,
+    note: 'Machine readings; some are not yet checked by a person. The traced shapes are not drawn: none are approved for these sheets.', src: 'CHANGELOG 5.0 · layers.json (1923)' },
+  { when: '6.0 · Aug 2026', group: 'place', title: 'Pin every sheet to the ground',
+    text: 'A map cannot be published until it can be placed. Each sheet lands by its own control points, never matched to another sheet. The 1882 plan turns 90° to fit.',
+    note: 'Where two sheets disagree, they differ by about 50–100 m: the paper itself is stretched.', src: 'CHANGELOG 6.0 · docs/journals/260921-sheet-overlap.md' },
+  { when: 'Prototype · Oct 2026', proto: true, group: 'show', title: 'Stack the years',
+    text: 'Six District 4 sheets, 1882 to 1968, one above another on the same ground. The oldest is on top.',
+    note: 'Not a release yet: it lives in work/proto/fabric.', src: 'work/proto/fabric' },
+  { when: 'Prototype · Oct 2026', proto: true, group: 'read', title: 'Link the same name across years',
+    text: () => `${links.length} names printed on neighbouring sheets, within 150 m of each other, are linked. ${nDoling} of them carry a citation to a published street-name study.`,
+    note: 'Proximity evidence only: two labels near each other is not proof they name the same thing.', src: 'layers.json · build.py' },
+  { when: 'Ahead', group: 'ahead', title: 'What is not built yet',
+    text: 'A walking tour, the evidence chain that traces a claim back to its spot on a sheet, building heights, and a year slider over the placed sheets. Each rests on the layers beneath it.',
+    note: 'Walk is proposed, the evidence chain is a plan, building attributes are deferred.', src: 'docs/walk-plan.md · evidence-chain-plan.md · ROADMAP' },
+];
+const GHOSTS = [['Walk', 'proposed'], ['Evidence chain', 'a plan'], ['Year slider', 'open'], ['Buildings in 3D', 'deferred']];
+
+const world = $('world');
+const GAP = 90, mid = (layers.length - 1) / 2, zOf = i => (mid - i) * GAP;
+// A sheet element is the 800 px thumbnail, not the 16,000 px scan: a layer that large is dropped by the
+// compositor. `k` folds the thumbnail-to-scan scale into the matrix layers.json gives for scan pixels.
+const TW = 800, k = l => l.image.width / TW;
+const flat = l => { const { width: W, height: H } = l.image, s = Math.min(860 / W, 860 / H); return [s * k(l), 0, 0, s * k(l), (1000 - W * s) / 2, (1000 - H * s) / 2]; };
+const placed = l => { const [a, b, c, d, e, f] = l.image.matrix; return [a * k(l), b * k(l), c * k(l), d * k(l), e, f]; };
+const tf = (m, z) => `translateZ(${z}px) matrix(${m.join(',')})`;
+
+const sheets = layers.map((l, i) => {
+  const { width: W, height: H, matrix: m } = l.image;
+  const el = document.createElement('div');
+  el.className = 'sheet'; el.style.width = TW + 'px'; el.style.height = Math.round(TW * H / W) + 'px';
+  const [a, b, c, d, e, f] = m, det = a * d - b * c, r = 2.4 / Math.sqrt(Math.abs(det));
+  const dots = l.labels.map(({ p: [X, Y] }) => `<circle cx="${((d * (X - e) - c * (Y - f)) / det).toFixed(0)}" cy="${((-b * (X - e) + a * (Y - f)) / det).toFixed(0)}" r="${r.toFixed(0)}"/>`).join('');
+  el.innerHTML = `<img alt="" src="${l.image.iiif}/full/800,/0/default.jpg"><svg viewBox="0 0 ${W} ${H}">${dots}</svg>`;
+  el.style.transform = tf(flat(l), 0);
+  world.append(el);
+  return el;
+});
+// A thin plane standing between a name on one sheet and the same name on the next.
+for (const k of links) {
+  const el = document.createElement('div');
+  el.className = 'link'; el.style.height = GAP + 'px';
+  el.style.transform = `translate3d(${k.p[0]}px,${k.p[1]}px,${zOf(k.b)}px) rotateX(90deg)`;
+  world.append(el);
+}
+const ghosts = GHOSTS.map(([name, why], i) => {
+  const el = document.createElement('div');
+  el.className = 'ghost'; el.innerHTML = `<div>${name}<small>${why}</small></div>`;
+  el.style.transform = `translateZ(${zOf(-1 - i)}px)`;
+  world.append(el);
+  return el;
+});
+
+const ROTATE = 'rotateX(58deg) rotateZ(-22deg)';
+const showSheet = (i, opacity, isPlaced, z, delay = 0) => {
+  const el = sheets[i];
+  el.style.opacity = opacity; el.style.transitionDelay = `${delay}ms,${delay}ms`;
+  el.style.transform = tf(isPlaced ? placed(layers[i]) : flat(layers[i]), z);
+};
+
+let step = -1, timer = null, cycle = null, playing = true;
+function enter(n) {
+  step = n;
+  clearInterval(cycle);
+  const s = STEPS[n];
+  $('area').dataset.step = n;
+  const stacked = n >= 4;
+  world.style.transform = stacked ? (n === 6 ? `translateY(110px) scale(.62) ${ROTATE}` : `translateY(-45px) ${ROTATE}`) : 'none';
+  $('year').textContent = '';
+  layers.forEach((l, i) => {
+    if (n === 0) showSheet(i, i === byYear(1923) ? 1 : 0, false, 0);
+    else if (n === 1) showSheet(i, 0, false, 0);
+    else if (n === 2) showSheet(i, i === byYear(1923) ? 1 : 0, false, 0);
+    // 2 px apart: coplanar sheets paint in DOM order, which put 1968 on top; the stack has the oldest on top.
+    else if (n === 3) showSheet(i, .6, true, (mid - i) * 2, i * 450);
+    else showSheet(i, .8, true, zOf(i), 0);
+  });
+  if (n === 1) {
+    let y = 0;
+    const tick = () => { sheets.forEach((el, j) => { el.style.opacity = j === y ? 1 : 0; }); $('year').textContent = layers[y].year; y = (y + 1) % layers.length; };
+    tick(); cycle = setInterval(tick, 900);
+  }
+  $('when').textContent = s.when; $('when').className = s.proto ? 'proto' : '';
+  $('title').textContent = s.title;
+  $('text').textContent = typeof s.text === 'function' ? s.text() : s.text;
+  $('note').textContent = s.note; $('src').textContent = 'Source: ' + s.src;
+  [...$('dots').children].forEach((b, i) => b.setAttribute('aria-current', String(i === n)));
+  const order = GROUPS.map(g => g[0]);
+  const lit = new Set(STEPS.slice(0, n + 1).map(x => x.group));
+  [...$('layers').children].forEach((c, i) => {
+    c.classList.toggle('on', lit.has(order[i]));
+    c.classList.toggle('now', order[i] === s.group);
+  });
+  clearTimeout(timer);
+  if (playing && n < STEPS.length - 1) timer = setTimeout(() => enter(n + 1), n === 3 ? 7500 : 6000);
+  else if (playing) { playing = false; $('play').textContent = 'Replay'; }
+}
+
+GROUPS.forEach(([id, name, sub]) => {
+  const c = document.createElement('div');
+  c.className = 'chip' + (id === 'ahead' ? ' ahead' : ''); c.innerHTML = `${name}<small>${sub}</small>`;
+  $('layers').append(c);
+});
+STEPS.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.setAttribute('aria-label', `${s.when}: ${s.title}`); b.onclick = () => { playing = false; $('play').textContent = 'Play'; enter(i); };
+  $('dots').append(b);
+});
+const go = d => { playing = false; $('play').textContent = 'Play'; enter(Math.max(0, Math.min(STEPS.length - 1, step + d))); };
+$('prev').onclick = () => go(-1); $('next').onclick = () => go(1);
+$('play').onclick = () => {
+  if (playing) { playing = false; clearTimeout(timer); $('play').textContent = 'Play'; return; }
+  playing = true; $('play').textContent = 'Pause';
+  enter(step >= STEPS.length - 1 ? 0 : step);
+};
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+
+const fit = () => { const r = $('area').getBoundingClientRect(); $('fit').style.setProperty('--k', Math.min(r.width, r.height - 70) / 1000); };
+new ResizeObserver(fit).observe($('area')); fit();
+enter(0);
+</script>
+</body></html>

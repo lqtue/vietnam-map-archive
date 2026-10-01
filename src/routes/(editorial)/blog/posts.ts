@@ -12,6 +12,12 @@ export interface BlogPost {
    */
   note?: string;
   content: string; // HTML
+  /**
+   * ROADMAP item names this rests on (`docs/ROADMAP.md`), so the public page and
+   * the tracker cannot drift apart. `tests/work-items.spec.ts` fails on a name
+   * that is neither open nor in `docs/roadmap-record.md`.
+   */
+  items?: string[];
 }
 
 export const posts: BlogPost[] = [
@@ -20,6 +26,7 @@ export const posts: BlogPost[] = [
     title: 'What We Are Doing Now: Fixing the Ground Before Building Higher',
     date: '2026-09-23',
     category: 'update',
+    items: ['l7014-rebuild', 'three-point-residuals', 'indochine-100k-georef'],
     excerpt:
       'The next stretch of work is deliberately unglamorous: correct a 470-metre datum error, make map and building quality measurable, finish two large surveys, and prepare the OCR corpus that will make search useful. Here is what that means, and where people are still indispensable.',
     content: `
