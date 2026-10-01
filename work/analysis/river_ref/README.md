@@ -43,7 +43,7 @@ The tracing workflow below still works, and is kept for any window that needs a 
 | Quay road along water | land | road, stops at the water |
 | Lettering | in water: `ignore`; on land: nothing to trace | in a street: road (leave untraced) |
 | Red city-limit dashes, red tramway | not an edge; trace through them | same |
-| Pavement: thin kerb line a few px inside a street, parallel to the block edge | land (a quay pavement against water follows the quay rule) | **road**; the kerb line is not an edge, the block's outer line is (owner, 2026-10-01) |
+| Pavement: thin kerb line a few px inside a street, parallel to the block edge | land (a quay pavement against water follows the quay rule) | **land**: the road is the carriageway, its edge the kerb line; where no kerb is drawn, the block's outer line (owner, 2026-10-01; labels from seed 2 on; seed-1 pavement points predate the rule) |
 | Park paths, garden interiors | land (except ponds and streams) | inside a block: part of the `block` |
 | Thin blank strip enclosed by ink in a street | land | `block` (owner: these are real plots) |
 | Roundabout islands, plaza planters | land | `block` |
