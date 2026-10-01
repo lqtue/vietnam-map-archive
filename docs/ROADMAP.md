@@ -1,8 +1,11 @@
-# Roadmap — open work (updated 2026-09-22)
+# Roadmap — open work (updated 2026-10-01)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
-the measurements and the defects each one turned up, is `docs/roadmap-record.md`, and the rules that
-keep getting re-learned are `docs/lessons.md`. Close an item by moving it there, not by ticking it.
+the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
+2026-09-22), and the rules that keep getting re-learned are `docs/lessons.md`. **Close an item by
+deleting it**, never by ticking it: the commit that deletes it carries the closing measurement, and
+anything worth re-learning goes into `docs/lessons.md`. Remove its name from
+`docs/knowledge-system-plan.md` §9 in the same commit.
 
 Ordered where order is claimed. Each item names the check that says it is finished.
 
@@ -32,7 +35,7 @@ measurement, metadata that maintains itself, and corpus size.
       run). `geo_audit.mjs` found one real FAIL beyond the known `fit` outliers: `hue-l7014-6541-4`
       (public, 3 GCPs) sat 5,391 m from printed cell 6541-4, while a draft duplicate
       `hue-l7014-6541-4-2` (4 GCPs) sat correctly on it. **Fixed 2026-09-22**: swapped the two
-      rows' status and re-pointed `series_sheets` cell 6541-4 at the `-2` row.
+      rows' status and re-pointed `series_cells` cell 6541-4 at the `-2` row.
       `geo_audit.mjs --key l7014-20260921` now reports **0 FAIL** (47 WARN, all pre-existing
       draft-sheet annotation gaps, unaffected by the swap). `fit`'s two known-bad sheets (`6630-4`,
       `6349-4`, distorted outlines, see `work/l7014/regen/REGEN.md`) are expected on every run and
@@ -42,10 +45,10 @@ measurement, metadata that maintains itself, and corpus size.
       *unrebuilt* archive as evidentiary) that belongs to the user; and `rasterSeries.ts`'s
       hand-carried `sheets: 452` needs updating to 436 (with `tests/series-rows.spec.ts:20,96`) as
       part of that same pass. Separately, **a new bug surfaced while checking this**:
-      `series_sheets.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
+      `series_cells.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
       WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — now its
       own item, `series-sheets-bbox-datum`, below. See `.claude/handoff.md` for the full trail.
-- [ ] **`series-sheets-bbox-datum`** — `series_sheets.bbox` holds the raw, unshifted Indian 1960
+- [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
       of the true lattice position, on the three cells checked (6150-4, 6330-4, 6541-4) — the same
@@ -55,7 +58,7 @@ measurement, metadata that maintains itself, and corpus size.
       where the survey actually places it. A database backfill, independent of `l7014-rebuild`'s
       tile/upload gate — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
       (`scripts/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
-      `series_sheets` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
+      `series_cells` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
       `CELL_TOL` (150 m) against `lattice.json`.
 - [ ] **`three-point-residuals`** — give the 11 remaining three-point sheets a measurable one. A
       3-GCP affine fit
@@ -69,20 +72,12 @@ measurement, metadata that maintains itself, and corpus size.
       promoted the 4-GCP `hue-l7014-6541-4-2` in its place.) Exit: no georeferenced sheet in the
       corpus sits on fewer than 4 points, and `modern_prior.py --sweep` reports a residual for
       every one.
-- [x] **`indochine-100k-ingest`** — done. Both series fully minted: 561 (1947–1959) 360/360 cells,
-      325 (1900–1947) 221/221 cells, 581 rows total. Two rows tiled pixel-less on first run (the
-      known `TILING FAILED`-silent failure mode this item used to warn about — sheet 12 "Muong Ou
-      Tay" W+E, no `map_iiif_sources` row, upstream Nakala source fine) — re-tiled and confirmed
-      loadable 2026-09-24. `check_series_index.mjs` reports 0 adrift/0 dangling/0 unindexed; its
-      `ORPHAN KEY` lines for both 100k series are a pre-existing `series_sheets` key-spelling
-      mismatch against `maps.collection`, not a symptom of anything this item touched — separate
-      cleanup, not blocking.
 - [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print, the
       way `tonkin_georef.py` does for the sibling 1:25,000 survey. **561: pipeline built and
       working, first batch published 2026-09-24** — `scripts/indochine100k_georef.py`
       (`calibrate`/`place`/`check`/`annotate`) mirrors Tonkin's catalogue-driven
       `from_catalogue()`/`calibrate()` fallback against `extra_metadata.cartomundi_fkeys[0]`'s own
-      UNIMARC bbox (not the unioned `series_sheets.bbox` — see the journal). Calibration accepted
+      UNIMARC bbox (not the unioned `series_cells.bbox` — see the journal). Calibration accepted
       on 6 sheets (10.5–20.9°N) after **excluding Tri Binh** (741m residual outlier, judged too
       clean to be an OCR error but excluded anyway to unblock — an open question, not a resolved
       one: docs/journals/260923-indochine100k-georef.md). Accepted fit: 76m mean / 188m max
@@ -150,7 +145,7 @@ measurement, metadata that maintains itself, and corpus size.
       triangular îlot bounded by Rue Mac, Rue No. 15 and Rue Pellerin, source pixels roughly
       `4420,3800,650,550` on map `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` (the 1882 cadastral).
       9 of the sheet's 46 volunteer traces (6 `building`, 3 `land_plot`, all `approved`) already
-      sit inside it — checked against `footprint_submissions` directly, not estimated — against
+      sit inside it — checked against `footprints` directly, not estimated — against
       roughly 11 real parcels/buildings visible in an IIIF crop of the same box. That leaves on the
       order of **one or two features** to add before the window is exhaustive, which is a single
       sitting at `/scan?mode=shapes`, not a research task — a person has to do the actual tracing
@@ -171,7 +166,7 @@ measurement, metadata that maintains itself, and corpus size.
       that year) and Phat Diem 1927 (IGN never digitised the east half) — a permanent gap, not a
       bug. What is left is the pipeline's own last step, by design
       (`annotate()`'s docstring in `scripts/tonkin_georef.py`): every one of the 62 sits at
-      `status = draft` with `georef_done = true`, visible to a signed-in reviewer at `/explore` and
+      `status = draft` with `is_georeferenced = true`, visible to a signed-in reviewer at `/explore` and
       nowhere else, on purpose, because nobody has looked at all of them yet. Exit: each reviewed,
       then `annotate(write=True, only_new=True)` plus a status flip to `public` for the ones that
       pass — check tiles and thumbnails actually render before flipping, the way
@@ -182,7 +177,16 @@ measurement, metadata that maintains itself, and corpus size.
 
 Do them when the surrounding work opens the file.
 
-- [ ] **`held-by-derived`** — `series_sheets.held_by` / `map_id` is a snapshot, and nothing
+- [ ] **`drop-compat-views`** — migration 095 renamed eight tables and left a view under each old
+      name (`series_sheets`, `footprint_submissions`, `ocr_extractions`, `sheet_sources`,
+      `map_iiif_sources`, `map_opens`, `user_favorites`, `annotation_sets`) to bridge `db push` to
+      deploy. That deploy shipped long ago and the drop migration was never written. No app,
+      worker or `scripts/*.mjs` code reads the old names; 28 files under `scripts/oneoff/` still
+      mention them (measured 2026-10-01). Exit: `grep -rlE
+      "series_sheets|footprint_submissions|ocr_extractions|sheet_sources|map_iiif_sources"
+      src worker work scripts` returns only filenames and comments, then a migration drops the
+      eight views.
+- [ ] **`held-by-derived`** — `series_cells.held_by` / `map_id` is a snapshot, and nothing
       maintains it — no trigger,
       no function, only the one-off importers. So the day anyone georeferences one of the 123
       obtainable L7014 sheets, or publishes a draft, the index still says *gap* and the coverage
@@ -212,15 +216,6 @@ Do them when the surrounding work opens the file.
       the 1882 sheet is hue 0–60° and `compute_tile_colours` looks at 60–260°. If colour
       segmentation is to do real work, that window is the starting point — and it needs a second
       sheet's histogram before the new one is trusted.
-- [x] **`phantom-annotations`** — **resolved, verified 2026-10-01:** all 592 rows carrying
-      `annotation_url` have a stored `annotations/<id>.json` (0 missing). Original finding: 21
-      draft L7014 sheets carried an `annotation_url` that 404s or 500s
-      — all created
-      2026-09-13/14, `georef_done` true in the row while the annotation store holds nothing
-      (measured 2026-09-21 by the `modern_prior.py --sweep` re-run). A different failure from the
-      `three-point-residuals` trap: there is no thin fit to distrust, there is no fit. Exit: every
-      row
-      claiming a georeference resolves to a real annotation, or stops claiming one.
 - [ ] **`saigon-cholon-1912`** — it cannot be fit at all. `saigon-cholon-et-environs`: 3 points, SVD
       condition ratio **0.0302** against `scale.py`'s `MIN_GCP_CONDITION` floor of 0.05, so
       `fit_sheet()` returns `None` rather than an exact-but-uninformative transform. Recorded on
@@ -254,7 +249,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       the script's own.
 - [ ] **`drain-the-queue`** — `python work/worker/vma_worker.py --worker $(hostname)`. Hours, not
       minutes.
-      Exit: `select count(distinct map_id) from ocr_extractions` > 30.
+      Exit: `select count(distinct map_id) from ocr_labels` > 30.
 - [ ] **`auto-priority`** — in the worker, deferred on purpose. Reopen once ~5 sheets have been
       triaged and OCR'd by hand, so there is a baseline to judge the automatic grid against. Exit:
       on a triaged sheet it picks a grid within a tile or two of the human one.
@@ -277,7 +272,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
 `docs/platform-design.md`):
 
 - [ ] **`colab-seg-run`** — mint a `seg`-scoped worker key, run `vma_worker.py --kinds seg`.
-      Exit: one `seg` job goes `queued → done` and writes `footprint_submissions` rows with
+      Exit: one `seg` job goes `queued → done` and writes `footprints` rows with
       `source='sam-auto'`.
 - [ ] **`district4-table`** — the review that fills it. `work/analysis/district4/` is built and
       self-checking; what is left
@@ -401,7 +396,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       pilot. Exit: no series fact lives only in `extra_metadata`. Plan:
       `docs/knowledge-system-plan.md` §1.
 
-- [ ] **`multi-printing-cells`** — `series_sheets` can name only one printing of a cell. Its key is
+- [ ] **`multi-printing-cells`** — `series_cells` can name only one printing of a cell. Its key is
       `(series_key, sheet_number)`, one row per cell — but the archive holds **10 cells in more than
       one edition**, three with two *published* printings fourteen years apart. Migration 086 hangs
       a printing off the existing key, so the page can say which printing it serves and that others
@@ -416,7 +411,7 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`l909-index`** — no coverage page, no /explore link. Narrower than it looks: the DB-filing
       half is already done in production — `fix_l909_series_index.mjs --apply` has run, all three
       sheets carry one `collection` string (`AMS L909 — Việt Nam City Maps 1:12,500`) and
-      consistent `extra_metadata.series`/`edition`. What's missing is a `series_sheets` row set —
+      consistent `extra_metadata.series`/`edition`. What's missing is a `series_cells` row set —
       someone still has to decide what the survey contains beyond the three held sheets.
 - [ ] **`titles-from-sheet`** — not from the catalogue. CartoMundi's spellings are
       French colonial transcriptions — `Yên-Dinh` is half-accented for Yên Định and reads as an
