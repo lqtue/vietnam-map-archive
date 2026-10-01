@@ -45,19 +45,13 @@ export const load: PageServerLoad = async ({ params }) => {
   // silently hid its sibling — the west half of a cell, or an entire second
   // printing, reachable from nothing. The cell is the key here, so the query is
   // on the cell.
-  // `collection` is the group key the view is built on, so in practice it is
-  // always set — but it is nullable in the schema, and a null would widen the
-  // query to every sheet numbered `number` in the archive rather than narrowing
-  // it to this survey's.
-  const { data: rows } = series.collection
-    ? await supabase
-        .from('maps')
-        .select('id,name,year,status,sheet_half')
-        .eq('collection', series.collection)
-        .eq('sheet_number', number)
-        .in('status', ['public', 'featured'])
-        .order('year', { ascending: true })
-    : { data: [] };
+  const { data: rows } = await supabase
+    .from('maps')
+    .select('id,name,year,status,sheet_half')
+    .eq('series_key', key)
+    .eq('sheet_number', number)
+    .in('status', ['public', 'featured'])
+    .order('year', { ascending: true });
 
   const maps = (rows ?? []).map((m) => ({
     id: m.id as string,
