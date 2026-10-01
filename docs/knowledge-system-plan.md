@@ -143,33 +143,30 @@ it. Map type, feature category, label category and rights already make four.
 | From → to | Stored as | Filled | Gap |
 |---|---|---|---|
 | cell → printing | `(series_key, sheet_number)`, with no foreign key | 1,131 printings | by design (see `multi-printing-cells`) |
-| cell → map | `series_cells.map_id` | 411 of 1,046: L7014 9 of 627, 1st ed. 130 of 143, 1:25k 75 of 79, 2nd ed. 197 of 197 | — |
+| cell → map | `series_cells.map_id` | 411 of 1,046: L7014 9 of 627, 1st ed. 130 of 143, 1:25k 75 of 79, 2nd ed. 197 of 197 | a snapshot that nothing maintains (`held-by-derived`) |
 | map → image | `map_images.map_id` | 132 of 859 maps | 727 maps have none: 481 published (mostly the Indochine halves) and 246 drafts |
 | map → georeference | a storage path, plus `annotation_url` | all 528 published and 64 drafts | no row in the database; history exists only as file names |
-| georeference → image | the annotation's `target.source` id, width and height | all 592 | not a foreign key. `map_images` stores no dimensions (owned by `evidence-chain`). |
+| georeference → image | the annotation's `target.source` id, width and height | all 592 | not a foreign key. `map_images` stores no dimensions (owned by `evidence-chain`); triage has the same gap (`triage-scan-identity`) |
 | label or polygon → map | `map_id` | always | — |
-| label or polygon → image | — | **none** | which scan's pixels were measured is not recorded (owned by `evidence-chain`) |
-| label or polygon → georeference version | `geom_src` | 13,529 labels; 46 polygons | **stale**: see below |
-| label → polygon | `ocr_labels.footprint_id` | **8 of 14,506** | the OCR ↔ shape join (Shapes) |
+| label or polygon → image | — | **none** | which scan's pixels were measured is not recorded (owned by `evidence-chain`); `merge` also drops the label box (`merge-keeps-box`) |
+| label or polygon → georeference version | `geom_src` | 13,529 labels; 46 polygons | stale on 5 maps when measured; re-warped 2026-10-01 (`rewarp-on-sync`) |
+| label → polygon | `ocr_labels.footprint_id` | **8 of 14,506** | the OCR ↔ shape join (Shapes: `seg-eval-set`, `colour-blocks`, `shape-precision`) |
 | label → legend entry | — | none | see §3 |
 | polygon → legend class | `footprints.category`, free text | 934 of 1,519 | see §3 |
-| label → place-name group | implicit, by `name_key` in a view | derived | does not prove that two spellings are one place (owned by `evidence-chain`) |
+| label → place-name group | implicit, by `name_key` in a view | derived | does not prove that two spellings are one place (owned by `evidence-chain`; reviewed spellings come from `attested-variants`) |
 | story point → map | `overlay_map_id` | 6 | — |
 | claim → evidence | planned: `claim_evidence` | — | `evidence-chain` step 2 |
 
-**The derived geometry is already stale.** I hashed the GCPs in each live annotation the way
-`gcpSrcHash` does (`src/lib/server/warp.ts:69`), reimplemented in a script, so check the result
-against the real function before you act on it:
-
-- **1882:** the live annotation (8 GCPs) hashes to `93c4487e621f83c9`. Its 499 labels and 46
-  approved polygons still carry `245d98f7f8d61572`, the hash of the old 10-GCP set. That is the very
-  value `evidence-chain-plan.md` step 1 pins as "as of 2026-09-30".
-- **1898:** the live annotation (9 GCPs) hashes to `c741978dab027258`. Its 472 labels carry
-  `6a9d98830937123e`.
+**The derived geometry was stale, and has been re-warped.** On 2026-10-01 five maps carried
+labels or polygons warped against an older GCP set: 1882 (10 → 8 GCPs), 1895, 1898 (3 → 9),
+1923 and 1942. The check recomputed `gcpSrcHash` (`src/lib/server/warp.ts:69`) from each stored
+annotation, and the recomputation matched the stored `geom_src` on every map that had not
+changed. All five were re-warped the same day. The 1882 hash pinned in `evidence-chain-plan.md`
+step 1, `245d98f7f8d61572`, is the old one; the current hash is `93c4487e621f83c9`.
 
 The staleness check works as designed: the hashes differ, so the drift is visible. But nothing
-re-warps when an annotation is synced, and the georeference has no database row a query could
-compare those hashes against.
+re-warps on its own when an annotation is synced (`rewarp-on-sync`), and the georeference has no
+database row that a query could compare the hashes against (`georef-versions`).
 
 ## 5. Gaps, ranked
 
@@ -204,11 +201,12 @@ Each gap is named for its subject. "Owner" points at the plan that already holds
    each sheet's legend.
    **Exit:** each distinct normalized category is one vocabulary term, and the printed spelling is
    kept on every row.
-6. **`image-identity`: image dimensions, and an image row for every map.** Owned by
-   `evidence-chain` step 5, "Differing images". This plan only adds the 481 published maps that have
-   no image row.
-7. **Label ↔ polygon and label ↔ legend links.** Owned by Shapes (the OCR ↔ shape join).
-   `legend_ref` → `legend_entry` falls under the same join.
+6. **Image identity: image dimensions, and an image row for every map.** Owned by
+   `evidence-chain` step 5, "Differing images", and by `triage-scan-identity` for triage. This plan
+   only adds the 481 published maps that have no image row.
+7. **Label ↔ polygon and label ↔ legend links.** Owned by Shapes (`seg-eval-set`,
+   `colour-blocks`). The pixel anchor these links rest on is `merge-keeps-box`. `legend_ref` →
+   `legend_entry` falls under the same join.
 8. **Naming the RMSE.** Owned by `evidence-chain` invariant 8. `georef_versions.rmse_method` is
    where that name gets stored.
 
@@ -255,9 +253,43 @@ under Evidence and legibility, and `series-identity` under Survey layer and cata
   `[10504, 2356] → (106.6950, 10.7795)`, misses by about 300 m; without it the RMSE is 26 m.
   `drop_1942_gcp1.mjs` removed that point on 2026-09-22. It is still on Allmaps, though, and the
   sync on 2026-10-01 put it back. This is the first regression caused by having no review step
-  before syncing. The repair is in `scripts/oneoff/fix_saigon_1942_1968.mjs`, and the point must
-  also be deleted in the Allmaps Editor.
+  before syncing. `scripts/oneoff/fix_saigon_1942_1968.mjs` dropped the point again the same day:
+  33.6 m RMSE on 8 GCPs. The point still has to be deleted in the Allmaps Editor
+  (`allmaps-drift`).
 - **1968 Sài Gòn.** `allmaps_id` is keyed to an Internet Archive scan that has no `map_images` row,
   so no editor link can be built. The same script adds the row.
 - **1959 Đô thành Sài Gòn** is consistent: its stored copy matches upstream, the fit is 14 m, and
   it has an editor link.
+
+## 9. Open work, by layer
+
+This section is an index, not a tracker. It lists every open `docs/ROADMAP.md` item **by name
+only**, once each, under the layer of the model it acts on. Descriptions, order and exit tests stay
+in ROADMAP, so the two cannot drift apart. When an item is added to or closed in ROADMAP, move its
+name here in the same commit.
+
+The layers stack. Each one rests on the one below, and an error low in the stack spreads upward
+without any sign of it. On 2026-10-01 one bad 1942 control point (placement) sat under 4,287
+misplaced labels (readings), and nothing flagged them until their hashes were checked. So within
+any one period of work, fix the lowest broken layer first.
+
+| Layer | What it holds | Open items |
+|---|---|---|
+| **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `indochine-100k-licence` · `hue-rescans` · `gallica-text-harvest` |
+| **1. Holdings** | the map row, its scans and tiles, its address | `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
+| **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-rebuild` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
+| **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` |
+| **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
+| **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` |
+| **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
+| **Outside the model** | operations, CI, the language of the UI | `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 7 unnamed lines under ROADMAP's Debt heading |
+
+That is 79 named items, plus the 7 unnamed debt lines, as of 2026-10-01. `phantom-annotations`
+was closed the same day: all 592 stored annotations exist.
+
+**Reading the table.** Layer 3 holds the most items (19), but the layers are not equally healthy
+underneath. Placement (layer 2) has 12 open items and three of them were stale or wrong this week,
+while layer 3's corpus is 22 OCR'd maps, of which 118 labels have been reviewed. So until
+`georef-versions` and `rewarp-on-sync` land, every new batch of readings rests on placement that
+nothing re-checks automatically.
+

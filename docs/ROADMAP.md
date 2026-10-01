@@ -127,7 +127,11 @@ measurement, metadata that maintains itself, and corpus size.
       over 2px against a version-28 snapshot. 46 holds remain: 24 catalogue-span, 4 axis-scale-only,
       12 mixed, 3 shape/aspect, 3 persistent exclusions. Resume from
       `docs/journals/260929-series561-handoff.md`.
-- [ ] **`indochine-100k-licence`** — settle it before the ingest run mints 578 rows.
+- [ ] **`indochine-100k-licence`** — **premise moved (2026-10-01):** the ingest is done, and all
+      581 rows already carry `CC BY 4.0 — IGN, deposited in Nakala`, not the NC-SA string below.
+      Still open: whether CC BY is right for the 100,000 series. The exit is now "the minted rows
+      carry a verified licence", not "settle before minting". Original text: settle it before the
+      ingest run mints 578 rows.
       Probed 2026-09-21 with the same
       per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also
       returns `"CC-BY-4.0"`, not NC-SA — and both series' CartoMundi records name the *same* Nakala
@@ -208,7 +212,9 @@ Do them when the surrounding work opens the file.
       the 1882 sheet is hue 0–60° and `compute_tile_colours` looks at 60–260°. If colour
       segmentation is to do real work, that window is the starting point — and it needs a second
       sheet's histogram before the new one is trusted.
-- [ ] **`phantom-annotations`** — 21 draft L7014 sheets carry an `annotation_url` that 404s or 500s
+- [x] **`phantom-annotations`** — **resolved, verified 2026-10-01:** all 592 rows carrying
+      `annotation_url` have a stored `annotations/<id>.json` (0 missing). Original finding: 21
+      draft L7014 sheets carried an `annotation_url` that 404s or 500s
       — all created
       2026-09-13/14, `georef_done` true in the row while the annotation store holds nothing
       (measured 2026-09-21 by the `modern_prior.py --sweep` re-run). A different failure from the
@@ -331,10 +337,56 @@ system — what a result must retain, and the two kinds of check — is in the r
       one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
       stale labels. Plan: `docs/knowledge-system-plan.md` §5.
 - [ ] **`rewarp-on-sync`** — a synced georeference leaves its labels on the old one. Measured
-      2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. One-off repair is
-      `scripts/oneoff/fix_saigon_1942_1968.mjs`; the item is making the sync script and
+      2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. The one-off repair
+      **ran 2026-10-01**: `scripts/oneoff/fix_saigon_1942_1968.mjs` queued 5 `warp` jobs, and all
+      5 maps' labels and footprints now carry the current `geom_src`. The item is making the sync
+      script and
       `mirrorAnnotation` queue the `warp` job themselves. Exit: after a sync, no label or footprint
       on that map carries an old `geom_src`.
+- [ ] **`georef-flag-one-meaning`** — the code has three different tests for "is this map
+      georeferenced", and they disagree:
+      - `api/search/+server.ts:368,395` (the facet) tests `allmaps_id` alone, so the 480 Indochine
+        halves made by our pipeline count as not georeferenced;
+      - `data/supabase/footprints.ts:62` (the label-map picker) also requires `allmaps_id`, which
+        excludes the same halves;
+      - `fetchGeoreferencedMaps` (`data/maps/service.ts:119`) accepts `allmaps_id` with no status
+        filter, so signed-in users get 267 drafts whose `allmaps_id` has nothing behind it on
+        Allmaps.
+
+      `is_georeferenced` already exists. Exit: every "georeferenced" test in `src/` reads that one
+      column.
+- [ ] **`size-check-fails-open`** — `sourceSizeMismatch` (`src/lib/core/iiif/sourceSize.ts`, and
+      its copy in `sync_district4_annotations.mjs`) returns "no mismatch" whenever `info.json`
+      does not load. That was meant for the first mirror of a map. But while the worker was 404ing
+      the 1942 sheet, the 2026-10-01 sync ran with no size check at all. Exit: an unreachable
+      `info.json` on a map that already has tiles refuses the write; only a map with no tiles yet
+      passes.
+- [ ] **`allmaps-drift`** — review what volunteers have changed on Allmaps before anything syncs
+      it. `node --env-file=.env scripts/georef_contributions.mjs`, 2026-10-01:
+      - Vinh Yen `2bd040e9` (draft) went from 4 to 25 GCPs and needs review.
+      - Hà Nội `0a8b92dc` has a suspicious 3-point mask; don't sync.
+      - Palanca `876dc3c6` was redone on a different scan size; don't sync.
+      - 1942 `eca788e5`: the bad GCP `[10504, 2356]` still has to be deleted in the Allmaps
+        Editor.
+
+      Exit: the report shows no drifted map whose difference is unexplained.
+- [ ] **`georef-figures-refresh`** — the published georeference error figures predate this
+      week's re-georeferencing. Re-measured 2026-10-01 with `georef_error.py`, similarity
+      RMSE / worst point:
+
+      | Sheet | GCPs | RMSE | Worst | Old figure |
+      |---|---:|---:|---:|---|
+      | 1882 | 8 | 12.3 m | 19.9 m | 12.7 m / 27.7 m on 10 GCPs |
+      | 1895 | 10 | 26.7 m | 55.0 m | |
+      | 1923 | 10 | 15.4 m | 31.0 m | |
+      | 1942 | 8 | 33.6 m | 53.0 m | |
+      | 1959 | 10 | 14.0 m | 22.9 m | |
+      | 1968 | 15 | 9.0 m | 20.1 m | |
+
+      Still citing the old numbers: `work/analysis/district4/georef_error.md`,
+      `docs/journals/260921-sheet-overlap.md:82`, `docs/paper/related-work.md:628` and the 1882
+      hash pinned in `evidence-chain-plan.md` step 1 (now `93c4487e621f83c9`). Exit: each cites
+      a figure together with the GCP set it was measured on.
 - [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
       neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
       writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
@@ -462,7 +514,15 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [~] **`sheet-overlap-floor`** — sheets on one ground (2026-09-21). Two Saigon plans sixteen years
       apart, each warped by its own GCPs, overlap to ~50–100 m, and the limit is the scan rather
       than the transform. Detail: `docs/journals/260921-sheet-overlap.md`.
-- [ ] **`district4-mirror-sync`** — three separate faults found chasing "the 1942 sheet looks off"
+- [ ] **`district4-mirror-sync`** — **status 2026-10-01:**
+      - (1) is done: `georef_contributions.mjs` reports the D4 mirrors in sync, and every label on
+        them was re-warped.
+      - (2) is still open.
+      - (3) has changed: Allmaps still holds the bad 1942 point. Our copy dropped it again
+        (`fix_saigon_1942_1968.mjs`; 33.6 m RMSE on 8 points), so the two now differ on purpose
+        until the point is deleted in the Allmaps Editor.
+
+      Original: three separate faults found chasing "the 1942 sheet looks off"
       (2026-09-22/23), none yet closed. The tooling bug is fixed (`allmapsEditorSourceUrl` now
       trusts the annotation's real source instead of always skipping R2, `0607cc26`, shipped but
       not confirmed deployed) — this item is what's left, which is data, not code. (1) 4 of the 6
