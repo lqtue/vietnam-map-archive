@@ -163,7 +163,8 @@ def main():
             if e.code != 400:
                 raise
             req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
-        public = f"{base}/storage/v1/object/public/{BUCKET}/{m['id']}.json"
+        # The app's route, not a storage URL: the bucket is private (mig 097).
+        public = f"https://maparchive.vn/api/maps/{m['id']}/annotation"
         req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
             {"annotation_url": public, "is_georeferenced": True})
         print(note + "   uploaded, row updated")

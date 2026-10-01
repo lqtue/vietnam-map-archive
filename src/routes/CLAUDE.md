@@ -36,6 +36,7 @@ and `paletteDestinations.ts`.
 | `/catalog/series` | Every survey, and how much of each is held | `src/routes/(editorial)/catalog/series/` |
 | `/catalog/series/[key]` | One survey: its coverage and every sheet it contains, held or not | `src/routes/(editorial)/catalog/series/[key]/` |
 | `/catalog/series/[key]/[number]` | One sheet of a survey — including the ones the archive does not hold | `src/routes/(editorial)/catalog/series/[key]/[number]/` |
+| `/catalog/cartomundi` | CartoMundi's Vietnam-related series and item-level Nakala rights evidence | `src/routes/(editorial)/catalog/cartomundi/` |
 | `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
 | `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
 

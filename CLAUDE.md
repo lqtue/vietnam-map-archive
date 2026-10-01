@@ -79,8 +79,8 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 102**; 095–101 are in production (verified 2026-09-30 via
-  `supabase migration list`), 102 is local — see `supabase/CLAUDE.md` for what each one does). Adding one, and
+- **Migration head is 102**; 095–102 are in production (verified 2026-10-01 via
+  `supabase migration list`) — see `supabase/CLAUDE.md` for what each one does. Adding one, and
   regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
@@ -141,7 +141,7 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   mapKurator / ICDAR MapText / the two automatic georeferencing routes, what our numbers cannot be
   compared to and why, and the verdict per axis
 - `docs/worked-example-1882.md` — **one sheet all the way through**, with the number each stage
-  produced: the georeference checked by hand (11.3 m RMSE), the three OCR runs and why only one
+  produced: the georeference checked by hand (12.7 m RMSE), the three OCR runs and why only one
   counts, the first `join` and the first `approved` footprints in the archive's history, and the
   four defects that only surfaced by running the chain
 - `docs/ROADMAP.md` — **the one tracker, open work only**: the foundations pass, the OCR drain,
@@ -154,6 +154,11 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   that taught it and a date. Read before any unattended run, any database write, or any pass that
   produces a number
 - `docs/search-plan.md` — label search · temporal fabric · period sources (**Search** detail)
+- `docs/knowledge-system-plan.md` — **the object model the other plans each take a slice of**:
+  every object (sheet, scan, georeference, GCPs, masks, labels, polygons), how each is classified,
+  every link with its fill rate, and the ranked gaps (`georef-versions`, `rewarp-on-sync`, …)
+- `docs/evidence-chain-plan.md` — claim → reading → pixels → provider, piloted on the 1882 sheet:
+  what the schema already carries, the citation invariants, the delivery order (`evidence-chain`)
 - `docs/walk-plan.md` — the walk-through surface (**Walk**): HACW forked for a District 4 route,
   warped sheets as a year slider, and the frozen-JSON seam between the two apps
 - `docs/platform-design.md` — one workspace for VMA + HACW: what is shared and what stays per-app

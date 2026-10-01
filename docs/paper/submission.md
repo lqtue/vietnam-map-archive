@@ -1,8 +1,8 @@
 # EarthArXiv submission packet
 
-Generated from `draft.md` on 2026-09-20 — regenerate rather than edit by hand, so the abstract here
+Generated from `draft.md` on 2026-09-20; subtitle and abstract re-synced 2026-09-30 — regenerate rather than edit by hand, so the abstract here
 can never drift from the one in the manuscript. The PDF to upload is
-`docs/paper/blind-by-construction.pdf` (20 pages, A4).
+`docs/paper/blind-by-construction.pdf` (25 pages, A4).
 
 **Do the Zenodo deposit first.** §11 promises a data DOI; posting before it exists means a v2 whose
 only change is a DOI. `work/zenodo/zenodo-metadata.json` is the form-fill for it.
@@ -15,7 +15,7 @@ Blind by construction: verifying a georeferenced map series when the check share
 
 **Subtitle / running head**
 
-Two colonial map series of Vietnam, 514 archive-reported sheets
+Three historical map series of Vietnam
 
 **Author**
 
@@ -37,7 +37,7 @@ historical maps, georeferencing, map series, verification, reference frames, rep
 
 **Abstract**
 
-Historical map series often supply their own georeferencing control, but agreement with that control does not independently establish placement. We examine this problem through a documented Vietnam Map Archive failure and a controlled reproduction on US Army Map Service L7014 GeoPDFs. Of 510 source files, 62 lacked usable control, 11 failed the graticule check, and 437 entered the faulty build. All 269 sheets with reproduced CRS displacements of 395–528 m (median 455 m) passed that check. The check evaluates registration in the sheet's own geographic CRS and cannot validate the subsequent datum transformation to WGS 84. Comparing the same 715 PDF/PDF edges before and after correction, the number with median outline separation above 100 m falls from 189 to zero. This establishes improved inter-sheet agreement, not independent absolute accuracy: the CRS-selection check and comparison lattice share the adopted Helmert parameters. A second case, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner readings can still assign two sheets to the same cell. Together these cases support a taxonomy of verification scope, committed inputs, detectable faults, and blind spots. The contribution is a reproducible account of how checks can remain silent under specific shared assumptions, with explicit separation of source control, build measurements, and serving-state evidence.
+Historical map series often supply their own georeferencing control, but agreement with that control does not independently establish placement. We examine this problem through a documented Vietnam Map Archive failure and a controlled reproduction on US Army Map Service L7014 GeoPDFs. Of 510 source files, 62 lacked usable control, 11 failed the graticule check, and 437 entered the faulty build. All 269 sheets with reproduced CRS displacements of 395–528 m (median 455 m) passed that check. The check evaluates registration in the sheet's own geographic CRS and cannot validate the subsequent datum transformation to WGS 84. Comparing the same 715 PDF/PDF edges before and after correction, the number with median outline separation above 100 m falls from 189 to zero. This establishes improved inter-sheet agreement, not independent absolute accuracy: the CRS-selection check and comparison lattice share the adopted Helmert parameters. A second case, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner readings can still assign two sheets to the same cell. A third, from the same survey's 1:100,000 series placed automatically from catalogue extents, shows the structure recurring in a pipeline built after the first two were understood: a sheet whose catalogue west and south edges were wrong by 509 m and 544 m passed every per-sheet gate at 0.69% shape error, and was found only because its printed graticule ticks, an input those gates do not use, were read for calibration. Together these cases support a taxonomy of verification scope, committed inputs, detectable faults, and blind spots; the taxonomy is drawn from three cases in one project and is offered as an organizing account of this failure mode, not a claim that it generalizes across archives or pipelines. The contribution is an account, structured for reproducibility, of how checks can remain silent under specific shared assumptions, with explicit separation of source control, build measurements, and serving-state evidence; the derived data and code supporting that reproduction are pending deposit (§11).
 
 ## Related identifiers
 

@@ -564,7 +564,7 @@ This preprint has not been submitted to a journal for peer review.\par}
 \begin{center}
 {\LARGE\bfseries Blind by construction: verifying a georeferenced map series when the check shares the error\par}
 \vspace{0.5em}
-{\large Two historical map series of Vietnam\par}
+{\large Three historical map series of Vietnam\par}
 \vspace{1.2em}
 {\large Tue Quang Le\par}
 \vspace{0.3em}
@@ -572,7 +572,7 @@ This preprint has not been submitted to a journal for peer review.\par}
 {\small Independent researcher, Ho Chi Minh City, Vietnam\par}
 {\small \href{mailto:lequangtuevn@gmail.com}{lequangtuevn@gmail.com} · \href{https://maparchive.vn}{maparchive.vn}\par}
 \vspace{1em}
-{\small Preprint — 20 September 2026\par}
+{\small Preprint — 30 September 2026\par}
 \end{center}
 `;
 

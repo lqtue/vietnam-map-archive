@@ -126,6 +126,8 @@
 
     <NavDropdown label="Tools" active={activeTools}>
       <a href="/explore" class="dropdown-item" on:click={closeDrawer}>{$t('Map viewer')}</a>
+      <a href="/catalog/cartomundi" class="dropdown-item" on:click={closeDrawer}>CartoMundi index</a
+      >
       <a href="/explore?mode=story" class="dropdown-item" on:click={closeDrawer}
         >{$t('Story Builder')}</a
       >
@@ -291,6 +293,7 @@
 
     <nav class="drawer-nav">
       <a href="/catalog" class="drawer-link" on:click={closeDrawer}>{$t('Catalog')}</a>
+      <a href="/catalog/cartomundi" class="drawer-link" on:click={closeDrawer}>CartoMundi index</a>
       <a href="/about" class="drawer-link" on:click={closeDrawer}>{$t('About')}</a>
       <a href="/blog" class="drawer-link" on:click={closeDrawer}>{$t('Blog')}</a>
 

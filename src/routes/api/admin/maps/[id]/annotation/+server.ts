@@ -53,6 +53,14 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   const item = annotation.items?.[0];
   if (!item) throw error(400, 'No annotation items found');
 
+  // History first, and of the version being replaced: the stable file may have been written by
+  // a path that keeps no history (an earlier PATCH, a script), so this is the only copy of the
+  // previous georeference. Same path convention as mirrorAnnotation; the read route's `?version=`
+  // serves it. `annotation` is mutated below, so this must come before any edit.
+  const now = Date.now();
+  const stampOf = (ms: number) => new Date(ms).toISOString().replace(/[:.]/g, '-');
+  await uploadJson('annotations', `${mapId}/${stampOf(now)}.json`, annotation);
+
   const target = item.target;
   const source = typeof target === 'string' ? { id: target } : (target.source ?? target);
   const sourceId = typeof source === 'string' ? source : source.id;
@@ -77,8 +85,10 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   }));
 
   // Update annotation in place
+  // Keep the transformation (thinPlateSpline, helmert, ...) the sheet was georeferenced with.
   item.body = {
     type: 'FeatureCollection',
+    ...(item.body?.transformation ? { transformation: item.body.transformation } : {}),
     features,
   };
 
@@ -98,6 +108,8 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
     };
   }
 
+  // The new version gets its own history entry too (a later stamp than the snapshot above).
+  await uploadJson('annotations', `${mapId}/${stampOf(now + 1)}.json`, annotation);
   await uploadJson('annotations', `${mapId}.json`, annotation);
   await adminClient()
     .from('maps')

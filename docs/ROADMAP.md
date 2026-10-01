@@ -314,8 +314,40 @@ system — what a result must retain, and the two kinds of check — is in the r
       a random audit of apparently easy rows retained. Do not call a score calibrated until it has
       been tested against human outcomes. Exit: reviewers find more confirmed errors in the same
       time without raising residual error.
+- [ ] **`evidence-chain`** — one reviewed feature on the 1882 cadastral sheet, cited from claim to
+      pixels, then a frozen research packet. Most of the chain exists — pixel-master geometry
+      (mig 016/066), `geom_src`, `ocr_labels.footprint_id`, `cell_printings` — so the pilot adds
+      `subjects`/`claims`/`claim_evidence` and closes three gaps: an approved footprint can be
+      deleted by its owner (cited rows get `ON DELETE RESTRICT` plus a `cited_value` snapshot),
+      `rights` is normalised not verbatim (mig 096), and nothing records which image the pixels
+      were measured on. Not blocked by `ocr-merge-evidence`; `source-agreement` and
+      `attested-variants` build on its `claim_evidence` rather than beside it. Exit: a public
+      claim opens its exact source region; the packet survives an OCR or georeference correction;
+      draft evidence stays private. Plan: `docs/evidence-chain-plan.md`.
+- [ ] **`georef-versions`** — the georeference is not a database object. GCPs, transformation,
+      mask and RMSE exist only inside `annotations/<id>.json`; only `geom_src` and a copied
+      `geom_rmse` reach the DB. One table, one row per stored version, appended by every writer
+      (`mirrorAnnotation`, the neatline PATCH, the sync script, the pipeline georef scripts). Exit:
+      one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
+      stale labels. Plan: `docs/knowledge-system-plan.md` §5.
+- [ ] **`rewarp-on-sync`** — a synced georeference leaves its labels on the old one. Measured
+      2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. One-off repair is
+      `scripts/oneoff/fix_saigon_1942_1968.mjs`; the item is making the sync script and
+      `mirrorAnnotation` queue the `warp` job themselves. Exit: after a sync, no label or footprint
+      on that map carries an old `geom_src`.
+- [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
+      neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
+      writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
+      uses a bare "mask" for more than one.
 
 ## Survey layer and catalog
+
+- [ ] **`series-identity`** — `maps.collection` is the series key by accident: `series_key()` folds
+      the display string, so editing it re-files the sheet. Add a generated `maps.series_key`, fill
+      `sheet_number` on the 188 first-edition rows that carry it only in `extra_metadata`, and give
+      curated non-survey groups (the city plans) their own concept. Gated on the `evidence-chain`
+      pilot. Exit: no series fact lives only in `extra_metadata`. Plan:
+      `docs/knowledge-system-plan.md` §1.
 
 - [ ] **`multi-printing-cells`** — `series_sheets` can name only one printing of a cell. Its key is
       `(series_key, sheet_number)`, one row per cell — but the archive holds **10 cells in more than
@@ -555,7 +587,9 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 **Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
 there is human time — `three-point-residuals` and `tonkin-review` are its two halves.
 `walk-the-route` comes before anything else in Walk is worth starting; `story-contract` is
-independent and can run alongside Search. Debt never blocks.
+independent and can run alongside Search. `evidence-chain` needs only the 1882 sheet, whose
+evidence is already reviewed, so it waits on nothing above it — but its step 1 must confirm the
+1882 annotation mirror against `district4-mirror-sync` first. Debt never blocks.
 
 Previously: A1–A4 → B1 → B2 → C0 → C1 → B3 → B4 → B5 → C2, then E1 → E2 → E3. Those codes are
 history; they still name the closed items in `docs/roadmap-record.md`, and the map from them to

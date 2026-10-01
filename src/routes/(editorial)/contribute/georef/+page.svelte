@@ -149,6 +149,13 @@
                     <a class="chip" href={map.editorUrl} target="_blank" rel="noopener">
                       {$t('Fix in Allmaps')}
                     </a>
+                  {:else if map.pipelineMade}
+                    <span
+                      class="badge-chip is-sm"
+                      title={$t(
+                        'Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.'
+                      )}>{$t('Pipeline-maintained')}</span
+                    >
                   {:else}
                     <span
                       class="badge-chip is-sm"

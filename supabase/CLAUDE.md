@@ -7,8 +7,10 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 - `maps.status` is `draft | public | featured` and is the **only** visibility model (mig 060).
   Draft maps are readable by any signed-in user, never anonymously (mig 063). A published map must
-  carry `annotation_url` **or** `allmaps_id` (mig 062), and publishing enqueues `mirror_annotation`
-  + `tile_to_r2` (mig 058).
+  carry `annotation_url` **or** `allmaps_id` (mig 062) — `allmaps_id` alone is enough on purpose:
+  a map may be published first and georeferenced by a volunteer afterwards (the sync-georef flip,
+  mig 080; pinned in `tests/write.spec.ts`), so do not tighten this to "already georeferenced".
+  Publishing enqueues `mirror_annotation` + `tile_to_r2` (mig 058).
 - **Status transitions live in Postgres**, not the API: `set_extraction_status`,
   `revert_recent_validations`, `set_footprint_status`, `set_review_mark`, `claim_job`, `finish_job`.
   All `security definer`, `service_role` only. New write paths reuse them.
@@ -26,7 +28,7 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **102**, local (101 is live in production, verified 2026-09-30 via
+Head is **102**, live in production (verified 2026-10-01 via
 `supabase migration list`). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
 trigger function 097 added and 099 missed. 101 narrows `map_images` and `map_slug_aliases`'s read policies from
 "published or any signed-in user" to "published, the map's creator, or staff" — the two
