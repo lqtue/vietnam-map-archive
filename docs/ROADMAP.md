@@ -396,9 +396,11 @@ system — what a result must retain, and the two kinds of check — is in the r
 ## Survey layer and catalog
 
 - [ ] **`series-identity`** — `maps.collection` is the series key by accident: `series_key()` folds
-      the display string, so editing it re-files the sheet. Add a generated `maps.series_key`, fill
-      `sheet_number` on the 188 first-edition rows that carry it only in `extra_metadata`, and give
-      curated non-survey groups (the city plans) their own concept. Gated on the `evidence-chain`
+      the display string, so editing it re-files the sheet. **Migration 104 (pushed 2026-10-01)**
+      adds the generated `maps.series_key` and fills `sheet_number` on the 188 first-edition rows;
+      the series page and sheet editions read it. Still open: the catalog filter and the persisted
+      layer refs still carry the `collection` string, the key is only as stable as the label until a
+      `series` table exists, and curated non-survey groups (the city plans) need their own concept. Gated on the `evidence-chain`
       pilot. Exit: no series fact lives only in `extra_metadata`. Plan:
       `docs/knowledge-system-plan.md` §1.
 
@@ -455,20 +457,28 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 ## Shapes — segmentation, and the OCR ↔ shape join
 
+- [ ] **`river-reconstruction`** — build and evaluate the 1882 river first, with 1898 as the
+      paired transfer check. The 2026-10-01 VMA IIIF pilot exposed a nearly empty 1882 open-river
+      core at the current half-size colour cut; a wider cut recovers water but leaks into Arsenal
+      streets. Native-pixel EDA shows that 1882 and 1898 share ruled-water geometry but differ in
+      colour, and VMA pyramid levels shift the river ink. The current 0.09 mask is only a diagnostic
+      proposal. Exit: hand-traced water and adjacent land in held-out river, quay, creek and dry-land
+      windows on **both** sheets; a source-resolution, bank-aware proposal scored for missed water,
+      false water and shoreline distance by case; human review before any layer is approved. Method,
+      measurements and reproducible artefacts: `docs/river-reconstruction.md`.
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any
       number means anything. Same blocker as `district4-table`.
-- [ ] **`colour-blocks`** — blocks from the sheet's own colour, not from 2023 geodata. Plan and full
-      measurement
-      trail: `docs/journals/260918-colour-blocks.md`. P1 landed 2026-09-18
-      (`colour_blocks.py`, CPU only) and **did not clear its gate** — 189 blocks on the whole sheet
-      in 5.9 s, but 0.124 mean IoU against the 24 `land_plot` traces. P3's null was **retracted the
-      same day** (it was measured against 89 traces of which 72 are OCR label boxes, which sit on
-      open wash and cannot differ from the plot); re-measured on the 17 real traces, `r − g` overlap
-      is 0.23, sharpening to 0.18 with ink excluded. So an axis exists; a threshold that beats
-      `building` 0.160 has not been shown. Number to beat overall is `--blocks-from-roads` at
-      land_plot IoU 0.262 / cover 0.87. Cheapest next test: a salmon-internal `r − g` threshold at
-      the measured trough, scored against the 17 traces. Needs one GPU run for P4 write-back.
+- [ ] **`colour-blocks`** — the sheet-colour pipeline exists (`colour_blocks.py`, CPU only), and
+      later passes moved 1882 best-match mean IoU to **0.343** on 24 `land_plot` traces and
+      **0.355** on 17 `building` traces. The early P1 null and its retracted P3 interpretation
+      remain in `docs/journals/260918-colour-blocks.md` as the method history, not the current
+      verdict. The traces are selected and do not measure precision; the 46-trace SAM2 LoRA has
+      no independent test set. Exit: the bounded `shape-precision` reference window, a measured
+      false-positive rate, and a MapSAM2 run prompted by the *same* colour prior before claiming
+      one method improves the other. River is tracked separately under `river-reconstruction`.
+      1882 and 1898 are run independently: swapping their auto-derived constants costs 1882 0.08
+      land_plot IoU and its road proposals (`docs/journals/261001-colour-pair-1882-1898.md`).
 - [ ] **`shapes-deferred`** — the gazetteer link and the LoRA shot set. Neither has a gate;
       both wait on `seg-eval-set` having data.
 

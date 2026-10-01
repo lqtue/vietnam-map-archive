@@ -1396,7 +1396,8 @@ def ruling_mask(rgb: np.ndarray, cell: int = WATER_COH_CELL,
 
 
 def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
-                 water: list[tuple[float, float]]) -> tuple[np.ndarray, np.ndarray, list[bool]]:
+                 water: list[tuple[float, float]],
+                 line_rb: float = WATER_LINE_RB) -> tuple[np.ndarray, np.ndarray, list[bool]]:
     """(the water as a pixel mask, the land mask bounding it, per-polygon named).
 
     Split out of `water_mask` so the review renderer can tint exactly what the
@@ -1413,7 +1414,7 @@ def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
         y, x = np.ogrid[-r:r + 1, -r:r + 1]
         return x * x + y * y <= r * r
 
-    blue = (v < WATER_LINE_V) & (rb < WATER_LINE_RB)
+    blue = (v < WATER_LINE_V) & (rb < line_rb)
     # Hue alone is not enough: the military class's wash is blue-grey too, and
     # it flowed down the streets of the Arsenal quarter and joined the river,
     # taking the Jardin Botanique and 0.14 km² of the Magasins with it. The
@@ -1462,7 +1463,8 @@ def water_region(feats: list[dict], rgb: np.ndarray, scale: float,
 
 
 def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tuple[float, float]],
-               ink_v: float = INK_V, share: float = WATER_SHARE) -> list[bool]:
+               ink_v: float = INK_V, share: float = WATER_SHARE,
+               region: tuple[np.ndarray, np.ndarray, list[bool]] | None = None) -> list[bool]:
     """True for each polygon lying in the sheet's water.
 
     `water` is the hydrology labels, in source px. `ink_v` is unused and kept
@@ -1480,7 +1482,7 @@ def water_mask(feats: list[dict], rgb: np.ndarray, scale: float, water: list[tup
     if not water:
         return [False] * len(feats)
     h, w = rgb.shape[:2]
-    full, _land, named = water_region(feats, rgb, scale, water)
+    full, _land, named = region if region is not None else water_region(feats, rgb, scale, water)
     if not full.any():
         return named
     out: list[bool] = []
@@ -2014,6 +2016,9 @@ def main() -> int:
     p.add_argument("--map-id", help="maps.id UUID; the IIIF base and scale are read from it")
     p.add_argument("--iiif-base", help="IIIF image base URL (overrides --map-id lookup)")
     p.add_argument("--local-image", help="read this file instead of fetching (no network)")
+    p.add_argument("--source-width", type=int,
+                   help="original scan width when --local-image is already downsampled; "
+                        "keeps OCR points and polygon coordinates in source pixels")
     p.add_argument("--render", type=int, default=4096,
                    help="longest edge of the working image. Ink lines are 2-3 source px: "
                         "too small and the outlines dissolve and blocks merge (default 4096)")
@@ -2098,6 +2103,9 @@ def main() -> int:
                         "is the default and takes ~200 polygons off the 1882 sheet "
                         "without moving land_plot or building a digit, because every "
                         "one of them was a false positive. This removes geometry")
+    p.add_argument("--export-water-mask", action="store_true",
+                   help="save the actual water-region mask as water-mask.png in --out "
+                        "(render pixels, 255 water / 0 other); requires water filtering")
     p.add_argument("--no-drop-slivers", dest="drop_slivers", action="store_false",
                    help="keep polygons too stringy to be a parcel (outline circularity "
                         f"below {MIN_CIRCULARITY}). On the 1882 sheet these are the shapes "
@@ -2137,6 +2145,10 @@ def main() -> int:
     if args.self_check:
         _self_check()
         return 0
+    if args.export_water_mask and (not args.drop_water or not args.out):
+        p.error("--export-water-mask requires --out and water filtering")
+    if args.source_width and not args.local_image:
+        p.error("--source-width requires --local-image")
     if not (args.local_image or args.iiif_base or args.map_id):
         p.error("one of --map-id, --iiif-base or --local-image is required")
 
@@ -2145,7 +2157,9 @@ def main() -> int:
     if args.local_image:
         Image.MAX_IMAGE_PIXELS = None
         pil = Image.open(args.local_image).convert("RGB")
-        source_w = pil.width
+        source_w = args.source_width or pil.width
+        if source_w < pil.width:
+            p.error("--source-width cannot be smaller than --local-image width")
         if pil.width > args.render:
             pil = pil.resize((args.render, round(pil.height * args.render / pil.width)))
     else:
@@ -2306,7 +2320,16 @@ def main() -> int:
                 print(f"  dropped {before - len(feats)} inside the title or legend box")
 
     if args.drop_water:
-        wet_mask = water_mask(feats, rgb, scale, wet, ink_v=args.ink)
+        region = water_region(feats, rgb, scale, wet) if args.export_water_mask and wet else None
+        if args.export_water_mask:
+            if region is None:
+                p.error("--export-water-mask requires hydrology labels")
+            out_dir = Path(args.out)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(region[0].astype(np.uint8) * 255).save(out_dir / "water-mask.png")
+            print(f"  water region: {int(region[0].sum())} render pixels "
+                  f"→ {out_dir / 'water-mask.png'}")
+        wet_mask = water_mask(feats, rgb, scale, wet, ink_v=args.ink, region=region)
         kept = [f for f, w in zip(feats, wet_mask) if not w]
         km2 = sum(f["geom"].area for f, w in zip(feats, wet_mask) if w) * ((mpp or 0) ** 2) / 1e6
         print(f"  dropped {len(feats) - len(kept)} as river surface"
@@ -2370,6 +2393,7 @@ def main() -> int:
             "cool_split": round(cool, 4) if cool is not None else None,
             "green_split": round(green, 4) if green is not None else None,
             "render": int(rgb.shape[1]),
+            "source_width": int(source_w),
             # The working image itself, not the request that produced it. Two
             # fetches of `--map-id X --render 6144` are not the same pixels:
             # `fetch_crop` can answer from the region URL, from a composed tile

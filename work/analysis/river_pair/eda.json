@@ -1,0 +1,796 @@
+{
+  "1882": {
+    "iiif": "https://iiif.maparchive.vn/iiif/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+    "source_size": [
+      12102,
+      8982
+    ],
+    "windows": {
+      "water_core": {
+        "size": [
+          200,
+          200
+        ],
+        "rgb_median": [
+          225.0,
+          212.0,
+          193.0
+        ],
+        "bright_rgb_median": [
+          226.0,
+          213.0,
+          194.0
+        ],
+        "dark_share": 0.1196,
+        "dark_rb_p10_p50_p90": [
+          0.0314,
+          0.0549,
+          0.0745
+        ],
+        "dark_rb_below_007_009_011": [
+          0.8191,
+          0.9952,
+          0.9994
+        ],
+        "directional_coherence": 0.882,
+        "box": [
+          3900,
+          6400,
+          200,
+          200
+        ],
+        "class": "water",
+        "raw_vma_tile_count": 2,
+        "rgb_sha256": "ce1642e17d4db4359ed49f7eb6461ac5f619f51611e43f36c3ff7d818bb89b80",
+        "resized_lanczos": {
+          "2": {
+            "size": [
+              100,
+              100
+            ],
+            "rgb_median": [
+              225.0,
+              212.0,
+              192.0
+            ],
+            "bright_rgb_median": [
+              226.0,
+              213.0,
+              193.0
+            ],
+            "dark_share": 0.1456,
+            "dark_rb_p10_p50_p90": [
+              0.0314,
+              0.0549,
+              0.0745
+            ],
+            "dark_rb_below_007_009_011": [
+              0.8242,
+              0.9931,
+              1.0
+            ],
+            "directional_coherence": 0.817
+          },
+          "4": {
+            "size": [
+              50,
+              50
+            ],
+            "rgb_median": [
+              225.0,
+              211.0,
+              192.0
+            ],
+            "bright_rgb_median": [
+              226.0,
+              212.0,
+              193.0
+            ],
+            "dark_share": 0.2012,
+            "dark_rb_p10_p50_p90": [
+              0.0392,
+              0.0588,
+              0.0745
+            ],
+            "dark_rb_below_007_009_011": [
+              0.7614,
+              0.9901,
+              1.0
+            ],
+            "directional_coherence": 0.787
+          }
+        },
+        "vma_pyramid": {
+          "2": {
+            "size": [
+              100,
+              100
+            ],
+            "rgb_median": [
+              224.0,
+              212.0,
+              194.0
+            ],
+            "bright_rgb_median": [
+              225.0,
+              213.0,
+              195.0
+            ],
+            "dark_share": 0.1234,
+            "dark_rb_p10_p50_p90": [
+              0.0588,
+              0.0784,
+              0.098
+            ],
+            "dark_rb_below_007_009_011": [
+              0.231,
+              0.7496,
+              0.9959
+            ],
+            "directional_coherence": 0.757,
+            "raw_tile_count": 2,
+            "rgb_sha256": "afaa818ac1f4494aebbf0566da2890863955a75b6f8f93e9f3661c2d00a39e87"
+          },
+          "4": {
+            "size": [
+              50,
+              50
+            ],
+            "rgb_median": [
+              223.0,
+              211.0,
+              194.0
+            ],
+            "bright_rgb_median": [
+              224.0,
+              212.0,
+              195.0
+            ],
+            "dark_share": 0.17,
+            "dark_rb_p10_p50_p90": [
+              0.0902,
+              0.1059,
+              0.1137
+            ],
+            "dark_rb_below_007_009_011": [
+              0.0,
+              0.0871,
+              0.7247
+            ],
+            "directional_coherence": 0.629,
+            "raw_tile_count": 2,
+            "rgb_sha256": "33024ddfa6dca3b55752f16c3bf033c24fd2738162cdd8e6da87b86c53ad010c"
+          }
+        }
+      },
+      "dry_blue": {
+        "size": [
+          800,
+          800
+        ],
+        "rgb_median": [
+          216.0,
+          206.0,
+          188.0
+        ],
+        "bright_rgb_median": [
+          223.0,
+          212.0,
+          195.0
+        ],
+        "dark_share": 0.3841,
+        "dark_rb_p10_p50_p90": [
+          0.0118,
+          0.0667,
+          0.1333
+        ],
+        "dark_rb_below_007_009_011": [
+          0.6424,
+          0.8139,
+          0.8459
+        ],
+        "directional_coherence": 0.445,
+        "box": [
+          6900,
+          4800,
+          800,
+          800
+        ],
+        "class": "land",
+        "raw_vma_tile_count": 20,
+        "rgb_sha256": "4f34e5b611ccfb097c0fcf453b3b4b477a4f2945bd793b24deb8bfa72369789d",
+        "resized_lanczos": {
+          "2": {
+            "size": [
+              400,
+              400
+            ],
+            "rgb_median": [
+              215.0,
+              205.0,
+              188.0
+            ],
+            "bright_rgb_median": [
+              223.0,
+              212.0,
+              194.0
+            ],
+            "dark_share": 0.4044,
+            "dark_rb_p10_p50_p90": [
+              0.0118,
+              0.0667,
+              0.1294
+            ],
+            "dark_rb_below_007_009_011": [
+              0.6456,
+              0.8125,
+              0.849
+            ],
+            "directional_coherence": 0.31
+          },
+          "4": {
+            "size": [
+              200,
+              200
+            ],
+            "rgb_median": [
+              205.0,
+              197.0,
+              186.0
+            ],
+            "bright_rgb_median": [
+              218.0,
+              205.0,
+              189.0
+            ],
+            "dark_share": 0.4167,
+            "dark_rb_p10_p50_p90": [
+              0.0039,
+              0.0627,
+              0.1137
+            ],
+            "dark_rb_below_007_009_011": [
+              0.7137,
+              0.8454,
+              0.8958
+            ],
+            "directional_coherence": 0.042
+          }
+        },
+        "vma_pyramid": {
+          "2": {
+            "size": [
+              400,
+              400
+            ],
+            "rgb_median": [
+              213.0,
+              204.0,
+              188.0
+            ],
+            "bright_rgb_median": [
+              222.0,
+              211.0,
+              194.0
+            ],
+            "dark_share": 0.3952,
+            "dark_rb_p10_p50_p90": [
+              0.0118,
+              0.0667,
+              0.1294
+            ],
+            "dark_rb_below_007_009_011": [
+              0.6512,
+              0.8114,
+              0.8462
+            ],
+            "directional_coherence": 0.278,
+            "raw_tile_count": 6,
+            "rgb_sha256": "5ad6fb99a8d0bcb6e569d928cb974ed6471bbe4e5035180ebb86511625226812"
+          },
+          "4": {
+            "size": [
+              200,
+              200
+            ],
+            "rgb_median": [
+              207.0,
+              198.0,
+              186.0
+            ],
+            "bright_rgb_median": [
+              217.0,
+              205.0,
+              190.0
+            ],
+            "dark_share": 0.4123,
+            "dark_rb_p10_p50_p90": [
+              0.0118,
+              0.0667,
+              0.1255
+            ],
+            "dark_rb_below_007_009_011": [
+              0.6509,
+              0.8183,
+              0.8665
+            ],
+            "directional_coherence": 0.054,
+            "raw_tile_count": 4,
+            "rgb_sha256": "597cefa87b3146e9bd9d7c9726615b4fd1324de69db18174d3ed51cf291ae84d"
+          }
+        }
+      },
+      "quay_mixed": {
+        "size": [
+          1000,
+          1000
+        ],
+        "rgb_median": [
+          210.0,
+          202.0,
+          187.0
+        ],
+        "bright_rgb_median": [
+          223.0,
+          212.0,
+          199.0
+        ],
+        "dark_share": 0.446,
+        "dark_rb_p10_p50_p90": [
+          -0.0118,
+          0.051,
+          0.1686
+        ],
+        "dark_rb_below_007_009_011": [
+          0.7762,
+          0.8294,
+          0.8501
+        ],
+        "directional_coherence": 0.461,
+        "box": [
+          6900,
+          5900,
+          1000,
+          1000
+        ],
+        "class": "mixed",
+        "raw_vma_tile_count": 20,
+        "rgb_sha256": "eaa3e507de5976e6c27afcb9a2926e2a3ccef98315f2bd0c6c82899cb45f0fa6"
+      },
+      "creek_mixed": {
+        "size": [
+          1000,
+          1000
+        ],
+        "rgb_median": [
+          224.0,
+          210.0,
+          188.0
+        ],
+        "bright_rgb_median": [
+          225.0,
+          211.0,
+          188.0
+        ],
+        "dark_share": 0.1645,
+        "dark_rb_p10_p50_p90": [
+          -0.0196,
+          0.0588,
+          0.1333
+        ],
+        "dark_rb_below_007_009_011": [
+          0.5957,
+          0.7161,
+          0.7809
+        ],
+        "directional_coherence": 0.163,
+        "box": [
+          800,
+          3800,
+          1000,
+          1000
+        ],
+        "class": "mixed",
+        "raw_vma_tile_count": 25,
+        "rgb_sha256": "45bc0ac1e208fc10c5aa51227ac023cf995b632611df348c4ad37bd07163ec50"
+      }
+    }
+  },
+  "1898": {
+    "iiif": "https://iiif.maparchive.vn/iiif/20ec4f9a-16bd-4895-a593-40c6ed9c9555",
+    "source_size": [
+      16267,
+      14859
+    ],
+    "windows": {
+      "water_core": {
+        "size": [
+          200,
+          200
+        ],
+        "rgb_median": [
+          239.0,
+          237.0,
+          221.0
+        ],
+        "bright_rgb_median": [
+          240.0,
+          237.0,
+          222.0
+        ],
+        "dark_share": 0.1336,
+        "dark_rb_p10_p50_p90": [
+          -0.051,
+          -0.0235,
+          0.0078
+        ],
+        "dark_rb_below_007_009_011": [
+          0.9987,
+          0.9996,
+          1.0
+        ],
+        "directional_coherence": 0.834,
+        "box": [
+          10950,
+          8650,
+          200,
+          200
+        ],
+        "class": "water",
+        "raw_vma_tile_count": 4,
+        "rgb_sha256": "5d4f69edc116708088a48348a8f538ddff8b184e1cb8b797ac5f048808e05f81",
+        "resized_lanczos": {
+          "2": {
+            "size": [
+              100,
+              100
+            ],
+            "rgb_median": [
+              240.0,
+              237.0,
+              220.0
+            ],
+            "bright_rgb_median": [
+              241.0,
+              238.0,
+              221.0
+            ],
+            "dark_share": 0.1738,
+            "dark_rb_p10_p50_p90": [
+              -0.0471,
+              -0.0196,
+              0.0078
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9994,
+              0.9994,
+              1.0
+            ],
+            "directional_coherence": 0.781
+          },
+          "4": {
+            "size": [
+              50,
+              50
+            ],
+            "rgb_median": [
+              233.0,
+              232.0,
+              218.0
+            ],
+            "bright_rgb_median": [
+              239.0,
+              236.0,
+              220.0
+            ],
+            "dark_share": 0.1192,
+            "dark_rb_p10_p50_p90": [
+              -0.0314,
+              -0.0157,
+              0.0039
+            ],
+            "dark_rb_below_007_009_011": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "directional_coherence": 0.758
+          }
+        },
+        "vma_pyramid": {
+          "2": {
+            "size": [
+              100,
+              100
+            ],
+            "rgb_median": [
+              238.0,
+              236.0,
+              222.0
+            ],
+            "bright_rgb_median": [
+              239.0,
+              237.0,
+              224.0
+            ],
+            "dark_share": 0.1544,
+            "dark_rb_p10_p50_p90": [
+              -0.0157,
+              0.0118,
+              0.0314
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9994,
+              1.0,
+              1.0
+            ],
+            "directional_coherence": 0.742,
+            "raw_tile_count": 2,
+            "rgb_sha256": "6b85d14a9a3b7354797e0d0862d6bf2aed119b8f3257208a4a652b384bee2f47"
+          },
+          "4": {
+            "size": [
+              51,
+              51
+            ],
+            "rgb_median": [
+              237.0,
+              235.0,
+              222.0
+            ],
+            "bright_rgb_median": [
+              238.0,
+              237.0,
+              224.0
+            ],
+            "dark_share": 0.1588,
+            "dark_rb_p10_p50_p90": [
+              0.0157,
+              0.0314,
+              0.0549
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9952,
+              1.0,
+              1.0
+            ],
+            "directional_coherence": 0.694,
+            "raw_tile_count": 1,
+            "rgb_sha256": "92468e5a3b00895af9d43f15750a67c40f457913c763508707d6af31a5f6c9cb"
+          }
+        }
+      },
+      "dry_blue": {
+        "size": [
+          800,
+          800
+        ],
+        "rgb_median": [
+          208.0,
+          212.0,
+          210.0
+        ],
+        "bright_rgb_median": [
+          226.0,
+          229.0,
+          223.0
+        ],
+        "dark_share": 0.4095,
+        "dark_rb_p10_p50_p90": [
+          -0.1059,
+          -0.0431,
+          0.0353
+        ],
+        "dark_rb_below_007_009_011": [
+          0.9204,
+          0.9293,
+          0.9338
+        ],
+        "directional_coherence": 0.578,
+        "box": [
+          8500,
+          5700,
+          800,
+          800
+        ],
+        "class": "land",
+        "raw_vma_tile_count": 16,
+        "rgb_sha256": "502b990ae5275623e914aa6ae333393621c91c299074f82d0070213bfbbc9d5e",
+        "resized_lanczos": {
+          "2": {
+            "size": [
+              400,
+              400
+            ],
+            "rgb_median": [
+              198.0,
+              199.0,
+              202.0
+            ],
+            "bright_rgb_median": [
+              230.0,
+              231.0,
+              221.0
+            ],
+            "dark_share": 0.4676,
+            "dark_rb_p10_p50_p90": [
+              -0.1098,
+              -0.0431,
+              0.0118
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9332,
+              0.9417,
+              0.9465
+            ],
+            "directional_coherence": 0.584
+          },
+          "4": {
+            "size": [
+              200,
+              200
+            ],
+            "rgb_median": [
+              197.0,
+              201.0,
+              202.0
+            ],
+            "bright_rgb_median": [
+              211.0,
+              214.0,
+              213.0
+            ],
+            "dark_share": 0.4627,
+            "dark_rb_p10_p50_p90": [
+              -0.1137,
+              -0.0353,
+              0.0039
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9447,
+              0.9548,
+              0.9612
+            ],
+            "directional_coherence": 0.222
+          }
+        },
+        "vma_pyramid": {
+          "2": {
+            "size": [
+              400,
+              400
+            ],
+            "rgb_median": [
+              199.0,
+              202.0,
+              203.0
+            ],
+            "bright_rgb_median": [
+              224.0,
+              227.0,
+              220.0
+            ],
+            "dark_share": 0.458,
+            "dark_rb_p10_p50_p90": [
+              -0.1059,
+              -0.0353,
+              0.0196
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9225,
+              0.9313,
+              0.9344
+            ],
+            "directional_coherence": 0.536,
+            "raw_tile_count": 6,
+            "rgb_sha256": "28785dfe4fc0fac41cf5382b538bc212e882358b1aa3e8e8abc20547837bd43b"
+          },
+          "4": {
+            "size": [
+              200,
+              200
+            ],
+            "rgb_median": [
+              197.0,
+              200.0,
+              200.0
+            ],
+            "bright_rgb_median": [
+              214.0,
+              217.0,
+              215.0
+            ],
+            "dark_share": 0.4783,
+            "dark_rb_p10_p50_p90": [
+              -0.098,
+              -0.0392,
+              0.0039
+            ],
+            "dark_rb_below_007_009_011": [
+              0.9388,
+              0.947,
+              0.9496
+            ],
+            "directional_coherence": 0.185,
+            "raw_tile_count": 4,
+            "rgb_sha256": "bf450f735aafc73e0e802009f2488223f82558f9465667f8f738e4f794d5b58a"
+          }
+        }
+      },
+      "quay_mixed": {
+        "size": [
+          1200,
+          1200
+        ],
+        "rgb_median": [
+          236.0,
+          233.0,
+          216.0
+        ],
+        "bright_rgb_median": [
+          239.0,
+          235.0,
+          218.0
+        ],
+        "dark_share": 0.2274,
+        "dark_rb_p10_p50_p90": [
+          -0.102,
+          0.0118,
+          0.1216
+        ],
+        "dark_rb_below_007_009_011": [
+          0.8298,
+          0.875,
+          0.8909
+        ],
+        "directional_coherence": 0.314,
+        "box": [
+          10000,
+          7300,
+          1200,
+          1200
+        ],
+        "class": "mixed",
+        "raw_vma_tile_count": 30,
+        "rgb_sha256": "d30cbe871f81651ac9ef090f48ff0f1f38aae0eb583b5a1b1d07d15c80ed1198"
+      },
+      "creek_mixed": {
+        "size": [
+          1000,
+          1000
+        ],
+        "rgb_median": [
+          241.0,
+          216.0,
+          196.0
+        ],
+        "bright_rgb_median": [
+          244.0,
+          225.0,
+          206.0
+        ],
+        "dark_share": 0.237,
+        "dark_rb_p10_p50_p90": [
+          0.0784,
+          0.3216,
+          0.3804
+        ],
+        "dark_rb_below_007_009_011": [
+          0.0785,
+          0.1167,
+          0.1291
+        ],
+        "directional_coherence": 0.815,
+        "box": [
+          4000,
+          1800,
+          1000,
+          1000
+        ],
+        "class": "mixed",
+        "raw_vma_tile_count": 20,
+        "rgb_sha256": "7543cc28528a1685ad33a453fc74006cb425c25c4487c15477e696ddacb2a5fb"
+      }
+    }
+  }
+}

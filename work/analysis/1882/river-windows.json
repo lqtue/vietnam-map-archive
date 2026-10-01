@@ -1,0 +1,72 @@
+{
+  "map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+  "iiif_service": "https://iiif.maparchive.vn/iiif/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+  "image": {
+    "width": 12102,
+    "height": 8982,
+    "tile_width": 256,
+    "sample_tile": {
+      "region": [3840, 6144, 256, 256],
+      "sha256": "457e07a7f3b31ec93576258fba7673f5813170d4de49ce38fedc8aad66dc6e04"
+    }
+  },
+  "coordinate_system": "source image pixels, origin at upper left; boxes are [x, y, width, height]",
+  "review_status": "visually inspected; no exhaustive water or land mask has been traced",
+  "binary_controls": [
+    {
+      "id": "open_river_core",
+      "box": [3900, 6400, 200, 200],
+      "expected": "water",
+      "basis": "Hand-checked on VMA IIIF tiles: this box is wholly inside the rippled Saigon River, clear of the bank and landing"
+    },
+    {
+      "id": "dry_blue_parcels",
+      "box": [6900, 4800, 800, 800],
+      "expected": "land",
+      "basis": "Hand-checked on VMA IIIF tiles: blue-grey hatched urban parcels, no water"
+    },
+    {
+      "id": "dry_city_blocks",
+      "box": [4300, 3700, 900, 900],
+      "expected": "land",
+      "basis": "Hand-checked on VMA IIIF tiles: salmon-hatched urban blocks, no water"
+    }
+  ],
+  "windows": [
+    {
+      "id": "open_bank",
+      "role": "positive_control",
+      "box": [3800, 6100, 800, 800],
+      "visible": "Open river with ripple lines, one bank across the upper edge, and a projecting landing",
+      "check": "Open-water coverage and the printed shoreline; exclude the landing from water"
+    },
+    {
+      "id": "arsenal_quay",
+      "role": "failure_case",
+      "box": [6900, 5900, 1000, 1000],
+      "visible": "Blue-grey hatched Arsenal land, street gaps, quay edge, open water and a basin mouth",
+      "check": "Keep the dockyard apron on land, follow the quay, and identify enclosed water separately"
+    },
+    {
+      "id": "western_creek",
+      "role": "failure_case",
+      "box": [800, 3800, 1000, 1000],
+      "visible": "Narrow winding creek joining a larger waterway, with bridges, plots and a nearby road",
+      "check": "Recover both banks of the narrow water and keep bridges, road and plots out of the water mask"
+    },
+    {
+      "id": "dry_blue_parcels",
+      "role": "negative_control",
+      "box": [6900, 4800, 800, 800],
+      "visible": "Blue-grey hatched parcels, buildings and streets; no visible water",
+      "check": "No water in the window despite blue-grey wash and ruling"
+    },
+    {
+      "id": "dry_city_blocks",
+      "role": "negative_control",
+      "box": [4300, 3700, 900, 900],
+      "visible": "Salmon-hatched parcels, buildings, labels and street intersections; no visible water",
+      "check": "No water in the window despite dense linework"
+    }
+  ]
+}
