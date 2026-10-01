@@ -117,8 +117,9 @@ def points(sheet, mask_path, layer="water", seed=None):
     groups = defaultdict(list)
     for pid, lab in labels.items():
         p = pts[pid]
-        if lab == "unsure" or (seed is not None and p["seed"] != seed):
+        if lab == "unsure" or (lab == "bridge" and layer == "water") or (seed is not None and p["seed"] != seed):
             continue
+        lab = "road" if lab == "bridge" else lab           # a bridge is road in the road layer
         w = win[p["window"]]
         truth, pred = lab == layer, bool(mask[p["y"], p["x"]])
         # how far a wrong point sits from the proposal's edge, px: small = edge placement, large = a missed body

@@ -9,7 +9,8 @@
 
 The page shows each point as a crosshair on the native raster, close up and in context. It never
 shows a proposal, the window or its case, so a label cannot lean on what a method said.
-Keys: w water, r road, l land (block, plot, anything not water or road), s unsure, u undo.
+Keys: w water, r road, l land (block, plot, pavement, anything not water or road), b bridge, s unsure,
+u undo. A bridge is dropped from the water score and counts as road in the road score.
 Labels append to labels/<sheet>.jsonl, one line per point; the last line for a point wins.
 Boundary rules are README's: a point on a printed edge line is `unsure`; a bridge is road.
 """
@@ -22,7 +23,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 ROOT = HERE.parents[2]
-CLASSES = {"w": "water", "r": "road", "l": "land", "s": "unsure"}
+CLASSES = {"w": "water", "r": "road", "l": "land", "b": "bridge", "s": "unsure"}
 CLOSE, CONTEXT = 120, 900   # source px either side shown; close-up at 4x, context at 1/2
 
 
@@ -69,7 +70,7 @@ PAGE = """<!doctype html><meta charset=utf-8><title>Point labels</title>
 <style>body{font:15px system-ui;margin:16px;background:#222;color:#eee}img{image-rendering:pixelated;border:1px solid #555}
 #row{display:flex;gap:16px;flex-wrap:wrap}kbd{background:#444;padding:2px 6px;border-radius:3px}</style>
 <p id=s></p><div id=row><img id=a width=960 height=960><img id=b width=900 height=900></div>
-<p><kbd>w</kbd> water <kbd>r</kbd> road <kbd>l</kbd> land <kbd>s</kbd> unsure (on a line, can't tell) <kbd>u</kbd> undo</p>
+<p><kbd>w</kbd> water <kbd>r</kbd> road <kbd>l</kbd> land <kbd>b</kbd> bridge <kbd>s</kbd> unsure (on a line, can't tell) <kbd>u</kbd> undo</p>
 <script>
 let cur=null;
 async function next(){const r=await (await fetch('/next')).json();cur=r.id;
@@ -77,7 +78,7 @@ async function next(){const r=await (await fetch('/next')).json();cur=r.id;
  if(r.id){a.src='/img/'+r.id+'/close';b.src='/img/'+r.id+'/context'}}
 document.onkeydown=async e=>{const k=e.key.toLowerCase();
  if(k==='u'){await fetch('/undo',{method:'POST'});return next()}
- if(cur&&k.length===1&&'wrls'.includes(k)){await fetch('/label',{method:'POST',body:JSON.stringify({id:cur,key:k})});next()}};
+ if(cur&&k.length===1&&'wrlbs'.includes(k)){await fetch('/label',{method:'POST',body:JSON.stringify({id:cur,key:k})});next()}};
 next();
 </script>"""
 
