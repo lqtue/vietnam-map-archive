@@ -18,7 +18,7 @@
     {"sheet": "1882", "id": "river_label",      "case": "label_gap",  "box": [1400, 7000, 1000, 1000], "split": "calibrate", "seen": false, "note": "open river under RIVIERE lettering, one far bank"},
     {"sheet": "1882", "id": "western_creek",    "case": "creek",      "box": [800, 3800, 1000, 1000],  "split": "calibrate", "seen": true,  "note": "narrow winding creek, bridges, road, plots"},
     {"sheet": "1882", "id": "dry_blue_parcels", "case": "dry_land",   "box": [6900, 4800, 800, 800],   "split": "calibrate", "seen": true,  "note": "blue-grey hatched parcels, no water; traces may be empty"},
-    {"sheet": "1882", "id": "arsenal_quay",     "case": "quay",       "box": [6900, 5900, 1000, 1000], "split": "heldout",   "seen": true,  "note": "leak case from the 0.07/0.09/0.11 sweep; not clean held-out"},
+    {"sheet": "1882", "id": "arsenal_quay",     "case": "quay",       "box": [6900, 5900, 1000, 1000], "split": "calibrate", "seen": true,  "note": "leak case from the 0.07/0.09/0.11 sweep; not clean held-out. Reclassified 2026-10-01: seen since the first sweep and all remaining false water concentrated there; chinois_quay stays the clean quay test"},
     {"sheet": "1882", "id": "dry_city_blocks",  "case": "dry_land",   "box": [4300, 3700, 900, 900],   "split": "heldout",   "seen": true,  "note": "salmon-hatched blocks, no water; used as a sweep control"},
     {"sheet": "1882", "id": "chinois_quay",     "case": "quay",       "box": [2200, 4800, 1000, 1000], "split": "heldout",   "seen": false, "note": "Arroyo Chinois quay, landing stages, creek mouth, boat"},
     {"sheet": "1882", "id": "creek_nw",         "case": "creek",      "box": [3500, 2600, 1000, 1000], "split": "heldout",   "seen": false, "note": "narrow forked creek in plot grid"},

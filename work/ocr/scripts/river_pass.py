@@ -20,6 +20,9 @@ ruling (same ink, measured), so the pass reads geometry:
      lands in a body is reported as stale in run.json, never guessed.
   4. pixels: inside the cell zone, bluish line pixels not under a Gabor ruling response, closed by
      CLOSE_R; the eroded cell core is water outright. So the edge is the outermost ripple line.
+     Machine ruling comes in two pitches (4.48 land, 3.55 buildings), and a large ruled area's
+     edge, where a wall outline spoils the response, still counts as ruled (v3). Solid dark
+     structures and enclosed ruled patches are never filled in.
 """
 import argparse
 import hashlib
@@ -39,7 +42,8 @@ REF = ROOT / "work" / "analysis" / "river_ref"
 CELL, FFT_N, FFT_P = 32, 64, 128
 BAND = (2.5, 30)                 # px spacing considered at all
 RULE_SPACING = (4.0, 5.6)        # measured: military ruling 4.48 px, salmon hatch 5.09 px
-RULE_PERIOD = 4.48               # Gabor tuned to the military ruling; salmon falls inside its bandwidth
+RULE_PERIODS = (4.48, 3.55)      # Gabor periods: land ruling 4.48 (salmon falls inside its bandwidth), and the
+                                 # denser 3.55 that fills buildings, same 144 deg (arsenal_quay, 2026-10-01)
 RULE_ANGLE, RULE_TOL = 144, 8    # line direction, image axes, deg; every ruled cell on 1882 sits here
 TEX_LOG_E = 4.0                  # log10 band power below which a cell is blank paper
 BLUE_SHARE, MARKED = 0.5, 0.03   # of a cell's marked (non-paper) half-res pixels; marked share
@@ -48,10 +52,12 @@ RULE_MAX, RULE_NEAR = 0.35, 0.08 # ruled cells measure ~0.9, ripples < 0.06, rip
 SEED_SPACING, SEED_COH, SEED_RULE = 6.5, 0.8, 0.05
 COMP_SEEDS, COMP_AREA, COMP_SEED_SHARE = 4, 12, 0.15
 LINK = 2                         # cells; bridges and lettering gaps up to ~2 cells join the network
-GABOR_SIGMA, RULE_PX = 4, 45     # ruling share per pixel: calibrate dry_blue_parcels median 29 / ruled ~88,
+GABOR_SIGMA, GABOR_FLOOR, RULE_PX = 4, 0.7, 45     # ruling share per pixel: calibrate dry_blue_parcels median 29 / ruled ~88,
                                  # open_bank 90th pct 0.4, river_label 90th 19 (lettering, before smoothing)
 LINE_PX, BLUE_ODR = 0.9, 1.0     # red / paper red below this is a line; OD blue/red below this is blue ink
 CLOSE_R, HOLE_MAX, MIN_PX = 6, 40_000, 2_000
+RULE_SOFT, RULE_REACH, RULE_BLOB = 15, 10, 4000    # pixels: a half-ruled pixel within this reach of a fully ruled one is ruled too (arsenal_quay: hatch beside a wall reads 33, ripples <0.5)
+HOLE_RULED = 0.5                 # share of an enclosed patch under the Gabor ruling above which it is not refilled
 CORE_ERODE = 1                   # cells; 2 was tried: it cut real river at the frame and moved no held-out edge
 SOLID_INK, SOLID_CLOSE, SOLID_OPEN, SOLID_PAD = 0.45, 2, 4, 3
                                  # grey / paper below SOLID_INK, closed then opened: a solid dark block
@@ -90,12 +96,16 @@ def gabor_rule(rel):
     y, x = np.mgrid[-k:k + 1, -k:k + 1]
     env = np.exp(-(x ** 2 + y ** 2) / (2 * GABOR_SIGMA ** 2))
     a = np.radians(RULE_ANGLE - 90)
-    kern = env * np.exp(2j * np.pi / RULE_PERIOD * (np.cos(a) * x + np.sin(a) * y))
-    kern -= env * kern.sum() / env.sum()
+    rel = np.maximum(rel, GABOR_FLOOR)   # a dark outline must not swamp the normaliser and blank the hatch beside it
     bp = rel - nd.gaussian_filter(rel, 6)
-    g = np.abs(fftconvolve(bp, kern, mode="same")) ** 2
-    share = g / (nd.gaussian_filter(bp ** 2, GABOR_SIGMA) * (np.abs(kern) ** 2).sum() + 1e-6)
-    return nd.gaussian_filter(share, GABOR_SIGMA)
+    local = nd.gaussian_filter(bp ** 2, GABOR_SIGMA)
+    best = 0
+    for period in RULE_PERIODS:
+        kern = env * np.exp(2j * np.pi / period * (np.cos(a) * x + np.sin(a) * y))
+        kern -= env * kern.sum() / env.sum()
+        g = np.abs(fftconvolve(bp, kern, mode="same")) ** 2
+        best = np.maximum(best, g / (local * (np.abs(kern) ** 2).sum() + 1e-6))
+    return nd.gaussian_filter(best, GABOR_SIGMA)
 
 
 def cells_to_water(spacing, rule, loge, coh, blue, marked, inside):
@@ -118,7 +128,7 @@ def refine(rgb, paper_at, zone_cells, core_cells):
     """Native mask from cell masks: line pixels in the zone, closed; eroded core is water outright;
     solid dark structures are cut out and never refilled as holes."""
     h, w, _ = rgb.shape
-    out, solid_px = np.zeros((h, w), bool), np.zeros((h, w), bool)
+    out, solid_px, ruled_px = (np.zeros((h, w), bool) for _ in range(3))
     dk = lambda r: np.hypot(*np.mgrid[-r:r + 1, -r:r + 1]) <= r
     disk = np.hypot(*np.mgrid[-CLOSE_R:CLOSE_R + 1, -CLOSE_R:CLOSE_R + 1]) <= CLOSE_R
     full = lambda m: np.pad(np.repeat(np.repeat(m, CELL, 0), CELL, 1), ((0, h - m.shape[0] * CELL), (0, w - m.shape[1] * CELL)))
@@ -134,16 +144,24 @@ def refine(rgb, paper_at, zone_cells, core_cells):
             p = paper_at(np.arange(a, b) + 0.5, np.arange(c, d) + 0.5)
             od = np.clip(-np.log10(np.maximum(s, 1) / p), 0, None)
             rel = s[..., 0] / p[..., 0]
-            line = (rel < LINE_PX) & (od[..., 2] < BLUE_ODR * od[..., 0]) & (gabor_rule(rel) < RULE_PX)
+            g = gabor_rule(rel)
+            strong = g >= RULE_PX
+            sl_, sn_ = nd.label(strong)
+            land = np.isin(sl_, 1 + np.where(nd.sum(strong, sl_, range(1, sn_ + 1)) >= RULE_BLOB)[0])   # not a bridge deck or a ladder
+            ruled = strong | ((g >= RULE_SOFT) & nd.binary_dilation(land, dk(RULE_REACH)))   # a ruled area's edge reads ~0.3-0.8 of the full share
+            line = (rel < LINE_PX) & (od[..., 2] < BLUE_ODR * od[..., 0]) & ~ruled
             zone = zone_px[a:b, c:d]
             solid = s.mean(2) / p.mean(2) < SOLID_INK
             solid = nd.binary_dilation(nd.binary_opening(nd.binary_closing(solid, dk(SOLID_CLOSE)), dk(SOLID_OPEN)), dk(SOLID_PAD))
             m = (nd.binary_closing(line & zone, disk) | core_px[a:b, c:d]) & zone & ~solid
             out[y0:y1, x0:x1] = m[y0 - a:y1 - a, x0 - c:x1 - c]
             solid_px[y0:y1, x0:x1] = solid[y0 - a:y1 - a, x0 - c:x1 - c]
+            ruled_px[y0:y1, x0:x1] = strong[y0 - a:y1 - a, x0 - c:x1 - c]
     holes = nd.binary_fill_holes(out) & ~out & ~solid_px
     hl, hn = nd.label(holes)
-    small = np.isin(hl, 1 + np.where(nd.sum(holes, hl, range(1, hn + 1)) <= HOLE_MAX)[0])
+    idx = np.arange(1, hn + 1)
+    # an enclosed patch is refilled only if small and not itself machine-ruled (a ruled building ringed by ripple-like outline is not a gap)
+    small = np.isin(hl, idx[(nd.sum(holes, hl, idx) <= HOLE_MAX) & (nd.mean(ruled_px, hl, idx) < HOLE_RULED)])
     out |= small
     ol, on = nd.label(out)
     return np.isin(ol, 1 + np.where(nd.sum(out, ol, range(1, on + 1)) >= MIN_PX)[0])
@@ -219,11 +237,11 @@ def main():
     pv[mv == 128] = pv[mv == 128] * 0.4 + np.array([255, 120, 0]) * 0.6
     Image.fromarray(pv.astype(np.uint8)).save(out / "preview.jpg", quality=85)
     run = {"sheet": a.sheet, "native_sha256": pin["rgb_sha256"],
-           "settings": {k: globals()[k] for k in ("CELL", "FFT_N", "BAND", "RULE_SPACING", "RULE_PERIOD", "RULE_ANGLE", "RULE_TOL",
+           "settings": {k: globals()[k] for k in ("CELL", "FFT_N", "BAND", "RULE_SPACING", "RULE_PERIODS", "RULE_ANGLE", "RULE_TOL",
                                                   "TEX_LOG_E", "BLUE_SHARE", "MARKED", "COH", "RULE_MAX", "RULE_NEAR",
                                                   "SEED_SPACING", "SEED_COH", "SEED_RULE", "COMP_SEEDS", "COMP_AREA",
-                                                  "COMP_SEED_SHARE", "LINK", "GABOR_SIGMA", "RULE_PX", "LINE_PX",
-                                                  "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "MIN_PX", "CORE_ERODE",
+                                                  "COMP_SEED_SHARE", "LINK", "GABOR_SIGMA", "GABOR_FLOOR", "RULE_PX", "LINE_PX",
+                                                  "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "RULE_SOFT", "RULE_REACH", "RULE_BLOB", "HOLE_RULED", "MIN_PX", "CORE_ERODE",
                                                   "SOLID_INK", "SOLID_CLOSE", "SOLID_OPEN", "SOLID_PAD")},
            "cells": {"candidate": int(cand.sum()), "seed": int(seed.sum()), "network": int(network.sum()), "review": int(review.sum())},
            "water_px": int((mask == 255).sum()), "review_px": int((mask == 128).sum()),
@@ -265,6 +283,21 @@ def self_check():
     on = np.ones((224 // CELL, 224 // CELL), bool)
     m = refine(img, lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32), on, on)
     assert m[40, 40] and m[150, 60] and not m[105, 105], (m[40, 40], m[150, 60], m[105, 105])
+    # a building filled with the finer 3.55 px machine ruling (same 144 deg) is ink, not ripples
+    yy, xx = np.mgrid[0:224, 0:224].astype(float)
+    a_m = np.radians(RULE_ANGLE + 90)
+    img2 = img.copy()
+    bld = np.cos(2 * np.pi * (np.cos(a_m) * xx + np.sin(a_m) * yy) / 3.55) > 0.2
+    img2[130:190, 160:224][bld[130:190, 160:224]] = (120, 140, 170)
+    img2[130:190, 160:224][~bld[130:190, 160:224]] = (220, 220, 220)
+    m2 = refine(img2, lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32), on, ~on)   # zone only, no core
+    assert not m2[140:180, 170:224].any() and m2[:100].any(), m2[140:180, 170:224].mean()
+    # ... and one ringed by ripple lines is not a hole to refill (it was, before HOLE_RULED)
+    img3 = img.copy()
+    img3[70:150, 70:150][bld[70:150, 70:150]] = (120, 140, 170)
+    img3[70:150, 70:150][~bld[70:150, 70:150]] = (220, 220, 220)
+    m3 = refine(img3, lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32), on, ~on)
+    assert not m3[90:130, 90:130].any() and m3[:60].any(), m3[90:130, 90:130].mean()
     print("self-check ok")
 
 
