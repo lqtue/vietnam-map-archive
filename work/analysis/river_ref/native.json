@@ -7,5 +7,14 @@
    8982
   ],
   "tiles": 1728
+ },
+ "1898": {
+  "path": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/native.png",
+  "rgb_sha256": "0538ff837b9e7aac84227f31cb4161dcbbde7bbe4c181d6a8406f833890f5b50",
+  "size": [
+   16267,
+   14859
+  ],
+  "tiles": 3776
  }
 }

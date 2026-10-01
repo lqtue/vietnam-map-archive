@@ -45,6 +45,9 @@ RULE_SPACING = (4.0, 5.6)        # measured: military ruling 4.48 px, salmon hat
 RULE_PERIODS = (4.48, 3.55)      # Gabor periods: land ruling 4.48 (salmon falls inside its bandwidth), and the
                                  # denser 3.55 that fills buildings, same 144 deg (arsenal_quay, 2026-10-01)
 RULE_ANGLE, RULE_TOL = 144, 8    # line direction, image axes, deg; every ruled cell on 1882 sits here
+# The four constants above that describe the machine ruling (RULE_SPACING, RULE_PERIODS, RULE_ANGLE,
+# RULE_TOL) are properties of the sheet, not of the method. The values here are 1882's and are the
+# defaults; `sheets.<id>.ruling` in river_ref/windows.json overrides any of them (see sheet_ruling).
 TEX_LOG_E = 4.0                  # log10 band power below which a cell is blank paper
 BLUE_SHARE, MARKED = 0.5, 0.03   # of a cell's marked (non-paper) half-res pixels; marked share
 COH = 0.4                        # structure-tensor coherence (texture.npz); gardens sit near 0.2
@@ -66,14 +69,22 @@ SOLID_INK, SOLID_CLOSE, SOLID_OPEN, SOLID_PAD = 0.45, 2, 4, 3
 TILE, MARGIN = 1024, 48
 
 
-def cell_fft(red, paper_red, rows, cols):
+def sheet_ruling(sheet):
+    """The sheet's machine-ruling constants: this module's (1882's) unless windows.json overrides them."""
+    r = sheet.get("ruling", {})
+    return {"spacing": tuple(r.get("spacing", RULE_SPACING)), "periods": tuple(r.get("periods", RULE_PERIODS)),
+            "angle": r.get("angle", RULE_ANGLE), "tol": r.get("tol", RULE_TOL), "structure": r.get("structure")}
+
+
+def cell_fft(red, paper_red, rows, cols, ruling=None):
     """Per cell: dominant spacing and the ruling share of band power, from a centred 64 px window."""
+    ruling = ruling or sheet_ruling({})
     ky = np.fft.fftfreq(FFT_P)[:, None]
     kx = np.fft.rfftfreq(FFT_P)[None, :]
     kr = np.hypot(ky, kx)
     band = (kr > 1 / BAND[1]) & (kr < 1 / BAND[0])
-    grad = np.abs((np.degrees(np.arctan2(ky, kx)) - (RULE_ANGLE - 90) + 90) % 180 - 90)
-    ruleband = band & (kr > 1 / RULE_SPACING[1]) & (kr < 1 / RULE_SPACING[0]) & (grad < RULE_TOL)
+    grad = np.abs((np.degrees(np.arctan2(ky, kx)) - (ruling["angle"] - 90) + 90) % 180 - 90)
+    ruleband = band & (kr > 1 / ruling["spacing"][1]) & (kr < 1 / ruling["spacing"][0]) & (grad < ruling["tol"])
     han = np.outer(np.hanning(FFT_N), np.hanning(FFT_N))
     h = (FFT_N - CELL) // 2
     pad = np.pad(red, ((h, FFT_N), (h, FFT_N)), mode="edge")
@@ -90,17 +101,18 @@ def cell_fft(red, paper_red, rows, cols):
     return spacing, rule, np.log10(energy + 1e-9)
 
 
-def gabor_rule(rel):
+def gabor_rule(rel, ruling=None):
     """Per-pixel share of local line energy at the ruling frequency and angle."""
+    ruling = ruling or sheet_ruling({})
     k = int(3 * GABOR_SIGMA)
     y, x = np.mgrid[-k:k + 1, -k:k + 1]
     env = np.exp(-(x ** 2 + y ** 2) / (2 * GABOR_SIGMA ** 2))
-    a = np.radians(RULE_ANGLE - 90)
+    a = np.radians(ruling["angle"] - 90)
     rel = np.maximum(rel, GABOR_FLOOR)   # a dark outline must not swamp the normaliser and blank the hatch beside it
     bp = rel - nd.gaussian_filter(rel, 6)
     local = nd.gaussian_filter(bp ** 2, GABOR_SIGMA)
     best = 0
-    for period in RULE_PERIODS:
+    for period in ruling["periods"]:
         kern = env * np.exp(2j * np.pi / period * (np.cos(a) * x + np.sin(a) * y))
         kern -= env * kern.sum() / env.sum()
         g = np.abs(fftconvolve(bp, kern, mode="same")) ** 2
@@ -124,10 +136,11 @@ def cells_to_water(spacing, rule, loge, coh, blue, marked, inside):
     return cand, seed, network, keep & ~network
 
 
-def refine(rgb, paper_at, zone_cells, core_cells):
+def refine(rgb, paper_at, zone_cells, core_cells, ruling=None):
     """Native mask from cell masks: line pixels in the zone, closed; eroded core is water outright;
     solid dark structures are cut out and never refilled as holes."""
     h, w, _ = rgb.shape
+    ruling = ruling or sheet_ruling({})
     out, solid_px, ruled_px = (np.zeros((h, w), bool) for _ in range(3))
     dk = lambda r: np.hypot(*np.mgrid[-r:r + 1, -r:r + 1]) <= r
     disk = np.hypot(*np.mgrid[-CLOSE_R:CLOSE_R + 1, -CLOSE_R:CLOSE_R + 1]) <= CLOSE_R
@@ -144,7 +157,7 @@ def refine(rgb, paper_at, zone_cells, core_cells):
             p = paper_at(np.arange(a, b) + 0.5, np.arange(c, d) + 0.5)
             od = np.clip(-np.log10(np.maximum(s, 1) / p), 0, None)
             rel = s[..., 0] / p[..., 0]
-            g = gabor_rule(rel)
+            g = gabor_rule(rel, ruling)
             strong = g >= RULE_PX
             sl_, sn_ = nd.label(strong)
             land = np.isin(sl_, 1 + np.where(nd.sum(strong, sl_, range(1, sn_ + 1)) >= RULE_BLOB)[0])   # not a bridge deck or a ladder
@@ -153,6 +166,13 @@ def refine(rgb, paper_at, zone_cells, core_cells):
             zone = zone_px[a:b, c:d]
             solid = s.mean(2) / p.mean(2) < SOLID_INK
             solid = nd.binary_dilation(nd.binary_opening(nd.binary_closing(solid, dk(SOLID_CLOSE)), dk(SOLID_OPEN)), dk(SOLID_PAD))
+            if ruling.get("structure"):
+                # a sheet that hatches structures (piers, buildings) in neutral black while water is blue ink:
+                # dark neutral hatch, closed into a body, is a structure. Off by default (1882 hatches both in blue).
+                st = ruling["structure"]
+                black = (rel < st["rel"]) & (od[..., 2] >= st["odr"] * od[..., 0])
+                black = nd.binary_dilation(nd.binary_opening(nd.binary_closing(black, dk(st["close"])), dk(st["open"])), dk(SOLID_PAD))
+                solid = solid | black
             m = (nd.binary_closing(line & zone, disk) | core_px[a:b, c:d]) & zone & ~solid
             out[y0:y1, x0:x1] = m[y0 - a:y1 - a, x0 - c:x1 - c]
             solid_px[y0:y1, x0:x1] = solid[y0 - a:y1 - a, x0 - c:x1 - c]
@@ -197,7 +217,8 @@ def main():
     marked = half(lab > 0)
     blue = half(lab == 1) / np.maximum(marked, 1e-6)
     paper_red = np.kron(paper[..., 0], np.ones((2, 2)))[:rows, :cols]     # PAPER_CELL 64 = 2 cells
-    spacing, rule, loge = cell_fft(rgb[..., 0], paper_red, rows, cols)
+    ruling = sheet_ruling(sheet)
+    spacing, rule, loge = cell_fft(rgb[..., 0], paper_red, rows, cols, ruling)
     inside = np.zeros((rows, cols), bool)
     x, y, bw, bh = sheet["neatline"]
     inside[-(-y // CELL):(y + bh) // CELL, -(-x // CELL):(x + bw) // CELL] = True
@@ -222,7 +243,7 @@ def main():
     sq = np.ones((3, 3))
     mask = np.zeros((h, w), np.uint8)
     for val, cells in ((128, review), (255, network)):
-        m = refine(rgb, pa, nd.binary_dilation(cells, sq), nd.binary_erosion(cells, sq, iterations=CORE_ERODE))
+        m = refine(rgb, pa, nd.binary_dilation(cells, sq), nd.binary_erosion(cells, sq, iterations=CORE_ERODE), ruling)
         mask[m] = val
     Image.fromarray(mask).save(out / "water.png", compress_level=6)
     np.savez_compressed(out / "cells.npz", spacing=spacing, rule=rule, loge=loge, blue=blue, marked=marked,
@@ -235,9 +256,12 @@ def main():
     mv = mask[::8, ::8]
     pv[mv == 255] = pv[mv == 255] * 0.4 + np.array([0, 170, 255]) * 0.6
     pv[mv == 128] = pv[mv == 128] * 0.4 + np.array([255, 120, 0]) * 0.6
-    Image.fromarray(pv.astype(np.uint8)).save(out / "preview.jpg", quality=85)
+    sys.path.insert(0, str(REF))
+    from view import blank     # heldout windows with seen:false are black in every preview
+    Image.fromarray(blank(pv.astype(np.uint8), a.sheet, 8)).save(out / "preview.jpg", quality=85)
     run = {"sheet": a.sheet, "native_sha256": pin["rgb_sha256"],
-           "settings": {k: globals()[k] for k in ("CELL", "FFT_N", "BAND", "RULE_SPACING", "RULE_PERIODS", "RULE_ANGLE", "RULE_TOL",
+           "ruling": ruling,
+           "settings": {k: globals()[k] for k in ("CELL", "FFT_N", "BAND",
                                                   "TEX_LOG_E", "BLUE_SHARE", "MARKED", "COH", "RULE_MAX", "RULE_NEAR",
                                                   "SEED_SPACING", "SEED_COH", "SEED_RULE", "COMP_SEEDS", "COMP_AREA",
                                                   "COMP_SEED_SHARE", "LINK", "GABOR_SIGMA", "GABOR_FLOOR", "RULE_PX", "LINE_PX",
@@ -298,6 +322,27 @@ def self_check():
     img3[70:150, 70:150][~bld[70:150, 70:150]] = (220, 220, 220)
     m3 = refine(img3, lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32), on, ~on)
     assert not m3[90:130, 90:130].any() and m3[:60].any(), m3[90:130, 90:130].mean()
+    # 1898 ruling (per-sheet): 6 px lines at 45 deg are ruled, 11 px ripples are not; and black hatch is a structure
+    r98 = sheet_ruling({"ruling": {"spacing": [5.2, 6.8], "periods": [5.95, 2.95], "angle": 45, "tol": 8,
+                                   "structure": {"rel": 0.6, "odr": 0.8, "close": 4, "open": 6}}})
+    a_m = np.radians(45 + 90)
+    red2 = np.full((n, 2 * n), 220.0)
+    red2[:, :n][rip[:, :n]] = 150
+    mil2 = np.cos(2 * np.pi * (np.cos(a_m) * x + np.sin(a_m) * y) / 6.0) > 0.6
+    red2[:, n:][mil2[:, n:]] = 150
+    sp2_, rule2, _ = cell_fft(red2.astype(np.uint8), np.full((rows, cols), 220.0), rows, cols, r98)
+    assert np.median(rule2[2:6, 1:6]) < 0.05 and np.median(rule2[2:6, 10:15]) > 0.5, (rule2[2:6, 1:6], rule2[2:6, 10:15])
+    g98 = gabor_rule(red2 / 220, r98)
+    assert np.median(g98[64:192, 300:450]) > RULE_PX > np.median(g98[64:192, 40:200]), (np.median(g98[64:192, 300:450]), np.median(g98[64:192, 40:200]))
+    img4 = img.copy()                                                         # blue ripples with a black-hatched pier
+    pier = np.zeros((224, 224), bool)
+    pier[80:130, 90:120] = True
+    hatch = np.cos(2 * np.pi * (xx + yy) / (6 * np.sqrt(2))) > 0.6           # thin lines 6 px apart at 135 deg, off the 45 deg ruling and too sparse for the solid test
+    img4[pier & hatch] = (60, 62, 66)                                         # near-neutral: OD blue/red 0.93, passes the 1882 blue test
+    img4[pier & ~hatch] = (200, 200, 200)
+    flat = lambda yc, xc: np.full((len(yc), len(xc), 3), 220, np.float32)
+    off, on_ = refine(img4, flat, on, on), refine(img4, flat, on, on, r98)
+    assert off[85:125, 95:115].mean() > 0.2 and on_[85:125, 95:115].mean() < 0.02 and on_[40, 40], (off[85:125, 95:115].mean(), on_[85:125, 95:115].mean())
     print("self-check ok")
 
 

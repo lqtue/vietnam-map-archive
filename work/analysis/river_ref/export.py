@@ -18,6 +18,8 @@ EMPTY = {"type": "FeatureCollection", "reviewed": False, "features": []}
 
 def full(sheet: str) -> None:
     """Whole sheet at native, raw tile bytes, to work/ocr/outputs/<map_id>/native.png; sha pinned in native.json."""
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = None   # 1898 is 242 Mpx, past PIL's 179 Mpx bomb limit
     s = json.loads((HERE / "windows.json").read_text())["sheets"][sheet]
     base = f"https://iiif.maparchive.vn/iiif/{s['map_id']}"
     img, tiles = fixed_tile_crop(base, s["width"], s["height"], [0, 0, s["width"], s["height"]])
@@ -29,6 +31,23 @@ def full(sheet: str) -> None:
                    "rgb_sha256": hashlib.sha256(img.tobytes()).hexdigest()}
     (HERE / "native.json").write_text(json.dumps(pins, indent=1, sort_keys=True) + "\n")
     print(sheet, pins[sheet])
+
+
+def verify(sheet: str) -> None:
+    """Cut every window of `sheet` from its native.png and compare the RGB hash with crops.json. Hashes only."""
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = None
+    pin = json.loads((HERE / "native.json").read_text())[sheet]
+    crops = json.loads((HERE / "crops.json").read_text())
+    im = Image.open(HERE.parents[2] / pin["path"]).convert("RGB")
+    bad = 0
+    for w in json.loads((HERE / "windows.json").read_text())["windows"]:
+        if w["sheet"] != sheet or f"{sheet}-{w['id']}" not in crops:   # windows added after the last export have no pin
+            continue
+        x, y, bw, bh = w["box"]
+        ok = hashlib.sha256(im.crop((x, y, x + bw, y + bh)).tobytes()).hexdigest() == crops[f"{sheet}-{w['id']}"]["rgb_sha256"]
+        bad += not ok
+    print(sheet, "windows identical" if not bad else f"{bad} windows DIFFER")
 
 
 def main() -> None:
@@ -52,4 +71,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    full(sys.argv[2]) if sys.argv[1:2] == ["--full"] else main()
+    if sys.argv[1:2] == ["--full"]:
+        full(sys.argv[2])
+    elif sys.argv[1:2] == ["--verify"]:
+        verify(sys.argv[2])
+    else:
+        main()

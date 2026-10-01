@@ -193,19 +193,24 @@ def display_rgb(p: np.ndarray, od: float = 0.5) -> np.ndarray:
     return 255 * 10 ** (-od * p / p.max())
 
 
-def previews(out: Path, rgb, paper, pig, label, conc8, ink8, stroke, tex, windows):
+def previews(out: Path, rgb, paper, pig, label, conc8, ink8, stroke, tex, windows, sheet):
+    """Preview images. Heldout windows with seen:false are painted black in every whole-sheet preview
+    (river_ref/view.py), so opening them cannot leak those windows; `windows` are the stroke crops."""
+    import sys
+    sys.path.insert(0, str(REF))
+    from view import blank
     h, w, _ = rgb.shape
     pv = np.asarray(Image.fromarray(paper.clip(0, 255).astype(np.uint8)).resize((w // 8, h // 8), Image.BILINEAR), float)
-    Image.fromarray(np.clip((pv - pv.reshape(-1, 3).mean(0)) * 6 + 128, 0, 255).astype(np.uint8)).save(out / "paper.jpg", quality=88)
+    Image.fromarray(blank(np.clip((pv - pv.reshape(-1, 3).mean(0)) * 6 + 128, 0, 255).astype(np.uint8), sheet, 8)).save(out / "paper.jpg", quality=88)
     lab, cc, ik = label[::4, ::4], conc8[::4, ::4] / 255, ink8[::4, ::4] / 255
     cols = np.array([display_rgb(p) for p in pig])
     alpha = np.clip(cc / 0.3, 0, 1)[..., None]
     img = 255 * (1 - alpha) + cols[lab] * alpha
     img = np.where((ik > 0.25)[..., None], 40, img)
-    Image.fromarray(img.astype(np.uint8)).save(out / "wash.jpg", quality=88)
+    Image.fromarray(blank(img.astype(np.uint8), sheet, 8)).save(out / "wash.jpg", quality=88)
     hsv = np.stack([tex["theta"] / np.pi * 255, np.full_like(tex["theta"], 255),
                     np.clip(tex["coherence"] * np.clip(tex["density"] * 5, 0, 1), 0, 1) * 255], -1)
-    a = Image.fromarray(hsv.astype(np.uint8), "HSV").convert("RGB")
+    a = Image.fromarray(blank(np.asarray(Image.fromarray(hsv.astype(np.uint8), "HSV").convert("RGB")), sheet, TEX_CELL))
     sp = tex["spacing"]
     keep = (tex["coherence"] > 0.5) & (tex["density"] > 0.03)
     val = np.clip(sp / 30, 0, 1)
@@ -213,7 +218,7 @@ def previews(out: Path, rgb, paper, pig, label, conc8, ink8, stroke, tex, window
     sc = 4
     pair = Image.new("RGB", (a.width * sc * 2 + 10, a.height * sc), "white")
     pair.paste(a.resize((a.width * sc, a.height * sc), Image.NEAREST), (0, 0))
-    pair.paste(Image.fromarray(b.astype(np.uint8)).resize((a.width * sc, a.height * sc), Image.NEAREST), (a.width * sc + 10, 0))
+    pair.paste(Image.fromarray(blank(b.astype(np.uint8), sheet, TEX_CELL)).resize((a.width * sc, a.height * sc), Image.NEAREST), (a.width * sc + 10, 0))
     pair.save(out / "texture.jpg", quality=88)
     for name, (x, y, bw, bh) in windows.items():
         crop = rgb[y:y + bh, x:x + bw].astype(float) * 0.35 + 165
@@ -279,7 +284,7 @@ def main() -> None:
     np.savez_compressed(out / "texture.npz", **tex)
     wins = {w["id"]: w["box"] for w in spec["windows"]
             if w["sheet"] == a.sheet and w["id"] in ("ne_cream", "dense_grid", "blue_domain", "open_bank")}
-    previews(out, rgb, paper, pig, label, conc8, ink8, stroke, tex, wins)
+    previews(out, rgb, paper, pig, label, conc8, ink8, stroke, tex, wins, a.sheet)
     share = np.bincount(label.ravel(), minlength=len(pig)) / label.size
     hist = np.bincount(stroke.ravel(), minlength=4)
     run = {"sheet": a.sheet, "map_id": map_id, "native_sha256": pin["rgb_sha256"],
