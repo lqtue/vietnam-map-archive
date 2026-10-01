@@ -330,7 +330,10 @@ system — what a result must retain, and the two kinds of check — is in the r
       `geom_rmse` reach the DB. One table, one row per stored version, appended by every writer
       (`mirrorAnnotation`, the neatline PATCH, the sync script, the pipeline georef scripts). Exit:
       one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
-      stale labels. Plan: `docs/knowledge-system-plan.md` §5.
+      stale labels. Plan: `docs/knowledge-system-plan.md` §5. **Built 2026-10-01, not pushed:**
+      migration 103, the three TS/JS writers, `scripts/backfill_georef_versions.mjs`, one write
+      test. Left: `db push`, regenerate types, run the backfill with `--apply` (it prints the exit
+      query), then the Python writers record their own rows.
 - [ ] **`rewarp-on-sync`** — a synced georeference leaves its labels on the old one. Measured
       2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. The one-off repair
       **ran 2026-10-01**: `scripts/oneoff/fix_saigon_1942_1968.mjs` queued 5 `warp` jobs, and all

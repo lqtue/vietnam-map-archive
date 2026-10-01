@@ -15,6 +15,7 @@ import { error } from '@sveltejs/kit';
 import { adminClient } from './supabaseAdmin';
 import { uploadJson } from './storage';
 import { fetchAnnotationJson } from './safeAnnotation';
+import { recordGeorefVersion } from './georefVersions';
 import { r2MirrorBase, sourceSizeMismatch } from '$lib/core/iiif/sourceSize';
 
 const R2_BASE = 'https://iiif.maparchive.vn/iiif';
@@ -68,7 +69,7 @@ export type MirrorResult = {
  */
 export async function mirrorAnnotation(
   mapId: string,
-  { fromAllmaps = false }: { fromAllmaps?: boolean } = {}
+  { fromAllmaps = false, userId = null }: { fromAllmaps?: boolean; userId?: string | null } = {}
 ): Promise<MirrorResult> {
   const supabase = adminClient();
 
@@ -86,10 +87,8 @@ export async function mirrorAnnotation(
     throw error(400, 'Map has no allmaps_id — nothing upstream to re-fetch');
   }
 
-  const sourceUrl =
-    fromAllmaps || !map.annotation_url
-      ? `${ALLMAPS_ANNOTATIONS}/${map.allmaps_id}`
-      : map.annotation_url;
+  const upstream = fromAllmaps || !map.annotation_url;
+  const sourceUrl = upstream ? `${ALLMAPS_ANNOTATIONS}/${map.allmaps_id}` : map.annotation_url!;
 
   let annotation: any;
   try {
@@ -110,6 +109,10 @@ export async function mirrorAnnotation(
   // History first: if the second write fails, we have still kept the version.
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   await uploadJson(ANNOTATIONS_BUCKET, `${mapId}/${stamp}.json`, updated);
+  await recordGeorefVersion(mapId, stamp, updated, upstream ? 'allmaps' : 'mirror', {
+    allmapsId: upstream ? map.allmaps_id : null,
+    userId,
+  });
   await uploadJson(ANNOTATIONS_BUCKET, `${mapId}.json`, updated);
   const publicAnnotationUrl = `https://maparchive.vn/api/maps/${mapId}/annotation`;
   const historyUrl = `${publicAnnotationUrl}?version=${stamp}`;

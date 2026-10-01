@@ -12,6 +12,6 @@ import { assertUuid } from '$lib/server/http';
 import { mirrorAnnotation } from '$lib/server/annotationMirror';
 
 export const POST: RequestHandler = async ({ locals, params }) => {
-  await requireRole(locals);
-  return json(await mirrorAnnotation(assertUuid(params.id, 'map id')));
+  const { user } = await requireRole(locals);
+  return json(await mirrorAnnotation(assertUuid(params.id, 'map id'), { userId: user.id }));
 };

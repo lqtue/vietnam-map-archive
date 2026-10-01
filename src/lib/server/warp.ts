@@ -13,6 +13,7 @@
 
 import type { GcpTransformer } from '@allmaps/transform';
 import { getTransformer } from './transformer';
+import { gcpRmseMetres, gcpSrcHash } from '$lib/core/georef/version';
 
 export interface MapWarp {
   transformer: GcpTransformer;
@@ -20,67 +21,6 @@ export interface MapWarp {
   src: string;
   /** RMS of the GCP residuals, in metres. Null when it cannot be computed. */
   rmse: number | null;
-}
-
-const EARTH_RADIUS_M = 6_371_008.8;
-
-/** Great-circle metres between two lng/lat pairs. */
-function distanceMetres([lng1, lat1]: number[], [lng2, lat2]: number[]): number {
-  const toRad = Math.PI / 180;
-  const dLat = (lat2 - lat1) * toRad;
-  const dLng = (lng2 - lng1) * toRad;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLng / 2) ** 2;
-  return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(a)));
-}
-
-/**
- * Warp error, measured the only way the library allows: push each GCP's own
- * resource coordinate through the transform and compare with where the GCP
- * says it belongs. `@allmaps/transform` keeps its residuals private, but it
- * exposes the GCPs, and a handful of round trips is cheap.
- *
- * A thin-plate spline interpolates its control points exactly, so this reads
- * ~0 for RBF-type transforms. It is honest about polynomial and Helmert fits,
- * which is where the large errors actually live.
- */
-export function gcpRmseMetres(transformer: GcpTransformer): number | null {
-  const gcps = transformer.gcps;
-  if (!gcps?.length) return null;
-  let sum = 0;
-  let n = 0;
-  for (const gcp of gcps) {
-    try {
-      const got = transformer.transformToGeo(gcp.resource as [number, number]);
-      sum += distanceMetres(got, gcp.geo) ** 2;
-      n++;
-    } catch {
-      /* a GCP the transform cannot round-trip tells us nothing; skip it */
-    }
-  }
-  return n ? Math.sqrt(sum / n) : null;
-}
-
-/**
- * Identity of the georeference a warp was computed against. Rounded to ~1e-7°
- * (about a centimetre) so floating-point noise does not invent a new version.
- */
-export async function gcpSrcHash(transformer: GcpTransformer): Promise<string> {
-  const gcps = transformer.gcps ?? [];
-  const canonical = gcps
-    .map(
-      (g) =>
-        `${Math.round(g.resource[0])},${Math.round(g.resource[1])}:` +
-        `${g.geo[0].toFixed(7)},${g.geo[1].toFixed(7)}`
-    )
-    .sort()
-    .join('|');
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical));
-  return Array.from(new Uint8Array(digest))
-    .slice(0, 8)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
 }
 
 /** Resolve a map's transformer plus the two provenance fields. Null if it has no usable annotation. */

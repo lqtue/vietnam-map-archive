@@ -173,11 +173,22 @@ database row that a query could compare the hashes against (`georef-versions`).
 Each gap is named for its subject. "Owner" points at the plan that already holds it, if any.
 
 1. **`georef-versions`: make the georeference a database object.** This is the one genuinely new
-   table. Proposed: `georef_versions(map_id, image_id, stamp, geom_src, transformation, gcp_count,
-   rmse_m, rmse_method, origin, allmaps_id, created_by)`, with `origin` one of `allmaps`,
-   `pipeline` or `neatline`. Every writer appends a row: `mirrorAnnotation`, the neatline `PATCH`,
-   `sync_district4_annotations.mjs`, and the pipeline scripts (`tonkin_georef.py`,
-   `indochine100k_georef.py`, `l7014_annotate.py`). Defer a table with one row per GCP until a
+   table. **Built (migration 103, not yet pushed):** `georef_versions(map_id, stamp, geom_src,
+   transformation, gcp_count, rmse_m, rmse_method, source_id, source_width, source_height, origin,
+   allmaps_id, user_id)`, one row per history file, plus the `map_georef_current` view (newest
+   stamp per map). It differs from the first draft of this plan in four ways:
+   - there is no `image_id`, because `map_images` rows are rewritten in place; the annotation's own
+     source id and dimensions pin the pixels instead;
+   - there is no current-version pointer on `maps`; the view derives the current version;
+   - `origin` adds `mirror` (an existing version re-stored), `script` (the 1942 sequence was
+     script → sync → script) and `unrecorded`;
+   - `geom_src` comes from one implementation, `$lib/core/georef/version.ts`, which the scripts
+     import by path.
+
+   Writers that record their own row: `mirrorAnnotation`, the neatline `PATCH` and
+   `sync_district4_annotations.mjs`. The Python pipeline scripts (`tonkin_georef.py`,
+   `indochine100k_georef.py`, `l7014_annotate.py`) do not yet; `scripts/backfill_georef_versions.mjs`
+   records what they leave in Storage as `unrecorded`. Defer a table with one row per GCP until a
    query needs one.
    **Exit:** one query lists every 1882 version with its GCP count and its named RMSE, and a join
    on `geom_src` shows which labels are stale.

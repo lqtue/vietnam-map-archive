@@ -28,8 +28,14 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **102**, live in production (verified 2026-10-01 via
-`supabase migration list`). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
+Head is **103**, **not yet pushed**; 102 is live in production (verified 2026-10-01 via
+`supabase migration list`). 103 adds `georef_versions`, one row per stored georeference version
+(`annotations/<map>/<stamp>.json`), and the `map_georef_current` view (newest stamp per map). Every
+writer records its row right after the history file and before the live file moves:
+`mirrorAnnotation`, the neatline `PATCH`, `sync_district4_annotations.mjs`. `geom_src` comes from
+`$lib/core/georef/version.ts`, the one hash implementation, which the scripts import by path. After
+the push, run `node --env-file=.env scripts/backfill_georef_versions.mjs --apply` to record what
+Storage already holds, and regenerate the types (103's were hand-typed). 102 revokes PUBLIC execute on `maps_guard_contributor_slug()`, the
 trigger function 097 added and 099 missed. 101 narrows `map_images` and `map_slug_aliases`'s read policies from
 "published or any signed-in user" to "published, the map's creator, or staff" — the two
 draft-visibility gates copying 063's wording that nothing non-staff actually reads that broadly —
@@ -98,7 +104,7 @@ password; use the Dashboard SQL Editor or `db push` instead of pulling. Repair m
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 33 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 37 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done

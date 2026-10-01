@@ -200,12 +200,18 @@ and the archive looks correct while every link to the older sheet has quietly mo
 001) and migration 060 narrowed the check constraint without touching the default, so an insert that
 omits it is rejected — which presents as a null row rather than as an error about status.
 
+The migration-103 check saves a neatline through the real `PATCH` route and asserts **two**
+`georef_versions` rows, `mirror` then `neatline`, one per history file the route wrote, with
+the second as `map_georef_current`. The first row is the one worth the test: it is the snapshot of
+the version being replaced, and losing it is how a georeference goes missing from history without
+anything failing.
+
 `tests/schemaCheck.ts` holds no tests of its own: it is the ~50-line JSON Schema subset walker
 `tests/write.spec.ts` imports to check the shapes in `contracts/`, and it reports anything outside
 that subset through `unsupportedKeywords` rather than passing it silently, so adding an unsupported
 keyword to a contract fails loudly instead of going unchecked.
 
-**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 33 tests)
+**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 37 tests)
 against a **local** stack, never production: `npm run db:test` runs
 `supabase start -x vector -x logflare` and seeds one staff user + one map via
 `scripts/seed-test-db.mjs`. The suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and

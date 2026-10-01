@@ -5,6 +5,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid } from '$lib/server/http';
 import { uploadJson } from '$lib/server/storage';
 import { fetchAnnotationJson } from '$lib/server/safeAnnotation';
+import { recordGeorefVersion } from '$lib/server/georefVersions';
 
 interface GCP {
   resourceCoords: [number, number];
@@ -17,7 +18,7 @@ interface GCP {
  * Order: NW, NE, SE, SW
  */
 export const PATCH: RequestHandler = async ({ locals, params, request }) => {
-  await requireRole(locals);
+  const { user } = await requireRole(locals);
   const mapId = assertUuid(params.id, 'map id');
 
   const body = await request.json();
@@ -60,6 +61,8 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   const now = Date.now();
   const stampOf = (ms: number) => new Date(ms).toISOString().replace(/[:.]/g, '-');
   await uploadJson('annotations', `${mapId}/${stampOf(now)}.json`, annotation);
+  // A re-store of the live version, so `mirror`: same points as the row before it, if it has one.
+  await recordGeorefVersion(mapId, stampOf(now), annotation, 'mirror', { userId: user.id });
 
   const target = item.target;
   const source = typeof target === 'string' ? { id: target } : (target.source ?? target);
@@ -110,6 +113,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 
   // The new version gets its own history entry too (a later stamp than the snapshot above).
   await uploadJson('annotations', `${mapId}/${stampOf(now + 1)}.json`, annotation);
+  await recordGeorefVersion(mapId, stampOf(now + 1), annotation, 'neatline', { userId: user.id });
   await uploadJson('annotations', `${mapId}.json`, annotation);
   await adminClient()
     .from('maps')

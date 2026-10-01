@@ -46,7 +46,7 @@ npm run format       # prettier --write .
 npm run test         # Playwright smoke suite, read-only (363 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
-npm run test:write   # Write-path smokes against that local stack (33 tests)
+npm run test:write   # Write-path smokes against that local stack (37 tests)
 npm run deploy       # Build + deploy to Cloudflare Pages via wrangler
 npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 ```
@@ -79,8 +79,8 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 102**; 095–102 are in production (verified 2026-10-01 via
-  `supabase migration list`) — see `supabase/CLAUDE.md` for what each one does. Adding one, and
+- **Migration head is 103**; 095–102 are in production (verified 2026-10-01 via
+  `supabase migration list`), **103 (`georef_versions`) is not pushed yet** — see `supabase/CLAUDE.md` for what each one does. Adding one, and
   regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
   canonical; a uuid and every retired slug 301 to it, so no published link dies. The rule and the
