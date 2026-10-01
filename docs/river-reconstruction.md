@@ -138,6 +138,6 @@ This is a design proposal, not a tested improvement.
    layer only after the held-out windows and visual whole-sheet review pass.
    Then move to road surfaces, followed by blocks and buildings.
 
-The immediate task is the paired hand-traced reference windows. The initial
+The paired reference windows are now chosen and exported, and a scorer exists ([`work/analysis/river_ref/`](../work/analysis/river_ref/README.md): 10 windows on 1882, 9 on 1898, 9 unseen held-out); **none is traced yet**. The immediate task is the hand tracing. The initial
 pixel EDA is recorded; the river proposal remains provisional. This task is tracked under
 `river-reconstruction` in [ROADMAP.md](ROADMAP.md).

@@ -1,0 +1,192 @@
+{
+ "1882-arsenal_basin": {
+  "box": [
+   8400,
+   6800,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "3c3bf9d7eef4b8dab184e4385a9d24af75c232437893956f3ba03b4ca522c518",
+  "tiles": 25
+ },
+ "1882-arsenal_quay": {
+  "box": [
+   6900,
+   5900,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "eaa3e507de5976e6c27afcb9a2926e2a3ccef98315f2bd0c6c82899cb45f0fa6",
+  "tiles": 20
+ },
+ "1882-bridge_basin": {
+  "box": [
+   9800,
+   5500,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "99b52b2c2307e5e248160212446870bf8dac539f676bf1976335a63ed867db06",
+  "tiles": 25
+ },
+ "1882-chinois_quay": {
+  "box": [
+   2200,
+   4800,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "ee47a43db0c87c45538145a85cf2f29e5081cb9ceef02dc167d699605be7782e",
+  "tiles": 25
+ },
+ "1882-creek_nw": {
+  "box": [
+   3500,
+   2600,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "a5bb728cab9270b181f6829fbe0a90da41825a9d17f62b29d83417bd251d5624",
+  "tiles": 25
+ },
+ "1882-dry_blue_parcels": {
+  "box": [
+   6900,
+   4800,
+   800,
+   800
+  ],
+  "rgb_sha256": "4f34e5b611ccfb097c0fcf453b3b4b477a4f2945bd793b24deb8bfa72369789d",
+  "tiles": 20
+ },
+ "1882-dry_city_blocks": {
+  "box": [
+   4300,
+   3700,
+   900,
+   900
+  ],
+  "rgb_sha256": "b8edab982e740a551f218902b30bfb7f22f70f12ef441530ce5580b3575cdaa2",
+  "tiles": 20
+ },
+ "1882-open_bank": {
+  "box": [
+   3800,
+   6100,
+   800,
+   800
+  ],
+  "rgb_sha256": "c3ca6f650d6b39e12c7f7de5051ec9bab374c9a2405cef56450e5b1afee57caf",
+  "tiles": 16
+ },
+ "1882-river_label": {
+  "box": [
+   1400,
+   7000,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "c803464b18e24450172e2f68c77ce75a7bc86b5c15191be6eab5ed10341e9f2d",
+  "tiles": 25
+ },
+ "1882-western_creek": {
+  "box": [
+   800,
+   3800,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "45bc0ac1e208fc10c5aa51227ac023cf995b632611df348c4ad37bd07163ec50",
+  "tiles": 25
+ },
+ "1898-bridge_label": {
+  "box": [
+   10800,
+   9200,
+   1000,
+   600
+  ],
+  "rgb_sha256": "dfae7709f159d816ef36b978c99cc5d828fcd8e2a9522cd0d4382dc53c16ea7c",
+  "tiles": 20
+ },
+ "1898-creek_north": {
+  "box": [
+   5200,
+   1300,
+   1200,
+   1000
+  ],
+  "rgb_sha256": "d59ffad38a25b948e4506db4d369aebeccc3aebec1ab05ba1d3d91cfd86fb65c",
+  "tiles": 20
+ },
+ "1898-creek_west": {
+  "box": [
+   900,
+   5000,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "e87a3ff2a041749a32c2c2117ccf42f4c2429027f8aaa36cf685cdb75d7d3ea6",
+  "tiles": 25
+ },
+ "1898-dry_blue": {
+  "box": [
+   8500,
+   5700,
+   800,
+   800
+  ],
+  "rgb_sha256": "502b990ae5275623e914aa6ae333393621c91c299074f82d0070213bfbbc9d5e",
+  "tiles": 16
+ },
+ "1898-dry_salmon": {
+  "box": [
+   4800,
+   5200,
+   900,
+   900
+  ],
+  "rgb_sha256": "c3c09fcef6e9845a5e5f5c7b4365d37e2c914d3ce0ad2a30350b884bf86807a7",
+  "tiles": 20
+ },
+ "1898-hatched_bank": {
+  "box": [
+   10300,
+   3000,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "c2718b476b649cd3f152af0ab35577f3e5297553c5787af114690e5f58330f27",
+  "tiles": 25
+ },
+ "1898-open_bank": {
+  "box": [
+   10300,
+   8000,
+   1000,
+   1000
+  ],
+  "rgb_sha256": "127bf25b890027830bbc95919cbfafe435b5ad6081e39a0a9febd46c1bfceaf8",
+  "tiles": 25
+ },
+ "1898-quay_canal": {
+  "box": [
+   7000,
+   11300,
+   1200,
+   1000
+  ],
+  "rgb_sha256": "bbc5ac24e8804dcc7b325cb271487eaa1117f44f4429a2c19d05a48f8b382a6f",
+  "tiles": 30
+ },
+ "1898-water_core": {
+  "box": [
+   10950,
+   8650,
+   200,
+   200
+  ],
+  "rgb_sha256": "5d4f69edc116708088a48348a8f538ddff8b184e1cb8b797ac5f048808e05f81",
+  "tiles": 4
+ }
+}

@@ -88,3 +88,8 @@ work/indochine-100k/gemini_cache/
 work/indochine-100k/full-place*.log
 work/indochine-100k/sample-*.jpg
 work/indochine-100k/__pycache__/
+
+# Regenerable native-pixel crops for the river reference windows (hashes in crops.json)
+work/analysis/river_ref/crops/
+work/analysis/river_ref/proposals/
+work/analysis/modern_overlay/out/

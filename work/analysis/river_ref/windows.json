@@ -1,0 +1,30 @@
+{
+  "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
+  "source": "VMA IIIF fixed tiles (iiif.maparchive.vn), native level, raw JPEG bytes",
+  "sheets": {
+    "1882": {"map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", "width": 12102, "height": 8982},
+    "1898": {"map_id": "20ec4f9a-16bd-4895-a593-40c6ed9c9555", "width": 16267, "height": 14859}
+  },
+  "split_rule": "calibrate = may be used to fit the appearance model and tune the method. heldout = never looked at by a method or threshold, scored once. seen = already used in a 2026-10-01 diagnostic, so it is NOT clean held-out even if listed there.",
+  "windows": [
+    {"sheet": "1882", "id": "open_bank",        "case": "open_river", "box": [3800, 6100, 800, 800],  "split": "calibrate", "seen": true,  "note": "rippled river, one bank, projecting landing"},
+    {"sheet": "1882", "id": "river_label",      "case": "label_gap",  "box": [1400, 7000, 1000, 1000], "split": "calibrate", "seen": false, "note": "open river under RIVIERE lettering, one far bank"},
+    {"sheet": "1882", "id": "western_creek",    "case": "creek",      "box": [800, 3800, 1000, 1000],  "split": "calibrate", "seen": true,  "note": "narrow winding creek, bridges, road, plots"},
+    {"sheet": "1882", "id": "dry_blue_parcels", "case": "dry_land",   "box": [6900, 4800, 800, 800],   "split": "calibrate", "seen": true,  "note": "blue-grey hatched parcels, no water; traces may be empty"},
+    {"sheet": "1882", "id": "arsenal_quay",     "case": "quay",       "box": [6900, 5900, 1000, 1000], "split": "heldout",   "seen": true,  "note": "leak case from the 0.07/0.09/0.11 sweep; not clean held-out"},
+    {"sheet": "1882", "id": "dry_city_blocks",  "case": "dry_land",   "box": [4300, 3700, 900, 900],   "split": "heldout",   "seen": true,  "note": "salmon-hatched blocks, no water; used as a sweep control"},
+    {"sheet": "1882", "id": "chinois_quay",     "case": "quay",       "box": [2200, 4800, 1000, 1000], "split": "heldout",   "seen": false, "note": "Arroyo Chinois quay, landing stages, creek mouth, boat"},
+    {"sheet": "1882", "id": "creek_nw",         "case": "creek",      "box": [3500, 2600, 1000, 1000], "split": "heldout",   "seen": false, "note": "narrow forked creek in plot grid"},
+    {"sheet": "1882", "id": "bridge_basin",     "case": "bridge_gap", "box": [9800, 5500, 1000, 1000], "split": "heldout",   "seen": false, "note": "1er Pont over Avalanche mouth, blue-wash domain land, basin"},
+    {"sheet": "1882", "id": "arsenal_basin",    "case": "basin",      "box": [8400, 6800, 1000, 1000], "split": "heldout",   "seen": false, "note": "enclosed arsenal basins inside blue-wash land, channel with lettering"},
+    {"sheet": "1898", "id": "water_core",       "case": "open_river", "box": [10950, 8650, 200, 200],  "split": "calibrate", "seen": true,  "note": "interior of the Saigon River; confirm on native crop"},
+    {"sheet": "1898", "id": "open_bank",        "case": "open_river", "box": [10300, 8000, 1000, 1000], "split": "calibrate", "seen": false, "note": "west bank, wharves, RIVIERE DE lettering"},
+    {"sheet": "1898", "id": "creek_west",       "case": "creek",      "box": [900, 5000, 1000, 1000],  "split": "calibrate", "seen": false, "note": "branching narrow channel, Binh lettering, hatched land at right"},
+    {"sheet": "1898", "id": "dry_blue",         "case": "dry_land",   "box": [8500, 5700, 800, 800],   "split": "calibrate", "seen": true,  "note": "blue-grey Hopital Militaire parcels; traces may be empty"},
+    {"sheet": "1898", "id": "quay_canal",       "case": "quay",       "box": [7000, 11300, 1200, 1000], "split": "heldout",  "seen": false, "note": "city bank, Arroyo Chinois mouth, narrow canal basin top-left, boat"},
+    {"sheet": "1898", "id": "creek_north",      "case": "creek",      "box": [5200, 1300, 1200, 1000], "split": "heldout",   "seen": false, "note": "wide channel with dendritic creeks into salmon land"},
+    {"sheet": "1898", "id": "bridge_label",     "case": "bridge_gap", "box": [10800, 9200, 1000, 600], "split": "heldout",   "seen": false, "note": "Rach Ong Cay with bridge and lettering"},
+    {"sheet": "1898", "id": "dry_salmon",       "case": "dry_land",   "box": [4800, 5200, 900, 900],   "split": "heldout",   "seen": false, "note": "salmon hatched blocks, Rue Liraye; traces may be empty"},
+    {"sheet": "1898", "id": "hatched_bank",     "case": "quay",       "box": [10300, 3000, 1000, 1000], "split": "heldout",  "seen": false, "note": "Avalanche bank against dense hatched garden land"}
+  ]
+}

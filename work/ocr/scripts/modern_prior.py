@@ -72,8 +72,12 @@ from scale import MIN_GCP_CONDITION, gcps_from_annotation, metres_per_pixel
 # 106.408,10.412 → 107.034,11.135 and the OSM extract 106.625,10.349 →
 # 107.067,10.880, so the 21 Huế and Hanoi sheets in the corpus get nothing
 # from either and need their own extracts before this is worth running on them.
-BUILDINGS_GPKG = Path("/Users/airm1/Desktop/tasco/hcmc/hcmc_buildings_3d.gpkg")
-OSM_GPKG = Path("/Users/airm1/Desktop/tasco/hcmc/saigon_osm.gpkg")
+# Moved 2026-10-01 from ~/Desktop/tasco/hcmc. The GeoPackages here are built from the parquet files by
+# work/analysis/modern_overlay/to_gpkg.py (this venv's pyogrio has no Parquet driver). The OSM extract
+# did not come with the move: `--roads` needs it back, `--blocks` and `--blocks-from-roads` do not.
+HCMC_DIR = Path("/Users/airm1/Work/Projects/hcmc-buildings")
+BUILDINGS_GPKG = HCMC_DIR / "hcmc_buildings_3d.gpkg"
+OSM_GPKG = HCMC_DIR / "saigon_osm.gpkg"
 
 # The TASCO topographic vector product, same ground as the buildings file
 # (106.408,10.376 → 107.034,11.135). It carries what neither of the two above
@@ -81,7 +85,7 @@ OSM_GPKG = Path("/Users/airm1/Desktop/tasco/hcmc/saigon_osm.gpkg")
 # polygons. That makes a block derivable as the negative space of the street
 # network rather than as buildings grown until they touch, which is what
 # `blocks()` does and what BLOCK_BUFFER_M is apologising for.
-TASCO_GPKG = Path("/Users/airm1/Desktop/tasco/hcmc/vector_out/hcmc_vector.gpkg")
+TASCO_GPKG = HCMC_DIR / "vector_out" / "hcmc_vector.gpkg"
 
 # Road surface and water, the two things a block is not. `region_duongbos` is
 # the carriageway including the hẻm fabric; `region_duongbokhacs` is the other
