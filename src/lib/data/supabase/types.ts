@@ -1400,7 +1400,22 @@ export type Database = {
           stamp: string | null
           transformation: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "georef_versions_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       map_iiif_sources: {
         Row: {
