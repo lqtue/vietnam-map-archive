@@ -1,0 +1,238 @@
+"""River pass v1, 1882: water from line texture, built on sheet_features.py's layers. No traces used.
+
+    work/ocr/.venv/bin/python work/ocr/scripts/river_pass.py --sheet 1882
+    work/ocr/.venv/bin/python work/ocr/scripts/river_pass.py --self-check
+
+Writes work/ocr/outputs/<map_id>/river/: water.png (native, 255 = water joined to the river network,
+128 = an isolated water-like body awaiting review, 0 = not water), cells.npz, preview.jpg, run.json.
+
+How 1882 draws water: blue ripple lines parallel to the bank, 6-28 px apart, hand engraved, no wash.
+The south bank has no ink line; the ripples stop. Colour cannot separate them from the blue military
+ruling (same ink, measured), so the pass reads geometry:
+  1. per 32 px cell, a 64 px FFT: dominant spacing, and `rule`, the share of power at the sheet's
+     machine ruling (4.0-5.6 px, lines at 144 deg; military and salmon hatch both sit there).
+  2. candidate cell: textured, its marks mostly blue (wash.npz), coherent, not ruled (stricter next
+     to ruled cells, where a block edge dilutes the ruling). Seed cell: ripple spacing, very coherent.
+  3. components with enough seeds; those within LINK cells of the largest are the network. Others
+     (the citadel's rampart hachures look exactly like ripples; garden ponds) are review only:
+     enclosed water needs its own confirmed seed (docs/river-reconstruction.md).
+  4. pixels: inside the cell zone, bluish line pixels not under a Gabor ruling response, closed by
+     CLOSE_R; the eroded cell core is water outright. So the edge is the outermost ripple line.
+"""
+import argparse
+import hashlib
+import json
+import time
+from pathlib import Path
+
+import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
+from PIL import Image
+from scipy import ndimage as nd
+from scipy.signal import fftconvolve
+
+ROOT = Path(__file__).resolve().parents[3]
+REF = ROOT / "work" / "analysis" / "river_ref"
+
+CELL, FFT_N, FFT_P = 32, 64, 128
+BAND = (2.5, 30)                 # px spacing considered at all
+RULE_SPACING = (4.0, 5.6)        # measured: military ruling 4.48 px, salmon hatch 5.09 px
+RULE_PERIOD = 4.48               # Gabor tuned to the military ruling; salmon falls inside its bandwidth
+RULE_ANGLE, RULE_TOL = 144, 8    # line direction, image axes, deg; every ruled cell on 1882 sits here
+TEX_LOG_E = 4.0                  # log10 band power below which a cell is blank paper
+BLUE_SHARE, MARKED = 0.5, 0.03   # of a cell's marked (non-paper) half-res pixels; marked share
+COH = 0.4                        # structure-tensor coherence (texture.npz); gardens sit near 0.2
+RULE_MAX, RULE_NEAR = 0.35, 0.08 # ruled cells measure ~0.9, ripples < 0.06, ripples under lettering 0.1-0.3
+SEED_SPACING, SEED_COH, SEED_RULE = 6.5, 0.8, 0.05
+COMP_SEEDS, COMP_AREA, COMP_SEED_SHARE = 4, 12, 0.15
+LINK = 2                         # cells; bridges and lettering gaps up to ~2 cells join the network
+GABOR_SIGMA, RULE_PX = 4, 45     # ruling share per pixel: calibrate dry_blue_parcels median 29 / ruled ~88,
+                                 # open_bank 90th pct 0.4, river_label 90th 19 (lettering, before smoothing)
+LINE_PX, BLUE_ODR = 0.9, 1.0     # red / paper red below this is a line; OD blue/red below this is blue ink
+CLOSE_R, HOLE_MAX, MIN_PX = 6, 40_000, 2_000
+TILE, MARGIN = 1024, 48
+
+
+def cell_fft(red, paper_red, rows, cols):
+    """Per cell: dominant spacing and the ruling share of band power, from a centred 64 px window."""
+    ky = np.fft.fftfreq(FFT_P)[:, None]
+    kx = np.fft.rfftfreq(FFT_P)[None, :]
+    kr = np.hypot(ky, kx)
+    band = (kr > 1 / BAND[1]) & (kr < 1 / BAND[0])
+    grad = np.abs((np.degrees(np.arctan2(ky, kx)) - (RULE_ANGLE - 90) + 90) % 180 - 90)
+    ruleband = band & (kr > 1 / RULE_SPACING[1]) & (kr < 1 / RULE_SPACING[0]) & (grad < RULE_TOL)
+    han = np.outer(np.hanning(FFT_N), np.hanning(FFT_N))
+    h = (FFT_N - CELL) // 2
+    pad = np.pad(red, ((h, FFT_N), (h, FFT_N)), mode="edge")
+    spacing, rule, energy = (np.zeros((rows, cols), np.float32) for _ in range(3))
+    for r in range(rows):
+        win = sliding_window_view(pad[r * CELL:r * CELL + FFT_N].astype(np.float32), (FFT_N, FFT_N))[0, :cols * CELL:CELL]
+        win = win / paper_red[r][:, None, None]
+        win = (win - win.mean((1, 2), keepdims=True)) * han
+        ps = (np.abs(np.fft.rfft2(win, (FFT_P, FFT_P))) ** 2 * band).reshape(cols, -1)
+        tot = ps.sum(1) + 1e-9
+        spacing[r] = 1 / np.maximum(kr.ravel()[ps.argmax(1)], 1e-6)
+        rule[r] = (ps * ruleband.ravel()).sum(1) / tot
+        energy[r] = tot
+    return spacing, rule, np.log10(energy + 1e-9)
+
+
+def gabor_rule(rel):
+    """Per-pixel share of local line energy at the ruling frequency and angle."""
+    k = int(3 * GABOR_SIGMA)
+    y, x = np.mgrid[-k:k + 1, -k:k + 1]
+    env = np.exp(-(x ** 2 + y ** 2) / (2 * GABOR_SIGMA ** 2))
+    a = np.radians(RULE_ANGLE - 90)
+    kern = env * np.exp(2j * np.pi / RULE_PERIOD * (np.cos(a) * x + np.sin(a) * y))
+    kern -= env * kern.sum() / env.sum()
+    bp = rel - nd.gaussian_filter(rel, 6)
+    g = np.abs(fftconvolve(bp, kern, mode="same")) ** 2
+    share = g / (nd.gaussian_filter(bp ** 2, GABOR_SIGMA) * (np.abs(kern) ** 2).sum() + 1e-6)
+    return nd.gaussian_filter(share, GABOR_SIGMA)
+
+
+def cells_to_water(spacing, rule, loge, coh, blue, marked, inside):
+    tex = loge > TEX_LOG_E
+    ruled = tex & (rule > RULE_MAX)
+    near = nd.binary_dilation(ruled, np.ones((3, 3)))
+    cand = tex & (blue > BLUE_SHARE) & (marked > MARKED) & (coh > COH) & inside & (rule < np.where(near, RULE_NEAR, RULE_MAX))
+    seed = cand & (spacing >= SEED_SPACING) & (coh > SEED_COH) & (rule < SEED_RULE)
+    lab, n = nd.label(cand, np.ones((3, 3)))
+    idx = np.arange(1, n + 1)
+    area, ns = nd.sum(cand, lab, idx), nd.sum(seed, lab, idx)
+    keep = np.isin(lab, idx[(ns >= COMP_SEEDS) & (area >= COMP_AREA) & (ns >= COMP_SEED_SHARE * area)])
+    glab, gn = nd.label(nd.binary_dilation(keep, np.ones((2 * LINK + 1,) * 2)))
+    big = 1 + np.argmax(nd.sum(keep, glab, range(1, gn + 1))) if gn else 0
+    network = keep & (glab == big)
+    return cand, seed, network, keep & ~network
+
+
+def refine(rgb, paper_at, zone_cells, core_cells):
+    """Native mask from cell masks: line pixels in the zone, closed; eroded core is water outright."""
+    h, w, _ = rgb.shape
+    out = np.zeros((h, w), bool)
+    disk = np.hypot(*np.mgrid[-CLOSE_R:CLOSE_R + 1, -CLOSE_R:CLOSE_R + 1]) <= CLOSE_R
+    full = lambda m: np.pad(np.repeat(np.repeat(m, CELL, 0), CELL, 1), ((0, h - m.shape[0] * CELL), (0, w - m.shape[1] * CELL)))
+    zone_px, core_px = full(zone_cells), full(core_cells)
+    for y0 in range(0, h, TILE):
+        for x0 in range(0, w, TILE):
+            y1, x1 = min(h, y0 + TILE), min(w, x0 + TILE)
+            cy, cx = slice(y0 // CELL, -(-y1 // CELL)), slice(x0 // CELL, -(-x1 // CELL))
+            if not zone_cells[cy, cx].any():
+                continue
+            a, b, c, d = max(0, y0 - MARGIN), min(h, y1 + MARGIN), max(0, x0 - MARGIN), min(w, x1 + MARGIN)
+            s = rgb[a:b, c:d].astype(np.float32)
+            p = paper_at(np.arange(a, b) + 0.5, np.arange(c, d) + 0.5)
+            od = np.clip(-np.log10(np.maximum(s, 1) / p), 0, None)
+            rel = s[..., 0] / p[..., 0]
+            line = (rel < LINE_PX) & (od[..., 2] < BLUE_ODR * od[..., 0]) & (gabor_rule(rel) < RULE_PX)
+            zone = zone_px[a:b, c:d]
+            m = (nd.binary_closing(line & zone, disk) | core_px[a:b, c:d]) & zone
+            out[y0:y1, x0:x1] = m[y0 - a:y1 - a, x0 - c:x1 - c]
+    holes = nd.binary_fill_holes(out) & ~out
+    hl, hn = nd.label(holes)
+    small = np.isin(hl, 1 + np.where(nd.sum(holes, hl, range(1, hn + 1)) <= HOLE_MAX)[0])
+    out |= small
+    ol, on = nd.label(out)
+    return np.isin(ol, 1 + np.where(nd.sum(out, ol, range(1, on + 1)) >= MIN_PX)[0])
+
+
+def main():
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from sheet_features import paper_at
+
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--sheet")
+    ap.add_argument("--self-check", action="store_true")
+    a = ap.parse_args()
+    if a.self_check:
+        return self_check()
+    t0 = time.time()
+    spec = json.loads((REF / "windows.json").read_text())
+    sheet = spec["sheets"][a.sheet]
+    pin = json.loads((REF / "native.json").read_text())[a.sheet]
+    Image.MAX_IMAGE_PIXELS = None
+    rgb = np.asarray(Image.open(ROOT / pin["path"]).convert("RGB"))
+    assert hashlib.sha256(rgb.tobytes()).hexdigest() == pin["rgb_sha256"], "native raster differs from native.json"
+    base = ROOT / "work" / "ocr" / "outputs" / sheet["map_id"]
+    feat, out = base / "features", base / "river"
+    out.mkdir(parents=True, exist_ok=True)
+    paper = np.load(feat / "paper.npy")
+    tex = np.load(feat / "texture.npz")
+    lab = np.load(feat / "wash.npz")["label"]
+    h, w, _ = rgb.shape
+    rows, cols = h // CELL, w // CELL
+    half = lambda m: m[:rows * 16, :cols * 16].reshape(rows, 16, cols, 16).mean((1, 3))
+    marked = half(lab > 0)
+    blue = half(lab == 1) / np.maximum(marked, 1e-6)
+    paper_red = np.kron(paper[..., 0], np.ones((2, 2)))[:rows, :cols]     # PAPER_CELL 64 = 2 cells
+    spacing, rule, loge = cell_fft(rgb[..., 0], paper_red, rows, cols)
+    inside = np.zeros((rows, cols), bool)
+    x, y, bw, bh = sheet["neatline"]
+    inside[-(-y // CELL):(y + bh) // CELL, -(-x // CELL):(x + bw) // CELL] = True
+    for fx, fy, fw, fh in sheet["furniture"].values():
+        inside[fy // CELL:-(-(fy + fh) // CELL), fx // CELL:-(-(fx + fw) // CELL)] = False
+    cand, seed, network, review = cells_to_water(spacing, rule, loge, tex["coherence"][:rows, :cols], blue, marked, inside)
+    t1 = time.time()
+    pa = lambda yc, xc: paper_at(paper, yc, xc)
+    sq = np.ones((3, 3))
+    mask = np.zeros((h, w), np.uint8)
+    for val, cells in ((128, review), (255, network)):
+        m = refine(rgb, pa, nd.binary_dilation(cells, sq), nd.binary_erosion(cells, sq))
+        mask[m] = val
+    Image.fromarray(mask).save(out / "water.png", compress_level=6)
+    np.savez_compressed(out / "cells.npz", spacing=spacing, rule=rule, loge=loge, blue=blue, marked=marked,
+                        cand=cand, seed=seed, network=network, review=review)
+    rl, rn = nd.label(review, np.ones((3, 3)))
+    bodies = [{"box": [int(sl[1].start * CELL), int(sl[0].start * CELL), int((sl[1].stop - sl[1].start) * CELL),
+                       int((sl[0].stop - sl[0].start) * CELL)], "cells": int((rl[sl] == i + 1).sum())}
+              for i, sl in enumerate(nd.find_objects(rl))]
+    pv = rgb[::8, ::8].astype(np.float32)
+    mv = mask[::8, ::8]
+    pv[mv == 255] = pv[mv == 255] * 0.4 + np.array([0, 170, 255]) * 0.6
+    pv[mv == 128] = pv[mv == 128] * 0.4 + np.array([255, 120, 0]) * 0.6
+    Image.fromarray(pv.astype(np.uint8)).save(out / "preview.jpg", quality=85)
+    run = {"sheet": a.sheet, "native_sha256": pin["rgb_sha256"],
+           "settings": {k: globals()[k] for k in ("CELL", "FFT_N", "BAND", "RULE_SPACING", "RULE_PERIOD", "RULE_ANGLE", "RULE_TOL",
+                                                  "TEX_LOG_E", "BLUE_SHARE", "MARKED", "COH", "RULE_MAX", "RULE_NEAR",
+                                                  "SEED_SPACING", "SEED_COH", "SEED_RULE", "COMP_SEEDS", "COMP_AREA",
+                                                  "COMP_SEED_SHARE", "LINK", "GABOR_SIGMA", "RULE_PX", "LINE_PX",
+                                                  "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "MIN_PX")},
+           "cells": {"candidate": int(cand.sum()), "seed": int(seed.sum()), "network": int(network.sum()), "review": int(review.sum())},
+           "water_px": int((mask == 255).sum()), "review_px": int((mask == 128).sum()),
+           "review_bodies": bodies,
+           "seconds": {"cells": round(t1 - t0, 1), "total": round(time.time() - t0, 1)}}
+    (out / "run.json").write_text(json.dumps(run, indent=1) + "\n")
+    print(json.dumps({k: v for k, v in run.items() if k != "settings"}, indent=1))
+
+
+def self_check():
+    """Synthetic: ripples (11 px, 20 deg) beside machine ruling (4.48 px, 144 deg) and blank paper."""
+    n = 256
+    y, x = np.mgrid[0:n, 0:2 * n].astype(float)
+    a_r, a_m = np.radians(20 + 90), np.radians(RULE_ANGLE + 90)
+    red = np.full((n, 2 * n), 220.0)
+    rip = np.cos(2 * np.pi * (np.cos(a_r) * x + np.sin(a_r) * y) / 11) > 0.8
+    mil = np.cos(2 * np.pi * (np.cos(a_m) * x + np.sin(a_m) * y) / 4.48) > 0.6
+    red[:, :n][rip[:, :n]] = 150
+    red[:, n:][mil[:, n:]] = 150
+    rows, cols = n // CELL, 2 * n // CELL
+    sp, rule, loge = cell_fft(red.astype(np.uint8), np.full((rows, cols), 220.0), rows, cols)
+    assert np.median(rule[2:6, 1:6]) < 0.05 and np.median(rule[2:6, 10:15]) > 0.5, (rule[2:6, 1:6], rule[2:6, 10:15])
+    assert 9 < np.median(sp[2:6, 1:6]) < 13 and 4 < np.median(sp[2:6, 10:15]) < 5.2, np.median(sp[2:6, 10:15])
+    g = gabor_rule(red / 220)
+    assert np.median(g[64:192, 300:450]) > RULE_PX > np.median(g[64:192, 40:200]), (np.median(g[64:192, 300:450]), np.median(g[64:192, 40:200]))
+    # component logic: a big seeded body, a small seeded body far away (review), a seedless one (dropped)
+    c = np.zeros((40, 40), bool)
+    c[2:20, 2:20] = c[30:36, 30:36] = c[2:6, 30:36] = True
+    one = np.ones_like(c, float)
+    sp2 = np.where(c, 10, 0).astype(float)
+    sp2[2:6, 30:36] = 5
+    _, _, net, rev = cells_to_water(sp2, np.zeros_like(one), c * 5.0, one * 0.9, one, one, np.ones_like(c))
+    assert net[10, 10] and not net[33, 33] and rev[33, 33] and not rev[3, 31] and not net[3, 31]
+    print("self-check ok")
+
+
+if __name__ == "__main__":
+    main()

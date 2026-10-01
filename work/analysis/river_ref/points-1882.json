@@ -1,0 +1,2402 @@
+[
+{
+"id": "1882-0000",
+"x": 7037,
+"y": 6482,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0001",
+"x": 7767,
+"y": 6721,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0002",
+"x": 7682,
+"y": 5964,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0003",
+"x": 7161,
+"y": 6020,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0004",
+"x": 7407,
+"y": 6679,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0005",
+"x": 7360,
+"y": 6383,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0006",
+"x": 7567,
+"y": 6288,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0007",
+"x": 7707,
+"y": 6114,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0008",
+"x": 6996,
+"y": 6399,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0009",
+"x": 6929,
+"y": 6814,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0010",
+"x": 7755,
+"y": 6299,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0011",
+"x": 7343,
+"y": 6522,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0012",
+"x": 7680,
+"y": 6685,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0013",
+"x": 6902,
+"y": 6612,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0014",
+"x": 7356,
+"y": 6172,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0015",
+"x": 7638,
+"y": 6721,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0016",
+"x": 7134,
+"y": 6505,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0017",
+"x": 7867,
+"y": 6004,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0018",
+"x": 7823,
+"y": 6225,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0019",
+"x": 6931,
+"y": 5922,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0020",
+"x": 6926,
+"y": 6565,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0021",
+"x": 7454,
+"y": 5909,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0022",
+"x": 7861,
+"y": 6802,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0023",
+"x": 7290,
+"y": 6602,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0024",
+"x": 7121,
+"y": 6892,
+"window": "arsenal_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0025",
+"x": 4732,
+"y": 4443,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0026",
+"x": 4329,
+"y": 4240,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0027",
+"x": 4527,
+"y": 4482,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0028",
+"x": 4748,
+"y": 4207,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0029",
+"x": 4866,
+"y": 3938,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0030",
+"x": 4653,
+"y": 3936,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0031",
+"x": 4993,
+"y": 3924,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0032",
+"x": 5079,
+"y": 4170,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0033",
+"x": 4596,
+"y": 3722,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0034",
+"x": 4726,
+"y": 4557,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0035",
+"x": 4869,
+"y": 4357,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0036",
+"x": 4402,
+"y": 3890,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0037",
+"x": 4944,
+"y": 4441,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0038",
+"x": 5180,
+"y": 4003,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0039",
+"x": 4423,
+"y": 4460,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0040",
+"x": 4640,
+"y": 4438,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0041",
+"x": 5028,
+"y": 4212,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0042",
+"x": 4732,
+"y": 4219,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0043",
+"x": 5149,
+"y": 4386,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0044",
+"x": 4494,
+"y": 4010,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0045",
+"x": 4590,
+"y": 4301,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0046",
+"x": 4811,
+"y": 4566,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0047",
+"x": 4817,
+"y": 4102,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0048",
+"x": 4903,
+"y": 4573,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0049",
+"x": 4335,
+"y": 4191,
+"window": "dry_city_blocks",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0050",
+"x": 2448,
+"y": 5561,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0051",
+"x": 3016,
+"y": 5213,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0052",
+"x": 2624,
+"y": 5480,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0053",
+"x": 2377,
+"y": 5175,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0054",
+"x": 2761,
+"y": 5703,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0055",
+"x": 2919,
+"y": 5594,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0056",
+"x": 2890,
+"y": 5555,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0057",
+"x": 2583,
+"y": 4888,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0058",
+"x": 2649,
+"y": 5479,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0059",
+"x": 2720,
+"y": 4910,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0060",
+"x": 2997,
+"y": 4967,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0061",
+"x": 2733,
+"y": 5660,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0062",
+"x": 2602,
+"y": 5179,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0063",
+"x": 2701,
+"y": 5550,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0064",
+"x": 2230,
+"y": 5280,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0065",
+"x": 2244,
+"y": 5115,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0066",
+"x": 2920,
+"y": 5668,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0067",
+"x": 2829,
+"y": 5407,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0068",
+"x": 2792,
+"y": 5203,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0069",
+"x": 2862,
+"y": 4974,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0070",
+"x": 2372,
+"y": 5314,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0071",
+"x": 2432,
+"y": 4812,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0072",
+"x": 2989,
+"y": 5004,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0073",
+"x": 2752,
+"y": 5742,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0074",
+"x": 3080,
+"y": 5361,
+"window": "chinois_quay",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0075",
+"x": 3737,
+"y": 3014,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0076",
+"x": 4026,
+"y": 2952,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0077",
+"x": 4475,
+"y": 3467,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0078",
+"x": 4091,
+"y": 2961,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0079",
+"x": 3970,
+"y": 3531,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0080",
+"x": 3775,
+"y": 3275,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0081",
+"x": 4061,
+"y": 3223,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0082",
+"x": 4480,
+"y": 3346,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0083",
+"x": 3505,
+"y": 2992,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0084",
+"x": 4302,
+"y": 3477,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0085",
+"x": 4340,
+"y": 3577,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0086",
+"x": 4407,
+"y": 3560,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0087",
+"x": 4258,
+"y": 3124,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0088",
+"x": 4328,
+"y": 2732,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0089",
+"x": 4031,
+"y": 3396,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0090",
+"x": 4074,
+"y": 2810,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0091",
+"x": 3936,
+"y": 3572,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0092",
+"x": 3557,
+"y": 3092,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0093",
+"x": 4390,
+"y": 2973,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0094",
+"x": 4083,
+"y": 3167,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0095",
+"x": 3704,
+"y": 3563,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0096",
+"x": 4016,
+"y": 3023,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0097",
+"x": 3996,
+"y": 3432,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0098",
+"x": 3865,
+"y": 3024,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0099",
+"x": 3854,
+"y": 2601,
+"window": "creek_nw",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0100",
+"x": 10351,
+"y": 6053,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0101",
+"x": 10438,
+"y": 6305,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0102",
+"x": 10427,
+"y": 5839,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0103",
+"x": 10269,
+"y": 6114,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0104",
+"x": 9828,
+"y": 6323,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0105",
+"x": 10035,
+"y": 6150,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0106",
+"x": 9981,
+"y": 6063,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0107",
+"x": 10398,
+"y": 5685,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0108",
+"x": 10681,
+"y": 5593,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0109",
+"x": 10617,
+"y": 6064,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0110",
+"x": 10616,
+"y": 6371,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0111",
+"x": 10636,
+"y": 6453,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0112",
+"x": 10061,
+"y": 5533,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0113",
+"x": 10661,
+"y": 6466,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0114",
+"x": 10489,
+"y": 5572,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0115",
+"x": 9885,
+"y": 6388,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0116",
+"x": 9817,
+"y": 5963,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0117",
+"x": 9814,
+"y": 6272,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0118",
+"x": 10573,
+"y": 5787,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0119",
+"x": 10055,
+"y": 5775,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0120",
+"x": 9912,
+"y": 6316,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0121",
+"x": 10439,
+"y": 5689,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0122",
+"x": 10152,
+"y": 5797,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0123",
+"x": 9871,
+"y": 5671,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0124",
+"x": 9963,
+"y": 5761,
+"window": "bridge_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0125",
+"x": 8940,
+"y": 7774,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0126",
+"x": 8572,
+"y": 7472,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0127",
+"x": 8679,
+"y": 7463,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0128",
+"x": 9128,
+"y": 7101,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0129",
+"x": 8865,
+"y": 7519,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0130",
+"x": 8729,
+"y": 7308,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0131",
+"x": 8885,
+"y": 6916,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0132",
+"x": 8424,
+"y": 7119,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0133",
+"x": 8795,
+"y": 7151,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0134",
+"x": 8831,
+"y": 7615,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0135",
+"x": 8592,
+"y": 7064,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0136",
+"x": 8511,
+"y": 7059,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0137",
+"x": 9321,
+"y": 7547,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0138",
+"x": 8922,
+"y": 7014,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0139",
+"x": 9388,
+"y": 7420,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0140",
+"x": 8842,
+"y": 7636,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0141",
+"x": 9398,
+"y": 6821,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0142",
+"x": 8630,
+"y": 6818,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0143",
+"x": 8806,
+"y": 6949,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0144",
+"x": 8436,
+"y": 7536,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0145",
+"x": 9382,
+"y": 6964,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0146",
+"x": 8856,
+"y": 7521,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0147",
+"x": 8918,
+"y": 7494,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0148",
+"x": 8836,
+"y": 7357,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0149",
+"x": 9252,
+"y": 7025,
+"window": "arsenal_basin",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0150",
+"x": 4699,
+"y": 5645,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0151",
+"x": 4516,
+"y": 5711,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0152",
+"x": 4228,
+"y": 5461,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0153",
+"x": 3928,
+"y": 5536,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0154",
+"x": 4364,
+"y": 5031,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0155",
+"x": 4104,
+"y": 5691,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0156",
+"x": 4289,
+"y": 5822,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0157",
+"x": 4028,
+"y": 5675,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0158",
+"x": 4346,
+"y": 5436,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0159",
+"x": 3760,
+"y": 5755,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0160",
+"x": 4005,
+"y": 5128,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0161",
+"x": 4691,
+"y": 5217,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0162",
+"x": 4596,
+"y": 5048,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0163",
+"x": 4013,
+"y": 5072,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0164",
+"x": 4579,
+"y": 5078,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0165",
+"x": 4017,
+"y": 5939,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0166",
+"x": 4661,
+"y": 5305,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0167",
+"x": 4461,
+"y": 5162,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0168",
+"x": 4126,
+"y": 5578,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0169",
+"x": 3958,
+"y": 5133,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0170",
+"x": 3708,
+"y": 5574,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0171",
+"x": 4599,
+"y": 5870,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0172",
+"x": 3738,
+"y": 5604,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0173",
+"x": 4539,
+"y": 5222,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0174",
+"x": 4685,
+"y": 5922,
+"window": "charner_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0175",
+"x": 10783,
+"y": 3471,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0176",
+"x": 10375,
+"y": 3847,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0177",
+"x": 11088,
+"y": 3890,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0178",
+"x": 11197,
+"y": 3798,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0179",
+"x": 10920,
+"y": 3637,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0180",
+"x": 10721,
+"y": 3038,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0181",
+"x": 10587,
+"y": 3205,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0182",
+"x": 10555,
+"y": 3101,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0183",
+"x": 10410,
+"y": 3587,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0184",
+"x": 10890,
+"y": 3918,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0185",
+"x": 10643,
+"y": 3605,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0186",
+"x": 10398,
+"y": 3504,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0187",
+"x": 10306,
+"y": 3960,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0188",
+"x": 10881,
+"y": 3399,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0189",
+"x": 10503,
+"y": 3516,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0190",
+"x": 10711,
+"y": 3017,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0191",
+"x": 10533,
+"y": 3626,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0192",
+"x": 11092,
+"y": 3411,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0193",
+"x": 11121,
+"y": 3288,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0194",
+"x": 10218,
+"y": 3160,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0195",
+"x": 10405,
+"y": 3878,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0196",
+"x": 10535,
+"y": 3830,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0197",
+"x": 10776,
+"y": 3801,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0198",
+"x": 10338,
+"y": 3347,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0199",
+"x": 10639,
+"y": 3218,
+"window": "avalanche_head",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0200",
+"x": 8872,
+"y": 4390,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0201",
+"x": 8698,
+"y": 4557,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0202",
+"x": 8988,
+"y": 4654,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0203",
+"x": 9160,
+"y": 4052,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0204",
+"x": 9536,
+"y": 4603,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0205",
+"x": 9457,
+"y": 4403,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0206",
+"x": 9147,
+"y": 4196,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0207",
+"x": 9386,
+"y": 4245,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0208",
+"x": 8840,
+"y": 3766,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0209",
+"x": 9342,
+"y": 3741,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0210",
+"x": 8686,
+"y": 3836,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0211",
+"x": 8773,
+"y": 3870,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0212",
+"x": 9532,
+"y": 4251,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0213",
+"x": 8818,
+"y": 3974,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0214",
+"x": 9377,
+"y": 4040,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0215",
+"x": 9214,
+"y": 4218,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0216",
+"x": 9461,
+"y": 3961,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0217",
+"x": 8976,
+"y": 4046,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0218",
+"x": 8948,
+"y": 3816,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0219",
+"x": 8898,
+"y": 3940,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0220",
+"x": 9488,
+"y": 4666,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0221",
+"x": 9218,
+"y": 4498,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0222",
+"x": 9577,
+"y": 4432,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0223",
+"x": 9508,
+"y": 4200,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0224",
+"x": 8738,
+"y": 4293,
+"window": "citadel_moat",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0225",
+"x": 5364,
+"y": 6288,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0226",
+"x": 4906,
+"y": 5828,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0227",
+"x": 4840,
+"y": 5916,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0228",
+"x": 4874,
+"y": 5889,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0229",
+"x": 5686,
+"y": 6307,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0230",
+"x": 4950,
+"y": 6348,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0231",
+"x": 4928,
+"y": 5849,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0232",
+"x": 4917,
+"y": 6129,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0233",
+"x": 5401,
+"y": 6300,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0234",
+"x": 5748,
+"y": 5887,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0235",
+"x": 4878,
+"y": 6084,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0236",
+"x": 5363,
+"y": 5729,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0237",
+"x": 5379,
+"y": 5583,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0238",
+"x": 5775,
+"y": 5773,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0239",
+"x": 5173,
+"y": 6412,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0240",
+"x": 5102,
+"y": 6077,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0241",
+"x": 5347,
+"y": 6447,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0242",
+"x": 4917,
+"y": 5968,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0243",
+"x": 5718,
+"y": 5783,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0244",
+"x": 4910,
+"y": 6305,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0245",
+"x": 4846,
+"y": 6347,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0246",
+"x": 5102,
+"y": 5512,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0247",
+"x": 5428,
+"y": 6186,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0248",
+"x": 4814,
+"y": 5593,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0249",
+"x": 5223,
+"y": 5617,
+"window": "quay_rondpoint",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0250",
+"x": 3045,
+"y": 3306,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0251",
+"x": 3008,
+"y": 2440,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0252",
+"x": 2392,
+"y": 2645,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0253",
+"x": 3004,
+"y": 3000,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0254",
+"x": 2631,
+"y": 2565,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0255",
+"x": 2318,
+"y": 2861,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0256",
+"x": 2371,
+"y": 3097,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0257",
+"x": 2447,
+"y": 2562,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0258",
+"x": 2961,
+"y": 3265,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0259",
+"x": 2305,
+"y": 2845,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0260",
+"x": 3132,
+"y": 3387,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0261",
+"x": 2587,
+"y": 3225,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0262",
+"x": 3193,
+"y": 2955,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0263",
+"x": 3131,
+"y": 3237,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0264",
+"x": 2501,
+"y": 2963,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0265",
+"x": 2459,
+"y": 3128,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0266",
+"x": 2688,
+"y": 2722,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0267",
+"x": 2302,
+"y": 2612,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0268",
+"x": 2867,
+"y": 2725,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0269",
+"x": 2240,
+"y": 2427,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0270",
+"x": 2210,
+"y": 3205,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0271",
+"x": 3147,
+"y": 2702,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0272",
+"x": 2943,
+"y": 3010,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0273",
+"x": 2527,
+"y": 2860,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0274",
+"x": 2600,
+"y": 2720,
+"window": "outskirts_rail",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0275",
+"x": 8308,
+"y": 4764,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0276",
+"x": 7965,
+"y": 5024,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0277",
+"x": 8515,
+"y": 5166,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0278",
+"x": 8014,
+"y": 4956,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0279",
+"x": 8120,
+"y": 5332,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0280",
+"x": 8696,
+"y": 5255,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0281",
+"x": 8604,
+"y": 5180,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0282",
+"x": 8577,
+"y": 5064,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0283",
+"x": 8165,
+"y": 4887,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0284",
+"x": 8454,
+"y": 4912,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0285",
+"x": 8214,
+"y": 4903,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0286",
+"x": 8152,
+"y": 5069,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0287",
+"x": 7983,
+"y": 4987,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0288",
+"x": 7991,
+"y": 5471,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0289",
+"x": 8358,
+"y": 4792,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0290",
+"x": 8567,
+"y": 5288,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0291",
+"x": 8558,
+"y": 5047,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0292",
+"x": 8132,
+"y": 5099,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0293",
+"x": 8214,
+"y": 4742,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0294",
+"x": 8235,
+"y": 4891,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0295",
+"x": 8224,
+"y": 5292,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0296",
+"x": 8210,
+"y": 4951,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0297",
+"x": 8242,
+"y": 4803,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0298",
+"x": 8457,
+"y": 5326,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1882-0299",
+"x": 8492,
+"y": 5310,
+"window": "blue_domain",
+"stratum": "uniform",
+"seed": 1
+}
+]
