@@ -1,14 +1,21 @@
 # System graph
 
-![How the archive is built, in seven steps](system-graph.png)
+![How the archive is built, in five steps](system-graph.png)
 
-The plain-language view, for anyone. Seven steps a map goes through, from finding it to showing it,
+The plain-language view, for anyone. Five steps a map goes through, from finding it to showing it,
 with what is done and what is open at each. Each step depends on the one before it, so a mistake
-early on carries into everything after. Fix the earliest broken step first.
+early on carries into everything after. Fix the earliest broken step first. "Keep it running" sits
+apart because it is not a layer.
+
+The five are the plan's layers folded together: Find and keep (0–1), Place (2), Read and name (3–4),
+Show (Surfaces), and **Not started yet** (layer 5, the Walk items, and `building-attributes`). The
+version animation `work/proto/fabric/journey.html` uses the same five. Which open items count as
+"not started" is decided in `gen_system_graph.py` from §9 and ROADMAP's Walk section, so the counts
+follow the docs: 14 + 12 + 27 + 3 + 16 = 72, plus 9 for keeping it running, which is §9's 81.
 
 ## Engineer view
 
-`system-graph-technical.png` (and `.svg`) shows the same steps as the knowledge layers of
+`system-graph-technical.png` (and `.svg`) shows the plan's eight layers unfolded, as in
 `docs/knowledge-system-plan.md` §9, with the tools, research files and git branches in each row.
 
 - **Containment is the link.** A tool or research strand sits in the row of the layer it acts on.
