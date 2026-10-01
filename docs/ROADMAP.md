@@ -462,9 +462,11 @@ system — what a result must retain, and the two kinds of check — is in the r
       core at the current half-size colour cut; a wider cut recovers water but leaks into Arsenal
       streets. Native-pixel EDA shows that 1882 and 1898 share ruled-water geometry but differ in
       colour, and VMA pyramid levels shift the river ink. The current 0.09 mask is only a diagnostic
-      proposal. Exit: hand-traced water and adjacent land in held-out river, quay, creek and dry-land
-      windows on **both** sheets; a source-resolution, bank-aware proposal scored for missed water,
-      false water and shoreline distance by case; human review before any layer is approved. Method,
+      proposal. **2026-10-01: 1882 river pass v1** (line texture, no colour cut) scores 96.5% [94–98]
+      on 289 blind owner point labels in held-out windows; its open failure is false water 17–60 px
+      onto quays. Exit: blind point labels (they replaced hand tracing, owner, 2026-10-01) in held-out
+      river, quay, creek and dry-land windows on **both** sheets; a source-resolution proposal scored
+      for missed and false water by case; human review before any layer is approved. Method,
       measurements and reproducible artefacts: `docs/river-reconstruction.md`.
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any

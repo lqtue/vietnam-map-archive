@@ -1,8 +1,19 @@
 # River and road reference windows, 1882 + 1898
 
 **2026-10-01.** Step 1 and the scoring half of step 3 of the `river-reconstruction` gate
-(`docs/river-reconstruction.md`), and the same for the road stage. **No window is traced yet; no
-score exists.** Everything here is source pixels from `iiif.maparchive.vn` fixed tiles.
+(`docs/river-reconstruction.md`), and the same for the road stage. Everything here is source
+pixels from `iiif.maparchive.vn` fixed tiles.
+
+**The reference is now point labels, not traces** (owner, 2026-10-01):
+
+- `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
+- `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
+  and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
+  (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
+- `score.py --points 1882 <whole-sheet mask.png> [--layer road]` — score once per frozen version.
+  The water pass is `work/ocr/scripts/river_pass.py`; results in `docs/river-reconstruction.md`.
+
+The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
 - `windows.json` — 1882: 14 water windows and 6 road windows (`"layer": "road"`); 1898: 9 water
   windows. Each has a case and a split. `calibrate` windows may fit the appearance model;

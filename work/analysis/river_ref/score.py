@@ -100,7 +100,7 @@ def wilson(k, n, z=1.96):
         return "n/a"
     p, d = k / n, 1 + z * z / n
     c, h = (p + z * z / (2 * n)) / d, z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
-    return f"{100 * p:.1f}% [{100 * (c - h):.0f}-{100 * (c + h):.0f}] ({k}/{n})"
+    return f"{100 * p:.1f}% [{max(0, 100 * (c - h)):.0f}-{min(100, 100 * (c + h)):.0f}] ({k}/{n})"
 
 
 def points(sheet, mask_path, layer="water"):

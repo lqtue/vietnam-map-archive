@@ -138,6 +138,50 @@ This is a design proposal, not a tested improvement.
    layer only after the held-out windows and visual whole-sheet review pass.
    Then move to road surfaces, followed by blocks and buildings.
 
-The paired reference windows are now chosen and exported, and a scorer exists ([`work/analysis/river_ref/`](../work/analysis/river_ref/README.md): 10 windows on 1882, 9 on 1898, 9 unseen held-out); **none is traced yet**. The immediate task is the hand tracing. The initial
-pixel EDA is recorded; the river proposal remains provisional. This task is tracked under
-`river-reconstruction` in [ROADMAP.md](ROADMAP.md).
+**Change to step 1 (owner, 2026-10-01): blind point labels replace polygon tracing.** Tracing
+cost hours per window; 300 random points in the held-out windows, each labelled water / road /
+land / unsure on a page that never shows a proposal, the window or its case
+([`label.py`](../work/analysis/river_ref/label.py)), are one keystroke each and give accuracy
+with a ±2–3 point interval. What they do not give is a shoreline distance in pixels: the
+scorer reports, for each wrong point, its distance to the proposal's edge instead. Few points
+land on narrow water, so creek and basin numbers rest on single digits; an edge-stratified batch
+is the fix. Traces remain supported by `score.py` if a window ever needs one.
+
+## River pass v1, 1882 (2026-10-01)
+
+[`work/ocr/scripts/river_pass.py`](../work/ocr/scripts/river_pass.py), commit `27ee4023`, on the
+sheet-wide layers of `sheet_features.py`. What the sheet showed first:
+
+- **Colour cannot do it.** Ripples and the military ruling are the same blue ink (measured optical
+  density directions agree within noise). The earlier hue cuts failed for this reason.
+- **Geometry can.** The military ruling and the salmon hatch are machine-ruled: 4.48 and 5.09 px,
+  always at 144°, with a sharp spectral peak. Ripples are hand engraved, 6–28 px apart, following
+  the bank. A per-cell FFT measures the share of power at the ruling (≈0.9 ruled, <0.06 ripples).
+- **The south bank has no ink line**; the ripples stop. The proposal's edge is therefore the
+  outermost ripple line, not a detected bank.
+- **The citadel's rampart hachures look exactly like ripples** (owner: they draw height, not a
+  ditch). Texture cannot separate them, so only water joined to the river network is accepted;
+  isolated water-like bodies (the citadel, garden ponds, creek pieces cut off by bridges) go to a
+  review list and are not water until a person confirms them. This is the "enclosed water needs its
+  own confirmed seed" rule above.
+
+Thresholds were set on the calibrate windows and on whole-sheet cell maps; one tuning overlay also
+showed `citadel_moat`, `blue_domain` and part of `bridge_basin`, which are marked `seen`. Score,
+run once on 300 owner labels (11 unsure), review bodies counted as not water:
+
+| Group | Accuracy [95% CI] | Missed water | False water |
+|---|---|---|---|
+| all | 96.5% [94–98] (279/289) | 4/52 | 6/237 |
+| held-out, unseen | 97.6% [94–99] (163/167) | 3/40 | 1/127 |
+| held-out, seen | 95.1% [90–98] (116/122) | 1/12 | 5/110 |
+| quay | 89.8% [78–96] | 0/17 | **5/32** |
+| creek | 95.8% [86–99] | 2/9 | 0/39 |
+| dry land, moat (dry), outskirts, canal, bridge | 100% | — | 0 |
+
+The failure that matters is **false water on quays**: all five false points sit 17–60 px past
+the bank, the leak this document predicted. Three of the four misses are more than 150 px from any
+proposed water, i.e. whole bodies not found: narrow creeks too thin for 32 px cells. Calibration
+views show the same limit on the garden streams. The 1882 dry and moat windows have no false water.
+Not done: the 1898 transfer, the quay fix, an edge-stratified point batch, the review of isolated
+bodies. No layer is approved. This task is tracked under `river-reconstruction` in
+[ROADMAP.md](ROADMAP.md).
