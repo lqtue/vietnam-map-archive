@@ -55,6 +55,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { generateId } from '@allmaps/id';
 import { serviceClient } from '../lib/db.mjs';
 import { willApply, dryNotice, opt } from '../lib/cli.mjs';
 
@@ -182,6 +183,9 @@ for (const { skey, SERIES_KEY, collection, description, cell, half, r, asset } o
     source_type: 'self',
     status: 'draft',
     collection,
+    // The typed columns map_series counts (mig 104); extra_metadata alone left 188 rows uncounted.
+    sheet_number: cell,
+    sheet_half: half,
     creator: "Service Géographique de l'Indochine",
     publisher: "Service Géographique de l'Indochine",
     description,
@@ -189,6 +193,8 @@ for (const { skey, SERIES_KEY, collection, description, cell, half, r, asset } o
     rights: 'CC BY 4.0 — IGN, deposited in Nakala',
     source_url: `https://doi.org/${doi}`,
     iiif_image: `https://iiif.maparchive.vn/iiif/${id}`,
+    // Allmaps files a contributor's work under this hash; the admin route derives it the same way.
+    allmaps_id: await generateId(`https://iiif.maparchive.vn/iiif/${id}`),
     thumbnail: `https://iiif.maparchive.vn/iiif/${id}/full/400,/0/default.jpg`,
     is_georeferenced: false,
     extra_metadata: {

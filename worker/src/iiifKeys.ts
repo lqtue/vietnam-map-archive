@@ -137,7 +137,10 @@ export function splitIiifPath(
 ): { mapId: string; version: string; rest: string } | null {
   const match = pathname.match(/^\/iiif\/([^/]+)(\/.*)?$/);
   if (!match) return null;
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(match[1]))
+  // A UUID, optionally with a `-YYYYMMDD` suffix: a rescanned sheet lives under a
+  // dated R2 key (`<uuid>-20260911`) distinct from its bare id, which still
+  // serves the original scan. The suffix stays in `mapId` — it is the key.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(-\d{8})?$/i.test(match[1]))
     return null;
   let rest = match[2] || '';
   try {

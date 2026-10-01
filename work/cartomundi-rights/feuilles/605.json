@@ -1,0 +1,18 @@
+{
+  "source": "https://www.cartomundi.fr/ctmd-services/serie/605/feuilles",
+  "fetchedAt": "2026-09-30T14:44:07.847Z",
+  "records": [
+    {
+      "fkey": 63712,
+      "number": "Carte topographique du service géographique",
+      "title": "Yên - Minh",
+      "year": 1915,
+      "bbox": [
+        "e1050627",
+        "n0225815",
+        "e1052824",
+        "n0232515"
+      ]
+    }
+  ]
+}

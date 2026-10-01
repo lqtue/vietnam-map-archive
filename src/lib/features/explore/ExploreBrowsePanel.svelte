@@ -1,11 +1,12 @@
 <!--
-  ExploreBrowsePanel.svelte — map list for /explore, with an in-place "show
-  all" expansion.
+  ExploreBrowsePanel.svelte — map list for /explore.
 
-  Default view: just the maps that cover the user's location (GPS coverage),
-  with a big tick-circle first cell for add/remove. "Browse the full archive →"
-  swaps in ArchiveBrowser (shared catalog engine + facets). Both modes
-  render the same ArchiveMapRows — tap to add, tap again to remove.
+  One list, no modes: the survey rows, then the maps that cover the user's spot
+  (when there are any), then the whole archive through ArchiveBrowser (shared
+  catalog engine + facets). There used to be a "Browse the full archive →"
+  toggle between the last two; a query forced it open and the way back did
+  nothing, so it went. Every row is the same ArchiveMapRows — tap to add, tap
+  again to remove.
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
@@ -14,6 +15,7 @@
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
   import { onMount, tick } from 'svelte';
+  import { get, writable } from 'svelte/store';
   import { layersStore } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
   import type { MapSeries } from '$lib/data/maps/types';
@@ -28,22 +30,10 @@
   // Admins/mods may browse draft maps in the viewer; everyone else is
   // capped to public/featured (mirrors /catalog's role gating).
   export let role: 'user' | 'mod' | 'admin' = 'user';
-  // When the parent's welcome-mode is "Show all maps", force-expand so the
-  // user lands on the full archive immediately. When the parent's mode is
-  // location-based, leave `expanded` user-controlled — never auto-expand on
-  // empty matches, since that hides the location's "no map here" status
-  // after the tour ends.
-  export let forceExpanded = false;
   // The desktop rail owns one filter bar above its two tabs and hands the
   // engine down; the mobile drawer has no such bar, so null leaves the browser
   // to create and render its own.
   export let search: CatalogSearchController | null = null;
-
-  let expanded = false;
-
-  // Parent owns the "Show all maps" decision. When it flips on, expand;
-  // when off, leave whatever the user chose manually.
-  $: if (forceExpanded) expanded = true;
 
   // Oldest → newest, matching /catalog's default sort. Undated maps sink
   // to the bottom; ties break by name so the order is stable.
@@ -114,19 +104,30 @@
    * address) or the raster archive (`l7014`) — because a reader copying a key
    * out of one of those URLs should not have to know which half they took.
    *
-   * Consumed once: the param is dropped from the URL after it is applied, or a
-   * reload would put back the survey the reader had just taken off.
+   * `solo=1` is used by the series catalogue's map button. It replaces any
+   * previously selected historical layers so the link shows only that survey.
+   * Consumed once: the params are dropped from the URL after they are applied,
+   * or a reload would put back the survey the reader had just taken off.
    */
   function applySeriesParam() {
     const url = new URL(window.location.href);
     const key = url.searchParams.get('series');
     if (!key) return;
+    const solo = url.searchParams.get('solo') === '1';
     url.searchParams.delete('series');
+    url.searchParams.delete('solo');
     replaceState(url, {});
     const row = visibleSeries.find((r) => r.key === key || r.seriesKey === key);
+    if (!row) return;
+    if (solo) {
+      layersStore.clearOverlays();
+      if (get(layersStore).base.kind === 'historical') {
+        layersStore.setBase({ kind: 'basemap', key: 'g-streets' });
+      }
+    }
     // Already on the stack is not a failure — the reader has it, and
     // `addOverlay` would refuse the duplicate anyway.
-    if (row) layersStore.addOverlay(row.ref);
+    layersStore.addOverlay(row.ref);
   }
 
   /** Tap to put the survey on the map, tap again to take it off. */
@@ -135,26 +136,18 @@
     else layersStore.addOverlay(row.ref);
   }
 
+  // While a query is typed the list answers the query, so the spot's maps step
+  // aside — they would sit above results they may not match.
+  $: query = search ? search.query : writable('');
+  $: typing = !!$query.trim();
+
   $: visibleSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts) : [];
   $: seriesOn = new Set(
     $layersStore.overlays.filter((o) => o.ref.kind === 'series').map((o) => o.ref.mapId)
   );
 </script>
 
-<div class="ebp" class:is-expanded={expanded}>
-  <div class="head">
-    <strong class="title">
-      {#if expanded}{$t('Browse the archive')}{:else if matches.length}
-        {matches.length === 1
-          ? $t('1 map covers this spot')
-          : $t('{N} maps cover this spot', { N: matches.length })}
-      {:else}{$t('No archival map here')}{/if}
-    </strong>
-    {#if !expanded && matches.length}
-      <span class="hint">{$t('Tap a row to add it as a layer · tap again to remove.')}</span>
-    {/if}
-  </div>
-
+<div class="ebp">
   <ul class="series">
     {#each visibleSeries as s (s.key)}
       {@const on = seriesOn.has(s.ref.mapId)}
@@ -191,24 +184,28 @@
     {/each}
   </ul>
 
-  {#if expanded}
-    <ArchiveBrowser
-      sortRows={byYear}
-      {search}
-      showFilters={search === null}
-      on:pick
-      on:remove
-      on:pickLabel
-    />
-  {:else if visibleMatches.length}
+  {#if visibleMatches.length && !typing}
+    <div class="head">
+      <strong class="title">
+        {visibleMatches.length === 1
+          ? $t('1 map covers this spot')
+          : $t('{N} maps cover this spot', { N: visibleMatches.length })}
+      </strong>
+    </div>
     <ArchiveMapRows rows={visibleMatches} on:pick on:remove />
   {/if}
 
-  <button type="button" class="browse-toggle" on:click={() => (expanded = !expanded)}>
-    {#if expanded}{$t('← Back to maps at this location')}{:else}{$t(
-        'Browse the full archive →'
-      )}{/if}
-  </button>
+  <div class="head">
+    <strong class="title">{$t('Browse the archive')}</strong>
+  </div>
+  <ArchiveBrowser
+    sortRows={byYear}
+    {search}
+    showFilters={search === null}
+    showLabels={false}
+    on:pick
+    on:remove
+  />
 </div>
 
 <style>
@@ -310,27 +307,5 @@
     font-family: var(--sb-font-display);
     font-size: var(--text-base);
     font-weight: var(--font-extrabold);
-  }
-  .hint {
-    color: var(--sb-text-meta);
-    font-size: 0.78rem;
-  }
-
-  .browse-toggle {
-    align-self: flex-start;
-    margin-top: 0.3rem;
-    padding: 0.45rem 0.7rem;
-    background: transparent;
-    border: none;
-    color: var(--sb-accent);
-    text-decoration: none;
-    font-family: inherit;
-    font-size: 0.84rem;
-    font-weight: var(--font-bold);
-    cursor: pointer;
-    border-bottom: 1.5px dashed var(--sb-accent);
-  }
-  .browse-toggle:hover {
-    color: var(--sb-accent-dark);
   }
 </style>

@@ -974,7 +974,8 @@ def annotate(write=False, only_new=False):
             r = requests.put(obj, headers={**H, "Content-Type": "application/json",
                                            "x-upsert": "true"}, data=body, timeout=60)
         r.raise_for_status()
-        public = f"{url}/storage/v1/object/public/{BUCKET}/{mid}.json"
+        # The app's route, not a storage URL: the bucket is private (mig 097).
+        public = f"https://maparchive.vn/api/maps/{mid}/annotation"
         r = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}", headers=H, timeout=30,
                            json={"annotation_url": public, "is_georeferenced": True,
                                  "bbox": bbox})

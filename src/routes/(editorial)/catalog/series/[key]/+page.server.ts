@@ -162,17 +162,13 @@ export const load: PageServerLoad = async ({ params }) => {
    * three-point georeference, deliberately left as a draft, and counting it
    * would advertise an edition no reader can open.
    */
-  // `map_series.collection` is nullable in the view's type. Without it there is
-  // nothing to group on, and no printings to count.
-  const { data: rows } = series.collection
-    ? await supabase
-        .from('maps')
-        .select('id,name,year,sheet_number,sheet_half,extra_metadata')
-        .eq('collection', series.collection)
-        .in('status', ['public', 'featured'])
-        .not('sheet_number', 'is', null)
-        .order('year', { ascending: true })
-    : { data: [] };
+  const { data: rows } = await supabase
+    .from('maps')
+    .select('id,name,year,sheet_number,sheet_half,extra_metadata')
+    .eq('series_key', key)
+    .in('status', ['public', 'featured'])
+    .not('sheet_number', 'is', null)
+    .order('year', { ascending: true });
 
   const printings: Record<string, SheetPrinting[]> = {};
   for (const row of rows ?? []) {

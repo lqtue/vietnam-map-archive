@@ -25,6 +25,7 @@ archive incident from becoming an unwarranted priority or generalisation claim.
 | hand sheets are not a free seam | A | `corners` writes the lattice cell as the ground half of every hand control point | A `jpg / pdf` seam measures the PDF sheet's departure from its cell, so it is not the independent join §7.3 opens with. The free comparisons include 715 `pdf / pdf` and 25 `jpg / jpg` (**0.0–0.6 m**). Draft §7.3 identifies the distinction. |
 | A Lưới `graticule_error = 2e-12` | B + D | recorded in `docs/pipelines.md`; zero mechanism follows when the same datum translation is applied to both operands | Case-study exhibit, not evidence of prevalence elsewhere. |
 | Indochine lattice, `Ha Noi` collision, neatline/rim readings | B | `allmaps-series-note.md`, surfaced by `figures.md` | Include provenance artifacts in the release package. |
+| Series 561: Tri Binh catalogue error (+509 m W / +544 m S) passing the per-sheet gates at 0.69%; Quang Ngai ~9.2 km caught by the span gate; v29 wrong-line landing; 314 public | B | `figures.md` §3.7 (added 2026-09-30), sourced to the 561 journal and handoff; not re-run here | Third case for the taxonomy (§7.8). No prevalence or error-rate claim: no random sample of cleared sheets has been tick-read or reviewed. |
 | fixture and geometry invariants | A | `catalog_audit --self-check`, `check_series_index --self-check`, `geo_audit --self-test`, `georef_error.py --self-check` all passed | These validate code behavior, not production measurements. |
 
 ## Claims that survive, claims that need limits

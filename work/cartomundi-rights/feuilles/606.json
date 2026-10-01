@@ -1,0 +1,114 @@
+{
+  "source": "https://www.cartomundi.fr/ctmd-services/serie/606/feuilles",
+  "fetchedAt": "2026-09-30T14:44:08.241Z",
+  "records": [
+    {
+      "fkey": 63713,
+      "number": "2",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1013912",
+        "n0194801",
+        "e1062524",
+        "n0253901"
+      ]
+    },
+    {
+      "fkey": 64199,
+      "number": "1",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e0965259",
+        "n0194801",
+        "e1013912",
+        "n0253901"
+      ]
+    },
+    {
+      "fkey": 64202,
+      "number": "6",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1062524",
+        "n0134338",
+        "e1111136",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 65200,
+      "number": "3",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1062524",
+        "n0194801",
+        "e1111136",
+        "n0253901"
+      ]
+    },
+    {
+      "fkey": 65201,
+      "number": "4",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e0965259",
+        "n0134338",
+        "e1013912",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 65202,
+      "number": "5",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1013912",
+        "n0134338",
+        "e1062524",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 65203,
+      "number": "7",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e0965259",
+        "n0072934",
+        "e1013912",
+        "n0134338"
+      ]
+    },
+    {
+      "fkey": 65204,
+      "number": "8",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1013912",
+        "n0072934",
+        "e1062524",
+        "n0134338"
+      ]
+    },
+    {
+      "fkey": 65205,
+      "number": "9",
+      "title": "Indo-Chine",
+      "year": 1903,
+      "bbox": [
+        "e1062524",
+        "n0072934",
+        "e1111136",
+        "n0134338"
+      ]
+    }
+  ]
+}

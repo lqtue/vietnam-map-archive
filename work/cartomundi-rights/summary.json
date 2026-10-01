@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-09-30T14:48:06.034Z",
+  "scope": "Nakala-linked CartoMundi scans in VMA local Tonkin and Indochine source files",
+  "total_unique_dois": 870,
+  "series_counts": {
+    "175": 0,
+    "243": 157,
+    "325": 221,
+    "561": 492
+  },
+  "posted_licenses": {
+    "CC-BY-4.0": 870
+  },
+  "note": "A posted license is not proof that the depositor controlled every right in a scan or underlying map."
+}

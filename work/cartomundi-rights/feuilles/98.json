@@ -1,0 +1,54 @@
+{
+  "source": "https://www.cartomundi.fr/ctmd-services/serie/98/feuilles",
+  "fetchedAt": "2026-09-30T14:41:23.990Z",
+  "records": [
+    {
+      "fkey": 7767,
+      "number": "[4]",
+      "title": "[Quart sud-est]",
+      "year": 1899,
+      "bbox": [
+        "e1032014",
+        "n0074500",
+        "e1095014",
+        "n0155959"
+      ]
+    },
+    {
+      "fkey": 7768,
+      "number": "[1]",
+      "title": "[Quart nord-ouest]",
+      "year": 1899,
+      "bbox": [
+        "e0962714",
+        "n0155459",
+        "e1032014",
+        "n0240759"
+      ]
+    },
+    {
+      "fkey": 7769,
+      "number": "[2]",
+      "title": "[Quart nord-est]",
+      "year": 1899,
+      "bbox": [
+        "e1032014",
+        "n0155459",
+        "e1101514",
+        "n0240759"
+      ]
+    },
+    {
+      "fkey": 7766,
+      "number": "[3]",
+      "title": "[Quart sud-ouest]",
+      "year": 1899,
+      "bbox": [
+        "e0965014",
+        "n0074500",
+        "e1032014",
+        "n0155959"
+      ]
+    }
+  ]
+}

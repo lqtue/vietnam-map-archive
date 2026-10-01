@@ -283,14 +283,22 @@ def annotation_for_map(map_id: str) -> dict[str, Any] | None:
     if not isinstance(rows, list) or not rows:
         return None
     row = rows[0]
-    source = row.get("annotation_url") or (
-        f"https://annotations.allmaps.org/maps/{row['allmaps_id']}"
-        if row.get("allmaps_id")
-        else None
-    )
-    if not source:
+    # Our route 404s a draft without a session, so read the private bucket
+    # directly with the service key. `/images/`, not `/maps/`: allmaps_id is
+    # Allmaps' image id (see src/lib/server/transformer.ts).
+    if (row.get("annotation_url") or "").startswith("https://maparchive.vn/api/maps/"):
+        ann = requests.get(
+            f"{url}/storage/v1/object/annotations/{map_id}.json",
+            headers={"apikey": key, "Authorization": f"Bearer {key}"},
+            timeout=20,
+        )
+    elif row.get("annotation_url") or row.get("allmaps_id"):
+        source = row.get("annotation_url") or (
+            f"https://annotations.allmaps.org/images/{row['allmaps_id']}"
+        )
+        ann = requests.get(source, timeout=20)
+    else:
         return None
-    ann = requests.get(source, timeout=20)
     return ann.json() if ann.ok else None
 
 

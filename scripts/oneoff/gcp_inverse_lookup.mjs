@@ -77,7 +77,7 @@ for (const id of mapIds) {
   const { data: rows, error } = await db
     .from('maps')
     .select(
-      'id,year,name,slug,allmaps_id,annotation_url,iiif_manifest,map_iiif_sources(iiif_image,source_type)'
+      'id,year,name,slug,allmaps_id,annotation_url,map_images:map_iiif_sources(iiif_image,source_type)'
     )
     .eq('id', id);
   if (error || !rows?.length) {

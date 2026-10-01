@@ -24,6 +24,7 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { page } from '$app/stores';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
   import { layersStore } from '$lib/map/stores/layersStore';
@@ -47,7 +48,6 @@
   export let mapList: MapListItem[] = [];
   /** Map ids whose traced fabric is drawn; owned by the page. */
   export let matches: ResolvedMap[] = [];
-  export let forceBrowseExpanded = false;
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** True while the product tour is pending or open. It sets `tab` itself, per
    *  step, so the auto-switch below must stand aside for it. */
@@ -89,9 +89,12 @@
    *     owns it outright while running. That is what `tourActive` is for: the
    *     two assignments raced and made `tests/smoke.spec.ts:125` flap, passing
    *     or failing on whichever landed last;
-   *   - anything at all after the first switch.
+   *   - anything at all after the first switch;
+   *   - a `?series=` link. The browse panel is what applies it, so it has to
+   *     mount, and a reader who already has a stack would otherwise land on
+   *     Picked and never run it.
    */
-  let tabSettled = false;
+  let tabSettled = $page.url.searchParams.has('series');
   function chooseTab(next: Tab) {
     tabSettled = true;
     tab = next;
@@ -170,7 +173,6 @@
           {matches}
           {role}
           {search}
-          forceExpanded={forceBrowseExpanded || filterActive}
           on:pick={(e) => pickMap(e.detail)}
           on:pickLabel={(e) => dispatch('pickLabel', e.detail)}
           on:remove={(e) => dispatch('removeOverlay', e.detail)}

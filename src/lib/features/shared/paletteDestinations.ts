@@ -63,6 +63,14 @@ export const DESTINATIONS: Destination[] = [
     role: 'anyone',
     keywords: 'series survey sheets l7014 indochine coverage index gap',
   },
+  {
+    href: '/catalog/cartomundi',
+    label: 'CartoMundi index',
+    hint: 'Vietnam-related surveys and scan rights evidence',
+    group: 'Browse',
+    role: 'anyone',
+    keywords: 'cartomundi nakala indochine tonkin annam cochinchine license rights maps',
+  },
 
   // Make
   {

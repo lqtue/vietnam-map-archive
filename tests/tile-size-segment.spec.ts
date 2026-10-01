@@ -21,6 +21,18 @@ test('encoded separators cannot escape the IIIF source path', () => {
   });
 });
 
+test('a dated rescan key is a map id, and a non-UUID is still not', () => {
+  const dated = 'eca788e5-6780-4dca-bf23-7651a1c48aba-20260911';
+  const p = splitIiifPath(`/iiif/${dated}/info.json`);
+  expect(p).toEqual({ mapId: dated, version: '', rest: '/info.json' });
+  expect(iiifR2Key(p!.mapId, p!.version, p!.rest)).toBe(`tiles/${dated}/info.json`);
+  expect(splitIiifPath(`/iiif/${dated}/v2/info.json`)!.version).toBe('/v2');
+  expect(splitIiifPath('/iiif/eca788e5-6780-4dca-bf23-7651a1c48aba-2026091/info.json')).toBeNull();
+  expect(splitIiifPath('/iiif/eca788e5-6780-4dca-bf23-7651a1c48aba-2026091x/info.json')).toBeNull();
+  expect(splitIiifPath('/iiif/../x/info.json')).toBeNull();
+  expect(splitIiifPath('/iiif/abc/info.json')).toBeNull();
+});
+
 /**
  * The IIIF size segment, and the 404 that hid behind it.
  *

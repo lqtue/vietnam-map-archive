@@ -3,14 +3,14 @@
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **363** tests:
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **374** tests:
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
-that sheet is unpublished) and the **six** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 345 browser-less pure
+that sheet is unpublished) and the **seven** in `tests/catalog-series.spec.ts`, which are
+**read-only** (they hit the real Supabase project but never write), plus 355 browser-less pure
 checks that ride the same runner — `tests/press.spec.ts` (the Gallica CQL builder and the NLV year
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
 camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
@@ -150,7 +150,9 @@ that the series filter matches `maps.collection` and not the label beside it, th
 compact type `<select>` had when it wrote `map_type` where the filter read `type` and so did
 nothing, visibly working; that "Open in map" carries a `#@lat,lng,zoomz` camera, because `?series=`
 alone lands a country-sized layer on the reader's last camera and draws one corner of it; and that
-the drawer paints **over** the sticky nav rather than under it) and `tests/screens.spec.ts`'s fourth
+the drawer paints **over** the sticky nav rather than under it; and that the series page's map
+button replaces a previously selected survey, since the layer stack persists across pages) and
+`tests/screens.spec.ts`'s fourth
 check (every `var(--token)` is one something declares — an undeclared custom property is not an
 error anywhere, the declaration using it is silently dropped, and `gap: var(--space-sm)` against a
 numeric scale had been rendering as no gap in three files since Sept 2026; the checker counts
@@ -200,12 +202,25 @@ and the archive looks correct while every link to the older sheet has quietly mo
 001) and migration 060 narrowed the check constraint without touching the default, so an insert that
 omits it is rejected — which presents as a null row rather than as an error about status.
 
+The migration-103 check saves a neatline through the real `PATCH` route and asserts **two**
+`georef_versions` rows, `mirror` then `neatline`, one per history file the route wrote, with
+the second as `map_georef_current`. The first row is the one worth the test: it is the snapshot of
+the version being replaced, and losing it is how a georeference goes missing from history without
+anything failing.
+
+`tests/work-items.spec.ts` (two checks) pins the join between the public pages and the tracker: every
+`items: [...]` a `/changelog` release or `/blog` post names must be an open item in `docs/ROADMAP.md`
+or appear in backticks in `docs/roadmap-record.md`. A renamed or mistyped item still renders, so
+nothing else would notice the page now describes work that does not exist under that name. The first
+check asserts ROADMAP still parses into more than 50 names, so a format change cannot turn the second
+into a pass on an empty set.
+
 `tests/schemaCheck.ts` holds no tests of its own: it is the ~50-line JSON Schema subset walker
 `tests/write.spec.ts` imports to check the shapes in `contracts/`, and it reports anything outside
 that subset through `unsupportedKeywords` rather than passing it silently, so adding an unsupported
 keyword to a contract fails loudly instead of going unchecked.
 
-**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 33 tests)
+**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 37 tests)
 against a **local** stack, never production: `npm run db:test` runs
 `supabase start -x vector -x logflare` and seeds one staff user + one map via
 `scripts/seed-test-db.mjs`. The suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and

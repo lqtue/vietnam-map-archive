@@ -1,0 +1,10122 @@
+{
+  "source": "https://www.cartomundi.fr/ctmd-services/serie/561/feuilles",
+  "fetchedAt": "2026-09-30T14:44:19.527Z",
+  "records": [
+    {
+      "fkey": 60065,
+      "number": "22 W",
+      "title": "Muong Hùn Xiêng Hung Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1021223",
+        "n0213511",
+        "e1023447",
+        "n0220238"
+      ]
+    },
+    {
+      "fkey": 60066,
+      "number": "23",
+      "title": "Luân Châu",
+      "year": 1954,
+      "bbox": [
+        "e1025558",
+        "n0213552",
+        "e1033958",
+        "n0220329"
+      ]
+    },
+    {
+      "fkey": 60067,
+      "number": "23",
+      "title": "Luân Châu",
+      "year": 1950,
+      "bbox": [
+        "e1025558",
+        "n0213552",
+        "e1033958",
+        "n0220329"
+      ]
+    },
+    {
+      "fkey": 60068,
+      "number": "23 E",
+      "title": "Luân Châu Est",
+      "year": 1955,
+      "bbox": [
+        "e1031745",
+        "n0213609",
+        "e1033958",
+        "n0220329"
+      ]
+    },
+    {
+      "fkey": 60069,
+      "number": "23 W",
+      "title": "Luân Châu Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1025558",
+        "n0213552",
+        "e1031814",
+        "n0220314"
+      ]
+    },
+    {
+      "fkey": 60084,
+      "number": "32 E",
+      "title": "Bun - Tai Est",
+      "year": 1951,
+      "bbox": [
+        "e1015121",
+        "n0210742",
+        "e1021344",
+        "n0213511"
+      ]
+    },
+    {
+      "fkey": 60085,
+      "number": "33 W",
+      "title": "Ban Khana Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1023447",
+        "n0210827",
+        "e1025702",
+        "n0213552"
+      ]
+    },
+    {
+      "fkey": 60087,
+      "number": "34 E",
+      "title": "Diên Biên Phu Est",
+      "year": 1954,
+      "bbox": [
+        "e1031814",
+        "n0210903",
+        "e1034021",
+        "n0213623"
+      ]
+    },
+    {
+      "fkey": 60088,
+      "number": "34 E",
+      "title": "Diên Biên Phu Est",
+      "year": 1950,
+      "bbox": [
+        "e1031814",
+        "n0210903",
+        "e1034021",
+        "n0213623"
+      ]
+    },
+    {
+      "fkey": 60090,
+      "number": "34 W",
+      "title": "Diên Biên Phu Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1025630",
+        "n0210846",
+        "e1031842",
+        "n0213609"
+      ]
+    },
+    {
+      "fkey": 60091,
+      "number": "34 W",
+      "title": "Diên Biên Phu Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1025630",
+        "n0210846",
+        "e1031842",
+        "n0213609"
+      ]
+    },
+    {
+      "fkey": 60122,
+      "number": "45 W",
+      "title": "Sop Cop Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1025702",
+        "n0204141",
+        "e1031909",
+        "n0210903"
+      ]
+    },
+    {
+      "fkey": 60154,
+      "number": "58 W",
+      "title": "Sam - Neua Est",
+      "year": 1950,
+      "bbox": [
+        "e1034045",
+        "n0201506",
+        "e1040240",
+        "n0204224"
+      ]
+    },
+    {
+      "fkey": 60176,
+      "number": "68 E",
+      "title": "Ban Ko Kieng Est",
+      "year": 1955,
+      "bbox": [
+        "e1031936",
+        "n0194746",
+        "e1034130",
+        "n0201506"
+      ]
+    },
+    {
+      "fkey": 60178,
+      "number": "69 E",
+      "title": "Muong Vène Est",
+      "year": 1955,
+      "bbox": [
+        "e1040240",
+        "n0194813",
+        "e1042426",
+        "n0201529"
+      ]
+    },
+    {
+      "fkey": 60196,
+      "number": "78 E",
+      "title": "Nong - Het Est",
+      "year": 1953,
+      "bbox": [
+        "e1040258",
+        "n0192107",
+        "e1042441",
+        "n0194823"
+      ]
+    },
+    {
+      "fkey": 60198,
+      "number": "78 W",
+      "title": "Nong - Het Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034130",
+        "n0192055",
+        "e1040316",
+        "n0194813"
+      ]
+    },
+    {
+      "fkey": 60205,
+      "number": "84 E",
+      "title": "Vang Vieng Est",
+      "year": 1950,
+      "bbox": [
+        "e1023737",
+        "n0185259",
+        "e1025930",
+        "n0192023"
+      ]
+    },
+    {
+      "fkey": 60209,
+      "number": "85 W",
+      "title": "Xieng Khouang ouest",
+      "year": 1950,
+      "bbox": [
+        "e1025902",
+        "n0185318",
+        "e1032051",
+        "n0192040"
+      ]
+    },
+    {
+      "fkey": 60213,
+      "number": "86 E",
+      "title": "Khê Kiên Est",
+      "year": 1954,
+      "bbox": [
+        "e1040316",
+        "n0185401",
+        "e1042455",
+        "n0192117"
+      ]
+    },
+    {
+      "fkey": 60214,
+      "number": "86 W",
+      "title": "Khê Kiên Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1034151",
+        "n0185349",
+        "e1040333",
+        "n0192107"
+      ]
+    },
+    {
+      "fkey": 60243,
+      "number": "99 - 107",
+      "title": "Vientiane Ban Keun",
+      "year": 1952,
+      "bbox": [
+        "e1022718",
+        "n0174745",
+        "e1025058",
+        "n0182603"
+      ]
+    },
+    {
+      "fkey": 60245,
+      "number": "99-107 E",
+      "title": "Vientiane Ban Keun Est",
+      "year": 1954,
+      "bbox": [
+        "e1023839",
+        "n0174756",
+        "e1030033",
+        "n0182612"
+      ]
+    },
+    {
+      "fkey": 60268,
+      "number": "103 W",
+      "title": "Ha Tinh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050744",
+        "n0180012",
+        "e1052905",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60291,
+      "number": "112",
+      "title": "Thakhek",
+      "year": 1954,
+      "bbox": [
+        "e1044231",
+        "n0170552",
+        "e1050803",
+        "n0173306"
+      ]
+    },
+    {
+      "fkey": 60307,
+      "number": "116",
+      "title": "Keng Kabao",
+      "year": 1950,
+      "bbox": [
+        "e1044530",
+        "n0163847",
+        "e1050809",
+        "n0170559"
+      ]
+    },
+    {
+      "fkey": 60308,
+      "number": "117 E",
+      "title": "Muong Phalane Est",
+      "year": 1950,
+      "bbox": [
+        "e1052912",
+        "n0163856",
+        "e1055020",
+        "n0170604"
+      ]
+    },
+    {
+      "fkey": 60309,
+      "number": "117 W",
+      "title": "Muong Phalane Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050803",
+        "n0163853",
+        "e1052915",
+        "n0170603"
+      ]
+    },
+    {
+      "fkey": 60325,
+      "number": "122 W",
+      "title": "Muong-Song-Khone Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050809",
+        "n0161146",
+        "e1052918",
+        "n0163856"
+      ]
+    },
+    {
+      "fkey": 60327,
+      "number": "123 W",
+      "title": "Muong - Phine Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0161150",
+        "e1061125",
+        "n0163857"
+      ]
+    },
+    {
+      "fkey": 60340,
+      "number": "128 E",
+      "title": "Ban - Taphane Est",
+      "year": 1951,
+      "bbox": [
+        "e1052918",
+        "n0154443",
+        "e1055020",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60343,
+      "number": "128 E",
+      "title": "Ban Taphane Est",
+      "year": 1954,
+      "bbox": [
+        "e1052918",
+        "n0154443",
+        "e1055020",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60344,
+      "number": "128 W",
+      "title": "Ban - Taphane Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1045702",
+        "n0154437",
+        "e1052920",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60354,
+      "number": "131 E",
+      "title": "An Diêm Est",
+      "year": 1951,
+      "bbox": [
+        "e1073518",
+        "n0154405",
+        "e1075635",
+        "n0161123"
+      ]
+    },
+    {
+      "fkey": 60377,
+      "number": "136 E",
+      "title": "Bên Giang Est",
+      "year": 1952,
+      "bbox": [
+        "e1073504",
+        "n0151658",
+        "e1075618",
+        "n0154417"
+      ]
+    },
+    {
+      "fkey": 60380,
+      "number": "137 E",
+      "title": "Tam - Ky Est",
+      "year": 1951,
+      "bbox": [
+        "e1081658",
+        "n0151627",
+        "e1083817",
+        "n0154350"
+      ]
+    },
+    {
+      "fkey": 60384,
+      "number": "137 W",
+      "title": "Tam - Ky Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075601",
+        "n0151644",
+        "e1081717",
+        "n0154405"
+      ]
+    },
+    {
+      "fkey": 60401,
+      "number": "142 E",
+      "title": "Dak Sut Est",
+      "year": 1952,
+      "bbox": [
+        "e1073451",
+        "n0144951",
+        "e1075601",
+        "n0151710"
+      ]
+    },
+    {
+      "fkey": 60404,
+      "number": "143 E",
+      "title": "Son Ha Est",
+      "year": 1952,
+      "bbox": [
+        "e1081640",
+        "n0144921",
+        "e1083755",
+        "n0151644"
+      ]
+    },
+    {
+      "fkey": 60406,
+      "number": "143 W",
+      "title": "Son Ha Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075545",
+        "n0144937",
+        "e1081658",
+        "n0151658"
+      ]
+    },
+    {
+      "fkey": 60409,
+      "number": "144",
+      "title": "Quang Ngai",
+      "year": 1951,
+      "bbox": [
+        "e1083734",
+        "n0144856",
+        "e1090550",
+        "n0151627"
+      ]
+    },
+    {
+      "fkey": 60422,
+      "number": "149 E",
+      "title": "Kon Plong Est",
+      "year": 1952,
+      "bbox": [
+        "e1081622",
+        "n0142214",
+        "e1083734",
+        "n0144937"
+      ]
+    },
+    {
+      "fkey": 60424,
+      "number": "149 W",
+      "title": "Kon Plong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075530",
+        "n0142231",
+        "e1081640",
+        "n0144951"
+      ]
+    },
+    {
+      "fkey": 60432,
+      "number": "151 E",
+      "title": "Chong Kal Est",
+      "year": 1953,
+      "bbox": [
+        "e1032415",
+        "n0135524",
+        "e1034525",
+        "n0142810"
+      ]
+    },
+    {
+      "fkey": 60433,
+      "number": "151 W",
+      "title": "Chong Kal Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030323",
+        "n0135508",
+        "e1032436",
+        "n0142756"
+      ]
+    },
+    {
+      "fkey": 60434,
+      "number": "151 bis E",
+      "title": "Anlong Veng Est",
+      "year": 1953,
+      "bbox": [
+        "e1040559",
+        "n0135550",
+        "e1042703",
+        "n0142832"
+      ]
+    },
+    {
+      "fkey": 60435,
+      "number": "151 bis W",
+      "title": "Anlong Veng Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034507",
+        "n0135538",
+        "e1040614",
+        "n0142822"
+      ]
+    },
+    {
+      "fkey": 60436,
+      "number": "152 E",
+      "title": "Cheom Ksan Est",
+      "year": 1953,
+      "bbox": [
+        "e1044743",
+        "n0135607",
+        "e1050841",
+        "n0142845"
+      ]
+    },
+    {
+      "fkey": 60437,
+      "number": "152 W",
+      "title": "Cheom Ksan Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042651",
+        "n0135560",
+        "e1044752",
+        "n0142840"
+      ]
+    },
+    {
+      "fkey": 60440,
+      "number": "153 W",
+      "title": "Kompong Sralao Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050837",
+        "n0135613",
+        "e1052931",
+        "n0142323"
+      ]
+    },
+    {
+      "fkey": 60468,
+      "number": "159b E",
+      "title": "Banteai - Srei Est",
+      "year": 1951,
+      "bbox": [
+        "e1032436",
+        "n0132817",
+        "e1034539",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60470,
+      "number": "159b E",
+      "title": "Banteai Srei Est",
+      "year": 1952,
+      "bbox": [
+        "e1032436",
+        "n0132817",
+        "e1034539",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60471,
+      "number": "159b W",
+      "title": "Banteai - Srei Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1030347",
+        "n0132801",
+        "e1032452",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60479,
+      "number": "162 E",
+      "title": "Stung Treng Est",
+      "year": 1951,
+      "bbox": [
+        "e1061107",
+        "n0132906",
+        "e1063158",
+        "n0135616"
+      ]
+    },
+    {
+      "fkey": 60484,
+      "number": "163 E",
+      "title": "Bô Kheo Est",
+      "year": 1951,
+      "bbox": [
+        "e1065240",
+        "n0132853",
+        "e1071337",
+        "n0135607"
+      ]
+    },
+    {
+      "fkey": 60486,
+      "number": "163 W",
+      "title": "Bô Kheo Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063154",
+        "n0132900",
+        "e1065248",
+        "n0135613"
+      ]
+    },
+    {
+      "fkey": 60525,
+      "number": "169 W",
+      "title": "Kompong Trabeck Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050846",
+        "n0130159",
+        "e1052935",
+        "n0132909"
+      ]
+    },
+    {
+      "fkey": 60529,
+      "number": "170 E",
+      "title": "Prek Preas Est",
+      "year": 1952,
+      "bbox": [
+        "e1061104",
+        "n0130159",
+        "e1063154",
+        "n0132909"
+      ]
+    },
+    {
+      "fkey": 60536,
+      "number": "172 E",
+      "title": "Ko Mayol Est",
+      "year": 1953,
+      "bbox": [
+        "e1073403",
+        "n0130124",
+        "e1075501",
+        "n0132843"
+      ]
+    },
+    {
+      "fkey": 60571,
+      "number": "177 E",
+      "title": "Kompong Thom Est",
+      "year": 1953,
+      "bbox": [
+        "e1044806",
+        "n0123447",
+        "e1050855",
+        "n0130159"
+      ]
+    },
+    {
+      "fkey": 60574,
+      "number": "177 W",
+      "title": "Kompong Thom Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042722",
+        "n0123439",
+        "e1044813",
+        "n0130154"
+      ]
+    },
+    {
+      "fkey": 60575,
+      "number": "177 W",
+      "title": "Kompong Thom Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042722",
+        "n0123439",
+        "e1044813",
+        "n0130154"
+      ]
+    },
+    {
+      "fkey": 60578,
+      "number": "178 E",
+      "title": "Beng Lovéa Est",
+      "year": 1953,
+      "bbox": [
+        "e1052935",
+        "n0123455",
+        "e1055020",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60579,
+      "number": "178 E",
+      "title": "Beng Lovéa Est",
+      "year": 1954,
+      "bbox": [
+        "e1052935",
+        "n0123455",
+        "e1055020",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60582,
+      "number": "178 W",
+      "title": "Beng Lovéa Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050851",
+        "n0123452",
+        "e1052938",
+        "n0130202"
+      ]
+    },
+    {
+      "fkey": 60583,
+      "number": "178 W",
+      "title": "Beng Lovéa Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050851",
+        "n0123452",
+        "e1052938",
+        "n0130202"
+      ]
+    },
+    {
+      "fkey": 60611,
+      "number": "186",
+      "title": "Phnom Leach",
+      "year": 1951,
+      "bbox": [
+        "e1030442",
+        "n0120640",
+        "e1034619",
+        "n0123418"
+      ]
+    },
+    {
+      "fkey": 60614,
+      "number": "187 E",
+      "title": "Pursat Est",
+      "year": 1950,
+      "bbox": [
+        "e1040648",
+        "n0120722",
+        "e1042739",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60622,
+      "number": "188 E",
+      "title": "Kompong Chhnang Est",
+      "year": 1953,
+      "bbox": [
+        "e1044813",
+        "n0120740",
+        "e1050859",
+        "n0123452"
+      ]
+    },
+    {
+      "fkey": 60623,
+      "number": "188 E",
+      "title": "Kompong Chhnang Est",
+      "year": 1954,
+      "bbox": [
+        "e1044813",
+        "n0120740",
+        "e1050859",
+        "n0123452"
+      ]
+    },
+    {
+      "fkey": 60624,
+      "number": "188 W",
+      "title": "Kompong - Chhnang Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042731",
+        "n0120732",
+        "e1044819",
+        "n0123447"
+      ]
+    },
+    {
+      "fkey": 60626,
+      "number": "188 W",
+      "title": "Kompong Chhnang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042731",
+        "n0120732",
+        "e1044819",
+        "n0123447"
+      ]
+    },
+    {
+      "fkey": 60627,
+      "number": "188 W",
+      "title": "Kompong Chhnang Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042731",
+        "n0120732",
+        "e1044819",
+        "n0123447"
+      ]
+    },
+    {
+      "fkey": 60629,
+      "number": "189 E",
+      "title": "Krau Chmar Est",
+      "year": 1953,
+      "bbox": [
+        "e1052938",
+        "n0120748",
+        "e1055020",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60630,
+      "number": "189 E",
+      "title": "Krau Chmar Est",
+      "year": 1954,
+      "bbox": [
+        "e1052938",
+        "n0120748",
+        "e1055020",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60634,
+      "number": "189 W",
+      "title": "Krau Chmar Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050855",
+        "n0120745",
+        "e1052940",
+        "n0123455"
+      ]
+    },
+    {
+      "fkey": 60635,
+      "number": "189 W",
+      "title": "Krau Chmar Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050855",
+        "n0120745",
+        "e1052940",
+        "n0123455"
+      ]
+    },
+    {
+      "fkey": 60642,
+      "number": "192 E",
+      "title": "Poste Maître Est",
+      "year": 1948,
+      "bbox": [
+        "e1073341",
+        "n0120710",
+        "e1075434",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60647,
+      "number": "192 W",
+      "title": "Poste Maître Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071301",
+        "n0120722",
+        "e1073352",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60665,
+      "number": "198 E",
+      "title": "Phsar Oudong Est",
+      "year": 1954,
+      "bbox": [
+        "e1044819",
+        "n0114032",
+        "e1050904",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60669,
+      "number": "198 W",
+      "title": "Phsar Oudong Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042739",
+        "n0114025",
+        "e1044825",
+        "n0120740"
+      ]
+    },
+    {
+      "fkey": 60673,
+      "number": "199 E",
+      "title": "Kompong-Cham Est",
+      "year": 1954,
+      "bbox": [
+        "e1052940",
+        "n0114041",
+        "e1055020",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60677,
+      "number": "199 W",
+      "title": "Kompong-Cham Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050859",
+        "n0114038",
+        "e1052942",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60706,
+      "number": "206 E",
+      "title": "Chamnop Est",
+      "year": 1954,
+      "bbox": [
+        "e1032553",
+        "n0111242",
+        "e1034643",
+        "n0114003"
+      ]
+    },
+    {
+      "fkey": 60707,
+      "number": "206 W",
+      "title": "Chamnop Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1030515",
+        "n0111226",
+        "e1032607",
+        "n0113950"
+      ]
+    },
+    {
+      "fkey": 60711,
+      "number": "208 E",
+      "title": "Phnom Penh Est",
+      "year": 1953,
+      "bbox": [
+        "e1044825",
+        "n0111325",
+        "e1050908",
+        "n0114038"
+      ]
+    },
+    {
+      "fkey": 60712,
+      "number": "208 E",
+      "title": "Phnom Penh Est",
+      "year": 1954,
+      "bbox": [
+        "e1044825",
+        "n0111325",
+        "e1050908",
+        "n0114038"
+      ]
+    },
+    {
+      "fkey": 60714,
+      "number": "208 W",
+      "title": "Phnom Penh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042747",
+        "n0111318",
+        "e1044831",
+        "n0114032"
+      ]
+    },
+    {
+      "fkey": 60715,
+      "number": "208 W",
+      "title": "Phnom Penh Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042747",
+        "n0111318",
+        "e1044831",
+        "n0114032"
+      ]
+    },
+    {
+      "fkey": 60717,
+      "number": "209 E",
+      "title": "Prey Veng Est",
+      "year": 1953,
+      "bbox": [
+        "e1052942",
+        "n0111334",
+        "e1055020",
+        "n0114042"
+      ]
+    },
+    {
+      "fkey": 60718,
+      "number": "209 E",
+      "title": "Prey Veng Est",
+      "year": 1954,
+      "bbox": [
+        "e1052942",
+        "n0111334",
+        "e1055020",
+        "n0114042"
+      ]
+    },
+    {
+      "fkey": 60720,
+      "number": "209 W",
+      "title": "Phnom Penh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050904",
+        "n0111331",
+        "e1052944",
+        "n0114041"
+      ]
+    },
+    {
+      "fkey": 60721,
+      "number": "209 W",
+      "title": "Prey Veng Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050904",
+        "n0111331",
+        "e1052944",
+        "n0114041"
+      ]
+    },
+    {
+      "fkey": 60722,
+      "number": "210 E",
+      "title": "Tây Ninh Est",
+      "year": 1951,
+      "bbox": [
+        "e1061056",
+        "n0111331",
+        "e1063136",
+        "n0114041"
+      ]
+    },
+    {
+      "fkey": 60724,
+      "number": "210 W",
+      "title": "Tây Ninh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0111334",
+        "e1061058",
+        "n0114042"
+      ]
+    },
+    {
+      "fkey": 60746,
+      "number": "217 E",
+      "title": "Chhuk Est",
+      "year": 1953,
+      "bbox": [
+        "e1040719",
+        "n0104601",
+        "e1042803",
+        "n0111318"
+      ]
+    },
+    {
+      "fkey": 60748,
+      "number": "217 W",
+      "title": "Chhuk Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034643",
+        "n0104549",
+        "e1040728",
+        "n0111308"
+      ]
+    },
+    {
+      "fkey": 60750,
+      "number": "218 E",
+      "title": "Takeo Est",
+      "year": 1953,
+      "bbox": [
+        "e1044831",
+        "n0104618",
+        "e1050911",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60751,
+      "number": "218 E",
+      "title": "Takeo Est",
+      "year": 1954,
+      "bbox": [
+        "e1044831",
+        "n0104618",
+        "e1050911",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60753,
+      "number": "218 W",
+      "title": "Takeo Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042755",
+        "n0104611",
+        "e1044837",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60754,
+      "number": "218 W",
+      "title": "Takeo Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042755",
+        "n0104611",
+        "e1044837",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60756,
+      "number": "219 E",
+      "title": "Svay - Rieng Est",
+      "year": 1953,
+      "bbox": [
+        "e1052944",
+        "n0104627",
+        "e1055020",
+        "n0111335"
+      ]
+    },
+    {
+      "fkey": 60757,
+      "number": "219 E",
+      "title": "Svay - Rieng Est",
+      "year": 1954,
+      "bbox": [
+        "e1052944",
+        "n0104627",
+        "e1055020",
+        "n0111335"
+      ]
+    },
+    {
+      "fkey": 60759,
+      "number": "219 W",
+      "title": "Svay - Rieng Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050908",
+        "n0104623",
+        "e1052946",
+        "n0111334"
+      ]
+    },
+    {
+      "fkey": 60760,
+      "number": "219 W",
+      "title": "Svay - Rieng Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050908",
+        "n0104623",
+        "e1052946",
+        "n0111334"
+      ]
+    },
+    {
+      "fkey": 60767,
+      "number": "221 E",
+      "title": "Saigon Est",
+      "year": 1952,
+      "bbox": [
+        "e1065203",
+        "n0104611",
+        "e1071245",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60792,
+      "number": "228 E",
+      "title": "Long Xuyën Est",
+      "year": 1951,
+      "bbox": [
+        "e1052946",
+        "n0101919",
+        "e1055020",
+        "n0104628"
+      ]
+    },
+    {
+      "fkey": 60793,
+      "number": "228 E",
+      "title": "Long Xuyën Est",
+      "year": 1953,
+      "bbox": [
+        "e1052946",
+        "n0101919",
+        "e1055020",
+        "n0104628"
+      ]
+    },
+    {
+      "fkey": 60796,
+      "number": "229 E",
+      "title": "My - Tho Est",
+      "year": 1948,
+      "bbox": [
+        "e1061052",
+        "n0101916",
+        "e1063129",
+        "n0104627"
+      ]
+    },
+    {
+      "fkey": 60798,
+      "number": "229 W",
+      "title": "My Tho Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1055020",
+        "n0101919",
+        "e1061054",
+        "n0104628"
+      ]
+    },
+    {
+      "fkey": 60801,
+      "number": "230 E",
+      "title": "Cho Lon Est",
+      "year": 1953,
+      "bbox": [
+        "e1065157",
+        "n0101903",
+        "e1071237",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60815,
+      "number": "233 E",
+      "title": "Rach Gia Est",
+      "year": 1951,
+      "bbox": [
+        "e1044842",
+        "n0095203",
+        "e1050918",
+        "n0101916"
+      ]
+    },
+    {
+      "fkey": 60817,
+      "number": "233 W",
+      "title": "Rach Gia Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1042810",
+        "n0095156",
+        "e1044847",
+        "n0101911"
+      ]
+    },
+    {
+      "fkey": 60822,
+      "number": "225 E",
+      "title": "Ream Est",
+      "year": 1954,
+      "bbox": [
+        "e1032620",
+        "n0101828",
+        "e1034705",
+        "n0104549"
+      ]
+    },
+    {
+      "fkey": 60846,
+      "number": "241",
+      "title": "Ca Mau",
+      "year": 1953,
+      "bbox": [
+        "e1044726",
+        "n0085748",
+        "e1050925",
+        "n0092501"
+      ]
+    },
+    {
+      "fkey": 60853,
+      "number": "244 E",
+      "title": "Pointe de Ca Mau Est",
+      "year": 1952,
+      "bbox": [
+        "e1050114",
+        "n0083045",
+        "e1052832",
+        "n0085757"
+      ]
+    },
+    {
+      "fkey": 60854,
+      "number": "244 E",
+      "title": "Pointe de Ca Mau Est",
+      "year": 1953,
+      "bbox": [
+        "e1050114",
+        "n0083045",
+        "e1052832",
+        "n0085757"
+      ]
+    },
+    {
+      "fkey": 60855,
+      "number": "244 W",
+      "title": "Pointe de Ca Mau Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1043641",
+        "n0083037",
+        "e1050117",
+        "n0085752"
+      ]
+    },
+    {
+      "fkey": 60856,
+      "number": "244 W",
+      "title": "Pointe de Ca Mau Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1043641",
+        "n0083037",
+        "e1050117",
+        "n0085752"
+      ]
+    },
+    {
+      "fkey": 60062,
+      "number": "22 E",
+      "title": "Muong Hun Xieng Hung Est",
+      "year": 1955,
+      "bbox": [
+        "e1023410",
+        "n0213533",
+        "e1025630",
+        "n0220257"
+      ]
+    },
+    {
+      "fkey": 60063,
+      "number": "22 W",
+      "title": "Muong Hun Xieng Hung Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1021223",
+        "n0213511",
+        "e1023447",
+        "n0220238"
+      ]
+    },
+    {
+      "fkey": 60064,
+      "number": "22 W",
+      "title": "Muong Hun Xieng Hung Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1021223",
+        "n0213511",
+        "e1023447",
+        "n0220238"
+      ]
+    },
+    {
+      "fkey": 60086,
+      "number": "33 W",
+      "title": "Ban Khana Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1023447",
+        "n0210827",
+        "e1025702",
+        "n0213552"
+      ]
+    },
+    {
+      "fkey": 60089,
+      "number": "34 E",
+      "title": "Diên Biên Phu Est",
+      "year": 1955,
+      "bbox": [
+        "e1031814",
+        "n0210903",
+        "e1034021",
+        "n0213623"
+      ]
+    },
+    {
+      "fkey": 60118,
+      "number": "43 E",
+      "title": "M?ong Sai Est",
+      "year": 1954,
+      "bbox": [
+        "e1015204",
+        "n0204037",
+        "e1021422",
+        "n0210806"
+      ]
+    },
+    {
+      "fkey": 60119,
+      "number": "44 W",
+      "title": "Muong Khoua Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1021344",
+        "n0204100",
+        "e1023558",
+        "n0210827"
+      ]
+    },
+    {
+      "fkey": 60120,
+      "number": "45 E",
+      "title": "Sop Cop Est",
+      "year": 1954,
+      "bbox": [
+        "e1031842",
+        "n0204158",
+        "e1034045",
+        "n0210918"
+      ]
+    },
+    {
+      "fkey": 60121,
+      "number": "45 E",
+      "title": "Sop Cop Est",
+      "year": 1955,
+      "bbox": [
+        "e1031842",
+        "n0204158",
+        "e1034045",
+        "n0210918"
+      ]
+    },
+    {
+      "fkey": 60124,
+      "number": "46 E",
+      "title": "Muong Het Est",
+      "year": 1950,
+      "bbox": [
+        "e1040201",
+        "n0204224",
+        "e1042356",
+        "n0210940"
+      ]
+    },
+    {
+      "fkey": 60125,
+      "number": "46 W",
+      "title": "Muong Het Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1034021",
+        "n0204212",
+        "e1040221",
+        "n0210930"
+      ]
+    },
+    {
+      "fkey": 60149,
+      "number": "56 E",
+      "title": "Ban Nam Bac Est",
+      "year": 1955,
+      "bbox": [
+        "e1023558",
+        "n0201416",
+        "e1025804",
+        "n0204141"
+      ]
+    },
+    {
+      "fkey": 60150,
+      "number": "56 W",
+      "title": "Ban Nam Bac Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1021422",
+        "n0201355",
+        "e1023632",
+        "n0204122"
+      ]
+    },
+    {
+      "fkey": 60151,
+      "number": "57 E",
+      "title": "Muong Son Est",
+      "year": 1955,
+      "bbox": [
+        "e1031909",
+        "n0201452",
+        "e1034108",
+        "n0204212"
+      ]
+    },
+    {
+      "fkey": 60152,
+      "number": "57 W",
+      "title": "Muong Son Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1025733",
+        "n0201435",
+        "e1031936",
+        "n0204158"
+      ]
+    },
+    {
+      "fkey": 60155,
+      "number": "58 W",
+      "title": "Sam Neua Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1034045",
+        "n0201506",
+        "e1040240",
+        "n0204224"
+      ]
+    },
+    {
+      "fkey": 60156,
+      "number": "59 E",
+      "title": "Hôi Xuân Est",
+      "year": 1955,
+      "bbox": [
+        "e1044532",
+        "n0201537",
+        "e1050716",
+        "n0204248"
+      ]
+    },
+    {
+      "fkey": 60157,
+      "number": "59 W",
+      "title": "Hôi Xuân Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1042356",
+        "n0201529",
+        "e1044544",
+        "n0204242"
+      ]
+    },
+    {
+      "fkey": 60173,
+      "number": "66 E",
+      "title": "Luang Prabang Est",
+      "year": 1954,
+      "bbox": [
+        "e1015329",
+        "n0194626",
+        "e1021537",
+        "n0201355"
+      ]
+    },
+    {
+      "fkey": 60174,
+      "number": "67 E",
+      "title": "Pak Seng Est",
+      "year": 1954,
+      "bbox": [
+        "e1023632",
+        "n0194710",
+        "e1025833",
+        "n0201435"
+      ]
+    },
+    {
+      "fkey": 60177,
+      "number": "68 W",
+      "title": "Ban Ko Kieng Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1025804",
+        "n0194729",
+        "e1032001",
+        "n0201452"
+      ]
+    },
+    {
+      "fkey": 60180,
+      "number": "70 E",
+      "title": "Sam Teu Est",
+      "year": 1955,
+      "bbox": [
+        "e1044544",
+        "n0194831",
+        "e1050723",
+        "n0201542"
+      ]
+    },
+    {
+      "fkey": 60181,
+      "number": "70 W",
+      "title": "Sam Teu Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1042412",
+        "n0194823",
+        "e1044555",
+        "n0201537"
+      ]
+    },
+    {
+      "fkey": 60192,
+      "number": "77 E",
+      "title": "Khang Khai Est",
+      "year": 1950,
+      "bbox": [
+        "e1032001",
+        "n0192040",
+        "e1034151",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 60195,
+      "number": "77 W",
+      "title": "Khang Khai Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1025833",
+        "n0192023",
+        "e1032026",
+        "n0194746"
+      ]
+    },
+    {
+      "fkey": 60197,
+      "number": "78 E",
+      "title": "Nong Het Est",
+      "year": 1955,
+      "bbox": [
+        "e1040258",
+        "n0192107",
+        "e1042441",
+        "n0194823"
+      ]
+    },
+    {
+      "fkey": 60199,
+      "number": "79 E",
+      "title": "Qui Chäu Est",
+      "year": 1955,
+      "bbox": [
+        "e1044555",
+        "n0192125",
+        "e1050730",
+        "n0194836"
+      ]
+    },
+    {
+      "fkey": 60200,
+      "number": "79 W",
+      "title": "Qui Chäu Ouest",
+      "year": 1955,
+      "bbox": [
+        "e1042426",
+        "n0192117",
+        "e1044605",
+        "n0194831"
+      ]
+    },
+    {
+      "fkey": 60204,
+      "number": "80 W",
+      "title": "Thanh Hoa Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050723",
+        "n0192130",
+        "e1052855",
+        "n0194840"
+      ]
+    },
+    {
+      "fkey": 60206,
+      "number": "84 W",
+      "title": "Vang Vieng Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1021613",
+        "n0185238",
+        "e1023809",
+        "n0192005"
+      ]
+    },
+    {
+      "fkey": 60207,
+      "number": "85 E",
+      "title": "Xieng Khouang est",
+      "year": 1950,
+      "bbox": [
+        "e1032026",
+        "n0185334",
+        "e1034212",
+        "n0192055"
+      ]
+    },
+    {
+      "fkey": 60208,
+      "number": "85 E",
+      "title": "Xieng Khouang est",
+      "year": 1954,
+      "bbox": [
+        "e1032026",
+        "n0185334",
+        "e1034212",
+        "n0192055"
+      ]
+    },
+    {
+      "fkey": 60211,
+      "number": "86 E",
+      "title": "Khê Kiên Est",
+      "year": 1953,
+      "bbox": [
+        "e1040316",
+        "n0185401",
+        "e1042455",
+        "n0192117"
+      ]
+    },
+    {
+      "fkey": 60212,
+      "number": "86 E",
+      "title": "Khê Kiên Est",
+      "year": 1950,
+      "bbox": [
+        "e1040316",
+        "n0185401",
+        "e1042455",
+        "n0192117"
+      ]
+    },
+    {
+      "fkey": 60216,
+      "number": "86 W",
+      "title": "Khê Kiên Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034151",
+        "n0185349",
+        "e1040333",
+        "n0192107"
+      ]
+    },
+    {
+      "fkey": 60217,
+      "number": "87 E",
+      "title": "Cua Rao E",
+      "year": 1950,
+      "bbox": [
+        "e1044605",
+        "n0185419",
+        "e1050737",
+        "n0192130"
+      ]
+    },
+    {
+      "fkey": 60218,
+      "number": "87 W",
+      "title": "Cua Rao W",
+      "year": 1950,
+      "bbox": [
+        "e1042441",
+        "n0185411",
+        "e1044616",
+        "n0192125"
+      ]
+    },
+    {
+      "fkey": 60219,
+      "number": "88 E",
+      "title": "Phu Diên Châu Est",
+      "year": 1950,
+      "bbox": [
+        "e1052855",
+        "n0185428",
+        "e1055854",
+        "n0192135"
+      ]
+    },
+    {
+      "fkey": 60222,
+      "number": "88 W",
+      "title": "Phu Diên Châu Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050730",
+        "n0185424",
+        "e1052859",
+        "n0192134"
+      ]
+    },
+    {
+      "fkey": 60225,
+      "number": "91 W",
+      "title": "Tourakom Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1021648",
+        "n0182532",
+        "e1023839",
+        "n0185259"
+      ]
+    },
+    {
+      "fkey": 60226,
+      "number": "91 W",
+      "title": "Tourakom Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1021648",
+        "n0182532",
+        "e1023839",
+        "n0185259"
+      ]
+    },
+    {
+      "fkey": 60237,
+      "number": "94 E",
+      "title": "Pha Bo Est",
+      "year": 1953,
+      "bbox": [
+        "e1044616",
+        "n0182713",
+        "e1050744",
+        "n0185424"
+      ]
+    },
+    {
+      "fkey": 60238,
+      "number": "94 W",
+      "title": "Pha Bo Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042455",
+        "n0182705",
+        "e1044626",
+        "n0185419"
+      ]
+    },
+    {
+      "fkey": 60239,
+      "number": "95 E",
+      "title": "Vinh Est",
+      "year": 1950,
+      "bbox": [
+        "e1052859",
+        "n0182721",
+        "e1055853",
+        "n0185429"
+      ]
+    },
+    {
+      "fkey": 60241,
+      "number": "95 W",
+      "title": "Vinh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050737",
+        "n0182718",
+        "e1052902",
+        "n0185428"
+      ]
+    },
+    {
+      "fkey": 60491,
+      "number": "165 E",
+      "title": "Ban - Tur Est",
+      "year": 1950,
+      "bbox": [
+        "e1081548",
+        "n0132801",
+        "e1083653",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60244,
+      "number": "99 - 107",
+      "title": "Vientiane Ban Keun",
+      "year": 1950,
+      "bbox": [
+        "e1022718",
+        "n0174745",
+        "e1025058",
+        "n0182603"
+      ]
+    },
+    {
+      "fkey": 60246,
+      "number": "99-107 W",
+      "title": "Vientiane Ban Keun Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1021721",
+        "n0174735",
+        "e1023920",
+        "n0182553"
+      ]
+    },
+    {
+      "fkey": 60248,
+      "number": "100 E",
+      "title": "Paksane Est",
+      "year": 1954,
+      "bbox": [
+        "e1032114",
+        "n0175922",
+        "e1034252",
+        "n0182643"
+      ]
+    },
+    {
+      "fkey": 60251,
+      "number": "100 W",
+      "title": "Paksane Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1025957",
+        "n0175906",
+        "e1032137",
+        "n0182628"
+      ]
+    },
+    {
+      "fkey": 60254,
+      "number": "101 E",
+      "title": "Ban Sot Est",
+      "year": 1954,
+      "bbox": [
+        "e1040350",
+        "n0175949",
+        "e1042521",
+        "n0182705"
+      ]
+    },
+    {
+      "fkey": 60257,
+      "number": "101 W",
+      "title": "Ban Sot Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1034232",
+        "n0175937",
+        "e1040407",
+        "n0182655"
+      ]
+    },
+    {
+      "fkey": 60259,
+      "number": "102 E",
+      "title": "Napé Est",
+      "year": 1950,
+      "bbox": [
+        "e1044626",
+        "n0180006",
+        "e1050751",
+        "n0182718"
+      ]
+    },
+    {
+      "fkey": 60260,
+      "number": "102 E",
+      "title": "Napé Est",
+      "year": 1954,
+      "bbox": [
+        "e1044626",
+        "n0180006",
+        "e1050751",
+        "n0182718"
+      ]
+    },
+    {
+      "fkey": 60262,
+      "number": "102 W",
+      "title": "Napé Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1042508",
+        "n0175959",
+        "e1044636",
+        "n0182713"
+      ]
+    },
+    {
+      "fkey": 60263,
+      "number": "102 W",
+      "title": "Napé Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042508",
+        "n0175959",
+        "e1044636",
+        "n0182713"
+      ]
+    },
+    {
+      "fkey": 60270,
+      "number": "103 W",
+      "title": "Huong Khé Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050744",
+        "n0180012",
+        "e1052905",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60278,
+      "number": "109 E",
+      "title": "Pak Hin Boun Est",
+      "year": 1954,
+      "bbox": [
+        "e1044636",
+        "n0173300",
+        "e1050757",
+        "n0180012"
+      ]
+    },
+    {
+      "fkey": 60317,
+      "number": "120",
+      "title": "Van Trinh",
+      "year": 1950,
+      "bbox": [
+        "e1071442",
+        "n0163830",
+        "e1073602",
+        "n0170546"
+      ]
+    },
+    {
+      "fkey": 60282,
+      "number": "109 W",
+      "title": "Pak Hin Boun Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1042521",
+        "n0173252",
+        "e1044646",
+        "n0180006"
+      ]
+    },
+    {
+      "fkey": 60283,
+      "number": "110 E",
+      "title": "Mu Gia Est",
+      "year": 1950,
+      "bbox": [
+        "e1052905",
+        "n0173309",
+        "e1055020",
+        "n0180016"
+      ]
+    },
+    {
+      "fkey": 60285,
+      "number": "110 W",
+      "title": "Mu Gia Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050751",
+        "n0173306",
+        "e1052909",
+        "n0180015"
+      ]
+    },
+    {
+      "fkey": 60286,
+      "number": "110 W",
+      "title": "Mu Gia Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050751",
+        "n0173306",
+        "e1052909",
+        "n0180015"
+      ]
+    },
+    {
+      "fkey": 60288,
+      "number": "111 E",
+      "title": "Ron Est",
+      "year": 1950,
+      "bbox": [
+        "e1061132",
+        "n0173304",
+        "e1064119",
+        "n0180015"
+      ]
+    },
+    {
+      "fkey": 60292,
+      "number": "113 E",
+      "title": "Mahaxay Est",
+      "year": 1950,
+      "bbox": [
+        "e1052909",
+        "n0170603",
+        "e1055020",
+        "n0173310"
+      ]
+    },
+    {
+      "fkey": 60293,
+      "number": "113 E",
+      "title": "Mahaxay Est",
+      "year": 1954,
+      "bbox": [
+        "e1052909",
+        "n0170603",
+        "e1055020",
+        "n0173310"
+      ]
+    },
+    {
+      "fkey": 60295,
+      "number": "113 W",
+      "title": "Mahaxay Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050757",
+        "n0170559",
+        "e1052912",
+        "n0173309"
+      ]
+    },
+    {
+      "fkey": 60296,
+      "number": "113 W",
+      "title": "Mahaxay Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1050757",
+        "n0170559",
+        "e1052912",
+        "n0173309"
+      ]
+    },
+    {
+      "fkey": 60310,
+      "number": "118 E",
+      "title": "Tchépone Est",
+      "year": 1950,
+      "bbox": [
+        "e1061125",
+        "n0163853",
+        "e1063237",
+        "n0170603"
+      ]
+    },
+    {
+      "fkey": 60311,
+      "number": "118 W",
+      "title": "Tchépone Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0163856",
+        "e1061128",
+        "n0170604"
+      ]
+    },
+    {
+      "fkey": 60313,
+      "number": "119 E",
+      "title": "Quang Tri Est",
+      "year": 1950,
+      "bbox": [
+        "e1065336",
+        "n0163840",
+        "e1071454",
+        "n0170554"
+      ]
+    },
+    {
+      "fkey": 60315,
+      "number": "119 W",
+      "title": "Quang Tri Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063231",
+        "n0163847",
+        "e1065345",
+        "n0170559"
+      ]
+    },
+    {
+      "fkey": 60402,
+      "number": "142 W",
+      "title": "Dak Sut Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1071357",
+        "n0145003",
+        "e1073504",
+        "n0151720"
+      ]
+    },
+    {
+      "fkey": 60320,
+      "number": "121",
+      "title": "Savannakhet",
+      "year": 1950,
+      "bbox": [
+        "e1044539",
+        "n0161140",
+        "e1050815",
+        "n0163853"
+      ]
+    },
+    {
+      "fkey": 60323,
+      "number": "122 E",
+      "title": "Muong-Song-Khone Est",
+      "year": 1950,
+      "bbox": [
+        "e1052915",
+        "n0161150",
+        "e1055020",
+        "n0163857"
+      ]
+    },
+    {
+      "fkey": 60326,
+      "number": "123 E",
+      "title": "Muong - Phine Est",
+      "year": 1950,
+      "bbox": [
+        "e1061123",
+        "n0161146",
+        "e1063231",
+        "n0163856"
+      ]
+    },
+    {
+      "fkey": 60329,
+      "number": "124 E",
+      "title": "Lao - Bao Est",
+      "year": 1950,
+      "bbox": [
+        "e1065327",
+        "n0161133",
+        "e1071442",
+        "n0163847"
+      ]
+    },
+    {
+      "fkey": 60330,
+      "number": "124 W",
+      "title": "Lao - Bao Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063225",
+        "n0161141",
+        "e1065336",
+        "n0163853"
+      ]
+    },
+    {
+      "fkey": 60331,
+      "number": "125 E",
+      "title": "Hué Est",
+      "year": 1950,
+      "bbox": [
+        "e1073532",
+        "n0161111",
+        "e1075652",
+        "n0163830"
+      ]
+    },
+    {
+      "fkey": 60334,
+      "number": "125 W",
+      "title": "Hué Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071430",
+        "n0161123",
+        "e1073547",
+        "n0163840"
+      ]
+    },
+    {
+      "fkey": 60348,
+      "number": "129 E",
+      "title": "Ban Song Kon Est",
+      "year": 1953,
+      "bbox": [
+        "e1061120",
+        "n0154440",
+        "e1063225",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60349,
+      "number": "129 E",
+      "title": "Ban Song Kon Est",
+      "year": 1952,
+      "bbox": [
+        "e1061120",
+        "n0154440",
+        "e1063225",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60350,
+      "number": "129 W",
+      "title": "Ban Song Kon Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0154443",
+        "e1061123",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60351,
+      "number": "129 W",
+      "title": "Ban Song Kon Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0154443",
+        "e1061123",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60352,
+      "number": "130 E",
+      "title": "Haute Sé Kong Est",
+      "year": 1952,
+      "bbox": [
+        "e1065319",
+        "n0154427",
+        "e1071430",
+        "n0161141"
+      ]
+    },
+    {
+      "fkey": 60353,
+      "number": "130 W",
+      "title": "Haute - Sé Kong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063219",
+        "n0154434",
+        "e1065327",
+        "n0161146"
+      ]
+    },
+    {
+      "fkey": 60358,
+      "number": "131 W",
+      "title": "An Diêm Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071419",
+        "n0154417",
+        "e1073532",
+        "n0161133"
+      ]
+    },
+    {
+      "fkey": 60359,
+      "number": "132 E",
+      "title": "Tourane Est",
+      "year": 1951,
+      "bbox": [
+        "e1081717",
+        "n0154334",
+        "e1083839",
+        "n0161057"
+      ]
+    },
+    {
+      "fkey": 60366,
+      "number": "133 E",
+      "title": "Khong - Sédone",
+      "year": 1951,
+      "bbox": [
+        "e1052508",
+        "n0151736",
+        "e1055020",
+        "n0154444"
+      ]
+    },
+    {
+      "fkey": 60368,
+      "number": "134 E",
+      "title": "Saravane Est",
+      "year": 1951,
+      "bbox": [
+        "e1061117",
+        "n0151733",
+        "e1063219",
+        "n0154443"
+      ]
+    },
+    {
+      "fkey": 60371,
+      "number": "134 W",
+      "title": "Saravane Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0151736",
+        "e1061120",
+        "n0154444"
+      ]
+    },
+    {
+      "fkey": 60373,
+      "number": "135 E",
+      "title": "Ban Phone Est",
+      "year": 1953,
+      "bbox": [
+        "e1065311",
+        "n0151720",
+        "e1071419",
+        "n0154434"
+      ]
+    },
+    {
+      "fkey": 60374,
+      "number": "135 W",
+      "title": "Ban Phone Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1063214",
+        "n0151728",
+        "e1065319",
+        "n0154440"
+      ]
+    },
+    {
+      "fkey": 60376,
+      "number": "136 E",
+      "title": "Bên Giang Est",
+      "year": 1953,
+      "bbox": [
+        "e1073504",
+        "n0151658",
+        "e1075618",
+        "n0154417"
+      ]
+    },
+    {
+      "fkey": 60378,
+      "number": "136 W",
+      "title": "Bên Giang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071408",
+        "n0151710",
+        "e1073518",
+        "n0154427"
+      ]
+    },
+    {
+      "fkey": 60387,
+      "number": "138 E",
+      "title": "Tri Binh Est",
+      "year": 1951,
+      "bbox": [
+        "e1085851",
+        "n0151548",
+        "e1092015",
+        "n0154315"
+      ]
+    },
+    {
+      "fkey": 60390,
+      "number": "138 W",
+      "title": "Tri - Binh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083755",
+        "n0151609",
+        "e1085916",
+        "n0154334"
+      ]
+    },
+    {
+      "fkey": 60393,
+      "number": "139",
+      "title": "Paksé",
+      "year": 1951,
+      "bbox": [
+        "e1052512",
+        "n0145029",
+        "e1055020",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60396,
+      "number": "140 W",
+      "title": "Bassac Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0145030",
+        "e1061117",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60400,
+      "number": "142 E",
+      "title": "Dak Sut Est",
+      "year": 1953,
+      "bbox": [
+        "e1073451",
+        "n0144951",
+        "e1075601",
+        "n0151710"
+      ]
+    },
+    {
+      "fkey": 60403,
+      "number": "143 E",
+      "title": "Son Ha Est",
+      "year": 1953,
+      "bbox": [
+        "e1081640",
+        "n0144921",
+        "e1083755",
+        "n0151644"
+      ]
+    },
+    {
+      "fkey": 60405,
+      "number": "143 W",
+      "title": "Son Ha Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075545",
+        "n0144937",
+        "e1081658",
+        "n0151658"
+      ]
+    },
+    {
+      "fkey": 60413,
+      "number": "146 W",
+      "title": "Phiafay Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0142323",
+        "e1061114",
+        "n0145031"
+      ]
+    },
+    {
+      "fkey": 60416,
+      "number": "147 E",
+      "title": "Attopeu Est",
+      "year": 1954,
+      "bbox": [
+        "e1065255",
+        "n0142307",
+        "e1071357",
+        "n0145021"
+      ]
+    },
+    {
+      "fkey": 60418,
+      "number": "148 E",
+      "title": "Dak To Est",
+      "year": 1951,
+      "bbox": [
+        "e1073438",
+        "n0142245",
+        "e1075545",
+        "n0145003"
+      ]
+    },
+    {
+      "fkey": 60421,
+      "number": "149 E",
+      "title": "Kon Plong Est",
+      "year": 1953,
+      "bbox": [
+        "e1081622",
+        "n0142214",
+        "e1083734",
+        "n0144937"
+      ]
+    },
+    {
+      "fkey": 60423,
+      "number": "149 W",
+      "title": "Kon Plong Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075530",
+        "n0142231",
+        "e1081640",
+        "n0144951"
+      ]
+    },
+    {
+      "fkey": 60431,
+      "number": "150 bis",
+      "title": "Thmar Puok",
+      "year": 1953,
+      "bbox": [
+        "e1024235",
+        "n0135449",
+        "e1030347",
+        "n0142214"
+      ]
+    },
+    {
+      "fkey": 60438,
+      "number": "153 E",
+      "title": "Kompong - Sralao Est",
+      "year": 1951,
+      "bbox": [
+        "e1052928",
+        "n0135616",
+        "e1055020",
+        "n0142324"
+      ]
+    },
+    {
+      "fkey": 60441,
+      "number": "154 W",
+      "title": "Khong Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050837",
+        "n0135613",
+        "e1052931",
+        "n0142323"
+      ]
+    },
+    {
+      "fkey": 60444,
+      "number": "157 E",
+      "title": "Plei Ku Est",
+      "year": 1951,
+      "bbox": [
+        "e1073426",
+        "n0135538",
+        "e1075530",
+        "n0142257"
+      ]
+    },
+    {
+      "fkey": 60445,
+      "number": "157 W",
+      "title": "Plei Ku Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075515",
+        "n0135524",
+        "e1081622",
+        "n0142245"
+      ]
+    },
+    {
+      "fkey": 60446,
+      "number": "157 W",
+      "title": "Plei Ku Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075515",
+        "n0135524",
+        "e1081622",
+        "n0142245"
+      ]
+    },
+    {
+      "fkey": 60447,
+      "number": "157 W",
+      "title": "Plei Ku Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075515",
+        "n0135524",
+        "e1081622",
+        "n0142245"
+      ]
+    },
+    {
+      "fkey": 60448,
+      "number": "158 E",
+      "title": "An Khê Est",
+      "year": 1951,
+      "bbox": [
+        "e1085742",
+        "n0135429",
+        "e1091856",
+        "n0142156"
+      ]
+    },
+    {
+      "fkey": 60453,
+      "number": "158 W",
+      "title": "An Khê Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083653",
+        "n0135449",
+        "e1085805",
+        "n0142214"
+      ]
+    },
+    {
+      "fkey": 60462,
+      "number": "159 E",
+      "title": "Kralanh E",
+      "year": 1951,
+      "bbox": [
+        "e1040614",
+        "n0132843",
+        "e1042713",
+        "n0135560"
+      ]
+    },
+    {
+      "fkey": 60465,
+      "number": "159 W",
+      "title": "Kralanh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1034525",
+        "n0132831",
+        "e1040626",
+        "n0135550"
+      ]
+    },
+    {
+      "fkey": 60474,
+      "number": "160 E",
+      "title": "Phnom Tabeng Est",
+      "year": 1953,
+      "bbox": [
+        "e1044752",
+        "n0132901",
+        "e1050846",
+        "n0135613"
+      ]
+    },
+    {
+      "fkey": 60475,
+      "number": "160 W",
+      "title": "Phnom Tabeng Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042703",
+        "n0132853",
+        "e1044759",
+        "n0135607"
+      ]
+    },
+    {
+      "fkey": 60476,
+      "number": "161 E",
+      "title": "Mélouprey Est",
+      "year": 1953,
+      "bbox": [
+        "e1052931",
+        "n0132909",
+        "e1055020",
+        "n0135617"
+      ]
+    },
+    {
+      "fkey": 60477,
+      "number": "161 W",
+      "title": "Mélouprey Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050841",
+        "n0132906",
+        "e1052933",
+        "n0135616"
+      ]
+    },
+    {
+      "fkey": 60478,
+      "number": "162 E",
+      "title": "Stung Treng Est",
+      "year": 1952,
+      "bbox": [
+        "e1061107",
+        "n0132906",
+        "e1063158",
+        "n0135616"
+      ]
+    },
+    {
+      "fkey": 60480,
+      "number": "162 W",
+      "title": "Stung - Treng Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0132909",
+        "e1061109",
+        "n0135617"
+      ]
+    },
+    {
+      "fkey": 60483,
+      "number": "163 E",
+      "title": "Bô Kheo Est",
+      "year": 1952,
+      "bbox": [
+        "e1065240",
+        "n0132853",
+        "e1071337",
+        "n0135607"
+      ]
+    },
+    {
+      "fkey": 60485,
+      "number": "163 W",
+      "title": "Bô Kheo Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063154",
+        "n0132900",
+        "e1065248",
+        "n0135613"
+      ]
+    },
+    {
+      "fkey": 60487,
+      "number": "164 E",
+      "title": "Bô Kham Est",
+      "year": 1953,
+      "bbox": [
+        "e1073414",
+        "n0132831",
+        "e1075515",
+        "n0135550"
+      ]
+    },
+    {
+      "fkey": 60488,
+      "number": "164 E",
+      "title": "Bô Kham Est",
+      "year": 1951,
+      "bbox": [
+        "e1073414",
+        "n0132831",
+        "e1075515",
+        "n0135550"
+      ]
+    },
+    {
+      "fkey": 60490,
+      "number": "164 W",
+      "title": "Bô Kham Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071327",
+        "n0132843",
+        "e1073426",
+        "n0135560"
+      ]
+    },
+    {
+      "fkey": 60494,
+      "number": "165 W",
+      "title": "Ban - Tur Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1075501",
+        "n0132817",
+        "e1081604",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60495,
+      "number": "165 W",
+      "title": "Ban Tur Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075501",
+        "n0132817",
+        "e1081604",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60496,
+      "number": "165 W",
+      "title": "Ban Tur Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075501",
+        "n0132817",
+        "e1081604",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60497,
+      "number": "166 E",
+      "title": "Qui - Nhon Est",
+      "year": 1951,
+      "bbox": [
+        "e1085721",
+        "n0132713",
+        "e1092651",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60523,
+      "number": "169 E",
+      "title": "Kompong Trabeck Est",
+      "year": 1953,
+      "bbox": [
+        "e1052933",
+        "n0130202",
+        "e1055020",
+        "n0132910"
+      ]
+    },
+    {
+      "fkey": 60524,
+      "number": "169 E",
+      "title": "Kompong Trabeck Est",
+      "year": 1952,
+      "bbox": [
+        "e1052933",
+        "n0130202",
+        "e1055020",
+        "n0132910"
+      ]
+    },
+    {
+      "fkey": 60526,
+      "number": "169 W",
+      "title": "Kompong Trabeck Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050846",
+        "n0130159",
+        "e1052935",
+        "n0132909"
+      ]
+    },
+    {
+      "fkey": 60527,
+      "number": "169 W",
+      "title": "Kompong Trabeck Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050846",
+        "n0130159",
+        "e1052935",
+        "n0132909"
+      ]
+    },
+    {
+      "fkey": 60528,
+      "number": "170 E",
+      "title": "Prek Preas Est",
+      "year": 1947,
+      "bbox": [
+        "e1061104",
+        "n0130159",
+        "e1063154",
+        "n0132909"
+      ]
+    },
+    {
+      "fkey": 60533,
+      "number": "171 E",
+      "title": "Srépok Est",
+      "year": 1952,
+      "bbox": [
+        "e1065234",
+        "n0130146",
+        "e1071327",
+        "n0132900"
+      ]
+    },
+    {
+      "fkey": 60534,
+      "number": "171 W",
+      "title": "Srépok Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063149",
+        "n0130154",
+        "e1065240",
+        "n0132906"
+      ]
+    },
+    {
+      "fkey": 60535,
+      "number": "172 E",
+      "title": "Ko Mayol Est",
+      "year": 1952,
+      "bbox": [
+        "e1073403",
+        "n0130124",
+        "e1075501",
+        "n0132843"
+      ]
+    },
+    {
+      "fkey": 60537,
+      "number": "172 W",
+      "title": "Ko Mayol Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071318",
+        "n0130136",
+        "e1073414",
+        "n0132853"
+      ]
+    },
+    {
+      "fkey": 60538,
+      "number": "173 E",
+      "title": "Cheo Reo Est",
+      "year": 1950,
+      "bbox": [
+        "e1081532",
+        "n0130054",
+        "e1083634",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60539,
+      "number": "173 E",
+      "title": "Cheo Reo Est",
+      "year": 1953,
+      "bbox": [
+        "e1081532",
+        "n0130054",
+        "e1083634",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60540,
+      "number": "173 E",
+      "title": "Cheo Reo Est",
+      "year": 1952,
+      "bbox": [
+        "e1081532",
+        "n0130054",
+        "e1083634",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60541,
+      "number": "173 W",
+      "title": "Cheo Reo Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1075447",
+        "n0130110",
+        "e1081548",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60542,
+      "number": "173 W",
+      "title": "Cheo Reo Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075447",
+        "n0130110",
+        "e1081548",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60543,
+      "number": "173 W",
+      "title": "Cheo Reo Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075447",
+        "n0130110",
+        "e1081548",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60545,
+      "number": "174 E",
+      "title": "Söng Cau Est",
+      "year": 1951,
+      "bbox": [
+        "e1085700",
+        "n0130006",
+        "e1092626",
+        "n0132742"
+      ]
+    },
+    {
+      "fkey": 60549,
+      "number": "174 W",
+      "title": "Söng Cau Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083616",
+        "n0130036",
+        "e1085721",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60569,
+      "number": "177 E",
+      "title": "Kompong Thom Est",
+      "year": 1951,
+      "bbox": [
+        "e1044806",
+        "n0123447",
+        "e1050855",
+        "n0130159"
+      ]
+    },
+    {
+      "fkey": 60576,
+      "number": "178 E",
+      "title": "Beng Lovéa Est",
+      "year": 1951,
+      "bbox": [
+        "e1052935",
+        "n0123455",
+        "e1055020",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60580,
+      "number": "178 W",
+      "title": "Beng Lovéa Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050851",
+        "n0123452",
+        "e1052938",
+        "n0130202"
+      ]
+    },
+    {
+      "fkey": 60584,
+      "number": "179 E",
+      "title": "Sambor Est",
+      "year": 1952,
+      "bbox": [
+        "e1061102",
+        "n0123452",
+        "e1063149",
+        "n0130202"
+      ]
+    },
+    {
+      "fkey": 60588,
+      "number": "180 E",
+      "title": "Poste Deshayes Est",
+      "year": 1952,
+      "bbox": [
+        "e1065227",
+        "n0123439",
+        "e1071318",
+        "n0130154"
+      ]
+    },
+    {
+      "fkey": 60589,
+      "number": "180 W",
+      "title": "Poste Deshayes Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063145",
+        "n0123447",
+        "e1065234",
+        "n0130159"
+      ]
+    },
+    {
+      "fkey": 60594,
+      "number": "182 E",
+      "title": "Ban Mé Thuot Est",
+      "year": 1953,
+      "bbox": [
+        "e1081516",
+        "n0123347",
+        "e1083616",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60595,
+      "number": "182 E",
+      "title": "Ban Mé Thuot Est",
+      "year": 1950,
+      "bbox": [
+        "e1081516",
+        "n0123347",
+        "e1083616",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60596,
+      "number": "182 E",
+      "title": "Ban Mé Thuot Est",
+      "year": 1952,
+      "bbox": [
+        "e1081516",
+        "n0123347",
+        "e1083616",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60597,
+      "number": "182 W",
+      "title": "Ban - Mé - Thuot Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1075434",
+        "n0123403",
+        "e1081532",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60598,
+      "number": "182 W",
+      "title": "Ban Mé Thuot Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075434",
+        "n0123403",
+        "e1081532",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60599,
+      "number": "182 W",
+      "title": "Ban Mé Thuot Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075434",
+        "n0123403",
+        "e1081532",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60600,
+      "number": "183 E",
+      "title": "Van Gia Est",
+      "year": 1951,
+      "bbox": [
+        "e1085640",
+        "n0123308",
+        "e1091745",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60608,
+      "number": "184",
+      "title": "Tô Bông",
+      "year": 1951,
+      "bbox": [
+        "e1091723",
+        "n0123246",
+        "e1093829",
+        "n0130015"
+      ]
+    },
+    {
+      "fkey": 60631,
+      "number": "189 E",
+      "title": "Krau -Chmar Est",
+      "year": 1951,
+      "bbox": [
+        "e1052938",
+        "n0120748",
+        "e1055020",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60632,
+      "number": "189 W",
+      "title": "Krau - Chmar Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050855",
+        "n0120745",
+        "e1052940",
+        "n0123455"
+      ]
+    },
+    {
+      "fkey": 60636,
+      "number": "190 E",
+      "title": "Kratié Est",
+      "year": 1952,
+      "bbox": [
+        "e1061100",
+        "n0120745",
+        "e1063145",
+        "n0123455"
+      ]
+    },
+    {
+      "fkey": 60640,
+      "number": "191 E",
+      "title": "Sré Khtum Est",
+      "year": 1952,
+      "bbox": [
+        "e1065221",
+        "n0120732",
+        "e1071309",
+        "n0123447"
+      ]
+    },
+    {
+      "fkey": 60641,
+      "number": "191 W",
+      "title": "Sré Khtum Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063140",
+        "n0120739",
+        "e1065227",
+        "n0123452"
+      ]
+    },
+    {
+      "fkey": 60646,
+      "number": "192 W",
+      "title": "Poste Maître Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071301",
+        "n0120722",
+        "e1073352",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60657,
+      "number": "195",
+      "title": "Klong Klun",
+      "year": 1954,
+      "bbox": [
+        "e1023725",
+        "n0113909",
+        "e1030515",
+        "n0120640"
+      ]
+    },
+    {
+      "fkey": 60658,
+      "number": "196 E",
+      "title": "Russey Chrum Est",
+      "year": 1953,
+      "bbox": [
+        "e1032539",
+        "n0113950",
+        "e1034631",
+        "n0120711"
+      ]
+    },
+    {
+      "fkey": 60659,
+      "number": "196 W",
+      "title": "Russey Chrum Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030459",
+        "n0113933",
+        "e1032553",
+        "n0120657"
+      ]
+    },
+    {
+      "fkey": 60660,
+      "number": "197 E",
+      "title": "Tang Phloch Est",
+      "year": 1954,
+      "bbox": [
+        "e1040659",
+        "n0114015",
+        "e1042747",
+        "n0120732"
+      ]
+    },
+    {
+      "fkey": 60661,
+      "number": "197 W",
+      "title": "Tang Phloch Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1034619",
+        "n0114003",
+        "e1040709",
+        "n0120722"
+      ]
+    },
+    {
+      "fkey": 60662,
+      "number": "198 E",
+      "title": "Phsar Oudong Est",
+      "year": 1951,
+      "bbox": [
+        "e1044819",
+        "n0114032",
+        "e1050904",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60666,
+      "number": "198 W",
+      "title": "Phsar Oudong Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042739",
+        "n0114025",
+        "e1044825",
+        "n0120740"
+      ]
+    },
+    {
+      "fkey": 60670,
+      "number": "199 E",
+      "title": "Kompong-Cham Est",
+      "year": 1951,
+      "bbox": [
+        "e1052940",
+        "n0114041",
+        "e1055020",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60674,
+      "number": "199 W",
+      "title": "Kompong-Cham Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050859",
+        "n0114038",
+        "e1052942",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60678,
+      "number": "200 E",
+      "title": "Mimot Est",
+      "year": 1950,
+      "bbox": [
+        "e1061058",
+        "n0114038",
+        "e1063140",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60680,
+      "number": "200 W",
+      "title": "Mimot Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0114041",
+        "e1061100",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60682,
+      "number": "201 E",
+      "title": "Lôc Ninh Est",
+      "year": 1950,
+      "bbox": [
+        "e1065214",
+        "n0114025",
+        "e1071301",
+        "n0120739"
+      ]
+    },
+    {
+      "fkey": 60685,
+      "number": "201 W",
+      "title": "Lôc Ninh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063136",
+        "n0114032",
+        "e1065221",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60731,
+      "number": "212 W",
+      "title": "Blao Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071245",
+        "n0111308",
+        "e1073331",
+        "n0114025"
+      ]
+    },
+    {
+      "fkey": 60734,
+      "number": "213 E",
+      "title": "Djiring Est",
+      "year": 1950,
+      "bbox": [
+        "e1081433",
+        "n0111226",
+        "e1083525",
+        "n0113949"
+      ]
+    },
+    {
+      "fkey": 60737,
+      "number": "213 W",
+      "title": "Djiring Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1075357",
+        "n0111242",
+        "e1081447",
+        "n0114003"
+      ]
+    },
+    {
+      "fkey": 60743,
+      "number": "216 E",
+      "title": "Kompong Som Est",
+      "year": 1954,
+      "bbox": [
+        "e1032607",
+        "n0104535",
+        "e1034654",
+        "n0111256"
+      ]
+    },
+    {
+      "fkey": 60744,
+      "number": "216 W",
+      "title": "Kompong Som Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1030531",
+        "n0104519",
+        "e1032620",
+        "n0111242"
+      ]
+    },
+    {
+      "fkey": 60745,
+      "number": "217 E",
+      "title": "Chhuk Est",
+      "year": 1954,
+      "bbox": [
+        "e1040719",
+        "n0104601",
+        "e1042803",
+        "n0111318"
+      ]
+    },
+    {
+      "fkey": 60747,
+      "number": "217 W",
+      "title": "Chhuk Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1034643",
+        "n0104549",
+        "e1040728",
+        "n0111308"
+      ]
+    },
+    {
+      "fkey": 60842,
+      "number": "239 W",
+      "title": "Soc - Trang [Ouest]",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0092505",
+        "e1061051",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60771,
+      "number": "222 E",
+      "title": "Gia Ray Est",
+      "year": 1950,
+      "bbox": [
+        "e1073311",
+        "n0104549",
+        "e1075357",
+        "n0111308"
+      ]
+    },
+    {
+      "fkey": 60774,
+      "number": "222 W",
+      "title": "Gia Ray Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071237",
+        "n0104601",
+        "e1073321",
+        "n0111318"
+      ]
+    },
+    {
+      "fkey": 60777,
+      "number": "223 E",
+      "title": "Phan Thiet Est",
+      "year": 1951,
+      "bbox": [
+        "e1081417",
+        "n0103954",
+        "e1083509",
+        "n0111242"
+      ]
+    },
+    {
+      "fkey": 60779,
+      "number": "223 W",
+      "title": "Phan Thiet Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075343",
+        "n0104010",
+        "e1081433",
+        "n0111256"
+      ]
+    },
+    {
+      "fkey": 60781,
+      "number": "225 W",
+      "title": "Ream Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1030546",
+        "n0101812",
+        "e1032632",
+        "n0104535"
+      ]
+    },
+    {
+      "fkey": 60788,
+      "number": "227 E",
+      "title": "Ha Tiên Est",
+      "year": 1951,
+      "bbox": [
+        "e1044837",
+        "n0101911",
+        "e1050915",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60790,
+      "number": "227 W",
+      "title": "Ha Tiên Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042803",
+        "n0101903",
+        "e1044842",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60794,
+      "number": "228 W",
+      "title": "Long Xuyën Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050911",
+        "n0101916",
+        "e1052947",
+        "n0104627"
+      ]
+    },
+    {
+      "fkey": 60808,
+      "number": "231 E",
+      "title": "Xuyên Moc Est",
+      "year": 1950,
+      "bbox": [
+        "e1073302",
+        "n0101842",
+        "e1075346",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60811,
+      "number": "231 W",
+      "title": "Xuyên- Moc Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071230",
+        "n0101854",
+        "e1073311",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60829,
+      "number": "236",
+      "title": "Ba - Tri",
+      "year": 1950,
+      "bbox": [
+        "e1063121",
+        "n0095203",
+        "e1065157",
+        "n0101916"
+      ]
+    },
+    {
+      "fkey": 60832,
+      "number": "237",
+      "title": "An Bien",
+      "year": 1952,
+      "bbox": [
+        "e1044847",
+        "n0092456",
+        "e1050922",
+        "n0095209"
+      ]
+    },
+    {
+      "fkey": 60833,
+      "number": "237",
+      "title": "An Bien",
+      "year": 1953,
+      "bbox": [
+        "e1044847",
+        "n0092456",
+        "e1050922",
+        "n0095209"
+      ]
+    },
+    {
+      "fkey": 60834,
+      "number": "238 E",
+      "title": "Long - My Est",
+      "year": 1950,
+      "bbox": [
+        "e1052949",
+        "n0092505",
+        "e1055020",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60837,
+      "number": "238 W",
+      "title": "Long - My Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050918",
+        "n0092501",
+        "e1052951",
+        "n0095212"
+      ]
+    },
+    {
+      "fkey": 60840,
+      "number": "239 E",
+      "title": "Soc - Trang Est",
+      "year": 1950,
+      "bbox": [
+        "e1061049",
+        "n0092459",
+        "e1064218",
+        "n0095212"
+      ]
+    },
+    {
+      "fkey": 60845,
+      "number": "241",
+      "title": "Ca Mau",
+      "year": 1952,
+      "bbox": [
+        "e1044726",
+        "n0085748",
+        "e1050925",
+        "n0092501"
+      ]
+    },
+    {
+      "fkey": 60847,
+      "number": "242 E",
+      "title": "Bac Liêu Est",
+      "year": 1952,
+      "bbox": [
+        "e1052951",
+        "n0085757",
+        "e1055020",
+        "n0092506"
+      ]
+    },
+    {
+      "fkey": 60848,
+      "number": "242 E",
+      "title": "Bac Liêu Est",
+      "year": 1953,
+      "bbox": [
+        "e1052951",
+        "n0085757",
+        "e1055020",
+        "n0092506"
+      ]
+    },
+    {
+      "fkey": 60849,
+      "number": "242 W",
+      "title": "Bac Liêu Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050922",
+        "n0085754",
+        "e1052952",
+        "n0092505"
+      ]
+    },
+    {
+      "fkey": 60850,
+      "number": "242 W",
+      "title": "Bac Liêu Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050922",
+        "n0085754",
+        "e1052952",
+        "n0092505"
+      ]
+    },
+    {
+      "fkey": 60851,
+      "number": "243",
+      "title": "Vin Châu",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0085757",
+        "e1061049",
+        "n0092506"
+      ]
+    },
+    {
+      "fkey": 60852,
+      "number": "243",
+      "title": "Vin Châu",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0085757",
+        "e1061049",
+        "n0092506"
+      ]
+    },
+    {
+      "fkey": 60857,
+      "number": "55 E",
+      "title": "Muong Nga est",
+      "year": 1955,
+      "bbox": [
+        "e1015247",
+        "n0201331",
+        "e1021500",
+        "n0204100"
+      ]
+    },
+    {
+      "fkey": 60858,
+      "number": "104E",
+      "title": "Ha - Tinh Est",
+      "year": 1950,
+      "bbox": [
+        "e1061135",
+        "n0180012",
+        "e1063256",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60861,
+      "number": "43 E",
+      "title": "M?ong Sai Est",
+      "year": 1955,
+      "bbox": [
+        "e1015204",
+        "n0204037",
+        "e1021422",
+        "n0210806"
+      ]
+    },
+    {
+      "fkey": 60862,
+      "number": "78 W",
+      "title": "Nong - Het Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1034130",
+        "n0192055",
+        "e1040316",
+        "n0194813"
+      ]
+    },
+    {
+      "fkey": 60021,
+      "number": "1 E",
+      "title": "Quan-Ba Est",
+      "year": 1950,
+      "bbox": [
+        "e1044418",
+        "n0225810",
+        "e1050627",
+        "n0232521"
+      ]
+    },
+    {
+      "fkey": 60022,
+      "number": "2 E",
+      "title": "Dong-Van Est",
+      "year": 1950,
+      "bbox": [
+        "e1052819",
+        "n0225819",
+        "e1055020",
+        "n0232526"
+      ]
+    },
+    {
+      "fkey": 60023,
+      "number": "2 W",
+      "title": "Dong-Van Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050619",
+        "n0225816",
+        "e1052824",
+        "n0232524"
+      ]
+    },
+    {
+      "fkey": 60024,
+      "number": "4 E",
+      "title": "Ban-Calan Est",
+      "year": 1950,
+      "bbox": [
+        "e1023254",
+        "n0222943",
+        "e1025524",
+        "n0225708"
+      ]
+    },
+    {
+      "fkey": 60025,
+      "number": "4 W",
+      "title": "Ban-Calan Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1021058",
+        "n0222922",
+        "e1023332",
+        "n0225648"
+      ]
+    },
+    {
+      "fkey": 60026,
+      "number": "5 E",
+      "title": "Phong Thô Est",
+      "year": 1949,
+      "bbox": [
+        "e1031646",
+        "n0223019",
+        "e1033908",
+        "n0225739"
+      ]
+    },
+    {
+      "fkey": 60027,
+      "number": "5 W",
+      "title": "Phong Thô Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1025450",
+        "n0223002",
+        "e1031716",
+        "n0225725"
+      ]
+    },
+    {
+      "fkey": 60028,
+      "number": "6 E",
+      "title": "Pa-Kha Est",
+      "year": 1949,
+      "bbox": [
+        "e1040038",
+        "n0223047",
+        "e1042252",
+        "n0225802"
+      ]
+    },
+    {
+      "fkey": 60029,
+      "number": "6 W",
+      "title": "Pa-Kha Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1033842",
+        "n0223034",
+        "e1040060",
+        "n0225752"
+      ]
+    },
+    {
+      "fkey": 60032,
+      "number": "8 E",
+      "title": "Bao-Lac Est",
+      "year": 1950,
+      "bbox": [
+        "e1052824",
+        "n0223114",
+        "e1055020",
+        "n0225820"
+      ]
+    },
+    {
+      "fkey": 60033,
+      "number": "8 W",
+      "title": "Bao-Lac Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050627",
+        "n0223110",
+        "e1052828",
+        "n0225819"
+      ]
+    },
+    {
+      "fkey": 60034,
+      "number": "9 E",
+      "title": "Cao - Bang Est",
+      "year": 1949,
+      "bbox": [
+        "e1061212",
+        "n0223110",
+        "e1063413",
+        "n0230344"
+      ]
+    },
+    {
+      "fkey": 60035,
+      "number": "9 W",
+      "title": "Cao - Bang Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0223114",
+        "e1061218",
+        "n0230345"
+      ]
+    },
+    {
+      "fkey": 60036,
+      "number": "10 W",
+      "title": "Ha - Lang Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063405",
+        "n0223105",
+        "e1065610",
+        "n0225816"
+      ]
+    },
+    {
+      "fkey": 60038,
+      "number": "12 E",
+      "title": "Muong Ou Tay Est",
+      "year": 1952,
+      "bbox": [
+        "e1014949",
+        "n0220153",
+        "e1021223",
+        "n0222922"
+      ]
+    },
+    {
+      "fkey": 60040,
+      "number": "12 W",
+      "title": "Muong Ou Tay Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1012758",
+        "n0220127",
+        "e1015036",
+        "n0222858"
+      ]
+    },
+    {
+      "fkey": 60055,
+      "number": "18 E",
+      "title": "Thât Khê Est",
+      "year": 1952,
+      "bbox": [
+        "e1061208",
+        "n0220405",
+        "e1063405",
+        "n0223114"
+      ]
+    },
+    {
+      "fkey": 60057,
+      "number": "18 W",
+      "title": "Thât Khê Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0220408",
+        "e1061212",
+        "n0223115"
+      ]
+    },
+    {
+      "fkey": 60058,
+      "number": "19 W",
+      "title": "Bi-Nhi Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063356",
+        "n0220359",
+        "e1065557",
+        "n0223110"
+      ]
+    },
+    {
+      "fkey": 60070,
+      "number": "24 E",
+      "title": "Tu Lê Est",
+      "year": 1952,
+      "bbox": [
+        "e1040121",
+        "n0213636",
+        "e1042325",
+        "n0220351"
+      ]
+    },
+    {
+      "fkey": 60075,
+      "number": "25 W",
+      "title": "Yên-Bay Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042309",
+        "n0213646",
+        "e1044509",
+        "n0220359"
+      ]
+    },
+    {
+      "fkey": 60092,
+      "number": "35 E",
+      "title": "Són - La Est",
+      "year": 1949,
+      "bbox": [
+        "e1040141",
+        "n0210930",
+        "e1042341",
+        "n0213646"
+      ]
+    },
+    {
+      "fkey": 60093,
+      "number": "35 W",
+      "title": "Són La Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1033958",
+        "n0210918",
+        "e1040201",
+        "n0213636"
+      ]
+    },
+    {
+      "fkey": 60094,
+      "number": "36 E",
+      "title": "Thanh Ba Est",
+      "year": 1952,
+      "bbox": [
+        "e1044509",
+        "n0210948",
+        "e1050700",
+        "n0213659"
+      ]
+    },
+    {
+      "fkey": 60095,
+      "number": "36 E",
+      "title": "Thanh-Ba Est",
+      "year": 1949,
+      "bbox": [
+        "e1044509",
+        "n0210948",
+        "e1050700",
+        "n0213659"
+      ]
+    },
+    {
+      "fkey": 60096,
+      "number": "36 W",
+      "title": "Thanh Ba Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042325",
+        "n0210940",
+        "e1044521",
+        "n0213654"
+      ]
+    },
+    {
+      "fkey": 60097,
+      "number": "36 W",
+      "title": "Thanh-Ba Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1042325",
+        "n0210940",
+        "e1044521",
+        "n0213654"
+      ]
+    },
+    {
+      "fkey": 60099,
+      "number": "37 E",
+      "title": "Viêt Trì Est",
+      "year": 1949,
+      "bbox": [
+        "e1052836",
+        "n0210957",
+        "e1055020",
+        "n0213704"
+      ]
+    },
+    {
+      "fkey": 60103,
+      "number": "37 W",
+      "title": "Viêt Trì Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1050653",
+        "n0210954",
+        "e1052840",
+        "n0213703"
+      ]
+    },
+    {
+      "fkey": 60104,
+      "number": "38 E",
+      "title": "Bac - Ninh Est",
+      "year": 1950,
+      "bbox": [
+        "e1061200",
+        "n0210954",
+        "e1063348",
+        "n0213703"
+      ]
+    },
+    {
+      "fkey": 60105,
+      "number": "38 E",
+      "title": "Bac - Ninh Est",
+      "year": 1948,
+      "bbox": [
+        "e1061200",
+        "n0210954",
+        "e1063348",
+        "n0213703"
+      ]
+    },
+    {
+      "fkey": 60107,
+      "number": "38 W",
+      "title": "Bac - Ninh Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1055020",
+        "n0210957",
+        "e1061204",
+        "n0213704"
+      ]
+    },
+    {
+      "fkey": 60108,
+      "number": "39 E",
+      "title": "Dinh-Lâp Est",
+      "year": 1949,
+      "bbox": [
+        "e1065520",
+        "n0210940",
+        "e1071715",
+        "n0213654"
+      ]
+    },
+    {
+      "fkey": 60109,
+      "number": "39 E",
+      "title": "Dinh-Lâp Est",
+      "year": 1952,
+      "bbox": [
+        "e1065520",
+        "n0210940",
+        "e1071715",
+        "n0213654"
+      ]
+    },
+    {
+      "fkey": 60110,
+      "number": "39 W",
+      "title": "Dinh-Lâp Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1063340",
+        "n0210948",
+        "e1065532",
+        "n0213659"
+      ]
+    },
+    {
+      "fkey": 60111,
+      "number": "39 W",
+      "title": "Dinh-Lâp Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063340",
+        "n0210948",
+        "e1065532",
+        "n0213659"
+      ]
+    },
+    {
+      "fkey": 60126,
+      "number": "47 Est",
+      "title": "Van - Yên Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1044521",
+        "n0204242",
+        "e1050708",
+        "n0210954"
+      ]
+    },
+    {
+      "fkey": 60127,
+      "number": "47 W",
+      "title": "Van - Yên Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1042341",
+        "n0204235",
+        "e1044532",
+        "n0210948"
+      ]
+    },
+    {
+      "fkey": 60128,
+      "number": "48 E",
+      "title": "Son Tây Est",
+      "year": 1949,
+      "bbox": [
+        "e1052840",
+        "n0204251",
+        "e1055020",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60131,
+      "number": "48 W",
+      "title": "Son Tây Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1050700",
+        "n0204248",
+        "e1052844",
+        "n0210957"
+      ]
+    },
+    {
+      "fkey": 60134,
+      "number": "49 E",
+      "title": "Hanoi Est",
+      "year": 1949,
+      "bbox": [
+        "e1061156",
+        "n0204248",
+        "e1063340",
+        "n0210957"
+      ]
+    },
+    {
+      "fkey": 60137,
+      "number": "49 W",
+      "title": "Hanoi Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0204251",
+        "e1061200",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60141,
+      "number": "50 E",
+      "title": "Hai Phong Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1065508",
+        "n0204234",
+        "e1071659",
+        "n0210948"
+      ]
+    },
+    {
+      "fkey": 60143,
+      "number": "50 W",
+      "title": "Hai Phong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063332",
+        "n0204242",
+        "e1065520",
+        "n0210954"
+      ]
+    },
+    {
+      "fkey": 60144,
+      "number": "50 W",
+      "title": "Hai Phong Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1063332",
+        "n0204242",
+        "e1065520",
+        "n0210954"
+      ]
+    },
+    {
+      "fkey": 60147,
+      "number": "51 E",
+      "title": "Cam Pha est",
+      "year": 1950,
+      "bbox": [
+        "e1073820",
+        "n0204212",
+        "e1080019",
+        "n0210930"
+      ]
+    },
+    {
+      "fkey": 60148,
+      "number": "51 W",
+      "title": "Cam Pha ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071644",
+        "n0204224",
+        "e1073839",
+        "n0210940"
+      ]
+    },
+    {
+      "fkey": 60153,
+      "number": "58 E",
+      "title": "Sam - Neua Est",
+      "year": 1950,
+      "bbox": [
+        "e1040221",
+        "n0201519",
+        "e1042412",
+        "n0204235"
+      ]
+    },
+    {
+      "fkey": 60159,
+      "number": "60 E",
+      "title": "Phu-Nho-Quan Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1052844",
+        "n0201546",
+        "e1055020",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60161,
+      "number": "60 W",
+      "title": "Phu-Nho-Quan Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1050708",
+        "n0201542",
+        "e1052848",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60162,
+      "number": "61 E",
+      "title": "Nam - Dinh Est",
+      "year": 1949,
+      "bbox": [
+        "e1061152",
+        "n0201542",
+        "e1063332",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60163,
+      "number": "61 E",
+      "title": "Nam - Dinh Est",
+      "year": 1950,
+      "bbox": [
+        "e1061152",
+        "n0201542",
+        "e1063332",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60167,
+      "number": "61 W",
+      "title": "Nam Dinh Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0201546",
+        "e1061156",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60168,
+      "number": "61 W",
+      "title": "Nam Dinh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0201546",
+        "e1061156",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60172,
+      "number": "66 E",
+      "title": "Luang - Prabang Est",
+      "year": 1948,
+      "bbox": [
+        "e1015329",
+        "n0194626",
+        "e1021537",
+        "n0201355"
+      ]
+    },
+    {
+      "fkey": 60175,
+      "number": "67 W",
+      "title": "Pak-Seng Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1021500",
+        "n0194649",
+        "e1023705",
+        "n0201416"
+      ]
+    },
+    {
+      "fkey": 60179,
+      "number": "69 W",
+      "title": "Muong - Vène Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1034108",
+        "n0194801",
+        "e1040258",
+        "n0201519"
+      ]
+    },
+    {
+      "fkey": 60182,
+      "number": "71 E",
+      "title": "Bai - Thuong Est",
+      "year": 1949,
+      "bbox": [
+        "e1052848",
+        "n0194840",
+        "e1055020",
+        "n0201547"
+      ]
+    },
+    {
+      "fkey": 60183,
+      "number": "71 W",
+      "title": "Bai - Thuong Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1050716",
+        "n0194836",
+        "e1052852",
+        "n0201546"
+      ]
+    },
+    {
+      "fkey": 60184,
+      "number": "72 E",
+      "title": "Ninh Binh Est",
+      "year": 1949,
+      "bbox": [
+        "e1061149",
+        "n0194836",
+        "e1063324",
+        "n0201546"
+      ]
+    },
+    {
+      "fkey": 60186,
+      "number": "72 W",
+      "title": "Ninh Binh Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0194840",
+        "e1061152",
+        "n0201547"
+      ]
+    },
+    {
+      "fkey": 60188,
+      "number": "76 E",
+      "title": "Muong Soui Est",
+      "year": 1951,
+      "bbox": [
+        "e1023705",
+        "n0192005",
+        "e1025902",
+        "n0194729"
+      ]
+    },
+    {
+      "fkey": 60201,
+      "number": "80 E",
+      "title": "Thanh Hoa Est",
+      "year": 1950,
+      "bbox": [
+        "e1052852",
+        "n0192134",
+        "e1055856",
+        "n0194841"
+      ]
+    },
+    {
+      "fkey": 60203,
+      "number": "80 W",
+      "title": "Thanh - Hoa Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050723",
+        "n0192130",
+        "e1052855",
+        "n0194840"
+      ]
+    },
+    {
+      "fkey": 60227,
+      "number": "92 E",
+      "title": "Muong May Est",
+      "year": 1950,
+      "bbox": [
+        "e1032051",
+        "n0182628",
+        "e1034232",
+        "n0185349"
+      ]
+    },
+    {
+      "fkey": 60230,
+      "number": "92 W",
+      "title": "Muong May Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1025930",
+        "n0182612",
+        "e1032114",
+        "n0185334"
+      ]
+    },
+    {
+      "fkey": 60247,
+      "number": "100 E",
+      "title": "Paksane Est",
+      "year": 1950,
+      "bbox": [
+        "e1032114",
+        "n0175922",
+        "e1034252",
+        "n0182643"
+      ]
+    },
+    {
+      "fkey": 60250,
+      "number": "100 W",
+      "title": "Paksane Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1025957",
+        "n0175906",
+        "e1032137",
+        "n0182628"
+      ]
+    },
+    {
+      "fkey": 60253,
+      "number": "101 E",
+      "title": "Ban Sot Est",
+      "year": 1950,
+      "bbox": [
+        "e1040350",
+        "n0175949",
+        "e1042521",
+        "n0182705"
+      ]
+    },
+    {
+      "fkey": 60256,
+      "number": "101 W",
+      "title": "Ban Sot Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1034232",
+        "n0175937",
+        "e1040407",
+        "n0182655"
+      ]
+    },
+    {
+      "fkey": 60275,
+      "number": "108 E",
+      "title": "Ban - Poung Est",
+      "year": 1950,
+      "bbox": [
+        "e1040407",
+        "n0173242",
+        "e1042534",
+        "n0175959"
+      ]
+    },
+    {
+      "fkey": 60277,
+      "number": "109 E",
+      "title": "Pak - Hin - Boun Est",
+      "year": 1950,
+      "bbox": [
+        "e1044636",
+        "n0173300",
+        "e1050757",
+        "n0180012"
+      ]
+    },
+    {
+      "fkey": 60280,
+      "number": "109 W",
+      "title": "Pak - Hin - Boun Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1042521",
+        "n0173252",
+        "e1044646",
+        "n0180006"
+      ]
+    },
+    {
+      "fkey": 60289,
+      "number": "111 W",
+      "title": "Ron Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0173309",
+        "e1061135",
+        "n0180016"
+      ]
+    },
+    {
+      "fkey": 60298,
+      "number": "114 E",
+      "title": "Kê Bang Est",
+      "year": 1949,
+      "bbox": [
+        "e1061128",
+        "n0170559",
+        "e1063243",
+        "n0173309"
+      ]
+    },
+    {
+      "fkey": 60299,
+      "number": "114 E",
+      "title": "Kê Bang Est",
+      "year": 1950,
+      "bbox": [
+        "e1061128",
+        "n0170559",
+        "e1063243",
+        "n0173309"
+      ]
+    },
+    {
+      "fkey": 60300,
+      "number": "114 W",
+      "title": "Kê - Bang Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0170603",
+        "e1061132",
+        "n0173310"
+      ]
+    },
+    {
+      "fkey": 60301,
+      "number": "114 W",
+      "title": "Kê - Bang Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0170603",
+        "e1061132",
+        "n0173310"
+      ]
+    },
+    {
+      "fkey": 60303,
+      "number": "115 E",
+      "title": "Dong-Hoi Est",
+      "year": 1950,
+      "bbox": [
+        "e1065345",
+        "n0170546",
+        "e1071506",
+        "n0173300"
+      ]
+    },
+    {
+      "fkey": 60305,
+      "number": "115 W",
+      "title": "Dong-Hoi Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063237",
+        "n0170554",
+        "e1065355",
+        "n0173306"
+      ]
+    },
+    {
+      "fkey": 60318,
+      "number": "120",
+      "title": "Van Trinh",
+      "year": 1952,
+      "bbox": [
+        "e1071442",
+        "n0163830",
+        "e1073602",
+        "n0170546"
+      ]
+    },
+    {
+      "fkey": 60328,
+      "number": "123 W",
+      "title": "Muong Phine Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0161150",
+        "e1061125",
+        "n0163857"
+      ]
+    },
+    {
+      "fkey": 60337,
+      "number": "126",
+      "title": "Phu - Gia",
+      "year": 1948,
+      "bbox": [
+        "e1075635",
+        "n0161057",
+        "e1081757",
+        "n0163818"
+      ]
+    },
+    {
+      "fkey": 60338,
+      "number": "126",
+      "title": "Phu - Gia",
+      "year": 1952,
+      "bbox": [
+        "e1075635",
+        "n0161057",
+        "e1081757",
+        "n0163818"
+      ]
+    },
+    {
+      "fkey": 60345,
+      "number": "128 W",
+      "title": "Ban - Taphane Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1045702",
+        "n0154437",
+        "e1052920",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60356,
+      "number": "131 E",
+      "title": "An Diêm Est",
+      "year": 1950,
+      "bbox": [
+        "e1073518",
+        "n0154405",
+        "e1075635",
+        "n0161123"
+      ]
+    },
+    {
+      "fkey": 60361,
+      "number": "132 E",
+      "title": "Tourane Est",
+      "year": 1950,
+      "bbox": [
+        "e1081717",
+        "n0154334",
+        "e1083839",
+        "n0161057"
+      ]
+    },
+    {
+      "fkey": 60365,
+      "number": "132 W",
+      "title": "Tourane Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075618",
+        "n0154350",
+        "e1081737",
+        "n0161111"
+      ]
+    },
+    {
+      "fkey": 60375,
+      "number": "136 E",
+      "title": "Bên - Giang",
+      "year": 1950,
+      "bbox": [
+        "e1073504",
+        "n0151658",
+        "e1075618",
+        "n0154417"
+      ]
+    },
+    {
+      "fkey": 60379,
+      "number": "137 E",
+      "title": "Tam - Ky",
+      "year": 1950,
+      "bbox": [
+        "e1081658",
+        "n0151627",
+        "e1083817",
+        "n0154350"
+      ]
+    },
+    {
+      "fkey": 60383,
+      "number": "137 W",
+      "title": "Tam - Ky",
+      "year": 1950,
+      "bbox": [
+        "e1075601",
+        "n0151644",
+        "e1081717",
+        "n0154405"
+      ]
+    },
+    {
+      "fkey": 60408,
+      "number": "144",
+      "title": "Quang Ngai",
+      "year": 1950,
+      "bbox": [
+        "e1083734",
+        "n0144856",
+        "e1090550",
+        "n0151627"
+      ]
+    },
+    {
+      "fkey": 60425,
+      "number": "150 E",
+      "title": "Bong - Son Est",
+      "year": 1951,
+      "bbox": [
+        "e1085805",
+        "n0142135",
+        "e1091922",
+        "n0144902"
+      ]
+    },
+    {
+      "fkey": 60428,
+      "number": "150 W",
+      "title": "Bong - Son Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083713",
+        "n0142156",
+        "e1085828",
+        "n0144921"
+      ]
+    },
+    {
+      "fkey": 60451,
+      "number": "158 E",
+      "title": "An- Khê Est",
+      "year": 1950,
+      "bbox": [
+        "e1085742",
+        "n0135429",
+        "e1091856",
+        "n0142156"
+      ]
+    },
+    {
+      "fkey": 60452,
+      "number": "158 W",
+      "title": "An - Khe Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1083653",
+        "n0135449",
+        "e1085805",
+        "n0142214"
+      ]
+    },
+    {
+      "fkey": 60457,
+      "number": "158bis E",
+      "title": "Sisophon Est",
+      "year": 1948,
+      "bbox": [
+        "e1024257",
+        "n0132743",
+        "e1030406",
+        "n0135508"
+      ]
+    },
+    {
+      "fkey": 60459,
+      "number": "158bis W",
+      "title": "Sisophon Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1021349",
+        "n0132713",
+        "e1024319",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60489,
+      "number": "164 W",
+      "title": "Bô Kham Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071327",
+        "n0132843",
+        "e1073426",
+        "n0135560"
+      ]
+    },
+    {
+      "fkey": 60500,
+      "number": "166 W",
+      "title": "Qui Nhon Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083634",
+        "n0132742",
+        "e1085742",
+        "n0135508"
+      ]
+    },
+    {
+      "fkey": 60502,
+      "number": "166 bis E",
+      "title": "Lovéa Est",
+      "year": 1949,
+      "bbox": [
+        "e1024319",
+        "n0130036",
+        "e1030424",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60503,
+      "number": "166 bis E",
+      "title": "Lovéa Est",
+      "year": 1952,
+      "bbox": [
+        "e1024319",
+        "n0130036",
+        "e1030424",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60506,
+      "number": "166 bis W",
+      "title": "Lovéa Ouest",
+      "year": 1947,
+      "bbox": [
+        "e1021414",
+        "n0130007",
+        "e1024340",
+        "n0132743"
+      ]
+    },
+    {
+      "fkey": 60507,
+      "number": "166 bis W",
+      "title": "Lovéa Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1021414",
+        "n0130007",
+        "e1024340",
+        "n0132743"
+      ]
+    },
+    {
+      "fkey": 60515,
+      "number": "167bis E",
+      "title": "Siem - Réap Est",
+      "year": 1948,
+      "bbox": [
+        "e1040626",
+        "n0130136",
+        "e1042722",
+        "n0132853"
+      ]
+    },
+    {
+      "fkey": 60518,
+      "number": "167bis W",
+      "title": "Siem - Réap Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1034539",
+        "n0130124",
+        "e1040637",
+        "n0132843"
+      ]
+    },
+    {
+      "fkey": 60530,
+      "number": "170 W",
+      "title": "Prek Preas Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0130202",
+        "e1061107",
+        "n0132910"
+      ]
+    },
+    {
+      "fkey": 60544,
+      "number": "174 E",
+      "title": "Söng - Cau [Est]",
+      "year": 1950,
+      "bbox": [
+        "e1085700",
+        "n0130006",
+        "e1092626",
+        "n0132742"
+      ]
+    },
+    {
+      "fkey": 60548,
+      "number": "174 W",
+      "title": "Söng - Cau Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1083616",
+        "n0130036",
+        "e1085721",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60553,
+      "number": "174bis E",
+      "title": "Pailin Est",
+      "year": 1949,
+      "bbox": [
+        "e1024340",
+        "n0123329",
+        "e1030442",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60556,
+      "number": "174bis W",
+      "title": "Pailin Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1022255",
+        "n0123309",
+        "e1024359",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60558,
+      "number": "175 E",
+      "title": "Moung Est",
+      "year": 1948,
+      "bbox": [
+        "e1032508",
+        "n0123404",
+        "e1034606",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60561,
+      "number": "175 W",
+      "title": "Moung Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1030424",
+        "n0123347",
+        "e1032524",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60564,
+      "number": "176 E",
+      "title": "Trapéang Chong Est",
+      "year": 1950,
+      "bbox": [
+        "e1040637",
+        "n0123429",
+        "e1042731",
+        "n0130146"
+      ]
+    },
+    {
+      "fkey": 60566,
+      "number": "176 W",
+      "title": "Trapéang Chong Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1034553",
+        "n0123418",
+        "e1040648",
+        "n0130136"
+      ]
+    },
+    {
+      "fkey": 60572,
+      "number": "177 W",
+      "title": "Kompong Thom Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042722",
+        "n0123439",
+        "e1044813",
+        "n0130154"
+      ]
+    },
+    {
+      "fkey": 60586,
+      "number": "179 W",
+      "title": "Sambor Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1055020",
+        "n0123455",
+        "e1061104",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60591,
+      "number": "181 E",
+      "title": "Ban Don Est",
+      "year": 1952,
+      "bbox": [
+        "e1073352",
+        "n0123417",
+        "e1075447",
+        "n0130136"
+      ]
+    },
+    {
+      "fkey": 60593,
+      "number": "181 W",
+      "title": "Ban Don Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071309",
+        "n0123429",
+        "e1073403",
+        "n0130146"
+      ]
+    },
+    {
+      "fkey": 60602,
+      "number": "183 E",
+      "title": "Van Gia Est",
+      "year": 1950,
+      "bbox": [
+        "e1085640",
+        "n0123308",
+        "e1091745",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60604,
+      "number": "183 W",
+      "title": "Van Gia Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1083558",
+        "n0123329",
+        "e1085700",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60606,
+      "number": "183 W",
+      "title": "Van Gia Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083558",
+        "n0123329",
+        "e1085700",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60617,
+      "number": "187 W",
+      "title": "Pursat Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1034606",
+        "n0120711",
+        "e1040659",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60637,
+      "number": "190 W",
+      "title": "Kratié Est",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0120748",
+        "e1061102",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60639,
+      "number": "190 W",
+      "title": "Kratié Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1055020",
+        "n0120748",
+        "e1061102",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60648,
+      "number": "193",
+      "title": "Poste du Lac",
+      "year": 1949,
+      "bbox": [
+        "e1075421",
+        "n0120640",
+        "e1083558",
+        "n0123417"
+      ]
+    },
+    {
+      "fkey": 60652,
+      "number": "194 E",
+      "title": "Nha Trang Est",
+      "year": 1948,
+      "bbox": [
+        "e1085621",
+        "n0120553",
+        "e1092539",
+        "n0123329"
+      ]
+    },
+    {
+      "fkey": 60655,
+      "number": "194 W",
+      "title": "Nha Trang Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1083541",
+        "n0120622",
+        "e1085640",
+        "n0123347"
+      ]
+    },
+    {
+      "fkey": 60664,
+      "number": "198 E",
+      "title": "Phsar Oudong Est",
+      "year": 1953,
+      "bbox": [
+        "e1044819",
+        "n0114032",
+        "e1050904",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60668,
+      "number": "198 W",
+      "title": "Phsar Oudong Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042739",
+        "n0114025",
+        "e1044825",
+        "n0120740"
+      ]
+    },
+    {
+      "fkey": 60672,
+      "number": "199 E",
+      "title": "Kompong-Cham Est",
+      "year": 1953,
+      "bbox": [
+        "e1052940",
+        "n0114041",
+        "e1055020",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60676,
+      "number": "199 W",
+      "title": "Kompong-Cham Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050859",
+        "n0114038",
+        "e1052942",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60687,
+      "number": "201 W",
+      "title": "Lôc Ninh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063136",
+        "n0114032",
+        "e1065221",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60696,
+      "number": "204 E",
+      "title": "Cam Ranh Est",
+      "year": 1948,
+      "bbox": [
+        "e1085603",
+        "n0113855",
+        "e1091701",
+        "n0120622"
+      ]
+    },
+    {
+      "fkey": 60697,
+      "number": "204 E",
+      "title": "Cam Ranh Est",
+      "year": 1950,
+      "bbox": [
+        "e1085603",
+        "n0113855",
+        "e1091701",
+        "n0120622"
+      ]
+    },
+    {
+      "fkey": 60700,
+      "number": "204 E",
+      "title": "Cam Ranh Est",
+      "year": 1952,
+      "bbox": [
+        "e1085603",
+        "n0113855",
+        "e1091701",
+        "n0120622"
+      ]
+    },
+    {
+      "fkey": 60701,
+      "number": "204 W",
+      "title": "Cam Ranh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1083525",
+        "n0113915",
+        "e1085621",
+        "n0120640"
+      ]
+    },
+    {
+      "fkey": 60703,
+      "number": "204 W",
+      "title": "Cam Ranh Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1083525",
+        "n0113915",
+        "e1085621",
+        "n0120640"
+      ]
+    },
+    {
+      "fkey": 60719,
+      "number": "209 W",
+      "title": "Phnom Penh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050904",
+        "n0111331",
+        "e1052944",
+        "n0114041"
+      ]
+    },
+    {
+      "fkey": 60755,
+      "number": "219 E",
+      "title": "Svay - Rieng Est",
+      "year": 1951,
+      "bbox": [
+        "e1052944",
+        "n0104627",
+        "e1055020",
+        "n0111335"
+      ]
+    },
+    {
+      "fkey": 60758,
+      "number": "219 W",
+      "title": "Svay - Rieng Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050908",
+        "n0104623",
+        "e1052946",
+        "n0111334"
+      ]
+    },
+    {
+      "fkey": 60761,
+      "number": "220 E",
+      "title": "Trang Bang Est",
+      "year": 1950,
+      "bbox": [
+        "e1061054",
+        "n0104623",
+        "e1063132",
+        "n0111334"
+      ]
+    },
+    {
+      "fkey": 60763,
+      "number": "220 W",
+      "title": "Trang Bang Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0104627",
+        "e1061056",
+        "n0111335"
+      ]
+    },
+    {
+      "fkey": 60765,
+      "number": "221 E",
+      "title": "Saigon Est",
+      "year": 1948,
+      "bbox": [
+        "e1065203",
+        "n0104611",
+        "e1071245",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60782,
+      "number": "226 E",
+      "title": "Kampot Est",
+      "year": 1948,
+      "bbox": [
+        "e1040728",
+        "n0101854",
+        "e1042810",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60785,
+      "number": "226 W",
+      "title": "Kampot Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1034654",
+        "n0101842",
+        "e1040737",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60800,
+      "number": "230 E",
+      "title": "Cho Lon Est",
+      "year": 1949,
+      "bbox": [
+        "e1065157",
+        "n0101903",
+        "e1071237",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60802,
+      "number": "230 E",
+      "title": "Cho Lon Est",
+      "year": 1950,
+      "bbox": [
+        "e1065157",
+        "n0101903",
+        "e1071237",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60804,
+      "number": "230 W",
+      "title": "Cho Lon Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1063125",
+        "n0101911",
+        "e1065203",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60806,
+      "number": "230 W",
+      "title": "Cho Lon Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063125",
+        "n0101911",
+        "e1065203",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60830,
+      "number": "236",
+      "title": "Ba Tri",
+      "year": 1952,
+      "bbox": [
+        "e1063121",
+        "n0095203",
+        "e1065157",
+        "n0101916"
+      ]
+    },
+    {
+      "fkey": 60030,
+      "number": "7 E",
+      "title": "Hà Giang Est",
+      "year": 1950,
+      "bbox": [
+        "e1044431",
+        "n0223105",
+        "e1050636",
+        "n0225816"
+      ]
+    },
+    {
+      "fkey": 60031,
+      "number": "7 W",
+      "title": "Hà Giang Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1042234",
+        "n0223057",
+        "e1044444",
+        "n0225810"
+      ]
+    },
+    {
+      "fkey": 60037,
+      "number": "10 W",
+      "title": "Ha - Lang Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063405",
+        "n0223105",
+        "e1065610",
+        "n0225816"
+      ]
+    },
+    {
+      "fkey": 60039,
+      "number": "12 E",
+      "title": "Muong Ou Tay Est",
+      "year": 1950,
+      "bbox": [
+        "e1014949",
+        "n0220153",
+        "e1021223",
+        "n0222922"
+      ]
+    },
+    {
+      "fkey": 60041,
+      "number": "12 W",
+      "title": "Muong Ou Tay Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1012758",
+        "n0220127",
+        "e1015036",
+        "n0222858"
+      ]
+    },
+    {
+      "fkey": 60042,
+      "number": "13 E",
+      "title": "Muong -Tè Est",
+      "year": 1950,
+      "bbox": [
+        "e1023332",
+        "n0220238",
+        "e1025558",
+        "n0223002"
+      ]
+    },
+    {
+      "fkey": 60043,
+      "number": "13 W",
+      "title": "Muong -Tè Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1021141",
+        "n0220216",
+        "e1023410",
+        "n0222943"
+      ]
+    },
+    {
+      "fkey": 60044,
+      "number": "14 E",
+      "title": "Lai Châu Est",
+      "year": 1949,
+      "bbox": [
+        "e1031716",
+        "n0220314",
+        "e1033933",
+        "n0223034"
+      ]
+    },
+    {
+      "fkey": 60045,
+      "number": "14 E",
+      "title": "Lai Châu Est",
+      "year": 1954,
+      "bbox": [
+        "e1031716",
+        "n0220314",
+        "e1033933",
+        "n0223034"
+      ]
+    },
+    {
+      "fkey": 60046,
+      "number": "14 W",
+      "title": "Lai Châu Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1025524",
+        "n0220257",
+        "e1031745",
+        "n0223019"
+      ]
+    },
+    {
+      "fkey": 60047,
+      "number": "14 W",
+      "title": "Lai Châu Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1025524",
+        "n0220257",
+        "e1031745",
+        "n0223019"
+      ]
+    },
+    {
+      "fkey": 60048,
+      "number": "15 E",
+      "title": "Lao - Kay Est",
+      "year": 1949,
+      "bbox": [
+        "e1040060",
+        "n0220341",
+        "e1042309",
+        "n0223057"
+      ]
+    },
+    {
+      "fkey": 60049,
+      "number": "15 W",
+      "title": "Lao - Kay Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1033908",
+        "n0220329",
+        "e1040121",
+        "n0223047"
+      ]
+    },
+    {
+      "fkey": 60050,
+      "number": "16 E",
+      "title": "Luc - An - Chau Est",
+      "year": 1949,
+      "bbox": [
+        "e1044444",
+        "n0220359",
+        "e1050644",
+        "n0223110"
+      ]
+    },
+    {
+      "fkey": 60051,
+      "number": "16 W",
+      "title": "Luc - An - Chau Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1042252",
+        "n0220351",
+        "e1044456",
+        "n0223105"
+      ]
+    },
+    {
+      "fkey": 60052,
+      "number": "17 E",
+      "title": "Bac - Kan Est",
+      "year": 1950,
+      "bbox": [
+        "e1052828",
+        "n0220408",
+        "e1055020",
+        "n0223115"
+      ]
+    },
+    {
+      "fkey": 60053,
+      "number": "17 W",
+      "title": "Bac - Kan Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050636",
+        "n0220405",
+        "e1052832",
+        "n0223114"
+      ]
+    },
+    {
+      "fkey": 60054,
+      "number": "18 E",
+      "title": "Thât - Khê Est",
+      "year": 1949,
+      "bbox": [
+        "e1061208",
+        "n0220405",
+        "e1063405",
+        "n0223114"
+      ]
+    },
+    {
+      "fkey": 60056,
+      "number": "18 W",
+      "title": "Thât - Khê Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0220408",
+        "e1061212",
+        "n0223115"
+      ]
+    },
+    {
+      "fkey": 60059,
+      "number": "19 W",
+      "title": "Bi-Nhi Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1063356",
+        "n0220359",
+        "e1065557",
+        "n0223110"
+      ]
+    },
+    {
+      "fkey": 60060,
+      "number": "21 E",
+      "title": "Phong-Saly Est",
+      "year": 1950,
+      "bbox": [
+        "e1015036",
+        "n0213447",
+        "e1021304",
+        "n0220216"
+      ]
+    },
+    {
+      "fkey": 60061,
+      "number": "21 W",
+      "title": "Phong-Saly Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1012848",
+        "n0213421",
+        "e1015121",
+        "n0220153"
+      ]
+    },
+    {
+      "fkey": 60071,
+      "number": "24 E",
+      "title": "Tu Lê Est",
+      "year": 1948,
+      "bbox": [
+        "e1040121",
+        "n0213636",
+        "e1042325",
+        "n0220351"
+      ]
+    },
+    {
+      "fkey": 60072,
+      "number": "24 W",
+      "title": "Tu Lê Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1033933",
+        "n0213623",
+        "e1040141",
+        "n0220341"
+      ]
+    },
+    {
+      "fkey": 60073,
+      "number": "25 E",
+      "title": "Yên-Bay Est",
+      "year": 1948,
+      "bbox": [
+        "e1044456",
+        "n0213654",
+        "e1050653",
+        "n0220405"
+      ]
+    },
+    {
+      "fkey": 60074,
+      "number": "25 W",
+      "title": "Yên-Bay Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1042309",
+        "n0213646",
+        "e1044509",
+        "n0220359"
+      ]
+    },
+    {
+      "fkey": 60076,
+      "number": "26 E",
+      "title": "Tuyên-Quang Est",
+      "year": 1949,
+      "bbox": [
+        "e1052832",
+        "n0213703",
+        "e1055020",
+        "n0220409"
+      ]
+    },
+    {
+      "fkey": 60077,
+      "number": "26 W",
+      "title": "Tuyên-Quang Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1050644",
+        "n0213659",
+        "e1052836",
+        "n0220408"
+      ]
+    },
+    {
+      "fkey": 60078,
+      "number": "27 E",
+      "title": "Pho Bình Gia Est",
+      "year": 1949,
+      "bbox": [
+        "e1061204",
+        "n0213659",
+        "e1063356",
+        "n0220408"
+      ]
+    },
+    {
+      "fkey": 60079,
+      "number": "27 W",
+      "title": "Pho Bình Gia Ouest",
+      "year": 1949,
+      "bbox": [
+        "e1055020",
+        "n0213703",
+        "e1061208",
+        "n0220409"
+      ]
+    },
+    {
+      "fkey": 60080,
+      "number": "28 E",
+      "title": "Lang Son Est",
+      "year": 1950,
+      "bbox": [
+        "e1065532",
+        "n0213646",
+        "e1071732",
+        "n0220359"
+      ]
+    },
+    {
+      "fkey": 60081,
+      "number": "28 W",
+      "title": "Lang Son Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063348",
+        "n0213654",
+        "e1065544",
+        "n0220405"
+      ]
+    },
+    {
+      "fkey": 60082,
+      "number": "29 E",
+      "title": "Than - Poun Est",
+      "year": 1950,
+      "bbox": [
+        "e1073859",
+        "n0213623",
+        "e1080107",
+        "n0220341"
+      ]
+    },
+    {
+      "fkey": 60083,
+      "number": "29 W",
+      "title": "Than - Poun Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071715",
+        "n0213636",
+        "e1073920",
+        "n0220351"
+      ]
+    },
+    {
+      "fkey": 60098,
+      "number": "37 E",
+      "title": "Viêt Trì Est",
+      "year": 1952,
+      "bbox": [
+        "e1052836",
+        "n0210957",
+        "e1055020",
+        "n0213704"
+      ]
+    },
+    {
+      "fkey": 60100,
+      "number": "37 E",
+      "title": "Viêt Trì Est",
+      "year": 1953,
+      "bbox": [
+        "e1052836",
+        "n0210957",
+        "e1055020",
+        "n0213704"
+      ]
+    },
+    {
+      "fkey": 60101,
+      "number": "37 W",
+      "title": "Viêt Trì Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050653",
+        "n0210954",
+        "e1052840",
+        "n0213703"
+      ]
+    },
+    {
+      "fkey": 60102,
+      "number": "37 W",
+      "title": "Viêt Trì Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050653",
+        "n0210954",
+        "e1052840",
+        "n0213703"
+      ]
+    },
+    {
+      "fkey": 60106,
+      "number": "38 W",
+      "title": "Bac - Ninh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0210957",
+        "e1061204",
+        "n0213704"
+      ]
+    },
+    {
+      "fkey": 60112,
+      "number": "40 E",
+      "title": "Mon-Cay Est",
+      "year": 1952,
+      "bbox": [
+        "e1073839",
+        "n0210918",
+        "e1080043",
+        "n0213636"
+      ]
+    },
+    {
+      "fkey": 60113,
+      "number": "40 E",
+      "title": "Mon-Cay Est",
+      "year": 1950,
+      "bbox": [
+        "e1073839",
+        "n0210918",
+        "e1080043",
+        "n0213636"
+      ]
+    },
+    {
+      "fkey": 60114,
+      "number": "40 W",
+      "title": "Mon-Cay Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071659",
+        "n0210930",
+        "e1073859",
+        "n0213646"
+      ]
+    },
+    {
+      "fkey": 60115,
+      "number": "40 W",
+      "title": "Mon-Cay Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1071659",
+        "n0210930",
+        "e1073859",
+        "n0213646"
+      ]
+    },
+    {
+      "fkey": 60116,
+      "number": "40 bis",
+      "title": "Tra Co",
+      "year": 1950,
+      "bbox": [
+        "e1080019",
+        "n0210903",
+        "e1082226",
+        "n0213623"
+      ]
+    },
+    {
+      "fkey": 60117,
+      "number": "40 bis",
+      "title": "Tra Co",
+      "year": 1952,
+      "bbox": [
+        "e1080019",
+        "n0210903",
+        "e1082226",
+        "n0213623"
+      ]
+    },
+    {
+      "fkey": 60123,
+      "number": "46 E",
+      "title": "Muong Het Est",
+      "year": 1954,
+      "bbox": [
+        "e1040201",
+        "n0204224",
+        "e1042356",
+        "n0210940"
+      ]
+    },
+    {
+      "fkey": 60129,
+      "number": "48 E",
+      "title": "Son Tây Est",
+      "year": 1953,
+      "bbox": [
+        "e1052840",
+        "n0204251",
+        "e1055020",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60130,
+      "number": "48 E",
+      "title": "Son Tây Est",
+      "year": 1952,
+      "bbox": [
+        "e1052840",
+        "n0204251",
+        "e1055020",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60132,
+      "number": "48 W",
+      "title": "Son Tây Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050700",
+        "n0204248",
+        "e1052844",
+        "n0210957"
+      ]
+    },
+    {
+      "fkey": 60133,
+      "number": "49 E",
+      "title": "Hanoi Est",
+      "year": 1952,
+      "bbox": [
+        "e1061156",
+        "n0204248",
+        "e1063340",
+        "n0210957"
+      ]
+    },
+    {
+      "fkey": 60135,
+      "number": "49 E",
+      "title": "Hanoi Est",
+      "year": 1953,
+      "bbox": [
+        "e1061156",
+        "n0204248",
+        "e1063340",
+        "n0210957"
+      ]
+    },
+    {
+      "fkey": 60136,
+      "number": "49 W",
+      "title": "Hanoi Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0204251",
+        "e1061200",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60138,
+      "number": "49 W",
+      "title": "Hanoi Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0204251",
+        "e1061200",
+        "n0210958"
+      ]
+    },
+    {
+      "fkey": 60139,
+      "number": "50 E",
+      "title": "Hai Phong Est",
+      "year": 1952,
+      "bbox": [
+        "e1065508",
+        "n0204234",
+        "e1071659",
+        "n0210948"
+      ]
+    },
+    {
+      "fkey": 60140,
+      "number": "50 E",
+      "title": "Hai Phong Est",
+      "year": 1953,
+      "bbox": [
+        "e1065508",
+        "n0204234",
+        "e1071659",
+        "n0210948"
+      ]
+    },
+    {
+      "fkey": 60142,
+      "number": "50 E",
+      "title": "Hai Phong Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1065508",
+        "n0204234",
+        "e1071659",
+        "n0210948"
+      ]
+    },
+    {
+      "fkey": 60145,
+      "number": "50 W",
+      "title": "Hai Phong Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1063332",
+        "n0204242",
+        "e1065520",
+        "n0210954"
+      ]
+    },
+    {
+      "fkey": 60146,
+      "number": "50 W",
+      "title": "Hai Phong Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063332",
+        "n0204242",
+        "e1065520",
+        "n0210954"
+      ]
+    },
+    {
+      "fkey": 60158,
+      "number": "60 E",
+      "title": "Phu Nho Quan Est",
+      "year": 1951,
+      "bbox": [
+        "e1052844",
+        "n0201546",
+        "e1055020",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60160,
+      "number": "60 W",
+      "title": "Phu Nho Quan Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050708",
+        "n0201542",
+        "e1052848",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60164,
+      "number": "61 E",
+      "title": "Nam Dinh Est",
+      "year": 1952,
+      "bbox": [
+        "e1061152",
+        "n0201542",
+        "e1063332",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60165,
+      "number": "61 E",
+      "title": "Nam Dinh Est",
+      "year": 1953,
+      "bbox": [
+        "e1061152",
+        "n0201542",
+        "e1063332",
+        "n0204251"
+      ]
+    },
+    {
+      "fkey": 60166,
+      "number": "61 W",
+      "title": "Nam Dinh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0201546",
+        "e1061156",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60169,
+      "number": "61 W",
+      "title": "Nam Dinh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0201546",
+        "e1061156",
+        "n0204253"
+      ]
+    },
+    {
+      "fkey": 60170,
+      "number": "62 E",
+      "title": "Dô-Son Est",
+      "year": 1950,
+      "bbox": [
+        "e1065457",
+        "n0201529",
+        "e1071644",
+        "n0204242"
+      ]
+    },
+    {
+      "fkey": 60171,
+      "number": "62 W",
+      "title": "Dô-Son Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1063324",
+        "n0201537",
+        "e1065508",
+        "n0204248"
+      ]
+    },
+    {
+      "fkey": 60185,
+      "number": "72 E",
+      "title": "Ninh Binh Est",
+      "year": 1953,
+      "bbox": [
+        "e1061149",
+        "n0194836",
+        "e1063324",
+        "n0201546"
+      ]
+    },
+    {
+      "fkey": 60187,
+      "number": "72 W",
+      "title": "Ninh Binh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0194840",
+        "e1061152",
+        "n0201547"
+      ]
+    },
+    {
+      "fkey": 60189,
+      "number": "76 E",
+      "title": "Muong Soui Est",
+      "year": 1950,
+      "bbox": [
+        "e1023705",
+        "n0192005",
+        "e1025902",
+        "n0194729"
+      ]
+    },
+    {
+      "fkey": 60190,
+      "number": "76 W",
+      "title": "Muong Soui Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1021537",
+        "n0191943",
+        "e1023737",
+        "n0194710"
+      ]
+    },
+    {
+      "fkey": 60191,
+      "number": "76 W",
+      "title": "Muong Soui Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1021537",
+        "n0191943",
+        "e1023737",
+        "n0194710"
+      ]
+    },
+    {
+      "fkey": 60193,
+      "number": "77 E",
+      "title": "Khang Khai Est",
+      "year": 1954,
+      "bbox": [
+        "e1032001",
+        "n0192040",
+        "e1034151",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 60194,
+      "number": "77 E",
+      "title": "Khang Khai Est",
+      "year": 1952,
+      "bbox": [
+        "e1032001",
+        "n0192040",
+        "e1034151",
+        "n0194801"
+      ]
+    },
+    {
+      "fkey": 60202,
+      "number": "80 E",
+      "title": "Thanh Hoa Est",
+      "year": 1953,
+      "bbox": [
+        "e1052852",
+        "n0192134",
+        "e1055856",
+        "n0194841"
+      ]
+    },
+    {
+      "fkey": 60242,
+      "number": "95 W",
+      "title": "Vinh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050737",
+        "n0182718",
+        "e1052902",
+        "n0185428"
+      ]
+    },
+    {
+      "fkey": 60210,
+      "number": "86 E",
+      "title": "Khê Kiên Est",
+      "year": 1952,
+      "bbox": [
+        "e1040316",
+        "n0185401",
+        "e1042455",
+        "n0192117"
+      ]
+    },
+    {
+      "fkey": 60215,
+      "number": "86 W",
+      "title": "Khê Kiên Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034151",
+        "n0185349",
+        "e1040333",
+        "n0192107"
+      ]
+    },
+    {
+      "fkey": 60220,
+      "number": "88 E",
+      "title": "Phu Diên Châu Est",
+      "year": 1952,
+      "bbox": [
+        "e1052855",
+        "n0185428",
+        "e1055854",
+        "n0192135"
+      ]
+    },
+    {
+      "fkey": 60221,
+      "number": "88 E",
+      "title": "Phu Diên Châu Est",
+      "year": 1953,
+      "bbox": [
+        "e1052855",
+        "n0185428",
+        "e1055854",
+        "n0192135"
+      ]
+    },
+    {
+      "fkey": 60223,
+      "number": "88 W",
+      "title": "Phu Diên Châu Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050730",
+        "n0185424",
+        "e1052859",
+        "n0192134"
+      ]
+    },
+    {
+      "fkey": 60224,
+      "number": "88 W",
+      "title": "Phu Diên Châu Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050730",
+        "n0185424",
+        "e1052859",
+        "n0192134"
+      ]
+    },
+    {
+      "fkey": 60228,
+      "number": "92 E",
+      "title": "Muong May Est",
+      "year": 1954,
+      "bbox": [
+        "e1032051",
+        "n0182628",
+        "e1034232",
+        "n0185349"
+      ]
+    },
+    {
+      "fkey": 60229,
+      "number": "92 E",
+      "title": "Muong May Est",
+      "year": 1953,
+      "bbox": [
+        "e1032051",
+        "n0182628",
+        "e1034232",
+        "n0185349"
+      ]
+    },
+    {
+      "fkey": 60231,
+      "number": "93 E",
+      "title": "Borikhane Est",
+      "year": 1954,
+      "bbox": [
+        "e1040333",
+        "n0182655",
+        "e1042508",
+        "n0185411"
+      ]
+    },
+    {
+      "fkey": 60232,
+      "number": "93 E",
+      "title": "Borikhane Est",
+      "year": 1950,
+      "bbox": [
+        "e1040333",
+        "n0182655",
+        "e1042508",
+        "n0185411"
+      ]
+    },
+    {
+      "fkey": 60233,
+      "number": "93 E",
+      "title": "Borikhane Est",
+      "year": 1952,
+      "bbox": [
+        "e1040333",
+        "n0182655",
+        "e1042508",
+        "n0185411"
+      ]
+    },
+    {
+      "fkey": 60234,
+      "number": "93 W",
+      "title": "Borikhane Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034212",
+        "n0182643",
+        "e1040350",
+        "n0185401"
+      ]
+    },
+    {
+      "fkey": 60235,
+      "number": "93 W",
+      "title": "Borikhane Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1034212",
+        "n0182643",
+        "e1040350",
+        "n0185401"
+      ]
+    },
+    {
+      "fkey": 60236,
+      "number": "93 W",
+      "title": "Borikhane Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034212",
+        "n0182643",
+        "e1040350",
+        "n0185401"
+      ]
+    },
+    {
+      "fkey": 60240,
+      "number": "95 E",
+      "title": "Vinh Est",
+      "year": 1953,
+      "bbox": [
+        "e1052859",
+        "n0182721",
+        "e1055853",
+        "n0185429"
+      ]
+    },
+    {
+      "fkey": 60249,
+      "number": "100 E",
+      "title": "Paksane Est",
+      "year": 1952,
+      "bbox": [
+        "e1032114",
+        "n0175922",
+        "e1034252",
+        "n0182643"
+      ]
+    },
+    {
+      "fkey": 60252,
+      "number": "100 W",
+      "title": "Paksane Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1025957",
+        "n0175906",
+        "e1032137",
+        "n0182628"
+      ]
+    },
+    {
+      "fkey": 60255,
+      "number": "101 E",
+      "title": "Ban Sot Est",
+      "year": 1952,
+      "bbox": [
+        "e1040350",
+        "n0175949",
+        "e1042521",
+        "n0182705"
+      ]
+    },
+    {
+      "fkey": 60258,
+      "number": "101 W",
+      "title": "Ban Sot Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034232",
+        "n0175937",
+        "e1040407",
+        "n0182655"
+      ]
+    },
+    {
+      "fkey": 60261,
+      "number": "102 E",
+      "title": "Napé Est",
+      "year": 1952,
+      "bbox": [
+        "e1044626",
+        "n0180006",
+        "e1050751",
+        "n0182718"
+      ]
+    },
+    {
+      "fkey": 60264,
+      "number": "102 W",
+      "title": "Napé Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042508",
+        "n0175959",
+        "e1044636",
+        "n0182713"
+      ]
+    },
+    {
+      "fkey": 60265,
+      "number": "103 E",
+      "title": "Ha Tinh Est",
+      "year": 1950,
+      "bbox": [
+        "e1052902",
+        "n0180015",
+        "e1055020",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60266,
+      "number": "103 E",
+      "title": "Ha Tinh Est",
+      "year": 1952,
+      "bbox": [
+        "e1052902",
+        "n0180015",
+        "e1055020",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60267,
+      "number": "103 E",
+      "title": "Ha Tinh Est",
+      "year": 1953,
+      "bbox": [
+        "e1052902",
+        "n0180015",
+        "e1055020",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60269,
+      "number": "103 W",
+      "title": "Huong Khé Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1050744",
+        "n0180012",
+        "e1052905",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60271,
+      "number": "103 W",
+      "title": "Huong Khé Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050744",
+        "n0180012",
+        "e1052905",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60272,
+      "number": "104 W",
+      "title": "Ha - Tinh Ouest",
+      "year": 1950,
+      "bbox": [
+        "e1055020",
+        "n0180015",
+        "e1061138",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60273,
+      "number": "104 W",
+      "title": "Ha Tinh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0180015",
+        "e1061138",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60274,
+      "number": "104 W",
+      "title": "Ha Tinh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0180015",
+        "e1061138",
+        "n0182723"
+      ]
+    },
+    {
+      "fkey": 60276,
+      "number": "108 E",
+      "title": "Ban - Poung Est",
+      "year": 1953,
+      "bbox": [
+        "e1040407",
+        "n0173242",
+        "e1042534",
+        "n0175959"
+      ]
+    },
+    {
+      "fkey": 60279,
+      "number": "109 E",
+      "title": "Pak Hin Boun Est",
+      "year": 1951,
+      "bbox": [
+        "e1044636",
+        "n0173300",
+        "e1050757",
+        "n0180012"
+      ]
+    },
+    {
+      "fkey": 60281,
+      "number": "109 W",
+      "title": "Pak - Hin - Boun Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042521",
+        "n0173252",
+        "e1044646",
+        "n0180006"
+      ]
+    },
+    {
+      "fkey": 60284,
+      "number": "110 E",
+      "title": "Mu Gia Est",
+      "year": 1954,
+      "bbox": [
+        "e1052905",
+        "n0173309",
+        "e1055020",
+        "n0180016"
+      ]
+    },
+    {
+      "fkey": 60287,
+      "number": "110 W",
+      "title": "Mu Gia Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050751",
+        "n0173306",
+        "e1052909",
+        "n0180015"
+      ]
+    },
+    {
+      "fkey": 60290,
+      "number": "112",
+      "title": "Thakhek",
+      "year": 1950,
+      "bbox": [
+        "e1044231",
+        "n0170552",
+        "e1050803",
+        "n0173306"
+      ]
+    },
+    {
+      "fkey": 60294,
+      "number": "113 E",
+      "title": "Mahaxay Est",
+      "year": 1952,
+      "bbox": [
+        "e1052909",
+        "n0170603",
+        "e1055020",
+        "n0173310"
+      ]
+    },
+    {
+      "fkey": 60297,
+      "number": "113 W",
+      "title": "Mahaxay Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050757",
+        "n0170559",
+        "e1052912",
+        "n0173309"
+      ]
+    },
+    {
+      "fkey": 60302,
+      "number": "115 E",
+      "title": "Dong Hoi Est",
+      "year": 1951,
+      "bbox": [
+        "e1065345",
+        "n0170546",
+        "e1071506",
+        "n0173300"
+      ]
+    },
+    {
+      "fkey": 60304,
+      "number": "115 W",
+      "title": "Dong Hoi Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063237",
+        "n0170554",
+        "e1065355",
+        "n0173306"
+      ]
+    },
+    {
+      "fkey": 60306,
+      "number": "116",
+      "title": "Keng Kabao",
+      "year": 1952,
+      "bbox": [
+        "e1044530",
+        "n0163847",
+        "e1050809",
+        "n0170559"
+      ]
+    },
+    {
+      "fkey": 60312,
+      "number": "119 E",
+      "title": "Quang Tri Est",
+      "year": 1953,
+      "bbox": [
+        "e1065336",
+        "n0163840",
+        "e1071454",
+        "n0170554"
+      ]
+    },
+    {
+      "fkey": 60314,
+      "number": "119 E",
+      "title": "Quang Tri Est",
+      "year": 1952,
+      "bbox": [
+        "e1065336",
+        "n0163840",
+        "e1071454",
+        "n0170554"
+      ]
+    },
+    {
+      "fkey": 60316,
+      "number": "119 W",
+      "title": "Quang Tri Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063231",
+        "n0163847",
+        "e1065345",
+        "n0170559"
+      ]
+    },
+    {
+      "fkey": 60319,
+      "number": "120",
+      "title": "Van Trinh",
+      "year": 1953,
+      "bbox": [
+        "e1071442",
+        "n0163830",
+        "e1073602",
+        "n0170546"
+      ]
+    },
+    {
+      "fkey": 60321,
+      "number": "121",
+      "title": "Savannakhet",
+      "year": 1952,
+      "bbox": [
+        "e1044539",
+        "n0161140",
+        "e1050815",
+        "n0163853"
+      ]
+    },
+    {
+      "fkey": 60322,
+      "number": "122 E",
+      "title": "Muong Song Khone Est",
+      "year": 1952,
+      "bbox": [
+        "e1052915",
+        "n0161150",
+        "e1055020",
+        "n0163857"
+      ]
+    },
+    {
+      "fkey": 60324,
+      "number": "122 W",
+      "title": "Muong Song Khone Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050809",
+        "n0161146",
+        "e1052918",
+        "n0163856"
+      ]
+    },
+    {
+      "fkey": 60391,
+      "number": "138 W",
+      "title": "Tri Binh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083755",
+        "n0151609",
+        "e1085916",
+        "n0154334"
+      ]
+    },
+    {
+      "fkey": 60332,
+      "number": "125 E",
+      "title": "Hué Est",
+      "year": 1953,
+      "bbox": [
+        "e1073532",
+        "n0161111",
+        "e1075652",
+        "n0163830"
+      ]
+    },
+    {
+      "fkey": 60333,
+      "number": "125 E",
+      "title": "Hué Est",
+      "year": 1952,
+      "bbox": [
+        "e1073532",
+        "n0161111",
+        "e1075652",
+        "n0163830"
+      ]
+    },
+    {
+      "fkey": 60335,
+      "number": "125 W",
+      "title": "Hué Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071430",
+        "n0161123",
+        "e1073547",
+        "n0163840"
+      ]
+    },
+    {
+      "fkey": 60336,
+      "number": "125 W",
+      "title": "Hué Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071430",
+        "n0161123",
+        "e1073547",
+        "n0163840"
+      ]
+    },
+    {
+      "fkey": 60339,
+      "number": "126",
+      "title": "Phu Gia",
+      "year": 1953,
+      "bbox": [
+        "e1075635",
+        "n0161057",
+        "e1081757",
+        "n0163818"
+      ]
+    },
+    {
+      "fkey": 60341,
+      "number": "128 E",
+      "title": "Ban - Taphane Est",
+      "year": 1952,
+      "bbox": [
+        "e1052918",
+        "n0154443",
+        "e1055020",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60342,
+      "number": "128 E",
+      "title": "Ban Taphane Est",
+      "year": 1953,
+      "bbox": [
+        "e1052918",
+        "n0154443",
+        "e1055020",
+        "n0161151"
+      ]
+    },
+    {
+      "fkey": 60346,
+      "number": "128 W",
+      "title": "Ban Taphane Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1045702",
+        "n0154437",
+        "e1052920",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60347,
+      "number": "128 W",
+      "title": "Ban Taphane Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1045702",
+        "n0154437",
+        "e1052920",
+        "n0161150"
+      ]
+    },
+    {
+      "fkey": 60355,
+      "number": "131 E",
+      "title": "An Diêm Est",
+      "year": 1953,
+      "bbox": [
+        "e1073518",
+        "n0154405",
+        "e1075635",
+        "n0161123"
+      ]
+    },
+    {
+      "fkey": 60357,
+      "number": "131 E",
+      "title": "An Diêm Est",
+      "year": 1952,
+      "bbox": [
+        "e1073518",
+        "n0154405",
+        "e1075635",
+        "n0161123"
+      ]
+    },
+    {
+      "fkey": 60360,
+      "number": "132 E",
+      "title": "Tourane Est",
+      "year": 1953,
+      "bbox": [
+        "e1081717",
+        "n0154334",
+        "e1083839",
+        "n0161057"
+      ]
+    },
+    {
+      "fkey": 60362,
+      "number": "132 E",
+      "title": "Tourane Est",
+      "year": 1952,
+      "bbox": [
+        "e1081717",
+        "n0154334",
+        "e1083839",
+        "n0161057"
+      ]
+    },
+    {
+      "fkey": 60363,
+      "number": "132 W",
+      "title": "Tourane Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075618",
+        "n0154350",
+        "e1081737",
+        "n0161111"
+      ]
+    },
+    {
+      "fkey": 60364,
+      "number": "132 W",
+      "title": "Tourane Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075618",
+        "n0154350",
+        "e1081737",
+        "n0161111"
+      ]
+    },
+    {
+      "fkey": 60367,
+      "number": "134 E",
+      "title": "Saravane Est",
+      "year": 1953,
+      "bbox": [
+        "e1061117",
+        "n0151733",
+        "e1063219",
+        "n0154443"
+      ]
+    },
+    {
+      "fkey": 60369,
+      "number": "134 E",
+      "title": "Saravane Est",
+      "year": 1952,
+      "bbox": [
+        "e1061117",
+        "n0151733",
+        "e1063219",
+        "n0154443"
+      ]
+    },
+    {
+      "fkey": 60370,
+      "number": "134 W",
+      "title": "Saravane Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0151736",
+        "e1061120",
+        "n0154444"
+      ]
+    },
+    {
+      "fkey": 60372,
+      "number": "134 W",
+      "title": "Saravane Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0151736",
+        "e1061120",
+        "n0154444"
+      ]
+    },
+    {
+      "fkey": 60381,
+      "number": "137 E",
+      "title": "Tam Ky Est",
+      "year": 1953,
+      "bbox": [
+        "e1081658",
+        "n0151627",
+        "e1083817",
+        "n0154350"
+      ]
+    },
+    {
+      "fkey": 60382,
+      "number": "137 E",
+      "title": "Tam Ky Est",
+      "year": 1952,
+      "bbox": [
+        "e1081658",
+        "n0151627",
+        "e1083817",
+        "n0154350"
+      ]
+    },
+    {
+      "fkey": 60385,
+      "number": "137 W",
+      "title": "Tam Ky Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075601",
+        "n0151644",
+        "e1081717",
+        "n0154405"
+      ]
+    },
+    {
+      "fkey": 60386,
+      "number": "137 W",
+      "title": "Tam Ky Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1075601",
+        "n0151644",
+        "e1081717",
+        "n0154405"
+      ]
+    },
+    {
+      "fkey": 60388,
+      "number": "138 E",
+      "title": "Tri Binh Est",
+      "year": 1953,
+      "bbox": [
+        "e1085851",
+        "n0151548",
+        "e1092015",
+        "n0154315"
+      ]
+    },
+    {
+      "fkey": 60389,
+      "number": "138 E",
+      "title": "Tri Binh Est",
+      "year": 1952,
+      "bbox": [
+        "e1085851",
+        "n0151548",
+        "e1092015",
+        "n0154315"
+      ]
+    },
+    {
+      "fkey": 60590,
+      "number": "181 E",
+      "title": "Ban Don Est",
+      "year": 1953,
+      "bbox": [
+        "e1073352",
+        "n0123417",
+        "e1075447",
+        "n0130136"
+      ]
+    },
+    {
+      "fkey": 60392,
+      "number": "138 W",
+      "title": "Tri Binh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083755",
+        "n0151609",
+        "e1085916",
+        "n0154334"
+      ]
+    },
+    {
+      "fkey": 60394,
+      "number": "139",
+      "title": "Paksé",
+      "year": 1953,
+      "bbox": [
+        "e1052512",
+        "n0145029",
+        "e1055020",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60395,
+      "number": "139",
+      "title": "Paksé",
+      "year": 1952,
+      "bbox": [
+        "e1052512",
+        "n0145029",
+        "e1055020",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60397,
+      "number": "140 W",
+      "title": "Bassac Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0145030",
+        "e1061117",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60398,
+      "number": "140 W",
+      "title": "Bassac Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0145030",
+        "e1061117",
+        "n0151737"
+      ]
+    },
+    {
+      "fkey": 60399,
+      "number": "141 E",
+      "title": "Ban Keng Say Est",
+      "year": 1954,
+      "bbox": [
+        "e1065303",
+        "n0145013",
+        "e1071408",
+        "n0151728"
+      ]
+    },
+    {
+      "fkey": 60407,
+      "number": "144",
+      "title": "Quang Ngai",
+      "year": 1953,
+      "bbox": [
+        "e1083734",
+        "n0144856",
+        "e1090550",
+        "n0151627"
+      ]
+    },
+    {
+      "fkey": 60410,
+      "number": "144",
+      "title": "Quang Ngai",
+      "year": 1952,
+      "bbox": [
+        "e1083734",
+        "n0144856",
+        "e1090550",
+        "n0151627"
+      ]
+    },
+    {
+      "fkey": 60411,
+      "number": "145",
+      "title": "Ban Soukhouma",
+      "year": 1953,
+      "bbox": [
+        "e1052228",
+        "n0142322",
+        "e1055020",
+        "n0145031"
+      ]
+    },
+    {
+      "fkey": 60412,
+      "number": "145",
+      "title": "Ban Soukhouma",
+      "year": 1952,
+      "bbox": [
+        "e1052228",
+        "n0142322",
+        "e1055020",
+        "n0145031"
+      ]
+    },
+    {
+      "fkey": 60414,
+      "number": "146 W",
+      "title": "Phiafay Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0142323",
+        "e1061114",
+        "n0145031"
+      ]
+    },
+    {
+      "fkey": 60415,
+      "number": "146 W",
+      "title": "Phiafay Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0142323",
+        "e1061114",
+        "n0145031"
+      ]
+    },
+    {
+      "fkey": 60417,
+      "number": "147 W",
+      "title": "Attopeu Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1063203",
+        "n0142314",
+        "e1065303",
+        "n0145026"
+      ]
+    },
+    {
+      "fkey": 60419,
+      "number": "148 E",
+      "title": "Dak To Est",
+      "year": 1953,
+      "bbox": [
+        "e1073438",
+        "n0142245",
+        "e1075545",
+        "n0145003"
+      ]
+    },
+    {
+      "fkey": 60420,
+      "number": "148 W",
+      "title": "Dak To Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1071347",
+        "n0142257",
+        "e1073451",
+        "n0145013"
+      ]
+    },
+    {
+      "fkey": 60426,
+      "number": "150 E",
+      "title": "Bong Son Est",
+      "year": 1953,
+      "bbox": [
+        "e1085805",
+        "n0142135",
+        "e1091922",
+        "n0144902"
+      ]
+    },
+    {
+      "fkey": 60427,
+      "number": "150 E",
+      "title": "Bong Son Est",
+      "year": 1952,
+      "bbox": [
+        "e1085805",
+        "n0142135",
+        "e1091922",
+        "n0144902"
+      ]
+    },
+    {
+      "fkey": 60429,
+      "number": "150 W",
+      "title": "Bong Son Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083713",
+        "n0142156",
+        "e1085828",
+        "n0144921"
+      ]
+    },
+    {
+      "fkey": 60430,
+      "number": "150 W",
+      "title": "Bong Son Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083713",
+        "n0142156",
+        "e1085828",
+        "n0144921"
+      ]
+    },
+    {
+      "fkey": 60439,
+      "number": "153 E",
+      "title": "Kompong Sralao Est",
+      "year": 1953,
+      "bbox": [
+        "e1052928",
+        "n0135616",
+        "e1055020",
+        "n0142324"
+      ]
+    },
+    {
+      "fkey": 60442,
+      "number": "156 E",
+      "title": "Ya Li Est",
+      "year": 1953,
+      "bbox": [
+        "e1073426",
+        "n0135538",
+        "e1075530",
+        "n0142257"
+      ]
+    },
+    {
+      "fkey": 60443,
+      "number": "156 E",
+      "title": "Ya Li Est",
+      "year": 1952,
+      "bbox": [
+        "e1073426",
+        "n0135538",
+        "e1075530",
+        "n0142257"
+      ]
+    },
+    {
+      "fkey": 60449,
+      "number": "158 E",
+      "title": "An Khê Est",
+      "year": 1953,
+      "bbox": [
+        "e1085742",
+        "n0135429",
+        "e1091856",
+        "n0142156"
+      ]
+    },
+    {
+      "fkey": 60450,
+      "number": "158 E",
+      "title": "An Khê Est",
+      "year": 1952,
+      "bbox": [
+        "e1085742",
+        "n0135429",
+        "e1091856",
+        "n0142156"
+      ]
+    },
+    {
+      "fkey": 60454,
+      "number": "158 W",
+      "title": "An Khê Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083653",
+        "n0135449",
+        "e1085805",
+        "n0142214"
+      ]
+    },
+    {
+      "fkey": 60455,
+      "number": "158 W",
+      "title": "An Khê Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083653",
+        "n0135449",
+        "e1085805",
+        "n0142214"
+      ]
+    },
+    {
+      "fkey": 60456,
+      "number": "158bis E",
+      "title": "Sisophon Est",
+      "year": 1953,
+      "bbox": [
+        "e1024257",
+        "n0132743",
+        "e1030406",
+        "n0135508"
+      ]
+    },
+    {
+      "fkey": 60458,
+      "number": "158bis E",
+      "title": "Sisophon Est",
+      "year": 1952,
+      "bbox": [
+        "e1024257",
+        "n0132743",
+        "e1030406",
+        "n0135508"
+      ]
+    },
+    {
+      "fkey": 60592,
+      "number": "181 W",
+      "title": "Ban Don Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071309",
+        "n0123429",
+        "e1073403",
+        "n0130146"
+      ]
+    },
+    {
+      "fkey": 60460,
+      "number": "158bis W",
+      "title": "Sisophon Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1021349",
+        "n0132713",
+        "e1024319",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60461,
+      "number": "158bis W",
+      "title": "Sisophon Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1021349",
+        "n0132713",
+        "e1024319",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60463,
+      "number": "159 E",
+      "title": "Kralanh E",
+      "year": 1953,
+      "bbox": [
+        "e1040614",
+        "n0132843",
+        "e1042713",
+        "n0135560"
+      ]
+    },
+    {
+      "fkey": 60464,
+      "number": "159 E",
+      "title": "Kralanh E",
+      "year": 1952,
+      "bbox": [
+        "e1040614",
+        "n0132843",
+        "e1042713",
+        "n0135560"
+      ]
+    },
+    {
+      "fkey": 60466,
+      "number": "159 W",
+      "title": "Kralanh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034525",
+        "n0132831",
+        "e1040626",
+        "n0135550"
+      ]
+    },
+    {
+      "fkey": 60467,
+      "number": "159 W",
+      "title": "Kralanh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034525",
+        "n0132831",
+        "e1040626",
+        "n0135550"
+      ]
+    },
+    {
+      "fkey": 60469,
+      "number": "159b E",
+      "title": "Banteai Srei Est",
+      "year": 1953,
+      "bbox": [
+        "e1032436",
+        "n0132817",
+        "e1034539",
+        "n0135538"
+      ]
+    },
+    {
+      "fkey": 60472,
+      "number": "159b W",
+      "title": "Banteai Srei Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030347",
+        "n0132801",
+        "e1032452",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60473,
+      "number": "159b W",
+      "title": "Banteai Srei Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1030347",
+        "n0132801",
+        "e1032452",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60481,
+      "number": "162 W",
+      "title": "Stung Treng Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0132909",
+        "e1061109",
+        "n0135617"
+      ]
+    },
+    {
+      "fkey": 60482,
+      "number": "162 W",
+      "title": "Stung Treng Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0132909",
+        "e1061109",
+        "n0135617"
+      ]
+    },
+    {
+      "fkey": 60492,
+      "number": "165 E",
+      "title": "Ban Tur Est",
+      "year": 1953,
+      "bbox": [
+        "e1081548",
+        "n0132801",
+        "e1083653",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60493,
+      "number": "165 E",
+      "title": "Ban Tur Est",
+      "year": 1952,
+      "bbox": [
+        "e1081548",
+        "n0132801",
+        "e1083653",
+        "n0135524"
+      ]
+    },
+    {
+      "fkey": 60498,
+      "number": "166 E",
+      "title": "Qui Nhon Est",
+      "year": 1953,
+      "bbox": [
+        "e1085721",
+        "n0132713",
+        "e1092651",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60499,
+      "number": "166 E",
+      "title": "Qui Nhon Est",
+      "year": 1952,
+      "bbox": [
+        "e1085721",
+        "n0132713",
+        "e1092651",
+        "n0135449"
+      ]
+    },
+    {
+      "fkey": 60501,
+      "number": "166 bis E",
+      "title": "Lovéa Est",
+      "year": 1947,
+      "bbox": [
+        "e1024319",
+        "n0130036",
+        "e1030424",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60504,
+      "number": "166 bis E",
+      "title": "Lovéa Est",
+      "year": 1953,
+      "bbox": [
+        "e1024319",
+        "n0130036",
+        "e1030424",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60505,
+      "number": "166 bis W",
+      "title": "Lovéa Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1021414",
+        "n0130007",
+        "e1024340",
+        "n0132743"
+      ]
+    },
+    {
+      "fkey": 60508,
+      "number": "166 bis W",
+      "title": "Lovéa Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1021414",
+        "n0130007",
+        "e1024340",
+        "n0132743"
+      ]
+    },
+    {
+      "fkey": 60509,
+      "number": "167 E",
+      "title": "Battambang Est",
+      "year": 1947,
+      "bbox": [
+        "e1032452",
+        "n0130110",
+        "e1034553",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60510,
+      "number": "167 E",
+      "title": "Battambang Est",
+      "year": 1953,
+      "bbox": [
+        "e1032452",
+        "n0130110",
+        "e1034553",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60511,
+      "number": "167 E",
+      "title": "Battambang Est",
+      "year": 1952,
+      "bbox": [
+        "e1032452",
+        "n0130110",
+        "e1034553",
+        "n0132831"
+      ]
+    },
+    {
+      "fkey": 60512,
+      "number": "167 W",
+      "title": "Battambang Ouest",
+      "year": 1947,
+      "bbox": [
+        "e1030406",
+        "n0130054",
+        "e1032508",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60513,
+      "number": "167 W",
+      "title": "Battambang Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1030406",
+        "n0130054",
+        "e1032508",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60514,
+      "number": "167 W",
+      "title": "Battambang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030406",
+        "n0130054",
+        "e1032508",
+        "n0132817"
+      ]
+    },
+    {
+      "fkey": 60516,
+      "number": "167bis E",
+      "title": "Siem Réap Est",
+      "year": 1953,
+      "bbox": [
+        "e1040626",
+        "n0130136",
+        "e1042722",
+        "n0132853"
+      ]
+    },
+    {
+      "fkey": 60517,
+      "number": "167bis E",
+      "title": "Siem Réap Est",
+      "year": 1952,
+      "bbox": [
+        "e1040626",
+        "n0130136",
+        "e1042722",
+        "n0132853"
+      ]
+    },
+    {
+      "fkey": 60519,
+      "number": "167bis W",
+      "title": "Siem Réap Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034539",
+        "n0130124",
+        "e1040637",
+        "n0132843"
+      ]
+    },
+    {
+      "fkey": 60520,
+      "number": "167bis W",
+      "title": "Siem Réap Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034539",
+        "n0130124",
+        "e1040637",
+        "n0132843"
+      ]
+    },
+    {
+      "fkey": 60521,
+      "number": "168 E",
+      "title": "Phnom Deck Est",
+      "year": 1951,
+      "bbox": [
+        "e1044759",
+        "n0130154",
+        "e1050851",
+        "n0132906"
+      ]
+    },
+    {
+      "fkey": 60522,
+      "number": "168 W",
+      "title": "Phnom Deck Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042713",
+        "n0130146",
+        "e1044806",
+        "n0132901"
+      ]
+    },
+    {
+      "fkey": 60531,
+      "number": "170 W",
+      "title": "Prek Preas Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0130202",
+        "e1061107",
+        "n0132910"
+      ]
+    },
+    {
+      "fkey": 60532,
+      "number": "170 W",
+      "title": "Prek Preas Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0130202",
+        "e1061107",
+        "n0132910"
+      ]
+    },
+    {
+      "fkey": 60577,
+      "number": "178 E",
+      "title": "Beng Lovéa Est",
+      "year": 1952,
+      "bbox": [
+        "e1052935",
+        "n0123455",
+        "e1055020",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60619,
+      "number": "187 W",
+      "title": "Pursat Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034606",
+        "n0120711",
+        "e1040659",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60546,
+      "number": "174 E",
+      "title": "Söng Cau Est",
+      "year": 1952,
+      "bbox": [
+        "e1085700",
+        "n0130006",
+        "e1092626",
+        "n0132742"
+      ]
+    },
+    {
+      "fkey": 60547,
+      "number": "174 E",
+      "title": "Söng Cau Est",
+      "year": 1953,
+      "bbox": [
+        "e1085700",
+        "n0130006",
+        "e1092626",
+        "n0132742"
+      ]
+    },
+    {
+      "fkey": 60550,
+      "number": "174 W",
+      "title": "Söng Cau Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083616",
+        "n0130036",
+        "e1085721",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60551,
+      "number": "174 W",
+      "title": "Söng Cau Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083616",
+        "n0130036",
+        "e1085721",
+        "n0132801"
+      ]
+    },
+    {
+      "fkey": 60552,
+      "number": "174bis E",
+      "title": "Pailin Est",
+      "year": 1947,
+      "bbox": [
+        "e1024340",
+        "n0123329",
+        "e1030442",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60554,
+      "number": "174bis E",
+      "title": "Pailin Est",
+      "year": 1953,
+      "bbox": [
+        "e1024340",
+        "n0123329",
+        "e1030442",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60555,
+      "number": "174bis W",
+      "title": "Pailin Ouest",
+      "year": 1947,
+      "bbox": [
+        "e1022255",
+        "n0123309",
+        "e1024359",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60557,
+      "number": "174bis W",
+      "title": "Pailin Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1022255",
+        "n0123309",
+        "e1024359",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60559,
+      "number": "175 E",
+      "title": "Moung Est",
+      "year": 1953,
+      "bbox": [
+        "e1032508",
+        "n0123404",
+        "e1034606",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60560,
+      "number": "175 E",
+      "title": "Moung Est",
+      "year": 1952,
+      "bbox": [
+        "e1032508",
+        "n0123404",
+        "e1034606",
+        "n0130124"
+      ]
+    },
+    {
+      "fkey": 60562,
+      "number": "175 W",
+      "title": "Moung Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030424",
+        "n0123347",
+        "e1032524",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60563,
+      "number": "175 W",
+      "title": "Moung Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1030424",
+        "n0123347",
+        "e1032524",
+        "n0130110"
+      ]
+    },
+    {
+      "fkey": 60565,
+      "number": "176 E",
+      "title": "Trapéang Chong Est",
+      "year": 1953,
+      "bbox": [
+        "e1040637",
+        "n0123429",
+        "e1042731",
+        "n0130146"
+      ]
+    },
+    {
+      "fkey": 60567,
+      "number": "176 W",
+      "title": "Trapéang Chong Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034553",
+        "n0123418",
+        "e1040648",
+        "n0130136"
+      ]
+    },
+    {
+      "fkey": 60568,
+      "number": "176 W",
+      "title": "Trapéang Chong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1034553",
+        "n0123418",
+        "e1040648",
+        "n0130136"
+      ]
+    },
+    {
+      "fkey": 60570,
+      "number": "177 E",
+      "title": "Kompong Thom Est",
+      "year": 1952,
+      "bbox": [
+        "e1044806",
+        "n0123447",
+        "e1050855",
+        "n0130159"
+      ]
+    },
+    {
+      "fkey": 60573,
+      "number": "177 W",
+      "title": "Kompong Thom Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042722",
+        "n0123439",
+        "e1044813",
+        "n0130154"
+      ]
+    },
+    {
+      "fkey": 60620,
+      "number": "188 E",
+      "title": "Kompong - Chhnang Est",
+      "year": 1951,
+      "bbox": [
+        "e1044813",
+        "n0120740",
+        "e1050859",
+        "n0123452"
+      ]
+    },
+    {
+      "fkey": 60581,
+      "number": "178 W",
+      "title": "Beng Lovéa Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050851",
+        "n0123452",
+        "e1052938",
+        "n0130202"
+      ]
+    },
+    {
+      "fkey": 60585,
+      "number": "179 W",
+      "title": "Sambor Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0123455",
+        "e1061104",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60587,
+      "number": "179 W",
+      "title": "Sambor Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0123455",
+        "e1061104",
+        "n0130203"
+      ]
+    },
+    {
+      "fkey": 60601,
+      "number": "183 E",
+      "title": "Van Gia Est",
+      "year": 1953,
+      "bbox": [
+        "e1085640",
+        "n0123308",
+        "e1091745",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60603,
+      "number": "183 E",
+      "title": "Van Gia Est",
+      "year": 1952,
+      "bbox": [
+        "e1085640",
+        "n0123308",
+        "e1091745",
+        "n0130036"
+      ]
+    },
+    {
+      "fkey": 60605,
+      "number": "183 W",
+      "title": "Van Gia Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083558",
+        "n0123329",
+        "e1085700",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60607,
+      "number": "183 W",
+      "title": "Van Gia Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083558",
+        "n0123329",
+        "e1085700",
+        "n0130054"
+      ]
+    },
+    {
+      "fkey": 60609,
+      "number": "184",
+      "title": "Tô Bông",
+      "year": 1953,
+      "bbox": [
+        "e1091723",
+        "n0123246",
+        "e1093829",
+        "n0130015"
+      ]
+    },
+    {
+      "fkey": 60610,
+      "number": "184",
+      "title": "Tô Bông",
+      "year": 1952,
+      "bbox": [
+        "e1091723",
+        "n0123246",
+        "e1093829",
+        "n0130015"
+      ]
+    },
+    {
+      "fkey": 60612,
+      "number": "186 E",
+      "title": "Phnom Leach Est",
+      "year": 1953,
+      "bbox": [
+        "e1032524",
+        "n0120657",
+        "e1034619",
+        "n0123418"
+      ]
+    },
+    {
+      "fkey": 60613,
+      "number": "186 W",
+      "title": "Phnom Leach Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1030442",
+        "n0120640",
+        "e1032539",
+        "n0123404"
+      ]
+    },
+    {
+      "fkey": 60615,
+      "number": "187 E",
+      "title": "Pursat Est",
+      "year": 1953,
+      "bbox": [
+        "e1040648",
+        "n0120722",
+        "e1042739",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60616,
+      "number": "187 E",
+      "title": "Pursat Est",
+      "year": 1951,
+      "bbox": [
+        "e1040648",
+        "n0120722",
+        "e1042739",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60618,
+      "number": "187 W",
+      "title": "Pursat Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034606",
+        "n0120711",
+        "e1040659",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60621,
+      "number": "188 E",
+      "title": "Kompong Chhnang Est",
+      "year": 1952,
+      "bbox": [
+        "e1044813",
+        "n0120740",
+        "e1050859",
+        "n0123452"
+      ]
+    },
+    {
+      "fkey": 60625,
+      "number": "188 W",
+      "title": "Kompong Chhnang Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042731",
+        "n0120732",
+        "e1044819",
+        "n0123447"
+      ]
+    },
+    {
+      "fkey": 60628,
+      "number": "189 E",
+      "title": "Krau Chmar Est",
+      "year": 1952,
+      "bbox": [
+        "e1052938",
+        "n0120748",
+        "e1055020",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60633,
+      "number": "189 W",
+      "title": "Krau Chmar Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050855",
+        "n0120745",
+        "e1052940",
+        "n0123455"
+      ]
+    },
+    {
+      "fkey": 60638,
+      "number": "190 W",
+      "title": "Kratié Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0120748",
+        "e1061102",
+        "n0123456"
+      ]
+    },
+    {
+      "fkey": 60643,
+      "number": "192 E",
+      "title": "Poste Maître Est",
+      "year": 1953,
+      "bbox": [
+        "e1073341",
+        "n0120710",
+        "e1075434",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60644,
+      "number": "192 E",
+      "title": "Poste Maître Est",
+      "year": 1952,
+      "bbox": [
+        "e1073341",
+        "n0120710",
+        "e1075434",
+        "n0123429"
+      ]
+    },
+    {
+      "fkey": 60645,
+      "number": "192 W",
+      "title": "Poste Maître Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071301",
+        "n0120722",
+        "e1073352",
+        "n0123439"
+      ]
+    },
+    {
+      "fkey": 60649,
+      "number": "193 E",
+      "title": "Poste du Lac",
+      "year": 1953,
+      "bbox": [
+        "e1081501",
+        "n0120640",
+        "e1083558",
+        "n0123403"
+      ]
+    },
+    {
+      "fkey": 60650,
+      "number": "193 W",
+      "title": "Poste du Lac",
+      "year": 1953,
+      "bbox": [
+        "e1075421",
+        "n0120656",
+        "e1081516",
+        "n0123417"
+      ]
+    },
+    {
+      "fkey": 60651,
+      "number": "194 E",
+      "title": "Nha Trang Est",
+      "year": 1953,
+      "bbox": [
+        "e1085621",
+        "n0120553",
+        "e1092539",
+        "n0123329"
+      ]
+    },
+    {
+      "fkey": 60653,
+      "number": "194 E",
+      "title": "Nha Trang Est",
+      "year": 1952,
+      "bbox": [
+        "e1085621",
+        "n0120553",
+        "e1092539",
+        "n0123329"
+      ]
+    },
+    {
+      "fkey": 60654,
+      "number": "194 W",
+      "title": "Nha Trang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083541",
+        "n0120622",
+        "e1085640",
+        "n0123347"
+      ]
+    },
+    {
+      "fkey": 60656,
+      "number": "194 W",
+      "title": "Nha Trang Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083541",
+        "n0120622",
+        "e1085640",
+        "n0123347"
+      ]
+    },
+    {
+      "fkey": 60663,
+      "number": "198 E",
+      "title": "Phsar Oudong Est",
+      "year": 1952,
+      "bbox": [
+        "e1044819",
+        "n0114032",
+        "e1050904",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60667,
+      "number": "198 W",
+      "title": "Phsar Oudong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1042739",
+        "n0114025",
+        "e1044825",
+        "n0120740"
+      ]
+    },
+    {
+      "fkey": 60671,
+      "number": "199 E",
+      "title": "Kompong-Cham Est",
+      "year": 1952,
+      "bbox": [
+        "e1052940",
+        "n0114041",
+        "e1055020",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60675,
+      "number": "199 W",
+      "title": "Kompong-Cham Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050859",
+        "n0114038",
+        "e1052942",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60679,
+      "number": "200 E",
+      "title": "Mimot Est",
+      "year": 1951,
+      "bbox": [
+        "e1061058",
+        "n0114038",
+        "e1063140",
+        "n0120748"
+      ]
+    },
+    {
+      "fkey": 60681,
+      "number": "200 W",
+      "title": "Mimot Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0114041",
+        "e1061100",
+        "n0120749"
+      ]
+    },
+    {
+      "fkey": 60683,
+      "number": "201 E",
+      "title": "Lôc Ninh Est",
+      "year": 1953,
+      "bbox": [
+        "e1065214",
+        "n0114025",
+        "e1071301",
+        "n0120739"
+      ]
+    },
+    {
+      "fkey": 60684,
+      "number": "201 E",
+      "title": "Lôc Ninh Est",
+      "year": 1951,
+      "bbox": [
+        "e1065214",
+        "n0114025",
+        "e1071301",
+        "n0120739"
+      ]
+    },
+    {
+      "fkey": 60686,
+      "number": "201 W",
+      "title": "Lôc Ninh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1063136",
+        "n0114032",
+        "e1065221",
+        "n0120745"
+      ]
+    },
+    {
+      "fkey": 60688,
+      "number": "202 E",
+      "title": "Haut - Donnaï Est",
+      "year": 1953,
+      "bbox": [
+        "e1073331",
+        "n0114003",
+        "e1075421",
+        "n0120722"
+      ]
+    },
+    {
+      "fkey": 60689,
+      "number": "202 E",
+      "title": "Haut - Donnaï Est",
+      "year": 1952,
+      "bbox": [
+        "e1073331",
+        "n0114003",
+        "e1075421",
+        "n0120722"
+      ]
+    },
+    {
+      "fkey": 60690,
+      "number": "202 W",
+      "title": "Haut - Donnaï Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071253",
+        "n0114015",
+        "e1073341",
+        "n0120732"
+      ]
+    },
+    {
+      "fkey": 60691,
+      "number": "202 W",
+      "title": "Haut - Donnaï Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071253",
+        "n0114015",
+        "e1073341",
+        "n0120732"
+      ]
+    },
+    {
+      "fkey": 60692,
+      "number": "203 E",
+      "title": "Dalat Est",
+      "year": 1951,
+      "bbox": [
+        "e1081447",
+        "n0113933",
+        "e1083541",
+        "n0120656"
+      ]
+    },
+    {
+      "fkey": 60693,
+      "number": "203 E",
+      "title": "Dalat Est",
+      "year": 1952,
+      "bbox": [
+        "e1081447",
+        "n0113933",
+        "e1083541",
+        "n0120656"
+      ]
+    },
+    {
+      "fkey": 60694,
+      "number": "203 W",
+      "title": "Dalat Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075409",
+        "n0113949",
+        "e1081501",
+        "n0120710"
+      ]
+    },
+    {
+      "fkey": 60695,
+      "number": "203 W",
+      "title": "Dalat Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075409",
+        "n0113949",
+        "e1081501",
+        "n0120710"
+      ]
+    },
+    {
+      "fkey": 60698,
+      "number": "204 E",
+      "title": "Cam Ranh Est",
+      "year": 1953,
+      "bbox": [
+        "e1085603",
+        "n0113855",
+        "e1091701",
+        "n0120622"
+      ]
+    },
+    {
+      "fkey": 60699,
+      "number": "204 E",
+      "title": "Cam Ranh Est",
+      "year": 1951,
+      "bbox": [
+        "e1085603",
+        "n0113855",
+        "e1091701",
+        "n0120622"
+      ]
+    },
+    {
+      "fkey": 60702,
+      "number": "204 W",
+      "title": "Cam Ranh Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083525",
+        "n0113915",
+        "e1085621",
+        "n0120640"
+      ]
+    },
+    {
+      "fkey": 60704,
+      "number": "204 W",
+      "title": "Cam Ranh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1083525",
+        "n0113915",
+        "e1085621",
+        "n0120640"
+      ]
+    },
+    {
+      "fkey": 60705,
+      "number": "205",
+      "title": "Kas Moul",
+      "year": 1954,
+      "bbox": [
+        "e1024437",
+        "n0111208",
+        "e1030531",
+        "n0113933"
+      ]
+    },
+    {
+      "fkey": 60708,
+      "number": "207 E",
+      "title": "Trapeang Kraleng Est",
+      "year": 1954,
+      "bbox": [
+        "e1040709",
+        "n0111308",
+        "e1042755",
+        "n0114025"
+      ]
+    },
+    {
+      "fkey": 60709,
+      "number": "207 W",
+      "title": "Trapeang Kraleng Ouest",
+      "year": 1954,
+      "bbox": [
+        "e1034631",
+        "n0111256",
+        "e1040719",
+        "n0114015"
+      ]
+    },
+    {
+      "fkey": 60710,
+      "number": "208 E",
+      "title": "Phnom Penh Est",
+      "year": 1951,
+      "bbox": [
+        "e1044825",
+        "n0111325",
+        "e1050908",
+        "n0114038"
+      ]
+    },
+    {
+      "fkey": 60713,
+      "number": "208 W",
+      "title": "Phnom Penh Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042747",
+        "n0111318",
+        "e1044831",
+        "n0114032"
+      ]
+    },
+    {
+      "fkey": 60716,
+      "number": "209 E",
+      "title": "Prey Veng Est",
+      "year": 1951,
+      "bbox": [
+        "e1052942",
+        "n0111334",
+        "e1055020",
+        "n0114042"
+      ]
+    },
+    {
+      "fkey": 60723,
+      "number": "210 E",
+      "title": "Tây Ninh Est",
+      "year": 1952,
+      "bbox": [
+        "e1061056",
+        "n0111331",
+        "e1063136",
+        "n0114041"
+      ]
+    },
+    {
+      "fkey": 60725,
+      "number": "210 W",
+      "title": "Tây Ninh Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0111334",
+        "e1061058",
+        "n0114042"
+      ]
+    },
+    {
+      "fkey": 60726,
+      "number": "211 E",
+      "title": "Hon Quan Est",
+      "year": 1953,
+      "bbox": [
+        "e1065208",
+        "n0111318",
+        "e1071253",
+        "n0114032"
+      ]
+    },
+    {
+      "fkey": 60727,
+      "number": "211 E",
+      "title": "Hon Quan Est",
+      "year": 1951,
+      "bbox": [
+        "e1065208",
+        "n0111318",
+        "e1071253",
+        "n0114032"
+      ]
+    },
+    {
+      "fkey": 60728,
+      "number": "211 W",
+      "title": "Hon Quan Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1063132",
+        "n0111325",
+        "e1065214",
+        "n0114038"
+      ]
+    },
+    {
+      "fkey": 60729,
+      "number": "211 W",
+      "title": "Hon Quan Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063132",
+        "n0111325",
+        "e1065214",
+        "n0114038"
+      ]
+    },
+    {
+      "fkey": 60730,
+      "number": "212 E",
+      "title": "Blao Est",
+      "year": 1953,
+      "bbox": [
+        "e1073321",
+        "n0111256",
+        "e1075409",
+        "n0114015"
+      ]
+    },
+    {
+      "fkey": 60732,
+      "number": "212 W",
+      "title": "Blao Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1071245",
+        "n0111308",
+        "e1073331",
+        "n0114025"
+      ]
+    },
+    {
+      "fkey": 60733,
+      "number": "213 E",
+      "title": "Djiring Est",
+      "year": 1953,
+      "bbox": [
+        "e1081433",
+        "n0111226",
+        "e1083525",
+        "n0113949"
+      ]
+    },
+    {
+      "fkey": 60735,
+      "number": "213 E",
+      "title": "Djiring Est",
+      "year": 1951,
+      "bbox": [
+        "e1081433",
+        "n0111226",
+        "e1083525",
+        "n0113949"
+      ]
+    },
+    {
+      "fkey": 60736,
+      "number": "213 W",
+      "title": "Djiring Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075357",
+        "n0111242",
+        "e1081447",
+        "n0114003"
+      ]
+    },
+    {
+      "fkey": 60738,
+      "number": "213 W",
+      "title": "Djiring Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1075357",
+        "n0111242",
+        "e1081447",
+        "n0114003"
+      ]
+    },
+    {
+      "fkey": 60739,
+      "number": "214 E",
+      "title": "Phan Rang Est",
+      "year": 1953,
+      "bbox": [
+        "e1085542",
+        "n0110622",
+        "e1091641",
+        "n0113915"
+      ]
+    },
+    {
+      "fkey": 60740,
+      "number": "214 E",
+      "title": "Phan Rang Est",
+      "year": 1950,
+      "bbox": [
+        "e1085542",
+        "n0110622",
+        "e1091641",
+        "n0113915"
+      ]
+    },
+    {
+      "fkey": 60741,
+      "number": "214 W",
+      "title": "Phan Rang Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1083506",
+        "n0110643",
+        "e1085603",
+        "n0113933"
+      ]
+    },
+    {
+      "fkey": 60742,
+      "number": "214 W",
+      "title": "Phan Rang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1083506",
+        "n0110643",
+        "e1085603",
+        "n0113933"
+      ]
+    },
+    {
+      "fkey": 60749,
+      "number": "218 E",
+      "title": "Takeo Est",
+      "year": 1951,
+      "bbox": [
+        "e1044831",
+        "n0104618",
+        "e1050911",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60752,
+      "number": "218 W",
+      "title": "Takeo Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042755",
+        "n0104611",
+        "e1044837",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60843,
+      "number": "239 W",
+      "title": "Soc Trang Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0092505",
+        "e1061051",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60762,
+      "number": "220 E",
+      "title": "Trang Bang Est",
+      "year": 1952,
+      "bbox": [
+        "e1061054",
+        "n0104623",
+        "e1063132",
+        "n0111334"
+      ]
+    },
+    {
+      "fkey": 60764,
+      "number": "220 W",
+      "title": "Trang Bang Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1055020",
+        "n0104627",
+        "e1061056",
+        "n0111335"
+      ]
+    },
+    {
+      "fkey": 60766,
+      "number": "221 E",
+      "title": "Saigon Est",
+      "year": 1951,
+      "bbox": [
+        "e1065203",
+        "n0104611",
+        "e1071245",
+        "n0111325"
+      ]
+    },
+    {
+      "fkey": 60768,
+      "number": "221 W",
+      "title": "Saigon Ouest",
+      "year": 1948,
+      "bbox": [
+        "e1063129",
+        "n0104618",
+        "e1065208",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60769,
+      "number": "221 W",
+      "title": "Saigon Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1063129",
+        "n0104618",
+        "e1065208",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60770,
+      "number": "221 W",
+      "title": "Saigon Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063129",
+        "n0104618",
+        "e1065208",
+        "n0111331"
+      ]
+    },
+    {
+      "fkey": 60772,
+      "number": "222 E",
+      "title": "Gia Ray Est",
+      "year": 1953,
+      "bbox": [
+        "e1073311",
+        "n0104549",
+        "e1075357",
+        "n0111308"
+      ]
+    },
+    {
+      "fkey": 60773,
+      "number": "222 E",
+      "title": "Gia Ray Est",
+      "year": 1951,
+      "bbox": [
+        "e1073311",
+        "n0104549",
+        "e1075357",
+        "n0111308"
+      ]
+    },
+    {
+      "fkey": 60775,
+      "number": "222 W",
+      "title": "Gia Ray Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071237",
+        "n0104601",
+        "e1073321",
+        "n0111318"
+      ]
+    },
+    {
+      "fkey": 60776,
+      "number": "222 W",
+      "title": "Gia Ray Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1071237",
+        "n0104601",
+        "e1073321",
+        "n0111318"
+      ]
+    },
+    {
+      "fkey": 60778,
+      "number": "223 E",
+      "title": "Phan Thiet Est",
+      "year": 1953,
+      "bbox": [
+        "e1081417",
+        "n0103954",
+        "e1083509",
+        "n0111242"
+      ]
+    },
+    {
+      "fkey": 60780,
+      "number": "223 W",
+      "title": "Phan Thiet Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1075343",
+        "n0104010",
+        "e1081433",
+        "n0111256"
+      ]
+    },
+    {
+      "fkey": 60783,
+      "number": "226 E",
+      "title": "Kampot Est",
+      "year": 1953,
+      "bbox": [
+        "e1040728",
+        "n0101854",
+        "e1042810",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60784,
+      "number": "226 E",
+      "title": "Kampot Est",
+      "year": 1951,
+      "bbox": [
+        "e1040728",
+        "n0101854",
+        "e1042810",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60786,
+      "number": "226 W",
+      "title": "Kampot Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1034654",
+        "n0101842",
+        "e1040737",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60787,
+      "number": "226 W",
+      "title": "Kampot Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1034654",
+        "n0101842",
+        "e1040737",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60789,
+      "number": "227 E",
+      "title": "Ha Tiên Est",
+      "year": 1953,
+      "bbox": [
+        "e1044837",
+        "n0101911",
+        "e1050915",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60791,
+      "number": "227 W",
+      "title": "Ha Tiên Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042803",
+        "n0101903",
+        "e1044842",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60795,
+      "number": "228 W",
+      "title": "Long Xuyën Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050911",
+        "n0101916",
+        "e1052947",
+        "n0104627"
+      ]
+    },
+    {
+      "fkey": 60797,
+      "number": "229 E",
+      "title": "My Tho Est",
+      "year": 1953,
+      "bbox": [
+        "e1061052",
+        "n0101916",
+        "e1063129",
+        "n0104627"
+      ]
+    },
+    {
+      "fkey": 60799,
+      "number": "229 W",
+      "title": "My Tho Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0101919",
+        "e1061054",
+        "n0104628"
+      ]
+    },
+    {
+      "fkey": 60844,
+      "number": "239 W",
+      "title": "Soc Trang Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0092505",
+        "e1061051",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60803,
+      "number": "230 E",
+      "title": "Cho Lon Est",
+      "year": 1951,
+      "bbox": [
+        "e1065157",
+        "n0101903",
+        "e1071237",
+        "n0104618"
+      ]
+    },
+    {
+      "fkey": 60805,
+      "number": "230 W",
+      "title": "Cho Lon Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1063125",
+        "n0101911",
+        "e1065203",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60807,
+      "number": "230 W",
+      "title": "Cho Lon Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1063125",
+        "n0101911",
+        "e1065203",
+        "n0104623"
+      ]
+    },
+    {
+      "fkey": 60809,
+      "number": "231 E",
+      "title": "Xuyên Moc Est",
+      "year": 1953,
+      "bbox": [
+        "e1073302",
+        "n0101842",
+        "e1075346",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60810,
+      "number": "231 E",
+      "title": "Xuyên Moc Est",
+      "year": 1951,
+      "bbox": [
+        "e1073302",
+        "n0101842",
+        "e1075346",
+        "n0104601"
+      ]
+    },
+    {
+      "fkey": 60812,
+      "number": "231 W",
+      "title": "Xuyên Moc Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1071230",
+        "n0101854",
+        "e1073311",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60813,
+      "number": "231 W",
+      "title": "Xuyên- Moc Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1071230",
+        "n0101854",
+        "e1073311",
+        "n0104611"
+      ]
+    },
+    {
+      "fkey": 60814,
+      "number": "232",
+      "title": "Phu Quoc",
+      "year": 1953,
+      "bbox": [
+        "e1034705",
+        "n0095135",
+        "e1040746",
+        "n0101854"
+      ]
+    },
+    {
+      "fkey": 60816,
+      "number": "233 E",
+      "title": "Rach Gia Est",
+      "year": 1953,
+      "bbox": [
+        "e1044842",
+        "n0095203",
+        "e1050918",
+        "n0101916"
+      ]
+    },
+    {
+      "fkey": 60818,
+      "number": "233 W",
+      "title": "Rach Gia Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1042810",
+        "n0095156",
+        "e1044847",
+        "n0101911"
+      ]
+    },
+    {
+      "fkey": 60819,
+      "number": "233 W",
+      "title": "Rach Gia Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1042810",
+        "n0095156",
+        "e1044847",
+        "n0101911"
+      ]
+    },
+    {
+      "fkey": 60820,
+      "number": "234 W",
+      "title": "Can Tho Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050915",
+        "n0095209",
+        "e1052949",
+        "n0101919"
+      ]
+    },
+    {
+      "fkey": 60821,
+      "number": "234 W",
+      "title": "Can - Tho Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050915",
+        "n0095209",
+        "e1052949",
+        "n0101919"
+      ]
+    },
+    {
+      "fkey": 60823,
+      "number": "234 E",
+      "title": "Can - Tho Est",
+      "year": 1951,
+      "bbox": [
+        "e1052947",
+        "n0095212",
+        "e1055020",
+        "n0101920"
+      ]
+    },
+    {
+      "fkey": 60824,
+      "number": "234 E",
+      "title": "Can Tho Est",
+      "year": 1953,
+      "bbox": [
+        "e1052947",
+        "n0095212",
+        "e1055020",
+        "n0101920"
+      ]
+    },
+    {
+      "fkey": 60825,
+      "number": "235 E",
+      "title": "Vinh Long Est",
+      "year": 1951,
+      "bbox": [
+        "e1061051",
+        "n0095209",
+        "e1063125",
+        "n0101919"
+      ]
+    },
+    {
+      "fkey": 60826,
+      "number": "235 E",
+      "title": "Vinh Long Est",
+      "year": 1953,
+      "bbox": [
+        "e1061051",
+        "n0095209",
+        "e1063125",
+        "n0101919"
+      ]
+    },
+    {
+      "fkey": 60827,
+      "number": "235 W",
+      "title": "Vinh - Long Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1055020",
+        "n0095212",
+        "e1061052",
+        "n0101920"
+      ]
+    },
+    {
+      "fkey": 60828,
+      "number": "235 W",
+      "title": "Vinh Long Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1055020",
+        "n0095212",
+        "e1061052",
+        "n0101920"
+      ]
+    },
+    {
+      "fkey": 60831,
+      "number": "236",
+      "title": "Ba Tri",
+      "year": 1953,
+      "bbox": [
+        "e1063121",
+        "n0095203",
+        "e1065157",
+        "n0101916"
+      ]
+    },
+    {
+      "fkey": 60835,
+      "number": "238 E",
+      "title": "Long - My Est",
+      "year": 1951,
+      "bbox": [
+        "e1052949",
+        "n0092505",
+        "e1055020",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60836,
+      "number": "238 E",
+      "title": "Long My Est",
+      "year": 1953,
+      "bbox": [
+        "e1052949",
+        "n0092505",
+        "e1055020",
+        "n0095213"
+      ]
+    },
+    {
+      "fkey": 60838,
+      "number": "238 W",
+      "title": "Long - My Ouest",
+      "year": 1951,
+      "bbox": [
+        "e1050918",
+        "n0092501",
+        "e1052951",
+        "n0095212"
+      ]
+    },
+    {
+      "fkey": 60839,
+      "number": "238 W",
+      "title": "Long My Ouest",
+      "year": 1953,
+      "bbox": [
+        "e1050918",
+        "n0092501",
+        "e1052951",
+        "n0095212"
+      ]
+    },
+    {
+      "fkey": 60841,
+      "number": "239 E",
+      "title": "Soc Trang Est",
+      "year": 1951,
+      "bbox": [
+        "e1061049",
+        "n0092459",
+        "e1064218",
+        "n0095212"
+      ]
+    },
+    {
+      "fkey": 60859,
+      "number": "104E",
+      "title": "Ha Tinh Est",
+      "year": 1953,
+      "bbox": [
+        "e1061135",
+        "n0180012",
+        "e1063256",
+        "n0182721"
+      ]
+    },
+    {
+      "fkey": 60860,
+      "number": "185",
+      "title": "Tuk Sok",
+      "year": 1950,
+      "bbox": [
+        "e1024359",
+        "n0120622",
+        "e1030459",
+        "n0123347"
+      ]
+    },
+    {
+      "fkey": 60863,
+      "number": "154 W",
+      "title": "Khong Ouest",
+      "year": 1952,
+      "bbox": [
+        "e1050837",
+        "n0135613",
+        "e1052931",
+        "n0142323"
+      ]
+    }
+  ]
+}

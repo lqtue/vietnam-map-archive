@@ -1,0 +1,28 @@
+{
+  "coordinate_system": "source image pixels, boxes [x, y, width, height]",
+  "source": "VMA IIIF fixed tiles only",
+  "sheets": {
+    "1882": {
+      "map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+      "width": 12102,
+      "height": 8982,
+      "windows": [
+        {"id": "water_core", "box": [3900, 6400, 200, 200], "class": "water", "basis": "all-water core from 1882 river pilot"},
+        {"id": "dry_blue", "box": [6900, 4800, 800, 800], "class": "land", "basis": "blue-grey hatched parcels, no water"},
+        {"id": "quay_mixed", "box": [6900, 5900, 1000, 1000], "class": "mixed", "basis": "Arsenal quay and river; not a binary control"},
+        {"id": "creek_mixed", "box": [800, 3800, 1000, 1000], "class": "mixed", "basis": "narrow creek and land; not a binary control"}
+      ]
+    },
+    "1898": {
+      "map_id": "20ec4f9a-16bd-4895-a593-40c6ed9c9555",
+      "width": 16267,
+      "height": 14859,
+      "windows": [
+        {"id": "water_core", "box": [10950, 8650, 200, 200], "class": "water", "basis": "visually selected interior of the Saigon River on VMA overview; confirm on native crop"},
+        {"id": "dry_blue", "box": [8500, 5700, 800, 800], "class": "land", "basis": "blue-grey Hôpital Militaire parcels, no river"},
+        {"id": "quay_mixed", "box": [10000, 7300, 1200, 1200], "class": "mixed", "basis": "city bank, boats and river lettering; not a binary control"},
+        {"id": "creek_mixed", "box": [4000, 1800, 1000, 1000], "class": "mixed", "basis": "small blue channels in hatched land; not a binary control"}
+      ]
+    }
+  }
+}

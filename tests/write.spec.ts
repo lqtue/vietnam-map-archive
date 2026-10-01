@@ -192,6 +192,102 @@ test('private annotation objects follow map publication', async ({ request }) =>
   created.mapIds = created.mapIds.filter((id) => id !== draft!.id);
 });
 
+test('a neatline save records the replaced and the new georeference version', async () => {
+  // Mig 103: every stored version gets a georef_versions row before it goes live.
+  const { data: map, error: mapError } = await admin
+    .from('maps')
+    .insert({ name: 'Georef version fixture', status: 'draft' })
+    .select('id')
+    .single();
+  expect(mapError).toBeNull();
+  const id = map!.id;
+  created.mapIds.push(id);
+  await admin
+    .from('maps')
+    .update({ annotation_url: `https://maparchive.vn/api/maps/${id}/annotation` })
+    .eq('id', id);
+
+  const corners = (lift: number) =>
+    [
+      [0, 0, 106.7, 10.8 + lift],
+      [1000, 0, 106.71, 10.8],
+      [1000, 1000, 106.71, 10.79],
+      [0, 1000, 106.7, 10.79],
+    ].map(([x, y, lng, lat]) => ({ resourceCoords: [x, y], geo: [lng, lat] }));
+  const annotation = {
+    type: 'AnnotationPage',
+    '@context': 'http://www.w3.org/ns/anno.jsonld',
+    items: [
+      {
+        type: 'Annotation',
+        '@context': [
+          'http://www.w3.org/ns/anno.jsonld',
+          'http://geojson.org/geojson-ld/geojson-context.jsonld',
+          'http://iiif.io/api/presentation/3/context.json',
+        ],
+        motivation: 'georeferencing',
+        target: {
+          type: 'SpecificResource',
+          source: {
+            id: 'https://iiif.maparchive.vn/iiif/write-smoke',
+            type: 'ImageService3',
+            width: 1000,
+            height: 1000,
+          },
+          selector: {
+            type: 'SvgSelector',
+            value:
+              '<svg width="1000" height="1000"><polygon points="0,0 1000,0 1000,1000 0,1000" /></svg>',
+          },
+        },
+        body: {
+          type: 'FeatureCollection',
+          transformation: { type: 'polynomial', options: { order: 1 } },
+          features: corners(0).map((g) => ({
+            type: 'Feature',
+            properties: { resourceCoords: g.resourceCoords },
+            geometry: { type: 'Point', coordinates: g.geo },
+          })),
+        },
+      },
+    ],
+  };
+  const { error: uploadError } = await admin.storage
+    .from('annotations')
+    .upload(`${id}.json`, JSON.stringify(annotation), {
+      contentType: 'application/json',
+      upsert: true,
+    });
+  expect(uploadError).toBeNull();
+  created.annotationPaths.push(`${id}.json`);
+
+  const res = await staffRequest.patch(`/api/admin/maps/${id}/annotation`, {
+    data: { gcps: corners(0.001) },
+  });
+  const { data: history } = await admin.storage.from('annotations').list(id);
+  created.annotationPaths.push(...(history ?? []).map((f) => `${id}/${f.name}`));
+  expect(res.status()).toBe(200);
+
+  const { data: versions } = await admin
+    .from('georef_versions')
+    .select('stamp, origin, geom_src, gcp_count, user_id')
+    .eq('map_id', id)
+    .order('stamp');
+  expect(versions!.map((v) => v.origin)).toEqual(['mirror', 'neatline']);
+  expect(versions!.map((v) => `${v.stamp}.json`).sort()).toEqual(
+    (history ?? []).map((f) => f.name).sort()
+  );
+  expect(versions![0].geom_src).not.toBe(versions![1].geom_src);
+  expect(versions![1].gcp_count).toBe(4);
+  expect(versions![1].user_id).toBe(session.user.id);
+  const { data: current } = await admin
+    .from('map_georef_current')
+    .select('stamp')
+    .eq('map_id', id)
+    .single();
+  expect(current!.stamp).toBe(versions![1].stamp);
+});
+
 test('staff can create and validate an OCR bbox through the review API', async () => {
   const runId = `write-smoke-${Date.now()}`;
   created.runIds.push(runId);

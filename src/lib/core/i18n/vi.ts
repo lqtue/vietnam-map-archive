@@ -221,6 +221,9 @@ export const vi: Record<string, string> = {
   'No georeferenced map matches.': 'Không có bản đồ đã định vị nào phù hợp.',
   'Fix in Allmaps': 'Chỉnh sửa trong Allmaps',
   'no source': 'không có nguồn',
+  'Pipeline-maintained': 'Do quy trình tự động duy trì',
+  'Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.':
+    'Định vị tọa độ do quy trình tự động của chúng tôi tạo (scripts/indochine100k_georef.py), không có trên Allmaps. Sửa bằng cách chạy lại quy trình; chỉnh trên Allmaps sẽ bị ghi đè.',
   'Submit a map': 'Gửi bản đồ',
   'Search by title, creator, year, or description…': 'Tìm theo tiêu đề, tác giả, năm hoặc mô tả…',
   '{N} in archive · {M} in scout queue': '{N} trong kho lưu trữ · {M} trong hàng chờ',
@@ -327,11 +330,6 @@ export const vi: Record<string, string> = {
     'Căn giữa vị trí hiện tại và hiển thị bản đồ phủ quanh khu vực.',
   'What happens when I share my location?': 'Điều gì xảy ra khi chia sẻ vị trí?',
   'Remember my choice on this device': 'Ghi nhớ lựa chọn trên thiết bị này',
-  'No archival map here': 'Không có bản đồ lưu trữ tại đây',
-  'Tap a row to add it as a layer · tap again to remove.':
-    'Nhấn vào một hàng để thêm lớp bản đồ · nhấn lần nữa để xóa.',
-  '← Back to maps at this location': '← Quay lại bản đồ tại vị trí này',
-  'Browse the full archive →': 'Duyệt toàn bộ kho lưu trữ →',
   'Search maps…': 'Tìm kiếm bản đồ…',
   Layers: 'Các lớp',
   Browse: 'Duyệt',

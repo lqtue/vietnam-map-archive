@@ -68,6 +68,7 @@ Self-hosted IIIF tile serving via Cloudflare R2 + Worker at `https://iiif.maparc
   `https://iiif.maparchive.vn/iiif/<map-uuid>`; `maps.annotation_url` becomes the Supabase Storage
   public URL of the updated annotation JSON (mig 047 — earlier code overloaded `allmaps_id` for
   this; the column now holds only bare image IDs).
+- **Is our stored annotation still what Allmaps holds?** `node --env-file=.env scripts/georef_contributions.mjs` — read-only report over every map with an `allmaps_id`: new contributions on queue maps, drifted copies (GCP and mask diffs, per-point pixel shifts, different-scan warning), with the `sync_district4_annotations.mjs` command to run. It is the review step before any sync; `--selftest` runs offline.
 
 **info.json patching:** the worker patches `vips dzsave`'s info.json on the fly — injects
 `tiles[0].height` (defaults to width per spec but required by OL's IIIFInfo parser) and a `sizes`

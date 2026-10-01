@@ -174,9 +174,9 @@ export interface SheetEdition {
  * which the corpus does not honour. Cell 6330-4 alone is SÀI GÒN 1965 and
  * THÀNH PHỐ HỒ CHÍ MINH 1984.
  *
- * The series half of that key is **`collection`**, not `extra_metadata.series`.
- * Collection is what makes a series a series everywhere else — `series_key()`
- * (mig 082) and `series_sheets` (083) are both built on it — and the metadata
+ * The series half of that key is **`series_key`** (mig 104, generated from
+ * `collection`), not `extra_metadata.series`. It is what `map_series` and
+ * `series_cells` are keyed on, and the metadata
  * spelling is a second name for the same fact that only some rows carry: all
  * 62 Indochine 1:25,000 rows have a sheet number and none has a `series`, so
  * keying on it hid the three cells that survey holds in two editions.
@@ -192,13 +192,13 @@ export async function fetchSheetEditions(
 ): Promise<SheetEdition[]> {
   const { data: self, error: selfError } = await supabase
     .from('maps')
-    .select('sheet_number, collection')
+    .select('sheet_number, series_key')
     .eq('id', mapId)
     .single();
   if (selfError || !self) return [];
 
   const sheet = self.sheet_number;
-  const series = self.collection;
+  const series = self.series_key;
   if (!sheet || !series) return [];
 
   const { data, error } = await supabase
@@ -207,7 +207,7 @@ export async function fetchSheetEditions(
       'id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced'
     )
     .eq('sheet_number', sheet)
-    .eq('collection', series)
+    .eq('series_key', series)
     .neq('id', mapId)
     .order('year', { ascending: true });
   if (error || !data) {

@@ -2,7 +2,7 @@
 # Blind by construction: verifying a georeferenced map series when the check shares the error
 
 <!--block:B0002-->
-*Two historical map series of Vietnam*
+*Three historical map series of Vietnam*
 
 <!--block:B0003-->
 ## Abstract
@@ -19,9 +19,14 @@ before and after correction, the number with median outline separation above 100
 189 to zero. This establishes improved inter-sheet agreement, not independent absolute accuracy:
 the CRS-selection check and comparison lattice share the adopted Helmert parameters. A second
 case, from the Service géographique de l'Indochine 1:25,000 series, shows why coherent corner
-readings can still assign two sheets to the same cell. Together these cases support a taxonomy of
+readings can still assign two sheets to the same cell. A third, from the same survey's 1:100,000
+series placed automatically from catalogue extents, shows the structure recurring in a pipeline
+built after the first two were understood: a sheet whose catalogue west and south edges were wrong
+by 509 m and 544 m passed every per-sheet gate at 0.69% shape error, and was found only because its
+printed graticule ticks, an input those gates do not use, were read for calibration. Together these
+cases support a taxonomy of
 verification scope, committed inputs, detectable faults, and blind spots; the taxonomy is drawn from
-two cases in one project and is offered as an organizing account of this failure mode, not a claim
+three cases in one project and is offered as an organizing account of this failure mode, not a claim
 that it generalizes across archives or pipelines. The contribution is an
 account, structured for reproducibility, of how checks can remain silent under specific shared
 assumptions, with explicit separation of source control, build measurements, and serving-state
@@ -90,9 +95,11 @@ the meaning of verification after control has been obtained, not about claiming 
 workflow outperforms automatic georeferencing.
 
 <!--block:B0015-->
-We examine two Vietnamese map series with complementary spatial evidence: US Army Map Service
-1:50,000 GeoPDFs, and Service géographique de l'Indochine 1:25,000 sheets whose corners are printed
-in grades from the Paris meridian. The archive reports 514 sheets across these routes, but that total includes an unverified
+We examine three Vietnamese map series with complementary spatial evidence: US Army Map Service
+1:50,000 GeoPDFs, Service géographique de l'Indochine 1:25,000 sheets whose corners are printed
+in grades from the Paris meridian, and the same survey's 1:100,000 second edition, placed from
+per-sheet catalogue extents and checked against ticks printed along its frame. The archive reports
+514 sheets across the first two routes, but that total includes an unverified
 publication constant (§3). We therefore report each audit's measured population separately. The series setting makes relations available that a single sheet cannot supply:
 regular lattice spacing,
 one-to-one occupancy of cells, shared edges, edition history and a distinction between a proposed
@@ -101,12 +108,14 @@ correction and what readers currently receive.
 <!--block:B0016-->
 The paper makes three contributions. First, it models a survey as cells, archive sheets and
 institutional printings rather than collapsing those states into one map record (§4). Second, it
-documents two reproducible georeferencing routes that require no interactive editor: embedded GCPs
-and neatlines for L7014, and detected frames plus printed corner labels for Indochine (§§5–6).
+documents three reproducible georeferencing routes that require no interactive editor: embedded
+GCPs and neatlines for L7014, detected frames plus printed corner labels for the Indochine
+1:25,000, and detected frames plus calibrated catalogue extents for the 1:100,000 (§§5–6).
 Third, it develops a verification taxonomy (§7). The taxonomy distinguishes checks by scope and by
 which information they have already committed to. It shows why a lattice residual, a lattice
 collision, a free seam residual, an outside CRS decision and a tile-key audit detect different
-classes of fault.
+classes of fault. It then applies the taxonomy to an automated pipeline we built for the third
+series, whose own gates share their input with the placement they check (§7.8).
 
 <!--block:B0017-->
 Our claim is deliberately narrow. Series self-consistency is not new, and neither are lattice or
@@ -335,7 +344,7 @@ geographic populations that make case B possible in this archive.
 ## §3 Corpus
 
 <!--block:B0048-->
-The corpus comprises a Cold-War and a colonial Vietnamese sheet series. L7014 is the US Army
+The corpus comprises one Cold-War and two colonial Vietnamese sheet series. L7014 is the US Army
 Map Service 1:50,000 coverage of Vietnam, held as GeoPDFs by the Perry-Castañeda Library at the
 University of Texas at Austin. The second is the Service géographique de l'Indochine 1:25,000
 coverage of Tonkin and Thanh Hóa, held by Cartomundi at Aix-Marseille Université/CNRS. The archive
@@ -348,6 +357,15 @@ the 1960s–70s; the Indochine material from 1903–1927. The Indochine sheets a
 products of the Service géographique de l'Indochine, and their control and coverage reflect the
 administrative priorities of that survey rather than a neutral sampling of the territory; we make no
 claim about the map content beyond the geometric properties used for verification here.
+
+<!--block:B0143-->
+The third series is outside that total. The Service géographique de l'Indochine 1:100,000 second
+edition (1947–1959) is held by Cartomundi as **492** catalogue records, each describing the
+eastern or western half of a numbered cell, with a per-record extent. The archive holds **360**
+of these halves as scans, each matched to exactly one record. **446** of the 492 records declare
+a longitude and latitude span inside the series' standard band (0.36–0.43 and 0.48–0.53 grades);
+the other 46 are catalogue anomalies, handled separately. At the recorded state, **314** of the 360
+are public and georeferenced (§7.8).
 
 <!--block:B0049-->
 Several L7014 denominators appear below and they are not interchangeable; Figure 6 shows all of them
@@ -364,9 +382,12 @@ Indochine side, **79** cells are indexed and **75** held; **62** were georeferen
 **83** image sources those sheets resolve to, some cells holding more than one edition.
 
 <!--block:B0050-->
-The two series are deliberately unlike in how they supply spatial evidence. L7014's source PDFs
+The first two series are deliberately unlike in how they supply spatial evidence. L7014's source PDFs
 carry GCPs and a CRS declaration but require a test of that declaration. The Indochine sheets carry
-no embedded georeference but print corner coordinates and a regular quadrangle scheme. This contrast
+no embedded georeference but print corner coordinates and a regular quadrangle scheme. The
+1:100,000 series sits between them: it prints graticule ticks rather than corner labels, and its
+catalogue supplies an extent for every sheet, so its placement comes from outside the sheet and
+its print is read only to calibrate that source. This contrast
 is useful for the paper's question: the checks in §7 do not depend on a single ingestion route, but
 on relations a sheet series makes available after its coordinates have been read.
 
@@ -494,6 +515,24 @@ is below the roughly 0.3% floor set by paper shrinkage and detection noise. Read
 graticule ticks would resolve it and would supply interior control points; it is deferred rather than
 represented as an achieved precision.
 
+<!--block:B0144-->
+**The 1:100,000 series.** The second edition does not print coordinates at its corners. It prints
+graticule ticks along all four sides, labelled every 0.1 grade (0.2 on northern sheets), and its catalogue supplies an extent
+for every half-sheet. We therefore place each sheet from its catalogue record rather than from its
+own print. The pixel frame is detected as in the 1:25,000 case, with constants re-measured for this
+series: an outer decorative frame sits about 175 px, roughly 1.3 km on the ground, outside the
+neatline that bounds the map. The four detected corners are then tied to the record's extent,
+corrected by a systematic catalogue-to-print offset.
+
+<!--block:B0145-->
+That offset is the one place the print enters. On a 16-sheet calibration sample, stratified by
+latitude, we located the printed ticks against the detected neatline and read their values. Seven
+sheets gave complete observations. A fit linear in latitude left 235.2 m mean and 741.5 m maximum
+residual, failing a 250 m gate; the maximum was a single sheet, Tri Binh (W). With it excluded,
+six sheets spanning 10.5–20.9°N fit at 76 m mean and 188 m maximum, and that fit was accepted.
+The exclusion was recorded at the time as a judgement made to unblock the series, not as a
+finding. §7.8 reports what it turned out to be.
+
 <!--block:B0069-->
 ---
 
@@ -529,13 +568,20 @@ undisplaced one; a displacement common to every sheet leaves every seam closed (
 | **Lattice residual** | series | ✓ | · | · | ✓ | — |
 | **Lattice collision** | series | · | · | **✓** | ✓ | — |
 | **`pick_crs`** — registration points scored against the adopted cell (§7.5) | per-sheet + index | · | **✓ ‡** | · | · | — |
+| **Span and frame gates vs catalogue box** (§7.8) | per-sheet | ✓ | · | · | **✓ §** | — |
+| **Line-fit residual** (§7.8) | per-sheet | **∅ ¶** | · | · | · | — |
+| **Printed ticks vs catalogue** (§7.8) | per-sheet | · | · | · | **✓** | — |
 | **Tile-key audit** | serving | — | — | — | — | **✓** |
 
 <!--block:B0075-->
 **‡** Detects disagreement with the adopted frame when a cell score is available. The candidate
 and reference cell share Helmert parameters; the decision does not validate those parameters
-against independent absolute control. Table entries describe diagnostic scope, not measured
-detection rates from running the published methods on this corpus.
+against independent absolute control. **§** Only when the index error changes the box's shape;
+an error that enlarges both axes by similar proportions passes (Tri Binh, §7.8). **¶** For
+the specific case of a boundary pinned to the wrong printed line: a ruled interior line fits
+straighter than a hand-engraved neatline, so the residual cannot flag the choice. Table entries
+describe diagnostic scope, not measured detection rates from running the published methods on
+this corpus.
 
 <!--block:B0137-->
 Three cells carry the argument, and each is sourced to a different paper's own design.
@@ -853,6 +899,58 @@ positional accuracy; no intermediate zoom-level rates are inferred.
 <!--block:B0115-->
 ![Figure 8](figures/figure-8.pdf)
 
+<!--block:B0146-->
+### 7.8 The same structure in an automated pipeline
+
+<!--block:B0147-->
+The 1:100,000 pipeline (§6) was built after the L7014 fault was understood, and it still has a
+shared input. Its per-sheet gates compare the detected frame with the catalogue box: the
+frame's pixel aspect against the box's ground aspect, the two ground-scale estimates against each
+other, and the four rim offsets against one another. A series pass adds the rim offset against
+the series median and footprint overlap between neighbouring slots. The rim-offset gates read only
+the image, so they bear on frame detection, not placement. The gates that bear on placement read
+the catalogue box, and the catalogue box is also what places the sheet. They can therefore see
+an index error only when it distorts the box's shape.
+
+<!--block:B0148-->
+Tri Binh (W) is that case. Its detected frame is clean: four rim offsets of 169–172 px, fit
+residuals of 2.2–3.8 px, and 0.69% shape error against its catalogue box. Every per-sheet gate
+passes it. When its printed ticks were read again, three per axis, the catalogue's east and north
+edges agreed with the print to within reading noise (−59 m and +50 m). Its west and south edges
+were wrong by +509 m and +544 m. That is about 1.3% of the sheet's width and 1.1% of its height:
+the box is too large on both axes by similar proportions, so its shape barely changes. The error
+is comparable to the L7014 displacement (395–528 m), and the gates could not report it. Under the corrected
+box the shape error falls to 0.43%, which is consistent with the correction being real. The sheet
+was found only because it had been drawn into the calibration sample, the one step where the
+print, rather than the catalogue, supplies coordinates. There the calibration gate flagged it as
+an outlier, and its exclusion was recorded as a judgement, not a finding. The re-reading shows it
+was neither a regional datum break nor a misread tick, but an error in the index.
+
+<!--block:B0149-->
+Quang Ngai marks the other side of the boundary. Its catalogue east edge was off by about 9.2 km,
+enough to push its declared longitude span to 0.5235 grades, outside the series band, while its
+detected frame's pixel aspect implied about 0.428. The span gate held it before any tick was
+read; the printed ticks later gave 0.4281 grades. A
+shape-changing index error is visible to the gates, and a shape-preserving one is not. This is
+the **§** mark in Table 1.
+
+<!--block:B0150-->
+The frame detector also has a blind spot of its own. Two sheets were once landed with a boundary
+on a kilometre-grid line about 52 px inside the true neatline. The ruled line fit with 0.28–0.48 px
+residual across 24 patches; the engraved frame fits at about 3.2 px. A straighter fit is not a more
+correct one, so the residual could not flag the choice (**¶** in Table 1). What caught it was a
+per-pixel profile of where the blank paper ends. That tests what the line bounds rather than how
+straight it is, which is a different property from the one the fit measures.
+
+<!--block:B0151-->
+These are cases, not rates. At the recorded state 314 of the 360 sheets are public and the series
+lattice check reports 328 clean placements with no conflicts. Printed ticks, however, were read
+only on the calibration sample and on sheets the gates had already held. How many public sheets
+carry an error like Tri Binh's is therefore unknown. The detector itself reached its 39th version
+within a week, each change justified on a handful of inspected sheets. That is a
+development record, not a held-out evaluation. §9 describes the measurement that would supply a
+rate.
+
 <!--block:B0116-->
 ---
 
@@ -921,10 +1019,30 @@ explain why a check with that structure was the one that shipped. That second qu
 question, not a geometry one, and it is the reason the ordering above is stated as a checklist rather
 than left implicit in the method.
 
+<!--block:B0152-->
+The third case says what an automated pipeline needs before its clear set can carry a rate. The
+gates' committed input is the catalogue, so the independent evidence must come from somewhere the
+catalogue does not reach. Two sources are available without new instruments. One is the sheet's
+own printed ticks, read on a random sample of *cleared* sheets rather than only on held ones. The
+other is a person's judgement of what the catalogue cannot supply: whether roads and rivers
+continue across seams with already-placed neighbours, and whether a named landmark falls where
+the sheet puts it. That review must record two separate verdicts, whether the boundary is on the
+printed edge and whether the sheet is in the right place. A frame-only review would pass Tri Binh,
+reproducing in the review the shared input the gates already have. The approval should also be
+bound to the corners it approved, so that a later detector version cannot publish new geometry
+under an old decision. We have not yet run this audit. Until it is run, the 1:100,000 clear set
+carries the gates' scope and no measured error rate.
+
 <!--block:B0124-->
-The reasoning may apply beyond these two series where its structural conditions hold. A seam census
+The reasoning may apply beyond these series where its structural conditions hold. A seam census
 requires enough adjacent sheets, a lattice requires a known regular scheme, and neither substitutes
-for an independent absolute reference. Conversely, an individual sheet can receive only per-sheet
+for an independent absolute reference. Not every series in the archive meets those conditions. A
+1971 province atlas prints a common military grid but gives each province its own frame, extent
+and layout, so it has a grid and no sheet lattice. A set of colonial arrondissement plans has
+neither. The first can take grid intersections as dense per-sheet control, and neighbouring
+provinces overlap rather than meet at an edge, so there is no lattice and no seam. The second
+offers only content matching or hand placement. Both are outside what this paper's lattice and
+seam instruments can verify. Conversely, an individual sheet can receive only per-sheet
 checks, which is precisely why its residual must not be made to imply more. The archive model in §4
 is part of the method here: series membership, editions, gaps and serving routes are not merely catalogue
 metadata when they determine which verification relations can be computed.
@@ -941,7 +1059,9 @@ edges, correction reduced the number above 100 m from 189 to zero. The compariso
 improved outline agreement. CRS selection against the lattice supplies a separate test of
 consistency with the adopted Helmert transformation, whose absolute accuracy remains to be
 independently assessed. These build measurements do not establish the exact population or
-accuracy of the serving archive.
+accuracy of the serving archive. The third case shows the structure again in a pipeline built
+with the first two in view: a 509–544 m index error passed every per-sheet gate, because the
+gates and the placement read the same catalogue.
 
 <!--block:B0127-->
 The generalisable part is not the magnitude, which is particular to this archive, nor the
@@ -966,7 +1086,8 @@ over the underlying scans.
 
 <!--block:B0130-->
 The implementation includes the L7014 mosaic pipeline, the Indochine frame and corner-reading
-pipeline, the series-index migrations, and the checks described in §7. The figures ledger records
+pipeline, the 1:100,000 frame, calibration and placement pipeline
+(`scripts/indochine100k_georef.py`), the series-index migrations, and the checks described in §7. The figures ledger records
 the source and measurement date of every number quoted in this paper. The serving archive is also
 versioned separately from a proposed correction: reproducibility requires readers to distinguish
 the evidence measured on the current layer from the dry run that supports its rebuild.
