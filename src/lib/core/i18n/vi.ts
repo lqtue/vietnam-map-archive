@@ -144,8 +144,8 @@ export const vi: Record<string, string> = {
     "Dữ liệu cấp phép mở (CC-BY / ODbL) và mã nguồn mở. Các bản scan ghi nhận bản quyền từ các thư viện gốc như Bibliothèque nationale de France, Đại học Côte d'Azur, UT Austin, Thư viện Quốc hội Hoa Kỳ và các đơn vị khác. Bất kỳ kho lưu trữ nào cũng có thể sao chép và triển khai độc lập.",
   "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL.":
     'Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc tiếp theo là đọc tên địa danh và số hóa công trình từ bản đồ thời kỳ thuộc địa vào dữ liệu mở, với sự kiểm duyệt thủ công. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL.',
-  "A featured sheet, whole. Pick another below, then open it in the viewer to lay it over today's city, or inspect the high-resolution IIIF scan up close. Each record links back to the library or collection that holds it.":
-    'Một bản đồ tiêu biểu. Chọn bản đồ bên dưới để xem chồng khớp lên thành phố hiện đại hoặc kiểm tra bản scan độ phân giải cao IIIF. Mỗi bản ghi liên kết trực tiếp đến thư viện lưu trữ gốc.',
+  'The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list.':
+    'Các bộ bản đồ mà kho lưu trữ giữ một phần, và nằm ở đâu. Chọn một bộ để xem những mảnh nào đã có, rồi mở trên bản đồ hoặc đọc danh sách mảnh.',
   "What's actually done →": 'Tiến độ thực tế →',
   'How this works': 'Cách thức hoạt động',
   'A scan of an 1882 survey, pinned to real coordinates, laid back over the ground it drew — then the plots traced off it and the names read off it. Drag the slider to move between the two cities.':

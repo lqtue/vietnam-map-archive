@@ -152,6 +152,17 @@ export interface SeriesTally {
   no_scan: number;
 }
 
+/**
+ * Whether "held of total" says anything. A survey's index is only a denominator
+ * if it lists sheets the archive does NOT have: the Indochine 1:100,000 2nd
+ * edition's index was built from the CartoMundi records we hold, so every cell
+ * is held and "197 of 197 — 100%" is true of the list and false of the survey.
+ * Nothing held-only can distinguish that from a survey we genuinely complete,
+ * and from our own rows we cannot know the second, so both say how many are
+ * held and stop there.
+ */
+export const hasDenominator = (t: SeriesTally): boolean => t.held < t.total;
+
 export function tally(sheets: SeriesSheetView[]): SeriesTally {
   return {
     total: sheets.length,

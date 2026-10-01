@@ -4,14 +4,21 @@
   One full scan at a readable size, its brief beside it, and a strip to switch
   between the featured maps. No OpenLayers: the front page shows the sheet, the
   viewer is one click away.
+
+  The strip also carries one tile per survey (`series`), after the sheets. A
+  survey is not a scan, so its plate is one of its own sheets as a sample, and
+  its brief says what is held and links to the coverage page and the map.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { MapListItem } from '$lib/data/maps/types';
+  import type { FeaturedSeries } from './homeCatalog';
+  import { cellCamera, hasDenominator } from '$lib/data/maps/seriesSheets';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
   import { mapHref, exploreHref } from '$lib/core/utils/mapSlug';
 
   export let maps: MapListItem[] = [];
+  export let series: FeaturedSeries[] = [];
   /** IIIF thumbnail URLs the page already resolved, keyed by map id. */
   export let thumbnails: Map<string, string> = new Map();
   export let favoriteIds: string[] = [];
@@ -19,32 +26,63 @@
 
   const dispatch = createEventDispatcher<{ toggleFavorite: string }>();
 
+  interface Tile {
+    id: string;
+    name: string;
+    /** The stamp on the tile: a year, or "Survey". */
+    stamp: string;
+    small?: string;
+    map?: MapListItem;
+    series?: FeaturedSeries;
+  }
+
   let selectedId: string | null = null;
 
-  $: selected = maps.find((m) => m.id === selectedId) ?? maps[0] ?? null;
+  /* `thumbnails` is read here, not in a helper, so that a thumbnail arriving
+     late repaints the tiles. */
+  $: tiles = [
+    ...maps.map((m): Tile => ({
+      id: m.id,
+      name: m.name,
+      stamp: String(m.year ?? '\u2014'),
+      small: thumbnails.get(m.id) ?? m.thumbnail ?? undefined,
+      map: m,
+    })),
+    ...series.map((s): Tile => ({
+      id: `series:${s.entry.key}`,
+      name: s.entry.name,
+      stamp: 'Survey',
+      small: s.thumbnail,
+      series: s,
+    })),
+  ];
 
-  function smallSrc(m: MapListItem): string | undefined {
-    return thumbnails.get(m.id) ?? m.thumbnail ?? undefined;
-  }
+  $: current = tiles.find((t) => t.id === selectedId) ?? tiles[0] ?? null;
+  $: selected = current?.map ?? null;
+  $: selectedSeries = current?.series ?? null;
 
   /** The plate: the one image on the page worth its own request. */
-  function largeSrc(m: MapListItem): string | undefined {
-    return atWidth(smallSrc(m), 1200);
-  }
+  const largeSrc = (small?: string) => atWidth(small, 1200);
 
   /**
    * The picker tiles are 132px wide, and the stored `thumbnail` column is
    * 800 — five of those was 715 kB of front page for five thumbnails. 400
    * still covers a 2x screen.
    */
-  function tileSrc(m: MapListItem): string | undefined {
-    return atWidth(smallSrc(m), 400);
+  const tileSrc = (small?: string) => atWidth(small, 400);
+
+  function fallbackToSmall(e: Event, small?: string) {
+    const img = e.target as HTMLImageElement;
+    if (small && img.src !== small) img.src = small;
   }
 
-  function fallbackToSmall(e: Event, m: MapListItem) {
-    const img = e.target as HTMLImageElement;
-    const small = smallSrc(m);
-    if (small && img.src !== small) img.src = small;
+  /** The survey on the map, framed to its own sheets — `/explore`'s `?series=` deeplink. */
+  function seriesMapHref(entry: FeaturedSeries['entry']): string {
+    const c = cellCamera(entry.bounds);
+    return (
+      `/explore?series=${encodeURIComponent(entry.key)}` +
+      `#@${c.lat.toFixed(4)},${c.lng.toFixed(4)},${c.zoom}z,0r`
+    );
   }
 
   /* Most sheets carry no `dc_description` yet. The share page (/catalog/[id])
@@ -86,16 +124,16 @@
   }
 </script>
 
-{#if selected}
+{#if current}
   <div class="fs">
     <div class="fs-main">
       <figure class="fs-plate">
-        {#key selected.id}
-          {#if largeSrc(selected)}
+        {#key current.id}
+          {#if largeSrc(current.small)}
             <img
-              src={largeSrc(selected)}
-              alt={selected.name}
-              on:error={(e) => fallbackToSmall(e, selected)}
+              src={largeSrc(current.small)}
+              alt={current.name}
+              on:error={(e) => fallbackToSmall(e, current?.small)}
             />
           {:else}
             <figcaption class="empty-state">No scan preview for this sheet yet.</figcaption>
@@ -104,67 +142,97 @@
       </figure>
 
       <div class="fs-brief">
-        <div class="fs-heading">
-          {#if selected.year}
-            <span class="fs-year">{selected.year}</span>
-          {/if}
-          <h3 class="fs-name">{selected.name}</h3>
-        </div>
+        {#if selectedSeries}
+          {@const entry = selectedSeries.entry}
+          <div class="fs-heading">
+            <span class="fs-year">Survey</span>
+            <h3 class="fs-name">{entry.name}</h3>
+          </div>
 
-        {#if facts.length}
-          <p class="fs-facts">{facts.join(' · ')}</p>
+          <!-- "N of N" when the index is only what we hold says nothing: see
+               `hasDenominator`. -->
+          <p class="fs-facts">
+            {#if hasDenominator(entry.index)}
+              {entry.index.held} of {entry.index.total} sheets held
+            {:else}
+              {entry.index.held} sheets held
+            {/if}
+          </p>
+
+          <p class="fs-desc">
+            A survey rather than a single sheet: its sheets are drawn together on the map, and the
+            coverage page shows where they sit and which are held. The picture is one sheet from it.
+          </p>
+
+          <div class="fs-actions">
+            <a class="chip is-primary" href={seriesMapHref(entry)}>Open on the map</a>
+            <a class="chip" href="/catalog/series/{encodeURIComponent(entry.key)}">Coverage</a>
+          </div>
+        {:else if selected}
+          <div class="fs-heading">
+            {#if selected.year}
+              <span class="fs-year">{selected.year}</span>
+            {/if}
+            <h3 class="fs-name">{selected.name}</h3>
+          </div>
+
+          {#if facts.length}
+            <p class="fs-facts">{facts.join(' · ')}</p>
+          {/if}
+
+          <p class="fs-desc" class:fs-desc-stand-in={!selected.dc_description}>{blurb}</p>
+
+          <div class="fs-actions">
+            <a class="chip is-primary" href={exploreHref(selected)}>Open in the viewer</a>
+            <a class="chip" href={mapHref(selected)}>Record</a>
+            {#if selected.source_url}
+              <a
+                class="fs-source"
+                href={selected.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View at {sourceLabel(selected)}<span aria-hidden="true"> ↗</span>
+              </a>
+            {/if}
+          </div>
         {/if}
-
-        <p class="fs-desc" class:fs-desc-stand-in={!selected.dc_description}>{blurb}</p>
-
-        <div class="fs-actions">
-          <a class="chip is-primary" href={exploreHref(selected)}>Open in the viewer</a>
-          <a class="chip" href={mapHref(selected)}>Record</a>
-          {#if selected.source_url}
-            <a
-              class="fs-source"
-              href={selected.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View at {sourceLabel(selected)}<span aria-hidden="true"> ↗</span>
-            </a>
-          {/if}
-        </div>
       </div>
     </div>
 
     <div class="fs-strip">
-      {#each maps as m (m.id)}
+      {#each tiles as tile (tile.id)}
         <div class="fs-tile-wrap">
           <button
             class="fs-tile"
-            class:active={m.id === selected.id}
-            aria-pressed={m.id === selected.id}
-            title={m.name}
-            on:click={() => (selectedId = m.id)}
+            class:active={tile.id === current.id}
+            aria-pressed={tile.id === current.id}
+            title={tile.name}
+            on:click={() => (selectedId = tile.id)}
           >
             <span class="fs-plate-sm">
-              {#if tileSrc(m)}
+              {#if tileSrc(tile.small)}
                 <img
-                  src={tileSrc(m)}
+                  src={tileSrc(tile.small)}
                   alt=""
                   loading="lazy"
-                  on:error={(e) => fallbackToSmall(e, m)}
+                  on:error={(e) => fallbackToSmall(e, tile.small)}
                 />
               {/if}
-              <span class="fs-tile-year">{m.year ?? '\u2014'}</span>
+              <span class="fs-tile-year">{tile.stamp}</span>
             </span>
-            <span class="fs-tile-name">{m.name}</span>
+            <span class="fs-tile-name">{tile.name}</span>
           </button>
-          {#if showFavorite}
+          {#if showFavorite && tile.map}
             <button
               class="fs-fav"
-              class:on={favoriteIds.includes(m.id)}
-              aria-label={favoriteIds.includes(m.id) ? 'Remove from favorites' : 'Add to favorites'}
-              on:click={() => dispatch('toggleFavorite', m.id)}
+              class:on={favoriteIds.includes(tile.id)}
+              aria-label={favoriteIds.includes(tile.id)
+                ? 'Remove from favorites'
+                : 'Add to favorites'}
+              on:click={() => dispatch('toggleFavorite', tile.id)}
             >
-              {favoriteIds.includes(m.id) ? '\u2665' : '\u2661'}
+              {favoriteIds.includes(tile.id) ? '\u2665' : '\u2661'}
             </button>
           {/if}
         </div>

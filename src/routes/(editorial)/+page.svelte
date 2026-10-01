@@ -19,13 +19,13 @@
 
   const { supabase, session } = getSupabaseContext();
 
-  /** The featured sheets and the count, server-rendered — see `+page.server.ts`. */
+  /** The surveys and the sheet count, server-rendered — see `+page.server.ts`. */
   export let data: PageData;
 
   let favoriteMaps: MapListItem[] = [];
   let favoriteIds: string[] = [];
   let thumbnails: Map<string, string> = new Map();
-  /** Only the Favorites tab ever waits: the featured set is already in the HTML. */
+  /** Only the Favorites tab ever waits: the surveys are already in the HTML. */
   let loadingFavorites = false;
   let filterCollection: 'featured' | 'favorites' = 'featured';
 
@@ -288,7 +288,7 @@
     description: metaDescription,
   });
 
-  $: displayedMaps = filterCollection === 'featured' ? data.featured : favoriteMaps;
+  $: displayedMaps = favoriteMaps;
 
   /**
    * Two client-side jobs, and neither blocks the page: the reader's favorites,
@@ -296,8 +296,6 @@
    * to be read out of an annotation one at a time.
    */
   async function loadReaderData() {
-    thumbnails = await resolveThumbnails(data.featured);
-
     if (!session?.user?.id) return;
     loadingFavorites = true;
     try {
@@ -337,8 +335,6 @@
       favoriteMaps = favoriteMaps.filter((m) => m.id !== mapId);
       return;
     }
-    const added = data.featured.find((m) => m.id === mapId);
-    if (added && !favoriteMaps.some((m) => m.id === mapId)) favoriteMaps = [...favoriteMaps, added];
   }
 
   onMount(loadReaderData);
@@ -514,7 +510,7 @@
           <h2 class="feature-title">{$t('The Catalog')}</h2>
           <p class="feature-description">
             {$t(
-              "A featured sheet, whole. Pick another below, then open it in the viewer to lay it over today's city, or inspect the high-resolution IIIF scan up close. Each record links back to the library or collection that holds it."
+              'The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list.'
             )}
           </p>
         </div>
@@ -525,7 +521,7 @@
           <Tabs
             label={$t('Which sheets')}
             tabs={[
-              { key: 'featured', label: 'Featured' },
+              { key: 'featured', label: 'Surveys' },
               { key: 'favorites', label: 'Favorites' },
             ]}
             active={filterCollection}
@@ -534,7 +530,7 @@
         {/if}
       </div>
 
-      <!-- No loading state for the featured set: it is in the HTML. Favorites
+      <!-- No loading state for the surveys: they are in the HTML. Favorites
            are the only thing this page still waits for. -->
       {#if filterCollection === 'favorites' && loadingFavorites}
         <p class="empty-state is-block">{$t('Opening the archive…')}</p>
@@ -543,9 +539,10 @@
           <h3>{$t('No favorites yet.')}</h3>
           <p>{$t('Heart any map and it lands here, on every device you sign in from.')}</p>
         </div>
-      {:else if displayedMaps.length > 0}
+      {:else if filterCollection === 'featured' ? data.series.length > 0 : displayedMaps.length > 0}
         <FeaturedSheet
-          maps={displayedMaps}
+          maps={filterCollection === 'featured' ? [] : displayedMaps}
+          series={filterCollection === 'featured' ? data.series : []}
           {thumbnails}
           {favoriteIds}
           showFavorite={!!session}

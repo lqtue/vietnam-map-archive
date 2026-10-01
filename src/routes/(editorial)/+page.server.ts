@@ -13,26 +13,53 @@
 
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
-import { fetchFeaturedMaps, fetchMaps, fetchPublishedMapCount } from '$lib/data/maps/service';
+import { fetchPublishedMapCount } from '$lib/data/maps/service';
+import { fetchSeriesIndex } from '$lib/data/maps/seriesIndex';
+import type { FeaturedSeries } from '$lib/features/catalog/homeCatalog';
 
-/** How many maps stand in for the featured set when nothing is flagged. */
-const FALLBACK_FEATURED = 6;
+/**
+ * The surveys, each with one of its own catalogued scans as the picture.
+ *
+ * Which surveys qualify is `fetchSeriesIndex`'s call, the same list /catalog's
+ * band shows, so a survey ingested tomorrow reaches the front page with nobody
+ * editing this file. A survey is a coverage map rather than a scan, so the
+ * picture is only a sample — the coverage map itself lives on the survey's page;
+ * the first sheet by name is stable between loads. A failure here is an empty
+ * section, never a broken front page.
+ */
+async function loadFeaturedSeries(
+  supabase: ReturnType<typeof adminClient>
+): Promise<FeaturedSeries[]> {
+  try {
+    const index = await fetchSeriesIndex(supabase);
+    return await Promise.all(
+      index.map(async (entry) => {
+        const { data } = await supabase
+          .from('maps')
+          .select('thumbnail')
+          .eq('series_key', entry.key)
+          .in('status', ['public', 'featured'])
+          .not('thumbnail', 'is', null)
+          .order('name')
+          .limit(1);
+        return { entry, thumbnail: data?.[0]?.thumbnail ?? undefined };
+      })
+    );
+  } catch (err) {
+    console.error('loadFeaturedSeries:', err);
+    return [];
+  }
+}
 
 export const load: PageServerLoad = async () => {
   // The service key, so no row-level policy applies — every query here filters
   // by status itself, and a draft must never reach the front page.
   const supabase = adminClient();
 
-  const [featured, mapCount] = await Promise.all([
-    fetchFeaturedMaps(supabase),
+  const [mapCount, series] = await Promise.all([
     fetchPublishedMapCount(supabase),
+    loadFeaturedSeries(supabase),
   ]);
 
-  // An archive with nothing flagged featured still has a front page.
-  if (featured.length === 0) {
-    const published = (await fetchMaps(supabase)).filter((m) => m.status !== 'draft');
-    return { featured: published.slice(0, FALLBACK_FEATURED), mapCount };
-  }
-
-  return { featured, mapCount };
+  return { mapCount, series };
 };

@@ -15,6 +15,7 @@
   import { t } from '$lib/core/i18n';
   import { createEventDispatcher } from 'svelte';
   import type { SeriesIndexEntry } from '$lib/data/maps/seriesIndex';
+  import { hasDenominator } from '$lib/data/maps/seriesSheets';
 
   export let series: SeriesIndexEntry[] = [];
   export let dense: boolean = false;
@@ -63,11 +64,15 @@
                too and carry no year here — so it says what it counts. -->
           {#if years}<span>{$t('catalogued {years}', { years })}</span>{/if}
           <span>
-            {$t('{held} of {total} sheets — {pct}%', {
-              held: s.index.held,
-              total: s.index.total,
-              pct: pct(s.index.held, s.index.total),
-            })}
+            {#if hasDenominator(s.index)}
+              {$t('{held} of {total} sheets — {pct}%', {
+                held: s.index.held,
+                total: s.index.total,
+                pct: pct(s.index.held, s.index.total),
+              })}
+            {:else}
+              {$t('{held} sheets held', { held: s.index.held })}
+            {/if}
           </span>
         </span>
       </a>

@@ -1,0 +1,22 @@
+{
+  "series-l7014-vietnam-1-50-000": {
+    "file": "/images/coverage/series-l7014-vietnam-1-50-000.webp",
+    "bbox": [99.35779, 7.24774, 112.14221, 24.42432]
+  },
+  "indochine-1-100-000-1st-edition-sgi-1900-1947": {
+    "file": "/images/coverage/indochine-1-100-000-1st-edition-sgi-1900-1947.webp",
+    "bbox": [99.51676, 8.04433, 111.61157, 24.2753]
+  },
+  "indochine-1-100-000-2nd-edition-sgi-1947-1959": {
+    "file": "/images/coverage/indochine-1-100-000-2nd-edition-sgi-1947-1959.webp",
+    "bbox": [99.50602, 8.04349, 111.60082, 24.27453]
+  },
+  "indochine-1-25-000-tonkin-thanh-hoa": {
+    "file": "/images/coverage/indochine-1-25-000-tonkin-thanh-hoa.webp",
+    "bbox": [105.19489, 19.44267, 107.01789, 21.83541]
+  },
+  "ams-l909-viet-nam-city-maps-1-12-500": {
+    "file": "/images/coverage/ams-l909-viet-nam-city-maps-1-12-500.webp",
+    "bbox": [102.36585, 10.01921, 111.03755, 21.69633]
+  }
+}

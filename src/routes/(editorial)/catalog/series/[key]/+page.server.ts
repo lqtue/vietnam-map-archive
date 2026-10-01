@@ -132,6 +132,13 @@ function distinctPrintings(printings: SheetPrinting[]): number {
   return whole + pairs + (pairs ? 0 : assembled);
 }
 
+/** The smallest box holding both; either may be absent. */
+function unionBox(a?: number[] | null, b?: number[] | null): number[] | undefined {
+  if (a?.length !== 4) return b?.length === 4 ? b : undefined;
+  if (b?.length !== 4) return a;
+  return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])];
+}
+
 export const load: PageServerLoad = async ({ params }) => {
   const key = decodeURIComponent(params.key);
   const supabase = adminClient();
@@ -164,15 +171,19 @@ export const load: PageServerLoad = async ({ params }) => {
    */
   const { data: rows } = await supabase
     .from('maps')
-    .select('id,name,year,sheet_number,sheet_half,extra_metadata')
+    .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox')
     .eq('series_key', key)
     .in('status', ['public', 'featured'])
     .not('sheet_number', 'is', null)
     .order('year', { ascending: true });
 
   const printings: Record<string, SheetPrinting[]> = {};
+  /** Per cell, the union of the georeferenced records' boxes — see `coverage` below. */
+  const reach: Record<string, number[]> = {};
   for (const row of rows ?? []) {
     if (!row.sheet_number) continue;
+    const box = unionBox(reach[row.sheet_number], row.bbox);
+    if (box) reach[row.sheet_number] = box;
     // `edition`/`scan_provenance` have no columns of their own (mig 095) — only
     // `sheet_number`/`sheet_half` moved off `extra_metadata`.
     const meta = (row.extra_metadata ?? {}) as {
@@ -231,11 +242,29 @@ export const load: PageServerLoad = async ({ params }) => {
     if (cell.length < 2 && !cell.some((p) => !p.held)) delete printings[number];
   }
 
+  /**
+   * Where each cell sits, for the coverage map.
+   *
+   * `series_cells.bbox` is the extent of ONE record — for a cell printed as a
+   * west and an east half that is half a cell, so the map showed the 1:100,000's
+   * halves as a ragged scatter while /explore, which draws every record at its
+   * georeference, showed a continuous quilt. The cell's box joined with its
+   * records' boxes is the footprint /explore actually paints. Rounded to three
+   * decimals (about 100 m): the payload is ~200–600 boxes.
+   */
+  const coverage = sheets.map((s) => ({
+    bbox:
+      unionBox(s.bbox ?? undefined, reach[s.sheet_number])?.map((n) => Math.round(n * 1e3) / 1e3) ??
+      null,
+    status: s.status,
+  }));
+
   // Prose about the survey itself, when it has been written. Undefined is a
   // normal state — the page renders no panel rather than an empty one.
   return {
     series,
     sheets,
+    coverage,
     counts: tally(sheets),
     editions,
     printings,
