@@ -289,5 +289,94 @@ Owner-labelled 2026-10-01; 3 unsure dropped.
 (`arsenal_quay`, now calibrate) is not in it, so batch 4 does not measure the fix. It shows v3 did
 not break the unseen windows, edge points included. The Arsenal gain (36/50 to 50/50) rests on
 spent points in a window v3 was tuned on, and v3 was partly selected on unseen-box flip counts
-(above). Small batches: the lower bound at 74 points is 95%. Not done: the 1898 transfer. No layer
+(above). Small batches: the lower bound at 74 points is 95%. Not done here: the 1898 transfer (next section). No layer
 is approved. This task is tracked under `river-reconstruction` in [ROADMAP.md](ROADMAP.md).
+
+## River pass, 1898 (2026-10-02)
+
+The 1882 pass, code unchanged in its logic, run on the 16267 x 14859 Bertaux sheet
+(`20ec4f9a`). Native raster pinned in `native.json` (`rgb_sha256` `0538ff83...`, 3776 tiles;
+all nine 1898 window crops hash identically when cut from it, `export.py --verify 1898`). Sheet
+spec in `windows.json` `sheets.1898`: legend swatches (read off the native legend), neatline
+(`[700, 790, 14928, 13380]`: the four-line frame is tilted and keystoned, so the box lies inside
+the innermost line at all four sides), furniture (title, scale bar with credit, legend). Features
+by `sheet_features.py --sheet 1898` (2.5 GB, 95 s); the pass takes 160 s and 2.5 GB. Nothing
+needed tiling. **Discipline:** the five `seen: false` heldout windows (`quay_canal`,
+`creek_north`, `bridge_label`, `dry_salmon`, `hatched_bank`) were never cropped or viewed. Every
+whole-sheet image I opened had them painted black, and to keep that true after I was gone the
+previews that `sheet_features.py` and `river_pass.py` write now blank them as well
+([`view.py`](../work/analysis/river_ref/view.py)); no count taken inside one gated a decision.
+
+### How 1898 draws, against 1882
+
+| | 1882 | 1898 |
+|---|---|---|
+| Machine ruling | land hatch 4.48 px, buildings 3.55 px, salmon 5.09 px, all at 144 deg | **5.9-6.0 px at 45 deg**, the same for salmon, blue, green and grey hatch (225 of 245 strongly ruled 64 px cells in a 1200 x 1000 land crop sit at 6.0 px / 45 deg); building fills are flat wash, 2.95 px is only the second harmonic |
+| Ripples | hand engraved, 6-28 px, follow the bank, ink same blue as the military ruling | engraved contours, **graded**: 4-6 px at the bank, 12-19 px mid-river (water_core 11.5-19, median 16), lines run across the whole width of the open river; in a creek they are concentric and end in a blank centre |
+| Bank | no ink line, ripples stop | **a dense blue band** (line pitch about 4 px for 25-60 px, growing smoothly), so the outermost line is a printed bank. Water is `blue` in the wash labels (89-96% of marked pixels on open_bank and water_core) |
+| Structure ink | same blue as the water | landing stages and buildings are hatched in **neutral black** (OD blue/red about 1.0, at 45 and 135 deg); water lines run 0.2-0.6 at the bank |
+| Paper, pigments | paper 226, 213, 190; ink brownish | paper 247, 240, 219; ink neutral; legend has the same five swatches (blue, grey, blank, green, salmon) and unmixing picks the right wash on the calibrate windows |
+
+Things that look like ripples: the 6 px ruling itself when a creek bank runs at 45 degrees (the
+Gabor reads some interior creek lines as ruled and leaves five blank ovals, 20-30 px across, in
+`creek_west`); the pier hatching at 135 degrees (first run: pier arms filled as water blobs);
+tramway and rail lines (parallel pairs, review only); letter-spaced lettering; and the military
+building hatch in `dry_blue`.
+
+### What became per sheet
+
+`sheets.<id>.ruling` in `windows.json`; `river_pass.sheet_ruling` supplies 1882's values when a
+key is absent, so 1882 needs none (they are written out for 1882 too, as they stood).
+
+| key | 1882 | 1898 |
+|---|---|---|
+| `spacing` (FFT band of the cell test) | 4.0-5.6 | 5.2-6.8 |
+| `periods` (per-pixel Gabor) | 4.48, 3.55 | 5.95, 2.95 |
+| `angle`, `tol` | 144, 8 | 45, 8 |
+| `structure` | none | `rel` 0.6, `odr` 0.8, `close` 4, `open` 6 |
+
+`structure` is the one addition: dark (grey/paper < 0.6), neutral (OD blue >= 0.8 red) pixels,
+closed (r 4) and opened (r 6), dilated by `SOLID_PAD`, join the solid-structure cut-out. Absent
+for 1882, which hatches structures in the water's own blue. Every other constant is unchanged,
+including `GABOR_SIGMA` 4, `SEED_SPACING` 6.5 and the cell thresholds. **1882 is bit-identical**:
+`water.png` rerun after the change `cmp`s equal to `water-1006337f.png`. Self-check has two new
+cases (6 px at 45 deg ruled and 11 px ripples not; a black-hatched pier cut out only when
+`structure` is set) and passes for both sheets' settings.
+
+### Calibrate-window results (viewed, not scored)
+
+`water-b7ff0618.png`: 16.20 M water px, 18 285 review px (7 bodies). One tuning step only: the
+first run (no `structure`) left the piers of `open_bank` half-filled with water blobs; with it
+they are cut out cleanly, and nothing else in the four windows moved.
+
+- **`water_core`** 100% water. **`open_bank`** 85.5% water: the whole river across 1000 px, both
+  banks followed to the outermost bank-band line, the five T-shaped landing stages and the
+  `RIVIERE DE` lettering cut out as holes (bold lettering is cut out as in 1882). A few water
+  blobs stick onto the lettering `ATELIERS ... VIALES` ashore.
+- **`creek_west`** 15.8% water: the branching creek with its side channels, the thin southern
+  reach under `Binh`, the two bank spikes, all with outlines on the bank band; the salmon-hatched
+  land at right untouched. Weak: the five blank ovals inside the creek (ruled-confusion, above)
+  and a few pixels of straight edge at two junctions.
+- **`dry_blue`** 0% water; the blue parcels' diagonal hatching is ruled and ignored. One review
+  body, the long hatched hospital block at the window's bottom left.
+- **Outside the windows**, whole-sheet overlay with the heldout boxes black: the Saigon River,
+  the Arroyo de l'Avalanche, the northwest creek system and the Arroyo Chinois mouth are found;
+  the river's east-bank shoals are blobbed. **Missed:** the narrowest creek heads (one to three
+  lines wide, in the northwest and at the west edge) and the hatched "Canal de ceinture" strip,
+  the same limit as 1882's thin creeks. These are my reading of overlays, not a score.
+
+### Review bodies awaiting the owner
+
+Seven, in `river/review.jpg` (`work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/`, built
+by `review_sheet.py`; raw crop beside the outlined one). None touches a heldout window, so all
+are drawn. By eye: #1 and #2 military building complexes inside the blue-wash hospital land (#2
+is the `dry_blue` block above); #3, #4 and #5 the tramway and rail tracks (pairs of parallel
+lines) with no water pixels; #6 and #7 the letter-spaced lettering `Khanh Hoi`. I expect all seven
+to be dry, but they are the owner's to call: a confirmed answer is a point in `confirmed.json`.
+
+### Batch 1
+
+80 points, seed 1, `label.py points 1898 --seed 1 --per 8 --edge water-b7ff0618.png --edge-per 10
+--band 30`: 8 uniform in each of the five heldout windows and 10 within 30 px of the proposal's
+edge in each that has one (`quay_canal`, `creek_north`, `bridge_label`, `hatched_bank`: 18 each;
+`dry_salmon` has no edge, 8). Not viewed, not served, not scored. **Batch 1 pending owner labels.**

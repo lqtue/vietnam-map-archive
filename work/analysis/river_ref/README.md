@@ -18,7 +18,8 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
 - `windows.json` — 1882: 14 water windows and 6 road windows (`"layer": "road"`); 1898: 9 water
-  windows. Each has a case and a split. `calibrate` windows may fit the appearance model;
+  windows. `sheets.<id>` also carries the sheet's legend, neatline, furniture and `ruling` (the
+  machine-ruling constants river_pass.py reads; 1882's are its defaults). Each has a case and a split. `calibrate` windows may fit the appearance model;
   `heldout` are scored once. `seen: true` marks a window already used in a 2026-10-01
   diagnostic — **not clean held-out**, whatever its split says. The four 1882 water windows and
   six road windows added later on 2026-10-01 were placed on the bare sheet, before any proposal existed.
@@ -26,7 +27,11 @@ The tracing workflow below still works, and is kept for any window that needs a 
   RGB SHA-256; committed) and creates an empty `traces/<sheet>-<id>.geojson` where none exists.
   `export.py --full 1882` writes the whole sheet at native to `work/ocr/outputs/<map_id>/native.png`
   (gitignored) and pins its SHA-256 in `native.json`; every 1882 window crop hashes identically
-  when cut from it. Both read raw tile bytes (`river_pair/eda.py`), never the re-encoding cache.
+  when cut from it, as does every 1898 one: `export.py --verify <sheet>` re-cuts each window from
+  `native.png` and compares the hashes (hashes only). Both read raw tile bytes (`river_pair/eda.py`), never the re-encoding cache.
+- `view.py SHEET out.jpg [--scale 8 | --box X Y W H]` — look at a sheet without leaking a heldout
+  window: boxes with `seen: false` are painted black, and a crop that touches one is refused. The
+  feature and river previews use its `blank`. Setting `seen: true` is the record that someone looked.
 - `traces/` — the hand traces, committed, GeoJSON Polygons in **source pixels**. Classes:
   `water` (in water windows; extra rings are islands, landings, piers), `block` (in road windows:
   every face that is **not** road) and `ignore` (both). Water windows: land is the complement.
