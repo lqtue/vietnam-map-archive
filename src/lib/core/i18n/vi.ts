@@ -244,9 +244,12 @@ export const vi: Record<string, string> = {
     'Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không.',
   'catalogued {years}': 'biên mục {years}',
   '{held} of {total} sheets — {pct}%': '{held} trên {total} mảnh — {pct}%',
+  '{held} sheets held': '{held} mảnh đang có',
   'Series details': 'Thông tin bộ bản đồ',
   'The archive holds {held} of this survey’s {total} sheets — {pct}%.':
     'Kho lưu trữ có {held} trên {total} mảnh của bộ này — {pct}%.',
+  'The archive holds {held} sheets of this survey. Its full sheet list is not imported yet, so how much that is of the whole is not known.':
+    'Kho lưu trữ có {held} mảnh của bộ này. Danh sách đầy đủ các mảnh chưa được nhập, nên chưa biết đó là bao nhiêu phần của toàn bộ.',
   '{N} held': '{N} mảnh đang có',
   '{N} scan identified, not yet fetched': '{N} đã xác định bản quét, chưa tải về',
   '{N} no known scan': '{N} chưa rõ bản quét',
