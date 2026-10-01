@@ -27,7 +27,7 @@ score exists.** Everything here is source pixels from `iiif.maparchive.vn` fixed
 
 | Thing | Water layer | Road layer |
 |---|---|---|
-| Printed bank or street edge line | the edge is the **centre of the line** | same |
+| Printed bank or street edge line | the edge is the **centre of the line**, thick or thin (1882 draws each block's lower-right sides ≈3 px, upper-left ≈1.5 px: a shadow line; the difference is under 1 px) | same |
 | Bridge | `ignore` | road (leave untraced) |
 | Quay road along water | land | road, stops at the water |
 | Lettering | in water: `ignore`; on land: nothing to trace | in a street: road (leave untraced) |
