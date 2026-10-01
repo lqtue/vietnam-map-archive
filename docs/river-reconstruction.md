@@ -192,6 +192,21 @@ missed water 2/52, false water unchanged at 6/237; unseen held-out 98.8% [96–1
 misses were in confirmed reaches. Left: the five quay points, one basin miss and one basin false
 point, and one water point in `blue_domain` more than 150 px from any proposed water.
 
-Not done: the 1898 transfer, the quay fix (to be scored on a fresh point batch, since these 300
-are now spent on two runs), an edge-stratified batch. No layer is approved. This task is tracked under `river-reconstruction` in
+**Fresh batch, edge-stratified (seed 2, 2026-10-01).** 156 new points in the held-out windows:
+108 within 30 px of the `15995ce3` water edge, 48 uniform; committed before labelling, labelled
+by the owner (7 unsure, bridges dropped). The same version, scored once:
+
+| Group | Accuracy [95% CI] | Missed water | False water |
+|---|---|---|---|
+| all (edge-weighted, so harder than the sheet) | 95.3% [91–98] (141/148) | **0/43** | 7/105 |
+| edge stratum, within 30 px | 94.1% [88–97] | 0/38 | **6/63** |
+| uniform stratum | 97.9% [89–100] | 0/5 | 1/42 |
+
+Every error is false water, every one within 61 px of the proposal's edge and five of seven
+within 22 px: **the edge sits outside the bank, never inside it.** The bias is one-sided, so it is
+a placement fault (closing radius, core cells, hole filling), not a detection fault. Quays, the
+canal and creeks all show it. Both batches are now spent on this version.
+
+Not done: the edge fix (tune on calibrate windows, score on a third batch), the 1898 transfer.
+No layer is approved. This task is tracked under `river-reconstruction` in
 [ROADMAP.md](ROADMAP.md).
