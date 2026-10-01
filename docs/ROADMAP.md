@@ -324,8 +324,30 @@ system — what a result must retain, and the two kinds of check — is in the r
       `attested-variants` build on its `claim_evidence` rather than beside it. Exit: a public
       claim opens its exact source region; the packet survives an OCR or georeference correction;
       draft evidence stays private. Plan: `docs/evidence-chain-plan.md`.
+- [ ] **`georef-versions`** — the georeference is not a database object. GCPs, transformation,
+      mask and RMSE exist only inside `annotations/<id>.json`; only `geom_src` and a copied
+      `geom_rmse` reach the DB. One table, one row per stored version, appended by every writer
+      (`mirrorAnnotation`, the neatline PATCH, the sync script, the pipeline georef scripts). Exit:
+      one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
+      stale labels. Plan: `docs/knowledge-system-plan.md` §5.
+- [ ] **`rewarp-on-sync`** — a synced georeference leaves its labels on the old one. Measured
+      2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. One-off repair is
+      `scripts/oneoff/fix_saigon_1942_1968.mjs`; the item is making the sync script and
+      `mirrorAnnotation` queue the `warp` job themselves. Exit: after a sync, no label or footprint
+      on that map carries an old `geom_src`.
+- [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
+      neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
+      writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
+      uses a bare "mask" for more than one.
 
 ## Survey layer and catalog
+
+- [ ] **`series-identity`** — `maps.collection` is the series key by accident: `series_key()` folds
+      the display string, so editing it re-files the sheet. Add a generated `maps.series_key`, fill
+      `sheet_number` on the 188 first-edition rows that carry it only in `extra_metadata`, and give
+      curated non-survey groups (the city plans) their own concept. Gated on the `evidence-chain`
+      pilot. Exit: no series fact lives only in `extra_metadata`. Plan:
+      `docs/knowledge-system-plan.md` §1.
 
 - [ ] **`multi-printing-cells`** — `series_sheets` can name only one printing of a cell. Its key is
       `(series_key, sheet_number)`, one row per cell — but the archive holds **10 cells in more than

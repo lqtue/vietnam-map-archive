@@ -154,6 +154,9 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
   that taught it and a date. Read before any unattended run, any database write, or any pass that
   produces a number
 - `docs/search-plan.md` — label search · temporal fabric · period sources (**Search** detail)
+- `docs/knowledge-system-plan.md` — **the object model the other plans each take a slice of**:
+  every object (sheet, scan, georeference, GCPs, masks, labels, polygons), how each is classified,
+  every link with its fill rate, and the ranked gaps (`georef-versions`, `rewarp-on-sync`, …)
 - `docs/evidence-chain-plan.md` — claim → reading → pixels → provider, piloted on the 1882 sheet:
   what the schema already carries, the citation invariants, the delivery order (`evidence-chain`)
 - `docs/walk-plan.md` — the walk-through surface (**Walk**): HACW forked for a District 4 route,
