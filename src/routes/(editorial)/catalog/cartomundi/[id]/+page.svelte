@@ -278,7 +278,7 @@
   .facts {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-    gap: var(--space-3) var(--space-5);
+    gap: var(--space-3) var(--space-4);
     margin: 0;
   }
   .facts div {
