@@ -15,7 +15,7 @@
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
   import { onMount, tick } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
   import { layersStore } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
   import type { MapSeries } from '$lib/data/maps/types';
@@ -104,19 +104,30 @@
    * address) or the raster archive (`l7014`) — because a reader copying a key
    * out of one of those URLs should not have to know which half they took.
    *
-   * Consumed once: the param is dropped from the URL after it is applied, or a
-   * reload would put back the survey the reader had just taken off.
+   * `solo=1` is used by the series catalogue's map button. It replaces any
+   * previously selected historical layers so the link shows only that survey.
+   * Consumed once: the params are dropped from the URL after they are applied,
+   * or a reload would put back the survey the reader had just taken off.
    */
   function applySeriesParam() {
     const url = new URL(window.location.href);
     const key = url.searchParams.get('series');
     if (!key) return;
+    const solo = url.searchParams.get('solo') === '1';
     url.searchParams.delete('series');
+    url.searchParams.delete('solo');
     replaceState(url, {});
     const row = visibleSeries.find((r) => r.key === key || r.seriesKey === key);
+    if (!row) return;
+    if (solo) {
+      layersStore.clearOverlays();
+      if (get(layersStore).base.kind === 'historical') {
+        layersStore.setBase({ kind: 'basemap', key: 'g-streets' });
+      }
+    }
     // Already on the stack is not a failure — the reader has it, and
     // `addOverlay` would refuse the duplicate anyway.
-    if (row) layersStore.addOverlay(row.ref);
+    layersStore.addOverlay(row.ref);
   }
 
   /** Tap to put the survey on the map, tap again to take it off. */

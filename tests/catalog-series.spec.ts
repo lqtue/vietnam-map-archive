@@ -178,6 +178,50 @@ test('"Open in map" actually puts the survey on the map', async ({ page }) => {
   await expect(page.getByRole('button', { name })).toBeVisible({ timeout: 20000 });
 });
 
+test('a series page opens its survey alone, clearing a previously selected survey', async ({
+  page,
+}) => {
+  await page.goto('/catalog/series');
+  const hrefs = await page
+    .locator('a[href^="/catalog/series/"]')
+    .evaluateAll((links) => [
+      ...new Set(links.map((link) => link.getAttribute('href')).filter(Boolean)),
+    ]);
+  expect(hrefs.length).toBeGreaterThan(1);
+
+  const previousKey = hrefs[1]!.split('/').pop()!;
+  await page.goto(`/explore?series=${previousKey}`);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem('vma-layers-v1') || '{}').overlays?.length
+      )
+    )
+    .toBe(1);
+  const previousRefKey = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('vma-layers-v1') || '{}').overlays[0].ref.key
+  );
+
+  await page.goto(hrefs[0]!);
+  const link = page.getByRole('link', { name: 'Open in map' });
+  await expect(link).toHaveAttribute('href', /\/explore\?series=.+&solo=1#@/);
+  await link.click();
+  await expect
+    .poll(() =>
+      page.evaluate((oldKey) => {
+        const layers = JSON.parse(localStorage.getItem('vma-layers-v1') || '{}');
+        return {
+          count: layers.overlays?.length,
+          kind: layers.overlays?.[0]?.ref.kind,
+          oldPresent: layers.overlays?.some(
+            (overlay: { ref: { key: string } }) => overlay.ref.key === oldKey
+          ),
+        };
+      }, previousRefKey)
+    )
+    .toEqual({ count: 1, kind: 'series', oldPresent: false });
+});
+
 test('a query puts the band away too', async ({ page }) => {
   await page.goto('/catalog');
   await ready(page);
