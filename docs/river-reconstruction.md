@@ -273,10 +273,21 @@ unseen boxes. An intermediate setting (a softer rule without the area condition)
 labelled-water points to land in unseen windows; I rejected it on that count alone, and fixed the
 bridge-deck loss on windows I am allowed to see.
 
-**Batch 4 (seed 4), pending owner labels.** 77 points from `label.py points 1882 --seed 4
+**Batch 4 (seed 4).** 77 points from `label.py points 1882 --seed 4
 --unseen --per 3 --edge water-1006337f.png --edge-per 8 --band 30`: heldout windows with `seen: false`
 only, 11 each in `chinois_quay`, `creek_nw`, `arsenal_basin`, `charner_canal`, `avalanche_head` and
 the road windows `quay_rondpoint`, `outskirts_rail` (3 uniform + 8 within 30 px of the v3 edge).
-Committed unlabelled in `points-1882.json`; v3 is scored on it once, after the owner labels it. Not
-done: the batch score, the 1898 transfer. No layer is approved. This task is tracked under
-`river-reconstruction` in [ROADMAP.md](ROADMAP.md).
+Owner-labelled 2026-10-01; 3 unsure dropped.
+
+| v3 (`1006337f`) on batch 4 | accuracy | missed water | false water |
+|---|---|---|---|
+| all | **100.0% [95-100] (74/74)** | 0/32 | 0/42 |
+| edge stratum | 100.0% [93-100] (53/53) | 0/25 | 0/28 |
+| `quay` (`chinois_quay`) | 100.0% [72-100] (10/10) | 0/6 | 0/4 |
+
+**What this does and does not show.** v2 also scores 74/74 on batch 4: the fix's region
+(`arsenal_quay`, now calibrate) is not in it, so batch 4 does not measure the fix. It shows v3 did
+not break the unseen windows, edge points included. The Arsenal gain (36/50 to 50/50) rests on
+spent points in a window v3 was tuned on, and v3 was partly selected on unseen-box flip counts
+(above). Small batches: the lower bound at 74 points is 95%. Not done: the 1898 transfer. No layer
+is approved. This task is tracked under `river-reconstruction` in [ROADMAP.md](ROADMAP.md).
