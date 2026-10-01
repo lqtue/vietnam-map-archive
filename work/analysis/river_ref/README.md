@@ -7,6 +7,8 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 **The reference is now point labels, not traces** (owner, 2026-10-01):
 
 - `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
+  `--unseen` restricts it to heldout windows with `seen: false`, the only clean test; a window that
+  has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). Batch 4 (seed 4) is unlabelled.
 - `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.

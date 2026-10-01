@@ -3,6 +3,7 @@
   label.py points SHEET [--per 25] [--seed 1]   random points in the sheet's heldout windows,
                                                 appended to points-<sheet>.json (stratum "uniform")
            [--edge MASK --edge-per 12 --band 30]  plus points near MASK's water edge (stratum "edge")
+           [--unseen]                            only heldout windows with seen:false (the clean test)
                                                 A batch is a seed; score a new version on a batch it
                                                 has not been scored on (score.py --seed).
   label.py serve SHEET [--port 8791]            labelling page at http://127.0.0.1:8791
@@ -27,7 +28,7 @@ CLASSES = {"w": "water", "r": "road", "l": "land", "b": "bridge", "s": "unsure"}
 CLOSE, CONTEXT = 120, 900   # source px either side shown; close-up at 4x, context at 1/2
 
 
-def points(sheet, per, seed, edge=None, edge_per=0, band=30):
+def points(sheet, per, seed, edge=None, edge_per=0, band=30, unseen=False):
     """A batch is a seed. --edge MASK adds edge_per points per window within `band` px of that mask's
     water edge (either side), where wrong edges live; a window with no edge gets none."""
     path = HERE / f"points-{sheet}.json"
@@ -36,7 +37,7 @@ def points(sheet, per, seed, edge=None, edge_per=0, band=30):
         sys.exit(f"seed {seed} already used: a batch is a seed, pick a new one")
     rng = random.Random(seed)
     wins = [w for w in json.loads((HERE / "windows.json").read_text())["windows"]
-            if w["sheet"] == sheet and w["split"] == "heldout"]
+            if w["sheet"] == sheet and w["split"] == "heldout" and not (unseen and w["seen"])]
     if edge:
         import numpy as np
         from PIL import Image
@@ -146,7 +147,7 @@ if __name__ == "__main__":
     opt = lambda k, d: int(a[a.index(k) + 1]) if k in a else d
     if a[:1] == ["points"] and len(a) >= 2:
         points(a[1], opt("--per", 25), opt("--seed", 1), a[a.index("--edge") + 1] if "--edge" in a else None,
-               opt("--edge-per", 0), opt("--band", 30))
+               opt("--edge-per", 0), opt("--band", 30), "--unseen" in a)
     elif a[:1] == ["serve"] and len(a) >= 2:
         serve(a[1], opt("--port", 8791))
     else:
