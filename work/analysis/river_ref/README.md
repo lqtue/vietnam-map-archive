@@ -8,16 +8,17 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 
 - `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
   `--unseen` restricts it to heldout windows with `seen: false`, the only clean test; a window that
-  has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). Batch 4 (seed 4) is unlabelled.
+  has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). `--only ID,ID` restricts a batch to named windows
+  (batch 5 is the three road windows added after the road pass was frozen). Batch 5 (seed 5) is unlabelled.
 - `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
-- `score.py --points 1882 <whole-sheet mask.png> [--layer road]` — score once per frozen version.
+- `score.py --points 1882 <whole-sheet mask.png> [--layer road] [--seed N[,N...]]` — score once per frozen version (a comma list pools batches).
   The water pass is `work/ocr/scripts/river_pass.py`; results in `docs/river-reconstruction.md`.
 
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
-- `windows.json` — 1882: 14 water windows and 6 road windows (`"layer": "road"`); 1898: 9 water
+- `windows.json` — 1882: 14 water windows and 9 road windows (`"layer": "road"`; `west_dense`, `msg_quay`, `ne_boulevard` added 2026-10-02 after the road pass was frozen); 1898: 9 water
   windows. `sheets.<id>` also carries the sheet's legend, neatline, furniture and `ruling` (the
   machine-ruling constants river_pass.py reads; 1882's are its defaults). Each has a case and a split. `calibrate` windows may fit the appearance model;
   `heldout` are scored once. `seen: true` marks a window already used in a 2026-10-01
@@ -84,5 +85,5 @@ The tracing workflow below still works, and is kept for any window that needs a 
    Re-import any time.
 
 Do one window first and import it, so the alignment can be checked before the rest.
-Not built: the river and road passes, and the multi-reviewer agreement check. Two people tracing
+The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (1882 only; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
 the same window is what tells you whether 5 px of edge error is the method or the tracing.

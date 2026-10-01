@@ -398,3 +398,137 @@ answered dry by the owner on 2026-10-02 (`confirmed.json`, 7 dry, 0 stale); the 
 and the review layer is empty.
 Not done: the narrow creek heads, the hatched "Canal de ceinture", a fresh 1898 batch after any
 edge fix. No layer is approved.
+
+## Road pass, 1882 (2026-10-02)
+
+[`work/ocr/scripts/road_pass.py`](../work/ocr/scripts/road_pass.py), commit `4ecf05fc`, on `paper.npy`, the
+water mask `water.png` and the cell layers `cells.npz`, `texture.npz`. Writes `river/road.png` (255 = road),
+`road-preview.jpg` (unseen heldout boxes black) and `road-run.json`. Deterministic (two runs `cmp` equal),
+229 s, 3.0 GB resident (3.95 GB peak footprint). `--self-check` builds one synthetic sheet (street with a pavement strip and kerb line, a closed blank block, a ruled
+block, a letter, a tramway, a creek with a deck, a garden patch) and makes eight checks; the pavement and tramway ones
+fail with `R_CORE` or `RED_OD` changed.
+
+### The representation, and why
+
+A street is the unfilled space between block outlines, so the pass finds that space and keeps what is
+street-shaped; it does not look for road texture, because there is none. Blocks are ruled (their hatch is ink
+every 4-5 px) or blank (paper closed by an outline), and the outline is the evidence that matters:
+
+1. **Ink** = grey / local paper below `INK_GREY` 0.92, grown 1 px. That is outlines, kerb lines, hatch of every
+   pigment, lettering and the red tramway. Ink components under `GLYPH` 60 px across (letters, numbers, the
+   city-limit crosses) are not walls.
+2. **Free space** = not ink, not water (`water.png` == 255, grown 2 px), inside the road neatline, outside the
+   furniture. Bridges are not water in that mask (the pass cut the decks out), so they are free or ink.
+3. **Core** = free space deeper than `R_CORE` 9 px from any wall, and not in a machine-ruled cell or a garden.
+   Hatch fills no core (lines every 4-5 px). **This is the pavement rule:** a pavement is a strip a few px
+   inside the block outline, bounded by a thin kerb line (measured 8-16 px wide, carriageway 20-30 px), so
+   it is narrower than `2 * R_CORE`, is not core, and the carriageway is what remains. The kerb line is read
+   from the scan as ordinary ink: nothing recognises it as a kerb. Where no kerb is drawn the strip and the
+   street are one wide space and all of it is road, which is the owner's "block's outer line" case.
+4. **Grow back**: the core is dilated `R_CORE + 2` steps through free space only (4-connected), so the road
+   returns to its lines and never crosses a kerb into the pavement beyond it.
+5. **Open fields** (free space deeper than `FAT` 70 px: the blank land outside the city limit, a bigger
+   plaza) are cut out with a margin; a street that flares into one stops there. Without this, the blank paper
+   outside the red limit line was the largest "road" on the sheet.
+6. **Tramway**: road on both sides of a red line (od(R) < 0.65 od(G)) is joined across it by a closing of
+   12 px, restricted to the tramway's own pixels.
+7. **Components**: a blank block is a paper face closed by its outline, so it is free space too. It is
+   separated from the street by its outline and is compact; the street network is long and thin. A component is
+   kept if area / (inscribed radius)^2 >= `SHAPE_MIN` 20, or it is as large as a network (`NET_AREA`
+   200 000 px), or it is thin and a little shorter (radius <= `LANE_R` 24 and ratio >= 12: a street cut by a
+   tramway or lettering).
+8. **Gardens** (owner: park paths and garden interiors are block): lawns and tree masses are unruled,
+   incoherent texture (`texture.npz` coherence < 0.3) in big dense patches; a patch is where 45% of a 7 x 7
+   cell window is stipple, at least 60 cells, closed over its paths. The paths are cut from the road
+   outright. This finds the Jardin de la Ville, the tree masses beside it and the Jardin Botanique.
+9. **Bridges** (after selection, so a deck cannot join a street to the blank lots beside it): a dark
+   hatched blob within 14 px of water (opened by 3 px, 150-8000 px) that touches the selected road on two
+   separate sides is added.
+
+Two sheet facts went into `windows.json` `sheets.1882.road`: the frame. The water pass's neatline is the
+outermost frame line; the map starts inside the inner thin line, 100 px further in at left and top. Measured
+from row and column dark profiles: inner line at x 597, y 555 and y 8298; the bottom is cut at y 7950, the top
+of the scale bar. The hand-drawn furniture boxes were tight, so they are padded by 100 px. Before this, slivers
+between the frame and those boxes were the longest "streets" on the sheet.
+
+Constants: `INK_GREY` 0.92, `INK_PAD` 1, `GLYPH` 60, `R_CORE` 9, `FAT` 70, `RED_OD` 0.65, `BRIDGE_REACH` 14,
+`BRIDGE_INK` 0.8, `BRIDGE_MIN`/`MAX` 150/8000, `SHAPE_MIN` 20, `NET_AREA` 200 000, `LANE_R` 24, `LANE_RATIO` 12,
+`GARDEN_COH` 0.3, `GARDEN_WIN` 7, `GARDEN_FRAC` 0.45, `GARDEN_MIN` 60 (all in `road-run.json`).
+
+### Tuning, and calibrate-window results (viewed, not scored)
+
+Tuned on `ne_cream`, `dense_grid`, `creek_crossing` and whole-sheet views with the unseen boxes blacked out.
+**No labelled point was used while tuning**, spent or not; no reviewed traces exist for any road window
+(`traces/1882-*.geojson` are empty, `reviewed: false`), so `score.py <dir> --layer road` has nothing to score.
+Road share of window: `ne_cream` 17.5%, `dense_grid` 9.1%, `creek_crossing` 7.4%; whole sheet 4.7%.
+
+- **`ne_cream`**: one street network, every blank block and the little plots inside the dense plot patch
+  dropped. Misses: one elongated blank plot kept, a narrow lane between plots lost.
+- **`dense_grid`**: the kerbed carriageways, not their pavement strips (the strips are separate pieces
+  and drop). Lettering "Bonnard" is road. The wide strip lettered "Bonnard" is a closed polygon
+  drawn with the block shadow-line convention; it is kept (long, thin) and may be a plot or canal, the owner's
+  call. Junction squares where kerb returns cut them off from the streets are lost.
+- **`creek_crossing`**: the street along the limit kept and the one bridge with road on both sides added; the outside blank paper
+  is cut; the tramway no longer splits the street at its crossing. Streets are still broken at "Rue" (a letter
+  touches the kerb line) and at the tramway where the pieces fail the shape test.
+
+### The first honest score (frozen `4ecf05fc`, run once, 2026-10-02)
+
+`score.py --points 1882 road.png --layer road`, all 635 labels (21 unsure dropped), bridge = road. **Accuracy
+does not beat the trivial answer**: 94.5% of the labelled points are not road (the points were drawn for the
+water layer: quays, creeks, plots), and "nothing is road" scores 94.5% [92-96].
+
+| | accuracy [95% CI] | missed road | false road |
+|---|---|---|---|
+| all batches | **85.7% [83-88] (526/614)** | **17/34 (50% [34-66])** | 71/580 (12.2% [10-15]) |
+| batches 2, 3, 4 (pavement rule) | **82.8% [78-86] (269/325)** | 9/16 (56% [33-77]) | 47/309 (15.2% [12-20]) |
+| batch 1 alone (predates the pavement rule) | 88.9% [85-92] (257/289) | 8/18 | 24/271 (8.9%) |
+| unseen heldout windows | 83.9% [80-87] (355/423) | 9/23 | 59/400 (14.8%) |
+| seen heldout / calibrate windows | 90.0% [84-94] / 88.2% [77-94] | 6/7, 2/4 | 8/133, 4/47 |
+| uniform / edge stratum | 89.7% [86-92] / 79.6% [74-84] | 10/22, 7/12 | 28/347, 43/233 |
+
+By window case, all batches: quay 81.6% [73-88] (3/7 missed, 18/107 false), `quay_plaza` (`quay_rondpoint`) 70.2%
+[57-80] (16/55 false), canal 82.3%, bridge_gap 84.6% (bridges: 1 of 4 road/bridge-labelled points found),
+outskirts (`outskirts_rail`) 84.5%, creek 88.5%, dry_land 93.1%, moat 96.7%, basin 96.7%. Only 34 points are road
+(5.5%), so every road-recall figure rests on single digits.
+
+**Wrong points** (88, all batches): 45 within 8 px of the proposal's edge, 78 within 24 px, ten farther: 34, 40,
+43, 79, 79, 84, 101 and three at 150 or more. All 71 false-road points are labelled `land` (none water), spread over
+the windows with the most edge points: `quay_rondpoint` 16, `chinois_quay` 14, `creek_nw` 8, `outskirts_rail` 7,
+`charner_canal` 7, `bridge_basin` 6, the other five windows 2-5 each. They sit within 24 px of an edge: strips beside
+quays, canals and creeks that the owner calls land (pavement, plot) and that the pass cannot tell from a quay
+road, because a quay pavement has no kerb line to stop on. The ten far errors are bodies, not edges: whole
+plots read as street or a street missed.
+
+I did not look at pixels in any unseen window to find out why; the diagnosis above is from counts by label and
+window only. The pass is **not good enough to promote**: half of road points are missed and a tenth of land
+points are called road. No layer is approved.
+
+### Weak spots (what the pass cannot do)
+
+- **Pavement and kerb line**: it can only honour a kerb that is drawn and wider than 8-16 px of carriageway
+  away from the block line; a pavement wider than 17 px, or a kerb the scan lost, is road; a street with no
+  kerb is road to its outlines. Nothing reads "kerb": a quay pavement against water is road if it is wide.
+- **Blank block vs street**: only shape tells them apart. A blank block that leaks through a gap in its outline,
+  an elongated blank plot (long thin plots read as lane), and a street drawn as a closed polygon with lettering
+  inside it (read as a plot) are wrong. Shadow-line thickness (thick lower-right side) was measured and is too
+  faint to separate them at this scale.
+- **Narrow lanes** under about 20 px between outlines (R_CORE 9), and single-line streets where no space is drawn.
+- **Lettering** that touches a kerb line or outline cuts the street there; removing such letters by stroke width
+  opened outline gaps and merged lots into streets, so it is not in the pass.
+- **Junction squares and small plazas** cut off by kerb returns, and compact open spaces generally; the
+  70 px open-field cut also clips plaza edges.
+- **Outskirts**: sparse plots, the blank land outside the limit and the west bank are the least reliable.
+- **Gardens**: the garden mask follows 32 px cells, so a garden edge is rough and some path may remain.
+
+### Batch 5 (seed 5): pending owner labels
+
+Three new road windows, placed after the pass was frozen and by eye on the 1/8 whole-sheet view (unseen
+boxes black), `seen: false`, clear of every unseen water box: `west_dense` (dense old quarter, [2700, 3600,
+1000, 1000]), `msg_quay` (Messageries Maritimes quay, [1700, 5800, 1000, 1000]) and `ne_boulevard` (a wide street
+NE of the Jardin de la Ville, [6300, 1600, 1000, 1000]; the case name is a guess). One slip: I had already
+viewed the 1/8 whole-sheet road preview (not the places at higher scale), so the windows were not placed before
+any proposal at all. 90 points, 30 per window (10 uniform, 20 within 30 px of the `road-4ecf05fc.png` edge):
+`label.py points 1882 --seed 5 --unseen --only west_dense,msg_quay,ne_boulevard --per 10 --edge road-4ecf05fc.png
+--edge-per 20 --band 30`. `--only` is new; without it, `--unseen` also takes in the seven unseen water windows
+and this command gives 300 points. **Batch 5 pending owner labels**; it was not viewed or scored.
