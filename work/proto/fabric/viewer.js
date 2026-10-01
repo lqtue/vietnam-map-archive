@@ -460,6 +460,35 @@ async function load() {
     // Mobile's top pill is the only thing visible with the sheet collapsed,
     // so the current selection has to surface there too, not just in the list.
     $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : 'Six sheets in view';
+    showBasis(l, focus);
+  }
+  // The same steps docs/system-graph.md draws for the whole archive, answered
+  // for the one sheet in focus from facts layers.json already carries.
+  function showBasis(l, index) {
+    const box = $('sheet-basis');
+    box.hidden = !l;
+    if (!l) return;
+    const g = l.georef;
+    const matched = links.filter(k => k.a === index || k.b === index);
+    const cited = matched.filter(k => k.d).length;
+    const items = [
+      ['Pinned to the real ground', g.exact
+        ? `${g.gcps} control points fit exactly, so its 0.0 m error says nothing about accuracy.`
+        : `${g.gcps} control points, ${g.rmse_m} m typical error.`, g.exact],
+      ['Paper stretch', `The two axes differ by ${g.scale_spread_pct}%; a single transform cannot absorb that.`, g.scale_spread_pct > 2],
+      ['Printed names read', `${l.n_labels.toLocaleString()} distinct names, read by OCR; some are not yet checked by a person.`, false],
+      ['Compared across years', `${matched.length} names match a neighbouring sheet${cited ? `, ${cited} with a Doling citation` : ''}.`, false],
+    ];
+    const h = document.createElement('h2'); h.textContent = `How ${l.year} was made`;
+    const dl = document.createElement('dl');
+    for (const [title, text, caution] of items) {
+      const dt = document.createElement('dt'); dt.textContent = title;
+      const dd = document.createElement('dd'); dd.textContent = text; if (caution) dd.className = 'caution';
+      dl.append(dt, dd);
+    }
+    const more = document.createElement('a'); more.href = 'https://github.com/lqtue/vietnam-map-archive/blob/main/docs/system-graph.md';
+    more.target = '_blank'; more.rel = 'noopener'; more.textContent = 'All seven steps ↗';
+    box.replaceChildren(h, dl, more);
   }
   function fitSheetInMobileView(index) {
     const corners = sheetCorners[index];
@@ -544,6 +573,7 @@ async function load() {
     shortcut.onclick = () => selectYear(index);
     $('sheet-shortcuts').append(shortcut); shortcutRows.push(shortcut);
   }
+  $('legend').append($('sheet-basis')); // after the sheet list, so the list does not jump when a sheet is focused
   restoreHomeContent = () => setFocusedYear(null);
   homeTarget = new THREE.Vector3(...toWorld([innerWidth <= 720 ? 400 : 570, 520], layerY(1923)));
   homeDistance = innerWidth <= 720 ? 700 : 500;

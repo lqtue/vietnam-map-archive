@@ -17,6 +17,12 @@ export interface Release {
   /** Plain-language changes. Three to six is the useful length. */
   changes: string[];
   current?: boolean;
+  /**
+   * ROADMAP item names this rests on (`docs/ROADMAP.md`), so the public page and
+   * the tracker cannot drift apart. `tests/work-items.spec.ts` fails on a name
+   * that is neither open nor in `docs/roadmap-record.md`.
+   */
+  items?: string[];
   /** Set when the version lived in an earlier repository. */
   legacy?: boolean;
   /**

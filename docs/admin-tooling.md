@@ -9,8 +9,9 @@ Admin controls live inline in `/catalog` (gated by `role === 'admin' | 'mod'`). 
 there is no `?v=` switch and no legacy view. It hits `/api/search` once per `q` / `include=scout`
 change; facet chips filter and re-tally client-side so chip toggles are instant.
 
-- `src/lib/ui/FacetRail.svelte` — multi-select chip groups with "all-but-this-dimension" tallies;
-  two-way binds the selection.
+- `src/lib/features/shared/catalogSearch.ts` — the facet tallies ("all-but-this-dimension" counts per
+  chip group); the chips themselves are rendered inside `CatalogUnifiedSearch.svelte`
+  (`FacetRail.svelte` was removed in the ui cleanup, e992dbc7).
 - `src/lib/features/catalog/CatalogTable.svelte` — the result rows (curated + scout).
   `src/lib/ui/CatalogGrid.svelte` / `CatalogCard.svelte` are the card-grid counterparts.
 - `src/lib/features/catalog/CatalogDetailDrawer.svelte` — row detail. Staff

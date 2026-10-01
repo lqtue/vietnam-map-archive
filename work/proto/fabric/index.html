@@ -67,6 +67,8 @@ a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{o
 h1{margin:0;font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.18}
 #thesis{margin:9px 0 0;max-width:40ch;color:var(--soft)}
 #status{margin:10px 0 0;font-size:11px;color:var(--mute)}
+#journey{margin:6px 0 0;font-size:11px}
+#journey a{color:var(--line);text-decoration:none}
 #current-sheet{display:none}
 #sheet-shortcuts{display:none}
 
@@ -93,6 +95,13 @@ strong{color:var(--ink);font-weight:600}
 .name[aria-pressed=true]{color:var(--warm);background:rgba(182,103,54,.1);box-shadow:inset 3px 0 var(--warm)}
 .name[hidden]{display:none}
 #instruction{margin:7px 0 0;color:var(--mute);font-size:11px}
+#sheet-basis{margin-top:12px;padding-top:12px;border-top:1px solid var(--faint)}
+#sheet-basis h2{margin:0 0 6px;font-size:11px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+#sheet-basis dl{margin:0}
+#sheet-basis dt{margin:8px 0 1px;font-size:11px;font-weight:650;color:var(--ink)}
+#sheet-basis dd{margin:0;font-size:11px;line-height:1.4;color:var(--mute)}
+#sheet-basis dd.caution{color:var(--warm)}
+#sheet-basis a{display:inline-block;margin-top:8px;color:var(--line);text-decoration:none}
 #nearby h2{margin:0 0 5px;font-size:13px;font-weight:650}
 #nearby p{margin:5px 0;color:var(--mute);font-size:11px;line-height:1.4}
 #nearby a{color:var(--line);text-decoration:none}
@@ -208,6 +217,7 @@ strong{color:var(--ink);font-weight:600}
   <p id="thesis">Six sheets, independently georeferenced and stacked by year.</p>
   <p id="current-sheet" aria-live="polite"></p>
   <p id="status">Loading scans…</p>
+  <p id="journey"><a href="journey.html">How the archive grew →</a></p>
 </header>
 <div id="sheet" class="panel" data-tab="sheets">
   <button id="sheet-handle" type="button" aria-expanded="false" aria-controls="sheet-body">
@@ -223,6 +233,7 @@ strong{color:var(--ink);font-weight:600}
     </nav>
     <section id="legend" class="sidebar-view" role="tabpanel" aria-labelledby="tab-sheets" aria-label="Map layers">
       <p id="instruction">Drag to move, scroll to zoom, Command-drag to rotate, or click a scan to inspect a place. Choose Stack to see the years in depth.</p>
+      <div id="sheet-basis" hidden></div>
     </section>
     <section id="controls" class="sidebar-view" role="tabpanel" aria-labelledby="tab-names" hidden>
       <input id="name-search" type="search" placeholder="Search shared names…" aria-label="Search shared names">

@@ -291,17 +291,46 @@ any one period of work, fix the lowest broken layer first.
 | **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `indochine-100k-licence` · `hue-rescans` · `gallica-text-harvest` |
 | **1. Holdings** | the map row, its scans and tiles, its address | `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
 | **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-rebuild` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
-| **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` |
+| **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
 | **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
 | **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` |
 | **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
 | **Outside the model** | operations, CI, the language of the UI | `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 7 unnamed lines under ROADMAP's Debt heading |
 
-That is 80 named items, plus the 7 unnamed debt lines, as of 2026-10-01.
+That is 81 named items, plus the 7 unnamed debt lines, as of 2026-10-01.
 
-**Reading the table.** Layer 3 holds the most items (19), but the layers are not equally healthy
+**Reading the table.** Layer 3 holds the most items (20), but the layers are not equally healthy
 underneath. Placement (layer 2) has 12 open items and three of them were stale or wrong this week,
 while layer 3's corpus is 22 OCR'd maps, of which 118 labels have been reviewed. So until
 `georef-versions` and `rewarp-on-sync` land, every new batch of readings rests on placement that
 nothing re-checks automatically.
 
+
+## 10. Showing the work beside the product (steps 1–2 built 2026-10-01; step 3 not)
+
+The public pages already exist: `/changelog` (`releases.ts`) and `/blog` (`posts.ts`), both in
+`(editorial)`. Each is hand-written and linked to nothing, so a release or a post can describe work
+that ROADMAP has since renamed or closed, which is the same drift §9 exists to prevent.
+
+**The join key is the item name.** Nothing else is needed:
+
+1. **Built.** An optional `items: string[]` on `Release` and on `BlogPost`, holding ROADMAP item
+   names. The 2026-09-23 post already names three.
+2. **Built** as `tests/work-items.spec.ts`. It fails when a name is in neither ROADMAP's open
+   items nor `docs/roadmap-record.md`. It catches typos and renames, and nothing else.
+3. **Not built.** Render "Work behind this" under a release or post. A standalone `/work` page waits until there
+   is something to say there.
+
+**What stays out.** No wiki or graph database: the model is already in this file and the names are
+already in ROADMAP. Public pages show a short plain-language label per item, never the eight
+engineering layers, which are an order of work and not reader language. Anything from `docs/private/`
+is never an item on a public page.
+
+**The blog inherits the evidence rule, not the layers.** A post is a layer-5 surface, so it follows
+`docs/evidence-chain-plan.md`: each factual claim cites an object (a map slug, a `georef_versions`
+stamp, an OCR run) instead of resting on a screenshot. It uses the tokens in `docs/design-system.md`
+and no separate blog theme.
+
+**Is it necessary?** No. The product works without it. It is worth doing once a post or release
+needs to claim "this rests on that work", which is what `docs/strategy.md` asks the public pages to
+show.

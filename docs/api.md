@@ -113,7 +113,7 @@ Public / other:
 - `/api/maps/[id]/legend-points/` — **public** GET. Numbered-legend references placed on the ground:
   each body numeral (`category = 'legend_ref'`) warped to lng/lat via the map's Allmaps
   georeference, joined to its `legend_entry` for a name. Legend-internal numbers are dropped.
-  Rendered by `src/lib/features/explore/LegendPointsLayer.svelte`.
+  Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`.
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
   small failed-job list). Admin or mod.
