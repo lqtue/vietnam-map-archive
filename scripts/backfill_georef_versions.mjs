@@ -64,6 +64,10 @@ const mapIds = onlyMap
       ]),
     ];
 
+for (const e of root)
+  if (e.id && e.name.endsWith('.json') && !UUID.test(e.name.slice(0, -5)))
+    console.log(`  ${e.name}: root file is not keyed by a map uuid, skipped`);
+
 const exists = new Set();
 for (let i = 0; i < mapIds.length; i += 200) {
   const { data, error } = await db
@@ -74,7 +78,15 @@ for (let i = 0; i < mapIds.length; i += 200) {
   data.forEach((m) => exists.add(m.id));
 }
 
-const totals = { maps: 0, history: 0, recorded: 0, liveCopied: 0, unparseable: 0, orphan: 0 };
+const totals = {
+  maps: 0,
+  history: 0,
+  recorded: 0,
+  liveCopied: 0,
+  unparseable: 0,
+  orphan: 0,
+  odd: 0,
+};
 
 for (const mapId of mapIds) {
   if (!exists.has(mapId)) {
@@ -90,7 +102,14 @@ for (const mapId of mapIds) {
   if (error && (apply || error.code !== 'PGRST205')) throw error;
   const recorded = new Set((rows ?? []).map((r) => r.stamp));
 
-  const stamps = (await listAll(mapId))
+  const entries = await listAll(mapId);
+  for (const e of entries) {
+    if (e.id && !STAMP.test(e.name)) {
+      totals.odd++;
+      console.log(`  ${mapId}/${e.name}: not a stamp, skipped — rename it or extend STAMP`);
+    }
+  }
+  const stamps = entries
     .map((e) => e.name.match(STAMP)?.[1])
     .filter(Boolean)
     .sort();
@@ -142,7 +161,7 @@ for (const mapId of mapIds) {
 
 console.log(
   `\n${totals.maps} maps · ${totals.history} history files · ${totals.recorded} rows ${apply ? 'written' : 'to write'} · ` +
-    `${totals.liveCopied} live files without history · ${totals.unparseable} unparseable · ${totals.orphan} storage folders with no map row`
+    `${totals.liveCopied} live files without history · ${totals.unparseable} unparseable · ${totals.odd} history names that are not stamps · ${totals.orphan} storage folders with no map row`
 );
 
 if (!apply) {

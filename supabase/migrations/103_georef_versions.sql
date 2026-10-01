@@ -88,9 +88,21 @@ create policy "georef_versions_select_visible_parent" on public.georef_versions 
     )
   );
 
--- The live version per map. Stamps are fixed-width ISO, so text order is time order.
+-- RLS gates rows, not columns (101). `user_id` is a staff member's auth.users id on every
+-- neatline and sync row, and the row gate above hands a public map's rows to anon, so narrow
+-- both client roles to the other columns. Staff read `user_id` through the service key.
+revoke select on public.georef_versions from anon, authenticated;
+grant select (
+  id, map_id, stamp, geom_src, transformation, gcp_count, rmse_m, rmse_method,
+  source_id, source_width, source_height, origin, allmaps_id, created_at
+) on public.georef_versions to anon, authenticated;
+
+-- The live version per map. Stamps are fixed-width ISO, so text order is time order. Column
+-- list spelled out, not `*`: a view repeats its table's columns, user_id included.
 create or replace view public.map_georef_current
   with (security_invoker = true) as
-select distinct on (map_id) *
+select distinct on (map_id)
+       id, map_id, stamp, geom_src, transformation, gcp_count, rmse_m, rmse_method,
+       source_id, source_width, source_height, origin, allmaps_id, created_at
   from public.georef_versions
  order by map_id, stamp desc;

@@ -1399,7 +1399,6 @@ export type Database = {
           source_width: number | null
           stamp: string | null
           transformation: string | null
-          user_id: string | null
         }
         Relationships: []
       }

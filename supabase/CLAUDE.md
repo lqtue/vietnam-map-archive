@@ -28,8 +28,11 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **103**, **not yet pushed**; 102 is live in production (verified 2026-10-01 via
-`supabase migration list`). 103 adds `georef_versions`, one row per stored georeference version
+Head is **103**, **not yet pushed — push 103 *before* deploying the app.** The new routes record a
+row after writing each history file and answer 500 if the table is missing, so an app deployed
+ahead of the migration fails every publish, sync and neatline save *after* its history file is
+already written. (The reverse of 101's order; 102 below is live.) 102 is live in production (verified 2026-10-01 via
+`supabase migration list`). 103 adds `georef_versions` (anon/authenticated lose `user_id`, as 101 did for footprints), one row per stored georeference version
 (`annotations/<map>/<stamp>.json`), and the `map_georef_current` view (newest stamp per map). Every
 writer records its row right after the history file and before the live file moves:
 `mirrorAnnotation`, the neatline `PATCH`, `sync_district4_annotations.mjs`. `geom_src` comes from

@@ -186,9 +186,11 @@ Each gap is named for its subject. "Owner" points at the plan that already holds
      import by path.
 
    Writers that record their own row: `mirrorAnnotation`, the neatline `PATCH` and
-   `sync_district4_annotations.mjs`. The Python pipeline scripts (`tonkin_georef.py`,
-   `indochine100k_georef.py`, `l7014_annotate.py`) do not yet; `scripts/backfill_georef_versions.mjs`
-   records what they leave in Storage as `unrecorded`. Defer a table with one row per GCP until a
+   `sync_district4_annotations.mjs`. Four writers do not yet, and until each one records its own
+   row `map_georef_current` points at an older version after it runs and the stale-label join
+   gives false positives: `scripts/indochine100k_georef.py`, `scripts/oneoff/fix_saigon_1942_1968.mjs`,
+   `drop_1942_gcp1.mjs` and `rescan_1942_to_2x.mjs`. `scripts/backfill_georef_versions.mjs` is the
+   catch-up: rerun it after any of them; it records what they leave as `unrecorded`. Defer a table with one row per GCP until a
    query needs one.
    **Exit:** one query lists every 1882 version with its GCP count and its named RMSE, and a join
    on `geom_src` shows which labels are stale.
