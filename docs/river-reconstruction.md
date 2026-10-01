@@ -393,7 +393,8 @@ settings, `water-b7ff0618.png`, scored once; nothing in 1898 was tuned on these 
 
 Both errors are false water 4 and 9 px outward of the proposal's edge: edge placement, not a missed
 or invented body. 1898 reaches the 1882 level (96.5% on its first batch) with only the ruling
-period and angle changed plus the black-hatch `structure` step. The 7 review bodies are still
-unanswered by the owner; scoring counts them as not water, and no labelled point fell in one.
+period and angle changed plus the black-hatch `structure` step. The 7 review bodies were
+answered dry by the owner on 2026-10-02 (`confirmed.json`, 7 dry, 0 stale); the water mask is unchanged
+and the review layer is empty.
 Not done: the narrow creek heads, the hatched "Canal de ceinture", a fresh 1898 batch after any
 edge fix. No layer is approved.

@@ -13,5 +13,14 @@
   {"x": 8016, "y": 4688, "water": false, "note": "citadel rampart hachures (height)", "date": "2026-10-01"},
   {"x": 6384, "y": 5264, "water": false, "note": "Auxiliaires du Genie block edge", "date": "2026-10-01"},
   {"x": 8560, "y": 6128, "water": true,  "note": "Jardin Botanique pond", "date": "2026-10-01"}
+ ],
+ "1898": [
+  {"x": 8368, "y": 4688, "water": false, "note": "building complex on blue hospital land", "date": "2026-10-02"},
+  {"x": 8720, "y": 6448, "water": false, "note": "building complex on blue hospital land", "date": "2026-10-02"},
+  {"x": 6768, "y": 9392, "water": false, "note": "tramway track", "date": "2026-10-02"},
+  {"x": 8720, "y": 9488, "water": false, "note": "rail track", "date": "2026-10-02"},
+  {"x": 9232, "y": 9520, "water": false, "note": "rail track", "date": "2026-10-02"},
+  {"x": 10064, "y": 12688, "water": false, "note": "lettering Khanh Hoi", "date": "2026-10-02"},
+  {"x": 10512, "y": 12688, "water": false, "note": "lettering Khanh Hoi", "date": "2026-10-02"}
  ]
 }
