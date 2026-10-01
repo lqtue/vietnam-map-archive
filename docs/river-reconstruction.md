@@ -182,6 +182,16 @@ The failure that matters is **false water on quays**: all five false points sit 
 the bank, the leak this document predicted. Three of the four misses are more than 150 px from any
 proposed water, i.e. whole bodies not found: narrow creeks too thin for 32 px cells. Calibration
 views show the same limit on the garden streams. The 1882 dry and moat windows have no false water.
-Not done: the 1898 transfer, the quay fix, an edge-stratified point batch, the review of isolated
-bodies. No layer is approved. This task is tracked under `river-reconstruction` in
+**Owner review of the isolated bodies (2026-10-01).** Of 12, five are water (three creek reaches
+cut off by bridges or the tramway, the Gouverneur garden pond, the Jardin Botanique pond) and
+seven are not (citadel rampart ×3, street lettering ×2, cathedral hatching, a block edge). The
+answers are points in [`confirmed.json`](../work/analysis/river_ref/confirmed.json); the pass
+promotes a confirmed body and reports a point that no longer lands in a body as stale. Rescored on
+the same labels (fair: the change came from the review, not from the labels): **97.2% [95–99]**,
+missed water 2/52, false water unchanged at 6/237; unseen held-out 98.8% [96–100]. Both creek
+misses were in confirmed reaches. Left: the five quay points, one basin miss and one basin false
+point, and one water point in `blue_domain` more than 150 px from any proposed water.
+
+Not done: the 1898 transfer, the quay fix (to be scored on a fresh point batch, since these 300
+are now spent on two runs), an edge-stratified batch. No layer is approved. This task is tracked under `river-reconstruction` in
 [ROADMAP.md](ROADMAP.md).

@@ -463,7 +463,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       streets. Native-pixel EDA shows that 1882 and 1898 share ruled-water geometry but differ in
       colour, and VMA pyramid levels shift the river ink. The current 0.09 mask is only a diagnostic
       proposal. **2026-10-01: 1882 river pass v1** (line texture, no colour cut) scores 96.5% [94–98]
-      on 289 blind owner point labels in held-out windows; its open failure is false water 17–60 px
+      on 289 blind owner point labels in held-out windows, 97.2% after the owner settled 12 isolated bodies; its open failure is false water 17–60 px
       onto quays. Exit: blind point labels (they replaced hand tracing, owner, 2026-10-01) in held-out
       river, quay, creek and dry-land windows on **both** sheets; a source-resolution proposal scored
       for missed and false water by case; human review before any layer is approved. Method,

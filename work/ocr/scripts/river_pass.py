@@ -15,7 +15,9 @@ ruling (same ink, measured), so the pass reads geometry:
      to ruled cells, where a block edge dilutes the ruling). Seed cell: ripple spacing, very coherent.
   3. components with enough seeds; those within LINK cells of the largest are the network. Others
      (the citadel's rampart hachures look exactly like ripples; garden ponds) are review only:
-     enclosed water needs its own confirmed seed (docs/river-reconstruction.md).
+     enclosed water needs its own confirmed seed (docs/river-reconstruction.md). The owner's answers
+     live in river_ref/confirmed.json: a point inside a body settles it; a point that no longer
+     lands in a body is reported as stale in run.json, never guessed.
   4. pixels: inside the cell zone, bluish line pixels not under a Gabor ruling response, closed by
      CLOSE_R; the eroded cell core is water outright. So the edge is the outermost ripple line.
 """
@@ -174,6 +176,19 @@ def main():
     for fx, fy, fw, fh in sheet["furniture"].values():
         inside[fy // CELL:-(-(fy + fh) // CELL), fx // CELL:-(-(fx + fw) // CELL)] = False
     cand, seed, network, review = cells_to_water(spacing, rule, loge, tex["coherence"][:rows, :cols], blue, marked, inside)
+    # owner decisions on review bodies (river_ref/confirmed.json): water joins the network, dry is settled
+    rl, _ = nd.label(review, np.ones((3, 3)))
+    stale, settled = [], {True: 0, False: 0}
+    for p in json.loads((REF / "confirmed.json").read_text()).get(a.sheet, []):
+        i = rl[p["y"] // CELL, p["x"] // CELL]
+        if not i:
+            stale.append(p)    # the body moved or vanished under new settings: ask again, never guess
+            continue
+        body = rl == i
+        if p["water"]:
+            network |= body
+        review &= ~body
+        settled[p["water"]] += 1
     t1 = time.time()
     pa = lambda yc, xc: paper_at(paper, yc, xc)
     sq = np.ones((3, 3))
@@ -201,6 +216,7 @@ def main():
                                                   "BLUE_ODR", "CLOSE_R", "HOLE_MAX", "MIN_PX")},
            "cells": {"candidate": int(cand.sum()), "seed": int(seed.sum()), "network": int(network.sum()), "review": int(review.sum())},
            "water_px": int((mask == 255).sum()), "review_px": int((mask == 128).sum()),
+           "confirmed": {"water": settled[True], "dry": settled[False], "stale": stale},
            "review_bodies": bodies,
            "seconds": {"cells": round(t1 - t0, 1), "total": round(time.time() - t0, 1)}}
     (out / "run.json").write_text(json.dumps(run, indent=1) + "\n")
