@@ -1,7 +1,7 @@
 """Score river proposals against hand traces, per window, case and sheet.
 
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py <proposal_dir> [--layer road]
-    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road] [--seed N]
+    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road] [--seed N[,N...]]
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py --selfcheck
 
 --points scores against the point labels (label.py), the reference that replaced tracing on
@@ -105,7 +105,8 @@ def wilson(k, n, z=1.96):
 
 def points(sheet, mask_path, layer="water", seed=None):
     """Score a whole-sheet mask (255 = positive) against labels/<sheet>.jsonl; unsure points dropped.
-    seed = one batch only: a version is scored honestly only on a batch nothing was tuned or scored on."""
+    seed = batches to score, an int or a set of ints: a version is scored honestly only on a batch nothing was tuned or scored on."""
+    seed = None if seed is None else ({seed} if isinstance(seed, int) else set(seed))
     Image.MAX_IMAGE_PIXELS = None
     mask = np.array(Image.open(mask_path)) == 255
     pts = {p["id"]: p for p in json.loads((HERE / f"points-{sheet}.json").read_text())}
@@ -117,7 +118,7 @@ def points(sheet, mask_path, layer="water", seed=None):
     groups = defaultdict(list)
     for pid, lab in labels.items():
         p = pts[pid]
-        if lab == "unsure" or (lab == "bridge" and layer == "water") or (seed is not None and p["seed"] != seed):
+        if lab == "unsure" or (lab == "bridge" and layer == "water") or (seed is not None and p["seed"] not in seed):
             continue
         lab = "road" if lab == "bridge" else lab           # a bridge is road in the road layer
         w = win[p["window"]]
@@ -172,6 +173,6 @@ if __name__ == "__main__":
         selfcheck()
     elif a[:1] == ["--points"]:
         points(a[1], a[2], a[a.index("--layer") + 1] if "--layer" in a else "water",
-               int(a[a.index("--seed") + 1]) if "--seed" in a else None)
+               {int(v) for v in a[a.index("--seed") + 1].split(",")} if "--seed" in a else None)
     else:
         main(a[0], a[a.index("--layer") + 1] if "--layer" in a else "water")

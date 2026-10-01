@@ -10,6 +10,8 @@
              "furniture": {"title": [700, 600, 2400, 1500], "scale": [3200, 7950, 2800, 200], "legend": [9800, 6950, 1700, 1100]},
              "ruling": {"spacing": [4.0, 5.6], "periods": [4.48, 3.55], "angle": 144, "tol": 8},
              "ruling_note": "machine ruling, measured 2026-10-01: land hatch 4.48 px, buildings 3.55 px, salmon 5.09 px, all at 144 deg (image axes); spacing = FFT band of the cell test, periods = the per-pixel Gabor",
+             "road": {"neatline": [600, 560, 10800, 7390], "furniture_pad": 100,
+                      "note": "road pass only. Measured 2026-10-02 from column / row dark profiles away from the title: the inner thin frame line is at x 597, y 555 (top), and y 8298 (bottom); right edge 11400 as above. Bottom cut at y 7950, the top of the scale bar: below it are only the scale, credit lines, the printer line and open water. furniture_pad: the by-eye boxes were tight, and the slivers between them and the frame read as streets"},
              "furniture_note": "neatline = inside the inner frame line (dark-profile at two corners), right edge pulled in to 11400 past marginal ink; furniture boxes read by eye off the 1/8 preview, 2026-10-01; masked from the river pass"},
     "1898": {"map_id": "20ec4f9a-16bd-4895-a593-40c6ed9c9555", "width": 16267, "height": 14859,
              "legend": {"ink": [15240, 8525, 248, 56], "blue": [15240, 8391, 248, 56], "green": [15240, 8797, 248, 56],
