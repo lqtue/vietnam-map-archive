@@ -2,7 +2,10 @@
   "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
   "source": "VMA IIIF fixed tiles (iiif.maparchive.vn), native level, raw JPEG bytes",
   "sheets": {
-    "1882": {"map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", "width": 12102, "height": 8982},
+    "1882": {"map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", "width": 12102, "height": 8982,
+             "legend": {"ink": [11178, 7258, 190, 36], "blue": [11178, 7178, 190, 38], "green": [11178, 7416, 190, 36],
+                        "salmon": [11178, 7494, 190, 36], "paper": [11178, 7336, 190, 36]},
+             "legend_note": "swatch interiors, 8 px inset, read by eye 2026-10-01: ink = service-local black hatch, paper = non affectees (blank)"},
     "1898": {"map_id": "20ec4f9a-16bd-4895-a593-40c6ed9c9555", "width": 16267, "height": 14859}
   },
   "layer_rule": "layer = water (default) or road. Water windows: trace class water. Road windows: trace every NON-road face as class block, extended past the window edge; road is the rest. ignore works in both.",
