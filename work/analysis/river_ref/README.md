@@ -41,7 +41,9 @@ score exists.** Everything here is source pixels from `iiif.maparchive.vn` fixed
 
 1. `python3 qgis.py prep` (writes a `.pgw` beside each crop; y is negated because QGIS is y-up).
 2. New project; Project → Properties → CRS → tick *No CRS (or unknown/non-Earth projection)*.
-   Drag in `crops/1882-*.png`; they land at source pixels beside each other.
+   Drag in `crops/1882-*.png`; they land at source pixels beside each other. Or drag in the whole
+   sheet with **no** world file (QGIS places it at x = column, y = −row, the same frame) plus
+   `crops/windows-1882.geojson`, the window outlines, and trace inside those.
 3. Layer → Create Layer → New GeoPackage Layer: file `trace.gpkg`, table `1882`, Polygon, one
    text field `class`. (A GeoPackage survives closing QGIS; a scratch layer does not.)
    Layer Properties → Attributes Form → `class` → Default value `'water'`, and Settings →

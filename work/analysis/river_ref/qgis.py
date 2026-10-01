@@ -24,6 +24,14 @@ def prep():
         # ponytail: pgw refers to the upper-left pixel centre; half-pixel offset ignored, < 1 px
         (HERE / "crops" / f"{w['sheet']}-{w['id']}.pgw").write_text(f"1\n0\n0\n-1\n{x}\n{-y}\n")
     print(f"wrote {len(W)} .pgw files")
+    # window outlines in the same x, -y frame, to trace on the whole sheet instead of the crops
+    for sheet in {w["sheet"] for w in W}:
+        feats = [{"type": "Feature", "properties": {k: w.get(k, "water") for k in ("id", "layer", "case", "split")},
+                  "geometry": {"type": "Polygon", "coordinates": [[[x, -y], [x + bw, -y], [x + bw, -y - bh],
+                                                                   [x, -y - bh], [x, -y]]]}}
+                 for w in W if w["sheet"] == sheet for x, y, bw, bh in [w["box"]]]
+        (HERE / "crops" / f"windows-{sheet}.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}))
+    print("wrote crops/windows-<sheet>.geojson")
 
 
 def flip(g):
