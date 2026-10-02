@@ -255,11 +255,12 @@ def main():
     ap.add_argument("--hand", action="store_true", help="hand-read / autoplace-failed corners (four points, order 1)")
     ap.add_argument("--offcell", action="store_true", help="the 11 OFFCELL PDFs, on their own georeference")
     ap.add_argument("--auto", action="store_true", help="the autoplace passes, from detected corners")
+    ap.add_argument("--bbox-only", action="store_true", help="set maps.bbox on rows already annotated; upload nothing")
     ap.add_argument("--force", action="store_true", help="redo rows that already have an annotation")
     args = ap.parse_args()
 
     base, key = env()
-    rows = req(f"{base}/rest/v1/maps?select=id,slug,iiif_image,annotation_url,extra_metadata"
+    rows = req(f"{base}/rest/v1/maps?select=id,slug,iiif_image,annotation_url,bbox,extra_metadata"
                f"&extra_metadata->>source_archive=eq.PCL&limit=1000", key)
     manifest = {f["properties"]["sheet"]: f["geometry"] for f in json.load(open(MANIFEST))["features"]}
     files = {r["sheet"]: r for r in M.load_sheets() if r["kind"] == "pdf"}
@@ -271,7 +272,10 @@ def main():
         sheet = m["extra_metadata"]["sheet_number"]
         if args.sheet and sheet not in args.sheet:
             continue
-        if m["annotation_url"] and not args.force:
+        if args.bbox_only:
+            if not m["annotation_url"] or m["bbox"]:
+                continue
+        elif m["annotation_url"] and not args.force:
             skipped.append((sheet, "already annotated"))
             continue
         try:
@@ -303,13 +307,20 @@ def main():
             continue
         if note_how and rms > 25:
             note_how += f"; corners are {rms:.0f} m off a parallelogram (bent scan or a corner off by a few px)"
+        # The warped extent of the mask, as `oneoff/backfill_map_bbox.mjs` defines it. Without it a
+        # sheet has no known place: zoom-to-overlay and `?map=` fall back to fetching the annotation,
+        # which a draft only serves to a staff session.
+        bbox = [round(float(v), 6) for v in (*mask_ground.min(0), *mask_ground.max(0))]
         out = OUT / f"{m['id']}.json"
         out.write_text(json.dumps(annotation(m["iiif_image"], w, h, px, ground, mask, order), indent=1))
         if args.offcell:
             dm = lambda v: f"{int(v)}d{(v % 1) * 60:05.2f}"
             crs = f"{crs} NW {dm(mask_ground[0][0])} {dm(mask_ground[0][1])} SE {dm(mask_ground[2][0])} {dm(mask_ground[2][1])}"
         note = f"{sheet}  {crs:<10} src {off:4.1f} m  fit {rms:4.1f} m  outline {'n/a' if gap is None else f'{gap:4.1f} m'}"
-        if args.write:
+        if args.write and args.bbox_only:
+            req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH", {"bbox": bbox})
+            note += f"  bbox {bbox}"
+        elif args.write:
             url = f"{base}/storage/v1/object/{BUCKET}/{m['id']}.json"
             try:
                 req(url, key, "POST", out.read_bytes(), extra={"x-upsert": "true"})
@@ -319,7 +330,7 @@ def main():
                 req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
             req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
                 {"annotation_url": f"https://maparchive.vn/api/maps/{m['id']}/annotation",
-                 "is_georeferenced": True,
+                 "is_georeferenced": True, "bbox": bbox,
                  **({"extra_metadata": {**m["extra_metadata"], "georef_method": note_how}} if note_how else {})})
             note += "  uploaded"
         ok.append(note)
