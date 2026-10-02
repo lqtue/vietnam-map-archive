@@ -261,7 +261,7 @@ def main():
 
     base, key = env()
     rows = req(f"{base}/rest/v1/maps?select=id,slug,iiif_image,annotation_url,bbox,extra_metadata"
-               f"&extra_metadata->>source_archive=eq.PCL&limit=1000", key)
+               f"&collection=ilike.*L7014*&limit=1000", key)
     manifest = {f["properties"]["sheet"]: f["geometry"] for f in json.load(open(MANIFEST))["features"]}
     files = {r["sheet"]: r for r in M.load_sheets() if r["kind"] == "pdf"}
     OUT.mkdir(parents=True, exist_ok=True)
