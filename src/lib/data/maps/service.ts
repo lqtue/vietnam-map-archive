@@ -47,15 +47,32 @@ function toMapListItem(row: DbRow): MapListItem {
   };
 }
 
-/** All maps (published). For catalog page. */
-export async function fetchMaps(supabase: SupabaseClient<Database>): Promise<MapListItem[]> {
-  const { data, error } = await supabase.from('maps').select(LIST_COLUMNS).order('name');
+/** PostgREST caps one response at `max_rows` (supabase/config.toml: 1000), silently. */
+const PAGE = 1000;
 
-  if (error) {
-    console.error('fetchMaps:', error);
-    return [];
+/**
+ * Every map this reader can read, in pages. One unpaged query stopped at row 1000 by name:
+ * the day a staff reader's list passed that (drafts included) everything after "Polei Jar
+ * Sieng" vanished from /explore, with nothing reporting it. The second sort key keeps pages
+ * from overlapping when names repeat.
+ */
+export async function fetchMaps(supabase: SupabaseClient<Database>): Promise<MapListItem[]> {
+  const rows: DbRow[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from('maps')
+      .select(LIST_COLUMNS)
+      .order('name')
+      .order('id')
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error('fetchMaps:', error);
+      return [];
+    }
+    rows.push(...(data as unknown as DbRow[]));
+    if (data.length < PAGE) break;
   }
-  return (data as unknown as DbRow[]).map(toMapListItem);
+  return rows.map(toMapListItem);
 }
 
 /** Featured maps only, sorted by year. For home page hero. */
