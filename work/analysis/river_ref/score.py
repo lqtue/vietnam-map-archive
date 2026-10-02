@@ -1,12 +1,13 @@
 """Score river proposals against hand traces, per window, case and sheet.
 
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py <proposal_dir> [--layer road]
-    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road] [--seed N[,N...]]
+    work/ocr/.venv/bin/python work/analysis/river_ref/score.py --points <sheet> <whole-sheet mask.png> [--layer road] [--seed N[,N...]] [--spent]
     work/ocr/.venv/bin/python work/analysis/river_ref/score.py --selfcheck
 
 --points scores against the point labels (label.py), the reference that replaced tracing on
 2026-10-01: accuracy, missed and false shares with Wilson 95% intervals, per split and case, and for
-each wrong point its distance to the proposal's edge.
+each wrong point its distance to the proposal's edge. --spent keeps only points in windows that are calibrate or
+seen:true, the evidence a version may be tuned on; without it every labelled point counts, so run that once per frozen version.
 
 Truth: traces/<sheet>-<id>.geojson, Polygon features in SOURCE pixels, property
 class = "water" (holes = land islands/landings) or "ignore" (bridge, label, fold,
@@ -103,7 +104,7 @@ def wilson(k, n, z=1.96):
     return f"{100 * p:.1f}% [{max(0, 100 * (c - h)):.0f}-{min(100, 100 * (c + h)):.0f}] ({k}/{n})"
 
 
-def points(sheet, mask_path, layer="water", seed=None):
+def points(sheet, mask_path, layer="water", seed=None, spent=False):
     """Score a whole-sheet mask (255 = positive) against labels/<sheet>.jsonl; unsure points dropped.
     seed = batches to score, an int or a set of ints: a version is scored honestly only on a batch nothing was tuned or scored on."""
     seed = None if seed is None else ({seed} if isinstance(seed, int) else set(seed))
@@ -122,6 +123,8 @@ def points(sheet, mask_path, layer="water", seed=None):
             continue
         lab = "road" if lab == "bridge" else lab           # a bridge is road in the road layer
         w = win[p["window"]]
+        if spent and not (w["split"] == "calibrate" or w["seen"]):
+            continue
         truth, pred = lab == layer, bool(mask[p["y"], p["x"]])
         # how far a wrong point sits from the proposal's edge, px: small = edge placement, large = a missed body
         far = None
@@ -173,6 +176,6 @@ if __name__ == "__main__":
         selfcheck()
     elif a[:1] == ["--points"]:
         points(a[1], a[2], a[a.index("--layer") + 1] if "--layer" in a else "water",
-               {int(v) for v in a[a.index("--seed") + 1].split(",")} if "--seed" in a else None)
+               {int(v) for v in a[a.index("--seed") + 1].split(",")} if "--seed" in a else None, "--spent" in a)
     else:
         main(a[0], a[a.index("--layer") + 1] if "--layer" in a else "water")
