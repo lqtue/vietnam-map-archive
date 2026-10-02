@@ -9,11 +9,11 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 - `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
   `--unseen` restricts it to heldout windows with `seen: false`, the only clean test; a window that
   has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). `--only ID,ID` restricts a batch to named windows
-  (batch 5 is the three road windows added after the road pass was frozen). Batch 5 (seed 5) is unlabelled.
+  (batches 5 and 6 are the three road windows added after the road pass v1 was frozen). Batch 5 (seed 5, around v1's edge) stays unlabelled; batch 6 (seed 6, around `road-a772ecd1.png`, the frozen v2) is pending owner labels.
 - `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
-- `score.py --points 1882 <whole-sheet mask.png> [--layer road] [--seed N[,N...]]` — score once per frozen version (a comma list pools batches).
+- `score.py --points 1882 <whole-sheet mask.png> [--layer road] [--seed N[,N...]]` — score once per frozen version (a comma list pools batches); `--spent` keeps only points in calibrate / seen:true windows, the evidence a version may be tuned on.
   The water pass is `work/ocr/scripts/river_pass.py`; results in `docs/river-reconstruction.md`.
 
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
@@ -85,5 +85,5 @@ The tracing workflow below still works, and is kept for any window that needs a 
    Re-import any time.
 
 Do one window first and import it, so the alignment can be checked before the rest.
-The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (1882 only; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
+The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v2; 1882 only; `--window ID` previews one window and refuses an unseen heldout one; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
 the same window is what tells you whether 5 px of edge error is the method or the tracing.

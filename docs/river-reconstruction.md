@@ -532,3 +532,142 @@ any proposal at all. 90 points, 30 per window (10 uniform, 20 within 30 px of th
 `label.py points 1882 --seed 5 --unseen --only west_dense,msg_quay,ne_boulevard --per 10 --edge road-4ecf05fc.png
 --edge-per 20 --band 30`. `--only` is new; without it, `--unseen` also takes in the seven unseen water windows
 and this command gives 300 points. **Batch 5 pending owner labels**; it was not viewed or scored.
+
+## Road pass v2, 1882 (2026-10-02)
+
+[`work/ocr/scripts/road_pass.py`](../work/ocr/scripts/road_pass.py), commit `a772ecd1`, frozen mask
+`river/road-a772ecd1.png` (gitignored with the other outputs; sha256 `5ce76c69...59c20a`). Same inputs as v1. Deterministic (two full runs
+`cmp` equal), 748-1007 s, 2.0-2.6 GB resident, 3.7-4.3 GB peak footprint. `--self-check` now has seven synthetic
+sheets and fifteen asserts (street with pavement and kerb, boulevard of two promenades and a lettered carriageway,
+block with its pavement, lane against plot, quay strip against yard, pier against shed, garden); each new constant
+fails at least one (`FAT_Q`, `PIER_WATER`, `NARROW_AREA`, `R_FACE`, `PAVE_RATIO`, `INNER_MIN`, `KERB_MAX`, `HATCH_RATIO`,
+`HATCH_BLOCK` were each changed and caught). **v2 is frozen and was not scored by the owner's labels when written.**
+
+### Diagnosis (viewed windows only, see discipline)
+
+Viewed natively and v1 side by side on `arsenal_quay`, `quay_primauguet`, `ne_cream`, `dense_grid`,
+`creek_crossing`, `bridge_basin`, `blue_domain`, `garden_pond`, `western_creek`. **The quay-pavement hypothesis did
+not hold as stated.** On `arsenal_quay` and `quay_primauguet` v1 puts no road on a water-side pavement at all: the
+river quay there is either a street between two lines (road, fragmented by lettering and cross hatching) or a plain
+blank strip that v1 did not take. The four false points in `arsenal_quay` were: a leak through a gap in a building's
+outline into the paper between the building and its block line (two points), the wide promenade beside a boulevard
+(one), and the pavement beside "No. 15" (one). What v1 got wrong, by area on the nine calibrate / seen windows (v1-only
+and v2-only pixels, approximate, windows overlap a little):
+
+| cause | evidence | area |
+|---|---|---|
+| blank yards, plazas and open ground beside water called road (`FAT` cut too shallow, no cut at all beside water) | v1-only pixels in blobs 16 px or deeper | 156 k px lost |
+| quay-side and creek-side strips and blobs | v1-only pixels within 40 px of water (`open_bank` 45 k, `western_creek` 88 k, `quay_primauguet` 41 k) | 95 k lost |
+| pavement strips: a kerb and a block line, or a block line and a thin line (a promenade beside a boulevard) | v1-only strips under 16 px deep | 36 k lost |
+| narrow carriageways dropped: v1 needed a 19 px core, a street between kerbs is 12-20 px | v2-only pixels in strips under 9 px deep (lane-like) | 150 k gained |
+| mid-width carriageways dropped the same way | v2-only, 9-16 px | 123 k gained |
+| bridge decks, piers and landing stages | `bridge_basin`, `quay_primauguet` | not counted |
+
+So the main failure was the opposite of the one in the brief: v1 was missing road (any carriageway under 19 px between
+kerbs) and calling open ground road; pavement was the smaller share.
+
+### Changes (each general, each with a self-check case)
+
+1. **Faces at 7 px** (`R_FACE` 3, was a 19 px core): a face is free space that survives a 3 px opening, grown back to
+   its walls through free space. This is what recovers carriageways between kerbs (12-20 px), lanes and junction
+   squares. Cost: it admits more narrow blank strips, so the next two steps follow.
+2. **Narrow-only components need 15 000 px** (`NARROW_AREA`): a component with no 19 px core is a plot or a pavement
+   ring unless it is as large as a network. Specks under 500 px left by the pavement cut are dropped (`SPECK`).
+3. **Open ground** (`fat_region`): an exact union of inscribed disks around every pixel deeper than `FAT` 70 px (not
+   a band along the walls), plus **a yard beside water** deeper than `FAT_Q` 36 px whose nearest wall is water within
+   20 px (a quay road is 15-35 px, a blank yard behind it is deeper), grown by `YARD_EDGE` 10 px, and the rim of both
+   followed `RIM` 30 px along narrow ground (`RIM_R` 10), because a union of disks leaves a rim at the field's walls.
+4. **Kerbs by chords** (`pavement`): the strip-shaped faces (`strip_faces`: area 200, ratio 6, not open ground)
+   are cut by chords along four axes (`run_layers`, exact, run-length based). A pixel's chord is the shortest through it;
+   across a wall of at most `KERB_MAX` 8 px lies a neighbouring strip of 7-60 px. Strips beyond on **both** sides: the
+   carriageway (`inner`, kept; an `inner` stretch under `INNER_MIN` 600 px is a tramway or junction blip and not one).
+   On **one** side only: **pavement** if the strip beyond is `PAVE_RATIO` 1.5 times wider and it is under `W_NARROW` 19,
+   or if a hatched block lies against its outer wall and it is no wider than `HATCH_RATIO` 1.25 times the strip
+   beyond (hatch = ink that closes over 3 px and holds a 6 px disk), or if it lies beside an inner strip (within its
+   own width plus a wall, and not along the same strip, `SAME_STRIP` 40). That last test is the boulevard's two
+   wide promenades. Pavement pieces under `PAVE_LEN` 40 px are kept as road. No kerb on either side: a plain street, kept
+   (the owner's "no kerb, the block's outer line" case).
+5. **Quay**: a street line and water make a strip with no kerb beyond it; it is road if it passes the yard test
+   (step 3). A quay pavement against water cannot be told from the quay road by any drawn line, so it stays road
+   when there is no inner strip beside it. This is the quay rule as far as the drawing supports.
+6. **Piers and landing stages** (`PIER_WATER` 0.4): a hatched deck with water on at least 40% of its 4 px rim is road,
+   not only a deck with road on two sides (the owner labels piers bridges).
+7. `--window` now refuses a window that touches a blind box and walls the blind boxes off, so a preview computes on
+   nothing it may not show. `score.py --points ... --spent` keeps only points in calibrate / seen:true windows.
+
+Constants not listed above are unchanged (`INK_GREY`, `INK_PAD`, `GLYPH`, `R_CORE` is now only the narrow-component
+test, `RED_OD`, `BRIDGE_*`, `SHAPE_MIN`, `NET_AREA`, `LANE_*`, `GARDEN_*`); all are in `road-run.json`.
+
+### Spent evidence only
+
+191 labelled points (unsure dropped) in windows that are calibrate or `seen: true`: `arsenal_quay` 51, `bridge_basin` 52,
+`citadel_moat` 30, `blue_domain` 29, `dry_city_blocks` 29 (no point in `ne_cream`, `dense_grid`, `creek_crossing`,
+`quay_primauguet`). Of those 11 are road (8 road, 3 bridge), 156 land, 24 water; water counts as not road.
+The trivial all-land answer is 180/191 = 94.2%.
+
+| | accuracy | missed road | false road |
+|---|---|---|---|
+| v1 `4ecf05fc` | 171/191 = 89.5% | 8/11 | 12/180 |
+| v2 `a772ecd1` | 179/191 = 93.7% | 6/11 | 6/180 |
+| v1 / v2 without `bridge_basin` (139 points) | 133/139 and 133/139 | 6/9 and 6/9 | 6/130 and 6/130 |
+
+**The gain is all in `bridge_basin`** (v1 6 false + 2 missed bridge points, v2 none), which is the window I viewed to
+write the pier rule and the yard rule. Elsewhere v1 and v2 tie: 6 missed and 6 false each, with different points.
+So there is no evidence here that the kerb logic works on a quay, and no evidence it does not; the spent windows hold
+too few road points (11) and almost no pavement points. v2 is still **below the all-land baseline** on these points.
+
+Points that flipped from right to wrong (three):
+`1882-0003` (`arsenal_quay`, road to land: the wide strip beside the kerb pair of the boulevard, which v1 left in
+and the new promenade rule cuts; the owner called it road, so the rule is wrong for this strip, or the label reads
+the promenade as carriageway), `1882-0222` (`citadel_moat`, land to road: a 20 px strip in an acute block corner
+with a thin line on its far side that is the outline, read as a plain street), `1882-0010` (`arsenal_quay`, land to
+road: the strip beside the lettered "No. 15" strip, a pavement with a broken kerb).
+Eleven flipped from wrong to right: `0116 0357 0358 0359 0362 0366` (`bridge_basin` land), `0363 0494` (`bridge_basin`
+bridges), `0286` (`blue_domain`), `0025` (`dry_city_blocks`), `0461` (`arsenal_quay`).
+Still wrong: missed `0003 0276 0048 0203 0303 0462`; false `0001 0292 0222 0010 0307 0465`. Bridge-labelled points in
+spent windows: v1 found 0 of 3, v2 2 of 3 (`0462` in `arsenal_quay` is still missed). `0001` sits in a wide
+paper-coloured street and I cannot see why the owner called it land.
+
+**Area, whole sheet (7390 x 10800 px road frame):** v1 5.12 M px (6.4%), v2 6.09 M px (7.6%); 4.11 M in both, 1.01 M
+only v1, 1.98 M only v2. Inside the spent windows the biggest drops are `open_bank` (7.6% to 0.6%, open river
+called road by v1), `western_creek` (16.5% to 10.5%), `quay_primauguet` (8.2% to 5.3%); the biggest gains `creek_crossing`
+(7.4% to 15.0%), `dense_grid` (9.1% to 13.7%), `dry_city_blocks` (14.3% to 18.2%), `garden_pond` (2.0% to 6.6%).
+Counts only in unseen heldout boxes (road share v1 to v2, not looked at, not a tuning gate): `chinois_quay` 14.9 to 9.8%,
+`creek_nw` 16.3 to 17.7, `arsenal_basin` 3.8 to 6.8, `charner_canal` 7.7 to 13.1, `avalanche_head` 12.9 to 11.7,
+`quay_rondpoint` 11.4 to 14.7, `outskirts_rail` 27.5 to 28.1, `west_dense` 16.6 to 18.2, `msg_quay` 16.7 to 6.4,
+`ne_boulevard` 10.6 to 16.3. `msg_quay` losing 60% of its road and `charner_canal` gaining 70% are the two changes to
+watch when the labels come in.
+
+### Weak spots (v2)
+
+- Lanes and narrow faces now come in, and so do narrow blank plots: `creek_crossing` doubled (7.4% to 15.0%), and
+  `western_creek` shows a blank plot with a building (a few thousand px) read as road. The 15 000 px rule only stops isolated ones.
+- **Gardens**: `garden_pond` gained 30 k px, paths along the pond that the 32 px garden cells do not cover. Not fixed.
+- A leak through a gap in a building outline still lets road into the paper around the building (`arsenal_quay`, two points).
+- A promenade wider than a carriageway beside a boulevard is land by rule; one spent point says the owner called it road.
+- A kerb with a gap, or lettering that touches it, breaks the chord test locally (`VOTE` 9 and `SAME_STRIP` 40 smooth it).
+- Junction squares inside a kerb return are recovered only where a 7 px face survives.
+- Quay pavement beside water with no drawn kerb is road. The pass cannot do better from the drawing.
+
+### Discipline
+
+Viewed and tuned on: the three calibrate road windows, `arsenal_quay`, `quay_primauguet`, `blue_domain`, `bridge_basin`,
+`citadel_moat`, `dry_city_blocks`, `garden_pond`, `western_creek`, and the whole-sheet 1/8 preview with every unseen box
+black. Labelled points used as tuning and regression evidence: the 191 above. Not viewed, not scored, not used: any
+`seen: false` heldout box, the labelled points in them, batch 5. The whole-sheet area counts for unseen boxes above
+are counts of a finished mask, and were computed after the freeze decision. **No blind box was seen; no `seen`
+flag was changed.** Windows seen on 2026-10-02 for the diagnosis were already `calibrate` or `seen: true`. One caveat on
+the numbers: the three false-road fixes in `bridge_basin` were tuned while looking at that window, so its eight flips
+are not independent.
+
+### Batch 5 stays unlabelled; batch 6 pending owner labels
+
+Batch 5 (seed 5, 90 points in `west_dense`, `msg_quay`, `ne_boulevard`) was drawn within 30 px of **v1's** edge. v2's
+edge lies elsewhere (`msg_quay` lost most of its road), so the 60 edge points no longer test v2's edges; the 30 uniform
+points still would, but scoring v2 on part of a batch drawn around v1 is not clean. It stays in `points-1882.json`,
+unlabelled, as a record. **Batch 6 (seed 6), 90 points, pending owner labels:** `west_dense` 30, `msg_quay` 30,
+`ne_boulevard` 30 (10 uniform + 20 within 30 px of the `road-a772ecd1.png` edge each):
+`label.py points 1882 --seed 6 --only west_dense,msg_quay,ne_boulevard --per 10 --edge road-a772ecd1.png --edge-per 20
+--band 30` (no `--unseen`: it would add the seven unseen water windows). Not viewed, served or scored. Score with
+`score.py --points 1882 river/road-a772ecd1.png --layer road --seed 6`.
+
