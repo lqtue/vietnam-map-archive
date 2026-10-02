@@ -51,11 +51,18 @@ measurement, metadata that maintains itself, and corpus size.
 - [ ] **`l7014-iiif`** — the 510 PCL GeoPDFs as IIIF sheets, replacing the 20 GB of COGs as the
       source for the next mosaic. **Ingested 2026-10-02**: 510 `draft` rows (slug
       `<place>-l7014-<sheet>`, `extra_metadata.source_archive = PCL`), tiles in R2 `tiles/<uuid>`,
-      none duplicating an existing L7014 row. 436 carry an annotation from the PDF's own control
-      points (`scripts/l7014_annotate_pdf.py`; outline within 0.8 m of the mosaic's, datum fix
-      applied; the PDFs' own registration is ~12 m median, 35 m worst). The 74 the warp refuses
-      (62 NOGEO, 11 OFFCELL, 1 OFFGRID) have rows and tiles but no annotation: 7 pass
-      `l7014_autoplace.py`, the rest need hand corners. Open: eyeball a few in `/explore`, check
+      none duplicating an existing L7014 row. **509 of 510 are annotated** (`l7014_annotate_pdf.py`),
+      all still `draft`: 436 from the PDF's own control points (outline within 0.8 m of the
+      mosaic's; the PDFs' own registration is ~12 m median, 35 m worst); 11 `--offcell` on the PDF
+      georeference, whose neatline corners land on round minutes (these are re-framed prints the
+      15' lattice does not describe, and the lattice check is what misfired); 7 autoplace passes;
+      and 55 with no georeference at all, placed by the printed neatline (`--hand`, corners read by
+      eye and snapped by `l7014_hand_corners.py`, each checked for shape against its cell and
+      recorded in `extra_metadata.georef_method`, with worst seam or affine misfit; **seven are
+      30-80 m off a parallelogram and want an eye**). Nine Chinese-border sheets (5454-1, 5554-4,
+      5654-1/-3, 5754-2/-4, 5854-4, 6155-2/-3) are 10' tall, not 15': the lattice has them wrong, the
+      printed corners are used. Left: `6835-4` (seam 119 m). The `series_cells` bbox for those
+      nine is wrong for the same reason. Open: eyeball a few in `/explore`, check
       6330-3 / 6330-1 for same-edition duplicates, flip sheets to `public` only after
       `geo_audit.mjs`, then build the PMTiles from them and close `l7014-rebuild`; `work/l7014/cogs*`
       (~25 GB) can go after that. Names are ASCII; diacritics are a later pass.
@@ -476,7 +483,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       proposal. Exit: hand-traced water and adjacent land in held-out river, quay, creek and dry-land
       windows on **both** sheets; a source-resolution, bank-aware proposal scored for missed water,
       false water and shoreline distance by case; human review before any layer is approved. Method,
-      measurements and reproducible artefacts: `docs/river-reconstruction.md`.
+      measurements and reproducible artefacts: `docs/research/river-reconstruction.md`.
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any
       number means anything. Same blocker as `district4-table`.
@@ -500,7 +507,7 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 - [ ] **`doling-review`** — measure the extractor before growing it. Tim Doling's *Historic
       Vietnam* export (268 posts, 3.1M chars) yielded **89 colonial ↔ modern name pairs** —
-      `work/doling/street-name-pairs.csv`, 43 `street`, 34 `unclear`, 10 `address`, 2 `building`,
+      `work/research/doling/street-name-pairs.csv`, 43 `street`, 34 `unclear`, 10 `address`, 2 `building`,
       every row carrying its post title, date and URL. He agreed on 2026-09-22 to be cited. There
       is no accuracy number for the extraction, which is `shape-precision`'s problem in another
       corpus: unfalsifiable until measured. The author's own markup is the cheapest ground truth
@@ -510,7 +517,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       text; **NLV does not** — verified 2026-09-22, the article view offers `img` only and the
       issue PDF 404s without a session `key`, so NLV stays a consumer of names
       (`press-from-gazetteer`) and never a source of them. Its query file is already generated at
-      `work/doling/nlv-queries.txt`. Write a harvester on the `scout_nlv_press.mjs` pattern —
+      `work/research/doling/nlv-queries.txt`. Write a harvester on the `scout_nlv_press.mjs` pattern —
       resumable, fixtured, `--selftest` — **never through `src/lib/server/gallica.ts`**, which is a
       per-reader lookup with no rate limiter. Titles: *Annuaires de l'Indochine*, *L'Opinion*,
       *La Dépêche d'Indochine* — the same three that make the Ian Gregory letter concrete.

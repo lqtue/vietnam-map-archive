@@ -42,6 +42,8 @@ OUT = Path("work/l7014/annotations")
 MANIFEST = Path("work/l7014/build/l7014-20260921.geojson")
 ORDER = 2
 AFFINE_TOL_M = 40.0
+OFFCELL = {"5650-1", "5729-1", "5926-2", "6130-1", "6146-2", "6147-1", "6433-3", "6530-3", "6534-3", "6538-4", "6636-4", "6731-1"}
+FIT_TOL_M = 80.0  # four hand/detected corners, an affine: a good sheet misses by <25 m (the 7 autoplace passes: 5-22); above that the misfit is recorded in the row
 OUTLINE_TOL_M = 25.0  # ~6 px at 150 dpi; the fit itself is ~3 m
 
 
@@ -59,7 +61,7 @@ def _lonlat(srs):
     return osr.CoordinateTransformation(s, w)
 
 
-def read_pdf(sheet, pdf):
+def read_pdf(sheet, pdf, offcell_ok=False):
     """(pixels, ground lon/lat, mask pixels, size, crs reading, affine residual m) or raises ValueError(reason)."""
     ds = gdal.Open(str(pdf))
     gcps, gt = ds.GetGCPs(), ds.GetGeoTransform(can_return_null=True)
@@ -69,8 +71,17 @@ def read_pdf(sheet, pdf):
     try:
         srs, crs, _ = M.pick_crs(ds, meta, sheet)
     except ValueError as e:
-        raise ValueError(f"offcell: {e}")
-    err = M.graticule_error(ds, srs, meta)
+        if not offcell_ok:
+            raise ValueError(f"offcell: {e}")
+        # The 15' lattice is what these miss, and it is the lattice that is in doubt (a larger or
+        # re-framed print, not a faulty georeference: 6146-2's neatline corner lands within 25 m of
+        # the 105 45' / 18 48'30" it prints). So take the datum reading the other 285 sheets chose.
+        declared, _ = M.sheet_crs(ds, meta)
+        srs, crs = M.indian_1960_utm(declared), "indian1960*"
+    # Where the sheet carries no printed corners the check snaps to the 15' lattice, which is the very
+    # thing an offcell sheet disagrees with -- so for them it is skipped, and the check is the
+    # neatline's corners landing on round minutes (printed in the note) with the printed labels read by eye.
+    err = None if offcell_ok else M.graticule_error(ds, srs, meta)
     if err is not None and err > M.GRATICULE_TOL:
         raise ValueError(f"offgrid: {err:.5f} deg")
     w, h = ds.RasterXSize, ds.RasterYSize
@@ -102,6 +113,12 @@ def read_pdf(sheet, pdf):
     if ring[0] == ring[-1]:
         ring = ring[:-1]
     mask = np.c_[np.array(ring), np.ones(len(ring))] @ fwd
+    if offcell_ok and (mask.max(0) - mask.min(0) > 0.98 * np.array([w, h])).all():
+        # Six of these carry the whole page as their NEATLINE; the printed frame is what the detector found.
+        frame = frame_corners().get(sheet)
+        if frame is None:
+            raise ValueError("neatline is the page and no detected frame")
+        mask = np.array([frame[k] for k in ("NW", "NE", "SE", "SW")])
 
     # Not the PDF's own 8 points: they sit on a symmetric lattice (4 corners + a
     # 2x2 interior block) that lies on one conic, so a second-order fit through
@@ -112,6 +129,53 @@ def read_pdf(sheet, pdf):
     t = _lonlat(srs)
     ground = np.array([t.TransformPoint(x, y)[:2] for x, y in np.c_[px, np.ones(len(px))] @ inv])
     return px, ground, mask, (w, h), crs, off
+
+
+def frame_corners():
+    """Pixel corners of the printed frame for sheets whose NEATLINE is the whole page."""
+    regen = Path("work/l7014/regen")
+    out = {s: r["corners"] for s, r in json.load(open(regen / "autoplace-detect.json")).items() if r.get("quad_ok")}
+    out.update({s: r["corners"] for s, r in json.load(open(regen / "hand-corners.json")).items()})
+    return out
+
+
+def corner_sources():
+    """sheet -> (pixel corners NW NE SE SW, ground corners, pixel size, how it was placed).
+
+    Two sources, neither with a georeference of its own to read: the corners a person read off the
+    sheet and snapped to its printed frame (`l7014_hand_corners.py`), and `l7014_autoplace.py`'s
+    detected neatline against the lattice cell, for the sheets whose seams missed its 25 m gate
+    (all measured under 100 m; the two above that are left out)."""
+    regen = Path("work/l7014/regen")
+    out = {}
+    summary = json.load(open(regen / "autoplace-summary.json"))
+    detect = json.load(open(regen / "autoplace-detect.json"))
+    cells = json.load(open("work/l7014/lattice.json"))["cells"]
+    worst = {}
+    for line in open(regen / "autoplace-seams.csv").read().splitlines()[1:]:
+        f = line.split(",")
+        if f[3]:
+            worst[f[0]] = max(worst.get(f[0], 0), float(f[3]))
+    for sh in summary["fail"] + summary["unverified"]:
+        if worst.get(sh, 0) >= 100:
+            continue
+        note = f"neatline to lattice cell; worst seam {worst[sh]:.0f} m" if sh in worst else "neatline to lattice cell; no neighbour to check against"
+        out[sh] = (detect[sh]["corners"], cells[sh], detect[sh]["size"], note)
+    for sh, r in json.load(open(regen / "hand-corners.json")).items():
+        if r["ok"]:
+            out[sh] = (r["corners"], r["ground"], r["size"],
+                       f"hand-read neatline to {r['ground_from']} corners; aspect {r['aspect_err_pct']}% off")
+    for sh in summary["pass"] + sorted(OFFCELL):  # done already / placed on their own PDF georeference
+        out.pop(sh, None)
+    return out
+
+
+def read_corners(sheet, src):
+    if sheet not in src:
+        raise ValueError("no hand or autoplace corners")
+    c, ground, size, note = src[sheet]
+    px = np.array([c[k] for k in ("NW", "NE", "SE", "SW")])
+    return px, np.array(ground), px, tuple(size), "lattice" if "lattice" in note else "printed", 0.0
 
 
 def read_auto(sheet):
@@ -188,6 +252,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sheet", nargs="*", help="only these sheet numbers")
     ap.add_argument("--write", action="store_true", help="upload and update the rows")
+    ap.add_argument("--hand", action="store_true", help="hand-read / autoplace-failed corners (four points, order 1)")
+    ap.add_argument("--offcell", action="store_true", help="the 11 OFFCELL PDFs, on their own georeference")
     ap.add_argument("--auto", action="store_true", help="the autoplace passes, from detected corners")
     ap.add_argument("--force", action="store_true", help="redo rows that already have an annotation")
     args = ap.parse_args()
@@ -199,6 +265,7 @@ def main():
     files = {r["sheet"]: r for r in M.load_sheets() if r["kind"] == "pdf"}
     OUT.mkdir(parents=True, exist_ok=True)
 
+    src = corner_sources() if args.hand else None
     ok, skipped = [], []
     for m in sorted(rows, key=lambda r: r["extra_metadata"]["sheet_number"]):
         sheet = m["extra_metadata"]["sheet_number"]
@@ -208,22 +275,39 @@ def main():
             skipped.append((sheet, "already annotated"))
             continue
         try:
-            order = 1 if args.auto else ORDER
-            px, ground, mask, (w, h), crs, off = (
-                read_auto(sheet) if args.auto else read_pdf(sheet, M.local_pdf(files[sheet])))
+            order = 1 if (args.auto or args.hand) else ORDER
+            note_how = None
+            if args.hand:
+                px, ground, mask, (w, h), crs, off = read_corners(sheet, src)
+                note_how = src[sheet][3]
+            elif args.auto:
+                px, ground, mask, (w, h), crs, off = read_auto(sheet)
+            else:
+                if args.offcell and not sheet in OFFCELL:
+                    raise ValueError("not offcell")
+                px, ground, mask, (w, h), crs, off = read_pdf(sheet, M.local_pdf(files[sheet]), args.offcell)
             info = plain(f"{m['iiif_image']}/info.json")
+            if args.hand and max(abs(info["width"] - w), abs(info["height"] - h)) <= 2:
+                w, h = info["width"], info["height"]  # the detector's size is rounded from a 2000-px render
             if (info["width"], info["height"]) != (w, h):
                 raise ValueError(f"size {w}x{h} but IIIF says {info['width']}x{info['height']}")
             mask_ground, resid = apply(px, ground, mask, order)
             rms = float(np.sqrt((metres(ground + resid, ground) ** 2).mean()))
-            gap = None if args.auto else outline_gap(mask_ground, sheet, manifest)
+            if (args.hand or args.auto) and rms > FIT_TOL_M:
+                raise ValueError(f"corners are not a parallelogram: affine misses by {rms:.0f} m (a side snapped to the wrong line)")
+            gap = None if (args.auto or args.hand or args.offcell) else outline_gap(mask_ground, sheet, manifest)
             if gap is not None and gap > OUTLINE_TOL_M:
                 raise ValueError(f"outline {gap:.0f} m off the mosaic's")
         except (ValueError, RuntimeError, urllib.error.URLError, KeyError) as e:
             skipped.append((sheet, str(e)))
             continue
+        if note_how and rms > 25:
+            note_how += f"; corners are {rms:.0f} m off a parallelogram (bent scan or a corner off by a few px)"
         out = OUT / f"{m['id']}.json"
         out.write_text(json.dumps(annotation(m["iiif_image"], w, h, px, ground, mask, order), indent=1))
+        if args.offcell:
+            dm = lambda v: f"{int(v)}d{(v % 1) * 60:05.2f}"
+            crs = f"{crs} NW {dm(mask_ground[0][0])} {dm(mask_ground[0][1])} SE {dm(mask_ground[2][0])} {dm(mask_ground[2][1])}"
         note = f"{sheet}  {crs:<10} src {off:4.1f} m  fit {rms:4.1f} m  outline {'n/a' if gap is None else f'{gap:4.1f} m'}"
         if args.write:
             url = f"{base}/storage/v1/object/{BUCKET}/{m['id']}.json"
@@ -235,7 +319,8 @@ def main():
                 req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
             req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
                 {"annotation_url": f"https://maparchive.vn/api/maps/{m['id']}/annotation",
-                 "is_georeferenced": True})
+                 "is_georeferenced": True,
+                 **({"extra_metadata": {**m["extra_metadata"], "georef_method": note_how}} if note_how else {})})
             note += "  uploaded"
         ok.append(note)
         print(note)
