@@ -183,7 +183,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       qMaps = qMaps.in('status', ['public', 'featured']);
     }
     const tsq = prefixQuery(q);
-    if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
+    // A sheet number ("5929-3") is not in `search_vector`, so it matches the sheet_number the series
+    // rows carry. The dash form only: a bare four digits is also a year. Digits only, so no filter syntax.
+    if (/^\d{4}-\d$/.test(q)) qMaps = qMaps.eq('extra_metadata->>sheet_number', q);
+    else if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
     // Slim callers get no facets, so there is nothing to tally the broad set
     // for — Postgres can do the cutting. Everyone else fetches broadly and
     // filters in JS, because a facet count needs the unfiltered set.
