@@ -62,6 +62,7 @@ INK_GREY, INK_PAD, GLYPH = 0.92, 1, 60
 R_FACE, R_CORE, FAT, FAT_Q, YARD_EDGE, RIM, RIM_R = 3, 9, 70, 36, 10, 30, 10
 RULED_DEEP = 14                 # a face deeper than this inside a ruled cell is faint hatch; narrower is a street between hatched blocks
 BRIDGE_REACH, BRIDGE_INK, BRIDGE_MIN, BRIDGE_MAX = 14, 0.8, 150, 8000   # px: deck reach from water, grey/paper of its hatch, area range
+DECK_SOLID, SOLID_GREY = 1.01, 0.45   # a candidate deck whose pixels are darker than SOLID_GREY (grey / paper) over more than this share is solid lettering, not a hatched pier (1.01 = off)
 PIER_WATER = 0.4                # share of a deck's rim (4 px) that is water for it to be a pier: a crossing has about half, a quay-side building a quarter
 RED_OD = 0.65                   # od(R) below this share of od(G): red ink, not black
 TILE, MARGIN = 1024, 2 * FAT + 40
@@ -73,6 +74,8 @@ STRIP_MIN, STRIP_MAX = 7, 60   # px across: the narrowest and widest strip that 
 RAY_MAX, W_NARROW, PAVE_LEN, VOTE, PAVE_RATIO, INNER_MIN, SAME_STRIP = 90, 19, 40, 9, 1.5, 600, 40
 W_PAVE, HATCH_RATIO, HATCH_GAP, HATCH_BLOCK = 40, 1.25, 3, 6   # a pavement against a block is at most W_PAVE wide; hatch is ink that closes over HATCH_GAP and still holds a disk of HATCH_BLOCK   # px: widest cross-section; narrow strip; a pavement lies this near an inner strip; shortest pavement piece
 W_PLAIN = 13                    # a strip with no kerb pair round it, no wider than W_PLAIN (chord, px), is a pavement or plot sliver, not a carriageway
+SHEET_CONSTS = ("INK_GREY", "INK_PAD", "GLYPH", "KERB_MAX", "RED_OD", "RULED_DEEP", "DECK_SOLID", "FAT")   # properties of the sheet's drawing, not of the method; the values above are 1882's, and
+                                # `sheets.<id>.road.consts` in river_ref/windows.json overrides any of them (1882's are written out there too)
 CELL = 32
 AXES = ((0, 1), (1, 0), (1, 1), (1, -1))
 BIG = 1 << 20
@@ -319,6 +322,12 @@ def road_tile(s, p, water, wall, ruled):
     # candidate bridge decks: dark hatched blobs beside water (kept only if road lies on two sides, or it is a pier, see add_bridges)
     near = nd.binary_dilation(water, disk(BRIDGE_REACH)) & ~water
     deck = nd.binary_opening(near & nd.binary_closing(grey < BRIDGE_INK, disk(3)) & ~wall, disk(3))   # a deck is a blob; a hatch strip along a bank is not
+    if DECK_SOLID <= 1:
+        lab, n = nd.label(deck, np.ones((3, 3)))
+        for i, t in enumerate(nd.find_objects(lab)):
+            m = lab[t] == i + 1
+            if (grey[t][m] < SOLID_GREY).mean() > DECK_SOLID:
+                deck[t] &= ~m
     hatch = nd.binary_opening(nd.binary_closing(ink, disk(HATCH_GAP)), disk(HATCH_BLOCK))      # lines 4-5 px apart fuse into a solid band; a line or two lines do not reach HATCH_BLOCK across
     return face, deck, glyph, strip_faces(face, dist), hatch
 
@@ -417,6 +426,10 @@ def main():
     water = np.asarray(Image.open(out / "water.png")) == 255
     wall = np.ones((h, w), bool)
     rs = sheet.get("road", {})
+    for k, v in rs.get("consts", {}).items():
+        assert k in SHEET_CONSTS, f"{k} is not a sheet constant"
+        globals()[k] = v
+    globals()["MARGIN"] = 2 * FAT + 40       # tile context: open ground is cut from disks of radius FAT
     x, y, bw, bh = rs.get("neatline", sheet["neatline"])
     wall[y:y + bh, x:x + bw] = False
     pad = rs.get("furniture_pad", 0)
@@ -464,7 +477,7 @@ def main():
     mv = road[::8, ::8]
     pv[mv] = pv[mv] * 0.4 + np.array([255, 150, 0]) * 0.6
     Image.fromarray(blank(pv.astype(np.uint8), a.sheet, 8)).save(out / "road-preview.jpg", quality=85)
-    run = {"sheet": a.sheet, "native_sha256": pin["rgb_sha256"],
+    run = {"sheet": a.sheet, "native_sha256": pin["rgb_sha256"], "sheet_consts": {k: globals()[k] for k in SHEET_CONSTS},
            "settings": {k: globals()[k] for k in ("INK_GREY", "INK_PAD", "GLYPH", "R_FACE", "R_CORE", "FAT", "FAT_Q", "YARD_EDGE", "RIM", "RIM_R", "RULED_DEEP", "RED_OD", "BRIDGE_REACH", "BRIDGE_INK", "BRIDGE_MIN", "BRIDGE_MAX", "PIER_WATER", "SHAPE_MIN", "NET_AREA", "NARROW_AREA", "SPECK", "LANE_R", "LANE_RATIO", "GARDEN_COH", "GARDEN_WIN", "GARDEN_FRAC", "GARDEN_MIN", "MK_RATIO", "MK_AREA", "RAY_MAX", "W_NARROW", "PAVE_LEN", "VOTE", "PAVE_RATIO", "W_PAVE", "HATCH_RATIO", "HATCH_GAP", "HATCH_BLOCK", "INNER_MIN", "SAME_STRIP", "STRIP_MIN", "STRIP_MAX", "KERB_MAX", "MK_R")},
            "road_px": int(road.sum()), "pavement_px": int(pave.sum()), "inner_px": int(inner.sum()), "components": len(stats), "kept": sum(s["kept"] for s in stats),
            "seconds": round(time.time() - t0, 1)}
@@ -590,6 +603,23 @@ def self_check():
     road, _, _ = finish(img, water)
     assert road[120, 190], "a deck with water on three sides is a pier, which the owner labels a bridge"
     assert not road[220, 40], "a hatched shed away from the water is not"
+    # 5b. bold lettering in the water is not a pier: a solid black blob with water all round it is road only when DECK_SOLID is off
+    img = canvas(300, 400)
+    water = np.zeros((300, 400), bool)
+    water[:, 150:] = True
+    water[100:140, 100:200] = False
+    img[100:140, 100:200] = black
+    global DECK_SOLID
+    keep = DECK_SOLID
+    try:
+        DECK_SOLID = 1.01
+        road, _, _ = finish(img, water)
+        assert road[120, 190], "with the solidity test off a deck with water on three sides is a pier"
+        DECK_SOLID = 0.65
+        road, _, _ = finish(img, water)
+        assert not road[120, 190], "a solid black blob is lettering, not a pier"
+    finally:
+        DECK_SOLID = keep
     # garden cells: a big dense patch of stipple with a 2-cell path through it, against scattered stipple
     st = np.zeros((60, 60), bool)
     st[10:50, 10:50] = True
