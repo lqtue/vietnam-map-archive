@@ -48,6 +48,17 @@ measurement, metadata that maintains itself, and corpus size.
       `series_cells.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
       WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — now its
       own item, `series-sheets-bbox-datum`, below. See `.claude/handoff.md` for the full trail.
+- [ ] **`l7014-iiif`** — the 510 PCL GeoPDFs as IIIF sheets, replacing the 20 GB of COGs as the
+      source for the next mosaic. **Ingested 2026-10-02**: 510 `draft` rows (slug
+      `<place>-l7014-<sheet>`, `extra_metadata.source_archive = PCL`), tiles in R2 `tiles/<uuid>`,
+      none duplicating an existing L7014 row. 436 carry an annotation from the PDF's own control
+      points (`scripts/l7014_annotate_pdf.py`; outline within 0.8 m of the mosaic's, datum fix
+      applied; the PDFs' own registration is ~12 m median, 35 m worst). The 74 the warp refuses
+      (62 NOGEO, 11 OFFCELL, 1 OFFGRID) have rows and tiles but no annotation: 7 pass
+      `l7014_autoplace.py`, the rest need hand corners. Open: eyeball a few in `/explore`, check
+      6330-3 / 6330-1 for same-edition duplicates, flip sheets to `public` only after
+      `geo_audit.mjs`, then build the PMTiles from them and close `l7014-rebuild`; `work/l7014/cogs*`
+      (~25 GB) can go after that. Names are ASCII; diacritics are a later pass.
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW

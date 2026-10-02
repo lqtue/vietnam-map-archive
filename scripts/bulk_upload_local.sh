@@ -6,6 +6,9 @@
 #
 # file-list.txt: one absolute path per line. Filename pattern parsed as:
 #   "<sheet#> <place> <year>.jpg"  → name="<sheet#> <place>", year=<year>
+# A line may instead be tab-separated "path<TAB>name<TAB>year<TAB>extra_metadata-json<TAB>slug"
+# (year "-" for none: `read` collapses empty tab fields), which skips the filename parsing — the slug is derived from
+# name + extra_metadata, so it has to be right at insert.
 #
 # Requires: .env with PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_KEY,
 #           rclone "r2:" remote, vips, jq, uuidgen.
@@ -49,13 +52,14 @@ parse_meta() {
 }
 
 total=0; ok=0; fail=0
-while IFS= read -r path; do
+while IFS=$'\t' read -r path T_NAME T_YEAR T_EXTRA T_SLUG; do
   [[ -z "$path" ]] && continue
   [[ ! -f "$path" ]] && { echo "SKIP (missing): $path" | tee -a "$LOG"; continue; }
   total=$((total+1))
 
   base=$(basename "$path" .jpg)
   IFS='|' read -r NAME YEAR SHEET <<< "$(parse_meta "$base")"
+  if [[ -n "${T_NAME:-}" ]]; then NAME="$T_NAME"; YEAR="${T_YEAR/#-/}"; SHEET=""; fi
   MAP_ID=$(uuidgen | tr 'A-Z' 'a-z')
 
   echo "" | tee -a "$LOG"
@@ -64,14 +68,16 @@ while IFS= read -r path; do
 
   # 1) Insert maps row
   extra_json='{}'
-  if [[ -n "$SHEET" ]]; then
+  if [[ -n "${T_EXTRA:-}" ]]; then
+    extra_json="$T_EXTRA"
+  elif [[ -n "$SHEET" ]]; then
     extra_json=$(jq -nc --arg s "$SHEET" '{sheet_number: $s}')
   fi
   insert_payload=$(jq -n \
     --arg id "$MAP_ID" --arg name "$NAME" \
     --arg col "$COLLECTION" \
     --argjson year "${YEAR:-null}" \
-    --argjson extra "$extra_json" \
+    --argjson extra "$extra_json" --arg slug "${T_SLUG:-}" \
     '{
       id: $id,
       name: $name,
@@ -81,7 +87,7 @@ while IFS= read -r path; do
       status: "draft",
       map_type: "topographic",
       extra_metadata: $extra
-    }')
+    } + (if $slug == "" then {} else {slug: $slug} end)')
   resp=$(curl -s -w "\n%{http_code}" -X POST "$SB_URL/rest/v1/maps" \
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" \
     -H "Content-Type: application/json" -H "Prefer: return=representation" \
