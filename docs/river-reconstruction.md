@@ -660,7 +660,7 @@ flag was changed.** Windows seen on 2026-10-02 for the diagnosis were already `c
 the numbers: the three false-road fixes in `bridge_basin` were tuned while looking at that window, so its eight flips
 are not independent.
 
-### Batch 5 stays unlabelled; batch 6 pending owner labels
+### Batch 5 stays unlabelled; batch 6 scored
 
 Batch 5 (seed 5, 90 points in `west_dense`, `msg_quay`, `ne_boulevard`) was drawn within 30 px of **v1's** edge. v2's
 edge lies elsewhere (`msg_quay` lost most of its road), so the 60 edge points no longer test v2's edges; the 30 uniform
@@ -670,4 +670,30 @@ unlabelled, as a record. **Batch 6 (seed 6), 90 points, pending owner labels:** 
 `label.py points 1882 --seed 6 --only west_dense,msg_quay,ne_boulevard --per 10 --edge road-a772ecd1.png --edge-per 20
 --band 30` (no `--unseen`: it would add the seven unseen water windows). Not viewed, served or scored. Score with
 `score.py --points 1882 river/road-a772ecd1.png --layer road --seed 6`.
+
+**Batch 6 result (owner-labelled 2026-10-02; 7 unsure dropped; v2 scored once, not tuned afterwards).**
+v1 (`road-4ecf05fc.png`) is rescored on the same points for comparison; the batch was drawn around v2's
+edges, so that comparison favours v2 slightly.
+
+| batch 6 | v2 | v1 |
+|---|---|---|
+| all (83 points, 17 road) | **84.3% [75-91] (70/83)** | 88.0% [79-93] (73/83) |
+| road missed | 1/17 | 0/17 |
+| land called road | 12/66 (18%) | 10/66 (15%) |
+| uniform stratum (28) | **100% [88-100]** | 89.3% (25/28) |
+| edge stratum (55) | 76.4% [64-86] | 87.3% [76-94] |
+| `quay` | 82.1% (false 4/21) | 71.4% (false 8/21) |
+| `boulevard` | 77.8% (false 6/26) | 96.3% (false 1/26) |
+| `dense_old_quarter` | 92.9% (false 2/19) | 96.4% (false 1/19) |
+
+Calling nothing a road scores 79.5% (66/83) on this edge-weighted batch, so v2 is above it here (the
+94.5% figure was on the mostly-uniform batches 1-4). What v2 does differently: away from edges it is
+right on all 28 uniform points (v1 missed three land points far from any edge, at 4, 13 and 31 px),
+and it halves the quay false road. **What it gets wrong is edge placement:** 12 of the 13 wrong points
+lie within 6 px of v2's edge (eleven at 1-3 px), and 6 of the 12 false-road points are in `boulevard`
+at 1-3 px. A 1-3 px error is the thickness of a kerb stroke, so it is where the label itself is least
+certain (a point on the stroke is `unsure`, and the owner dropped 7). A road edge pulled in by
+about the stroke width is a testable fix; it was **not** applied, because batch 6 is now spent for the
+road layer and the shift has to be set on calibrate windows and scored on a new batch. Road
+recall rests on 17 points. No road layer is approved.
 

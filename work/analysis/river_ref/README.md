@@ -9,7 +9,7 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 - `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
   `--unseen` restricts it to heldout windows with `seen: false`, the only clean test; a window that
   has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). `--only ID,ID` restricts a batch to named windows
-  (batches 5 and 6 are the three road windows added after the road pass v1 was frozen). Batch 5 (seed 5, around v1's edge) stays unlabelled; batch 6 (seed 6, around `road-a772ecd1.png`, the frozen v2) is pending owner labels.
+  (batches 5 and 6 are the three road windows added after the road pass v1 was frozen). Batch 5 (seed 5, around v1's edge) stays unlabelled; batch 6 (seed 6, around `road-a772ecd1.png`, the frozen v2) was labelled by the owner and scored (v2: 84.3%, results in `docs/river-reconstruction.md`).
 - `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
