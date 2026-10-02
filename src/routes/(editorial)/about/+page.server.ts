@@ -22,6 +22,7 @@
 
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
+import { readAll } from '$lib/data/supabase/paged';
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
   const db = adminClient();
@@ -39,7 +40,14 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     surveys,
   ] = await Promise.all([
     // Not a head count: the same rows give the year range and the city split.
-    db.from('maps').select('year, location').in('status', ['public', 'featured']),
+    readAll((from, to) =>
+      db
+        .from('maps')
+        .select('year, location')
+        .in('status', ['public', 'featured'])
+        .order('id')
+        .range(from, to)
+    ),
     db.from('maps').select('id', head).eq('status', 'draft'),
     db.from('ocr_labels').select('id', head),
     db.from('ocr_labels').select('id', head).eq('review_status', 'validated'),

@@ -6,6 +6,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import type { MapListItem, MapSeries, MapSourceType, MapStatus } from './types';
 import { looksValidBbox } from '$lib/core/geo/mapBounds';
+import { readAll } from '$lib/data/supabase/paged';
 
 export type DbRow = Database['public']['Tables']['maps']['Row'];
 
@@ -280,12 +281,16 @@ export async function fetchSeriesSheets(
   supabase: SupabaseClient<Database>,
   collection: string
 ): Promise<{ id: string; source: string; bbox?: [number, number, number, number] }[]> {
-  const { data, error } = await supabase
-    .from('maps')
-    .select('id, allmaps_id, annotation_url, bbox, extra_metadata, sheet_half')
-    .eq('collection', collection)
-    .eq('is_georeferenced', true)
-    .order('year', { ascending: true });
+  const { data, error } = await readAll((from, to) =>
+    supabase
+      .from('maps')
+      .select('id, allmaps_id, annotation_url, bbox, extra_metadata, sheet_half')
+      .eq('collection', collection)
+      .eq('is_georeferenced', true)
+      .order('year', { ascending: true })
+      .order('id')
+      .range(from, to)
+  );
 
   if (error || !data) {
     console.error('fetchSeriesSheets:', error);

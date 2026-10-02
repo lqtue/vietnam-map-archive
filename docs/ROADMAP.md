@@ -66,14 +66,6 @@ measurement, metadata that maintains itself, and corpus size.
       6330-3 / 6330-1 for same-edition duplicates, flip sheets to `public` only after
       `geo_audit.mjs`, then build the PMTiles from them and close `l7014-rebuild`; `work/l7014/cogs*`
       (~25 GB) can go after that. Names are ASCII; diacritics are a later pass.
-- [ ] **`row-cap`** — one PostgREST response stops at 1,000 rows (`supabase/config.toml`
-      `max_rows`), silently. `fetchMaps` hit it 2026-10-02, when the 510 L7014 drafts took a staff
-      reader's list to 1,369 rows: everything named after "Polei Jar Sieng" vanished from `/explore`
-      (fixed, paged). Still unpaged, and each crosses 1,000 the day the L7014 drafts are published
-      (528 public rows + 509): `about/+page.server.ts` (the year range and city split read every public
-      row), `catalog/series/[key]/+page.server.ts` (the `maps` read for one series) and
-      `fetchSeriesSheets`. Exit: each reads in pages, or counts in SQL instead of rows, before any
-      L7014 sheet is flipped to `public`.
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
