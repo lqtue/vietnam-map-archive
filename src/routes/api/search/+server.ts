@@ -22,6 +22,7 @@ import { getRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { tally } from '$lib/server/facets';
+import { readAll } from '$lib/data/supabase/paged';
 import { getTransformer } from '$lib/server/transformer';
 import { placeKey, placeCoreKey } from '$lib/core/utils/placeKey';
 
@@ -91,7 +92,7 @@ const SLIM_MAP_COLUMNS =
 
 // No pagination UI on the catalog/sidebar yet, so the page slice must be able
 // to hold the whole archive. Raw queries keep their own 2000-row safety ceiling.
-const MAX_LIMIT = 1000;
+const MAX_LIMIT = 5000;
 const DEFAULT_LIMIT = 60;
 
 const PERIODS: { key: string; label: string; from: number; to: number }[] = [
@@ -186,8 +187,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     // Slim callers get no facets, so there is nothing to tally the broad set
     // for — Postgres can do the cutting. Everyone else fetches broadly and
     // filters in JS, because a facet count needs the unfiltered set.
-    qMaps = qMaps.limit(slim ? Math.min(limit + offset, MAX_LIMIT) : 2000);
-    const { data, error: err } = await qMaps;
+    // `.limit(2000)` was silently cut to PostgREST's 1,000 with no order, so once the archive passed
+    // 1,000 rows every facet and filter ran over an arbitrary subset (L7014 showed 172 of 510).
+    const { data, error: err } = slim
+      ? await qMaps.limit(Math.min(limit + offset, MAX_LIMIT))
+      : await readAll((from, to) => qMaps.order('id').range(from, to));
     if (err) dbError(err, 'Map search failed');
     return (data as unknown as Record<string, unknown>[]) || [];
   };
@@ -205,8 +209,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       .neq('review_status', 'ingested'); // ingested rows already show up under maps
     const tsq = prefixQuery(q);
     if (tsq) qScout = qScout.textSearch('search_vector', tsq, { config: 'simple' });
-    qScout = qScout.limit(2000);
-    const { data, error: err } = await qScout;
+    const { data, error: err } = await readAll((from, to) => qScout.order('id').range(from, to));
     if (err) dbError(err, 'Scout search failed');
     return (data as Record<string, unknown>[]) || [];
   };
