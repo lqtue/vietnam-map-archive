@@ -18,6 +18,7 @@
  * route 404s before it ever reaches the sheet list.
  */
 
+import { readAll } from '$lib/data/supabase/paged';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
@@ -169,13 +170,17 @@ export const load: PageServerLoad = async ({ params }) => {
    * three-point georeference, deliberately left as a draft, and counting it
    * would advertise an edition no reader can open.
    */
-  const { data: rows } = await supabase
-    .from('maps')
-    .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox')
-    .eq('series_key', key)
-    .in('status', ['public', 'featured'])
-    .not('sheet_number', 'is', null)
-    .order('year', { ascending: true });
+  const { data: rows } = await readAll((from, to) =>
+    supabase
+      .from('maps')
+      .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox')
+      .eq('series_key', key)
+      .in('status', ['public', 'featured'])
+      .not('sheet_number', 'is', null)
+      .order('year', { ascending: true })
+      .order('id')
+      .range(from, to)
+  );
 
   const printings: Record<string, SheetPrinting[]> = {};
   /** Per cell, the union of the georeferenced records' boxes — see `coverage` below. */
