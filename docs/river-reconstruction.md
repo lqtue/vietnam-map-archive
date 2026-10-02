@@ -538,7 +538,7 @@ and this command gives 300 points. **Batch 5 pending owner labels**; it was not 
 [`work/ocr/scripts/road_pass.py`](../work/ocr/scripts/road_pass.py), commit `a772ecd1`, frozen mask
 `river/road-a772ecd1.png` (gitignored with the other outputs; sha256 `5ce76c69...59c20a`). Same inputs as v1. Deterministic (two full runs
 `cmp` equal), 748-1007 s, 2.0-2.6 GB resident, 3.7-4.3 GB peak footprint. `--self-check` now has seven synthetic
-sheets and fifteen asserts (street with pavement and kerb, boulevard of two promenades and a lettered carriageway,
+sheets and seventeen asserts (street with pavement and kerb, boulevard of two promenades and a lettered carriageway,
 block with its pavement, lane against plot, quay strip against yard, pier against shed, garden); each new constant
 fails at least one (`FAT_Q`, `PIER_WATER`, `NARROW_AREA`, `R_FACE`, `PAVE_RATIO`, `INNER_MIN`, `KERB_MAX`, `HATCH_RATIO`,
 `HATCH_BLOCK` were each changed and caught). **v2 is frozen and was not scored by the owner's labels when written.**
