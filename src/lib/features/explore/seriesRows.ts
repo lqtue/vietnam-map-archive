@@ -1,5 +1,5 @@
 import type { SeriesPart, SeriesRef } from '$lib/map/stores/layersStore';
-import { RASTER_SERIES, type RasterSeries } from '$lib/map/rasterSeries';
+import type { RasterSeries } from '$lib/map/rasterSeries';
 import type { MapSeries } from '$lib/data/maps/types';
 
 export type { RasterSeries };
@@ -92,7 +92,10 @@ function count(held: number, total?: number): string {
 export function buildSeriesRows(
   db: MapSeries[],
   canSeeDrafts: boolean,
-  rasters: RasterSeries[] = RASTER_SERIES
+  // Empty since 2026-10-03: L7014's 510 sheets are all `maps` rows now, so the list offers the
+  // database series alone and the pre-tiled mosaic (~470 m out) is no longer one tap away.
+  // `RASTER_SERIES` stays declared so a stack saved with the old row still folds and draws.
+  rasters: RasterSeries[] = []
 ): SeriesRow[] {
   const claimed = new Set<string>();
   const rows: SeriesRow[] = rasters.map((r) => {
