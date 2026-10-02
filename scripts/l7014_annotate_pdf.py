@@ -11,6 +11,7 @@ OFFCELL, OFFGRID) is refused here for the same reason.
     python3 scripts/l7014_annotate_pdf.py --sheet 6150-1     # dry run, one sheet
     python3 scripts/l7014_annotate_pdf.py                    # dry run, every PCL row
     python3 scripts/l7014_annotate_pdf.py --write            # upload what passes, point the rows at it
+    python3 scripts/l7014_annotate_pdf.py --auto --write     # the autoplace passes (no PDF georef) instead
 
 Second-order polynomial, not first: the control points are in UTM and Allmaps
 wants lon/lat, which a first-order fit cannot follow over 28 km -- measured
@@ -113,9 +114,23 @@ def read_pdf(sheet, pdf):
     return px, ground, mask, (w, h), crs, off
 
 
-def apply(px, ground, pts):
-    c, *_ = np.linalg.lstsq(_basis(px), ground, rcond=None)
-    return _basis(pts) @ c, _basis(px) @ c - ground
+def read_auto(sheet):
+    """The 7 sheets with no usable PDF georeference that `l7014_autoplace.py seams` passed:
+    the printed neatline's four detected corners against the sheet's lattice cell. Four
+    points, so order 1 -- an affine, exactly what the autoplace warp itself uses."""
+    summary = json.load(open("work/l7014/regen/autoplace-summary.json"))
+    if sheet not in summary["pass"]:
+        raise ValueError("not an autoplace pass")
+    rec = json.load(open("work/l7014/regen/autoplace-detect.json"))[sheet]
+    px = np.array([rec["corners"][k] for k in ("NW", "NE", "SE", "SW")])
+    ground = np.array(json.load(open("work/l7014/lattice.json"))["cells"][sheet])
+    return px, ground, px, tuple(rec["size"]), "lattice", 0.0
+
+
+def apply(px, ground, pts, order=ORDER):
+    b = _basis if order == 2 else lambda p: _basis(p)[:, :3]
+    c, *_ = np.linalg.lstsq(b(px), ground, rcond=None)
+    return b(pts) @ c, b(px) @ c - ground
 
 
 def metres(a, b):
@@ -138,7 +153,7 @@ def outline_gap(mask_ground, sheet, manifest):
     return gap
 
 
-def annotation(iiif, w, h, px, ground, mask):
+def annotation(iiif, w, h, px, ground, mask, order=ORDER):
     poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in mask)
     return {
         "type": "AnnotationPage",
@@ -157,7 +172,7 @@ def annotation(iiif, w, h, px, ground, mask):
             },
             "body": {
                 "type": "FeatureCollection",
-                "transformation": {"type": "polynomial", "options": {"order": ORDER}},
+                "transformation": {"type": "polynomial", "options": {"order": order}},
                 "features": [
                     {"type": "Feature",
                      "properties": {"resourceCoords": [round(float(p[0]), 1), round(float(p[1]), 1)]},
@@ -173,6 +188,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sheet", nargs="*", help="only these sheet numbers")
     ap.add_argument("--write", action="store_true", help="upload and update the rows")
+    ap.add_argument("--auto", action="store_true", help="the autoplace passes, from detected corners")
     ap.add_argument("--force", action="store_true", help="redo rows that already have an annotation")
     args = ap.parse_args()
 
@@ -192,20 +208,22 @@ def main():
             skipped.append((sheet, "already annotated"))
             continue
         try:
-            px, ground, mask, (w, h), crs, off = read_pdf(sheet, M.local_pdf(files[sheet]))
+            order = 1 if args.auto else ORDER
+            px, ground, mask, (w, h), crs, off = (
+                read_auto(sheet) if args.auto else read_pdf(sheet, M.local_pdf(files[sheet])))
             info = plain(f"{m['iiif_image']}/info.json")
             if (info["width"], info["height"]) != (w, h):
                 raise ValueError(f"size {w}x{h} but IIIF says {info['width']}x{info['height']}")
-            mask_ground, resid = apply(px, ground, mask)
+            mask_ground, resid = apply(px, ground, mask, order)
             rms = float(np.sqrt((metres(ground + resid, ground) ** 2).mean()))
-            gap = outline_gap(mask_ground, sheet, manifest)
+            gap = None if args.auto else outline_gap(mask_ground, sheet, manifest)
             if gap is not None and gap > OUTLINE_TOL_M:
                 raise ValueError(f"outline {gap:.0f} m off the mosaic's")
         except (ValueError, RuntimeError, urllib.error.URLError, KeyError) as e:
             skipped.append((sheet, str(e)))
             continue
         out = OUT / f"{m['id']}.json"
-        out.write_text(json.dumps(annotation(m["iiif_image"], w, h, px, ground, mask), indent=1))
+        out.write_text(json.dumps(annotation(m["iiif_image"], w, h, px, ground, mask, order), indent=1))
         note = f"{sheet}  {crs:<10} src {off:4.1f} m  fit {rms:4.1f} m  outline {'n/a' if gap is None else f'{gap:4.1f} m'}"
         if args.write:
             url = f"{base}/storage/v1/object/{BUCKET}/{m['id']}.json"
