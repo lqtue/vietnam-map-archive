@@ -72,6 +72,7 @@ MK_RATIO, MK_AREA, MK_R, KERB_MAX = 6.0, 200, 30, 8   # a face is a strip for ke
 STRIP_MIN, STRIP_MAX = 7, 60   # px across: the narrowest and widest strip that can lie beyond a kerb
 RAY_MAX, W_NARROW, PAVE_LEN, VOTE, PAVE_RATIO, INNER_MIN, SAME_STRIP = 90, 19, 40, 9, 1.5, 600, 40
 W_PAVE, HATCH_RATIO, HATCH_GAP, HATCH_BLOCK = 40, 1.25, 3, 6   # a pavement against a block is at most W_PAVE wide; hatch is ink that closes over HATCH_GAP and still holds a disk of HATCH_BLOCK   # px: widest cross-section; narrow strip; a pavement lies this near an inner strip; shortest pavement piece
+W_PLAIN = 13                    # a strip with no kerb pair round it, no wider than W_PLAIN (chord, px), is a pavement or plot sliver, not a carriageway
 CELL = 32
 AXES = ((0, 1), (1, 0), (1, 1), (1, -1))
 BIG = 1 << 20
@@ -260,22 +261,26 @@ def pavement(road, mk, hatch):
     against = nd.distance_transform_edt(~hatch) <= width / 2 + 8        # a hatched block lies against the strip's outer wall
     smaller = one & (((width <= W_NARROW) & (width * PAVE_RATIO <= beyond)) |
                      (against & (width <= W_PAVE) & (width <= HATCH_RATIO * beyond)))
+    plain = ok & ~inner_t & vote(ok & (width <= W_PLAIN))              # a strip too narrow for a carriageway, with no kerb pair round it
     inner, outer = inner_t & road, one & road
     pave = np.zeros_like(road)
-    if outer.any():
+    beside = np.zeros_like(road)
+    if outer.any() and inner_t.any():
         # beside an inner strip: one lies across the kerb, so within a chord's width and a wall of this pixel, but not
         # along the same strip (geodesically close through T): a strip is not beside its own inner stretch
-        if inner_t.any():
-            near_e = nd.distance_transform_edt(~inner_t) <= width + KERB_MAX + 4
-            same = nd.binary_dilation(inner_t, nd.generate_binary_structure(2, 1), iterations=SAME_STRIP, mask=mk)
-            beside = near_e & ~same
-        else:
-            beside = np.zeros_like(road)
-        cand = outer & (smaller | beside)
-        lab, n = nd.label(nd.binary_opening(cand, np.ones((3, 3), bool)), np.ones((3, 3)))
-        if n:
-            size = np.concatenate([[0], nd.sum(np.ones_like(lab), lab, np.arange(1, n + 1))])
-            pave = size[lab] >= PAVE_LEN
+        near_e = nd.distance_transform_edt(~inner_t) <= width + KERB_MAX + 4
+        same = nd.binary_dilation(inner_t, nd.generate_binary_structure(2, 1), iterations=SAME_STRIP, mask=mk)
+        beside = near_e & ~same
+    def pieces(cand):
+        """Candidate pixels in pieces of at least PAVE_LEN px."""
+        cand = nd.binary_opening(cand, np.ones((3, 3), bool))
+        lab, n = nd.label(cand, np.ones((3, 3)))
+        if not n:
+            return np.zeros_like(cand)
+        size = np.concatenate([[0], nd.sum(np.ones_like(lab), lab, np.arange(1, n + 1))])
+        return (size[lab] >= PAVE_LEN) & cand
+    pave = pieces(outer & (smaller | beside)) if outer.any() else pave
+    pave |= pieces(plain & road)
     return pave & ~inner, inner_t
 
 
@@ -546,17 +551,22 @@ def self_check():
     hatch(img, 160, 500, 0, 1800)
     hline(img, 120, 0, 1800)
     hline(img, 160, 0, 500)
-    hline(img, 160, 522, 1800)
-    for x in (500, 520):
+    hline(img, 160, 522, 698)
+    hline(img, 160, 718, 1800)
+    for x in (500, 520, 698, 714):
         vline(img, x, 160, 500)
     hline(img, 200, 900, 1700)
     hline(img, 215, 900, 1700)
     vline(img, 900, 200, 217)
     vline(img, 1700, 200, 217)
     img[160:500, 502:518] = paper                                  # the lane
+    img[160:500, 700:714] = paper                                  # a 14 px strip between block lines with red tramway dashes across it:
+    for y in range(190, 500, 30):                                  # pavement or plot sliver, not a carriageway (W_PLAIN), dashes or not
+        img[y:y + 8, 700:714] = (190, 90, 60)
     road, _, _ = finish(img)
     assert road[140, 900] and road[300, 510], "a narrow lane joining a street is road"
     assert not road[208, 1300], "an isolated narrow plot is not"
+    assert not road[300, 707] and not road[400, 707], "a plain strip of 12 px, even cut by dashes and joined to a street, is a pavement or sliver"
     # 4. beside water: a quay strip of 30 px is road, a blank yard 90 px deep is not
     img = canvas(400, 1300)
     hatch(img, 0, 100, 0, 1300)
