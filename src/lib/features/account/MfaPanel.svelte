@@ -41,7 +41,12 @@
       message = error?.message ?? 'Could not start authenticator setup';
     } else {
       pendingFactorId = data.id;
-      qrCode = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(data.totp.qr_code)}`;
+      // supabase-js already returns a `data:image/svg+xml` URI; wrapping it again made the browser
+      // parse "data:image/…" as XML ("Start tag expected"). Older responses were bare SVG.
+      const svg = data.totp.qr_code;
+      qrCode = svg.startsWith('data:')
+        ? svg
+        : `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
       secret = data.totp.secret;
     }
     busy = false;
@@ -92,7 +97,7 @@
         type="text"
         inputmode="numeric"
         autocomplete="one-time-code"
-        pattern="[0-9]{6}"
+        pattern={'[0-9]{6}'}
         maxlength="6"
         bind:value={code}
         required
