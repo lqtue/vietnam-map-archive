@@ -697,3 +697,59 @@ about the stroke width is a testable fix; it was **not** applied, because batch 
 road layer and the shift has to be set on calibrate windows and scored on a new batch. Road
 recall rests on 17 points. No road layer is approved.
 
+## Road pass v2: where the edge sits against the stroke (2026-10-02, diagnosis only)
+
+The batch 6 result above left a testable idea: 12 of 13 wrong points lie within 6 px of v2's edge, so pull the
+edge in by about a stroke width. Before changing the pass I measured where v2's edge sits against the ink stroke it
+follows, with [`edge_profile.py`](../work/analysis/river_ref/edge_profile.py) on windows I may view. **The idea does
+not survive the measurement, and v2 is unchanged (no v3, no batch 7).**
+
+**Measurement.** For each straight stretch of the edge of `road-a772ecd1.png` (the smoothed mask normal agrees at
+4 and 10 px) the ink density `1 - grey / local paper` is sampled along the normal, `t = 0` at the edge, `t > 0` into
+the road. The stroke is the ink run just outside (`t` in -8..+1); its centre is the ink-weighted mean of the run
+above half its peak. Road windows that are calibrate or `seen: true` (`ne_cream`, `dense_grid`, `blue_domain`;
+`creek_crossing` is skipped because its 40 px margin touches `creek_nw`): 31 290 straight edge pixels, 97.5% with a
+stroke. A block's lower-right sides are drawn thick and its upper-left sides thin, so the road is split by whether it
+lies lower-right of its wall (the thick side) or upper-left of it:
+
+| side of the wall the road lies on | n | stroke width (FWHM, 0.5 px steps) | stroke centre vs v2 edge | stroke's road-side half-max face vs v2 edge |
+|---|---|---|---|---|
+| lower-right (thick sides) | 6 858 | 3.0 px | **-3.20 px** [IQR -3.83 to -2.56] | -1.75 px |
+| upper-left (thin shadow line) | 6 905 | 2.0 px | **-2.67 px** [-3.45 to -2.20] | -1.75 px |
+| other orientations | 16 749 | 2.0 px | -2.66 px [-3.23 to -2.20] | -1.75 px |
+
+Negative is outside the road, in the wall. The same run on all 14 calibrate or seen windows of both layers (94 k
+pixels) gives -2.99, -2.69 and -2.71. The difference between the sides is 0.5 px, in line with the README's "under
+1 px". 88-96% of edge pixels lie 1-2 px from the nearest raw ink pixel (`grey < INK_GREY`): the edge is the ink
+threshold plus `INK_PAD`, and a synthetic boulevard shows the road ending one ink-pad pixel plus the threshold
+pixel from the kerb line.
+
+**What this says.** v2's edge does not sit outside the stroke. It sits **2.7-3.2 px on the road side of the stroke
+centre** (1.75 px clear of the stroke's visible face). "The edge is the centre of the line" (README) therefore
+means widening the road by about 3 px per side, not pulling it in. As a probe, `road | (ink & dilate(road, 3))`
+adds +11.8% (`ne_cream`), +16.7% (`dense_grid`) and +18.6% (`blue_domain`) road area. It flips none of the 191 spent
+labelled points (no spent point is near an edge) and, from the geometry, cannot remove false road: it moves the
+edge away from the road. I did not apply it. A pull-in in the direction the batch 6 errors suggest would go the
+other way from the owner's rule, and every face v2 keeps is at least 7 px wide (`R_FACE` 3), so 3 px per side
+would shrink the 12-20 px carriageways between kerbs to 6-14 px and the narrow lanes to 1-3 px.
+
+**So the 1-3 px false road is not edge placement.** A point inside a strip narrower than about 8 px is within 4 px
+of the strip's edge whatever the edge does, so a pavement strip or plot sliver that v2 keeps as road produces
+exactly this pattern (and 6 of 12 sit in `boulevard`, the case with the most kerb pairs). This is consistent with
+the counts but not shown: I looked at no pixel of an unseen window. What the viewable windows do show is room for
+it. Road at chord width under 10 px is 4.8% (`ne_cream`), 7.3% (`dense_grid`) and 11.9% (`blue_domain`) of road;
+`ne_cream` has long 8-12 px strips between parallel lines kept as road. In a replica of the kerb stage on
+`dense_grid`, one-sided strips of at most 24 px kept as road include 14 777 px (10% of its road) whose width is
+1.1-1.5 times the strip across the kerb, just under `PAVE_RATIO` 1.5. Whether they are pavement or street is the
+owner's call; no label in a viewable window says.
+
+**Next, for whoever owns the decision.** The 12 batch 6 false-road points are spent for the road layer, so they may
+be looked at to see which of these they are (strip of a pavement, a plot sliver, a boulevard promenade). If they
+are narrow strips, the fix is in `pavement` / `PAVE_RATIO` / `NARROW_AREA`, not in the edge, and it needs a fresh
+batch drawn on the new mask.
+
+**Discipline.** Viewed and measured: `ne_cream`, `dense_grid`, `blue_domain` and the other calibrate or seen
+windows only (the 1882 whole-sheet mask was read only inside them). No unseen heldout box was viewed or measured, no
+labelled point in an unseen window was used or scored, batch 6 was not touched, no `seen` flag changed. The probe
+growth was scored on the 191 spent points only (`score.py --spent` rule).
+

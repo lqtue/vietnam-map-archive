@@ -33,6 +33,7 @@ The tracing workflow below still works, and is kept for any window that needs a 
 - `view.py SHEET out.jpg [--scale 8 | --box X Y W H]` — look at a sheet without leaking a heldout
   window: boxes with `seen: false` are painted black, and a crop that touches one is refused. The
   feature and river previews use its `blank`. Setting `seen: true` is the record that someone looked.
+- `edge_profile.py 1882 MASK.png [--all]` — where a road mask's straight edges sit against the ink stroke they follow (stroke width and centre offset per side of the wall), on road windows that are calibrate or `seen: true`; `--all` adds the water windows. v2 (`road-a772ecd1.png`): the edge is 2.7-3.2 px on the road side of the stroke centre (`docs/river-reconstruction.md`, "Road pass v2: where the edge sits against the stroke").
 - `traces/` — the hand traces, committed, GeoJSON Polygons in **source pixels**. Classes:
   `water` (in water windows; extra rings are islands, landings, piers), `block` (in road windows:
   every face that is **not** road) and `ignore` (both). Water windows: land is the complement.
