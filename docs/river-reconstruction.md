@@ -888,3 +888,92 @@ uniform, 20 within 30 px of the `road-a3b0458f.png` edge), seed 7:
 `label.py points 1882 --seed 7 --only mid_boulevard,centre_dense,avalanche_quay --per 10 --edge road-a3b0458f.png --edge-per 20 --band 30`.
 Not viewed, served or scored. Score with `score.py --points 1882 river/road-a3b0458f.png --layer road --seed 7`. Compare
 v2 on the same points for reference only (the batch was drawn around v3's edge, which favours v3).
+
+## Road pass, 1898 (2026-10-02)
+
+The 1882 road pass, run on the 16267 x 14859 Bertaux sheet (`20ec4f9a`) from `river_pass`'s `water.png` and `cells.npz` and
+`sheet_features`' `paper.npy` and `texture.npz`. Code commit `fadb75b3`, frozen mask
+`river/road-fadb75b3.png` (gitignored; sha256 `8b5102cc...`). **One full run** (4212 s, 2.2 GB resident, **10.4 GB peak footprint**: the
+brief expected about 6; the 1898 masks are 242 Mpx each). 13.02 M road px, 6.5% of the neatline box; 4482 components, 205 kept;
+1.19 M px of pavement. No 1898 road label exists. **Nothing here is scored.**
+
+### What differs from 1882 (read on the calibrate windows and unblinded land)
+
+| | 1882 | 1898 |
+|---|---|---|
+| Streets | 20-45 px, kerb lines drawn on the wide ones | about 1.5x wider in px (a boulevard is 90 px), a single thin outline each side, no kerb pairs seen on the calibrate windows |
+| Ink | brownish, `INK_GREY` 0.92 on grey / local paper | neutral black; the same threshold works (streets come out on `cal_centre`, `cal_edge`, `dry_blue`) |
+| Blocks | salmon / blue / green hatch at 4.5 px, 144 deg, some blank | machine ruling 6 px at 45 deg (the water pass's `ruling`), some blank parcels |
+| Frame | one thin line, axis aligned | four lines, tilted and keystoned; `sheets.1898.neatline` is already inside the innermost line, so no separate `road.neatline` |
+| Lettering over water | thin | bold, solid black (`RIVIERE DE`): it passed as a pier deck |
+| Sheet fold | none seen | a horizontal crease at y about 7470 reads as a wall and cuts the streets that cross it |
+
+### What became per sheet
+
+`sheets.<id>.road.consts` in `windows.json`; `road_pass.py` takes the module's value (1882's) for any key that is absent, and
+1882's are written out too. `SHEET_CONSTS` names the eight keys; anything else in `consts` is refused.
+
+| key | 1882 | 1898 | why |
+|---|---|---|---|
+| `INK_GREY`, `INK_PAD`, `GLYPH`, `KERB_MAX`, `RED_OD` | 0.92, 1, 60, 8, 0.65 | same | not changed by eye; they are the ink threshold, stroke widths and tramway colour, written out so a later sheet can move them |
+| `RULED_DEEP` | 14 | **60** | a face deeper than this inside a ruled 32 px cell is called a block; 1898 streets are wider and sit beside ruled cells, so at 14 whole streets were cut (`cal_edge`: two of three streets missing) |
+| `DECK_SOLID` | 1.01 (off) | **0.65** | a candidate deck whose pixels are mostly under grey / paper 0.45 is solid lettering, not a hatched pier: 80-85% for the `RIVIERE` letters, 32-38% for the piers of `open_bank` |
+| `FAT` | 70 | **105** | open ground is cut from disks of this radius (tile margin `2 FAT + 40` follows); at 70 the 110 px plaza at the Garnier statue junction was cut out of the road (`cal_centre`) |
+
+`DECK_SOLID` and `FAT` are new sheet keys, `DECK_SOLID` adds a branch with a self-check case (a solid black blob in water is a pier
+with the test off and not with it on). `furniture_pad` for 1898 is 30 (1882: 100), unchanged from my first guess; I did not
+check the furniture borders.
+
+**1882 is bit-identical.** After the change the 1882 pass was run again from scratch (743 s) and `cmp`s equal to the frozen
+`road-a3b0458f.png`.
+
+### Calibrate quality (by eye, not scored)
+
+Viewed natively beside the road mask, window mode (`--window` walls off the unseen heldout boxes): `cal_centre`, `cal_edge`,
+`water_core`, `open_bank`, `creek_west`, `dry_blue`. Tuned on these only; each of the three constants above moved at least one
+visible fault.
+
+- **`cal_centre`** (23-25% road): the street grid, the Boulevard with its median line, the junction plaza and the lettered
+  streets (`Rue`, `Boulevard`, `Carabelli`) are road; blocks of every hatch, the garden islands and the statue block are
+  not. Junction corners lose small flecks. Weak: the dashed outlines of the projected theatre site are partly road.
+- **`cal_edge`** (about 8%): the three streets are road; the large salmon block is untouched.
+- **`dry_blue`**: both streets, no road inside the blue-hatched hospital parcels.
+- **`open_bank`**: the bank wharves and the five T-shaped landing stages are road (the owner labels piers bridges); the
+  `RIVIERE` lettering in the water is not. The statue / shore block at the top left is road.
+- **`creek_west`** (0.7%): blank land outside the limit is cut. Weak: small blobs (20-30 px) inside the creek, at the
+  water pass's blank ovals, and `Binh` lettering on the water, are road; a strip along the creek bank against the salmon land.
+- **`water_core`**: no road.
+
+Outside the windows (whole-sheet preview with every unseen box black; two native crops of unblinded land, 1400 x 1200 in the west
+and 2200 x 1600 in the centre): the street network is found across the city and the long diagonal avenues, the railway yard
+and the Jardin de la Ville are not road. **Weak spots seen:**
+
+- **The north-west planned grid.** A district of blank, unhatched plots whose streets are only **dashed lines** (`Rue` in dashed
+  outline) reads as a checkerboard of road: dashes are not walls, so blank plots leak into the dashed streets and half of
+  them are kept. This is the largest fault I saw; it is not in a calibrate window, so I did not tune on it. A closing over
+  the dash gap (8-10 px) is the obvious next change.
+- The crease at y about 7470 cuts streets it crosses; the pieces are kept but the street has a gap.
+- Water-pass leftovers (blank ovals in creeks) and lettering on narrow water.
+- Everything the 1882 notes list (a lettered carriageway between kerbs, leaks through gaps in a building outline) and the
+  `W_PLAIN` 13 px rule is carried over unchanged; whether 13 px suits a sheet whose scale is 1.5x larger is untested.
+
+### Discipline
+
+No `seen: false` heldout box was cropped, previewed or inspected: the five unseen water boxes (`quay_canal`, `creek_north`,
+`bridge_label`, `dry_salmon`, `hatched_bank`) and the five new road windows below. Every whole-sheet image, including
+`road-preview.jpg`, had them black; the two native crops go through `view.touches`. Window runs wall the unseen boxes off. No count was
+taken inside a blind box.
+
+### Windows and batch pending owner labels
+
+Added to `windows.json` (`"layer": "road"`, 1000 x 1000), placed by eye on the 1/12 whole-sheet view with the five unseen
+water boxes black, **before any 1898 road proposal existed**, clear of those boxes and of each other:
+heldout, `seen: false`: `road_boulevard` ([7300, 4900], wide avenue among the grid blocks), `road_dense` ([6200, 9400],
+dense small blocks), `road_quay` ([9500, 6500], the river bank), `road_outskirts` ([3300, 8700], sparse plots and the railway),
+`road_creek` ([2900, 3300], a creek among salmon land). The case names are guesses from the 1/12 view. Calibrate: `cal_centre`
+([8300, 7300]) and `cal_edge` ([4300, 7300]).
+
+Batch (seed 2, 90 points, 18 per window: 8 uniform, 10 within 30 px of the `road-fadb75b3.png` edge):
+`label.py points 1898 --seed 2 --only road_boulevard,road_dense,road_quay,road_outskirts,road_creek --per 8 --edge road-fadb75b3.png --edge-per 10 --band 30`.
+Not viewed, served or scored. Score with `score.py --points 1898 river/road-fadb75b3.png --layer road --seed 2`.
+**Batch pending owner labels.**

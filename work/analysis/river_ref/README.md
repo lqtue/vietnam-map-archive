@@ -19,7 +19,7 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
 - `windows.json` — 1882: 14 water windows and 12 road windows (`"layer": "road"`; `west_dense`, `msg_quay`, `ne_boulevard` were added 2026-10-02 after v1 was frozen and **reclassified calibrate / seen the same day** after a diagnosis of batch 6; `mid_boulevard`, `centre_dense`, `avalanche_quay` are the clean heldout road windows for v3, `seen: false`); 1898: 9 water
-  windows. `sheets.<id>` also carries the sheet's legend, neatline, furniture and `ruling` (the
+  windows and 7 road windows (`road_boulevard`, `road_dense`, `road_quay`, `road_outskirts`, `road_creek` heldout, `seen: false`; `cal_centre`, `cal_edge` calibrate; 2026-10-02, batch seed 2 of 90 points pending owner labels, drawn around `road-fadb75b3.png`). `sheets.<id>` also carries the sheet's legend, neatline, furniture and `ruling` (the
   machine-ruling constants river_pass.py reads; 1882's are its defaults). Each has a case and a split. `calibrate` windows may fit the appearance model;
   `heldout` are scored once. `seen: true` marks a window already used in a 2026-10-01
   diagnostic — **not clean held-out**, whatever its split says. The four 1882 water windows and
@@ -86,5 +86,5 @@ The tracing workflow below still works, and is kept for any window that needs a 
    Re-import any time.
 
 Do one window first and import it, so the alignment can be checked before the rest.
-The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v3; 1882 only; `--window ID` previews one window and refuses an unseen heldout one; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
+The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v3; 1882 and 1898 via `--sheet`; sheet constants in `sheets.<id>.road.consts`; `--window ID` previews one window and refuses an unseen heldout one; `sheets.<id>.road` in `windows.json` is its frame and sheet constants; 1898 is untuned beyond the calibrate windows and unscored). Not built: the multi-reviewer agreement check. Two people tracing
 the same window is what tells you whether 5 px of edge error is the method or the tracing.
