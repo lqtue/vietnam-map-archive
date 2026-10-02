@@ -188,55 +188,71 @@ function drawnExtent(doc) {
 
 async function checkAnnotations(maps) {
   const extents = new Map();
+  const sb = db();
+  let next = 0;
+  // 8 workers: an unbounded Promise.all over ~1,500 fetches drops connections ("fetch failed").
+  const pool = async (fn) => {
+    while (next < maps.length) await fn(maps[next++]);
+  };
   await Promise.all(
-    maps.map(async (m) => {
-      const published = m.status !== 'draft';
-      const level = published ? 'FAIL' : 'WARN';
-      const source = m.annotation_url || m.allmaps_id;
-      const where = `${m.name} [${m.status}]`;
-      if (!source) return say(level, 'annotation', where, 'no annotation_url and no allmaps_id');
-      let doc;
-      try {
-        const res = await fetch(annotationUrl(source));
-        if (!res.ok) return say(level, 'annotation', where, `annotation HTTP ${res.status}`);
-        doc = await res.json();
-      } catch (e) {
-        return say(level, 'annotation', where, `annotation unreachable: ${e.message}`);
-      }
+    Array.from({ length: 8 }, () =>
+      pool(async (m) => {
+        const published = m.status !== 'draft';
+        const level = published ? 'FAIL' : 'WARN';
+        const source = m.annotation_url || m.allmaps_id;
+        const where = `${m.name} [${m.status}]`;
+        if (!source) return say(level, 'annotation', where, 'no annotation_url and no allmaps_id');
+        let doc;
+        try {
+          if (m.annotation_url?.startsWith('https://maparchive.vn/api/maps/')) {
+            // The app route hides drafts from anonymous callers; the file itself is in the private bucket.
+            const { data, error } = await sb.storage.from('annotations').download(`${m.id}.json`);
+            if (error) return say(level, 'annotation', where, `annotation file: ${error.message}`);
+            doc = JSON.parse(await data.text());
+          } else {
+            const res = await fetch(annotationUrl(source));
+            if (!res.ok) return say(level, 'annotation', where, `annotation HTTP ${res.status}`);
+            doc = await res.json();
+          }
+        } catch (e) {
+          return say(level, 'annotation', where, `annotation unreachable: ${e.message}`);
+        }
 
-      const ext = drawnExtent(doc);
-      if (!ext) return say(level, 'annotation', where, 'annotation carries no map');
-      if (!ext.hull) return say(level, 'annotation', where, `${ext.gcps} control points, needs 3`);
-      extents.set(m.id, ext);
+        const ext = drawnExtent(doc);
+        if (!ext) return say(level, 'annotation', where, 'annotation carries no map');
+        if (!ext.hull)
+          return say(level, 'annotation', where, `${ext.gcps} control points, needs 3`);
+        extents.set(m.id, ext);
 
-      // The third party: a box round the country. Cheap, and the only thing here
-      // that catches a transform that went somewhere else entirely.
-      const [w, s, e, n] = ext.drawn;
-      if (w < VIETNAM[0] || s < VIETNAM[1] || e > VIETNAM[2] || n > VIETNAM[3])
-        say(
-          'FAIL',
-          'annotation',
-          where,
-          `drawn outside Vietnam: [${ext.drawn.map((v) => v.toFixed(3))}]`
-        );
-
-      // Copy against its source, so staleness only — bbox is computed FROM the
-      // annotation (scripts/oneoff/backfill_map_bbox.mjs) and is the warped
-      // extent of the sheet's mask, which is `drawn`. Comparing it with `hull`
-      // measures the gap between two different quantities and calls it drift.
-      if (Array.isArray(m.bbox) && m.bbox.length === 4) {
-        const off = Math.max(
-          ...boxCorners(m.bbox).map((p, i) => metres(p, boxCorners(ext.drawn)[i]))
-        );
-        if (off > BBOX_TOL)
+        // The third party: a box round the country. Cheap, and the only thing here
+        // that catches a transform that went somewhere else entirely.
+        const [w, s, e, n] = ext.drawn;
+        if (w < VIETNAM[0] || s < VIETNAM[1] || e > VIETNAM[2] || n > VIETNAM[3])
           say(
-            'WARN',
-            'bbox',
+            'FAIL',
+            'annotation',
             where,
-            `maps.bbox is ${(off / 1000).toFixed(1)} km from the sheet's warped extent — re-georeferenced since the backfill?`
+            `drawn outside Vietnam: [${ext.drawn.map((v) => v.toFixed(3))}]`
           );
-      }
-    })
+
+        // Copy against its source, so staleness only — bbox is computed FROM the
+        // annotation (scripts/oneoff/backfill_map_bbox.mjs) and is the warped
+        // extent of the sheet's mask, which is `drawn`. Comparing it with `hull`
+        // measures the gap between two different quantities and calls it drift.
+        if (Array.isArray(m.bbox) && m.bbox.length === 4) {
+          const off = Math.max(
+            ...boxCorners(m.bbox).map((p, i) => metres(p, boxCorners(ext.drawn)[i]))
+          );
+          if (off > BBOX_TOL)
+            say(
+              'WARN',
+              'bbox',
+              where,
+              `maps.bbox is ${(off / 1000).toFixed(1)} km from the sheet's warped extent — re-georeferenced since the backfill?`
+            );
+        }
+      })
+    )
   );
   return extents;
 }
@@ -247,7 +263,7 @@ function checkLattice(maps, extents, lattice) {
   let checked = 0,
     unmasked = 0;
   for (const m of maps) {
-    const sheet = m.sheet_number;
+    const sheet = m.sheet_number ?? m.pcl;
     const cell = sheet && lattice[sheet];
     const ext = extents.get(m.id);
     if (!cell || !ext?.drawn) continue;
@@ -288,7 +304,7 @@ function checkLattice(maps, extents, lattice) {
 function checkDoubleHeld(maps, extents, mosaic) {
   let pairs = 0;
   for (const m of maps) {
-    const sheet = m.sheet_number;
+    const sheet = m.sheet_number ?? m.pcl;
     const outline = sheet && mosaic.get(sheet);
     const ext = extents.get(m.id);
     if (!outline || !ext?.drawn || !ext.hasMask) continue;
@@ -412,12 +428,22 @@ if (args.includes('--self-test')) selfTest();
 
 // ── run ─────────────────────────────────────────────────────────────────────
 
-const { data: maps, error } = await db()
-  .from('maps')
-  .select('id,name,status,collection,bbox,allmaps_id,annotation_url,sheet_number');
-if (error) {
-  console.error(`maps: ${error.message}`);
-  process.exit(2);
+// PostgREST caps one response at 1,000 rows; page with a total order.
+const maps = [];
+for (let from = 0; ; from += 1000) {
+  const { data, error } = await db()
+    .from('maps')
+    .select(
+      'id,name,status,collection,bbox,allmaps_id,annotation_url,sheet_number,pcl:extra_metadata->>sheet_number'
+    )
+    .order('id')
+    .range(from, from + 999);
+  if (error) {
+    console.error(`maps: ${error.message}`);
+    process.exit(2);
+  }
+  maps.push(...data);
+  if (data.length < 1000) break;
 }
 
 const latticePath = 'work/l7014/lattice.json';

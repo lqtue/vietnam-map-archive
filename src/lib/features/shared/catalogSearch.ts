@@ -35,7 +35,7 @@ const DEFAULT_PERIODS: PeriodDef[] = [
 ];
 
 /** Match /api/search's row cap; with no pagination UI we want the whole archive. */
-const FETCH_LIMIT = 1000;
+const FETCH_LIMIT = 5000;
 const DEBOUNCE_MS = 100;
 
 type Row = Record<string, any>;
