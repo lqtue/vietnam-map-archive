@@ -9,7 +9,7 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 - `label.py points 1882` — random points in the heldout windows → `points-1882.json` (committed).
   `--unseen` restricts it to heldout windows with `seen: false`, the only clean test; a window that
   has been looked at moves to `calibrate` (`arsenal_quay`, 2026-10-01). `--only ID,ID` restricts a batch to named windows
-  (batches 5 and 6 are the three road windows added after the road pass v1 was frozen). Batch 5 (seed 5, around v1's edge) stays unlabelled; batch 6 (seed 6, around `road-a772ecd1.png`, the frozen v2) was labelled by the owner and scored (v2: 84.3%, results in `docs/river-reconstruction.md`).
+  (batches 5, 6 and 7 are road-only batches). Batch 5 (seed 5, around v1's edge) stays unlabelled; batch 6 (seed 6, around `road-a772ecd1.png`, the frozen v2) was labelled and scored (v2: 84.3%); its three windows are now calibrate / seen and batch 6 is spent. **Batch 7 (seed 7, 90 points, `mid_boulevard`, `centre_dense`, `avalanche_quay`, around `road-a3b0458f.png`, the frozen v3) is pending owner labels**; results and commands in `docs/river-reconstruction.md`.
 - `label.py serve 1882` — labelling page at http://127.0.0.1:8791. It shows a crosshair close up
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
@@ -18,7 +18,7 @@ pixels from `iiif.maparchive.vn` fixed tiles.
 
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
-- `windows.json` — 1882: 14 water windows and 9 road windows (`"layer": "road"`; `west_dense`, `msg_quay`, `ne_boulevard` added 2026-10-02 after the road pass was frozen); 1898: 9 water
+- `windows.json` — 1882: 14 water windows and 12 road windows (`"layer": "road"`; `west_dense`, `msg_quay`, `ne_boulevard` were added 2026-10-02 after v1 was frozen and **reclassified calibrate / seen the same day** after a diagnosis of batch 6; `mid_boulevard`, `centre_dense`, `avalanche_quay` are the clean heldout road windows for v3, `seen: false`); 1898: 9 water
   windows. `sheets.<id>` also carries the sheet's legend, neatline, furniture and `ruling` (the
   machine-ruling constants river_pass.py reads; 1882's are its defaults). Each has a case and a split. `calibrate` windows may fit the appearance model;
   `heldout` are scored once. `seen: true` marks a window already used in a 2026-10-01
@@ -33,7 +33,7 @@ The tracing workflow below still works, and is kept for any window that needs a 
 - `view.py SHEET out.jpg [--scale 8 | --box X Y W H]` — look at a sheet without leaking a heldout
   window: boxes with `seen: false` are painted black, and a crop that touches one is refused. The
   feature and river previews use its `blank`. Setting `seen: true` is the record that someone looked.
-- `edge_profile.py 1882 MASK.png [--all]` — where a road mask's straight edges sit against the ink stroke they follow (stroke width and centre offset per side of the wall), on road windows that are calibrate or `seen: true`; `--all` adds the water windows. v2 (`road-a772ecd1.png`): the edge is 2.7-3.2 px on the road side of the stroke centre (`docs/river-reconstruction.md`, "Road pass v2: where the edge sits against the stroke").
+- `edge_profile.py 1882 MASK.png [--all]` — where a road mask's straight edges sit against the ink stroke they follow (stroke width and centre offset per side of the wall), on road windows that are calibrate or `seen: true`; `--all` adds the water windows. v2 (`road-a772ecd1.png`; v3 changes only narrow strips, not edges): the edge is 2.7-3.2 px on the road side of the stroke centre (`docs/river-reconstruction.md`, "Road pass v2: where the edge sits against the stroke").
 - `traces/` — the hand traces, committed, GeoJSON Polygons in **source pixels**. Classes:
   `water` (in water windows; extra rings are islands, landings, piers), `block` (in road windows:
   every face that is **not** road) and `ignore` (both). Water windows: land is the complement.
@@ -86,5 +86,5 @@ The tracing workflow below still works, and is kept for any window that needs a 
    Re-import any time.
 
 Do one window first and import it, so the alignment can be checked before the rest.
-The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v2; 1882 only; `--window ID` previews one window and refuses an unseen heldout one; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
+The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v3; 1882 only; `--window ID` previews one window and refuses an unseen heldout one; `sheets.1882.road` in `windows.json` is its frame). Not built: the multi-reviewer agreement check. Two people tracing
 the same window is what tells you whether 5 px of edge error is the method or the tracing.

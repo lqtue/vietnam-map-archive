@@ -753,3 +753,138 @@ windows only (the 1882 whole-sheet mask was read only inside them). No unseen he
 labelled point in an unseen window was used or scored, batch 6 was not touched, no `seen` flag changed. The probe
 growth was scored on the 191 spent points only (`score.py --spent` rule).
 
+
+## Road pass v3, 1882 (2026-10-02)
+
+[`work/ocr/scripts/road_pass.py`](../work/ocr/scripts/road_pass.py), commit `a3b0458f`, frozen mask
+`river/road-a3b0458f.png` (gitignored; sha256 `6f71722e...a72bd`). Same inputs as v2. Two full runs `cmp` equal
+(810 s and 1250 s, the second while another job ran; 2.1-2.3 GB resident, **6.0-6.1 GB peak footprint**, v2 was 3.7-4.3: the
+new piece pass holds more full-tile arrays). `--self-check` has one new case (below). **v3 is frozen. It is
+tuned on the batch-6 windows and has no clean score yet: batch 7 is pending the owner's labels.**
+
+### Reclassification of three windows (owner decision, 2026-10-02)
+
+`west_dense`, `msg_quay` and `ne_boulevard` and the batch-6 points in them were looked at for this diagnosis, after batch 6
+was scored. They are now `split: calibrate`, `seen: true` (`windows.json`, with a note). They are no longer a clean test;
+v3 is tuned on them. Batch 6 is spent. Every other `seen: false` heldout box stayed blind (see Discipline).
+
+### Diagnosis of the 13 wrong points of batch 6
+
+Native crop (crosshair) beside v2's road, 7x, with a 280 px context; then the pass's own internals at each point (chord
+through its strip face, strips beyond across a kerb, inner / pavement flags) from a window run that reproduces v2 to
+under 2% of its pixels. "Ink" is the distance to the nearest pixel under `INK_GREY`.
+
+| kind | points | what it is |
+|---|---|---|
+| **narrow plain strip** (pavement or plot sliver, chord 5-13 px, no kerb pair round it) | 5: `0795` (11 px), `0796` (13), `0810` (10), `0813` (11), `0752` (5 at a corner, 15 along the strip) | `0795`/`0813`: strips between a block outline and a thin line, one of them with red tramway dashes across it, 2-3 px from ink; `0810`: a pavement of ratio 1.6 to its carriageway that tramway dashes cut into pieces under `PAVE_LEN` 40, so the pavement rule kept it; `0796`: the blank interior of an elongated unclosed building outline (a plot sliver); `0752`: a corner of a pavement at a street bend, two equal 14 px strips either side of a kerb (ratio about 1, under `PAVE_RATIO`) |
+| **edge band of a wide strip** (2.8-3.6 px from the kerb stroke on the road side, strip 23-42 px wide) | 3: `0739` (a 23 px carriageway between kerbs), `0775` (42 px), `0802` (32 px against the limit line) | the strip is a real carriageway; the point is on the label's uncertain stroke. Three road points sit as close to ink (`0780` 2.2 px, `0781` 3.2, `0740` 3.2) and the owner called them road |
+| **open-ground remnant** (not in any strip face, 20+ px from ink) | 2: `0771`, `0800` | the rim that the open-ground cut leaves: a wedge or a tendril of a blank lot or field that stays attached to a street |
+| **quay yard** kept as quay road (30-45 px wide, no kerb) | 2: `0769`, `0779` | the strip between a building line and the water; the quay road and quay pavement are not separated by any drawn line |
+| missed road | 1: `0782` (25 px strip) | a strip between a thick block line and a thin line next to a 46 px strip, cut by the "beside an inner strip" pavement clause; the owner calls it road |
+
+So the hypothesis of the brief (narrow strips) holds for **5 of the 12 false-road points**, and it is not the whole story:
+3 are the stroke itself (no structural rule separates them from the true-road points beside the same stroke), 4 are open
+ground or quay yard. The widths of the labelled points set the rule: of the 7 false-road points that sit in a strip
+face and are narrow, the chords are 5, 10, 11, 11, 13, 13, 14; **no labelled road point in any calibrate or seen window has a
+chord under 18 px outside a kerb pair** (road points: 18, 22 (inner), 25, 25, 25 (inner) ... 59; 28 road or bridge points in
+all, and the one narrow road point, `0203`, 6 px, v2 already misses).
+
+Away from the 12 points there is a second finding, seen on `dense_grid` and `ne_boulevard`: where a street is lettered
+(Rue Nationale, Catinat, "No. 24/26") v2 keeps both **pavement strips** (11-15 px) as road and drops the **lettered
+carriageway** between the kerbs, because a letter that touches a kerb joins it into one wall and cuts the strip into
+compact pieces that the shape test rejects. The pavements were the narrow strips; the carriageway is still dropped.
+
+### Change (one rule, one self-check case)
+
+`W_PLAIN` 13: a pixel of a strip face (`pavement`'s cross-section, the chord of least length over four axes) whose chord is at
+most 13 px, whose neighbourhood votes so (the `VOTE` 9 filter), and which is **not in a kerb-pair carriageway** (`inner`), is
+pavement or plot sliver, whatever lies beyond its walls. It joins the pieces list with the existing one-sided pavement
+candidates, so it is cut only where a piece is `PAVE_LEN` 40 px or more. Why general: it is a statement about the
+drawing, a carriageway is at least 14 px between outlines (labelled road: 18 px and up) while a pavement
+beside a block, a plot sliver and a passage between plots are 5-13 px; and a street between **two kerbs** is exempt, so
+the 12-20 px carriageways between kerbs (the boulevard of the self-check, 14 px) are kept. It needs no evidence beyond
+the strip itself (v2's one-sided rule needed a kerb and a wider strip across it, which a letter, a tramway dash or a
+corner hides). Constant: `W_PLAIN` 13 (the gap in the labelled widths is 14-17; 13 leaves the 14 px chord of the lane
+case clear of it, chords jitter by a pixel or two on diagonals).
+
+A closing over 8 px, to join strip pieces that dashes or letters cut, was tried: it flipped the same points and was
+dropped. A blob test to spare the gaps beside letters (a letter-wide ink blob within 2 px of the piece) did not separate
+anything (pavements beside lettered strips show the same share); it is not in the pass.
+
+`--self-check`: the lane case (3) gains a second strip, 14 px between two block lines (chord 12), cut across by red
+dashes and joined to the street; the assert is that it is not road. It fails with `W_PLAIN` 0. The existing lane, 14 px
+between lines (chord 14), still must be road; the isolated narrow plot is unchanged.
+
+### Checks (tuned on the batch-6 windows: these are fits, not scores)
+
+Frozen mask vs v2 (`road-a772ecd1.png`), whole sheet, road frame 7390 x 10800:
+
+| | v2 | v3 |
+|---|---|---|
+| road px | 6 092 035 (7.6%) | 5 704 284 (7.1%) |
+| only in one | 388 769 | 1 018 |
+
+Lost 6.4% of v2's road; only 1 018 px are new. **The interior is not disturbed:** the lost pixels lie a median of 2.2 px
+inside v2's edge (90% within 5 px, 99% within 7 px); of the 1.72 M v2 pixels more than 10 px inside the edge, 856 are lost
+(0.05%, narrow pieces and a few open-ground fragments).
+
+Points (unsure dropped), v2 -> v3, spent evidence only (the 191 older points plus batch 6 in the three reclassified windows):
+
+| | v2 | v3 | missed road | false road |
+|---|---|---|---|---|
+| batch 6 (83, tuned) | 70 | **73** | 1 -> 1 | 12 -> 9 |
+| 191 older, calibrate or seen | 179 | **180** | 6 -> 6 | 6 -> 5 |
+| all 274 | 249 | **253** (92.3%) | 7 -> 7 | 18 -> 14 |
+
+Flipped points: four, all wrong to right, all land: `0010` (`arsenal_quay`, the 13 px strip beside "No. 15"), `0795`,
+`0810`, `0813` (`ne_boulevard`). None right to wrong. Not changed: the 28 uniform points of batch 6 (v2 100%), the
+true-road points, `0796`, `0752`, `0222` (chord 14), the three edge-band points, the four open-ground and quay-yard
+points, the missed `0782`. The batch-6 fit is a 3-point gain, and the older evidence moved by one point.
+
+Area by window (v2 -> v3 road share): `dense_grid` 13.7 -> 12.7%, `ne_cream` 18.9 -> 18.3, `creek_crossing` 15.0 -> 14.3,
+`blue_domain` 7.5 -> 6.0, `ne_boulevard` 16.3 -> 15.0, `west_dense` 18.2 -> 17.8, `msg_quay` 6.4 -> 6.3, `garden_pond`
+6.6 -> 5.4, `dry_blue_parcels` 11.2 -> 10.3. Counts only in blind boxes, not looked at and not a gate: `charner_canal` 13.1 ->
+11.0, `quay_rondpoint` 14.7 -> 13.4, `outskirts_rail` 28.1 -> 27.3, `chinois_quay` 9.8 -> 9.5, `creek_nw` 17.7 -> 17.5,
+`arsenal_basin` 6.8 -> 6.4, `avalanche_head` 11.7 -> 11.5. Where it lands, from overlays of the lost pixels on `dense_grid`,
+`ne_cream`, `creek_crossing`, `blue_domain` and `ne_boulevard`: pavement strips along blocks and street edges (the most), the
+strip between a double limit line, tramway-dashed edge strips, and the gaps either side of lettering inside a street.
+
+**What is lost.** Plain strips of 5-13 px chord: if any of them is a real lane it is gone. I looked at the five windows above
+and found none, but a lane is indistinguishable from a pavement by width, and the labelled evidence holds no road point
+under 18 px outside a kerb pair. Carriageways between two kerbs, 12-20 px, are untouched by construction. The lost
+components of 100 px or more are 411 of inscribed diameter up to 13 px (163 k px) and 182 of 14-20 px (188 k px; these are
+strips merged with junction rims, not 14-20 px lanes). **A cost I saw:** in a lettered street whose letters touch the walls,
+the narrow gaps either side of the letters (`blue_domain`, "Thabert") were road in v2 and are land in v3; the lettered
+carriageway is now missing along its whole length there, as it already was along the pavement-flanked lettered streets of
+`dense_grid`. Recovering lettered carriageways between kerbs is the next obvious change and is not made here.
+
+### Not fixed
+
+- The edge band: the 3 wide-strip points at 2.8-3.6 px from a kerb stroke, and every other label that falls on the stroke,
+  are decided by the owner's click, not by structure.
+- Open-ground remnants (`0771`, `0800`, older `0307`): the rim the 70 px cut leaves is attached to a street and is
+  indistinguishable from a wide street by shape alone. Quay yards (`0769`, `0779`, older `0001`, `0292`, `0465`): 24-45 px
+  strips with no drawn line.
+- Lettered carriageways between kerbs (above); junction corners lose a few pixels where a chord is under 13 px.
+
+### Discipline
+
+Viewed and tuned on: the three reclassified windows (and the 13 wrong points in them), `ne_cream`, `dense_grid`,
+`creek_crossing`, `blue_domain`, `ne_boulevard`, `arsenal_quay` and the other seen or calibrate windows through lost-pixel
+overlays and chord maps. **No `seen: false` heldout box was cropped, previewed or inspected**: `quay_rondpoint`,
+`outskirts_rail`, `chinois_quay`, `creek_nw`, `arsenal_basin`, `charner_canal`, `avalanche_head`, and the three new batch-7
+windows below. Whole-sheet images (1/8 scale, for window placement) had every unseen box black. The per-window and
+unseen-box road shares above, and the lost-pixel counts per window (printed once for the three new windows too, not
+inspected), are counts of a finished mask. No labelled point in a blind box was used.
+
+### Batch 7: pending owner labels
+
+Three new road windows, `split: heldout`, `seen: false`, 1000 x 1000, placed by eye on the 1/8 whole-sheet view (every unseen
+box black) **before any v3 proposal was looked at around them**, clear of every unseen water and road box and of the
+other windows' boxes: `mid_boulevard` (boulevard, [7400, 2300]), `centre_dense` (dense old quarter, [5300, 3200]), `avalanche_quay`
+(a creek quay, the Avalanche bank below `avalanche_head`, [10300, 4200]; there is no second river-quay site that is
+clear of seen windows, so this is a creek bank). The case names are guesses from the 1/8 view. 90 points, 30 per window (10
+uniform, 20 within 30 px of the `road-a3b0458f.png` edge), seed 7:
+`label.py points 1882 --seed 7 --only mid_boulevard,centre_dense,avalanche_quay --per 10 --edge road-a3b0458f.png --edge-per 20 --band 30`.
+Not viewed, served or scored. Score with `score.py --points 1882 river/road-a3b0458f.png --layer road --seed 7`. Compare
+v2 on the same points for reference only (the batch was drawn around v3's edge, which favours v3).
