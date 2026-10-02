@@ -7,7 +7,7 @@
            [--only ID,ID]                        only these windows (a batch for windows nothing was scored on)
                                                 A batch is a seed; score a new version on a batch it
                                                 has not been scored on (score.py --seed).
-  label.py serve SHEET [--port 8791]            labelling page at http://127.0.0.1:8791
+  label.py serve SHEET [--port 8791] [--seed N] labelling page at http://127.0.0.1:8791 (--seed: one batch only)
 
 The page shows each point as a crosshair on the native raster, close up and in context. It never
 shows a proposal, the window or its case, so a label cannot lean on what a method said.
@@ -85,12 +85,14 @@ next();
 </script>"""
 
 
-def serve(sheet, port):
+def serve(sheet, port, seed=None):
     from PIL import Image, ImageDraw
     Image.MAX_IMAGE_PIXELS = None
     pin = json.loads((HERE / "native.json").read_text())[sheet]
     im = Image.open(ROOT / pin["path"]).convert("RGB")
     pts = {p["id"]: p for p in json.loads((HERE / f"points-{sheet}.json").read_text())}
+    if seed is not None:   # serve one batch only; the rest stay unlabelled (a batch drawn on a retired mask is never labelled)
+        pts = {i: p for i, p in pts.items() if p["seed"] == seed}
     order = sorted(pts, key=lambda i: random.Random(i).random())   # stable, not grouped by window
 
     def crop(p, view):
@@ -119,7 +121,7 @@ def serve(sheet, port):
             if self.path == "/next":
                 done, _ = latest(sheet)
                 todo = [i for i in order if i not in done]
-                return self.send(json.dumps({"id": todo[0] if todo else None, "done": len(done), "total": len(pts)}))
+                return self.send(json.dumps({"id": todo[0] if todo else None, "done": sum(i in done for i in pts), "total": len(pts)}))
             _, _, pid, view = self.path.split("/")
             self.send(crop(pts[pid], view), "image/png" if view == "close" else "image/jpeg")
 
@@ -150,6 +152,6 @@ if __name__ == "__main__":
         points(a[1], opt("--per", 25), opt("--seed", 1), a[a.index("--edge") + 1] if "--edge" in a else None,
                opt("--edge-per", 0), opt("--band", 30), "--unseen" in a, a[a.index("--only") + 1].split(",") if "--only" in a else None)
     elif a[:1] == ["serve"] and len(a) >= 2:
-        serve(a[1], opt("--port", 8791))
+        serve(a[1], opt("--port", 8791), opt("--seed", None) if "--seed" in a else None)
     else:
         sys.exit(__doc__)
