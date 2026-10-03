@@ -1,0 +1,628 @@
+sheet_number,name,public_records,draft_records,source_institutions,held_by,map_id,bbox_center_offset_m,no_record_anywhere
+5452-1,Lao Fu Chai,0,1,TTU,,,399.2,False
+5453-1,Giang Mung Pho,1,0,PCL,map,52196bd2-4ed1-4b3b-825b-b55fc4f3dfd2,397.7,False
+5453-2,Muang Hat Hin,0,1,TTU,,,398.5,False
+5453-3,Li Mou Chang,0,1,TTU,,,394.9,False
+5453-4,Trung Quoc,0,1,TTU,,,394.1,False
+5454-1,Phu Tu Lum,1,1,PCL|TTU,map,c28ee942-2036-447a-a294-b27615b43440,396.2,False
+5454-2,Ban Me Rang,1,0,ANU|PCL,map,72b309b4-9d6f-42ba-9abd-c244a732d4d6,397.0,False
+5551-1,Co Me / Muong Cha,0,1,TTU,,,408.0,False
+5551-2,Hua Thanh,0,1,TTU,,,408.8,False
+5552-1,Muong Cha,1,0,PCL,map,6dd9c318-b192-4714-8210-26c3f72736d6,406.4,False
+5552-2,Na Lam,0,1,TTU,,,407.2,False
+5552-3,Phou Ta Te Son,0,1,TTU,,,403.6,False
+5552-4,Na Khoa,0,1,TTU,,,402.8,False
+5553-1,Muong Boum,1,0,ANU|PCL,map,fa6b5edd-0fc7-45c4-8616-fa66d3ec5add,404.9,False
+5553-2,Muong No,1,0,PCL,map,2cf73dfb-aa26-4af1-95b2-bca9736fa012,405.6,False
+5553-3,Muong Tong,1,0,ANU|PCL,map,734ea17d-607b-4fdf-a2d2-e26c62b37d2e,402.1,False
+5553-4,Muong Te,1,0,PCL,map,9dc51443-53d2-4005-a632-7559f3668351,401.3,False
+5554-2,Phu Si Lung,0,1,TTU,,,404.2,False
+5554-3,Ban La Sin,1,0,PCL,map,e2b0b463-a7c5-4d16-a5d6-4c2e2b0e95ab,400.6,False
+5554-4,Phu Nam Sau,1,1,PCL|TTU,map,8c6d179b-fa28-46b8-83af-cda7d571652f,399.8,False
+5627-1,,0,0,,,,463.1,True
+5650-1,Ban Pou Sung,1,1,PCL|TTU,map,e121acfd-d001-4cc3-adbf-ae0dc11befaa,416.7,False
+5650-4,Nam Mat,0,1,TTU,,,413.2,False
+5651-1,Ban Muong Lan,1,0,PCL,map,91e8e076-5477-4c6c-9016-90ae374f0fd8,415.1,False
+5651-2,Ban Kha,1,0,PCL,map,65248989-fbae-4807-9d1d-46328ffd63e6,415.9,False
+5651-3,Ban Na Phai,1,0,ANU|PCL,map,ba61df56-0bf1-4502-993a-1b7c86132975,412.3,False
+5651-4,Dien Bien / Dien Bien Phu,1,0,ANU|PCL,map,6fa0ce6a-d2db-44f7-b5c1-108df6c8cf07,411.5,False
+5652-1,Tua Chua / Ban Nam Nen,1,0,PCL,map,fc10369d-975b-482e-b2c0-2a2ae1e7bfdc,413.6,False
+5652-2,Tuan Giao,1,0,ANU|PCL,map,7decec12-4e17-4365-b42c-9e5738d206ff,414.3,False
+5652-3,Muong Ang,1,0,ANU|PCL,map,9ca7ce3d-b020-4564-8ff6-beb655e9e609,410.8,False
+5652-4,Muong Tung,1,0,PCL,map,1b9c1fa7-893d-451c-8176-4a8b8a241245,410.0,False
+5653-1,Tsin Ho / Phu Nung Nong,1,0,ANU|PCL,map,d6e89db0-a68e-4c75-bead-d7113c2f63cf,412.1,False
+5653-2,Nam Ma,1,0,PCL,map,853deeba-3586-4b2a-b31d-d9fbdd79fd69,412.8,False
+5653-3,Lai Chau,1,0,ANU|PCL,map,15bb8218-dbc5-49ec-b4d0-0f56eb57da85,409.2,False
+5653-4,Ta Phing,1,0,PCL,map,6aaa3e9b-9355-486a-8f25-7b5a0d9dfd85,408.5,False
+5654-1,Giao San,1,1,PCL|TTU,map,c37ea760-b3c6-49ef-aa8e-bb04125fbd7f,410.6,False
+5654-2,Phong Tho,1,0,PCL,map,458ed110-57fd-406a-8d52-4c560d16287c,411.3,False
+5654-3,Ban Nam Cum,1,1,PCL|TTU,map,0e232803-e995-4e51-bcac-3797427b657f,407.8,False
+5727-4,,0,0,,,,466.2,True
+5728-1,Hon Thom,1,1,ANU|PCL|TTU,map,f5c6fff8-8a9e-445b-9e0d-f5e52c48a9dd,467.2,False
+5729-1,Xom Ong Thay,1,0,ANU|PCL|TTU,map,8c594cff-efb7-4a28-9ec9-40baf80a8d3c,464.9,False
+5729-2,Duong Dong,1,1,PCL|TTU,map,bc212e29-aaf7-4747-a418-8fccec98761c,466.1,False
+5747-1,Nong Het,0,1,TTU,,,428.8,False
+5747-2,Ban Namkhaohou,0,1,TTU,,,429.7,False
+5750-1,Muong Hung,1,1,PCL|TTU,map,efc717f0-9b97-4232-8dd0-356a6635071d,423.8,False
+5750-2,Ban Keng Long,1,1,PCL|TTU,map,233a0800-eba1-4aaf-b397-ae7b28539af5,424.6,False
+5750-3,Ban Xaosi,0,1,,,,421.1,False
+5750-4,Sop Cop,1,0,PCL,map,e95ca7bf-9a50-432f-9ed0-2020fca3c371,420.3,False
+5751-1,Son La,1,0,PCL,map,6cbd474d-cacb-4327-8462-ef32ceb52db3,422.2,False
+5751-2,Mai Son,1,0,PCL,map,3d05a659-dd9f-4076-a1bf-f6abaa7363c7,423.0,False
+5751-3,Muong Lam,1,0,PCL,map,85500c21-6b9c-4da5-9f6d-cb91e0b0a0e0,419.5,False
+5751-4,Thuan Chau,1,0,ANU|PCL,map,fe2faad1-fbd7-410a-9e22-2431cc617005,418.7,False
+5752-1,Than Uyen,1,0,PCL,map,9752ab7d-0a12-4cd3-9fa2-576052ff71ae,420.7,False
+5752-2,Muong Trai,1,0,ANU|PCL,map,4d692af3-b0b6-4e65-b84a-a359be7fdcb3,421.5,False
+5752-3,King Khoai,1,0,ANU|PCL,map,b51ef4c6-dbd1-4f76-aa75-d369b607df37,417.9,False
+5752-4,Quynh Nhai,1,0,PCL,map,cd5ed7f1-3141-4677-966b-adc4f3d22f11,417.1,False
+5753-1,Lao Cai / Lao Kay,1,0,PCL,map,727d02c0-cd72-4f1b-ac3c-ab926895ffdc,419.2,False
+5753-2,Chom Chang,1,0,PCL,map,23bacb5f-b188-43d2-bef0-30fde2aa97e2,420.0,False
+5753-3,Muong Khoa,1,0,PCL,map,b4534e5e-25d2-4ff8-a5b9-59ef0bf448ab,416.4,False
+5753-4,Ban Ko La,1,0,PCL,map,a14d5cb4-4825-489f-89c5-074d6db3bc78,415.7,False
+5754-2,Lao Kay,1,1,PCL|TTU,map,7beb3150-2564-4fb9-be4a-60f201426d4b,418.5,False
+5754-3,Muong Hum,1,0,PCL,map,e6db0285-4fb1-4bce-b891-664be294321f,414.9,False
+5754-4,Ban Mac,1,1,PCL|TTU,map,0a7a5ec2-973f-4fa2-801d-15a3d44ddc03,414.2,False
+5828-1,,0,0,,,,473.6,True
+5828-2,,0,0,,,,474.7,True
+5828-4,,0,0,,,,470.4,True
+5829-1,Krong Kep,0,1,TTU,,,471.4,False
+5829-2,,0,0,,,,472.5,True
+5829-3,,0,0,,,,469.3,True
+5829-4,,0,0,,,,468.2,True
+5846-1,Ban Muangchouan,0,1,TTU,,,437.5,False
+5847-1,Cua Rao,1,0,PCL,map,7776c605-99fd-4853-8c77-124b3ca8c6ae,435.8,False
+5847-2,Ban Tem,1,1,PCL|TTU,map,5b05e6ff-6f34-4779-bfb2-5c72be1d98da,436.7,False
+5847-3,Na Cang,0,1,TTU,,,433.2,False
+5847-4,Muong Sen,1,0,ANU|PCL,map,4236d1cd-fcbb-41c8-9812-d9de0faeff65,432.3,False
+5848-2,Ban Tha Lang,1,0,PCL,map,21494e01-b115-4bcd-9a8e-b48aa956efdc,435.0,False
+5848-3,Ban Huoi Heo,1,0,PCL,map,68b106c0-16a9-44a4-95bc-9f25dfd13df6,431.5,False
+5849-1,Xieng Louang,0,1,TTU,,,432.5,False
+5850-1,Song Con,1,0,PCL,map,71d73e1e-7987-4051-bbb6-797bc54ff1da,430.9,False
+5850-2,Sop Long,0,1,TTU,,,431.7,False
+5850-4,Muong Het,0,1,TTU,,,427.4,False
+5851-1,Tram Tau / Ban Luu,1,0,PCL,map,b0d43492-0b76-4b74-8778-90cb377e12c1,429.3,False
+5851-2,Yen Chau,1,0,ANU|PCL,map,cf590c88-138e-4d67-b84d-eee477fe043d,430.1,False
+5851-3,Ban Lot,1,1,PCL|TTU,map,1b14ef69-efe4-4c90-aff7-ad3c86dae661,426.6,False
+5851-4,Ban Ang,1,0,ANU|PCL,map,f9d9aa72-6bef-475d-8b9b-a73ce08713de,425.8,False
+5852-1,Tu Le,1,0,PCL,map,d04822ee-90f3-4105-858d-5b48477f693c,427.8,False
+5852-2,Muong Chen,1,0,PCL,map,f88df909-a4e7-475f-92f0-6d677b5347e7,428.6,False
+5852-3,Ban Na Tong,1,0,PCL,map,0c479b8e-c7a9-4516-973c-e7251bf253dc,425.0,False
+5852-4,Kim Noi,1,0,PCL,map,9c90ffbe-17e6-4193-9338-492261874a37,424.3,False
+5853-1,Nghia Do Tong,1,1,PCL|TTU,map,b53696ff-6869-40e2-a1c2-098948884a2d,426.4,False
+5853-2,Bao Ha,1,0,PCL,map,4939697a-8165-465f-a301-526cb076f88c,427.1,False
+5853-3,Van Ban,1,0,PCL,map,c6a7b399-3d54-46d5-ad6b-9b2126b6430f,423.5,False
+5853-4,Pho Lu,1,0,PCL,map,a8bb6dbf-d0fb-426a-8e55-e2fd98c6b15c,422.8,False
+5854-1,Ban Po,0,1,TTU,,,424.9,False
+5854-2,Bac Ha,1,0,ANU|PCL,map,df22f9d9-e03f-4598-a0fd-07c50a2e49c9,425.6,False
+5854-3,Ban Phiet / Ngai Fong Tion,1,0,ANU|PCL,map,69163553-f4c0-4f91-a506-69d9c1704ff8,422.1,False
+5854-4,Muong Khuong,1,1,PCL|TTU,map,c013807c-4dc7-4e57-bd39-399d86921f8e,421.4,False
+5925-1,,0,0,,,,486.4,True
+5926-1,Nam Cam,1,0,PCL,map,21d87aa0-8f20-48e1-98b8-5735b64ce355,484.3,False
+5926-2,Xom Ong Trang,1,0,ANU|PCL|TTU,map,690a092a-0e53-4251-824a-f6c479a87e95,485.4,False
+5926-3,,0,0,,,,482.2,True
+5926-4,,0,0,,,,481.1,True
+5927-1,Xom Giua,1,0,PCL,map,371fe05c-1813-4b6e-993d-bbebbf025f60,482.1,False
+5927-2,Song Ong Doc,1,0,ANU|PCL,map,78d1370f-7d39-4b44-be40-2ac50aa79a68,483.2,False
+5928-1,Dong Thai,1,0,PCL,map,1b6e8bd1-c603-4ff6-a48b-22821c730e08,479.9,False
+5928-2,Dong Hung,1,0,ANU|PCL,map,f45312ca-e639-46f4-be99-088a660c36a0,481.0,False
+5928-3,,0,0,,,,477.8,True
+5928-4,,0,0,,,,476.8,True
+5929-1,Ba Chuc,1,0,PCL,map,91609485-3a7f-4f43-9857-6514c0e936a7,477.8,False
+5929-2,Xom Tri Ton,1,0,PCL,map,e8db2c8b-da5c-4b03-889f-abb6b7da3986,478.9,False
+5929-3,Hon Chong,1,0,ANU|PCL,map,54d943e2-256c-449b-ac98-e93dfd1debd8,475.7,False
+5929-4,Kien Luong,1,1,ANU|PCL|TTU,map,5205a536-79c7-45fa-b4ce-129425871743,474.6,False
+5930-2,Tinh Bien,0,1,TTU,,,476.7,False
+5930-3,Giang Thanh,0,1,TTU,,,473.5,False
+5946-1,Ban Tai,1,1,PCL|TTU,map,83a4bf57-79c8-4715-8c61-85ebd4fbc5ed,444.5,False
+5946-2,Ban Sang,0,1,TTU,,,445.4,False
+5946-4,Phu Den Din,0,1,TTU,,,441.0,False
+5947-1,Na Ca / Ban Na Ca,1,0,PCL,map,1cc96578-a1c5-46b9-9f75-15426d851131,442.8,False
+5947-2,Con Cuong,1,0,PCL,map,75634186-a9ea-4d95-acc4-d6c4168082ba,443.7,False
+5947-3,Khe Bo,1,0,PCL,map,08ee0600-f9c1-4dfd-9879-bf9f023c9b67,440.2,False
+5947-4,Ban Xieng Lip,1,0,PCL,map,d7c3c083-3acd-448c-8197-3525464787de,439.3,False
+5948-1,Ban Xen Con,1,0,ANU|PCL,map,eb304764-b752-49a3-8ab2-d0904b08bf23,441.2,False
+5948-2,Tinche,1,0,ANU|PCL,map,1ab94df1-75e9-422e-b041-051711c108de,442.0,False
+5948-3,Muong Lam,1,0,PCL,map,aa69ae96-5deb-4431-af07-bd5c18dc9e49,438.5,False
+5948-4,Xamtai,1,1,PCL|TTU,map,bbb827a7-de99-4728-990b-e03cfc8b5a9d,437.6,False
+5949-1,Pieng Yao,1,1,PCL|TTU,map,5a72b473-1686-415b-8b07-5b7ae2428add,439.5,False
+5949-2,Sop Phua,0,1,TTU,,,440.3,False
+5949-3,Ban kho,1,1,PCL|TTU,map,f59fd377-54d9-47fd-989c-7b0dfa22257b,436.8,False
+5949-4,Muang Soi,0,1,TTU,,,436.0,False
+5950-1,Lang Chum,1,0,PCL,map,f22edc54-2ee1-4ecd-a6a9-2d49e946f24c,438.0,False
+5950-2,Ban Na Sun,1,0,PCL,map,d2ab0dad-eade-4a23-9efb-42cc1ed75d70,438.7,False
+5950-3,Muong Lat,1,1,PCL|TTU,map,d338378a-fb7f-4ba7-8ddd-b1e4f1b7a006,435.2,False
+5950-4,Moc Chau (Na Bo),1,0,PCL,map,441a3f58-a26c-4455-8e38-1ee96df408df,434.4,False
+5951-1,Ban Chua,1,0,PCL,map,04ab01ef-99d0-455f-bc71-d093a6fdcf01,436.4,False
+5951-2,Nuoc Moc,1,0,PCL,map,170934d6-06fd-48ca-9716-17fbdc56974d,437.2,False
+5951-3,Van Yen,1,0,PCL,map,c38d226c-ec8a-43ba-8090-564b6b147974,433.6,False
+5951-4,Ban Buc,1,0,PCL,map,e08079f2-e8fc-4d91-adfe-af353b50e162,432.9,False
+5952-1,Phu Yen Binh,1,0,PCL,map,4351503c-32d0-4f6a-9a92-ba67499c5a77,434.9,False
+5952-2,Yen Bay,1,0,PCL,map,958b5e57-e54e-43f5-a2f3-07119d05ba3e,435.7,False
+5952-3,Nghia Lo,1,0,PCL,map,9f76d0c4-a2c6-44ba-b83d-455049d9b76b,432.1,False
+5952-4,Van Yen / Trai Hut,1,0,PCL,map,db4f2382-feca-43d3-ae36-d989fa9dfc5e,431.4,False
+5953-1,Bac Quang,1,0,PCL,map,cbed1d27-287e-470c-8e66-85766e87a8ee,433.5,False
+5953-2,Lang Muong,1,0,PCL,map,71fe835d-a6a1-49f6-9aca-28454ee374f3,434.2,False
+5953-3,Lang Mong / Luc An Chau,1,0,PCL,map,ab046216-8e2b-4f36-9941-489a914aa8dd,430.6,False
+5953-4,Yen Binh Xa,1,0,ANU|PCL,map,750eff1c-ad60-496b-8416-95f7e56fc299,429.9,False
+5954-1,Ha Giang,1,0,ANU|PCL,map,f54d1b7d-0a7e-4f41-b814-3d5c9accfa6c,432.1,False
+5954-2,Viet Lam / Lang Zoi,1,0,PCL,map,c0289ea9-2ec3-4def-b067-0b4d52abc2e3,432.8,False
+5954-3,Hoang Su Phi,1,0,ANU|PCL,map,72b7e7f1-a3f6-4cb3-9bdd-81738f47c270,429.2,False
+5954-4,Hoang Su Phi,0,1,TTU,,,428.5,False
+5955-2,Quan Ba,0,1,TTU,,,431.4,False
+6026-1,Thuan Hoa,1,0,ANU|PCL,map,141539a1-781c-44a5-b08d-399b43231d14,490.6,False
+6026-3,Duong Keo,1,0,ANU|PCL,map,0a6861fd-e545-45b2-bcee-b4553b003a89,488.5,False
+6026-4,Cai Nuoc,1,0,PCL,map,99703312-a2c7-4c0c-bd41-9fe96f11d3cd,487.4,False
+6027-1,Phuoc Long,1,0,PCL,map,43d264e1-07da-4ee3-8097-674ccd8b25f5,488.4,False
+6027-2,Gia Rai,1,0,ANU|PCL,map,ba331b62-6855-4b89-b710-409d555970dc,489.5,False
+6027-3,Quan Long (Ca Mau),1,0,PCL,map,44dced3f-a2f6-4f2d-af54-118c8186c1c1,486.4,False
+6027-4,Thoi Binh,1,0,PCL,map,e91e53ac-f643-454a-bd95-6e5442550fea,485.3,False
+6028-1,Duc Long (Vi Thanh),1,0,PCL,map,a1b973c5-beb0-420e-a15b-b84331ea4148,486.3,False
+6028-2,Kien Hung (Go Quao),1,0,PCL,map,9807fa01-e14b-4e36-9d47-3cb243162420,487.4,False
+6028-3,Vinh Hoa / Dong Hoa,1,0,PCL,map,12a69cf5-e485-4941-ac09-de7b67ea6478,484.2,False
+6028-4,Kien Thanh (Ap Rach Soi) / Chau Thanh,1,0,PCL,map,7356ffb1-7c6f-4a95-bc9f-2e62fa246ffd,483.1,False
+6029-1,Long Xuyen,1,0,PCL,map,10e5884a-69a6-462c-ad4b-302d94400863,484.2,False
+6029-2,Co Do,1,0,PCL,map,d9962031-cbd1-41f7-9443-93a2afbe4742,485.3,False
+6029-3,Rach Gia,1,0,PCL,map,3d7b3c0a-f5b1-49c3-9511-8d408df51ae9,482.1,False
+6029-4,Tri Ton,1,0,PCL,map,d4374ae9-128d-4bc1-b852-4d86a060ac54,481.0,False
+6030-1,Hong Ngu,1,1,ANU|PCL|TTU,map,f7106215-75fa-4a90-aa25-47e3c7975773,482.1,False
+6030-2,An Long,1,0,ANU|PCL,map,ce34668e-48f5-495a-a5c6-59a371086618,483.2,False
+6030-3,Chau Phu (Chau Doc),1,1,ANU|PCL|TTU,map,e4dbb5bf-cf21-4a3b-a766-82a5fb1a1936,480.0,False
+6030-4,Tan Chau,1,1,ANU|PCL|TTU,map,0bab1490-b6b9-45ca-b94a-b5c3ce210ab4,478.9,False
+6045-1,Rao Qua,1,0,PCL,map,700c3942-bbe6-4d93-bba8-21f9241609d7,453.2,False
+6045-2,Phou Kounkanin,0,1,TTU,,,454.1,False
+6045-4,,0,0,,,,449.7,True
+6046-1,Do Luong,1,0,ANU|PCL,map,973dde11-1229-40fe-a68d-d73db2ff7500,451.5,False
+6046-2,Pho Chau,1,0,PCL,map,59baabfe-8f42-465f-86bc-9feab4fdb3a7,452.3,False
+6046-3,Ban Ka Long,1,0,ANU|PCL,map,41f404c2-24a9-4239-85e3-c726800bf130,448.9,False
+6046-4,Tri Le,1,0,ANU|PCL,map,3c8f9e54-de60-4229-a932-5a676a26b098,448.0,False
+6047-1,Nghia Dan / Nghia Hung,1,0,PCL,map,f6e2f7ac-b8aa-46c2-8080-18e9ecd7c619,449.8,False
+6047-2,Lang Sen / Xom Bau,1,0,PCL,map,bb08a4eb-1ab0-4038-a225-b4558b57efbe,450.6,False
+6047-3,Lang Rao,1,0,PCL,map,7736783a-bac7-4fd4-a839-ba416df89111,447.1,False
+6047-4,Quy Hop / Ban Dan,1,0,ANU|PCL,map,3a9b2312-5217-48ee-ba5e-786d957db20d,446.3,False
+6048-1,Bai Thuong,1,0,PCL,map,b3032407-b59f-4512-9b57-ca722e995e3a,448.2,False
+6048-2,Nhu Xuan / Dong Tau,1,0,PCL,map,55596895-3c11-45e2-8f9f-ea3ce98154b7,449.0,False
+6048-3,Ke Bon,1,0,ANU|PCL,map,f6e995d3-20a9-4be3-9fcc-07693361043d,445.5,False
+6048-4,Ban Pang,1,0,PCL,map,eb656cc2-bc87-42f1-bf8a-2d908d503bf2,444.7,False
+6049-1,Lac Son / Lang Be,1,0,ANU|PCL,map,f3404eeb-3605-4071-84b1-f82718bed478,446.6,False
+6049-2,Lang Tung,1,0,ANU|PCL,map,2925204f-5a74-458a-82b0-04063490007e,447.3,False
+6049-3,Lang Chanh,1,0,ANU|PCL,map,e6095355-4f40-4625-9d65-d7a6ef4b98c2,443.8,False
+6049-4,Hoi Xuan,1,0,ANU|PCL,map,a7a1cf44-e8d4-4e3f-a614-4a7774c15b4d,443.0,False
+6050-1,Hoa Binh,1,0,PCL,map,b4669803-3dd6-4ee8-b731-79d251ef9d27,445.0,False
+6050-2,Lang Tam,1,0,PCL,map,0ea3f7a2-4400-49f4-b299-e66e86c4641a,445.8,False
+6050-3,Mai Chau / Ban Bang,1,0,PCL,map,5bcdcdf2-861c-4168-a670-124231d14175,442.3,False
+6050-4,Cho Bo,1,0,ANU|PCL,map,4f520eee-fad3-458b-9788-a8018d38a68c,441.5,False
+6051-1,Viet Tri,1,0,ANU|PCL,map,0b698bea-3cc8-42c7-9264-4b1b8e51f718,443.5,False
+6051-2,Ba Vi / Hoang Xa,1,0,ANU|PCL,map,0f4f93b9-2551-4888-9353-e7f7e5dbc645,444.2,False
+6051-3,Xom Chai,1,0,ANU|PCL,map,0f4b88f7-a2c1-4369-acbe-0c1d4885eb5e,440.7,False
+6051-4,Phu Tho,1,0,PCL,map,ada5c280-080f-4aef-ba5e-286af79b28de,439.9,False
+6052-1,Binh Ca / Thuc Thuy,1,0,PCL,map,eac674f6-f225-4022-b5ad-3fb91d4bab57,442.0,False
+6052-2,Son Duong / Le My,1,0,ANU|PCL,map,6791e786-21df-4d73-8f76-a118b1ce2360,442.7,False
+6052-3,Doan Hung,1,0,ANU|PCL,map,b7250fb2-ffce-495c-940a-0bd26e28c24d,439.2,False
+6052-4,Tuyen Quang,1,0,ANU|PCL,map,ad04d74a-c7cb-4ed5-9284-be5f807e3c8f,438.5,False
+6053-1,Paka,1,0,PCL,map,cd34ddcd-4c60-45b8-816b-5187399fe5cc,440.6,False
+6053-2,Chiem Hoa,1,0,ANU|PCL,map,ee1a14e9-937a-44a4-8f29-a1c686964279,441.3,False
+6053-3,Ham Yen,1,0,PCL,map,efa825bb-150e-4192-8aed-4d86d668d49d,437.7,False
+6053-4,Lang Dat,1,0,PCL,map,c93665d0-e4a4-40f7-ad11-90e76c330061,437.0,False
+6054-1,Ban Le,1,0,PCL,map,e76ade53-6504-496b-abe4-443cbc6886af,439.2,False
+6054-2,Bac Me,1,0,PCL,map,c629fb50-99e5-4735-b2f3-af41efa33272,439.9,False
+6054-3,Linh Ho / Na Mong,1,0,ANU|PCL,map,3e8eada8-3ee1-4e44-b981-127d4f52a7fd,436.3,False
+6054-4,Tung Ba / Muong Cha,1,0,PCL,map,02350bd7-2887-4183-8ccc-57518eee5825,435.6,False
+6055-1,Dong Van,0,1,TTU,,,437.8,False
+6055-2,Meo Vac / Na Kung,1,0,PCL,map,c9ce7b9a-8186-46d1-8e9d-b0d6850f0e43,438.5,False
+6055-3,Na Lay,1,0,ANU|PCL,map,3cab0fca-5d7e-4f9a-8042-169d67433710,434.9,False
+6055-4,Pho Bang,0,1,TTU,,,434.3,False
+6127-1,Vinh Chau,1,0,PCL,map,c90abd80-7959-4f65-a4c1-a7b63014b509,494.8,False
+6127-2,Giong Giua,1,0,PCL,map,30a8d9b4-da69-444b-9817-db76aab77ede,495.8,False
+6127-3,Vinh My,1,0,PCL,map,559deeff-e880-43c0-8a20-4927bb6687b5,492.7,False
+6127-4,Vinh Loi (Bac Lieu),1,0,PCL,map,abdbc575-3a2b-45a3-b16d-f8e80295435b,491.6,False
+6128-1,Phung Hiep,1,0,ANU|PCL,map,09c48ba2-84c8-4839-8337-406403ad0ba3,492.7,False
+6128-2,Khanh Hung (Soc Trang),1,0,PCL,map,aea6422a-e2cb-48c3-9083-8eacd2d89609,493.7,False
+6128-3,Long My,1,0,PCL,map,df680ad3-edfc-4e48-ad45-5eaa0aa39ccd,490.6,False
+6128-4,Rach Goi,1,0,ANU|PCL,map,6d91ed70-04c5-4eee-9120-07ae926c7ed5,489.5,False
+6129-1,Sa Dec,1,0,PCL,map,4b80abe8-f536-45db-8b36-5f39b7240484,490.6,False
+6129-2,Can Tho,1,0,PCL,map,2e49b83a-ec04-4538-956b-bb90b5ba9a2a,491.7,False
+6129-3,Phong Phu (O Mon),1,0,PCL,map,0ce21201-e74c-4a08-ad75-e0a77c433162,488.5,False
+6129-4,Cao Lanh,1,0,ANU|PCL,map,0395eb8e-e283-4c90-aba0-88d0d6d2aac2,487.4,False
+6130-1,Moc Hoa,1,1,PCL|TTU,map,e7d849d5-d1af-4b03-b066-e0bfbbf508fd,488.6,False
+6130-2,My An,1,0,PCL,map,5e4c5fcb-d1c6-491e-b78a-b8d15b7dbfa5,489.6,False
+6130-3,Phong My,1,0,ANU|PCL,map,52d3418c-587e-4ce8-821d-133be08ef875,486.4,False
+6130-4,Vinh Thanh,1,0,ANU|PCL,map,d700cb7b-b045-4fe7-ad76-e094df8437ae,485.4,False
+6131-1,Ph Kampong Trach,0,1,,,,486.5,False
+6131-2,Svay Rieng,0,1,,,,487.6,False
+6131-3,Prey Nhay,1,0,PCL,map,1f800bfb-8945-4849-91ac-bd8f604ddc06,484.3,False
+6132-2,Khum Trapeang Phlong,0,1,,,,485.5,False
+6143-1,Ban Xe Nua,0,1,,,,463.6,False
+6144-1,Kim Lu Xa,1,0,ANU|PCL,map,eaed7df1-3fed-4627-b7d5-b2199ff72189,461.8,False
+6144-2,Hung Trung,1,0,ANU|PCL,map,86970bc3-724c-4c6a-b14c-7df4a04550b3,462.7,False
+6144-3,Ban Nathin,1,0,PCL,map,3cb7e76c-897c-4301-b231-7296989e00ab,459.3,False
+6144-4,Ban Buk,0,1,,,,458.4,False
+6145-1,Ha Tinh,1,0,PCL,map,8f89b193-ce55-4dc5-a117-5142ef9cd928,460.1,False
+6145-2,La Khe Thon,1,0,PCL,map,d0d972e4-d490-49c6-95fc-bab0759547e2,461.0,False
+6145-3,Huong Khe,1,0,PCL,map,02583f54-0204-4d4b-b675-f74f1835c144,457.5,False
+6145-4,Quang Te,1,0,ANU|PCL,map,4edfa179-68bf-47fa-8ed0-b05aa630049e,456.6,False
+6146-1,,0,0,,,,458.4,True
+6146-2,Nghi Xuan,1,0,ANU|PCL,map,e677f646-b50b-49b4-b3a0-3716094e9bdf,459.2,False
+6146-3,Vinh,1,0,ANU|PCL,map,4fc41377-4d34-4220-b10a-23967e6102e1,455.8,False
+6146-4,Phu Dien Chau,1,0,PCL,map,57925652-0519-4faa-925f-058d9555a117,454.9,False
+6147-1,Tinh Gia / Tinh Xuyen,1,0,ANU|PCL,map,565f9ca0-e76d-4f6f-bc65-cb6bb36beb22,456.8,False
+6147-2,,0,0,,,,457.6,True
+6147-3,Cho Giat,1,0,PCL,map,0766c2cb-b4e2-4d09-bd51-867def50fe84,454.1,False
+6147-4,Phong Bai,1,0,PCL,map,f9114a0b-fec5-417d-9d98-a18ac2f379d8,453.3,False
+6148-1,Thanh Hoa,1,0,PCL,map,9ae7a6bf-ea99-4682-83bb-73ab4c8ad3d8,455.1,False
+6148-2,Sam Son,1,0,ANU|PCL,map,047550a6-8adf-4b1c-ad9e-7a842516d60a,455.9,False
+6148-3,Tong Cong,1,0,ANU|PCL,map,b0df1220-d703-4fac-8746-77184b644187,452.5,False
+6148-4,Ngo Xa Thuong,1,0,PCL,map,c2a41d59-4fb0-42c0-be55-dde868b2efee,451.6,False
+6149-1,Ninh Binh,1,0,PCL,map,ccc9ca99-8e66-4c82-b0cf-9f5ed76f77d2,453.5,False
+6149-2,Tam Diep / Mai Xa,1,0,ANU|PCL,map,85e41d1a-3678-4de9-bc0a-beaf7a961974,454.3,False
+6149-3,Vinh Loc (Nhan Lo) / Yen Dinh,1,0,PCL,map,84cca799-19be-46ca-afa5-da2e8b3f8405,450.8,False
+6149-4,Yen Thuy / Xom Go,1,0,ANU|PCL,map,dc8cb611-433c-47c2-abdb-efeabf4bfb12,450.1,False
+6150-1,Ha Dong,1,0,ANU|PCL,map,fb8ea013-57c4-4f52-9ab9-0630038e2f60,452.0,False
+6150-2,Phu Ly,0,2,PCL|TTU,,,452.8,False
+6150-3,Kim Boi / Thuy Hien,0,2,ANU|PCL|TTU,,,449.3,False
+6150-4,Luong Son / Chuong My,0,2,PCL|TTU,,,448.5,False
+6151-1,Pho Yen,0,2,PCL|TTU,,,450.5,False
+6151-2,Ha Noi,1,0,PCL,map,6f075690-dc65-4308-85c4-6028cf51c88f,451.2,False
+6151-3,Son Tay,1,0,ANU|PCL,map,48055e42-7f67-4492-8f41-62b33f4984c1,447.7,False
+6151-4,Vinh Yen,0,2,ANU|PCL|TTU,,,447.0,False
+6152-1,Cho Moi,1,0,PCL,map,e30d8767-1266-42b8-85d9-9743e3846700,449.0,False
+6152-2,Thai Nguyen,1,0,PCL,map,5e2fa71e-31fe-47b0-991a-097197f13ff0,449.8,False
+6152-3,Dai Tu,1,0,PCL,map,8c057aff-6609-4f39-9eac-dccb7d5e62c6,446.2,False
+6152-4,Cho Chu,1,0,ANU|PCL,map,066fb734-301b-42fa-b924-384a9794d767,445.5,False
+6153-1,Na Fac,1,0,PCL,map,1015b305-9661-44f2-ab29-5e612c4bd5fb,447.6,False
+6153-2,Bac Kan / Bac Can,1,0,ANU|PCL,map,90e397fc-92e7-4b74-996b-a2751deabc2d,448.3,False
+6153-3,Cho Don,1,0,ANU|PCL,map,48be88b1-c022-4511-96da-b815a19c2445,444.8,False
+6153-4,Cho Ra,1,0,ANU|PCL,map,878e8cef-f270-444d-ac90-6b3cbb920960,444.1,False
+6154-1,Nam Quet,1,0,ANU|PCL,map,aad9444c-6ee1-4a54-9a5f-8bf3212c7649,446.2,False
+6154-2,Nguyen Binh,1,0,PCL,map,4bed9e7c-a314-4352-8419-5d2422d79d78,446.9,False
+6154-3,Na Cang,1,0,PCL,map,327c5050-018c-4189-a46c-e8775198105b,443.4,False
+6154-4,Bao Lac,1,0,ANU|PCL,map,8b420135-7aba-4bfa-967d-e4a9a2bf221c,442.7,False
+6155-2,Lung Cung,1,0,PCL,map,3e59f8de-cf57-4533-b575-7f3d8139c40f,445.6,False
+6155-3,Loung Mang,1,0,PCL,map,f6d9012f-ed69-4d43-ae6a-a97b485426c6,442.0,False
+6226-3,,0,0,,,,501.1,True
+6226-4,,0,0,,,,500.0,True
+6227-1,,0,0,,,,501.1,True
+6227-4,Lac Hoa,1,0,PCL,map,1938661e-df30-42c1-8cd2-8ad353c0b344,498.0,False
+6228-1,Phu Vinh (Tra Vinh),1,0,ANU|PCL,map,7fec2827-1318-4787-8316-ecabe7d0a592,499.1,False
+6228-2,Tra Cu,1,0,ANU|PCL,map,d4203cd6-7c69-4648-ba84-bdd196b6ea81,500.1,False
+6228-3,Long Phu (Bang Long),1,0,ANU|PCL,map,ba6d6fc2-6fa3-4c83-91ba-5eebdabca804,496.9,False
+6228-4,Cau Ke,1,0,ANU|PCL,map,8eb410ee-8816-46d5-9401-bab1553b9c16,495.9,False
+6229-1,My Tho / Mi Tho,1,0,PCL,map,36c4b094-5071-477d-be84-bd9757670ca7,497.0,False
+6229-2,Truc Giang (Ben Tre),1,0,ANU|PCL,map,bf46c6b9-091a-4d32-82b3-d5dcdbbfbef8,498.1,False
+6229-3,Vung Liem,1,0,ANU|PCL,map,7a06424e-fe1d-4ed3-a2dc-fd0258442980,494.9,False
+6229-4,Khiem Ich (Cai Lay),1,0,PCL,map,c21ebd39-d5eb-44f7-8f9b-ac376484f65a,493.8,False
+6230-1,Duc Hoa,1,0,PCL,map,dc16030e-bc80-49a2-b797-4e32055f6d9d,495.0,False
+6230-2,Tan An,1,0,PCL,map,04618a63-edd9-4362-95cc-c3c54e7a5ae7,496.0,False
+6230-3,Tuyen Nhon,1,0,PCL,map,2a1d6b4c-7593-452e-8119-787f4b40b140,492.8,False
+6230-4,Duc Hue,1,1,PCL|TTU,map,8fd695ff-735c-41d5-a7c3-30e949de1f5a,491.8,False
+6231-1,Tri Tam (Quan Dau Tieng),1,0,PCL,map,3a4b3175-60ed-427d-ae62-ee0519344931,493.0,False
+6231-2,Hieu Thien (Go Dau Ha),1,0,PCL,map,b4f6641e-41ad-47bd-95aa-0cae02264e32,494.0,False
+6231-3,An Thanh,1,0,PCL,map,47b4dc36-672b-4d8c-90a4-08f154801175,490.8,False
+6231-4,Tay Ninh,1,0,PCL,map,97e85cc2-1f3c-44c3-9610-7619a845ab56,489.8,False
+6232-1,Choam Kravien,0,1,,,,491.0,False
+6232-2,Bo Tuc (Uyen Binh),1,0,PCL,map,88dcbc90-9c81-44ec-aede-8624f0f1512f,492.0,False
+6232-3,Ta Dath,1,0,PCL,map,8cff6529-5577-43d3-a654-67714cdacc47,488.8,False
+6232-4,Memut (Memot),0,1,TTU,,,487.8,False
+6242-1,Ban Nathon,0,1,TTU,,,472.2,False
+6243-1,Co Trang,1,0,PCL,map,5d009047-2dde-424b-a23f-784e3b9f690b,470.4,False
+6243-2,Lang Mo,1,0,PCL,map,9fd12e97-ba33-4260-8009-2079bb603b82,471.3,False
+6243-3,Ban Vang-ala,1,1,PCL|TTU,map,0a7b36ed-b50f-430b-86f4-4c58a1056f5e,467.9,False
+6243-4,Ban Karal,1,0,PCL,map,d7acc2f5-037a-4c4d-89a4-89fb713947f3,467.0,False
+6244-1,Ron,1,0,PCL,map,325bf83d-a110-411b-a548-d57000736751,468.7,False
+6244-2,Quang Khe,1,0,PCL,map,527415b6-897b-4cfa-89fb-4c3f3069170f,469.5,False
+6244-3,Cha Noi,1,0,PCL,map,727b4590-3978-43ff-b5ca-124b8794e344,466.1,False
+6244-4,Thiet Son,1,0,PCL,map,6f06ab01-9366-4c99-a5c6-290e54732f81,465.3,False
+6245-1,,0,0,,,,467.0,True
+6245-2,Ky anh,1,0,ANU|PCL,map,7aaa8fbf-0a49-4d93-88d9-cee007e572ba,467.8,False
+6245-3,Tuan Thuong,1,0,ANU|PCL,map,8377d18f-cc62-43ab-9b8b-f0ef6bd78a1f,464.4,False
+6245-4,Nhuong Ban,1,0,ANU|PCL,map,ea36ff4a-1f88-4fd0-98d9-d500d0bf7300,463.5,False
+6248-4,Cua Day,1,0,PCL,map,48a48755-391f-4958-986b-ddec4f398bc3,458.6,False
+6249-1,Thai-Binh,1,0,PCL,map,3afa50ab-9e52-4a02-871e-6373739c4a5f,460.5,False
+6249-2,Van Ly,1,0,PCL,map,71038a5a-3133-415f-826c-64b85f263e7c,461.3,False
+6249-3,Phat Diem,1,0,PCL,map,93d84d76-1327-4208-a81c-ab0ff4cfd0ad,457.8,False
+6249-4,Nam Dinh,1,0,ANU|PCL,map,fac02693-f75c-4c37-aebd-672735627767,457.0,False
+6250-1,Hai Duong,1,0,PCL,map,3e7d4554-e013-4c90-b65b-349a59a10868,459.0,False
+6250-2,Ninh Giang,1,0,ANU|PCL,map,a302ce39-f52a-46ca-b9ab-0dbcbb0d0820,459.7,False
+6250-3,Hung Yen,1,0,ANU|PCL,map,ebf8330c-8a32-45cc-b17e-961539c678f3,456.3,False
+6250-4,Ke Sat,1,0,ANU|PCL,map,77ffaef8-d8b1-454e-8e8c-0a6636aa40be,455.5,False
+6251-1,Luc Nam,1,0,ANU|PCL,map,24992060-6b2f-46e5-9699-17066bf85d13,457.5,False
+6251-2,Pha Lai,1,0,ANU|PCL,map,54680ec0-3e9b-4ef0-8f81-78df8fad1344,458.2,False
+6251-3,Bac Ninh,1,0,ANU|PCL,map,87777cc4-3c79-4752-b994-475cdb34374e,454.8,False
+6251-4,Bac Giang / Phu Lang Thuong,1,0,PCL,map,23865627-972c-4365-9c5e-f172a8418cb9,454.0,False
+6252-1,Binh Gia / Pho Binh Gia,1,0,PCL,map,b719a5fd-e989-42db-bf2f-44ea90e9a1a2,456.1,False
+6252-2,Lang Met,1,0,ANU|PCL,map,216bda64-ba9a-43da-a898-502d8d05a969,456.8,False
+6252-3,Mo Trang,1,0,PCL,map,f264a6e6-19ae-42ca-a71c-32abb82f0a67,453.3,False
+6252-4,Vo Nhai,1,0,ANU|PCL,map,f8882113-1f80-46c3-9a02-0b3efb003408,452.5,False
+6253-1,That Khe,1,0,ANU|PCL,map,63fbe804-659b-44db-91c8-6e1aadb7edb8,454.7,False
+6253-2,Na Bon,1,0,PCL,map,96e5ead3-5691-4f84-a568-e57a2a6488c5,455.3,False
+6253-3,Yen Lac,1,0,ANU|PCL,map,b70f5ac6-00b8-4985-ace5-3c5e90125b15,451.8,False
+6253-4,Pho Moi / Ban Cao,1,0,ANU|PCL,map,231295e5-c890-406f-a94e-98411ed812a5,451.1,False
+6254-1,Tra Linh,1,0,ANU|PCL,map,ae037fa1-7bdf-4f76-bf17-e952e0835c67,453.3,False
+6254-2,Cao Bang,1,0,ANU|PCL,map,1f1cc09c-0c60-4187-908f-39383ef4b208,454.0,False
+6254-3,Nuoc Hai,1,0,ANU|PCL,map,29d0d1da-acd8-4be4-8606-c0c468474d6b,450.5,False
+6254-4,Soc Giang,1,0,ANU|PCL,map,1eea8082-478d-4343-91b4-653337b5e62f,449.8,False
+6255-3,,0,0,,,,449.1,True
+6326-2,,0,0,,,,510.5,True
+6326-3,Con Son,1,1,PCL|TTU,map,db1c0336-61e2-47e6-b5e5-dcfe1f3086b3,507.3,False
+6326-4,,0,0,,,,506.3,True
+6327-4,,0,0,,,,504.3,True
+6328-3,Ba Dong,1,0,ANU|PCL,map,ba5b3d3e-1671-445a-964d-d1868e0aa201,503.3,False
+6328-4,Thanh Phu,1,0,ANU|PCL,map,3279b201-ba2d-4181-9706-0c450b3cd7a7,502.3,False
+6329-1,Can Gio,1,1,PCL|TTU,map,7c4e2eaa-2113-4561-a339-d031f1161429,503.4,False
+6329-2,Thua Duc,0,2,ANU|PCL|TTU,,,504.4,False
+6329-3,Binh Dai,0,2,ANU|PCL|TTU,,,501.2,False
+6329-4,Go Cong,1,1,PCL|TTU,map,07859658-c9cd-4006-80b7-e3fbd45b6f2c,500.2,False
+6330-1,Bien Hoa,1,1,PCL|TTU,map,8bb23b06-3f98-4e27-9a1e-118ca5d6092c,501.4,False
+6330-2,Nhon Trach (Phu Thanh),1,1,PCL|TTU,map,232e921a-7504-4d78-bbb6-526e8cd6afef,502.4,False
+6330-3,Can Giuoc,1,1,PCL|TTU,map,8716b8cc-1ee3-4e4a-9026-e2995d466a49,499.2,False
+6330-4,Saigon / Thanh Pho Ho Chi Minh (Ho Chi Minh City),1,1,PCL|TTU,map,08f9e044-c324-4291-99da-69783768e85f,498.2,False
+6331-1,Phuoc Vinh,1,0,PCL,map,43374a6c-e202-44cd-aaab-d5501fa81f48,499.5,False
+6331-2,Tan Uyen (Xa Uyen-Hung),1,0,PCL,map,0b031239-4e8c-446a-9d47-4ba6b82ccee4,500.5,False
+6331-3,Ben Cat,1,0,ANU|PCL,map,68a86a4c-eaa5-45b6-a1d9-11894ed96fcb,497.2,False
+6331-4,Xom Ruong,1,0,PCL,map,911d8d02-e4f5-4fbb-962f-be98bbad6e5b,496.2,False
+6332-1,Phuoc Binh (Ap Son Thuy),1,0,PCL,map,a24630fa-fbb7-4384-b1bd-581e00f428f5,497.5,False
+6332-2,Don Luan (Doan Duc / Dong Xoai),1,0,ANU|PCL,map,c914ba72-a341-413d-8af8-05ed0cd9a8b8,498.5,False
+6332-3,An Loc (Hon Quan),1,0,PCL,map,1a61201b-fb87-4a87-9047-ac9a5afa0315,495.3,False
+6332-4,Loc Ninh,1,1,ANU|PCL|TTU,map,a88a5367-831f-488f-918f-369978246197,494.3,False
+6333-2,Ap Phuoc Thien,0,1,TTU,,,496.5,False
+6333-3,Meak Say,0,1,TTU,,,493.3,False
+6341-1,Sa Moi,0,1,TTU,,,480.7,False
+6341-4,Ha Shin Pe Nu,0,1,TTU,,,477.3,False
+6342-1,Cam Lo,1,1,PCL|TTU,map,7c02ff16-dd01-4c4e-974c-a7bd8ab3fceb,479.0,False
+6342-2,Thon Doc Kinh,1,0,PCL,map,5920a2e7-2bf8-4f36-98fc-ae34d9446223,479.8,False
+6342-3,Huong Hoa,1,0,PCL,map,41e22bab-d538-4dc8-bde9-9326bb7361f0,476.4,False
+6342-4,Nguon Rao,1,0,PCL,map,4611934e-82e7-4342-b9d7-0fbcce563c06,475.6,False
+6343-1,An Dinh,1,0,PCL,map,53181033-7176-49bc-bf28-224fdb742acb,477.2,False
+6343-2,Qui Hau,1,0,PCL,map,8426dfea-d3ed-4a5e-b6b9-63abdb81aaa8,478.1,False
+6343-3,My Duc,1,0,ANU|PCL,map,bb4073d6-d02b-4f1c-b24c-932f6eabf897,474.7,False
+6343-4,Dong Hoi,1,0,PCL,map,b5b1c5d8-21a0-4d37-8588-1a7f9310f2b7,473.8,False
+6344-3,Hoan Lao / Ly Hoa,1,0,PCL,map,27fd8422-7ac0-4c31-b80f-a24ac012d581,473.0,False
+6344-4,Vinh Son,1,0,PCL,map,3c47e337-553c-4dd4-b528-1066a8b4e42d,472.1,False
+6345-3,,0,0,,,,471.3,True
+6349-3,,0,0,,,,464.8,True
+6349-4,Cua Tra Ly,1,0,PCL,map,a6d27059-fca2-401a-abcb-2ec0f9175393,464.0,False
+6350-1,Quang Yen,0,2,PCL|TTU,,,466.0,False
+6350-2,Do Son,0,2,PCL|TTU,,,466.7,False
+6350-3,Cua Van Uc / Thai Thuy,0,2,PCL|TTU,,,463.2,False
+6350-4,Hai Phong,1,1,PCL|TTU,map,45c50503-a010-46ca-8aba-25409b603878,462.5,False
+6351-1,Son Dong / Thanh Am,1,0,ANU|PCL,map,37462715-21da-4822-bc3f-531ce05d8445,464.5,False
+6351-2,Uong Bi,1,0,PCL,map,28b4319e-03c1-4cb9-9f42-4e2bdc756491,465.2,False
+6351-3,Dong Trieu,1,0,PCL,map,e4b34f03-1e12-4a17-a7f5-acbf886aff97,461.7,False
+6351-4,Chu,1,0,ANU|PCL,map,060ede62-36e8-4c1a-9d81-9993a6f412b5,461.0,False
+6352-1,Lang Son,1,0,PCL,map,c4dfe722-8789-4322-a703-d534550b394b,463.1,False
+6352-2,Dong Quan,1,0,PCL,map,c0596071-ed7c-4e72-936e-1359f9389183,463.8,False
+6352-3,Chi Lang / On,1,0,PCL,map,57b8a76d-6399-4fd6-93c3-be374e0a7c94,460.3,False
+6352-4,Dong Dang,1,0,PCL,map,f1ba78ce-f3fd-4f4e-a3a0-b2319ff387f6,459.6,False
+6353-2,,0,0,,,,462.4,True
+6353-3,Na Cham,1,0,PCL,map,7793477d-be9f-4640-8a09-c428329b4ea5,458.9,False
+6353-4,Ta Lung,0,1,TTU,,,458.2,False
+6354-1,Ban Khong,0,1,TTU,,,460.3,False
+6354-2,Ban Kieng,0,1,TTU,,,461.0,False
+6354-3,Phuc Hoa,1,0,PCL,map,9c78923f-6124-4c80-9198-a92215f59bfe,457.5,False
+6354-4,Trung Khanh / Trung Khanh Phu,1,0,ANU|PCL,map,4e134bf8-a9f9-40b2-be53-be0acadc2545,456.8,False
+6429-1,Dat Do (Xa Phuoc Tho) / Cho Phuoc Hai,1,0,PCL,map,dd50cf9a-f055-4d78-b370-077938ce41e6,509.8,False
+6429-4,Xa Vung Tau (Cap Saint Jacques),1,0,PCL,map,98331858-4fa1-47c1-8b47-8d9b66172f05,506.6,False
+6430-1,Xa Cam My,1,0,PCL,map,a371ec15-0fc5-4114-8137-e1c1a70fc4e8,507.9,False
+6430-2,Xuyen Moc,1,0,ANU|PCL,map,e79aea17-61b0-4ede-82e7-7529831e6eff,508.8,False
+6430-3,Xa Binh Ba,1,0,PCL,map,e933b818-1404-449d-892e-d9fa2ecbbb76,505.6,False
+6430-4,Xa Xuan Loc,1,0,PCL,map,0cf660d9-c154-4de3-9451-10debb09599e,504.7,False
+6431-1,Loi Tan,1,0,ANU|PCL,map,f0a32d54-7ea9-4c48-86fb-6c8438c3cd2e,505.9,False
+6431-2,Dinh Quan,1,0,ANU|PCL,map,9b10ffe6-81f9-4596-a3dc-781a0c8e37ed,506.9,False
+6431-3,Xa Gia Kiem,1,0,PCL,map,3f3e057c-f24e-4632-8ac1-b137692f50fe,503.7,False
+6431-4,Ap Cau Cay,1,0,ANU|PCL,map,a18adad0-dfe1-4c8c-88f7-d9a9576320b6,502.7,False
+6432-1,Duc Phong (Bu Dang),1,0,PCL,map,045b6ecf-8430-4c16-8bce-bba70661197f,504.0,False
+6432-2,B R'Du,1,0,PCL,map,83a287f2-f42e-40c9-a0de-ac90a51fe10c,505.0,False
+6432-3,Dia Diem Bunard,1,0,PCL,map,9e1562c7-d8b0-4c63-8b5a-e78d08071251,501.7,False
+6432-4,Dong Sre Viet,1,0,PCL,map,d786bab4-e395-480f-b45f-2faa0108218c,500.8,False
+6433-1,Dak Dam,1,1,PCL|TTU,map,70d9938a-6820-4d24-9116-5e9e2f69f5ba,502.1,False
+6433-2,Ap Doan Van,1,0,PCL,map,81e3d8bc-8aa6-423f-bd27-ebe7fcbbb72b,503.0,False
+6433-3,Bu Gia Map,1,1,PCL|TTU,map,3dcc3133-bf4f-4464-9c2a-3669a16edc34,499.8,False
+6433-4,O Rang,1,1,PCL|TTU,map,318afc6f-dde3-4948-9787-984d9354f7d3,498.8,False
+6434-1,O Tea,1,1,PCL|TTU,map,23042a21-1385-470c-b104-82733e4a6d92,500.2,False
+6435-2,,0,0,,,,499.3,True
+6436-1,Ph. Ba Kham,1,1,PCL|TTU,map,a83f9d52-a548-41b0-b9ba-c4524ad92384,496.5,False
+6437-1,Phum Kham Dorang,1,1,PCL|TTU,map,1ba8e89e-2453-42e2-90d9-7ba1056556e2,494.6,False
+6437-2,Phum Hay,1,0,PCL,map,1c36f588-1539-4b05-897d-0e1f768ff191,495.5,False
+6438-1,Dak Palouat,1,1,PCL|TTU,map,f0474ce6-3abe-44c7-aebc-247ab9f29998,492.8,False
+6438-2,Ban Phiadouang,0,0,,,,493.7,True
+6439-1,Ban Mangha Noy,1,1,PCL|TTU,map,f4c27aca-1962-4354-914f-e768683e40aa,491.0,False
+6439-2,Ban Vangtat,1,0,PCL,map,0f12a435-d174-4c27-8dd9-c63af60556ad,491.9,False
+6440-1,Ta Ko,1,0,PCL,map,832198b0-8304-4ad0-8e4e-ed3655882cc3,489.2,False
+6440-2,A Ro,1,1,PCL|TTU,map,6a29c2d1-3fa1-4b61-b9e2-05b66d7cc1b0,490.1,False
+6440-3,Ban Tangyoun,1,1,PCL|TTU,map,fac4d8fd-2b8d-42ae-adec-83042fb6ec9f,486.8,False
+6440-4,Ban Alot,1,1,PCL|TTU,map,8fe6f597-d88c-4ef6-88f0-35e96d279a8d,485.9,False
+6441-1,Ap Lai Bang,1,1,PCL|TTU,map,d4e07fa3-ff94-4d3b-b979-12ad2170c83f,487.5,False
+6441-2,A Sap,1,1,PCL|TTU,map,6b41f075-1baa-4ca0-b297-dadebca724b6,488.3,False
+6441-3,Ban Ko,1,1,PCL|TTU,map,8a46c269-1ad5-45a2-a6f9-e6a1c2135fb3,485.0,False
+6441-4,A Lu Oi,1,0,PCL,map,d9810dd3-1178-44e2-bacb-6279ce4d77e4,484.1,False
+6442-1,Thon Ngo Xa Dong,1,0,PCL,map,e975651e-91a1-41b4-8c14-b69ddb98f2d6,485.7,False
+6442-2,Hai Lang (Thon Dien Sanh),1,0,PCL,map,4d9b6392-12fc-41f9-88fd-acf6789c4d63,486.6,False
+6442-3,Ba Long (Thon Ha Vung),1,0,ANU|PCL,map,f293cab4-5e0f-4e30-a580-008f7f9f3744,483.2,False
+6442-4,Quang Tri / Vinh Linh,1,0,ANU|PCL,map,46e99049-a971-47db-a861-7361ed03b9f8,482.4,False
+6443-2,,0,0,,,,484.9,True
+6443-3,Ho Xa (Vinh Linh),1,0,PCL,map,1f8fee08-7442-4036-ae50-4fbe76e5e99a,481.5,False
+6449-1,Ile Longue,0,0,,,,474.4,True
+6450-1,Dao Van Canh / Cat Ba,1,0,ANU|PCL,map,a39f60c5-aa3e-4b65-8bd9-9d131f4d5da3,472.9,False
+6450-2,,0,0,,,,473.6,True
+6450-3,Pho Cat Ba,1,0,PCL,map,0c3239e7-7091-48cb-ada9-baf24c36f3b1,470.2,False
+6450-4,Hong Gai,1,0,PCL,map,45b48226-6170-4a7b-8eef-7034f000ef0e,469.4,False
+6451-1,Tien Yen / Lang Troi,1,0,ANU|PCL,map,28909a67-75ff-42e9-ae5f-c4a09d292fbc,471.5,False
+6451-2,Cam Pha,1,0,PCL,map,bbec6bae-a7bf-4e53-8428-200720c94e07,472.2,False
+6451-3,Ba Sao,1,0,ANU|PCL,map,0dadf442-d4bd-497f-91df-f4616ece2537,468.7,False
+6451-4,Chau Son,1,0,PCL,map,829c0c63-54a8-4f6b-a2f4-7eb500532f6b,468.0,False
+6452-2,Binh Lieu,1,0,PCL,map,8c64026c-33ea-44d9-827b-3e433bb51232,470.7,False
+6452-3,Dinh Lap,1,0,ANU|PCL,map,77e09426-cac9-4190-a1d2-10cff82ce13b,467.3,False
+6452-4,Chi Ma,0,1,TTU,,,466.5,False
+6529-4,,0,0,,,,513.0,True
+6530-1,Ap Phu Sung / Tan Tao,1,0,ANU|PCL,map,61272a52-ff05-4f6e-a77f-b579b74b0b5e,514.3,False
+6530-2,Ham Tan,1,0,PCL,map,08fe292b-a26c-48eb-a6b2-b0cce16c342c,515.2,False
+6530-3,Ap Binh Chau,1,1,PCL|TTU,map,bec7087b-2dcc-4268-9012-ac5515eca2d0,512.0,False
+6530-4,Song Dinh,1,0,PCL,map,a0010a0c-55ad-46c4-97ab-4965a1c51cfb,511.1,False
+6531-1,Cirlao Da S'Rang,1,0,ANU|PCL,map,a55919a8-06ee-4edd-a34b-af54d430dbfd,512.4,False
+6531-2,Xa Tram Da Mi,1,0,ANU|PCL,map,067f4617-1b87-4ea5-ab44-66495dc139c8,513.3,False
+6531-3,Tanh Linh (Xa Lac Tanh),1,0,PCL,map,730a6e93-9e7f-4864-a322-2bcda26ad8e1,510.1,False
+6531-4,Madagui,1,0,PCL,map,b619dbf9-f688-4fe0-a8fd-1d272122c5db,509.1,False
+6532-1,Kro Layu,1,0,ANU|PCL,map,62a32488-237b-4130-bec9-da0d8e8456bd,510.5,False
+6532-2,Bao Loc (Blao),1,0,PCL,map,45c5bec9-ae8a-45cd-8989-fc0cad872e4a,511.4,False
+6532-3,B Dan Deung,1,0,ANU|PCL,map,7d17ad04-cb73-483f-a746-26fa75d3b328,508.2,False
+6532-4,Gia Nghia (Nghia Duc),1,0,PCL,map,3d5833cb-d5ef-4213-97ee-86488f2852b1,507.2,False
+6533-1,Duc Xuyen,1,0,PCL,map,51cea9bf-de42-4c29-8f4f-b9cd22ea893b,508.6,False
+6533-2,Ban N'Doh,1,0,ANU|PCL,map,0fb99b90-186b-4dea-b61b-b81ec5d6f12f,509.5,False
+6533-3,Nghia Tin,1,0,PCL,map,5cf11d13-86a1-4df6-a219-830f1d300acc,506.3,False
+6533-4,Duc Minh,1,0,PCL,map,bfa0a2e0-25dd-44a4-8ac0-13ba69f6e93c,505.3,False
+6534-1,Ban Don,1,0,ANU|PCL,map,8be95a8e-b187-443c-b001-b752450ef13c,506.7,False
+6534-2,Xa Tho Thanh,1,0,PCL,map,1c4377db-7096-4b2a-a54f-563fd2fdac27,507.7,False
+6534-3,Bon Dak N'Drot,1,1,PCL|TTU,map,b063a081-9590-468a-a841-107c0318ccaf,504.4,False
+6534-4,Bon Drang Phok,1,1,ANU|PCL|TTU,map,3616dca4-07d7-49a9-840f-b2047f2d9ab7,503.5,False
+6535-1,Tieu Teo,1,0,ANU|PCL,map,52529ba8-ad9f-4d61-b2cf-3b6b1826b97d,504.9,False
+6535-2,Buon Ya Soup,1,0,ANU|PCL,map,8a204ea1-b370-4c30-9489-7247767e63e3,505.8,False
+6535-3,Yok Mbre,1,1,PCL|TTU,map,cdb25733-03ef-4782-925e-8fd499f4b89b,502.5,False
+6535-4,Ya Lop,1,1,ANU|PCL|TTU,map,6af2b1e9-3a55-4a57-887a-42db087e3654,501.6,False
+6536-1,Bao Duc,1,0,PCL,map,b4c8d957-bb78-4a80-8093-c17a0e6d4866,503.1,False
+6536-2,Xuong Kuang,1,0,PCL,map,072baa7c-abb9-4836-9523-275dd3bf5e1f,504.0,False
+6536-3,Pl. Ya Bo,1,0,PCL,map,61db8686-d61b-4141-85dd-aba6922d636f,500.7,False
+6536-4,Le Thanh,1,0,PCL,map,614ea116-27f1-40e3-b19d-328f1e4583ba,499.8,False
+6537-1,Polei Breng,1,0,PCL,map,5e2e72b9-3d5a-4955-8a4a-9e6b693c4c87,501.2,False
+6537-2,Plei Mrong,1,0,PCL,map,39b560df-cc91-4968-ac49-b265ab3ff837,502.1,False
+6537-3,Polei Yome,1,0,PCL,map,6f9ee377-ec01-4ea9-bbea-f4a6a5216267,498.8,False
+6537-4,Polei Jar Sieng,1,1,PCL|TTU,map,95d68720-46c4-4238-a490-7729ab909a05,497.9,False
+6538-1,Kon Honong (Kon Henong),1,0,PCL,map,d191e779-e1dc-4c59-95e3-0ce7234065eb,499.4,False
+6538-2,Dak To,1,1,PCL|TTU,map,a96e4a1f-e155-4455-9027-4cb9d773216e,500.3,False
+6538-3,Dak Mot Lop,1,0,PCL,map,9cdb54c5-0da7-47db-ae7f-4ea1e5726138,497.0,False
+6538-4,Dak Sut,1,1,ANU|PCL|TTU,map,ad415246-356d-4771-a5f3-eeb5ae3f8289,496.1,False
+6539-1,Kason Mai,1,0,ANU|PCL,map,28f96ada-4f6a-4d90-b7ee-2cdc0c63da81,497.7,False
+6539-2,G. Rieng,1,0,ANU|PCL,map,e732e549-00d4-476b-86b6-7ac6f6fe1e60,498.6,False
+6539-3,D. Go Kram,1,1,PCL|TTU,map,e1b3b3a6-5edb-4b83-81ef-03c6b3f570c8,495.2,False
+6539-4,Peta Pac,1,1,PCL|TTU,map,d759ab21-4ad5-4fce-897e-40380c050534,494.3,False
+6540-1,Thuong Duc (Ha Tan),1,0,PCL,map,a25dcb2d-6505-4ea1-9af5-c0292dd6b90b,495.9,False
+6540-2,Ben Giang,1,0,PCL,map,157d3911-4433-4078-975f-b345aa2df89c,496.8,False
+6540-3,Muang Bac,1,0,ANU|PCL,map,3ad5a1c0-e7af-40f5-a9b9-f34854f1ea73,493.5,False
+6540-4,Atuin,1,0,PCL,map,60d67a30-a4a3-45a7-8880-54b13f6138f7,492.6,False
+6541-1,Phu Loc (Q Phu Loc),0,2,PCL|TTU,,,494.2,False
+6541-2,Bach Ma,0,2,PCL|TTU,,,495.1,False
+6541-3,Nong Truong Nam Dong,0,2,PCL|TTU,,,491.7,False
+6541-4,Hue,1,1,PCL|TTU,map,cdef2d04-4749-48a8-99f9-1a8b8f1c14ad,490.8,False
+6542-3,Phu Vang,1,0,PCL|TTU,map,03b3bc63-e137-4d64-b603-635248134629,490.0,False
+6549-1,Ile Cu Xu,0,0,,,,481.3,True
+6550-1,Dao Cu Xu,1,1,PCL|TTU,map,481e6eb7-a65f-4183-86fd-f51b899bae01,479.8,False
+6550-4,Ile De La Table / Ile Tching Lan Xan,1,1,PCL|TTU,map,dc1aa174-6808-495d-ba49-de8a8a8af7f1,476.4,False
+6551-1,Ha Coi,1,0,PCL,map,47454bd0-e2e4-4bcb-ac27-be828faa9ae5,478.4,False
+6551-2,Quan Dao Co To,1,1,ANU|PCL|TTU,map,6cbc048f-b2f2-4280-8cf3-5d7d323ed53c,479.1,False
+6551-3,Van Hoa,1,0,PCL,map,16cbdc2d-b778-43fb-9227-33fbad1eee55,475.6,False
+6551-4,Dam Ha,1,0,ANU|PCL,map,f3409702-c03f-4f9a-83ed-687d51e2ecb4,474.9,False
+6552-2,Mong Cai,0,1,TTU,,,477.7,False
+6552-3,,0,0,,,,474.2,True
+6630-1,Hai Long (Ap Long Linh) / Xa Phan Thiet,1,0,PCL,map,33bdaf00-4fda-44b0-bc8a-443ab1504056,520.7,False
+6630-3,,0,0,,,,518.4,True
+6630-4,Phan Thiet / Ap Luong Tay,1,0,PCL,map,1ec00ffd-c173-4fe3-a0aa-5b85c59075e5,517.5,False
+6631-1,Soprai,1,0,ANU|PCL,map,07a6f1ef-abcb-4d23-a13b-135ed336e731,518.8,False
+6631-2,Ap Thien Ai,1,0,PCL,map,e281facf-88c3-4c99-9b0b-af3438f8f510,519.7,False
+6631-3,Ap An-Lam,1,0,PCL,map,6f98bd22-25fc-4bdd-9ce2-2f2712478f6b,516.5,False
+6631-4,Ap Gia-Bac,1,0,ANU|PCL,map,21577777-c8e4-49bd-95e0-e266225168dc,515.6,False
+6632-1,Da Lat,1,0,PCL,map,9bcf7408-f83e-4722-9fed-e7e201ef599d,516.9,False
+6632-2,Dai Ninh / Phi Lieng,1,0,PCL,map,659fd41d-d0cd-42fe-94ec-125192262876,517.9,False
+6632-3,Di-Linh,1,0,ANU|PCL,map,74bc7cf4-3b52-499b-ac6c-37a7186338de,514.6,False
+6632-4,Ngoc Son / Dan Kia,1,0,PCL,map,7e5ec740-6105-4340-9d50-8c2b89ff177b,513.7,False
+6633-1,Buon Ja Ea Kuat,1,0,ANU|PCL,map,8457a8ee-f3a4-482b-a61c-e4d4639f7729,515.1,False
+6633-2,Ap Dan-Kia,1,0,PCL,map,3949c4af-a5a2-4a5d-ba91-a25526613c94,516.0,False
+6633-3,Phi Sroin,1,0,PCL,map,3b7c0972-a541-47f8-944f-b02a35081750,512.8,False
+6633-4,Buon Dong Bak,1,0,PCL,map,332260cd-7fa0-4502-b354-7f421ced4a43,511.8,False
+6634-1,Buon Ho,1,0,PCL,map,acc4c09e-5a05-4edc-bd31-394ff4eb5c30,513.2,False
+6634-2,Ban Ti Srenh,1,0,PCL,map,d8ebd142-d915-4f0b-888e-48c630427518,514.2,False
+6634-3,Ban Me Thuot,1,0,PCL,map,7e5970c1-a328-47f1-80b8-9e0d8e985f3f,510.9,False
+6634-4,Buon Trap,1,0,PCL,map,c2f4a22f-1230-4ba9-8c68-0b6606bf1169,510.0,False
+6635-1,Cheo Reo (Hau Bon),1,0,PCL,map,8a0b51bd-c6fb-411e-af18-cc6a8e1e842f,511.4,False
+6635-2,Ban Suk Hdrah,1,0,PCL,map,fbe76726-3d45-47ea-ae4b-7f5d53579143,512.3,False
+6635-3,Ban Drang,1,0,PCL,map,8275f657-311d-4119-bde7-fee1df20e02d,509.1,False
+6635-4,Ban Tsham,1,0,PCL,map,921e06f8-673b-4457-b8c9-3765f54e1075,508.2,False
+6636-1,Chu Rpan,1,0,PCL,map,a63d79bb-3634-4a16-bec9-c218e1818038,509.6,False
+6636-2,Phu Thien,1,0,ANU|PCL,map,0279c017-0f56-4011-997a-5166ded30491,510.5,False
+6636-3,Phu Nhon,1,0,PCL,map,662b689d-cb60-4371-9bb1-52e63578ece0,507.2,False
+6636-4,Pleiku,1,1,PCL|TTU,map,cb655dce-d2d4-4e48-8ae7-8e23ac566b8e,506.3,False
+6637-1,Kon Mahar,1,0,PCL,map,51c6c623-b0bd-442d-a954-498832da05eb,507.8,False
+6637-2,Plei Troeh,1,0,PCL,map,f0f175ea-4038-417d-817d-c48df5cca916,508.7,False
+6637-3,Plei Neh,1,0,PCL,map,d8ed429f-9473-4e10-ab7f-beb0412f7d80,505.4,False
+6637-4,Kontum,1,0,PCL,map,c98612ab-1c17-401f-8208-474b4b1093df,504.5,False
+6638-1,Dak Ninh Kola,1,0,PCL,map,5aa30366-92eb-48f2-84fc-a10c621a3043,506.1,False
+6638-2,Chuong Nghia,1,0,PCL,map,bb07893c-16ae-41c7-aa25-59cdfc7a2bc5,507.0,False
+6638-3,Kong Roman,1,0,ANU|PCL,map,9f00a841-50c4-45cd-9a8b-9ff047a8407f,503.7,False
+6638-4,Mang Buk,1,0,PCL,map,6da919fc-b7ca-4f65-b862-c34780a056d8,502.8,False
+6639-1,Tien Phuoc (Phuoc An),1,0,PCL,map,310f7d7d-57f1-41c7-ad7c-0e0860115829,504.3,False
+6639-2,Gi Lang,1,0,PCL,map,74f38ea7-f19e-41b8-9c61-ac87911a1da5,505.2,False
+6639-3,Lac Trom Dong,1,0,PCL,map,29953387-781d-4f29-a2dc-856510688bd9,501.9,False
+6639-4,Hau Duc (Tien Tra),1,0,PCL,map,2aacbdec-0e4d-4c3d-be61-792ae5912998,501.0,False
+6640-1,Hoi An (Fai Fo),1,0,PCL,map,3c7f7b5b-b7a1-4b12-9518-2a9a4a59b5fc,502.6,False
+6640-2,Tam Ky,1,0,PCL,map,ee8b3667-c86c-4a93-91fd-c92bcb447711,503.5,False
+6640-3,Hiep Duc,1,0,ANU|PCL,map,74a6a32b-7370-4a4a-b101-e908f2ba2575,500.1,False
+6640-4,Dai Loc (Ai Nghia),1,0,PCL,map,d7703b62-8292-453e-b63a-61503a052416,499.3,False
+6641-2,Khu Pho Nam Tho,0,2,PCL|TTU,,,501.8,False
+6641-3,Da Nang (Tourane),1,1,PCL|TTU,map,93792eea-2b60-4871-a689-7783816f2062,498.4,False
+6641-4,Thon Trung Kien,0,2,PCL|TTU,,,497.6,False
+6651-3,,0,0,,,,482.5,True
+6651-4,,0,0,,,,481.8,True
+6652-3,Chiang-Ping-Hsu,0,1,TTU,,,481.1,False
+6729-1,,0,0,,,,528.9,True
+6730-2,,0,0,,,,528.0,True
+6731-1,Thon Vu Bon / Phan Ri,1,1,PCL|TTU,map,d665e342-4d13-411e-b6f5-2daf7e586d8f,525.2,False
+6731-2,Hai Ninh,0,0,,,,526.1,True
+6731-3,Phan Ly Cham,1,0,PCL,map,7e29069b-505b-4772-a9c3-adc503c9df03,522.9,False
+6731-4,Song Mao,1,0,PCL,map,566895e6-e397-43f5-ab52-43eebe1d2903,522.0,False
+6732-1,Thon Ma Ty,1,0,PCL,map,0f55f7e5-6702-44ec-9736-16c455b06924,523.4,False
+6732-2,Phan Rang,1,0,PCL,map,cfe26b6a-c446-411e-a3e8-1884ebe9f22b,524.3,False
+6732-3,Ma Noi,1,0,ANU|PCL,map,f3dd9aa2-3fff-41a6-bfa1-b3357381ac36,521.1,False
+6732-4,Don Duong / E Lam Thuong,1,0,PCL,map,09557145-c7f7-4da9-9107-1847fc65efaf,520.1,False
+6733-1,Buon Thach Trai,1,0,ANU|PCL,map,99433f39-f831-467d-8229-66cbb03eb390,521.5,False
+6733-2,Buon Gia Le,1,0,PCL,map,9390a0fc-e846-41df-acdd-0c1cca1fb0ae,522.4,False
+6733-3,B. Du Damour,1,0,PCL,map,7932ba1b-cf50-4b22-82f8-f89495505850,519.2,False
+6733-4,Lak Ea Gam,1,0,ANU|PCL,map,13d55676-893e-4e2c-ab56-e7c4cc2eadc0,518.3,False
+6734-1,Phu Duc,1,0,ANU|PCL,map,ff1f4540-c881-435c-b174-7bd31f19ea0c,519.7,False
+6734-2,Buon Ea Thi,1,0,PCL,map,8b17256a-2fee-451b-9129-0f7dcfa680e4,520.6,False
+6734-3,Ban M'Trong,1,0,PCL,map,d2d7f15a-105b-4e26-a814-2eb0252e6890,517.4,False
+6734-4,Ban M'Gam,1,0,PCL,map,31d6cb7c-6365-436d-8100-b0275e6d6e06,516.5,False
+6735-1,Triem Duc,1,0,PCL,map,0503daba-390a-4f49-ba1d-c8dcf2aa7e36,518.0,False
+6735-2,Son Hoa (Cung Son),1,0,PCL,map,6ff74d17-2425-459e-b667-90d59e7d8fa6,518.8,False
+6735-3,Phu Tuc,1,0,ANU|PCL,map,c6cb43fe-8f4a-4b77-862c-032f41ba4c4f,515.6,False
+6735-4,Buon Thoat,1,0,ANU|PCL,map,e5da51c7-2812-4535-a2d6-2ccf393213d7,514.7,False
+6736-1,Binh Khe (Binh Lien),1,1,PCL|TTU,map,65fd71f2-7c3d-43ee-a1ad-7c1fa2a47b14,516.2,False
+6736-2,Canh Tien,1,0,PCL,map,5cd423f0-7a34-48b3-ba5e-7def3e17569b,517.1,False
+6736-3,Plei Djama,1,0,PCL,map,d69fa075-b6af-43d7-b40e-651e99d294cd,513.8,False
+6736-4,An Tuc (An Khe),1,0,PCL,map,bd4202a4-b76d-4364-b8a8-6bd674e6d8ce,512.9,False
+6737-1,Hoai An,1,0,PCL,map,b0ebb43d-f8a7-42b9-be2a-9c9585f41eba,514.4,False
+6737-2,Tien Thuan,1,0,PCL,map,041ab268-f280-4d09-837e-145d2af5df2d,515.3,False
+6737-3,Kannack,1,0,PCL,map,78f6cc28-207d-4eec-93f3-a057b99ab858,512.0,False
+6737-4,Kon Giong,1,0,ANU|PCL,map,f7ee5d4c-14ba-4518-864f-70eb1b0c8e3e,511.1,False
+6738-1,Mo Duc,1,0,PCL,map,df6e8331-4a30-4015-8bdf-8b40fe01ca74,512.7,False
+6738-2,An Lao,1,0,PCL,map,0c54b0c3-8c92-4d69-9839-a11ae27648a9,513.6,False
+6738-3,Gia Vuc,1,0,ANU|PCL,map,829068bf-e5fe-4f03-8951-576177bceae1,510.3,False
+6738-4,Ba To,1,0,PCL,map,d63f5616-9e1e-4283-988b-dd27e92b87e2,509.4,False
+6739-1,Binh Son,1,0,PCL,map,f967d90f-02ab-4164-b7c3-88ad8485fba2,511.0,False
+6739-2,Quang Ngai / Ly Tin,1,0,PCL,map,ca080325-c37e-4ecf-9d9a-4739eb8a9a1f,511.8,False
+6739-3,Son Ha (La Lang) / Tam Ky,1,0,PCL,map,415a4145-7aaf-4b7d-a1f2-e1c09860de8b,508.5,False
+6739-4,Tra Bong / Tan Hiep,1,0,PCL,map,8b8a5c7f-f71d-4c2e-b60a-b8d871facdc8,507.7,False
+6740-3,Nam Ap,1,0,PCL,map,a4eb6aea-b738-4ef8-bb2d-a339a1dad010,506.8,False
+6740-4,Cu Lao Cham,1,0,PCL,map,2e160350-208e-4e1c-8952-0f2f0e30af42,505.9,False
+6831-4,Thon Son Hai,1,0,ANU|PCL,map,46e78ee0-2b91-45f4-ac66-900b3b8ac410,528.4,False
+6832-1,Nui Cam Linh,1,0,PCL,map,38f398a3-c50b-431c-9744-78be7a8220a9,529.8,False
+6832-3,Thanh Hai,1,0,PCL,map,53ab3602-0f24-48f4-8880-222f7da9049c,527.5,False
+6832-4,Cam Lam,1,0,PCL,map,3862ad74-369e-4154-b5ea-4e2461b1580e,526.6,False
+6833-1,Ninh Phuoc,1,0,PCL,map,e78ae38c-24d4-45ef-aeaf-df7881885c56,528.0,False
+6833-2,Hon Tre,1,1,PCL|TTU,map,39b552f8-8dda-4b29-a011-383a6b41091a,528.9,False
+6833-3,Nha Trang,1,0,PCL,map,ef73daef-5957-49bb-9fab-3a2736cb6236,525.7,False
+6833-4,Ninh Hoa,1,0,PCL,map,c2436629-c613-4df0-a89b-a79a2e112722,524.8,False
+6834-1,Ban Nham,1,0,PCL,map,703d0ac1-39c1-4ee5-98a8-49bfcb47bfbf,526.2,False
+6834-2,Ninh Lam,1,0,PCL,map,f31dd11f-2b79-47c8-80ef-bae73b54ca79,527.1,False
+6834-3,Van Gia,1,0,PCL,map,0977029c-bbe6-42b7-b9f3-a271ab8e8785,523.9,False
+6834-4,Lien Thach,1,0,PCL,map,3008b2aa-c17d-44b6-8cfe-eff7acb755f5,523.0,False
+6835-1,Tuy An (Phu Tan) / Dong Cam,1,0,PCL,map,2fff91ad-b1bb-42c3-9b34-9a869e2d8067,524.5,False
+6835-2,Tuy Hoa (Chau Thanh),1,0,PCL,map,cf9469f3-8824-4abd-a5e1-843b64fd465b,525.3,False
+6835-3,Trung Trinh,1,0,PCL,map,6bf3f680-ceb5-4ab3-863e-88c468ffc15d,522.1,False
+6835-4,Dong Xuan,1,1,PCL|TTU,map,55f30aab-8cba-4a56-9a96-a2193607f4ef,521.2,False
+6836-1,Hai Dong,1,1,PCL|TTU,map,712ecadb-610c-43ac-b2a9-05207e1f456c,522.7,False
+6836-2,Phu Hoi,1,0,PCL,map,b6f3e665-ed99-45d1-840e-294dc3c4f8bb,523.6,False
+6836-3,Thach Khe,1,0,PCL,map,065d275b-8d3b-4412-9f7a-ee27975eb974,520.3,False
+6836-4,Qui Nhon,1,0,PCL,map,8f95cb7f-12d8-4107-a64e-d7ececf242b9,519.4,False
+6837-2,,0,0,,,,521.8,True
+6837-3,Phu My,1,0,PCL,map,6498059b-3986-4169-b0b6-d16259d47d64,518.6,False
+6837-4,Hoai Nhon (Bong Son),1,0,PCL,map,0c9b85e7-5d7a-4ba4-9030-d3bdc1ee85c4,517.7,False
+6838-3,Tam Quan (Gia An),1,0,PCL,map,c2be5ffd-f55a-4f55-bd2e-3f07ea800e1d,516.8,False
+6838-4,Thanh Gieng / Phuoc Dien,1,0,PCL,map,7cf8859b-7081-4595-8b06-9f96def1917d,516.0,False
+6839-4,,0,0,,,,514.3,True

@@ -48,7 +48,12 @@ measurement, metadata that maintains itself, and corpus size.
       2026-10-03 (the older of two rows for the cell; a 301 alias points at `-2`); (6) two draft scans are
       named from their filenames, not their sheets: `kim-boi` is PCL's printed "Thúy Hiền" and `luong-son`
       is TTU's "Chương Mỹ"; (7) `6835-4` was placed by hand from the detected neatline, its seams to
-      the neighbours unchecked; (8) diacritics.
+      the neighbours unchecked; (8) diacritics. **Audit 2026-10-03:** the live snapshot has 671 map
+      rows and 627 cells: 519 public, 152 draft, 586 placed. Of 137 TTU rows, 85 remain unplaced;
+      34 completed rough readings are not merged, and margin reading stopped on API limits. Seven
+      TTU map rows lack source records, three source records lack map rows, and 132 TTU rows lack a
+      year. The 15 plain scans and 52 placed TTU sheets remain drafts without visual acceptance.
+      Audit findings and the six-step review/close gates: [L7014 inventory audit](journals/261003-l7014-audit.md).
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
