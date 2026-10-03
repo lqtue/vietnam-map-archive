@@ -1117,7 +1117,7 @@ No extractions match the current filter. Push a run to DB first using ocr.py bat
 {N} shown. Edit text/category inline, then click ✓ to validate or ✗ to reject.
 [placeholders] Building, Temple, Market... · 1 | Abattoir Municipal / 2 | Treasury /
 3 | Post Office · Particulier, Communal, Militaire... · e.g. 20260417T120000 ·
-390,295,11239,8143 · work/ocr/outputs/…/runs/… · Filter by run_id…
+390,295,11239,8143 · work/image-processing/results/…/runs/… · Filter by run_id…
 [tooltips] Validate all pending items with confidence ≥ 0.7 · Mark as validated ground truth ·
 Reject (false positive)
 ```

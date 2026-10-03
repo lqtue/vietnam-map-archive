@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = new URL('../', import.meta.url);
-const out = new URL('../work/cartomundi-rights/', import.meta.url);
+const out = new URL('../work/research/cartomundi-rights/', import.meta.url);
 mkdirSync(out, { recursive: true });
 const read = (path) => JSON.parse(readFileSync(new URL(path, root), 'utf8'));
 const doiFrom = (value) => String(value || '').match(/10\.34847\/nkl\.[a-z0-9]+/i)?.[0] || null;

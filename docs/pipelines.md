@@ -396,12 +396,12 @@ python work/ocr/scripts/ocr.py batch --map-id <uuid> --iiif-base <url> --scout -
 
 # Fuzzy dedup + spatial fragment join → ocr_labels
 python work/ocr/scripts/ocr.py clean \
-  --local work/ocr/outputs/<map-id>/runs/<run-id> \
+  --local work/image-processing/results/<map-id>/runs/<run-id> \
   --map-id <uuid> --run-id <clean-run-id> --min-confidence 0.1 [--apply]
 
 # Read-only post-run audit: artifact integrity + a focused human-review queue
 python work/ocr/scripts/audit_run.py \
-  --run-dir work/ocr/outputs/<map-id>/runs/<run-id> \
+  --run-dir work/image-processing/results/<map-id>/runs/<run-id> \
   --output /tmp/<run-id>-audit.json
 ```
 
@@ -414,7 +414,7 @@ the shifted pass does not cover the first pass's outer strip, so a complete
 high-confidence singleton is still useful. Run it after every merge and before
 using the rows as a review or publication surface; `--self-check` is offline.
 When a map's source tiles are already cached, add `--tiles-dir
-work/ocr/outputs/<map-id> --review-dir /tmp/<run-id>-review` to produce one
+work/image-processing/results/<map-id> --review-dir /tmp/<run-id>-review` to produce one
 red-box crop per queued label and a `manifest.json`; no IIIF request is made.
 
 Subcommands (15): `run`, `batch`, `scout`, `stitch`, `clean`, `dedup`, `merge`, `preview`,
@@ -578,8 +578,8 @@ including a null result, so nobody re-runs this experiment blind.
 | `dictionary.py` | Offline gazetteer of every name read so far → `outputs/dictionary.{json,md}`. `--self-check` |
 | `eval.py`, `eval_metrics.py` | The quality gate: score an OCR or seg run against reviewed ground truth. Baseline in `EVAL-BASELINE.md` |
 | `modern_prior.py` | 2023 geodata (HCMC buildings, OSM) warped into a sheet's own source-pixel grid: blocks, road centrelines + junctions, built fraction, survivors. Saigon-only sources; **not** a positive seed source as-is — read its docstring on the epoch gap. `--self-check` |
-| `backfill_full800.py` | One-off: store the `full/800,` derivative in R2 for every published map. `--self-check` |
-| `fix_info_scalefactors.py` | One-off: drop scale factors a stored `info.json` advertises but the pyramid does not hold. `--self-check` |
+| `oneoff/backfill_full800.py` | One-off: store the `full/800,` derivative in R2 for every published map. `--self-check` |
+| `oneoff/fix_info_scalefactors.py` | One-off: drop scale factors a stored `info.json` advertises but the pyramid does not hold. `--self-check` |
 
 ### Local passes (no API — run on the M-series for free)
 
@@ -813,7 +813,7 @@ stating **different** cells is now reported at the end of the run instead of
 being dropped as a duplicate.
 
 **~$0.03 was a guess, not a measurement, and it was low either way (2026-09-10
-correction).** `work/ocr/outputs/34d4edb2…/runs/streetindex-20260910/calls.jsonl`
+correction).** `work/image-processing/results/34d4edb2…/runs/streetindex-20260910/calls.jsonl`
 holds two full runs of this command (28 logged calls — one band per pass is
 served from the response cache and never reaches `calls.jsonl`, so 14 billed
 calls per 15-band pass, not 15). Costed straight off that log at $0.75/$3.75
@@ -995,7 +995,7 @@ it before touching the core loop.
 - Model: `DEFAULT_MODEL = "gemini-3.8-flash"` (`work/ocr/scripts/gemini_client.py`), overridable
   per-subcommand with `--model`. Key in `.env` as `GEMINI_API_KEY` / `GEMINI_API_KEYS`
   (comma-separated for rotation). `ocr.py list-models` enumerates what the key can actually reach.
-- Outputs versioned at `work/ocr/outputs/<map_id>/runs/<run_id>/` with `run_config.json` for
+- Outputs versioned at `work/image-processing/results/<map_id>/runs/<run_id>/` with `run_config.json` for
   reproducibility.
 - Prompts in `work/ocr/scripts/prompt.py`: `v1`–`v8`, `seq-v1`, `seq-v1-idx` and `scout`.
   **`DEFAULT_PROMPT = "seq-v1"`** since 2026-09-08 — see *Prompt* above for what it changed. This
@@ -1100,7 +1100,7 @@ digitisations of the same sheet.
 `work/analysis/district4/README.md` states the scan it measured: 1959 is
 "5000x3790, Virtual Saigon/IRD, 2.80 m/px". At 5,000 px that is 14.0 km of
 ground, which is right for the Đô thành. The scan the OCR pipeline reads is
-much larger: the crop in `work/ocr/outputs/34d4edb2-*/runs/idx-20260910/run_config.json`
+much larger: the crop in `work/image-processing/results/34d4edb2-*/runs/idx-20260910/run_config.json`
 is `1148,775,11704,9221`, which alone puts that image at 12,852 px wide or
 more. The exact figure is **14,000 x 10,773**, and this file already said so
 340 lines above -- "the 1959 sheet was re-OCR'd after its scan was replaced
@@ -1156,7 +1156,7 @@ baochi/cgi-bin/baochi?a=q&r=<1-based>&results=1&txq=<query>&txf=txIN&ssnip=img&o
 
 `r` is the index of the first result and `o` the page size (50 is the largest the
 form offers). The script pages that, parses the results HTML, and appends
-`work/press/nlv.jsonl` — one row per `oid`, the archive's own article key, deduped
+`work/research/press/nlv.jsonl` — one row per `oid`, the archive's own article key, deduped
 against what is on disk. Neither the jsonl nor `--images` output is in git.
 
 ```bash
@@ -1236,10 +1236,10 @@ proxy is used for.
   Sequential, one request at a time, 1.2 s apart, one retry. Do not parallelise.
 - **`--max` is a per-run page budget, not the size of the archive.** Each (query,
   publication, year-range) pair's next `r` is remembered in
-  `work/press/offsets.json`, so re-running the same list continues where it
+  `work/research/press/offsets.json`, so re-running the same list continues where it
   stopped rather than re-paying for pages it already has. `--restart` ignores it.
 - **The parser is regexes over Veridian's HTML.** `--fixture` saves one results
-  page to `work/press/fixture-results.html` and `--selftest` pins the parser
+  page to `work/research/press/fixture-results.html` and `--selftest` pins the parser
   against it, asserting a full page's worth of rows and a non-zero total — so a
   template change fails loudly instead of reading as an archive with nothing in
   it. `--selftest` exits non-zero. Re-run `--fixture` if the page size changes.
@@ -1258,7 +1258,7 @@ lists of the same city's institutions:
 
 `legend_timeline.mjs` matches them to each other; `legend_press.mjs` hangs a
 per-decade press curve off each match, from the NLV (Vietnamese) and Gallica
-(French) archives. Output is `work/legend/{entries,timeline,press,baseline}.json`,
+(French) archives. Output is `work/research/legend/{entries,timeline,press,baseline}.json`,
 none of it in git.
 
 ```bash
@@ -1347,7 +1347,7 @@ node scripts/place_report.mjs "Khánh Hội" --max 14
 node scripts/place_report.mjs "Khánh Hội" --variants "Khanh Hoi,Khánh-Hội"
 ```
 
-Writes `work/reports/<slug>.md` (gitignored): the decade curve, a synthesis, then
+Writes `work/research/reports/<slug>.md` (gitignored): the decade curve, a synthesis, then
 every source numbered with its date, archive and URL. The synthesis is written by
 Gemini from the evidence table **and nothing else**, with `[n]` citations into it,
 so a reader checks rather than trusts.

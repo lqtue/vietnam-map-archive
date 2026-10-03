@@ -243,7 +243,7 @@ the rule chosen and why. Do not score a partial polygon as a false positive for 
 and `labels_matching`, recorded in `blocks.run.json` alongside the flags. When it is not given,
 print the runs the rows came from rather than pooling silently. (b) the same option on
 `seg_eval.py --labels`. (c) `load_labels` must page PostgREST rather than truncate at 1000.
-(d) a documented, stable path for the reference scan — `work/ocr/outputs/<map>/reference.jpg` or a
+(d) a documented, stable path for the reference scan — `work/image-processing/results/<map>/reference.jpg` or a
 symlink — so clearing `.tile_cache` does not destroy every quoted number.
 
 **Exit:** the reference run with `--ocr-run-id post0910` prints its run id in `blocks.run.json`,

@@ -29,7 +29,7 @@
 // Politeness: sequential, one request at a time, PAUSE_MS between, one retry.
 // This is a national library's public search, not an API. Do not parallelise.
 //
-// Output: work/press/nlv.jsonl, one row per `oid` (the archive's own article
+// Output: work/research/press/nlv.jsonl, one row per `oid` (the archive's own article
 // key), appended and deduped. --images pulls each hit's full page scan.
 //
 // Usage:
@@ -41,7 +41,7 @@
 //   node scripts/scout_nlv_press.mjs --report
 //
 // --max is a per-query page budget for ONE run, not the size of the archive:
-// each (query, filter) pair's next `r` is remembered in work/press/offsets.json,
+// each (query, filter) pair's next `r` is remembered in work/research/press/offsets.json,
 // so running the same list again continues where it stopped. --restart ignores it.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -49,7 +49,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 const HOST = 'http://baochi.nlv.gov.vn';
 const SEARCH = `${HOST}/baochi/cgi-bin/baochi`;
 const IMAGES = `${HOST}/baochi/cgi-bin/imageserver/imageserver.pl`;
-const OUT_DIR = 'work/press';
+const OUT_DIR = 'work/research/press';
 const OUT = `${OUT_DIR}/nlv.jsonl`;
 const IMG_DIR = `${OUT_DIR}/img`;
 const OFFSETS = `${OUT_DIR}/offsets.json`;
@@ -332,7 +332,7 @@ function report() {
 }
 
 function selftest() {
-  const fixture = 'work/press/fixture-results.html';
+  const fixture = 'work/research/press/fixture-results.html';
   // console.assert only prints; a selftest that cannot fail the process is a
   // selftest nobody notices failing.
   let bad = 0;

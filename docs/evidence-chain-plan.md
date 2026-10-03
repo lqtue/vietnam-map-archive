@@ -15,7 +15,7 @@ version intelligible. A missing source or unreviewed machine reading must be
 visible as such.
 
 Build the first complete trail on the 1882 Saigon cadastral map documented in
-`docs/worked-example-1882.md` (map `0e02b9d9-…`, Gallica `btv1b52508901z`),
+`docs/research/worked-example-1882.md` (map `0e02b9d9-…`, Gallica `btv1b52508901z`),
 where a reviewed OCR run (`v1b`), 46 approved footprints, a source record, and
 a measured georeference already exist. Choose one named feature whose label and
 trace can both be inspected. Add a second dated map only after checking that it

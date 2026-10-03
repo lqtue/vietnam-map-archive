@@ -15,8 +15,8 @@ those rows (`_write_legend_rows` for the legend key, the same row shape
 `cmd_numerals --db` builds for the map numerals), so the rows this writes are
 byte-for-byte what a normal `--db` run that day would have written.
 
-    python work/ocr/scripts/backfill_1968_legend.py --dry-run
-    python work/ocr/scripts/backfill_1968_legend.py
+    python work/ocr/scripts/oneoff/backfill_1968_legend.py --dry-run
+    python work/ocr/scripts/oneoff/backfill_1968_legend.py
 """
 from __future__ import annotations
 
@@ -25,10 +25,10 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 MAP_ID = "3a446d85-25a8-4e81-9cfc-8de357c3a5df"
-OUT = Path(__file__).resolve().parents[1] / "outputs" / MAP_ID / "runs"
+OUT = Path(__file__).resolve().parents[2] / "outputs" / MAP_ID / "runs"
 LEGEND_RUN, NUMERALS_RUN = "legend1968", "numerals1968"
 
 

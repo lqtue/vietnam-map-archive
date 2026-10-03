@@ -22,7 +22,7 @@ from PIL import Image, ImageDraw
 
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1] / "ocr" / "scripts"))
+sys.path.insert(0, str(HERE.parents[2] / "ocr" / "scripts"))
 from iiif_tiles import get_image_info, level0_tile_url  # noqa: E402
 
 RAW_CACHE = Path("/private/tmp/vma-river-iiif-raw-cache")

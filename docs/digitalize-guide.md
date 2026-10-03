@@ -248,7 +248,7 @@ and record it.
 The 1882 colour-pass run `colour-20260919` is already in the Validate queue: 1,443 proposals. Open
 `/scan?mode=shapes&tab=validate&map=0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` to review it. The
 normalized GeoJSON at
-`work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.normalized.geojson`
+`work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.normalized.geojson`
 retains all 1,443 geometries and maps their washes to review classes. Ten source polygons have
 interior holes that `pixel_polygon` cannot store; their indices and bounds are in the adjacent
 `audit.json`. The queue-safe file in that directory excludes those ten for any future reimport. The

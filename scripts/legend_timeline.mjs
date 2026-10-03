@@ -22,12 +22,12 @@
 //
 // Usage:
 //   node scripts/legend_timeline.mjs --selftest
-//   node scripts/legend_timeline.mjs                 # read DB, write work/legend/
+//   node scripts/legend_timeline.mjs                 # read DB, write work/research/legend/
 //   node scripts/legend_timeline.mjs --report
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 
-const OUT_DIR = 'work/legend';
+const OUT_DIR = 'work/research/legend';
 const ENTRIES = `${OUT_DIR}/entries.json`;
 const TIMELINE = `${OUT_DIR}/timeline.json`;
 

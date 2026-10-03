@@ -12,7 +12,7 @@ hash, tile count and statistics. `contact.jpg` shows the native crops and
 `dark-rb-histograms.png` plots the dark-ink distributions. Reproduce with:
 
 ```sh
-work/ocr/.venv/bin/python -u work/analysis/river_pair/eda.py
+work/ocr/.venv/bin/python -u work/image-processing/experiments/river-1882-1898/eda.py
 ```
 
 The two `water_core` windows are visually all water. The `dry_blue` windows are

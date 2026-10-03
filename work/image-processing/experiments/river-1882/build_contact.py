@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[2]
+ROOT = HERE.parents[3]
 sys.path.insert(0, str(ROOT / "work/ocr/scripts"))
 
 from iiif_tiles import fetch_crop_level0, get_image_info, level0_tile_url  # noqa: E402

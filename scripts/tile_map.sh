@@ -237,7 +237,7 @@ mv "$OUTPUT_DIR/source" "$OUTPUT_DIR/$MAP_ID"
 #    [1,2,4,8] while `full/166,235` sat in the bucket answering 200, so the
 #    renderer clamped a level down and pulled a 2x2 grid where one tile would
 #    have done. The same check is spelled again in
-#    `work/ocr/scripts/fix_info_scalefactors.py`; change either and change both.
+#    `work/ocr/scripts/oneoff/fix_info_scalefactors.py`; change either and change both.
 #
 #    This runs before the full/200, 400, 800 thumbnails below, but it still
 #    tests the exact `w,h` name rather than `full/` itself — a re-tile over an
