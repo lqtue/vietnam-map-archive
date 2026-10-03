@@ -44,7 +44,7 @@ hatch aliases away as the sheet is shrunk.
     python -c "from iiif_tiles import fetch_crop; \
       fetch_crop('https://iiif.maparchive.vn/iiif/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b', \
                  9681, 6961, 1754, 988, size=1754, fit=True).save('legend.png')"
-    python work/ocr/scripts/legend_probe.py legend.png
+    python work/image-processing/scripts/legend_probe.py legend.png
 
 Exits non-zero if the detected swatches disagree with `LEGEND_SWATCHES`, which
 is the whole check: the medians are known, so they prove the five rectangles
@@ -117,6 +117,9 @@ def main(path):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] in (["--help"], ["-h"]):
+        print(__doc__)
+        sys.exit(0)
     if len(sys.argv) != 2:
         sys.exit(__doc__.strip().splitlines()[0] + "\n\nusage: legend_probe.py <legend.png>")
     main(Path(sys.argv[1]))

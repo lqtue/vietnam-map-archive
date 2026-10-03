@@ -18,7 +18,7 @@ work, deferred by that plan; do not label or tune those batches as part of conso
   and in context, never a proposal, window or case. Keys `w` water, `r` road, `l` land, `s` unsure
   (on a line), `u` undo → `labels/1882.jsonl` (committed). 1882: 300 labelled by the owner.
 - `score.py --points 1882 <whole-sheet mask.png> [--layer road] [--seed N[,N...]]` — score once per frozen version (a comma list pools batches); `--spent` keeps only points in calibrate / seen:true windows, the evidence a version may be tuned on.
-  The water pass is `work/ocr/scripts/river_pass.py`; results in `docs/research/river-reconstruction.md`.
+  The water pass is `work/image-processing/scripts/river_pass.py`; results in `docs/research/river-reconstruction.md`.
 
 The tracing workflow below still works, and is kept for any window that needs a pixel shoreline.
 
@@ -90,5 +90,5 @@ The tracing workflow below still works, and is kept for any window that needs a 
    Re-import any time.
 
 Do one window first and import it, so the alignment can be checked before the rest.
-The river pass is `work/ocr/scripts/river_pass.py`, the road pass `road_pass.py` (v3; 1882 and 1898 via `--sheet`; sheet constants in `sheets.<id>.road.consts`; `--window ID` previews one window and refuses an unseen heldout one; `sheets.<id>.road` in `windows.json` is its frame and sheet constants; 1898 is untuned beyond the calibrate windows and unscored). Not built: the multi-reviewer agreement check. Two people tracing
+The river pass is `work/image-processing/scripts/river_pass.py`, the road pass `road_pass.py` (v3; 1882 and 1898 via `--sheet`; sheet constants in `sheets.<id>.road.consts`; `--window ID` previews one window and refuses an unseen heldout one; `sheets.<id>.road` in `windows.json` is its frame and sheet constants; 1898 is untuned beyond the calibrate windows and unscored). Not built: the multi-reviewer agreement check. Two people tracing
 the same window is what tells you whether 5 px of edge error is the method or the tracing.

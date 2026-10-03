@@ -22,7 +22,7 @@ from scipy import ndimage as nd
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(ROOT / "work" / "ocr" / "scripts"))
+sys.path.insert(0, str(ROOT / "work" / "image-processing" / "scripts"))
 from sheet_features import paper_at  # noqa: E402
 from view import touches  # noqa: E402
 

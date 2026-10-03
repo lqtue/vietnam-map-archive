@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """City blocks read off a polychrome sheet's own ink, in its own pixel grid.
 
-    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --census
-    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --out work/ocr/outputs/<uuid>/colour
-    python work/ocr/scripts/colour_blocks.py --map-id <uuid> --no-cream --no-drop-water --out <dir>
-    python work/ocr/scripts/colour_blocks.py --self-check          # no network, no data
+    python work/image-processing/scripts/colour_blocks.py --map-id <uuid> --census
+    python work/image-processing/scripts/colour_blocks.py --map-id <uuid> --out work/image-processing/results/<uuid>/colour
+    python work/image-processing/scripts/colour_blocks.py --map-id <uuid> --no-cream --no-drop-water --out <dir>
+    python work/image-processing/scripts/colour_blocks.py --self-check          # no network, no data
 
 The second line is the full pass — cream parcels, the legend key, the furniture,
 water and sliver drops and the oversize re-cut are all **on by default**, because
@@ -134,6 +134,7 @@ from PIL import Image, ImageDraw
 from scipy import ndimage
 
 _HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(_HERE.parents[1] / "ocr" / "scripts"))
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 

@@ -1,8 +1,8 @@
 """Road pass v2, 1882: the carriageway between blocks, from the paper-coloured space between outlines.
 
-    work/ocr/.venv/bin/python work/ocr/scripts/road_pass.py --sheet 1882
-    work/ocr/.venv/bin/python work/ocr/scripts/road_pass.py --sheet 1882 --window ne_cream   # calibrate preview
-    work/ocr/.venv/bin/python work/ocr/scripts/road_pass.py --self-check
+    work/ocr/.venv/bin/python work/image-processing/scripts/road_pass.py --sheet 1882
+    work/ocr/.venv/bin/python work/image-processing/scripts/road_pass.py --sheet 1882 --window ne_cream   # calibrate preview
+    work/ocr/.venv/bin/python work/image-processing/scripts/road_pass.py --self-check
 
 Needs sheet_features.py's paper.npy, river_pass.py's water.png and cells.npz. Writes
 work/image-processing/results/<map_id>/river/: road.png (native, 255 = road), road-preview.jpg, road-run.json.

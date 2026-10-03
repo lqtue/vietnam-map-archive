@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19 · **Map:** `20ec4f9a-16bd-4895-a593-40c6ed9c9555` · 16267 × 14859 px
 Gallica `btv1b530297676` · shelfmark **Ge C 2682**
-**Tool:** `work/ocr/scripts/colour_blocks.py` + `review_figs.py` (CPU)
+**Tool:** `work/image-processing/scripts/colour_blocks.py` + `review_figs.py` (CPU)
 **Status:** runs clean · georeference blocks geographic use · segmentation importable
 
 ## The sheet

@@ -19,10 +19,10 @@ Two modes, because the interesting comparison is not one number:
 
 Scored by the same script as every SAM2 run, on the same 46 hand traces:
 
-    python work/ocr/scripts/seg_gemini.py --map-id <uuid> --mode blocks --limit 40
+    python work/image-processing/scripts/seg_gemini.py --map-id <uuid> --mode blocks --limit 40
     python <outputs>/seg-review/blockprior-20260910/score.py <out.json>
 
-Self-check (no network, no key): python work/ocr/scripts/seg_gemini.py --self-check
+Self-check (no network, no key): python work/image-processing/scripts/seg_gemini.py --self-check
 """
 
 from __future__ import annotations
@@ -33,6 +33,7 @@ import os
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "ocr" / "scripts"))
 sys.path.insert(0, str(Path(__file__).parent))
 
 MAP_1882 = "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b"
@@ -445,7 +446,7 @@ def main() -> int:
     p.add_argument("--near-gt", action="store_true",
                    help="blocks mode: only blocks overlapping a hand trace, "
                         "so the calls land where the ground truth is")
-    p.add_argument("--out", default="work/ocr/outputs/seg_gemini.json")
+    p.add_argument("--out", default="work/image-processing/results/seg_gemini.json")
     args = p.parse_args()
 
     if args.self_check:

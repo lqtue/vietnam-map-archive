@@ -1,7 +1,11 @@
 # work/ — the pipelines
 
 Root context: `/CLAUDE.md`. What every folder here is: `work/README.md`; model responsibilities: `docs/model-layout.md`.
-Image experiments and local outputs live in `work/image-processing/`; `ocr/outputs` and `ocr/logs` are compatibility links. Full command reference and design rationale: `docs/pipelines.md`.
+Image commands live in `work/image-processing/scripts/`, experiments in `experiments/` and local
+outputs in `results/`. OCR commands and shared modules remain in `work/ocr/scripts/`, with the
+shared environment at `work/ocr/.venv`. `ocr/outputs` and `ocr/logs` are temporary compatibility
+links pending the reference audit in `docs/image-processing-1882-plan.md`.
+Full command reference and design rationale: `docs/pipelines.md`.
 §*Getting more out of OCR* there is the ranked list of what to do next and what not to re-attempt;
 `work/ocr/EVAL-BASELINE.md` is the measured gate behind it. `scripts/` holds the living operator
 scripts; `scripts/oneoff/` the backfills that have already run and stay only as a record.

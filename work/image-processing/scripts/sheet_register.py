@@ -2,9 +2,9 @@
 """sheet_register.py — register one historical sheet onto another using the
 names printed on both, then refine on block geometry.
 
-    python work/ocr/scripts/sheet_register.py --pair 1882:1898
-    python work/ocr/scripts/sheet_register.py --pair 1882:1898 --no-icp
-    python work/ocr/scripts/sheet_register.py --self-check
+    python work/image-processing/scripts/sheet_register.py --pair 1882:1898
+    python work/image-processing/scripts/sheet_register.py --pair 1882:1898 --no-icp
+    python work/image-processing/scripts/sheet_register.py --self-check
 
 Why this exists: `modern_prior.py` warps 2023 geodata into a sheet's pixel grid
 through that sheet's ground control points. A sheet whose georeference is bad
@@ -43,12 +43,12 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 SHEETS = {
     "1882": dict(
         map_id="0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", m_per_px=0.3411, georef_rmse_m=12.7,
-        ocr="work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/runs/post0910/all_extractions.json",
-        blocks="work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.clean.geojson"),
+        ocr="work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/runs/post0910/all_extractions.json",
+        blocks="work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.clean.geojson"),
     "1898": dict(
         map_id="20ec4f9a-16bd-4895-a593-40c6ed9c9555", m_per_px=None, georef_rmse_m=None,
-        ocr="work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/runs/2026-09-13T1036-20ec4f9a/all_extractions.json",
-        blocks="work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/colour-1898-20260919-normalized/blocks.clean.geojson"),
+        ocr="work/image-processing/results/20ec4f9a-16bd-4895-a593-40c6ed9c9555/runs/2026-09-13T1036-20ec4f9a/all_extractions.json",
+        blocks="work/image-processing/results/20ec4f9a-16bd-4895-a593-40c6ed9c9555/colour-1898-20260919-normalized/blocks.clean.geojson"),
 }
 SKIP_CAT = {"title", "legend", "other"}   # sheet furniture: same words on every sheet
 MIN_KEY = 5                               # "OUEST" and shorter match by accident
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     if a.self_check:
         self_check(); sys.exit()
     s, d = a.pair.split(":")
-    out = a.out or ROOT / f"work/ocr/outputs/register-{s}-{d}.json"
+    out = a.out or ROOT / f"work/image-processing/results/register-{s}-{d}.json"
     rep = register(s, d, a.tol_px, not a.no_icp, out)
     print(json.dumps({k: v for k, v in rep.items() if k != "inlier_names"}, indent=2))
     print(f"\n{len(rep['inlier_names'])} anchor names: " + " · ".join(rep["inlier_names"][:10]))

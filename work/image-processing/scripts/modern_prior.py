@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Modern geodata warped into a historical sheet's own pixel grid.
 
-    python work/ocr/scripts/modern_prior.py --map-id <uuid> --blocks --roads
-    python work/ocr/scripts/modern_prior.py --map-id <uuid> --built-fraction 16
-    python work/ocr/scripts/modern_prior.py --self-check          # no network
+    python work/image-processing/scripts/modern_prior.py --map-id <uuid> --blocks --roads
+    python work/image-processing/scripts/modern_prior.py --map-id <uuid> --built-fraction 16
+    python work/image-processing/scripts/modern_prior.py --self-check          # no network
 
 Why this exists: the corpus has 2023 ground truth sitting next to it — a
 cadastral-grade building layer for HCMC (2.1M polygons) and an OSM extract —
@@ -66,6 +66,7 @@ from typing import Any, Iterable
 import numpy as np
 import shapely
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "ocr" / "scripts"))
 from scale import MIN_GCP_CONDITION, gcps_from_annotation, metres_per_pixel
 
 # The two local sources. Both are Saigon-only: the buildings run
@@ -812,7 +813,7 @@ def run(args: argparse.Namespace) -> int:
               "pick one, or give the second run its own --out", file=sys.stderr)
         return 1
 
-    out = Path(args.out) if args.out else Path(__file__).resolve().parents[1] / "outputs" / "prior" / args.map_id
+    out = Path(args.out) if args.out else Path(__file__).resolve().parents[1] / "results" / "prior" / args.map_id
 
     if args.blocks or args.built_fraction or args.survivors:
         geoms, cols = load_buildings(bbox)
@@ -1113,7 +1114,7 @@ def main() -> int:
     p.add_argument("--built-fraction", type=int, metavar="N", help="N x N built-fraction grid")
     p.add_argument("--gcps", action="store_true", help="per-control-point residual + leave-one-out")
     p.add_argument("--osm", help="OSM GPKG with a `lines` layer (default: the Desktop extract)")
-    p.add_argument("--out", help="output directory (default work/ocr/outputs/prior/<map-id>)")
+    p.add_argument("--out", help="output directory (default work/image-processing/results/prior/<map-id>)")
     p.add_argument("--sweep", action="store_true",
                    help="fit every georeferenced sheet in the corpus, worst residual first")
     p.add_argument("--legend", action="store_true",

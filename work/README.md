@@ -28,9 +28,12 @@ Regenerate it after new runs:
 python3 work/image-processing/build_catalog.py
 ```
 
-Code and the Python environment remain in `ocr/` and `MapSAM2/`. Old analysis experiment paths,
-`ocr/outputs`, `ocr/logs` and `vectorize` are compatibility symlinks to the consolidated locations.
-Use the physical paths for new work; existing pipeline commands continue to use the links.
+Image commands live in [image-processing/scripts](image-processing/scripts/README.md).
+OCR commands and shared IIIF, georeference, model and database helpers stay in `ocr/scripts/`;
+the Python environment remains at `ocr/.venv`. SAM2 retains its own code in `MapSAM2/`.
+The older river-pilot and segmentation-review paths, `ocr/outputs`, `ocr/logs` and `vectorize`
+remain temporary compatibility symlinks. Use physical paths for new commands. Remove the
+remaining links only after the reference audit in the [1882 plan](../docs/image-processing-1882-plan.md).
 
 ## Keep evidence and outputs distinct
 

@@ -66,11 +66,11 @@ city. It is no longer identical **by design**: the split adds geometry there.
 cd ~/Work/Projects/vietnam-map-archive
 set -a && . ./.env && set +a
 export PYTHONPATH=work/ocr/scripts
-python3 work/ocr/scripts/colour_blocks.py \
+python3 work/image-processing/scripts/colour_blocks.py \
   --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b \
   --local-image .tile_cache/ocr/full_c03b7f44a1d8d455c2b476d248651265.jpg \
   --render 6051 --out <dir>
-python3 work/ocr/scripts/seg_eval.py \
+python3 work/image-processing/scripts/seg_eval.py \
   --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b <dir>/blocks.run.json
 ```
 

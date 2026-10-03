@@ -1,7 +1,7 @@
 """River pass v1, 1882: water from line texture, built on sheet_features.py's layers. No traces used.
 
-    work/ocr/.venv/bin/python work/ocr/scripts/river_pass.py --sheet 1882
-    work/ocr/.venv/bin/python work/ocr/scripts/river_pass.py --self-check
+    work/ocr/.venv/bin/python work/image-processing/scripts/river_pass.py --sheet 1882
+    work/ocr/.venv/bin/python work/image-processing/scripts/river_pass.py --self-check
 
 Writes work/image-processing/results/<map_id>/river/: water.png (native, 255 = water joined to the river network,
 128 = an isolated water-like body awaiting review, 0 = not water), cells.npz, preview.jpg, run.json.

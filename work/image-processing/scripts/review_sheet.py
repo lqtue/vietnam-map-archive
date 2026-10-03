@@ -1,6 +1,6 @@
 """Contact sheet of river_pass.py's review bodies (128 in water.png), for the owner to call water or dry.
 
-    work/ocr/.venv/bin/python work/ocr/scripts/review_sheet.py --sheet 1898
+    work/ocr/.venv/bin/python work/image-processing/scripts/review_sheet.py --sheet 1898
 
 Writes work/image-processing/results/<map_id>/river/review.jpg: one row per body, the raw native crop on the left
 and the same crop with the body's outline (orange) and the water edge (cyan) on the right, numbered in
