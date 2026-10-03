@@ -1,5 +1,8 @@
 # Processing the 1882 and 1898 plans: river, road, block, building
 
+> **Superseded 2026-10-03** by `docs/image-processing-1882-plan.md` (1882 only; 1898 deferred).
+> Kept as the record of the 2026-10-01 plan; do not work from it.
+
 **Plan, 2026-10-01. Nothing here is approved or measured unless a number is cited.** The 1882
 Plan Cadastral (`0e02b9d9-…`, 12102 × 8982 px) is the in-depth sheet; the 1898 Bertaux plan
 (`20ec4f9a-…`, 16267 × 14859 px) is the paired transfer check. Open items live in
