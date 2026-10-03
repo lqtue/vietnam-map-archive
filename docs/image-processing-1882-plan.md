@@ -1,6 +1,6 @@
 # Image-processing consolidation and the 1882 feature layer — plan
 
-**Written 2026-10-03; not started.** The plan to stop researching feature extraction and ship one approved
+**Written 2026-10-03; Phase 0 steps 1–2 integrated on `feat/1882-processing-integration` for PR review.** The plan to stop researching feature extraction and ship one approved
 1882 layer (water, plots, buildings, roads), after first cleaning up the image-processing WIP. Scope is the 1882 sheet only:
 1898 and District 4 are out of scope until this ships. The owner approved the direction and asked for this file
 so another session or model can pick it up cold. The briefing below is everything that session needs and would
@@ -53,7 +53,18 @@ Map id `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b`, 12102×8982 px, 0.3416 m/px, imag
   - water drawn over parcel hatching counts as water
   - the citadel is dry
 
-### Two checkouts — read before touching git
+### Original checkout briefing — historical state before PR #33
+
+Main’s reorganisation is now committed at `8a475366` (PR #33). The integration branch
+consolidates `feat/1882-1898-processing` without changing that original branch or its worktree.
+Reference tools are under `work/image-processing/experiments/river-reference/`; modern
+overlays use `experiments/modern-overlays/`. Selected OSM evidence stays local pending
+licence review. Phase 0 steps 3–7 remain, including script separation and final output cleanup.
+No layer has been approved or written to the database during integration.
+
+The checkout details below record the plan’s starting point, rather than the current checkout.
+
+### Two checkouts at plan creation
 - **Main:** `/Users/airm1/Work/Projects/vietnam-map-archive`, on branch `l7014-iiif-ingest`.
   - Its dirty tree is mostly **other sessions' work** (paper, docs, scripts): never stage it wholesale.
   - It also holds the owner's **uncommitted `work/` reorganisation**: `work/analysis/*` → `work/image-processing/experiments/*`, outputs → `work/image-processing/results/`. `work/ocr/outputs`, `work/ocr/logs` and `work/analysis/{1882,river_pair,river_ref,modern_overlay,seg-260919}` are compatibility symlinks.

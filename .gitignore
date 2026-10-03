@@ -103,8 +103,9 @@ work/image-processing/results/*
 !work/image-processing/results/.gitkeep
 work/image-processing/logs/*
 !work/image-processing/logs/.gitkeep
-work/image-processing/experiments/modern-overlays/
-work/image-processing/experiments/river-reference/
+work/image-processing/experiments/modern-overlays/out/
+work/image-processing/experiments/river-reference/crops/
+work/image-processing/experiments/river-reference/proposals/
 work/image-processing/experiments/segmentation-20260919/**
 !work/image-processing/experiments/segmentation-20260919/**/
 !work/image-processing/experiments/segmentation-20260919/**/*.md
@@ -112,3 +113,7 @@ work/archive/vectorize/
 !work/ocr/outputs
 !work/ocr/logs
 !work/vectorize
+
+# Modern-layer derived geometry and figures remain local pending licence review.
+work/image-processing/experiments/osm-warp/*
+!work/image-processing/experiments/osm-warp/README.md

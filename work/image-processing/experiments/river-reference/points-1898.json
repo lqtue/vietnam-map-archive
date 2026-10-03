@@ -1,0 +1,1452 @@
+[
+{
+"id": "1898-0000",
+"x": 7275,
+"y": 11882,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0001",
+"x": 7129,
+"y": 11561,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0002",
+"x": 7241,
+"y": 11807,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0003",
+"x": 7920,
+"y": 11783,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0004",
+"x": 7777,
+"y": 12107,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0005",
+"x": 7429,
+"y": 11396,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0006",
+"x": 7999,
+"y": 11329,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0007",
+"x": 7798,
+"y": 11743,
+"window": "quay_canal",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0008",
+"x": 8199,
+"y": 11304,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0009",
+"x": 7170,
+"y": 12132,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0010",
+"x": 7329,
+"y": 11735,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0011",
+"x": 7484,
+"y": 11683,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0012",
+"x": 7803,
+"y": 11481,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0013",
+"x": 7423,
+"y": 11836,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0014",
+"x": 8050,
+"y": 11358,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0015",
+"x": 7163,
+"y": 11344,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0016",
+"x": 8087,
+"y": 11349,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0017",
+"x": 7107,
+"y": 11320,
+"window": "quay_canal",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0018",
+"x": 5980,
+"y": 2002,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0019",
+"x": 5643,
+"y": 2292,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0020",
+"x": 6064,
+"y": 2043,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0021",
+"x": 5259,
+"y": 1840,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0022",
+"x": 5654,
+"y": 2082,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0023",
+"x": 6096,
+"y": 2261,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0024",
+"x": 6215,
+"y": 1866,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0025",
+"x": 5677,
+"y": 1653,
+"window": "creek_north",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0026",
+"x": 6277,
+"y": 1593,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0027",
+"x": 6325,
+"y": 2220,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0028",
+"x": 5384,
+"y": 1574,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0029",
+"x": 6265,
+"y": 1863,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0030",
+"x": 5458,
+"y": 1687,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0031",
+"x": 6095,
+"y": 1337,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0032",
+"x": 5895,
+"y": 1788,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0033",
+"x": 5717,
+"y": 2097,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0034",
+"x": 5759,
+"y": 2187,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0035",
+"x": 5888,
+"y": 1430,
+"window": "creek_north",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0036",
+"x": 10990,
+"y": 9503,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0037",
+"x": 10923,
+"y": 9540,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0038",
+"x": 11717,
+"y": 9712,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0039",
+"x": 11758,
+"y": 9632,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0040",
+"x": 11319,
+"y": 9394,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0041",
+"x": 11110,
+"y": 9490,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0042",
+"x": 11401,
+"y": 9711,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0043",
+"x": 11666,
+"y": 9717,
+"window": "bridge_label",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0044",
+"x": 11568,
+"y": 9542,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0045",
+"x": 11548,
+"y": 9641,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0046",
+"x": 10848,
+"y": 9241,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0047",
+"x": 10811,
+"y": 9583,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0048",
+"x": 11261,
+"y": 9455,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0049",
+"x": 11630,
+"y": 9547,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0050",
+"x": 11435,
+"y": 9552,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0051",
+"x": 11511,
+"y": 9721,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0052",
+"x": 11584,
+"y": 9386,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0053",
+"x": 11249,
+"y": 9530,
+"window": "bridge_label",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0054",
+"x": 5361,
+"y": 5919,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0055",
+"x": 5594,
+"y": 5890,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0056",
+"x": 5555,
+"y": 5583,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0057",
+"x": 4888,
+"y": 5649,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0058",
+"x": 5479,
+"y": 5720,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0059",
+"x": 4910,
+"y": 5997,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0060",
+"x": 4967,
+"y": 5733,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0061",
+"x": 5660,
+"y": 5602,
+"window": "dry_salmon",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0062",
+"x": 10679,
+"y": 3501,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0063",
+"x": 11050,
+"y": 3030,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0064",
+"x": 10780,
+"y": 3044,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0065",
+"x": 10615,
+"y": 3720,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0066",
+"x": 11168,
+"y": 3629,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0067",
+"x": 10907,
+"y": 3592,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0068",
+"x": 10703,
+"y": 3662,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0069",
+"x": 10474,
+"y": 3172,
+"window": "hatched_bank",
+"stratum": "uniform",
+"seed": 1
+},
+{
+"id": "1898-0070",
+"x": 10904,
+"y": 3800,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0071",
+"x": 10344,
+"y": 3429,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0072",
+"x": 10547,
+"y": 3048,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0073",
+"x": 10623,
+"y": 3387,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0074",
+"x": 10965,
+"y": 3837,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0075",
+"x": 10941,
+"y": 3846,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0076",
+"x": 10377,
+"y": 3437,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0077",
+"x": 10486,
+"y": 3684,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0078",
+"x": 10970,
+"y": 3812,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0079",
+"x": 10400,
+"y": 3607,
+"window": "hatched_bank",
+"stratum": "edge",
+"seed": 1,
+"edge_of": "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/water-b7ff0618.png"
+},
+{
+"id": "1898-0080",
+"x": 8278,
+"y": 5783,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0081",
+"x": 8270,
+"y": 5769,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0082",
+"x": 7357,
+"y": 4993,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0083",
+"x": 7386,
+"y": 5269,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0084",
+"x": 8155,
+"y": 5073,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0085",
+"x": 8053,
+"y": 5728,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0086",
+"x": 7985,
+"y": 5774,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0087",
+"x": 7615,
+"y": 5157,
+"window": "road_boulevard",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0088",
+"x": 8138,
+"y": 5806,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0089",
+"x": 7542,
+"y": 5140,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0090",
+"x": 8188,
+"y": 5807,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0091",
+"x": 7946,
+"y": 4939,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0092",
+"x": 7696,
+"y": 5775,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0093",
+"x": 7563,
+"y": 5092,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0094",
+"x": 7395,
+"y": 5509,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0095",
+"x": 8286,
+"y": 5850,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0096",
+"x": 7642,
+"y": 5444,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0097",
+"x": 7588,
+"y": 5679,
+"window": "road_boulevard",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0098",
+"x": 7172,
+"y": 9780,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0099",
+"x": 6757,
+"y": 10358,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0100",
+"x": 6655,
+"y": 9914,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0101",
+"x": 6474,
+"y": 10322,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0102",
+"x": 6236,
+"y": 10291,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0103",
+"x": 6228,
+"y": 9772,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0104",
+"x": 6676,
+"y": 10354,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0105",
+"x": 6526,
+"y": 10329,
+"window": "road_dense",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0106",
+"x": 6944,
+"y": 10126,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0107",
+"x": 6448,
+"y": 10208,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0108",
+"x": 6236,
+"y": 9687,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0109",
+"x": 6711,
+"y": 9727,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0110",
+"x": 7171,
+"y": 9868,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0111",
+"x": 6376,
+"y": 9859,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0112",
+"x": 6820,
+"y": 9431,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0113",
+"x": 6655,
+"y": 9725,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0114",
+"x": 6534,
+"y": 10030,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0115",
+"x": 6830,
+"y": 9715,
+"window": "road_dense",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0116",
+"x": 9639,
+"y": 7022,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0117",
+"x": 10022,
+"y": 6868,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0118",
+"x": 10026,
+"y": 7190,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0119",
+"x": 10073,
+"y": 6686,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0120",
+"x": 10415,
+"y": 6956,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0121",
+"x": 10315,
+"y": 6924,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0122",
+"x": 10252,
+"y": 7037,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0123",
+"x": 10428,
+"y": 7430,
+"window": "road_quay",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0124",
+"x": 10406,
+"y": 7347,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0125",
+"x": 9766,
+"y": 7085,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0126",
+"x": 10266,
+"y": 7363,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0127",
+"x": 10123,
+"y": 7241,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0128",
+"x": 9722,
+"y": 7077,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0129",
+"x": 9773,
+"y": 7083,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0130",
+"x": 9599,
+"y": 7485,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0131",
+"x": 10487,
+"y": 7403,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0132",
+"x": 9585,
+"y": 7473,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0133",
+"x": 9656,
+"y": 7146,
+"window": "road_quay",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0134",
+"x": 3465,
+"y": 9677,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0135",
+"x": 4072,
+"y": 9109,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0136",
+"x": 4032,
+"y": 9456,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0137",
+"x": 3772,
+"y": 9370,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0138",
+"x": 3843,
+"y": 8955,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0139",
+"x": 3801,
+"y": 8985,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0140",
+"x": 4247,
+"y": 9210,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0141",
+"x": 3812,
+"y": 9227,
+"window": "road_outskirts",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0142",
+"x": 3983,
+"y": 9344,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0143",
+"x": 3871,
+"y": 9487,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0144",
+"x": 3992,
+"y": 9387,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0145",
+"x": 3974,
+"y": 9390,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0146",
+"x": 4084,
+"y": 9342,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0147",
+"x": 3913,
+"y": 9442,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0148",
+"x": 3891,
+"y": 9534,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0149",
+"x": 3950,
+"y": 9437,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0150",
+"x": 3899,
+"y": 9530,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0151",
+"x": 3969,
+"y": 9388,
+"window": "road_outskirts",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0152",
+"x": 3398,
+"y": 3974,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0153",
+"x": 3127,
+"y": 4263,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0154",
+"x": 3232,
+"y": 4134,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0155",
+"x": 3616,
+"y": 4155,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0156",
+"x": 3070,
+"y": 4197,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0157",
+"x": 3829,
+"y": 3931,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0158",
+"x": 3174,
+"y": 4091,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0159",
+"x": 3833,
+"y": 3791,
+"window": "road_creek",
+"stratum": "uniform",
+"seed": 2
+},
+{
+"id": "1898-0160",
+"x": 3716,
+"y": 3706,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0161",
+"x": 3690,
+"y": 3699,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0162",
+"x": 3137,
+"y": 4093,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0163",
+"x": 3155,
+"y": 4215,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0164",
+"x": 3218,
+"y": 4120,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0165",
+"x": 3176,
+"y": 4099,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0166",
+"x": 3125,
+"y": 4272,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0167",
+"x": 3271,
+"y": 3895,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0168",
+"x": 3646,
+"y": 3709,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+},
+{
+"id": "1898-0169",
+"x": 3778,
+"y": 3577,
+"window": "road_creek",
+"stratum": "edge",
+"seed": 2,
+"edge_of": "/Users/airm1/Work/Projects/vma-1882-river/work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/river/road-fadb75b3.png"
+}
+]

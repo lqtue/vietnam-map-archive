@@ -297,6 +297,9 @@ any one period of work, fix the lowest broken layer first.
 | **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
 | **Outside the model** | operations, CI, the language of the UI | `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 7 unnamed lines under ROADMAP's Debt heading |
 
+The current scope of `river-reconstruction` is approved 1882 water; its 1898 work is
+deferred by the [1882 feature-layer plan](image-processing-1882-plan.md). The item stays in layer 3.
+
 That is 81 named items, plus the 7 unnamed debt lines, as of 2026-10-01.
 
 **Reading the table.** Layer 3 holds the most items (20), but the layers are not equally healthy
