@@ -151,6 +151,7 @@ test.afterAll(async () => {
   for (const key of created.seriesKeys)
     await admin.from('series_cells').delete().eq('series_key', key);
   for (const id of created.mapIds) await admin.from('maps').delete().eq('id', id);
+  for (const key of created.seriesKeys) await admin.from('series').delete().eq('key', key);
   await staffRequest?.dispose();
 });
 
@@ -1743,6 +1744,12 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
     extra: Record<string, unknown>,
     bbox: number[]
   ) => {
+    const seriesKey = collection.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (!created.seriesKeys.includes(seriesKey)) {
+      const { error: seriesError } = await admin.from('series').insert({ key: seriesKey, name: collection });
+      if (seriesError) throw new Error(`series fixture failed: ${seriesError.message}`);
+      created.seriesKeys.push(seriesKey);
+    }
     const { data, error } = await admin
       .from('maps')
       .insert({
@@ -1798,7 +1805,6 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   // The survey's own index (mig 083): what it CONTAINS, which `maps` cannot
   // say because it only holds successes. Five cells, of which we hold two.
   const pubKeyForIndex = pubSeries.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  created.seriesKeys.push(pubKeyForIndex);
   const { error: idxError } = await admin.from('series_cells').insert(
     ['1', '2', '3', '4', '5'].map((n) => ({
       series_key: pubKeyForIndex,
