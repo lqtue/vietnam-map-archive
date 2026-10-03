@@ -1744,9 +1744,14 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
     extra: Record<string, unknown>,
     bbox: number[]
   ) => {
-    const seriesKey = collection.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const seriesKey = collection
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
     if (!created.seriesKeys.includes(seriesKey)) {
-      const { error: seriesError } = await admin.from('series').insert({ key: seriesKey, name: collection });
+      const { error: seriesError } = await admin
+        .from('series')
+        .insert({ key: seriesKey, name: collection });
       if (seriesError) throw new Error(`series fixture failed: ${seriesError.message}`);
       created.seriesKeys.push(seriesKey);
     }
