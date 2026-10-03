@@ -43,14 +43,12 @@
  */
 
 import VectorTileLayer from 'ol/layer/VectorTile';
-import TileLayer from 'ol/layer/Tile';
-import { PMTilesVectorSource, PMTilesRasterSource } from 'ol-pmtiles';
+import { PMTilesVectorSource } from 'ol-pmtiles';
 import Style from 'ol/style/Style';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
 import type { FeatureLike } from 'ol/Feature';
-import type { Loader, LoaderOptions } from 'ol/source/DataTile';
 import { isDarkTheme } from '$lib/core/utils/theme';
 
 export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260913.pmtiles';
@@ -75,127 +73,6 @@ export const REGION_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/seasia-20
 
 /** Where the regional archive hands over to the detailed one. */
 const REGION_HANDOFF_ZOOM = 8;
-
-/**
- * The AMS Series L7014 mosaic: 509 GeoPDF sheets from the Perry-Castañeda
- * Library, each clipped to its own printed neatline and warped off the eight
- * control points the sheet carries, tiled into one raster archive by
- * `scripts/l7014_mosaic.py`.
- *
- * Like the basemap above, the key carries its build date because the R2 domain
- * sits behind a long edge TTL — a rebuild written over the same key would
- * strand readers on stale bytes. A new build is a new name and a new constant.
- */
-export const L7014_PMTILES_URL = 'https://tiles.maparchive.vn/overlay/l7014-20260913.pmtiles';
-
-/**
- * A tile the archive does not hold, as something drawable.
- *
- * `PMTilesRasterSource` returns an empty `Uint8Array` for a miss, and a sparse
- * archive is nothing but misses — every tile outside a sheet, inside a hole, or
- * past the last zoom level. The canvas renderer throws outright on array data
- * ("Rendering array data is not yet supported"), and the WebGL one paints it
- * black, which is worse: it hides the street basemap underneath instead of
- * letting it through. An untouched canvas is transparent, so a miss simply
- * shows what is below it.
- *
- * It has to match the archive's own tile size. A `DataTileSource` assumes every
- * tile is the size its grid declares, and handing back a 512 px blank where the
- * grid says 256 does not read as "nothing here" — it reads as four tiles' worth
- * of data, and the neighbouring tiles render as black bands.
- */
-const blankTiles = new Map<number, HTMLCanvasElement>();
-function blank(size: number): HTMLCanvasElement {
-  let tile = blankTiles.get(size);
-  if (!tile) {
-    tile = document.createElement('canvas');
-    tile.width = tile.height = size;
-    blankTiles.set(size, tile);
-  }
-  return tile;
-}
-
-/**
- * The mosaic's tile source. The loader the parent installs is wrapped rather
- * than replaced — the constructor calls `setLoader` itself once the PMTiles
- * header has arrived, so overriding the method is what gets in front of it.
- */
-class SparsePMTilesSource extends PMTilesRasterSource {
-  protected override setLoader(loader: Loader): void {
-    super.setLoader(async (z: number, x: number, y: number, options: LoaderOptions) => {
-      const data = await loader(z, x, y, options);
-      if (!(data instanceof Uint8Array)) return data;
-      const size = this.getTileGrid()?.getTileSize(z);
-      return blank(typeof size === 'number' ? size : (size?.[0] ?? 256));
-    });
-  }
-}
-
-/**
- * The pre-warped raster archives, by the key a `RasterRef` carries.
- *
- * `dev` is a locally built archive served by the `vma-local-pmtiles` middleware
- * in `vite.config.ts`, and it is tried first while `npm run dev` is running —
- * so a mosaic can be looked at before it is uploaded, which for 4.7 GB is worth
- * doing in that order. It is absent from every build.
- */
-const RASTER_ARCHIVES: Record<string, { url: string; dev?: string; attribution: string }> = {
-  l7014: {
-    url: L7014_PMTILES_URL,
-    dev: '/local-pmtiles/l7014-20260913.pmtiles',
-    attribution:
-      'U.S. Army Map Service, Series L7014 &mdash; <a href="https://maps.lib.utexas.edu/maps/topo/vietnam/" target="_blank">Perry-Castañeda Library Map Collection</a>, University of Texas at Austin',
-  },
-};
-
-/**
- * One raster archive as a stackable overlay layer. `LayerRenderer` owns its
- * z-index, opacity and visibility, the same as it does for a warped sheet.
- *
- * It stops at the sheets' own native resolution (~4.2 m/px, so zoom 15); past
- * that the tiles run out and whatever is beneath shows through, which is the
- * reader's basemap rather than a black screen.
- */
-export function buildRasterOverlayLayer(key: string): TileLayer {
-  const archive = RASTER_ARCHIVES[key];
-  if (!archive) throw new Error(`unknown raster archive: ${key}`);
-  const layer = new TileLayer({ properties: { name: `raster-${key}` } });
-  void attachArchive(layer, archive);
-  return layer;
-}
-
-/**
- * The source is wired only once the archive answers, because `PMTilesRasterSource`
- * reads the header in its constructor and a missing archive comes back as an
- * uncaught rejection — `Bad response code: 404`, once per load, with no way to
- * catch it from here and nothing on screen to explain it.
- *
- * This is not hypothetical. The key carries its build date on purpose (see
- * `L7014_PMTILES_URL`), so every rebuild retires a name, and any client still
- * pointing at the old one lands exactly here. A layer whose archive is gone
- * should draw nothing quietly, the same as a tile the archive does not hold.
- */
-async function attachArchive(
-  layer: TileLayer,
-  archive: { url: string; dev?: string; attribution: string }
-): Promise<void> {
-  const tried: string[] = [];
-  for (const url of [import.meta.env.DEV ? archive.dev : null, archive.url]) {
-    if (!url) continue;
-    tried.push(url);
-    try {
-      // The first bytes, not a HEAD: the archive is read over ranged GETs, which
-      // is also exactly what the source itself will do next.
-      const res = await fetch(url, { headers: { Range: 'bytes=0-15' } });
-      if (!res.ok && res.status !== 206) continue;
-    } catch {
-      continue;
-    }
-    layer.setSource(new SparsePMTilesSource({ url, attributions: [archive.attribution] }));
-    return;
-  }
-  console.warn('[basemap] raster archive unavailable, layer will draw nothing:', tried);
-}
 
 /**
  * Two palettes, because a canvas cannot read a CSS token: OL paints these as

@@ -139,6 +139,9 @@ def frame_corners():
     return out
 
 
+CORNERS_FILE = "hand-corners.json"
+
+
 def corner_sources():
     """sheet -> (pixel corners NW NE SE SW, ground corners, pixel size, how it was placed).
 
@@ -161,12 +164,13 @@ def corner_sources():
             continue
         note = f"neatline to lattice cell; worst seam {worst[sh]:.0f} m" if sh in worst else "neatline to lattice cell; no neighbour to check against"
         out[sh] = (detect[sh]["corners"], cells[sh], detect[sh]["size"], note)
-    for sh, r in json.load(open(regen / "hand-corners.json")).items():
+    for sh, r in json.load(open(regen / CORNERS_FILE)).items():
         if r["ok"]:
             out[sh] = (r["corners"], r["ground"], r["size"],
                        f"hand-read neatline to {r['ground_from']} corners; aspect {r['aspect_err_pct']}% off")
-    for sh in summary["pass"] + sorted(OFFCELL):  # done already / placed on their own PDF georeference
-        out.pop(sh, None)
+    if CORNERS_FILE == "hand-corners.json":  # a TTU file names cells PCL placed other ways; they are not the same sheets
+        for sh in summary["pass"] + sorted(OFFCELL):  # done already / placed on their own PDF georeference
+            out.pop(sh, None)
     return out
 
 
@@ -257,11 +261,18 @@ def main():
     ap.add_argument("--auto", action="store_true", help="the autoplace passes, from detected corners")
     ap.add_argument("--bbox-only", action="store_true", help="set maps.bbox on rows already annotated; upload nothing")
     ap.add_argument("--force", action="store_true", help="redo rows that already have an annotation")
+    ap.add_argument("--archive", choices=["PCL", "TTU"], default="PCL",
+                    help="which scans' rows: PCL (and the city sheets, no source_archive) or TTU's -- a cell can hold both")
+    ap.add_argument("--corners", default="hand-corners.json", help="corner file under work/l7014/regen for --hand")
     args = ap.parse_args()
+    global CORNERS_FILE
+    CORNERS_FILE = args.corners
 
     base, key = env()
     rows = req(f"{base}/rest/v1/maps?select=id,slug,iiif_image,annotation_url,bbox,extra_metadata"
-               f"&collection=ilike.*L7014*&limit=1000", key)
+               f"&collection=ilike.*L7014*&limit=1000"
+               + ("&extra_metadata->>source_archive=eq.TTU" if args.archive == "TTU"
+                  else "&or=(extra_metadata->>source_archive.is.null,extra_metadata->>source_archive.eq.PCL)"), key)
     manifest = {f["properties"]["sheet"]: f["geometry"] for f in json.load(open(MANIFEST))["features"]}
     files = {r["sheet"]: r for r in M.load_sheets() if r["kind"] == "pdf"}
     OUT.mkdir(parents=True, exist_ok=True)

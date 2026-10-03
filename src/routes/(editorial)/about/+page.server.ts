@@ -53,9 +53,8 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     db.from('ocr_labels').select('id', head).eq('review_status', 'validated'),
     db.from('footprints').select('id', head),
     db.from('footprints').select('id', head).eq('review_status', 'approved'),
-    // One row per sheet a survey contains, held or not. `held_by` says how it
-    // reaches a reader — `'map'` for a catalogue record, `'raster:<key>'` for
-    // a mosaic cell — and null means the archive has not got it.
+    // One row per sheet a survey contains, held or not. `held_by` is `'map'` for a catalogue
+    // record (its `map_id`), and null means the archive has not got it.
     db.from('series_cells').select('series_key', head),
     db.from('series_cells').select('series_key', head).not('held_by', 'is', null),
     // `survey_sheets` is non-null for exactly the surveys whose own index has

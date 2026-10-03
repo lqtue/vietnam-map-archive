@@ -290,17 +290,17 @@ any one period of work, fix the lowest broken layer first.
 |---|---|---|
 | **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `indochine-100k-licence` · `hue-rescans` · `gallica-text-harvest` |
 | **1. Holdings** | the map row, its scans and tiles, its address | `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
-| **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-rebuild` · `l7014-iiif` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
+| **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-iiif` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
 | **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
 | **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
 | **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` |
 | **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
 | **Outside the model** | operations, CI, the language of the UI | `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 7 unnamed lines under ROADMAP's Debt heading |
 
-That is 82 named items, plus the 7 unnamed debt lines, as of 2026-10-01.
+That is 81 named items, plus the 7 unnamed debt lines, as of 2026-10-01.
 
 **Reading the table.** Layer 3 holds the most items (20), but the layers are not equally healthy
-underneath. Placement (layer 2) has 12 open items and three of them were stale or wrong this week,
+underneath. Placement (layer 2) has 11 open items and three of them were stale or wrong this week,
 while layer 3's corpus is 22 OCR'd maps, of which 118 labels have been reviewed. So until
 `georef-versions` and `rewarp-on-sync` land, every new batch of readings rests on placement that
 nothing re-checks automatically.
