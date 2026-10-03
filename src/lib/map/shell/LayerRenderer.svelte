@@ -194,8 +194,9 @@
       // of annotations in it. `loadedAllmapsId` is the sentinel for "what is in
       // this layer already" either way — the collection name stands in for it,
       // so a series reloads only when the row itself changes.
+      const seriesKey = o.ref.kind === 'series' ? (sheets?.seriesKey ?? o.ref.key) : '';
       const wanted = sheets
-        ? `sheets:${sheets.collection}`
+        ? `sheets:${seriesKey}`
         : o.ref.kind === 'historical'
           ? o.ref.allmapsId
           : '';
@@ -204,12 +205,16 @@
         inst.loadedAllmapsId = wanted;
         try {
           if (sheets) {
-            const found = await fetchSeriesSheets(supabase, sheets.collection);
+            const found = await fetchSeriesSheets(
+              supabase,
+              seriesKey,
+              sheets.seriesKey ? undefined : sheets.collection
+            );
             if (!found.length) {
               // Every sheet in the series is a draft this reader may not read,
               // or the collection name has drifted. Either way an empty layer
               // explains nothing, so say it once.
-              console.warn('[LayerRenderer] series resolved to no sheets', sheets.collection);
+              console.warn('[LayerRenderer] series resolved to no sheets', seriesKey);
             }
             // The loader is purely additive, so whatever the previous series
             // left in this layer has to come out by hand.
@@ -224,7 +229,7 @@
             );
             if (failed)
               console.warn(
-                `[LayerRenderer] series ${sheets.collection}: ${failed} sheet(s) failed to load`
+                `[LayerRenderer] series ${seriesKey}: ${failed} sheet(s) failed to load`
               );
           } else {
             await loadOverlayByUrl(inst.layer, olMap, wanted, o.opacity);

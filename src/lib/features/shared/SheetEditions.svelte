@@ -17,7 +17,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
-  import { fetchSheetEditions, type SheetEdition } from '$lib/data/maps/service';
+  import { fetchSheetEditions, groupSheetScans, type SheetEdition } from '$lib/data/maps/service';
   import { layersStore, toggleOverlayFor } from '$lib/map/stores/layersStore';
   import { t } from '$lib/core/i18n';
 
@@ -53,6 +53,7 @@
   }
 
   $: onStack = new Set($layersStore.overlays.map((o) => o.ref.mapId));
+  $: groups = groupSheetScans(editions);
 
   onDestroy(() => {
     requestId++;
@@ -68,33 +69,31 @@
 
 {#if editions.length > 0}
   <div class="se">
-    <h4 class="se-title">{$t('Other editions of this sheet')}</h4>
+    <h4 class="se-title">{$t('Other scans and printings of this cell')}</h4>
     <ul class="se-list">
-      {#each editions as edition (edition.id)}
-        {@const drawable = edition.georef_done}
+      {#each groups as group (group.printingId ?? group.scans[0].id)}
         <li class="se-row">
           <div class="se-meta">
-            <span class="se-name">{edition.name}</span>
-            <span class="se-sub">
-              {label(edition)}
-              {#if edition.status === 'draft'}<em class="se-draft">{$t('draft')}</em>{/if}
-            </span>
-            {#if edition.printing}
-              <span class="se-printing">{edition.printing}</span>
-            {/if}
+            <span class="se-name">{group.scans[0].name}</span>
+            {#if group.unresolved}<span class="se-sub">{$t('Printing identity unresolved')}</span>
+            {:else}<span class="se-sub">{label(group.scans[0])}</span>{/if}
+            {#if group.scans.length > 1}<span class="se-printing">{group.scans.length} scans</span
+              >{/if}
           </div>
-          {#if drawable}
-            <button
-              type="button"
-              class="btn is-xs"
-              class:is-on={onStack.has(edition.id)}
-              on:click={() => toggleOverlayFor(edition)}
-            >
-              {onStack.has(edition.id) ? $t('On map') : $t('Compare')}
-            </button>
-          {:else}
-            <span class="se-nogeo">{$t('not georeferenced')}</span>
-          {/if}
+          {#each group.scans as edition (edition.id)}
+            {@const drawable = edition.georef_done}
+            {#if drawable}
+              <button
+                type="button"
+                class="btn is-xs"
+                class:is-on={onStack.has(edition.id)}
+                title={edition.name}
+                on:click={() => toggleOverlayFor(edition)}
+              >
+                {onStack.has(edition.id) ? $t('On map') : $t('Compare')}
+              </button>
+            {:else}<span class="se-nogeo">{$t('not georeferenced')}</span>{/if}
+          {/each}
         </li>
       {/each}
     </ul>
@@ -151,13 +150,6 @@
   }
   .se-printing {
     font-style: italic;
-  }
-  .se-draft {
-    margin-left: 0.35rem;
-    font-style: normal;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--sb-text-muted);
   }
   .se-nogeo {
     flex: none;

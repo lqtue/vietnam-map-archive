@@ -42,6 +42,10 @@
   ).map(([k, v]) => ({ key: k, value: String(v ?? '') }));
   let sheet_number = map.sheet_number || '';
   let sheet_half = map.sheet_half || '';
+  let series_id = map.series_id || '';
+  let printing_id = map.printing_id || '';
+  let duplicate_of_map_id = map.duplicate_of_map_id || '';
+  let archive_reason = map.archive_reason || '';
 
   // Source
   let source_type = map.source_type || '';
@@ -140,6 +144,10 @@
         extraPairs,
         sheet_number,
         sheet_half,
+        series_id,
+        printing_id,
+        duplicate_of_map_id,
+        archive_reason,
         source_type,
         holding_institution,
         collection,
@@ -215,6 +223,7 @@
           <option value="draft">Draft</option>
           <option value="public">Public</option>
           <option value="featured">Featured</option>
+          <option value="archived">Archived</option>
         </select>
       </label>
       <label class="quick-priority" title="Higher = surfaced first in tools">
@@ -256,6 +265,10 @@
           bind:extraPairs
           bind:sheet_number
           bind:sheet_half
+          bind:series_id
+          bind:printing_id
+          bind:duplicate_of_map_id
+          bind:archive_reason
         />
       {:else if activeTab === 'source'}
         <MapEditSourceTab

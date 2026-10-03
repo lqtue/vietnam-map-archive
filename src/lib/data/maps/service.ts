@@ -17,7 +17,7 @@ export type DbRow = Database['public']['Tables']['maps']['Row'];
  * takes the whole row — the admin editor writes back columns no list carries.
  */
 const LIST_COLUMNS =
-  'id,slug,allmaps_id,annotation_url,name,location,map_type,description,thumbnail,status,year,date_label,collection,holding_institution,source_url,source_type,bbox,iiif_image,is_georeferenced';
+  'id,slug,allmaps_id,annotation_url,name,location,map_type,description,thumbnail,status,year,date_label,collection,series_id,series_key,printing_id,holding_institution,source_url,source_type,bbox,iiif_image,is_georeferenced';
 
 // `MapListItem` keeps the pre-095 field names (`dc_description`, `year_label`,
 // `georef_done`) — it is also what `/api/search` hands the browser, under
@@ -38,6 +38,9 @@ function toMapListItem(row: DbRow): MapListItem {
     year: row.year ?? undefined,
     year_label: row.date_label ?? undefined,
     collection: row.collection ?? undefined,
+    series_id: row.series_id ?? undefined,
+    series_key: row.series_key ?? undefined,
+    printing_id: row.printing_id ?? undefined,
     holding_institution: row.holding_institution ?? undefined,
     source_url: row.source_url ?? undefined,
     source_type: (row.source_type ?? undefined) as MapSourceType | undefined,
@@ -57,15 +60,20 @@ const PAGE = 1000;
  * Sieng" vanished from /explore, with nothing reporting it. The second sort key keeps pages
  * from overlapping when names repeat.
  */
-export async function fetchMaps(supabase: SupabaseClient<Database>): Promise<MapListItem[]> {
+export async function fetchMaps(
+  supabase: SupabaseClient<Database>,
+  options: { includeArchived?: boolean } = {}
+): Promise<MapListItem[]> {
   const rows: DbRow[] = [];
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
+    let query = supabase
       .from('maps')
       .select(LIST_COLUMNS)
       .order('name')
       .order('id')
       .range(from, from + PAGE - 1);
+    if (!options.includeArchived) query = query.neq('status', 'archived');
+    const { data, error } = await query;
     if (error) {
       console.error('fetchMaps:', error);
       return [];
@@ -118,7 +126,11 @@ export async function fetchMapsByIds(
 ): Promise<MapListItem[]> {
   if (!ids.length) return [];
 
-  const { data, error } = await supabase.from('maps').select(LIST_COLUMNS).in('id', ids);
+  const { data, error } = await supabase
+    .from('maps')
+    .select(LIST_COLUMNS)
+    .in('id', ids)
+    .neq('status', 'archived');
 
   if (error) {
     console.error('fetchMapsByIds:', error);
@@ -135,6 +147,7 @@ export async function fetchGeoreferencedMaps(
     .from('maps')
     .select(LIST_COLUMNS)
     .or('allmaps_id.not.is.null,annotation_url.not.is.null')
+    .neq('status', 'archived')
     .order('year', { ascending: true, nullsFirst: false });
 
   if (error) {
@@ -181,6 +194,27 @@ export interface SheetEdition {
    * moment it is tiled and the layer draws nothing.
    */
   georef_done: boolean;
+  /** A reviewed bibliographic identity; multiple map rows may scan this same printing. */
+  printing_id?: string | null;
+  unresolved_printing: boolean;
+}
+
+/** Group map scans by reviewed printing, keeping unresolved scans visibly separate. */
+export function groupSheetScans<T extends { id: string; printing_id?: string | null }>(
+  scans: T[]
+): { printingId: string | null; unresolved: boolean; scans: T[] }[] {
+  const groups = new Map<string, { printingId: string | null; unresolved: boolean; scans: T[] }>();
+  for (const scan of scans) {
+    const key = scan.printing_id ? `printing:${scan.printing_id}` : `unresolved:${scan.id}`;
+    const group = groups.get(key) ?? {
+      printingId: scan.printing_id ?? null,
+      unresolved: !scan.printing_id,
+      scans: [],
+    };
+    group.scans.push(scan);
+    groups.set(key, group);
+  }
+  return [...groups.values()];
 }
 
 /**
@@ -210,7 +244,7 @@ export async function fetchSheetEditions(
 ): Promise<SheetEdition[]> {
   const { data: self, error: selfError } = await supabase
     .from('maps')
-    .select('sheet_number, series_key')
+    .select('sheet_number, series_key, printing_id')
     .eq('id', mapId)
     .single();
   if (selfError || !self) return [];
@@ -222,15 +256,34 @@ export async function fetchSheetEditions(
   const { data, error } = await supabase
     .from('maps')
     .select(
-      'id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced'
+      'id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced,printing_id'
     )
     .eq('sheet_number', sheet)
     .eq('series_key', series)
     .neq('id', mapId)
+    .in('status', ['public', 'featured'])
     .order('year', { ascending: true });
   if (error || !data) {
     console.error('fetchSheetEditions:', error);
     return [];
+  }
+
+  const linkedPrintingIds = [
+    ...new Set(data.flatMap((row) => (row.printing_id ? [row.printing_id] : []))),
+  ];
+  const verifiedPrintingIds = new Set<string>();
+  if (linkedPrintingIds.length) {
+    const { data: linkedPrintings, error: printingError } = await supabase
+      .from('sheet_printings')
+      .select('id,review_status')
+      .in('id', linkedPrintingIds);
+    if (printingError) {
+      console.error('fetchSheetEditions printing status:', printingError);
+      return [];
+    }
+    for (const printing of linkedPrintings ?? []) {
+      if (printing.review_status === 'verified') verifiedPrintingIds.add(printing.id);
+    }
   }
 
   return data.map((row) => {
@@ -246,6 +299,9 @@ export async function fetchSheetEditions(
       annotation_url: row.annotation_url ?? undefined,
       thumbnail: row.thumbnail ?? undefined,
       georef_done: row.is_georeferenced ?? false,
+      printing_id:
+        row.printing_id && verifiedPrintingIds.has(row.printing_id) ? row.printing_id : null,
+      unresolved_printing: !(row.printing_id && verifiedPrintingIds.has(row.printing_id)),
     };
   });
 }
@@ -279,18 +335,36 @@ export async function fetchSheetEditions(
  */
 export async function fetchSeriesSheets(
   supabase: SupabaseClient<Database>,
-  collection: string
+  seriesKey: string,
+  legacyCollection?: string
 ): Promise<{ id: string; source: string; bbox?: [number, number, number, number] }[]> {
-  const { data, error } = await readAll((from, to) =>
+  let { data, error } = await readAll((from, to) =>
     supabase
       .from('maps')
       .select('id, allmaps_id, annotation_url, bbox, extra_metadata, sheet_half')
-      .eq('collection', collection)
+      .eq('series_key', seriesKey)
+      .neq('status', 'archived')
       .eq('is_georeferenced', true)
       .order('year', { ascending: true })
       .order('id')
       .range(from, to)
   );
+
+  // Only old localStorage entries lack the durable key. If their saved key
+  // cannot resolve, fall back to the collection label they carried.
+  if (!error && !data?.length && legacyCollection && legacyCollection !== seriesKey) {
+    ({ data, error } = await readAll((from, to) =>
+      supabase
+        .from('maps')
+        .select('id, allmaps_id, annotation_url, bbox, extra_metadata, sheet_half')
+        .eq('collection', legacyCollection)
+        .neq('status', 'archived')
+        .eq('is_georeferenced', true)
+        .order('year', { ascending: true })
+        .order('id')
+        .range(from, to)
+    ));
+  }
 
   if (error || !data) {
     console.error('fetchSeriesSheets:', error);

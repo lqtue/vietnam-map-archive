@@ -74,15 +74,14 @@
       ? `${series.firstYear}–${series.lastYear}`
       : (series?.firstYear ?? series?.lastYear ?? '');
 
-  /* `sheets` is the count the /explore layer draws — cells with a `maps` row —
-     and it is nowhere near `counts.held` for a survey held mostly as mosaic
-     cells (9 against 461). Both are true and they answer different questions,
-     so the drawer says which is which rather than picking one. */
+  /* Distinct public cells, verified available printings, and the survey's full
+     cell denominator are separate counts. */
   $: fields = series
     ? ([
         [$t('Collection'), series.collection],
         [$t('Catalogued'), span ? String(span) : ''],
-        [$t('Sheets with a catalogue record'), `${series.publishedSheets}`],
+        [$t('Distinct public cells'), `${series.publishedSheets}`],
+        [$t('Printings linked to source items'), `${series.itemLinkedPrintings}`],
         [$t('Sheets in the survey'), `${counts.total}`],
       ].filter(([, v]) => v !== '') as [string, string][])
     : [];

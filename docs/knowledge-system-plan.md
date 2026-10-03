@@ -21,15 +21,28 @@ This plan adds four things the others do not have:
 3. every link between them, with how much of each link is actually filled in;
 4. the gaps, ranked.
 
-Every count below was taken from production on 2026-10-01.
+Every count below was taken from production on 2026-10-01. Migrations 105–108 now describe the
+additive implementation branch for stable series/cell/printing identities and archive lifecycle;
+they are not recorded as deployed or populated data. The production counts below remain the baseline
+until rollout and reviewed evidence are complete.
 
 ## 1. The question that started it: series and collection overlap
 
-**Yes, they overlap.** `maps.collection` is meant as a display string, but in practice it is the
-identity of the series:
+**Yes, they overlapped in the production schema.** `maps.collection` was meant as a display string,
+but until migration 105 it also supplied the series identity:
 
 - `series_key(collection)` is the key that both `series_cells` and the `map_series` view join on;
 - `map_series.name` is the same string as `collection`.
+
+Pending migration 105 adds `series(id,key,name,code,scale_denominator)` and UUID `series_id` links
+on maps, index cells, and institution items. `collection` becomes display text; its rename does not
+change `series_id`. The old `series_key` remains synchronized for readers during rollout. Pending
+migration 106 adds one UUID `sheet_printings` identity per reviewed printing and links it optionally
+from an institution item and a map scan. It does not create printing identities from old year or
+edition fields. A `series_cells` row remains one index cell regardless of the number of printings.
+Different source scans remain distinct `maps` rows and retain independent georeference/OCR work.
+Migrations 107–108 add retained `archived` lifecycle, guarded one-hop duplicate pointers, and the
+draft insert default. The counts and links below still describe the production snapshot until rollout.
 
 Facts about a sheet's series are stored in five places:
 
@@ -142,9 +155,9 @@ it. Map type, feature category, label category and rights already make four.
 
 | From → to | Stored as | Filled | Gap |
 |---|---|---|---|
-| cell → printing | `(series_key, sheet_number)`, with no foreign key | 1,131 printings | by design (see `multi-printing-cells`) |
+| cell → printing | Production: `(series_key, sheet_number)`, no printing FK. Branch: `series_cells.id → sheet_printings.cell_id` | Production has 1,131 source assertions | identities remain unreviewed until evidence is curated; see `multi-printing-cells` |
 | cell → map | `series_cells.map_id` | 411 of 1,046: L7014 9 of 627, 1st ed. 130 of 143, 1:25k 75 of 79, 2nd ed. 197 of 197 | a snapshot that nothing maintains (`held-by-derived`) |
-| map → image | `map_images.map_id` | 132 of 859 maps | 727 maps have none: 481 published (mostly the Indochine halves) and 246 drafts |
+| map → image | `map_images.map_id`; pending 106 adds optional `source_item_id`, dimensions and asset identity | 132 of 859 maps | 727 maps have none: 481 published (mostly the Indochine halves) and 246 drafts; image/printing links are not backfilled |
 | map → georeference | a storage path, plus `annotation_url` | all 528 published and 64 drafts | no row in the database; history exists only as file names |
 | georeference → image | the annotation's `target.source` id, width and height | all 592 | not a foreign key. `map_images` stores no dimensions (owned by `evidence-chain`); triage has the same gap (`triage-scan-identity`) |
 | label or polygon → map | `map_id` | always | — |
@@ -243,8 +256,10 @@ what it carries today into three groupings that differ in kind:
 
 | Name | What it is | How many per map | Where |
 |---|---|---|---|
-| **series** | A survey: one producer, scale and sheet grid, with cells that exist whether we hold them or not | 0 or 1 | `series_key`, today generated from `collection` (`series-identity`); later a `series` table when scale, producer and edition need columns |
-| **holder** | Who keeps the physical sheet or the scan | 1 per printing | `holding_institution` and `cell_printings.institution`, as today |
+| **series** | A survey: one producer, scale and sheet grid, with cells that exist whether we hold them or not | 0 or 1 | production: generated `series_key`; branch: `series.id` with mutable name and stable key (mig 105) |
+| **holder** | Who keeps the physical sheet or the scan | many per printing | `cell_printings.institution` is an institution catalogue item; pending `printing_id` links items to a reviewed printing (mig 106) |
+| **printing** | Bibliographic identity for one impression/revision of a cell | many per cell | pending `sheet_printings`; must be reviewed, never inferred from year/edition alone |
+| **scan workspace** | A particular digitization plus its processing and georeference | many per printing | each independently scanned copy remains a `maps` row; optional reviewed `printing_id` (mig 106) |
 | **set** | A curated group of sheets put together by a person: the Saigon city plans, the District 4 pilot, a story's sheets | any number | a new `sets` table plus a `set_maps` join table, when the first page needs one |
 
 Why three:
@@ -254,8 +269,11 @@ Why three:
 - A set is an editorial choice and has neither of those.
 
 Using one column for all three is why the 37 city plans have nowhere to go, and why "collection"
-reads as the archive's holding when it actually keys the survey. `maps.collection` stays as the
-display string until `series-identity` lands. After that it is only a label.
+reads as the archive's holding when it actually keys the survey. In the implementation branch,
+`maps.collection` is now display text and `maps.series_id` holds survey membership. The compatibility
+`series_key` mirrors that FK while readers migrate. Printing links are additive and have no bulk
+backfill. Public reader rollout, evidence review and production migration remain pending, so local
+implementation does not close `series-identity`, `multi-printing-cells` or `held-by-derived`.
 
 The open items are in `docs/ROADMAP.md`: `georef-versions`, `rewarp-on-sync` and `mask-names`
 under Evidence and legibility, and `series-identity` under Survey layer and catalog.

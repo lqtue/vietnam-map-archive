@@ -1,23 +1,7 @@
-/**
- * sheetSources.ts — which printings of a cell exist, and where.
- *
- * `series_sheets` (083) is one row per cell and answers "does the archive hold
- * this". `sheet_sources` (087) is one row per known PRINTING of a cell at an
- * institution and answers the other half: what else was printed of this ground,
- * and who has it. L7014 cell 6330-4 is the case that forced it — the 1965
- * Vietnamese SÀI GÒN reprinted in Hanoi in 1978, at Texas Tech, and the 1984
- * DMA recompilation titled THÀNH PHỐ HỒ CHÍ MINH, at Perry-Castañeda. One cell,
- * two maps, and a table keyed on the cell can say only one of them.
- *
- * Deliberately separate from `seriesSheets.ts`: these rows are not sheets of
- * the archive's index and must never be mistaken for them. A `sheet_sources`
- * row asserts that a printing EXISTS, not that the archive has it or could
- * serve it, and the moment the two are conflated a coverage percentage starts
- * counting other libraries' holdings as its own.
- */
+/** Reads institution catalogue items separately from canonical printing identities and scans. */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { fetchSeriesSheetIndex, type SeriesSheetView } from './seriesSheets';
+import { readAll } from '$lib/data/supabase/paged';
 
 /**
  * One printing, as a reader would be shown it.
@@ -41,10 +25,78 @@ export interface SheetPrinting {
   url: string | null;
   rights: string | null;
   held: boolean; // true when the archive serves this printing
+  printingId?: string | null;
+  title?: string | null;
+  reviewStatus?: string | null;
+  unresolved?: boolean;
+  scans?: { url: string; name: string }[];
+  institutions?: string[];
+  sourceItems?: { institution: string | null; url: string | null; rights: string | null }[];
+}
+
+export interface CanonicalSheetPrinting {
+  id: string;
+  cell_id: string;
+  printed_title: string | null;
+  edition_statement: string | null;
+  edition_label: string | null;
+  issuing_agency: string | null;
+  content_year: number | null;
+  edition_year: number | null;
+  printing_year: number | null;
+  printing_month: number | null;
+  printer: string | null;
+  printing_statement: string | null;
+  part: SheetPrinting['part'];
+  review_status: string;
+}
+
+/** Reviewed printings keyed to the legacy cell address during the compatibility rollout. */
+export async function fetchCanonicalSheetPrintings(
+  db: SupabaseClient,
+  seriesKey: string
+): Promise<Record<string, CanonicalSheetPrinting[]>> {
+  const cellsResult = await readAll((from, to) =>
+    db
+      .from('series_cells')
+      .select('id,sheet_number')
+      .eq('series_key', seriesKey)
+      .order('sheet_number')
+      .range(from, to)
+  );
+  if (cellsResult.error) throw cellsResult.error;
+  const cells = cellsResult.data ?? [];
+  const cellIds = cells.map((cell) => cell.id);
+  if (!cellIds.length) return {};
+  const printingsResult = await readAll((from, to) =>
+    db
+      .from('sheet_printings')
+      .select(
+        'id,cell_id,printed_title,edition_statement,edition_label,issuing_agency,content_year,edition_year,printing_year,printing_month,printer,printing_statement,part,review_status'
+      )
+      .in('cell_id', cellIds)
+      .order('id')
+      .range(from, to)
+  );
+  if (printingsResult.error) throw printingsResult.error;
+  const data = printingsResult.data ?? [];
+  const numberByCell = new Map(cells.map((cell) => [cell.id, cell.sheet_number]));
+  const result: Record<string, CanonicalSheetPrinting[]> = {};
+  for (const row of data ?? []) {
+    // Public readers receive reviewed identities. Pending assertions remain in
+    // admin data and do not become a public bibliographic claim.
+    if (row.review_status !== 'verified') continue;
+    const number = numberByCell.get(row.cell_id);
+    if (!number) continue;
+    (result[number] ??= []).push(row as CanonicalSheetPrinting);
+  }
+  return result;
 }
 
 interface SheetSourceRow {
+  id: string;
   series_key: string;
+  series_id?: string;
   sheet_number: string;
   institution: string;
   year: number | null;
@@ -52,9 +104,13 @@ interface SheetSourceRow {
   part: SheetPrinting['part'];
   url: string | null;
   rights: string | null;
+  printing_id?: string | null;
+  title?: string | null;
+  review_status?: string | null;
 }
 
-const COLUMNS = 'series_key,sheet_number,institution,year,edition,part,url,rights';
+const COLUMNS =
+  'id,series_key,sheet_number,institution,year,edition,part,url,rights,printing_id,title';
 
 /**
  * The column's short code to the name of the library. 087 stores the code so
@@ -71,93 +127,25 @@ const INSTITUTION_NAME: Record<string, string> = {
 };
 
 /**
- * `series_sheets.source` records where the archive found its own scan, and its
- * vocabulary is nearly but not quite 087's. The one real difference is
- * 'CartoMundi': that is the union catalogue the Indochine scans were discovered
- * through, while IGN is the library that holds the paper and serves it over
- * Nakala. Left unmapped, all 75 held Indochine cells would read as unheld next
- * to the very IGN record they were mirrored from.
- */
-const ARCHIVE_SOURCE_INSTITUTION: Record<string, string> = {
-  PCL: 'PCL',
-  TTU: 'TTU',
-  ANU: 'ANU',
-  IGN: 'IGN',
-  CartoMundi: 'IGN',
-};
-
-/**
- * Editions compare loosely because the corpus does not agree with itself about
- * leading zeros — `work/l7014/sheets.json` holds both "003" and "3" for cells of
- * one survey, and an earlier backfill wrote the integer form into 433 rows of
- * `series_sheets` (see `scripts/oneoff/fix_l7014_editions.mjs`). Comparing them
- * literally would call a held sheet unheld on a typographic difference. Only
- * leading zeros, case and surrounding space are folded: "3-DMA" and "3" stay
- * different, because the suffix names the issuing agency.
- */
-function sameEdition(a: string, b: string): boolean {
-  const fold = (s: string) =>
-    s
-      .trim()
-      .toLowerCase()
-      .replace(/^0+(?=\d)/, '');
-  return fold(a) === fold(b);
-}
-
-/**
- * Does the archive serve THIS printing?
- *
- * Derived, never stored — 083 refused a status column for the reason that
- * applies again here. The test is three-part, and each part is the weakest
- * claim that is still true:
- *
- *   1. the cell is held at all (`held_by` set, which covers both a warped
- *      `maps` row and a cell of the pre-tiled mosaic);
- *   2. this row's institution is the one the archive got its copy from; and
- *   3. the recorded printing does not CONTRADICT this row's.
- *
- * Step 3 is deliberately "does not contradict" rather than "matches". The
- * archive records a year for 446 of its 627 L7014 cells and for 59 of its 75
- * held Indochine cells; requiring a match would mark every unrecorded cell
- * unheld, which turns missing metadata into a claim about the collection.
- *
- * The residue is the opposite error, and it was measured rather than assumed
- * (2026-09-14, over the 1,023 printings the first load carries). 462 of the 535
- * Perry-Castañeda printings read held against 461 cells the archive actually
- * serves: the one extra is 6542-3, which PCL has twice — a GeoPDF and a JPEG
- * with no year and no edition, so nothing contradicts. On the Indochine side
- * 176 IGN printings read held over 74 cells, and most of that is correct rather
- * than residue: serie 243 issued a west and an east half of one printing, both
- * of which the archive holds as separate `maps` rows under one sheet number.
- * The genuinely ambiguous part is 33 rows in 12 groups that share a cell AND a
- * part, all of them cells where no year is recorded on the `series_sheets` row.
- *
- * Both are fixed by recording the printing on the `series_sheets` row, which is
- * the right place for it. The 75th held Indochine cell reads as no printing
- * held at all — the year the archive recorded for it matches no IGN record, and
- * that is a disagreement worth seeing rather than a rule to loosen.
- */
-function isHeld(cell: SeriesSheetView | undefined, row: SheetSourceRow): boolean {
-  if (!cell?.held_by) return false;
-  if (ARCHIVE_SOURCE_INSTITUTION[cell.source ?? ''] !== row.institution) return false;
-  if (cell.year != null && row.year != null && cell.year !== row.year) return false;
-  if (cell.edition && row.edition && !sameEdition(cell.edition, row.edition)) return false;
-  return true;
+/** A held claim requires an explicit map→printing or image→source-item link. */
+export function isPrintingHeld(
+  row: Pick<SheetSourceRow, 'id' | 'printing_id'>,
+  archiveLinks: { printing_id: string | null; source_item_id: string | null }[]
+): boolean {
+  return archiveLinks.some(
+    (link) =>
+      (row.printing_id != null && link.printing_id === row.printing_id) ||
+      link.source_item_id === row.id
+  );
 }
 
 /**
  * Every known printing of every cell of one survey, keyed by sheet number.
  *
- * Paged explicitly: PostgREST caps an unbounded select at 1000 rows and says
- * nothing about it, and this table starts at 1,023 rows over two surveys — so
- * the very first load would have been truncated, and the truncation would have
- * looked like the Indochine survey simply having fewer printings.
+ * Paged explicitly because PostgREST caps unbounded selects at 1000 rows.
  *
- * `db` is a bare `SupabaseClient` and the rows are cast once, here, to
- * `SheetSourceRow` — the same shape `seriesSheets.ts` uses. One cast at the
- * boundary rather than `as any` at every field. (Renamed to `cell_printings`
- * in mig 095; the name `SheetSourceRow` and this module's own vocabulary stay
- * — only the table read from moved.)
+ * Legacy institution items remain in the response. A missing printing link
+ * means unresolved and never counts as a held printing.
  */
 export async function fetchSheetSources(
   db: SupabaseClient,
@@ -170,18 +158,49 @@ export async function fetchSheetSources(
       .from('cell_printings')
       .select(COLUMNS)
       .eq('series_key', seriesKey)
+      .order('id')
       .range(from, from + page - 1);
     if (error) throw error;
     rows.push(...((data ?? []) as SheetSourceRow[]));
     if (!data || data.length < page) break;
   }
 
-  /* The archive's own index, for `held`. Read through `fetchSeriesSheetIndex`
-     rather than re-selecting the columns, so the paging and the shape of a
-     sheet stay spelled once — a second copy of either drifts silently and the
-     number it produces looks right both before and after. */
-  const cells = new Map<string, SeriesSheetView>();
-  for (const c of await fetchSeriesSheetIndex(db, seriesKey)) cells.set(c.sheet_number, c);
+  // Explicit archive links only. Missing year/edition is not identity evidence.
+  const archiveResult = await readAll((from, to) =>
+    db
+      .from('maps')
+      .select('printing_id,map_images(source_item_id)')
+      .eq('series_key', seriesKey)
+      .in('status', ['public', 'featured'])
+      .order('id')
+      .range(from, to)
+  );
+  if (archiveResult.error) throw archiveResult.error;
+  const archiveRows = archiveResult.data ?? [];
+  const linkedPrintingIds = [
+    ...new Set(rows.flatMap((row) => (row.printing_id ? [row.printing_id] : []))),
+  ];
+  const verifiedPrintingIds = new Set<string>();
+  if (linkedPrintingIds.length) {
+    const { data: linkedPrintings, error: printingError } = await db
+      .from('sheet_printings')
+      .select('id,review_status')
+      .in('id', linkedPrintingIds);
+    if (printingError) throw printingError;
+    for (const printing of linkedPrintings ?? []) {
+      if (printing.review_status === 'verified') verifiedPrintingIds.add(printing.id);
+    }
+  }
+  const archiveLinks = archiveRows.flatMap((m) => [
+    {
+      printing_id: m.printing_id && verifiedPrintingIds.has(m.printing_id) ? m.printing_id : null,
+      source_item_id: null,
+    },
+    ...((m.map_images ?? []) as { source_item_id: string | null }[]).map((image) => ({
+      printing_id: m.printing_id && verifiedPrintingIds.has(m.printing_id) ? m.printing_id : null,
+      source_item_id: image.source_item_id,
+    })),
+  ]);
 
   const out: Record<string, SheetPrinting[]> = {};
   for (const r of rows) {
@@ -192,7 +211,15 @@ export async function fetchSheetSources(
       part: r.part ?? null,
       url: r.url ?? null,
       rights: r.rights ?? null,
-      held: isHeld(cells.get(r.sheet_number), r),
+      held: isPrintingHeld(r, archiveLinks),
+      printingId: r.printing_id && verifiedPrintingIds.has(r.printing_id) ? r.printing_id : null,
+      title: r.title ?? null,
+      reviewStatus: r.printing_id
+        ? verifiedPrintingIds.has(r.printing_id)
+          ? 'verified'
+          : 'unreviewed'
+        : null,
+      unresolved: !(r.printing_id && verifiedPrintingIds.has(r.printing_id)),
     });
   }
 

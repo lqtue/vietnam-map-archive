@@ -76,7 +76,7 @@ export function buildSeriesRows(db: MapSeries[], canSeeDrafts: boolean): SeriesR
       // The collection is the layer's name in the stack, where it sits beside
       // sheet names — so no year span here, which belongs in the note.
       name: s.name,
-      parts: [{ kind: 'sheets', collection: s.collection }],
+      parts: [{ kind: 'sheets', seriesKey: s.key, collection: s.collection }],
       bounds: s.bounds,
     },
     label: count(s.sheets, s.surveySheets),

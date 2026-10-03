@@ -54,7 +54,7 @@ export function readOverlayRef(raw: unknown): OverlayRef | null {
   }
   if (ref.kind === 'sheets')
     return ref.collection
-      ? { ...head, parts: [{ kind: 'sheets', collection: ref.collection }] }
+      ? { ...head, parts: [{ kind: 'sheets', seriesKey: ref.key, collection: ref.collection }] }
       : null;
   return null;
 }

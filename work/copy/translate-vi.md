@@ -96,7 +96,7 @@ keyed on its own rather than as part of a sentence.
 | Tools | Công cụ |
 | Map viewer | Trình xem bản đồ |
 | Story Builder | Tạo câu chuyện |
-| Studio | Studio |
+| Studio | Không gian biên tập |
 | Contribute | Đóng góp |
 | Georeference | Định vị tọa độ |
 | Prepare a sheet | Chuẩn bị bản đồ |
@@ -180,7 +180,6 @@ keyed on its own rather than as part of a sentence.
 | Crop a map's neatline, set tile priorities, and check the place names the OCR pass read off the sheet. Around 950 distinct names are waiting; 43 have been checked. | Cắt khung bản đồ, thiết lập mức độ ưu tiên và kiểm tra địa danh OCR. Khoảng 950 địa danh đang chờ xử lý; 43 đã hoàn thành. |
 | Data is openly licensed (CC-BY / ODbL) and the code is public. Every sheet credits the institution holding the scan — the Bibliothèque nationale de France, Université Côte d'Azur, UT Austin, the Library of Congress and others — and links back to their record. None of that is a formal partnership. Any city with a map archive can fork the whole thing and run it locally; that is the point of building it this way. | Dữ liệu cấp phép mở (CC-BY / ODbL) và mã nguồn mở. Các bản scan ghi nhận bản quyền từ các thư viện gốc như Bibliothèque nationale de France, Đại học Côte d'Azur, UT Austin, Thư viện Quốc hội Hoa Kỳ và các đơn vị khác. Bất kỳ kho lưu trữ nào cũng có thể sao chép và triển khai độc lập. |
 | Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL. | Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc tiếp theo là đọc tên địa danh và số hóa công trình từ bản đồ thời kỳ thuộc địa vào dữ liệu mở, với sự kiểm duyệt thủ công. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL. |
-| A featured sheet, whole. Pick another below, then open it in the viewer to lay it over today's city, or inspect the high-resolution IIIF scan up close. Each record links back to the library or collection that holds it. | Một bản đồ tiêu biểu. Chọn bản đồ bên dưới để xem chồng khớp lên thành phố hiện đại hoặc kiểm tra bản scan độ phân giải cao IIIF. Mỗi bản ghi liên kết trực tiếp đến thư viện lưu trữ gốc. |
 | What's actually done → | Tiến độ thực tế → |
 
 ## 8 · Home — demo section
@@ -294,19 +293,26 @@ the catalogue.
 | catalogued {years} | biên mục {years} |
 | {held} of {total} sheets — {pct}% | {held} trên {total} mảnh — {pct}% |
 
-The drawer a series row opens. `Sheets with a catalogue record` is deliberately
-long: it is the count of `maps` rows, which for L7014 is 9 against 461 held, and
-a short label here would read as a contradiction of the bar above it.
-
 | English | Tiếng Việt |
 |---|---|
 | Series details | Thông tin bộ bản đồ |
+| Distinct public cells | Số ô bản đồ công khai riêng biệt |
+| Printings linked to source items | Lần in được liên kết với nguồn lưu trữ |
+| {held} sheets held | Kho lưu trữ giữ {held} mảnh |
+| The archive holds {held} sheets of this survey. Its full sheet list is not imported yet, so how much that is of the whole is not known. | Kho lưu trữ giữ {held} mảnh của bộ này. Danh sách đầy đủ chưa được nhập nên chưa biết tỷ lệ trên toàn bộ bộ bản đồ. |
+| This scan is an assemblage | Bản quét này là bản ghép |
+| The sheet was printed as two halves and never as one. This scan is a third party’s join of them, reduced in the joining. The archive now holds the original half-sheets from IGN, at full resolution and unaltered. | Tờ bản đồ được in thành hai nửa, không in liền thành một tờ. Bản quét này do bên thứ ba ghép lại và giảm độ phân giải. Kho lưu trữ hiện giữ hai nửa tờ gốc của IGN ở độ phân giải đầy đủ, không chỉnh sửa. |
+| Try it yourself | Hãy tự trải nghiệm |
+| Layers | Các lớp bản đồ |
+| Browse | Duyệt |
+| The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list. | Các bộ bản đồ mà kho lưu trữ đang lưu giữ một phần và vị trí của chúng. Chọn một bộ để xem các mảnh hiện có, rồi mở trên bản đồ hoặc đọc danh sách mảnh. |
+| Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten. | Định vị được tạo bằng quy trình của chúng tôi (scripts/indochine100k_georef.py), không phải trên Allmaps. Hãy chạy lại quy trình để sửa; chỉnh sửa trên Allmaps sẽ bị ghi đè. |
+| Pipeline-maintained | Được duy trì bằng quy trình tự động |
 | The archive holds {held} of this survey’s {total} sheets — {pct}%. | Kho lưu trữ có {held} trên {total} mảnh của bộ này — {pct}%. |
 | {N} held | {N} mảnh đang có |
 | {N} scan identified, not yet fetched | {N} đã xác định bản quét, chưa tải về |
 | {N} no known scan | {N} chưa rõ bản quét |
 | Catalogued | Biên mục |
-| Sheets with a catalogue record | Số mảnh có hồ sơ biên mục |
 | Sheets in the survey | Tổng số mảnh của bộ |
 | Open in map | Mở trên bản đồ |
 | All sheets | Toàn bộ mảnh |
@@ -400,20 +406,15 @@ a short label here would read as a contradiction of the bar above it.
 | Remember my choice on this device | Ghi nhớ lựa chọn trên thiết bị này |
 | Browse the archive | Duyệt kho lưu trữ |
 | {N} maps cover this spot | {N} bản đồ bao phủ khu vực này |
-| No archival map here | Không có bản đồ lưu trữ tại đây |
-| Tap a row to add it as a layer · tap again to remove. | Nhấn vào một hàng để thêm lớp bản đồ · nhấn lần nữa để xóa. |
-| ← Back to maps at this location | ← Quay lại bản đồ tại vị trí này |
-| Browse the full archive → | Duyệt toàn bộ kho lưu trữ → |
 | Search maps… | Tìm kiếm bản đồ… |
-| My layers | Các lớp bản đồ của tôi |
 | Tap a name to zoom · drag for opacity · eye hides a layer | Nhấn vào tên để phóng to · kéo để chỉnh độ mờ · biểu tượng mắt để ẩn lớp |
 | No stacked map matches those filters. | Không có lớp bản đồ phù hợp với bộ lọc. |
 | Opacity | Độ mờ |
 | This sheet | Bản đồ này |
 | Add a map layer to see its details. | Thêm lớp bản đồ để xem chi tiết. |
 | Holding library | Thư viện lưu giữ |
-| Other editions of this sheet | Các lần xuất bản khác của mảnh này |
-| draft | bản nháp |
+| Other scans and printings of this cell | Các bản quét và lần in khác của ô bản đồ này |
+| Printing identity unresolved | Chưa xác định bản in |
 | On map | Trên bản đồ |
 | Compare | So sánh |
 | not georeferenced | chưa định vị |
@@ -683,4 +684,3 @@ To wire one: reshape the markup so the whole sentence is one text node (or one
 | Walk within {N} m and you'll check in automatically. | Di chuyển trong bán kính {N} m để tự động điểm danh. |
 | {N} walked | Đã đi {N} |
 | {N} minutes | {N} phút |
-

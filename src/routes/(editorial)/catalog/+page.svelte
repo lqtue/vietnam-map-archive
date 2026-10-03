@@ -25,8 +25,8 @@
      who wants "what is missing from L7014" needs the first and would never
      find it from the second. */
   $: series = data.series;
-  // The filter matches `maps.collection`; the label is what the reader reads.
-  $: seriesChoices = series.map((s) => ({ value: s.collection, label: s.name }));
+  // Stable series identity filters membership; collection remains display text.
+  $: seriesChoices = series.map((s) => ({ value: s.key, label: s.name }));
 
   /** True until the reader narrows the list — see `CatalogUnifiedSearch`. */
   let atRest = true;
@@ -37,7 +37,7 @@
   let openedSeries: SeriesIndexEntry | null = null;
   function filterToSeries(s: SeriesIndexEntry) {
     openedSeries = null;
-    searchRef?.filterSeries(s.collection);
+    searchRef?.filterSeries(s.key);
   }
 
   const { supabase, session } = getSupabaseContext();

@@ -15,9 +15,8 @@
  *     held_by null, source set       -> obtainable, nobody has fetched it
  *     both null                      -> no known scan anywhere
  *
- * `bbox` is the cell the survey's own index assigns, not a georeference — for
- * L7014 an exact 15' x 15' lattice cell. It is right to a few metres and is
- * what lets an unheld sheet be drawn as a gap; nothing should warp against it.
+ * `bbox` is the cell the survey's own index assigns, not a georeference. It
+ * lets an unheld sheet be drawn as a gap; nothing should warp against it.
  *
  * This file is deliberately separate from `service.ts`, which reads `maps`.
  * These rows are not maps and do not become `MapListItem`s: a sheet is a cell
@@ -97,6 +96,36 @@ function decorate(row: SeriesSheet): SeriesSheetView {
   return { ...row, status: sheetStatus(row), heldAs: heldAs(row.held_by) };
 }
 
+async function publicCoverageByCell(
+  db: SupabaseClient,
+  seriesKey: string
+): Promise<Map<string, { publiclyHeld: boolean; mapId: string | null; knownSource: boolean }>> {
+  const page = 1000;
+  const result = new Map<
+    string,
+    { publiclyHeld: boolean; mapId: string | null; knownSource: boolean }
+  >();
+  for (let from = 0; ; from += page) {
+    const { data, error } = await db
+      .from('series_cell_coverage_detail')
+      .select('sheet_number,publicly_held,public_map_id,known_source')
+      .eq('key', seriesKey)
+      .order('sheet_number')
+      .range(from, from + page - 1);
+    if (error) throw error;
+    for (const cell of data ?? []) {
+      if (cell.sheet_number)
+        result.set(cell.sheet_number, {
+          publiclyHeld: !!cell.publicly_held,
+          mapId: cell.public_map_id ?? null,
+          knownSource: !!cell.known_source,
+        });
+    }
+    if (!data || data.length < page) break;
+  }
+  return result;
+}
+
 /**
  * Every sheet of one survey, ordered by sheet number the way a person reads it
  * — `numeric` collation so `6329-4` precedes `6330-1` and `10` follows `9`.
@@ -116,13 +145,26 @@ export async function fetchSeriesSheetIndex(
       .from('series_cells')
       .select(COLUMNS)
       .eq('series_key', seriesKey)
+      .order('sheet_number')
       .range(from, from + page - 1);
     if (error) throw error;
     out.push(...((data ?? []) as SeriesSheet[]));
     if (!data || data.length < page) break;
   }
+  const coverage = await publicCoverageByCell(db, seriesKey);
   return out
-    .map(decorate)
+    .map((row) => {
+      const cellCoverage = coverage.get(row.sheet_number);
+      const isPubliclyHeld = cellCoverage?.publiclyHeld ?? false;
+      return decorate({
+        ...row,
+        held_by: isPubliclyHeld ? 'map' : null,
+        map_id: cellCoverage?.mapId ?? null,
+        source: cellCoverage?.knownSource
+          ? (row.source ?? 'Institutional source item')
+          : row.source,
+      });
+    })
     .sort((a, b) => a.sheet_number.localeCompare(b.sheet_number, undefined, { numeric: true }));
 }
 
@@ -138,7 +180,16 @@ export async function fetchSeriesSheet(
     .eq('sheet_number', sheetNumber)
     .maybeSingle();
   if (error) throw error;
-  return data ? decorate(data as SeriesSheet) : null;
+  if (!data) return null;
+  const coverage = await publicCoverageByCell(db, seriesKey);
+  const cellCoverage = coverage.get(data.sheet_number);
+  const isPubliclyHeld = cellCoverage?.publiclyHeld ?? false;
+  return decorate({
+    ...(data as SeriesSheet),
+    held_by: isPubliclyHeld ? 'map' : null,
+    map_id: cellCoverage?.mapId ?? null,
+    source: cellCoverage?.knownSource ? (data.source ?? 'Institutional source item') : data.source,
+  });
 }
 
 export interface SeriesTally {

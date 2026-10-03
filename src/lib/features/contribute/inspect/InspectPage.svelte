@@ -69,7 +69,7 @@
 
   onMount(async () => {
     try {
-      maps = await fetchMaps(supabase);
+      maps = await fetchMaps(supabase, { includeArchived: true });
     } catch (err: any) {
       mapsError = err?.message ?? 'Failed to load maps';
     }
