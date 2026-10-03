@@ -152,7 +152,7 @@ is the fix. Traces remain supported by `score.py` if a window ever needs one.
 
 ## River pass v1, 1882 (2026-10-01)
 
-[`work/ocr/scripts/river_pass.py`](../../work/ocr/scripts/river_pass.py), commit `27ee4023`, on the
+[`work/image-processing/scripts/river_pass.py`](../../work/image-processing/scripts/river_pass.py), commit `27ee4023`, on the
 sheet-wide layers of `sheet_features.py`. What the sheet showed first:
 
 - **Colour cannot do it.** Ripples and the military ruling are the same blue ink (measured optical
@@ -404,7 +404,7 @@ edge fix. No layer is approved.
 
 ## Road pass, 1882 (2026-10-02)
 
-[`work/ocr/scripts/road_pass.py`](../../work/ocr/scripts/road_pass.py), commit `4ecf05fc`, on `paper.npy`, the
+[`work/image-processing/scripts/road_pass.py`](../../work/image-processing/scripts/road_pass.py), commit `4ecf05fc`, on `paper.npy`, the
 water mask `water.png` and the cell layers `cells.npz`, `texture.npz`. Writes `river/road.png` (255 = road),
 `road-preview.jpg` (unseen heldout boxes black) and `road-run.json`. Deterministic (two runs `cmp` equal),
 229 s, 3.0 GB resident (3.95 GB peak footprint). `--self-check` builds one synthetic sheet (street with a pavement strip and kerb line, a closed blank block, a ruled
@@ -538,7 +538,7 @@ and this command gives 300 points. **Batch 5 pending owner labels**; it was not 
 
 ## Road pass v2, 1882 (2026-10-02)
 
-[`work/ocr/scripts/road_pass.py`](../../work/ocr/scripts/road_pass.py), commit `a772ecd1`, frozen mask
+[`work/image-processing/scripts/road_pass.py`](../../work/image-processing/scripts/road_pass.py), commit `a772ecd1`, frozen mask
 `river/road-a772ecd1.png` (gitignored with the other outputs; sha256 `5ce76c69...59c20a`). Same inputs as v1. Deterministic (two full runs
 `cmp` equal), 748-1007 s, 2.0-2.6 GB resident, 3.7-4.3 GB peak footprint. `--self-check` now has seven synthetic
 sheets and seventeen asserts (street with pavement and kerb, boulevard of two promenades and a lettered carriageway,
@@ -759,7 +759,7 @@ growth was scored on the 191 spent points only (`score.py --spent` rule).
 
 ## Road pass v3, 1882 (2026-10-02)
 
-[`work/ocr/scripts/road_pass.py`](../../work/ocr/scripts/road_pass.py), commit `a3b0458f`, frozen mask
+[`work/image-processing/scripts/road_pass.py`](../../work/image-processing/scripts/road_pass.py), commit `a3b0458f`, frozen mask
 `river/road-a3b0458f.png` (gitignored; sha256 `6f71722e...a72bd`). Same inputs as v2. Two full runs `cmp` equal
 (810 s and 1250 s, the second while another job ran; 2.1-2.3 GB resident, **6.0-6.1 GB peak footprint**, v2 was 3.7-4.3: the
 new piece pass holds more full-tile arrays). `--self-check` has one new case (below). **v3 is frozen. It is

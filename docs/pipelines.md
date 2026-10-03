@@ -577,9 +577,32 @@ including a null result, so nobody re-runs this experiment blind.
 | `join_labels.py` | Level-aware label ↔ footprint join (writes `footprint_id`). `--self-check` |
 | `dictionary.py` | Offline gazetteer of every name read so far → `outputs/dictionary.{json,md}`. `--self-check` |
 | `eval.py`, `eval_metrics.py` | The quality gate: score an OCR or seg run against reviewed ground truth. Baseline in `EVAL-BASELINE.md` |
-| `modern_prior.py` | 2023 geodata (HCMC buildings, OSM) warped into a sheet's own source-pixel grid: blocks, road centrelines + junctions, built fraction, survivors. Saigon-only sources; **not** a positive seed source as-is — read its docstring on the epoch gap. `--self-check` |
 | `oneoff/backfill_full800.py` | One-off: store the `full/800,` derivative in R2 for every published map. `--self-check` |
 | `oneoff/fix_info_scalefactors.py` | One-off: drop scale factors a stored `info.json` advertises but the pyramid does not hold. `--self-check` |
+
+### Image-processing commands (`work/image-processing/scripts/`)
+
+These commands share `work/ocr/.venv` and import the IIIF, georeference, model and database
+helpers from `work/ocr/scripts/`. Their generated outputs use `work/image-processing/results/`.
+Follow `docs/image-processing-1882-plan.md` before running them: frozen masks and blind
+windows are evidence, and a fresh execution does not establish approval.
+
+| File | Purpose |
+| --- | --- |
+| `colour_blocks.py` | Sheet-colour plot/building proposals and diagnostic water masks |
+| `clean_blocks.py`, `regularize_blocks.py` | Polygon/class cleanup and straightening |
+| `sheet_features.py` | Native-raster paper, pigment, stroke and texture measurements |
+| `river_pass.py` | Frozen water proposal from line texture; blind-safe previews |
+| `road_pass.py` | Diagnostic road proposal; further tuning deferred by the 1882 plan |
+| `review_figs.py`, `review_sheet.py` | Geometry review figures and river-body contact sheets |
+| `legend_probe.py` | Legend swatch diagnostic |
+| `seg_gemini.py`, `name_masks.py` | Historical model-segmentation experiment and mask naming |
+| `seg_eval.py` | Segmentation evaluation; score frozen versions once on independent data |
+| `sheet_register.py` | Sheet-to-sheet registration |
+| `modern_prior.py` | Modern blocks, streets, junctions, built fraction and survivors in source pixels; Saigon-only, with an epoch gap |
+
+`work/image-processing/scripts/mask_to_footprints.py` is planned for Phase 1 and is not
+implemented yet. Its conversion must create `needs_review` rows; owner review precedes approval.
 
 ### Local passes (no API — run on the M-series for free)
 

@@ -1,6 +1,6 @@
 # Segmentation review pack — 19 Sep 2026
 
-Two sheets run through `work/ocr/scripts/colour_blocks.py`, plus the material
+Two sheets run through `work/image-processing/scripts/colour_blocks.py`, plus the material
 they superseded. Nothing here has been imported.
 
 | path | what it is |

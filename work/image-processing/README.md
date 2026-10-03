@@ -28,13 +28,15 @@ copying them. The catalog and shortcuts are local and gitignored; regenerate aft
 | Execution logs        | `logs/`                                                         | Operations                                                                        |
 | Catalog and shortcuts | `catalog.html`, `.browse/`                                      | Local navigation, generated from the existing files                               |
 
-Reusable code and environments remain in [OCR](../ocr/README.md) and
-[SAM2](../MapSAM2/VMA_SETUP.md). Study-level work remains in
+Reusable image commands live in [scripts](scripts/README.md), while shared helpers and the
+Python environment remain in [OCR](../ocr/README.md). [SAM2](../MapSAM2/VMA_SETUP.md) retains
+its model code and GPU environment. Study-level work remains in
 [analysis](../analysis/README.md). Retired vectorize previews live in `../archive/vectorize/`.
 The [system model layout](../../docs/model-layout.md) explains the responsibility of each area.
 
 The older river-pilot and segmentation-review paths in `work/analysis`, `work/ocr/outputs`,
-`work/ocr/logs`, and `work/vectorize` remain compatibility symlinks. River reference tools
+`work/ocr/logs`, and `work/vectorize` remain temporary compatibility symlinks until the
+reference audit in the 1882 plan is complete. River reference tools
 and modern overlays now use their physical experiment paths; their old links were removed. New references should
 use the physical paths. Preserve individual runs: methods, source images, coordinate frames and
 configurations can differ even on the same sheet.

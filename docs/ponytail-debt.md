@@ -365,21 +365,21 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   detector in a 3.11 venv — keep the `[{text, bbox, confidence}]` return shape and nothing
   downstream changes.
 
-## work/ocr/scripts/name_masks.py
+## work/image-processing/scripts/name_masks.py
 
 - **:37** — `MIN_INSIDE = 0.7`, one containment threshold for every sheet. ceiling: a single number
   across a corpus whose polygons vary in tightness. upgrade: tune it per sheet when a run names
   things across a street, or drop to centroid-in-polygon once the polygons are tight enough to make
   containment exact.
 
-## work/ocr/scripts/colour_blocks.py
+## work/image-processing/scripts/colour_blocks.py
 
 - **:84** — a block's ring is a concave hull over its boundary pixels, not a trace. ceiling: a block
   with a genuine notch comes back filled, and `blocks_to_seeds` reads only the bounds anyway.
   upgrade: marching squares on the component mask; the signal to do it is `seg_eval` cover running
   high while IoU stays flat, which is what over-coverage looks like.
 
-## work/ocr/scripts/seg_eval.py
+## work/image-processing/scripts/seg_eval.py
 
 - **:88** — the ground truth is filtered on `source=volunteer` alone, not on
   `status`. ceiling: a volunteer trace counts the moment it is submitted, so a
@@ -389,7 +389,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   two filters select the same set and the weaker one fails safe. Added
   2026-09-18 after `load_gt` was found returning 72 `sam-auto` rows as truth.
 
-## work/ocr/scripts/colour_blocks.py — legend key
+## work/image-processing/scripts/colour_blocks.py — legend key
 
 - **`LEGEND_SWATCHES`** — the five legend swatches of the 1882 sheet, hard-coded
   as measured, and still the default and the fallback. **Half-paid 2026-09-19**:
@@ -450,7 +450,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   fitted the same way, and the trigger is a class that is systematically
   mis-assigned in one direction while the others are right.
 
-## work/ocr/scripts/modern_prior.py
+## work/image-processing/scripts/modern_prior.py
 
 - **:133** — `BLOCK_BUFFER_M = 8.0`, one constant for the whole corpus. ceiling: it is a per-sheet
   quantity really — alley width varies by district and by era. upgrade: pass `buffer_m` explicitly

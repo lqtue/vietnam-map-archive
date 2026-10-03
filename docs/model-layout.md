@@ -23,7 +23,8 @@ its folder's primary responsibility does not replace that provenance.
 ## Storage and compatibility
 
 The physical image-processing workspace contains `experiments/`, local `results/` and local `logs/`.
-Reusable OCR code and its environment remain at `work/ocr/`; SAM2 remains at `work/MapSAM2/`.
+Reusable image commands live at `work/image-processing/scripts/`. OCR commands, shared
+helpers and the Python environment remain at `work/ocr/`; SAM2 remains at `work/MapSAM2/`.
 Studies stay at `work/analysis/`, source-derived material at `work/research/`, and surfaces at
 `work/proto/` and `work/copy/`. Finished or obsolete material belongs in `work/archive/`.
 
@@ -31,10 +32,13 @@ Research narratives live at `docs/research/`, dated records at `docs/journals/`,
 sources at `docs/paper/`. Shared engineering references, model documents, plans and the tracker keep
 their established canonical names. `docs/archive/` and `roadmap-record.md` remain frozen.
 
-Older image experiment paths, `work/ocr/outputs`, `work/ocr/logs`, `work/vectorize`, and the five
+Older river-pilot and segmentation-review paths, `work/ocr/outputs`, `work/ocr/logs`,
+`work/vectorize`, and the five
 research record paths at the docs root are relative compatibility symlinks. New references should
 use the physical locations. These links preserve existing scripts and historical citations;
-they are not duplicate stores. Private files remain gitignored and are never indexed.
+they are not duplicate stores. The remaining work-folder links are temporary and will be
+removed after the 1882 plan's reference audit. River reference tools and modern overlays
+already use their physical experiment paths. Private files remain gitignored and are never indexed.
 
 ## Adding or maintaining material
 

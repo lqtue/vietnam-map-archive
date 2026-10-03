@@ -1099,8 +1099,8 @@ and `partition_seeds` landed after these runs, so every `n` moves on the next on
 
 ## 2026-09-11 — Gemini as the segmenter, against SAM2 on the same plots
 
-`work/ocr/scripts/seg_gemini.py` asks Gemini for polygons instead of asking SAM2
-for masks, and `work/ocr/scripts/seg_eval.py` scores any run of either kind. The
+`work/image-processing/scripts/seg_gemini.py` asks Gemini for polygons instead of asking SAM2
+for masks, and `work/image-processing/scripts/seg_eval.py` scores any run of either kind. The
 reason to try: SAM2 needs a box prompt per object, a GPU, a LoRA checkpoint and a
 mask-to-polygon step, and returns a nameless shape. Gemini returns `box_2d`, a
 `label` and a **polygon**, in the 0-1000 space `ocr.py` already parses.
@@ -1244,7 +1244,7 @@ had and fixed in `5c`.
 
 ### Naming the other model's masks — the part that works
 
-`work/ocr/scripts/name_masks.py` gives each mask the name of the **smallest
+`work/image-processing/scripts/name_masks.py` gives each mask the name of the **smallest
 named polygon containing it** — `join_labels.py`'s rule, with Gemini's named
 quadrilaterals as the source instead of OCR extractions. Of the **213** SAM2
 masks inside the 40 called blocks, **61 (28.6%)** come out named:
@@ -1543,7 +1543,7 @@ sheet's printed index before trusting it.
 
 ## 2026-09-18 — colour blocks: the gate is not cleared, and the metric says why
 
-`work/ocr/scripts/colour_blocks.py` on the whole 1882 Plan Cadastral, from the
+`work/image-processing/scripts/colour_blocks.py` on the whole 1882 Plan Cadastral, from the
 cached full scan, `--render 6051` (2x), `--close 5`, splits found by vote:
 `r - g` +0.0725 from 20/64 crops, `r - b` +0.072 from 32/64. **189 blocks, 124
 salmon + 65 blue-grey, 5.9 s of CPU** — no GPU, no checkpoint, no network.

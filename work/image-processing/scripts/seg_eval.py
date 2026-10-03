@@ -14,9 +14,9 @@ Every run file is `{"polygons": [{"coords": [[x, y], ...]}, ...]}` in the
 sheet's own source pixels — what `inference_tiles_as_video.py` and
 `seg_gemini.py` both write.
 
-    python work/ocr/scripts/seg_eval.py run_a.json run_b.json
-    python work/ocr/scripts/seg_eval.py --map-id <uuid> --types land_plot run.json
-    python work/ocr/scripts/seg_eval.py --window x,y,w,h run.json
+    python work/image-processing/scripts/seg_eval.py run_a.json run_b.json
+    python work/image-processing/scripts/seg_eval.py --map-id <uuid> --types land_plot run.json
+    python work/image-processing/scripts/seg_eval.py --window x,y,w,h run.json
 
 `cover` is the median share of a ground-truth polygon's area caught by the
 union of all predictions. It answers a different question from IoU and the two
@@ -31,7 +31,7 @@ quality. The report prints a warning when the counts differ by more than 3x.
 Compare cover between runs of comparable `n`, or read it only as "did this run
 find the ink at all".
 
-Self-check (no network): python work/ocr/scripts/seg_eval.py --self-check
+Self-check (no network): python work/image-processing/scripts/seg_eval.py --self-check
 """
 
 from __future__ import annotations

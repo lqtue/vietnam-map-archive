@@ -1,12 +1,15 @@
-# OCR and colour processing workspace
+# OCR workspace and shared Python environment
 
-This folder contains more than OCR: text recognition, sheet layout, colour segmentation,
-polygon cleanup, evaluation and modern-map priors share its Python environment and helpers.
+Text recognition, sheet layout, OCR evaluation and label joining live here. Image extraction,
+polygon cleanup, registration and segmentation evaluation live in
+[image-processing/scripts](../image-processing/scripts/README.md). Both areas share the Python
+environment at `.venv` and the IIIF, georeference, model and database helpers in `scripts/`.
 Start with the [image processing workspace](../image-processing/README.md) to browse local results.
 
 Generated outputs physically live at [image-processing/results](../image-processing/results/),
 and logs at [image-processing/logs](../image-processing/logs/). `outputs` and `logs` here are
-relative compatibility symlinks, so existing commands still work. Run IDs and sheet UUIDs are preserved.
+temporary compatibility symlinks, so existing OCR commands still work. The 1882 plan removes
+them after its reference audit. Run IDs and sheet UUIDs are preserved.
 
 ## What is where?
 

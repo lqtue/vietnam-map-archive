@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "image-processing" / "scripts"))
 from review_figs import MAP, WINDOWS, windows_for  # noqa: E402
 
 

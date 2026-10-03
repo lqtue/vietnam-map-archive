@@ -140,7 +140,7 @@ measurement, metadata that maintains itself, and corpus size.
       **no
       precision number at all**, so every segmentation change to date is unfalsifiable. Trace one
       bounded 1882 window completely, run `seg_eval --window` (already built and self-checked —
-      `python work/ocr/scripts/seg_eval.py --self-check`), keep machine predictions out of the
+      `python work/image-processing/scripts/seg_eval.py --self-check`), keep machine predictions out of the
       ground truth by construction. **A candidate window is scoped, not traced** (2026-09-22): the
       triangular îlot bounded by Rue Mac, Rue No. 15 and Rue Pellerin, source pixels roughly
       `4420,3800,650,550` on map `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` (the 1882 cadastral).

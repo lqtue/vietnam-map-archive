@@ -14,8 +14,8 @@ Three rules, all reversible (nothing is edited in place):
              Reclassed to land_plot, with class_orig + class_source kept so the
              call can be audited or undone.
 
-  python3 work/ocr/scripts/clean_blocks.py --sheet all
-  python3 work/ocr/scripts/clean_blocks.py --self-check
+  python3 work/image-processing/scripts/clean_blocks.py --sheet all
+  python3 work/image-processing/scripts/clean_blocks.py --self-check
 
 ponytail: shoelace area on the exterior ring, no shapely. Holes are carried
 through untouched -- they are a queue problem (see audit.json), not a cleaning
@@ -25,10 +25,10 @@ import argparse, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 SHEETS = {
-    "1882": ("work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.normalized.geojson",
-             "work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/runs/layout-2026-09-05T1523-0e02b9d9/scout.json"),
-    "1898": ("work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/colour-1898-20260919-normalized/blocks.normalized.geojson",
-             "work/ocr/outputs/20ec4f9a-16bd-4895-a593-40c6ed9c9555/runs/layout-2026-09-05T1523-20ec4f9a/scout.json"),
+    "1882": ("work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/colour-20260919-normalized/blocks.normalized.geojson",
+             "work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/runs/layout-2026-09-05T1523-0e02b9d9/scout.json"),
+    "1898": ("work/image-processing/results/20ec4f9a-16bd-4895-a593-40c6ed9c9555/colour-1898-20260919-normalized/blocks.normalized.geojson",
+             "work/image-processing/results/20ec4f9a-16bd-4895-a593-40c6ed9c9555/runs/layout-2026-09-05T1523-20ec4f9a/scout.json"),
 }
 
 

@@ -14,13 +14,13 @@ even considered. A name read off the ink as part of the segmentation call is
 not subject to that ceiling — it is a different question asked of the paper,
 not a better answer to the same one.
 
-    python work/ocr/scripts/name_masks.py --names gemini_run.json \\
+    python work/image-processing/scripts/name_masks.py --names gemini_run.json \\
         --masks sam2_run.json --out named.json
 
 Nothing is written to the database. The output is a run file in the same shape
 as its inputs, so `seg_eval.py` scores it unchanged.
 
-Self-check (no network): python work/ocr/scripts/name_masks.py --self-check
+Self-check (no network): python work/image-processing/scripts/name_masks.py --self-check
 """
 
 from __future__ import annotations
