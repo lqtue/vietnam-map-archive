@@ -15,8 +15,8 @@ already hold. Either way the bytes end up in R2 and the proxy is out of the loop
 One map at a time, on purpose. Parallel runs hammer the upstream we are trying
 to stop depending on.
 
-    python work/ocr/scripts/backfill_full800.py --dry-run
-    python work/ocr/scripts/backfill_full800.py
+    python work/ocr/scripts/oneoff/backfill_full800.py --dry-run
+    python work/ocr/scripts/oneoff/backfill_full800.py
 """
 
 from __future__ import annotations
@@ -28,14 +28,14 @@ import sys
 import tempfile
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import requests  # noqa: E402
 from iiif_tiles import fetch_crop, get_image_info  # noqa: E402
 
 BUCKET = "r2:vma-tiles"
 WIDTH = 800
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[4]
 
 
 def r2_key(map_id: str) -> str:

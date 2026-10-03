@@ -142,7 +142,7 @@ ceiling.
 † **Superseded, 2026-09-10.** This whole row describes the 5,000×3790 scan
 `collection_aoi.mjs` measured on 2026-09-04. The OCR pipeline now reads a
 14,000×10,773 scan of the same sheet — `docs/pipelines.md`'s crop evidence
-(`work/ocr/outputs/34d4edb2-*/runs/idx-20260910/run_config.json`, a
+(`work/image-processing/results/34d4edb2-*/runs/idx-20260910/run_config.json`, a
 `1148,775,11704,9221` crop, which alone puts the image at ≥12,852 px wide) and
 `scale.py`'s GCP fit (0.999 m/px, asserted in its self-check) agree, and
 `tests/mpp-parity.spec.ts` pins the two estimators to 0.24% of each other on

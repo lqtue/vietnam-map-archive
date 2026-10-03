@@ -209,7 +209,7 @@ def _tile_cache_path(tile_cache_dir: Path, tile_key: str, render: int) -> Path:
     run cached (the level0 composition path moved under 2cf6dd02), so no two
     runs on the same sheet were byte-comparable and every A/B this pipeline
     exists to produce was quietly contaminated — the 1882 re-gate manufactured
-    a +1 label that way (`work/cleanup/F-1882-regate.md`).
+    a +1 label that way (`work/archive/cleanup/F-1882-regate.md`).
 
     The requested size is also the only key that cannot collide: given
     `fit=False`, the crop's own w/h plus the requested width determine the
@@ -478,7 +478,7 @@ def cmd_self_check(args: argparse.Namespace) -> None:
     # of the step. On the 1882 sheet's 7-column rows that group is the 402 px
     # right-edge sliver alone, rendered 1024x6113: it returned 0 extractions on
     # all five calls it was paid for, and then wiped what the 4-frame call had
-    # read for that tile. `work/cleanup/F-1882-regate.md` measured the loss at
+    # read for that tile. `work/archive/cleanup/F-1882-regate.md` measured the loss at
     # 78 of 362 extractions (22%) on one pass.
     seven = list(range(7))
     assert group_row_frames(seven, 4) == [[0, 1, 2, 3], [3, 4, 5, 6]],         group_row_frames(seven, 4)
@@ -1922,7 +1922,7 @@ def group_row_frames(row, max_frames):
     402 px right-edge sliver rendered 1024x6113 — a degenerate frame that
     returned 0 extractions on all five of the calls it was paid for, and then
     wiped what the 4-frame call had attributed to it
-    (`work/cleanup/F-1882-regate.md`).
+    (`work/archive/cleanup/F-1882-regate.md`).
 
     Here the window advances by `max_frames - 1` and stops as soon as it has
     reached the end of the row, so every group ends strictly further right than

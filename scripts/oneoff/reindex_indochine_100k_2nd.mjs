@@ -9,7 +9,7 @@
 // "197 of 197 — 100%" of a survey that is not complete.
 //
 // CartoMundi declares 843 records for the series, and
-// `work/cartomundi-rights/feuilles/561.json` (scripts/fetch_cartomundi_sheets.mjs,
+// `work/research/cartomundi-rights/feuilles/561.json` (scripts/fetch_cartomundi_sheets.mjs,
 // the light `serie/561/feuilles` endpoint) holds all 843 with their extents.
 // Grouped into cells the way the importer keyed them, that is 220 cells, of
 // which 197 have a digitised record; the other records are further printings
@@ -43,7 +43,7 @@ import { willApply, dryNotice } from '../lib/cli.mjs';
 
 const apply = willApply();
 const SERIES_KEY = 'indochine-1-100-000-2nd-edition-sgi-1947-1959';
-const FEUILLES = 'work/cartomundi-rights/feuilles/561.json';
+const FEUILLES = 'work/research/cartomundi-rights/feuilles/561.json';
 const DIGITISED = 'work/indochine-100k/sources/serie-561.json';
 
 /** UNIMARC corner: a hemisphere letter then DDDMMSS, e.g. "e1055008" -> 105.8356. */

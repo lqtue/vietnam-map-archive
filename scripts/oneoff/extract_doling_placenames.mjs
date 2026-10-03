@@ -60,7 +60,7 @@ import assert from 'node:assert/strict';
 import { flag, opt } from '../lib/cli.mjs';
 
 const DEFAULT_XML = '/Users/airm1/Work/Personal/Backups/historicvietnam.WordPress.2026-01-23.xml';
-const OUT = 'work/doling/street-name-pairs.csv';
+const OUT = 'work/research/doling/street-name-pairs.csv';
 
 // The French generics Doling uses. The colonial side must start with one of
 // these -- it is the single filter that does the most work, because without it
@@ -387,10 +387,10 @@ if (flag('--check')) {
 
   if (flag('--press')) {
     const gv = gallicaVariants(rows);
-    writeFileSync('work/doling/gallica-variants.json', JSON.stringify(gv, null, 2) + '\n');
-    writeFileSync('work/doling/nlv-queries.txt', nlvQueries(rows));
-    console.log(`→ work/doling/gallica-variants.json (${Object.keys(gv).length} place names)`);
-    console.log('→ work/doling/nlv-queries.txt');
+    writeFileSync('work/research/doling/gallica-variants.json', JSON.stringify(gv, null, 2) + '\n');
+    writeFileSync('work/research/doling/nlv-queries.txt', nlvQueries(rows));
+    console.log(`→ work/research/doling/gallica-variants.json (${Object.keys(gv).length} place names)`);
+    console.log('→ work/research/doling/nlv-queries.txt');
   }
 
   console.log('Source: Tim Doling, Historic Vietnam (historicvietnam.com), cited with permission.');

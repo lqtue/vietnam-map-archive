@@ -29,9 +29,9 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
-const TIMELINE = 'work/legend/timeline.json';
-const OUT = 'work/legend/press.json';
-const BASELINE = 'work/legend/baseline.json';
+const TIMELINE = 'work/research/legend/timeline.json';
+const OUT = 'work/research/legend/press.json';
+const BASELINE = 'work/research/legend/baseline.json';
 const NLV = 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi';
 const SRU = 'https://gallica.bnf.fr/SRU';
 const UA = 'VietnamMapArchive/1.0 (+https://maparchive.vn; period press lookup)';
@@ -339,7 +339,7 @@ function selftest() {
   ok(perMille(c, b, 1940) === 0, 'a decade with no hits but a baseline is zero, not null');
   ok(perMille(c, b, 1960) === null, 'a decade the baseline does not cover is null, not zero');
 
-  const fixture = 'work/legend/fixture-facet.html';
+  const fixture = 'work/research/legend/fixture-facet.html';
   if (existsSync(fixture)) {
     const c = parseNlvFacet(readFileSync(fixture, 'utf8'));
     ok(c.total > 0, 'fixture states a total');

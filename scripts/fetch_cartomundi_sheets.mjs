@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 const index = JSON.parse(
   readFileSync(new URL('../src/lib/data/maps/cartomundiIndex.json', import.meta.url), 'utf8')
 );
-const output = new URL('../work/cartomundi-rights/feuilles/', import.meta.url);
+const output = new URL('../work/research/cartomundi-rights/feuilles/', import.meta.url);
 mkdirSync(output, { recursive: true });
 const onlyAt = process.argv.indexOf('--only');
 const only = onlyAt < 0 ? null : process.argv[onlyAt + 1];

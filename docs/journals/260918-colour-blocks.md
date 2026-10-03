@@ -25,7 +25,7 @@ warps them into the sheet's pixel grid through its georeference annotation. Both
 paths inherit two errors the ink does not have:
 
 - **the georeference**, whose floor on this sheet is 11.3 m RMSE, worst point
-  23.0 m (`docs/worked-example-1882.md`);
+  23.0 m (`docs/research/worked-example-1882.md`);
 - **141 years of epoch drift.** The file says it itself: inside the 1882 extent
   the modern layer holds 51,382 buildings on 38% of the ground while the sheet
   draws a colonial town in paddy, so "the modern buildings are NOT a positive
@@ -39,7 +39,7 @@ review is blocked and where the archive holds zero footprints.
 ## What was measured, 2026-09-18
 
 One tile, `4142_4032_2048_2048_tile.png` from the cached 1882 Plan Cadastral run
-(`work/ocr/outputs/0e02b9d9-…/`, gitignored) — a 2048 px source region rendered
+(`work/image-processing/results/0e02b9d9-…/`, gitignored) — a 2048 px source region rendered
 to 1024, so **1 tile px ≈ 0.685 m** at the sheet's 0.3426 m/px. numpy + PIL +
 scipy, no cv2, no GPU. This is a **census, not a score**: it says the colour
 separates, not that the polygons are right.

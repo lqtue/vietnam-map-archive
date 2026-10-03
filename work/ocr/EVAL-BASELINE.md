@@ -36,7 +36,7 @@ Regenerate: `eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --run-id 
 > volunteer-only and unaffected.
 >
 > `load_gt` now filters `source=eq.volunteer` (`seg_eval.py`), so n=89 cannot recur.
-> `docs/worked-example-1882.md` counts 118 in a third sense — polygons produced, not
+> `docs/research/worked-example-1882.md` counts 118 in a third sense — polygons produced, not
 > traces scored against — so check the sentence, not the number.
 
 ## Baseline — run `baseline` (current default row-sequence batch), IoU ≥ 0.5
@@ -1044,7 +1044,7 @@ sheet's right-hand edge and the marginal apparatus rather than the street body.
 ## 2026-09-11 — the first segmentation numbers, and the pooling that hid them
 
 Working record, nine run JSONs and the scoring script:
-`work/ocr/outputs/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/seg-review/blockprior-20260910/`
+`work/image-processing/results/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/seg-review/blockprior-20260910/`
 (gitignored). **Unreproduced, and nothing was written to Supabase.** The map is the
 1882 Plan Cadastral, 12102x8982, 154 tiles of 1024, `epoch_010.pth`
 (SAM2.1 hiera_small + LoRA r=4) on MPS unless a row says otherwise.

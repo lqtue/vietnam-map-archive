@@ -1,0 +1,353 @@
+{
+  "model": "docs/knowledge-system-plan.md#9-open-work-by-layer",
+  "note": "Primary responsibility only. Multi-layer folders retain their per-object provenance; this index is not a task tracker.",
+  "layers": [
+    {
+      "key": "sources",
+      "name": "0. Sources and surveys",
+      "description": "Providers, surveys, cells, printings, holders, rights and period texts",
+      "entries": [
+        {
+          "path": "work/research/cartomundi-rights",
+          "purpose": "Rights and source provenance",
+          "availability": "repository"
+        },
+        {
+          "path": "work/research/press",
+          "purpose": "Period newspaper searches",
+          "availability": "local"
+        },
+        {
+          "path": "work/research/legend",
+          "purpose": "Period-text timeline artifacts",
+          "availability": "local"
+        },
+        {
+          "path": "docs/research/allmaps-series-note.md",
+          "purpose": "Dated survey georeferencing note",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "holdings",
+      "name": "1. Holdings",
+      "description": "Map identity, scans, tiles and addresses",
+      "entries": [
+        {
+          "path": "docs/digitalize-guide.md",
+          "purpose": "Sheet preparation guide",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/admin-tooling.md",
+          "purpose": "Catalog and holdings operations",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "placement",
+      "name": "2. Placement",
+      "description": "Georeferences, GCPs, transformations, masks and fit",
+      "entries": [
+        {
+          "path": "work/indochine-100k",
+          "purpose": "Survey placement dataset and tuning",
+          "availability": "repository"
+        },
+        {
+          "path": "work/tonkin",
+          "purpose": "Tonkin placement dataset",
+          "availability": "repository"
+        },
+        {
+          "path": "work/l7014",
+          "purpose": "L7014 scans and placement builds",
+          "availability": "local"
+        },
+        {
+          "path": "work/analysis/saigon6",
+          "purpose": "Saigon control-point picker",
+          "availability": "repository"
+        },
+        {
+          "path": "work/analysis/georef_coverage.md",
+          "purpose": "Dated georeference coverage measurements",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/journals/260930-series-georef-review-loop.md",
+          "purpose": "Placement review procedure",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "readings",
+      "name": "3. Readings",
+      "description": "OCR labels, polygons, legends and layout regions with run provenance",
+      "entries": [
+        {
+          "path": "work/ocr",
+          "purpose": "OCR and colour pipeline code and Python environment",
+          "availability": "repository"
+        },
+        {
+          "path": "work/MapSAM2",
+          "purpose": "Learned segmentation code",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/river-1882",
+          "purpose": "1882 river experiment",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/river-1882-1898",
+          "purpose": "Paired river experiment",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/segmentation-20260919",
+          "purpose": "Dated segmentation review pack; prose retained in repository",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/modern-overlays",
+          "purpose": "Local modern-map overlays",
+          "availability": "local"
+        },
+        {
+          "path": "work/image-processing/experiments/river-reference",
+          "purpose": "Local river reference crops",
+          "availability": "local"
+        },
+        {
+          "path": "work/image-processing/results",
+          "purpose": "Generated OCR, layout, polygon and reference outputs",
+          "availability": "local"
+        },
+        {
+          "path": "work/ocr/EVAL-BASELINE.md",
+          "purpose": "Recorded OCR and segmentation quality gate",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/research/image-processing-record.md",
+          "purpose": "Processing methods and recorded measurements",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/research/river-reconstruction.md",
+          "purpose": "Exploratory river reconstruction record",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "entities",
+      "name": "4. Entities and vocabularies",
+      "description": "Place-name groups, attested names and classification terms",
+      "entries": [
+        {
+          "path": "work/research/doling",
+          "purpose": "Source-derived street-name pairs and provenance",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "studies",
+      "name": "5. Assertions and studies",
+      "description": "Claims, cited evidence and study figures",
+      "entries": [
+        {
+          "path": "work/analysis/district4",
+          "purpose": "Morphology study; also contains placement diagnostics",
+          "availability": "repository"
+        },
+        {
+          "path": "work/research/zenodo",
+          "purpose": "Prospective evidence deposit and regeneration record",
+          "availability": "repository"
+        },
+        {
+          "path": "work/research/reports",
+          "purpose": "Generated research reports",
+          "availability": "local"
+        },
+        {
+          "path": "docs/paper",
+          "purpose": "Manuscript, claim audit and integrity records",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/research/field-comparison.md",
+          "purpose": "Comparison with external methods",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/research/worked-example-1882.md",
+          "purpose": "Dated one-sheet case study",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/journals",
+          "purpose": "Dated evidence and handoffs across layers",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/evidence-chain-plan.md",
+          "purpose": "Cross-layer identity and evidence plan",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "surfaces",
+      "name": "Surfaces",
+      "description": "Pages and apps that read the model",
+      "entries": [
+        {
+          "path": "work/proto",
+          "purpose": "Viewer prototypes",
+          "availability": "repository"
+        },
+        {
+          "path": "work/copy",
+          "purpose": "Copy and translations",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/user-guide.md",
+          "purpose": "Reader and contributor guide",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/design-system.md",
+          "purpose": "Product visual language",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/search-plan.md",
+          "purpose": "Search plan",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/walk-plan.md",
+          "purpose": "Walk plan",
+          "availability": "repository"
+        }
+      ]
+    },
+    {
+      "key": "operations",
+      "name": "Outside the model",
+      "description": "Operations, CI and shared engineering guidance",
+      "entries": [
+        {
+          "path": "work/worker",
+          "purpose": "Pipeline orchestration across layers",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/build_catalog.py",
+          "purpose": "Local result navigation",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/logs",
+          "purpose": "Execution transcripts",
+          "availability": "local"
+        },
+        {
+          "path": "docs/architecture.md",
+          "purpose": "Map runtime reference",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/api.md",
+          "purpose": "Server API reference",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/conventions.md",
+          "purpose": "Implementation conventions",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/db-guidelines.md",
+          "purpose": "Database rules",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/deploy.md",
+          "purpose": "Deployment guidance",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/lessons.md",
+          "purpose": "Operational and measurement lessons",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/pipelines.md",
+          "purpose": "Commands spanning layers",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/system-guidelines.md",
+          "purpose": "Code organization",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/testing.md",
+          "purpose": "Verification inventory",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/ponytail-debt.md",
+          "purpose": "Deliberate shortcuts",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/strategy.md",
+          "purpose": "Product strategy",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/theory.md",
+          "purpose": "Intellectual framework",
+          "availability": "repository"
+        },
+        {
+          "path": "docs/platform-design.md",
+          "purpose": "Platform proposal",
+          "availability": "repository"
+        },
+        {
+          "path": "work/archive/vectorize",
+          "purpose": "Retired colour-profile previews retained as evidence",
+          "availability": "local"
+        }
+      ]
+    }
+  ],
+  "historical": ["docs/archive", "docs/roadmap-record.md", "work/archive"],
+  "compatibility": {
+    "work/ocr/outputs": "work/image-processing/results",
+    "work/ocr/logs": "work/image-processing/logs",
+    "work/analysis/1882": "work/image-processing/experiments/river-1882",
+    "work/analysis/river_pair": "work/image-processing/experiments/river-1882-1898",
+    "work/analysis/modern_overlay": "work/image-processing/experiments/modern-overlays",
+    "work/analysis/river_ref": "work/image-processing/experiments/river-reference",
+    "work/analysis/seg-260919": "work/image-processing/experiments/segmentation-20260919",
+    "work/vectorize": "work/archive/vectorize",
+    "docs/allmaps-series-note.md": "docs/research/allmaps-series-note.md",
+    "docs/field-comparison.md": "docs/research/field-comparison.md",
+    "docs/image-processing-record.md": "docs/research/image-processing-record.md",
+    "docs/river-reconstruction.md": "docs/research/river-reconstruction.md",
+    "docs/worked-example-1882.md": "docs/research/worked-example-1882.md"
+  }
+}

@@ -91,7 +91,7 @@ with tempfile.TemporaryDirectory() as tmp:
 # back as different bytes than the earlier run had cached (the level0
 # composition path moved under 2cf6dd02) — so no two runs on a sheet were
 # byte-comparable and the 1882 re-gate manufactured a label out of it
-# (`work/cleanup/F-1882-regate.md`).
+# (`work/archive/cleanup/F-1882-regate.md`).
 with tempfile.TemporaryDirectory() as tmp:
     cache = Path(tmp)
 

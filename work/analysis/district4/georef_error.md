@@ -76,7 +76,7 @@ against a scan the control points do not live on. Fix the README row; do not fix
 
 ## The 1882 figure has moved, and why
 
-`docs/worked-example-1882.md:40` records **RMSE 11.3 m, worst 23.0 m, 0.3426 m/px**. This script
+`docs/research/worked-example-1882.md:40` records **RMSE 11.3 m, worst 23.0 m, 0.3426 m/px**. This script
 measures **12.7 m, 27.7 m, 0.3411 m/px** on the same annotation and the same ten points.
 
 **Neither is a bug, and the difference is the degrees→metres conversion.** The recorded pair was

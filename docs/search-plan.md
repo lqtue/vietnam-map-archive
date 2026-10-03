@@ -200,7 +200,7 @@ columns. **Not planned.** Revisit only if E3b's extraction proves worth scaling.
 
 ### Phases, in order, each gated
 
-- [ ] **`doling-review`** — send the 89-row sheet (`work/doling/street-name-pairs.csv`) to its
+- [ ] **`doling-review`** — send the 89-row sheet (`work/research/doling/street-name-pairs.csv`) to its
       author. 43 `street`, 34 `unclear`, 10 `address`, 2 `building`; the `unclear` bucket is where
       the value and the errors both are. **This is the measurement, and it comes first for the same
       reason `shape-precision` exists**: there is a name-extraction pipeline with no accuracy
@@ -219,7 +219,7 @@ columns. **Not planned.** Revisit only if E3b's extraction proves worth scaling.
       secondary prose.
 
 - [ ] **`attested-variants`** — the reviewed pairs into the gazetteer, not beside it.
-      `work/doling/gallica-variants.json` feeds `spellingVariants`' `extra`; the store of record is
+      `work/research/doling/gallica-variants.json` feeds `spellingVariants`' `extra`; the store of record is
       `place_names.variants[]` (mig 067). **One normalisation rule, not a third** —
       `dictionary-on-place-names` already records that two will drift. Exit: `/api/press` for
       "Đồng Khởi" returns a hit reachable only via "rue Catinat", and the response cites where the

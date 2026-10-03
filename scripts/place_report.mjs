@@ -48,7 +48,7 @@ const SRU = 'https://gallica.bnf.fr/SRU';
 const CONTENT_SEARCH = 'https://gallica.bnf.fr/services/ContentSearch';
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models';
 const MODEL = 'gemini-3.8-flash';
-const OUT_DIR = 'work/reports';
+const OUT_DIR = 'work/research/reports';
 const UA = 'VietnamMapArchive/1.0 (+https://maparchive.vn; period source report)';
 const PAUSE_MS = 1000;
 

@@ -43,7 +43,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (374 tests)
+npm run test         # Playwright smoke suite, read-only (377 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (37 tests)
@@ -54,7 +54,7 @@ npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 `npm run test` starts a dev server on 5173, or reuses one already running. It runs nineteen
 read-only
 browser checks — twelve in `tests/smoke.spec.ts`, seven in `tests/catalog-series.spec.ts` (they hit
-the real Supabase project but never write) — plus 355 browser-less pure checks riding the same
+the real Supabase project but never write) — plus 358 browser-less pure checks riding the same
 runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a
 check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
@@ -114,11 +114,12 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 
 ## Docs
 
-`ls docs/` is the index; each file's opening paragraph says what it covers. Read before acting:
+`docs/README.md` is the reader index; `docs/model-layout.md` maps docs and work to the system model.
+Each file's opening paragraph says what it covers. Read before acting:
 
 - **Before code:** `architecture.md` (map runtime) · `conventions.md` · `design-system.md` ·
   `system-guidelines.md` (layering, §11 live debt table) · `api.md` · `testing.md` (what each of the
-  374 tests pins)
+  377 tests pins)
 - **Before a migration or DB write:** `db-guidelines.md` · `lessons.md` (rules this project paid for
   more than once — also before any unattended run or any pass that produces a number)
 - **Before deploying:** `deploy.md`
@@ -127,8 +128,8 @@ the ten dead builds: **`docs/deploy.md`**. The rules:
 - **Open work:** `ROADMAP.md` is the one tracker, open items only, named for what they act on.
   Close an item by moving it out, not by ticking it. Plans: `search-plan.md`, `walk-plan.md`,
   `knowledge-system-plan.md`, `evidence-chain-plan.md`, `platform-design.md`
-- **Research records:** `image-processing-record.md`, `field-comparison.md`, `worked-example-1882.md`,
-  `river-reconstruction.md` (exploratory, 1882 + 1898; no river layer approved), `journals/` (dated
+- **Research records:** `research/README.md` indexes `image-processing-record.md`, `field-comparison.md`,
+  `worked-example-1882.md` and `river-reconstruction.md` (exploratory, 1882 + 1898; no river layer approved), `journals/` (dated
   `YYMMDD-slug.md`), `paper/` (the manuscript, outline and claim audit — LaTeX and Markdown sources)
 - **The object model:** `knowledge-system-plan.md` — every object, its link fill rates, the ranked
   gaps, and §9, the index of every open ROADMAP item by layer. When an item is added to or closed in

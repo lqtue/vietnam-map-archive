@@ -9,7 +9,7 @@ Regenerate with:
 grep -rn 'ponytail:' src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts
 ```
 
-then drop the one hit under `work/cleanup/` (a prose mention in a scratch TODO,
+then drop the one hit under `work/archive/cleanup/` (a prose mention in a scratch TODO,
 not a marker) and write the rows by hand. **The plugin that used to generate
 this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
@@ -529,7 +529,7 @@ puts most of its module-level ones — and every SQL `--` comment. A bare
 `grep -rn 'ponytail:'` catches all of them.
 
 **Hand-drop the prose mentions.** The grep scope above returns one non-marker
-hit, `work/cleanup/TODO.md`, which is a scratch note rather than a comment on
+hit, `work/archive/cleanup/TODO.md`, which is a scratch note rather than a comment on
 code. Widen the scope beyond it and you also pick up this file's own header,
 `CLAUDE.md`, `contracts/README.md:22` and `docs/search-plan.md:232` — all
 cross-references to the convention, none of them markers.

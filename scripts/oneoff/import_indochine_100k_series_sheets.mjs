@@ -37,7 +37,7 @@
 // RIGHTS CORRECTION (2026-09-30): the earlier NC-SA inference from null
 // `tr38Licence` fields was wrong. The item-level Nakala license is CC-BY-4.0
 // on all 713 linked scans from these two series; see
-// work/cartomundi-rights/sheets.csv. This records the posted license, not
+// work/research/cartomundi-rights/sheets.csv. This records the posted license, not
 // independent proof that the depositor controlled every right.
 //
 // NUMBERING. This scale's `f100NumeroOuCode` is NOT the 25,000 series'

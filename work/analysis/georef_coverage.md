@@ -24,7 +24,7 @@ count each time) and PostgREST's `Content-Range` header on an exact count, which
 Every row carries an `allmaps_id`, an `annotation_url`, or both — zero rows have neither.
 
 **The "58" figure elsewhere in the docs is not this population.** It comes from
-`docs/allmaps-series-note.md` (~L191) and `docs/paper/figures.md:138,141` / `outline.md:31`: a
+`docs/research/allmaps-series-note.md` (~L191) and `docs/paper/figures.md:138,141` / `outline.md:31`: a
 rim-offset / lattice-residual check run over the Indochine 1:25,000 series, "58 sheets read
 independently." That series' own row in the same note gives "56 of 62 georeferenced" — close to
 58 but not identical, and neither number is the archive's map count. Conflating either with 274
@@ -133,7 +133,7 @@ always even self-consistent.
 ### No annotation (21 sheets, all L7014)
 
 All 21 fetch failures are **L7014** sheets (US Army 1:50,000, 452-of-535 published per
-`docs/allmaps-series-note.md`). Each carries an `allmaps_id` in `maps`, but
+`docs/research/allmaps-series-note.md`). Each carries an `allmaps_id` in `maps`, but
 `https://annotations.allmaps.org/maps/<id>` returns `404 Map not found` for every one — consistent
 with that series "arriving georeferenced" from its own GeoPDF rather than through an Allmaps
 Editor annotation the hosted API would know about. None of the 21 carry any `ocr_extractions`

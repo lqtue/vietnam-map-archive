@@ -25,8 +25,8 @@ That mistake was pinned as correct in `self_check`, which asserted a
 time in `scripts/tile_map.sh`. Two implementations of one check, with one blind
 spot: change either and change both. Corrected 2026-09-14.
 
-    python work/ocr/scripts/fix_info_scalefactors.py --dry-run
-    python work/ocr/scripts/fix_info_scalefactors.py
+    python work/ocr/scripts/oneoff/fix_info_scalefactors.py --dry-run
+    python work/ocr/scripts/oneoff/fix_info_scalefactors.py
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backfill_full800 import BUCKET, published_maps  # noqa: E402
 

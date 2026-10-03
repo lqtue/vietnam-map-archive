@@ -13,7 +13,7 @@ import numpy as np
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 ANN = ROOT / "work/ocr/outputs/annotations"
 OUT = "work/ocr/outputs"
-DOLING_CSV = ROOT / "work/doling/street-name-pairs.csv"
+DOLING_CSV = ROOT / "work/research/doling/street-name-pairs.csv"
 K = np.array([111320.0 * math.cos(math.radians(10.775)), 110540.0])
 SPAN, PREC, KEEP = 1000.0, 1, 500
 SKIP = {"title", "legend", "other"}
@@ -72,7 +72,7 @@ def key(text):
 
 def load_doling():
     """key(colonial or modern name) -> {modern, kind, sightings, post_title, post_date,
-    post_url}, from Tim Doling's Historic Vietnam (work/doling/street-name-pairs.csv,
+    post_url}, from Tim Doling's Historic Vietnam (work/research/doling/street-name-pairs.csv,
     given by the author, cited with permission -- see the file's own header for terms).
     Unreviewed by a human yet (docs/search-plan.md's `doling-review`), so this is shown
     in the viewer as an attributed citation, never merged into a printed label as fact.

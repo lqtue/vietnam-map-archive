@@ -10,7 +10,7 @@ Coordinates refer to the **12102 × 8982 source scan**, not a 6051-pixel render 
 the georeferenced map. The manifest pins one fixed tile's SHA-256 as an image-identity
 check; it is not a checksum of the whole scan. A changed georeference does not move
 these source-pixel boxes, but a rescan may. Rebuild the contact sheet with
-`python work/analysis/1882/build_contact.py` after a scan change, then recheck the boxes.
+`python work/image-processing/experiments/river-1882/build_contact.py` after a scan change, then recheck the boxes.
 
 The visual descriptions identify what to trace, **not ground-truth masks**. Three
 `binary_controls` have been hand-checked on VMA's tiles: a 200 × 200 source-pixel
@@ -26,7 +26,7 @@ The working image was composed from **VMA IIIF fixed tiles** at 6051 × 4491 pix
 half the 12102 × 8982 source scan. The first colour run treated that render as the
 source; its OCR seeds and area thresholds were therefore mis-scaled. It is invalid.
 Rebuild that image and the five-window contact sheet with
-`python work/analysis/1882/build_contact.py --render-out /private/tmp/vma-1882-iiif-6051.png`.
+`python work/image-processing/experiments/river-1882/build_contact.py --render-out /private/tmp/vma-1882-iiif-6051.png`.
 `colour_blocks.py --source-width 12102` now keeps the source grid explicit for a
 pre-downsampled local image; `--export-water-mask` saves the exact mask used by
 water filtering at render resolution. The corrected baseline saved 842,489 water
@@ -74,4 +74,4 @@ either window as exhaustive for those feature types until they are traced as suc
 
 The evidence behind this set is `docs/journals/260919-seg-audit.md` (river and
 road defects), `docs/journals/260918-colour-blocks.md` (water trade-offs), and
-`docs/image-processing-record.md` (feature-level comparison).
+`docs/research/image-processing-record.md` (feature-level comparison).

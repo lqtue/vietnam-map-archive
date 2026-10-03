@@ -25,7 +25,7 @@ ROWS = [
      [("Paper on survey 561", "docs/paper-series561")]),
     ("4.", "L4 Entities", "place and street names",
      [("Match legends across sheets", "legend_timeline"), ("Attach period press to legends", "legend_press"), ("Place-name gazetteer", "gazetteer table")],
-     [("Old and new street-name pairs", "work/doling"), ("Period newspaper searches", "work/press"), ("Search plan", "search-plan")],
+     [("Old and new street-name pairs", "work/research/doling"), ("Period newspaper searches", "work/research/press"), ("Search plan", "search-plan")],
      []),
     ("3.", "L3 Readings", "text and shapes read off the scans",
      [("Read text from scans, clean it up", "enqueue_ocr_all · dedupe_ocr"), ("Find shapes on maps (MapSAM2)", "work/MapSAM2"), ("Read city blocks from ink colour", "colour_blocks")],

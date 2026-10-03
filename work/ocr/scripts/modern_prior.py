@@ -889,8 +889,14 @@ def run(args: argparse.Namespace) -> int:
         )
 
     if args.roads:
-        geoms, cols = load_streets(bbox)
+        geoms, cols = load_streets(bbox, Path(args.osm) if args.osm else OSM_GPKG)
         px = warp(geoms, fit)
+        # Same rotated-box overshoot as the blocks above: keep only what the scan covers.
+        clipped = shapely.intersection(px, shapely.box(0, 0, width, height))
+        keep = ~shapely.is_empty(clipped)
+        print(f"streets    {int((~keep).sum())} outside the scan itself, dropped")
+        px = clipped[keep]
+        cols = {k: v[keep] for k, v in cols.items()}
         feats = [
             _feature(g, {"name": (n or None), "highway": h})
             for g, n, h in zip(px, cols["name"], cols["highway"])
@@ -1102,6 +1108,7 @@ def main() -> int:
     p.add_argument("--survivors", action="store_true", help="large, low-rise buildings only")
     p.add_argument("--built-fraction", type=int, metavar="N", help="N x N built-fraction grid")
     p.add_argument("--gcps", action="store_true", help="per-control-point residual + leave-one-out")
+    p.add_argument("--osm", help="OSM GPKG with a `lines` layer (default: the Desktop extract)")
     p.add_argument("--out", help="output directory (default work/ocr/outputs/prior/<map-id>)")
     p.add_argument("--sweep", action="store_true",
                    help="fit every georeferenced sheet in the corpus, worst residual first")

@@ -15,7 +15,7 @@ from shapely.geometry import Polygon
 
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1] / "ocr" / "scripts"))
+sys.path.insert(0, str(HERE.parents[2] / "ocr" / "scripts"))
 from colour_blocks import water_region  # noqa: E402
 
 
