@@ -16,6 +16,7 @@
 import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { debounce } from '$lib/core/utils/debounce';
+import { matchesSeriesFacet } from '$lib/data/maps/seriesFacet';
 
 export interface PeriodDef {
   key: string;
@@ -117,10 +118,9 @@ const passType = (r: Row, sel: Selected) =>
 const passStatus = (r: Row, sel: Selected) =>
   !sel.status?.length || sel.status.includes(statusOf(r));
 /**
- * The series dimension. It matches on `maps.collection` — the column, not a
- * display name — because that is what makes a series a series (migration 082)
- * and what a `maps` row actually carries. Which collections are offered as
- * choices is not decided here: `map_series` decides it, and the caller passes
+ * The series dimension matches the durable `series_key`; collection is mutable
+ * descriptive text and remains a separate display field. Choices come from
+ * `map_series`, and the caller passes
  * the list down. A filter that derived "is this collection a survey?" on the
  * client would be the view's rule spelled a second time, in a place nothing
  * would notice going stale.
@@ -132,8 +132,7 @@ const passStatus = (r: Row, sel: Selected) =>
  * the map can draw. (/explore's copy of the engine drops them anyway, via
  * `requireGeoref`, because it can only overlay what is warped.)
  */
-const passSeries = (r: Row, sel: Selected) =>
-  !sel.collection?.length || sel.collection.includes(String(r.collection ?? ''));
+const passSeries = (r: Row, sel: Selected) => matchesSeriesFacet(r, sel.series_key ?? []);
 const passPeriod = (r: Row, sel: Selected, defs: PeriodDef[]) => {
   if (!sel.period?.length) return true;
   const p = periodOfYear(r.year, defs);
@@ -337,7 +336,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       return {
         area: tally(mapsForArea, 'location'),
         map_type: tally(mapsForType, 'map_type'),
-        collection: tally(mapsForSeries, 'collection'),
+        series_key: tally(mapsForSeries, 'series_key'),
         period: periodCounts,
         status: statusCounts,
         scout_category: $scoutOn ? scoutCatTally : {},

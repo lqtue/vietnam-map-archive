@@ -18,7 +18,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import { fetchMapSeries } from './service';
-import { sheetStatus, type SeriesTally } from './seriesSheets';
+import type { SeriesTally } from './seriesSheets';
+import { readAll } from '$lib/data/supabase/paged';
 
 export interface SeriesIndexEntry {
   key: string;
@@ -32,9 +33,11 @@ export interface SeriesIndexEntry {
   name: string;
   firstYear: number | null;
   lastYear: number | null;
-  /** Distinct cells held as `maps` rows — the 9 of L7014, not the 461. */
+  /** Distinct cells with a public served scan, from the role-aware view. */
   sheets: number;
   publishedSheets: number;
+  itemLinkedPrintings: number;
+  knownPrintings: number;
   /**
    * [minLon, minLat, maxLon, maxLat], the union of the survey's sheets — what
    * "zoom to this layer" means. Carried so a link into /explore can fit the
@@ -62,36 +65,68 @@ export async function fetchSeriesIndex(
      rather than listing surveys by hand. */
   const series = all.filter((s) => s.publishedSheets > 0 && s.surveySheets != null);
 
-  /* Held counts come from the survey's own index, because a sheet reaches a
-     reader by more than one route: 452 of L7014's 461 are mosaic cells with no
-     `maps` row, and `publishedSheets` cannot see them. Two columns over ~700
-     rows is cheaper than a per-series round trip, and the same read the drift
-     detector makes. `held_by` is the whole test — `sheetStatus` in
-     `seriesSheets.ts` owns the rule, and `sheetStatus` is called here rather
-     than reimplemented — including the half that separates two kinds of
-     *unheld*, which the drawer draws as a coverage bar. */
-  const { data: cells } = await supabase.from('series_cells').select('series_key,held_by,source');
+  const [
+    { data: coverage, error: coverageError },
+    { data: availability, error: availabilityError },
+  ] = await Promise.all([
+    supabase.from('series_cell_coverage').select('key,publicly_held_cell_count'),
+    supabase
+      .from('series_printing_availability')
+      .select('key,item_linked_printing_count,printing_count'),
+  ]);
+  if (coverageError) console.error('series cell coverage:', coverageError);
+  if (availabilityError) console.error('series printing availability:', availabilityError);
+  const publicCellsByKey = new Map(
+    (coverage ?? []).map((row) => [row.key ?? '', row.publicly_held_cell_count ?? 0])
+  );
+  const availabilityByKey = new Map(
+    (availability ?? []).map((row) => [
+      row.key ?? '',
+      {
+        itemLinked: row.item_linked_printing_count ?? 0,
+        known: row.printing_count ?? 0,
+      },
+    ])
+  );
 
+  // Per-cell counts come from the role-aware derived view. Legacy held_by and
+  // map_id snapshots are ignored; a source-item reference only makes a cell
+  // obtainable when the view confirms an institution item exists.
+  const { data: cells, error: cellError } = await readAll((from, to) =>
+    supabase
+      .from('series_cell_coverage_detail')
+      .select('key,sheet_number,publicly_held,known_source')
+      .order('key')
+      .order('sheet_number')
+      .range(from, to)
+  );
+  if (cellError) console.error('series cell coverage detail:', cellError);
   const held = new Map<string, SeriesTally>();
   for (const c of cells ?? []) {
-    const k = c.series_key as string;
+    const k = c.key ?? '';
+    if (!k) continue;
     const t = held.get(k) ?? { total: 0, held: 0, obtainable: 0, no_scan: 0 };
     t.total += 1;
-    t[sheetStatus(c)] += 1;
+    if (c.publicly_held) t.held += 1;
+    else if (c.known_source) t.obtainable += 1;
+    else t.no_scan += 1;
     held.set(k, t);
   }
 
-  return series.map((s) => ({
-    key: s.key,
-    collection: s.collection,
-    name: s.name,
-    firstYear: s.firstYear ?? null,
-    lastYear: s.lastYear ?? null,
-    sheets: s.sheets,
-    publishedSheets: s.publishedSheets,
-    bounds: s.bounds,
-    // Always set: the filter above kept only surveys whose index exists, and
-    // `survey_sheets` is a count over the very rows this counts.
-    index: held.get(s.key)!,
-  }));
+  return series.map((s) => {
+    const index = held.get(s.key) ?? { total: 0, held: 0, obtainable: 0, no_scan: 0 };
+    return {
+      key: s.key,
+      collection: s.collection,
+      name: s.name,
+      firstYear: s.firstYear ?? null,
+      lastYear: s.lastYear ?? null,
+      sheets: s.sheets,
+      publishedSheets: publicCellsByKey.get(s.key) ?? 0,
+      itemLinkedPrintings: availabilityByKey.get(s.key)?.itemLinked ?? 0,
+      knownPrintings: availabilityByKey.get(s.key)?.known ?? 0,
+      bounds: s.bounds,
+      index,
+    };
+  });
 }

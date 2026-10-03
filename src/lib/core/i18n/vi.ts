@@ -58,6 +58,7 @@ export const vi: Record<string, string> = {
   Tools: 'Công cụ',
   'Map viewer': 'Trình xem bản đồ',
   'Story Builder': 'Tạo câu chuyện',
+  Studio: 'Không gian biên tập',
   Contribute: 'Đóng góp',
   Georeference: 'Định vị tọa độ',
   'Prepare a sheet': 'Chuẩn bị bản đồ',
@@ -99,7 +100,6 @@ export const vi: Record<string, string> = {
   'All sheets in this survey': 'Tất cả bản đồ trong bộ này',
   '⌘ / Ctrl + scroll to zoom · drag to move': '⌘ / Ctrl + lăn chuột để phóng to · kéo để di chuyển',
   'How much of the 1882 sheet to show': 'Tỷ lệ hiển thị bản đồ năm 1882',
-  'Try it yourself': 'Tự trải nghiệm',
   'Imagery © Esri, Maxar, Earthstar Geographics · Sheet: Plan Cadastral de Saïgon, 1882':
     'Hình ảnh © Esri, Maxar, Earthstar Geographics · Bản đồ: Plan Cadastral de Saïgon, 1882',
   'The Catalog': 'Danh mục bản đồ',
@@ -144,8 +144,6 @@ export const vi: Record<string, string> = {
     "Dữ liệu cấp phép mở (CC-BY / ODbL) và mã nguồn mở. Các bản scan ghi nhận bản quyền từ các thư viện gốc như Bibliothèque nationale de France, Đại học Côte d'Azur, UT Austin, Thư viện Quốc hội Hoa Kỳ và các đơn vị khác. Bất kỳ kho lưu trữ nào cũng có thể sao chép và triển khai độc lập.",
   "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL.":
     'Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc tiếp theo là đọc tên địa danh và số hóa công trình từ bản đồ thời kỳ thuộc địa vào dữ liệu mở, với sự kiểm duyệt thủ công. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL.',
-  'The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list.':
-    'Các bộ bản đồ mà kho lưu trữ giữ một phần, và nằm ở đâu. Chọn một bộ để xem những mảnh nào đã có, rồi mở trên bản đồ hoặc đọc danh sách mảnh.',
   "What's actually done →": 'Tiến độ thực tế →',
   'How this works': 'Cách thức hoạt động',
   'A scan of an 1882 survey, pinned to real coordinates, laid back over the ground it drew — then the plots traced off it and the names read off it. Drag the slider to move between the two cities.':
@@ -221,9 +219,6 @@ export const vi: Record<string, string> = {
   'No georeferenced map matches.': 'Không có bản đồ đã định vị nào phù hợp.',
   'Fix in Allmaps': 'Chỉnh sửa trong Allmaps',
   'no source': 'không có nguồn',
-  'Pipeline-maintained': 'Do quy trình tự động duy trì',
-  'Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.':
-    'Định vị tọa độ do quy trình tự động của chúng tôi tạo (scripts/indochine100k_georef.py), không có trên Allmaps. Sửa bằng cách chạy lại quy trình; chỉnh trên Allmaps sẽ bị ghi đè.',
   'Submit a map': 'Gửi bản đồ',
   'Search by title, creator, year, or description…': 'Tìm theo tiêu đề, tác giả, năm hoặc mô tả…',
   '{N} in archive · {M} in scout queue': '{N} trong kho lưu trữ · {M} trong hàng chờ',
@@ -244,17 +239,29 @@ export const vi: Record<string, string> = {
     'Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không.',
   'catalogued {years}': 'biên mục {years}',
   '{held} of {total} sheets — {pct}%': '{held} trên {total} mảnh — {pct}%',
-  '{held} sheets held': '{held} mảnh đang có',
   'Series details': 'Thông tin bộ bản đồ',
+  'Distinct public cells': 'Số ô bản đồ công khai riêng biệt',
+  'Printings linked to source items': 'Lần in được liên kết với nguồn lưu trữ',
+  '{held} sheets held': 'Kho lưu trữ giữ {held} mảnh',
+  'The archive holds {held} sheets of this survey. Its full sheet list is not imported yet, so how much that is of the whole is not known.':
+    'Kho lưu trữ giữ {held} mảnh của bộ này. Danh sách đầy đủ chưa được nhập nên chưa biết tỷ lệ trên toàn bộ bộ bản đồ.',
+  'This scan is an assemblage': 'Bản quét này là bản ghép',
+  'The sheet was printed as two halves and never as one. This scan is a third party’s join of them, reduced in the joining. The archive now holds the original half-sheets from IGN, at full resolution and unaltered.':
+    'Tờ bản đồ được in thành hai nửa, không in liền thành một tờ. Bản quét này do bên thứ ba ghép lại và giảm độ phân giải. Kho lưu trữ hiện giữ hai nửa tờ gốc của IGN ở độ phân giải đầy đủ, không chỉnh sửa.',
+  'Try it yourself': 'Hãy tự trải nghiệm',
+  Layers: 'Các lớp bản đồ',
+  Browse: 'Duyệt',
+  'The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list.':
+    'Các bộ bản đồ mà kho lưu trữ đang lưu giữ một phần và vị trí của chúng. Chọn một bộ để xem các mảnh hiện có, rồi mở trên bản đồ hoặc đọc danh sách mảnh.',
+  'Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.':
+    'Định vị được tạo bằng quy trình của chúng tôi (scripts/indochine100k_georef.py), không phải trên Allmaps. Hãy chạy lại quy trình để sửa; chỉnh sửa trên Allmaps sẽ bị ghi đè.',
+  'Pipeline-maintained': 'Được duy trì bằng quy trình tự động',
   'The archive holds {held} of this survey’s {total} sheets — {pct}%.':
     'Kho lưu trữ có {held} trên {total} mảnh của bộ này — {pct}%.',
-  'The archive holds {held} sheets of this survey. Its full sheet list is not imported yet, so how much that is of the whole is not known.':
-    'Kho lưu trữ có {held} mảnh của bộ này. Danh sách đầy đủ các mảnh chưa được nhập, nên chưa biết đó là bao nhiêu phần của toàn bộ.',
   '{N} held': '{N} mảnh đang có',
   '{N} scan identified, not yet fetched': '{N} đã xác định bản quét, chưa tải về',
   '{N} no known scan': '{N} chưa rõ bản quét',
   Catalogued: 'Biên mục',
-  'Sheets with a catalogue record': 'Số mảnh có hồ sơ biên mục',
   'Sheets in the survey': 'Tổng số mảnh của bộ',
   'Open in map': 'Mở trên bản đồ',
   'All sheets': 'Toàn bộ mảnh',
@@ -277,9 +284,6 @@ export const vi: Record<string, string> = {
   'The sheet is served as warped map tiles, so it can sit under the OpenHistoricalMap editor while you draw. The button opens the editor with it already set as the background; if the editor does not pick it up, add it by hand under Background → Custom with this URL.':
     'Bản đồ được cung cấp dưới dạng các ô lưới biến dạng làm nền trong trình soạn thảo OpenHistoricalMap. Nếu trình soạn thảo không nhận diện tự động, hãy thêm thủ công vào phần Background → Custom bằng đường dẫn này.',
   'Open in OpenHistoricalMap': 'Mở trong OpenHistoricalMap',
-  'This scan is an assemblage': 'Bản quét này là bản ghép',
-  'The sheet was printed as two halves and never as one. This scan is a third party’s join of them, reduced in the joining. The archive now holds the original half-sheets from IGN, at full resolution and unaltered.':
-    'Tờ bản đồ này được in thành hai nửa, chưa bao giờ in liền một tờ. Bản quét này do một bên thứ ba ghép lại và đã bị giảm độ phân giải khi ghép. Kho lưu trữ hiện giữ hai nửa tờ gốc của IGN, ở độ phân giải đầy đủ và không chỉnh sửa.',
   'Places named on this sheet': 'Địa danh được ghi trên bản đồ này',
   'Read by optical character recognition from the sheet itself, then corrected by hand where a reviewer has reached it.':
     'Trích xuất tự động qua nhận dạng ký tự quang học (OCR) và được kiểm duyệt thủ công.',
@@ -334,18 +338,15 @@ export const vi: Record<string, string> = {
   'What happens when I share my location?': 'Điều gì xảy ra khi chia sẻ vị trí?',
   'Remember my choice on this device': 'Ghi nhớ lựa chọn trên thiết bị này',
   'Search maps…': 'Tìm kiếm bản đồ…',
-  Layers: 'Các lớp',
-  Browse: 'Duyệt',
   'Tap a name to zoom · drag for opacity · eye hides a layer':
     'Nhấn vào tên để phóng to · kéo để chỉnh độ mờ · biểu tượng mắt để ẩn lớp',
   'No stacked map matches those filters.': 'Không có lớp bản đồ phù hợp với bộ lọc.',
   Opacity: 'Độ mờ',
   'This sheet': 'Bản đồ này',
-  Studio: 'Studio',
   'Add a map layer to see its details.': 'Thêm lớp bản đồ để xem chi tiết.',
   'Holding library': 'Thư viện lưu giữ',
-  'Other editions of this sheet': 'Các lần xuất bản khác của mảnh này',
-  draft: 'bản nháp',
+  'Other scans and printings of this cell': 'Các bản quét và lần in khác của ô bản đồ này',
+  'Printing identity unresolved': 'Chưa xác định bản in',
   'On map': 'Trên bản đồ',
   Compare: 'So sánh',
   'not georeferenced': 'chưa định vị',

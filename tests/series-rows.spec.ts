@@ -19,12 +19,16 @@ const series = (over: Partial<MapSeries> = {}): MapSeries => ({
   ...over,
 });
 
-test('a survey is one row holding one sheets part', () => {
+test('a survey is one row holding one sheets part under its stable key', () => {
   const [row] = buildSeriesRows([series()], false);
   expect(row.key).toBe('series-l7014-vietnam-1-50-000');
   expect(row.ref.mapId).toBe('series:series-l7014-vietnam-1-50-000');
   expect(row.ref.parts).toEqual([
-    { kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' },
+    {
+      kind: 'sheets',
+      seriesKey: 'series-l7014-vietnam-1-50-000',
+      collection: 'Series L7014 (Vietnam 1:50,000)',
+    },
   ]);
   expect(row.ref.bounds).toEqual([102, 8, 110, 24]);
 });

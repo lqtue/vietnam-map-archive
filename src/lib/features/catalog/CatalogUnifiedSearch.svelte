@@ -33,7 +33,7 @@
   /** Show "+ overlay" and "B base" toggles on each row (only enabled in /view sidebar). */
   export let showLayerActions: boolean = false;
   /**
-   * The surveys offerable as a filter, `{ value: maps.collection, label }`.
+   * The surveys offerable as a filter, `{ value: maps.series_key, label }`.
    * Only /catalog passes any — it is the only caller with a server load to ask
    * `map_series` which collections are surveys. See `ArchiveFilters`.
    */
@@ -109,8 +109,8 @@
    * because the engine's state is this component's and the page should be able
    * to ask for a thing without holding the store that grants it.
    */
-  export function filterSeries(collection: string) {
-    setSingle('collection', collection);
+  export function filterSeries(seriesKey: string) {
+    setSingle('series_key', seriesKey);
   }
 
   function handleRowFacet(e: CustomEvent<{ group: string; value: string }>) {

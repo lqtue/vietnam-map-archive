@@ -2,7 +2,7 @@
 
 export type MapSourceType = 'ia' | 'bnf' | 'efeo' | 'gallica' | 'rumsey' | 'self' | 'other';
 
-export type MapStatus = 'draft' | 'public' | 'featured';
+export type MapStatus = 'draft' | 'public' | 'featured' | 'archived';
 
 /** Full map record as stored in the database. */
 export interface MapRecord {
@@ -40,6 +40,11 @@ export interface MapRecord {
 
   // Lifecycle
   status: MapStatus;
+  series_id?: string | null;
+  series_key?: string | null;
+  printing_id?: string | null;
+  duplicate_of_map_id?: string | null;
+  archive_reason?: string | null;
 
   created_at: string;
   updated_at?: string;
@@ -62,6 +67,11 @@ export interface MapListItem {
   collection?: string;
   source_type?: MapSourceType;
   status?: MapStatus;
+  series_id?: string;
+  series_key?: string;
+  printing_id?: string;
+  duplicate_of_map_id?: string;
+  archive_reason?: string;
   bbox?: [number, number, number, number]; // DB column maps.bbox
   bounds?: [number, number, number, number]; // Runtime-enriched in useMapList; equivalent to bbox once resolved.
   extra_metadata?: Record<string, string>;

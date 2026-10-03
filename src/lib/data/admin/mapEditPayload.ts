@@ -23,6 +23,10 @@ export interface MapEditForm {
   extraPairs: { key: string; value: string }[];
   sheet_number: string;
   sheet_half: string;
+  series_id: string;
+  printing_id: string;
+  duplicate_of_map_id: string;
+  archive_reason: string;
   // Source
   source_type: string;
   holding_institution: string;
@@ -72,6 +76,10 @@ export interface MapEditPayload {
   holding_institution?: string;
   sheet_number?: string;
   sheet_half?: string;
+  series_id?: string | null;
+  printing_id?: string | null;
+  duplicate_of_map_id?: string | null;
+  archive_reason?: string | null;
   label_config: LabelConfig;
   priority: number;
   is_georeferenced: boolean;
@@ -146,6 +154,10 @@ export function toMapEditPayload(form: MapEditForm): MapEditPayload {
     holding_institution: opt(form.holding_institution),
     sheet_number: opt(form.sheet_number),
     sheet_half: opt(form.sheet_half),
+    series_id: form.series_id.trim() || null,
+    printing_id: form.printing_id.trim() || null,
+    duplicate_of_map_id: form.duplicate_of_map_id.trim() || null,
+    archive_reason: form.archive_reason.trim() || null,
     label_config: parseLabelConfig(
       form.labelLegendMode,
       form.labelLegendText,

@@ -196,7 +196,7 @@ All tables must have `alter table ... enable row level security`.
 
 ---
 
-## 11. Current schema (migration head 096)
+## 11. Current schema (production head 104; additive model migrations 105–108 pending rollout)
 
 Table/column names below were renamed in mig 095 (`ocr_extractions`→`ocr_labels`,
 `footprint_submissions`→`footprints`, `series_sheets`→`series_cells`, `sheet_sources`→
@@ -212,11 +212,15 @@ are the rules a migration must not undo.
 
 | Table | Purpose | Notes |
 |-------|---------|-------|
-| `maps` | Map catalogue | `id` (uuid), `slug` (mig 088 — unique, minted by trigger, never moved by a rename), `allmaps_id`, `annotation_url` (mig 047), `iiif_image`, `source_type`, `holding_institution` (mig 044), `collection` (display string), `series_key` (mig 104 — generated from `collection`, what `map_series` and `series_cells` key on), `map_type`, `bbox`, `status`, `thumbnail`, DC fields (`publisher`, `description`, mig 095), `date_label` (mig 095), plus `is_georeferenced` (mig 095, was `georef_done`), `sheet_number`/`sheet_half` (mig 095, typed columns backfilled from `extra_metadata`), `priority`, `label_config`, `triage` (mig 069, `regions` added by 070; `triage_reviewed_at`/`triage_reviewed_by` are mig 095's typed columns backfilled from `triage`) |
+| `maps` | Map catalogue and scan workspace | `id` remains the scan/workspace identity; `slug` remains its address. Pending mig 105 adds nullable stable `series_id` and keeps `series_key` as a synchronized compatibility key; mig 106 adds nullable `printing_id`; mig 107 adds `archived`, `duplicate_of_map_id`, and `archive_reason`; mig 108 corrects the status default to `draft`. |
+| `series` | Stable survey identity (pending mig 105) | UUID PK, durable unique `key`, mutable `name`, optional code and scale. Rename the display name without changing survey membership. |
+| `series_cells` | One index row per survey cell | Pending mig 105 adds UUID `id` and `series_id`; the old `(series_key, sheet_number)` PK remains for compatibility and `(series_id, sheet_number)` is unique. Multiple printings never add denominator cells. |
+| `sheet_printings` | Bibliographic identity for one printing of one cell (pending mig 106) | UUID identity; nullable descriptive and date assertions; `review_status` is `unreviewed | verified | uncertain`. No identity is inferred from years/edition labels and there is no bulk printing backfill. |
+| `cell_printings` | Institution catalogue item/source assertion | Existing item identity and `(institution, source_ref)` stay intact; pending migrations add `series_id` and nullable `printing_id`. Null printing link means unresolved, not held identity. |
+| `map_images` | Image source and asset evidence | Existing map link stays; pending mig 106 adds nullable `source_item_id`, dimensions, content hash and asset version. Each separately scanned copy keeps its own `maps` workspace and processing history. |
 | `map_slug_aliases` | Addresses a sheet used to answer on (mig 088) | `slug` PK, `map_id → maps.id`. Written by the trigger when a sheet is demoted off a bare name or deliberately re-minted; `/catalog/[id]` 301s them. A slug is never both canonical and an alias |
 | `profiles` | Per-user role | `user`, `mod`, `admin`; read via `fetchUserRole` |
 | `scout_candidates` | External discoveries (mig 045) | `source`, `external_id` (unique with source), `manifest_url`, `score`, `category`, `review_status` (mig 095, was `status`; `pending/approved/rejected/ingested`), `reviewed_by` (mig 095, was `reviewer_id`), `map_id` on ingest, `raw` JSONB |
-| `map_images` | Multiple IIIF sources per map (mig 095, was `map_iiif_sources`) | `map_id → maps.id`, `source_type`, `is_primary`, `sort_order`. Partial unique index = one primary per map; trigger syncs primary to `maps.iiif_image` |
 | `map_views` | Per-map open tally (mig 049; mig 095, was `map_opens`) | Fire-and-forget insert from /explore |
 | `label_pins` | Point annotations | `map_id → maps.id`, pixel coords. `label_tasks` was dropped in mig 038 |
 | `footprints` | Polygon traces + SAM2 output (mig 095, was `footprint_submissions`) | `map_id → maps.id`; `review_status` (mig 095, was `status`) ∈ `draft/submitted/needs_review/approved/rejected`, source ∈ `volunteer/sam-auto/sam-corrected/import` (both widened in mig 055 — 038's lists rejected every SAM2 write); `pixel_polygon`; `run_id` (mig 057) pins a segmentation run so the OCR join cannot mix runs. `review_note`/`review_tags`/`reviewed_by`/`user_id` are column-revoked from `anon` (mig 101, column-level `grant`, since RLS gates rows not columns) — any anon `select` must name columns, not `*` |
@@ -228,10 +232,14 @@ are the rules a migration must not undo.
 | `map_review_marks` | The three stages a person asserts (mig 056) | `reviewed_at`, `seg_reviewed_at`, `exported_at`. Written only by the `set_review_mark` RPC |
 | `stories`, `story_points` | Stories/tours | `hunts` / `hunt_stops` were dropped in mig 034, `story_progress` in mig 075 — /trip/[id] keeps progress in localStorage. Since mig 059 a story has `review_status` (mig 095, was `status`; `draft/submitted/approved/rejected`) + `reviewed_by`/`reviewed_at`, and **`is_public` is gone** — publishing submits for review, and only `approved` is publicly readable |
 | `favorites` | Saved maps (mig 095, was `user_favorites`) | via `data/supabase/favorites.ts` |
-| `series_cells` | One row per sheet a survey contains, held or not (mig 083; mig 095, was `series_sheets`) | `(series_key, sheet_number)` PK; `held_by`, `source`/`source_ref`, `map_id → maps.id` nullable |
-| `cell_printings` | One row per known printing of a cell at an institution (mig 087; mig 095, was `sheet_sources`) | `(institution, source_ref)` unique; `series_key`/`sheet_number`, `year`, `edition`, `part` |
+| `map_series` | Compatibility series view | Existing output columns retained by pending mig 105; joined by stable series identity, with public/draft role gate. |
+| `series_cell_coverage`, `series_printing_availability` | Derived coverage and availability views (pending migs 105–106) | Count distinct cells and printings separately; public maps, external items, and scan workspaces are separate measures. Explicit gates protect service-role reads. |
 
-`maps.status` (mig 038): `draft | public | featured`. Inserts default to `draft`. The older
+Migrations 105–108 are additive in the implementation branch and are not yet a production rollout. The migration-level regression fixture is `tests/sql/l7014-model.sql`; it applies these four migrations to a disposable pre-105 schema and checks the identity, uniqueness, relationship, default, archive, and role-gate rules. Run it only in the dedicated local database named `vma_l7014_model` using `npm run test:model-sql`.
+
+For rollout, apply migrations 105–108 before deploying the app code that selects the new columns and views; then regenerate `src/lib/data/supabase/types.ts` from the linked production schema and run the full check/build gates. The branch's type declarations are hand-aligned for local development, not proof that production has the schema. The standalone SQL fixture does not replay the complete migration history or replace `supabase db:test:reset`. Keep printing links null until a reviewer has evidence; do not backfill them from year/edition fields.
+
+`maps.status` was `draft | public | featured` through mig 104. Pending mig 107 adds `archived`; pending mig 108 sets omitted status to `draft`. The older
 `pending_georef → georeferenced → processing → published` values fail `maps_status_check`.
 
 **Status transitions live in Postgres** (mig 054), not in the API:

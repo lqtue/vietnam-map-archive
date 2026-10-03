@@ -4,6 +4,8 @@
   bindable so the parent's handleSave sees the edits.
 -->
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import SheetPrintingReview from './SheetPrintingReview.svelte';
   export let name: string;
   export let original_title: string;
   export let year: string;
@@ -18,6 +20,33 @@
   export let extraPairs: { key: string; value: string }[];
   export let sheet_number: string;
   export let sheet_half: string;
+  export let series_id: string;
+  export let printing_id: string;
+  export let duplicate_of_map_id: string;
+  export let archive_reason: string;
+  type SeriesOption = {
+    id: string;
+    key: string;
+    name: string;
+    code: string | null;
+    scale_denominator: number | null;
+  };
+  let seriesOptions: SeriesOption[] = [];
+  onMount(async () => {
+    try {
+      const response = await fetch('/api/admin/series');
+      if (response.ok) seriesOptions = await response.json();
+    } catch {
+      /* keep the current linkage visible if the lookup is unavailable */
+    }
+  });
+  function changeSeries(value: string) {
+    if (series_id !== value) {
+      series_id = value;
+      printing_id = '';
+      duplicate_of_map_id = '';
+    }
+  }
 </script>
 
 <!-- ── Title & Date ───────────────────────────── -->
@@ -50,6 +79,52 @@
     />
   </label>
 </div>
+
+<div class="section-heading">Series and printing identity</div>
+<div class="form-grid">
+  <label class="form-label">
+    <span>Series <span class="field-hint">leave unresolved when identity is unknown</span></span>
+    <select
+      value={series_id}
+      on:change={(e) => changeSeries(e.currentTarget.value)}
+      class="form-input"
+    >
+      <option value="">Unresolved</option>
+      {#each seriesOptions as item (item.id)}
+        <option value={item.id}
+          >{item.name} · {item.key}{item.scale_denominator
+            ? ` · 1:${item.scale_denominator.toLocaleString()}`
+            : ''}</option
+        >
+      {/each}
+    </select>
+  </label>
+  <label class="form-label">
+    <span>Printing identity</span>
+    <input type="text" value={printing_id || 'Unresolved'} class="form-input" readonly />
+  </label>
+  <label class="form-label">
+    <span
+      >Duplicate target <span class="field-hint"
+        >Public survivor with the same verified printing</span
+      ></span
+    >
+    <input type="text" bind:value={duplicate_of_map_id} class="form-input" />
+  </label>
+  <label class="form-label full-width">
+    <span>Archive reason</span>
+    <textarea bind:value={archive_reason} class="form-input" rows="2"></textarea>
+  </label>
+</div>
+{#if series_id && sheet_number}
+  {#key `${series_id}:${sheet_number}`}
+    <SheetPrintingReview
+      seriesId={series_id}
+      sheetNumber={sheet_number}
+      on:selected={(event) => (printing_id = event.detail)}
+    />
+  {/key}
+{/if}
 
 <!-- ── Authorship ───────────────────────────── -->
 <div class="section-heading">Authorship</div>

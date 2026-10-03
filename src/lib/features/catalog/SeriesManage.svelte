@@ -12,7 +12,7 @@
   import { fetchUserRole } from '$lib/data/supabase/role';
   import { readAll } from '$lib/data/supabase/paged';
 
-  export let collection: string;
+  export let seriesKey: string;
   export let cellCount: number;
 
   interface Rec {
@@ -39,6 +39,7 @@
   const isLive = (r: Rec) => r.status === 'public' || r.status === 'featured';
   /** Where a record is on its way to the map. */
   function stageOf(r: Rec): string {
+    if (r.status === 'archived') return 'archived';
     if (isLive(r)) return 'published';
     if (!r.iiif_image) return 'no_image';
     return r.is_georeferenced ? 'ready' : 'needs_placement';
@@ -48,6 +49,7 @@
     ready: 'Placed, unpublished',
     needs_placement: 'Needs placement',
     no_image: 'Upload incomplete',
+    archived: 'Archived',
   };
 
   async function load() {
@@ -57,7 +59,7 @@
         .select(
           'id,slug,name,year,status,sheet_number,is_georeferenced,iiif_image,source:extra_metadata->>source_archive,edition:extra_metadata->>edition'
         )
-        .eq('collection', collection)
+        .eq('series_key', seriesKey)
         .not('sheet_number', 'is', null)
         .order('id')
         .range(from, to)
@@ -73,7 +75,7 @@
 
   /** One cell is "covered" when any record of it is published. */
   $: live = new Set(recs.filter(isLive).map((r) => r.sheet_number));
-  $: cellsHeld = new Set(recs.map((r) => r.sheet_number));
+  $: cellsHeld = new Set(recs.filter((r) => r.status !== 'archived').map((r) => r.sheet_number));
   $: counts = recs.reduce<Record<string, number>>((n, r) => {
     const k = stageOf(r);
     n[k] = (n[k] ?? 0) + 1;

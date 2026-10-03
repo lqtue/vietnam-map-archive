@@ -3,15 +3,21 @@
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **377** tests:
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **376** tests:
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **seven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 358 browser-less pure
-checks that ride the same runner — `tests/press.spec.ts` (the Gallica CQL builder and the NLV year
+**read-only** (they hit the real Supabase project but never write), plus 357 browser-less pure
+checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
+after a display-label change and omit unlinked maps; two scans group only when they have the same
+printing UUID; unresolved scans remain separate, and an institution is held only through
+an explicit matching printing or source-item link), `tests/sheet-printing-fields.spec.ts`
+(verified identities need a source URL and reviewer note, sparse unreviewed rows remain legal,
+dates are not guessed from booleans/fractions, and metadata edits preserve existing evidence),
+`tests/press.spec.ts` (the Gallica CQL builder and the NLV year
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
 camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
 animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker),
@@ -241,3 +247,19 @@ unexercised until CI ran it.
 Local ports are **54421** for the API and **54420** for the shadow DB, not the CLI defaults —
 54321/54320 collide with another local project. `-x vector -x logflare` is needed under colima:
 those containers bind-mount `/var/run/docker.sock`, which colima cannot provide.
+
+Pending migrations 105–108 have a separate database regression fixture at
+`tests/sql/l7014-model.sql`. It applies the actual migration files to a small disposable pre-105
+schema in local PostgreSQL, including the prior generated-key index and dependent view, then checks
+legacy data backfills without changing addresses or scan metadata and without guessed printing
+identities; a collection rename preserves series UUID membership;
+printings do not inflate the one-cell index; separate institutions and scans retain their own
+identities; unresolved/out-of-index source items and standalone maps remain legal; whole, W, E, and
+assemblage parts are accepted; and contradictory links are rejected. It also checks verified
+evidence requirements, the status default, archive replacement/self/cycle guards, and public/draft
+gates as anonymous, signed-in, and actual `service_role` sessions (the latter bypasses RLS). It never
+connects to Supabase or production. Create a fresh loopback PostgreSQL database named
+`vma_l7014_model`, set `VMA_MODEL_TEST_DATABASE_URL` to its connection URL, then run
+`npm run test:model-sql`. The runner refuses any other database name or non-loopback host. This
+fixture is a migration regression check, not a full Supabase replay, production rollout or evidence
+that catalog records have been reviewed.
