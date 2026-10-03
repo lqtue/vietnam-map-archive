@@ -561,7 +561,7 @@ undisplaced one; a displacement common to every sheet leaves every seam closed (
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | Corner residual vs sheet layout — *Luft & Schiewe 2021* | per-sheet | ✓ | · | · | · | — |
 | Internal consistency: sides, diagonals, cm×dpi, paper bulge — *Meijers & Schoonman 2025* | per-sheet | ✓ | · | · | ✓ | — |
-| `graticule_error` — sheet's GCPs vs the graticule it prints | per-sheet | ✓ | **∅** | · | · | — |
+| `graticule_error` — sheet's GCPs vs the graticule it prints | per-sheet | ✓ | **∅ ‖** | · | · | — |
 | Adjacency as a least-squares constraint — *Janata & Cajthaml 2020* | inter-sheet | ✓ | · | · | · | — |
 | …the same adjacency read back as a residual | inter-sheet | **∅** | **∅** | **∅** | **∅** | — |
 | **Seam census** (adjacency left free) | inter-sheet | ✓ | **✓ †** | ✓ | · | — |
@@ -579,15 +579,17 @@ and reference cell share Helmert parameters; the decision does not validate thos
 against independent absolute control. **§** Only when the index error changes the box's shape;
 an error that enlarges both axes by similar proportions passes (Tri Binh, §7.8). **¶** For
 the specific case of a boundary pinned to the wrong printed line: a ruled interior line fits
-straighter than a hand-engraved neatline, so the residual cannot flag the choice. Table entries
-describe diagnostic scope, not measured detection rates from running the published methods on
-this corpus.
+straighter than a hand-engraved neatline, so the residual cannot flag the choice. **‖** For a
+datum *translation* only; an ellipsoid error is detected (§7.9). The L7014 cells of the four
+checks this paper runs (`graticule_error`, lattice residual, `pick_crs`, seam census) are tested by
+fault injection in §7.9. Every other entry describes diagnostic scope, not measured detection rates
+from running the published methods on this corpus.
 
 <!--block:B0137-->
 Three cells carry the argument, and each is sourced to a different paper's own design.
 
 <!--block:B0076-->
-First, `graticule_error` on "frame/datum wrong" is `∅`, not `·`. It does not merely miss the fault;
+First, `graticule_error` on "frame/datum wrong" is `∅`, not `·`, for a datum translation. It does not merely miss the fault;
 it cannot report it under those shared-input conditions. The sheet's control points are read into the
 sheet's own datum and compared against the graticule that same sheet prints, so a datum error moves
 both sides together — the check passed all 269 displaced sheets, and returns 2.167e-12 on a sheet
@@ -950,6 +952,66 @@ carry an error like Tri Binh's is therefore unknown. The detector itself reached
 within a week, each change justified on a handful of inspected sheets. That is a
 development record, not a held-out evaluation. §9 describes the measurement that would supply a
 rate.
+
+<!--block:B0153-->
+### 7.9 Testing the table by fault injection
+
+<!--block:B0154-->
+Table 1 is argued from each check's inputs and from one incident per cell. That is a claim about
+mechanism, not a measurement, so for the four checks this paper runs we tested the L7014 cells by
+injecting faults whose size is known by construction and running the checks unchanged
+(`scripts/paper_fault_injection.py`; output `docs/paper/fault-injection.json`). The predictions
+were written in the script before its first run and are graded against it. Thirty sheets were drawn
+with a fixed seed from the corrected build, after requiring a clean baseline of each (graticule
+error within tolerance, lattice error under 30 m); one drawn sheet failed that requirement and was
+replaced. Four faults were injected at 25, 50, 100, 150, 300, 455 and 800 m: a datum translation
+(the Helmert scaled so the displacement has the stated size, along the direction of the real
+fault); a misregistration of one sheet's control points with the frame correct; a sheet filed under
+a neighbouring cell; and, once, the WGS 84 ellipsoid substituted on the declared projection. The
+seam census was run on the whole series with 0, 10, 50 and 100% of sheets displaced, five random
+subsets for the partial fractions, and on a single displaced sheet. Detection uses each check's own
+threshold: 5×10⁻⁴° for `graticule_error`, 150 m for the lattice residual and `pick_crs`, and the
+100 m seam cutoff used in §7.3.
+
+<!--block:B0155-->
+| fault | check | silent | fires | what was measured |
+|---|---|---|---|---|
+| datum translation | `graticule_error` | every size | never | identical to the baseline within 10⁻⁹° at all seven sizes |
+| datum translation | lattice residual | ≤ 100 m | ≥ 300 m | 28 of 30 sheets at 150 m |
+| datum translation, all sheets | seam census | every size | never | largest edge median 72.4 m before, 73.5 m after an 800 m shift |
+| datum translation, 10% or 50% of sheets | seam census | ≤ 25 m | ≥ 100 m | at 50 m, 1 of 5 and 2 of 5 subsets |
+| ellipsoid substituted | `graticule_error`, lattice | never | 30 of 30, both | |
+| one sheet misregistered | `graticule_error` | ≤ 50 m | ≥ 100 m | |
+| one sheet misregistered | lattice residual, `pick_crs` | ≤ 100 m | ≥ 300 m | 10 of 30 at 150 m |
+| one sheet misregistered | seam census | ≤ 50 m | ≥ 150 m | 2 of 5 at 100 m |
+| sheet filed under a neighbouring cell | `graticule_error` | every case | never | identical to the baseline |
+| sheet filed under a neighbouring cell | lattice residual | never | 30 of 30 | |
+
+<!--block:B0156-->
+Every prediction held, and three results sharpen the table. First, the `∅` in the datum column is
+exact for a translation and does not extend to the datum as a whole: substituting the WGS 84
+ellipsoid on the same projection moves the inverse-projected coordinates, and `graticule_error`
+rejected all 30 sheets. The existing `check` phase asserts the same thing, so the claim of §7.4
+is a claim about the translation, and Table 1 now says so. Second, a common displacement is
+silent to the seam census at every size, as §7.3 states: this is measured, not only argued. The
+census fires only when the displaced sheets border undisplaced ones, and then from about 100 m.
+Third, the checks cover different ranges of one fault. A misregistration of 55–150 m is seen by
+`graticule_error` and by neither the lattice residual nor `pick_crs`, whose 150 m tolerance was
+chosen by inspection; above about 300 m all three agree. The 150 m figure is therefore a
+statement about which faults `pick_crs` can refuse, not a calibrated error bound.
+
+<!--block:B0157-->
+The limits are the ones that decide how much this supports. The faults are synthetic and are
+injected into one series by the author who wrote the checks. "Truth" is the adopted Helmert and
+the lattice built from it, so this measures what each check can detect relative to that frame,
+not absolute accuracy. The thresholds are the code's own, so where a cell sits at a threshold
+(150 m for the lattice residual) the result describes the threshold. The 100 m seam cutoff was
+fixed from the same build whose baseline is used here, so a zero false-alarm rate at no injected
+fault holds by construction. Two faults in the harness itself, a sheet outline reduced to its
+first ring and a "neighbouring cell" that was the sheet's own, were found because the results
+disagreed with the predictions; they are fixed, and they are a reason to expect the same of any
+reader's harness. The rows for the published methods, the Indochine collision and the 1:100,000
+index-box error (§7.8) are not tested here and remain argued from scope.
 
 <!--block:B0116-->
 ---
