@@ -33,8 +33,9 @@ Reusable code and environments remain in [OCR](../ocr/README.md) and
 [analysis](../analysis/README.md). Retired vectorize previews live in `../archive/vectorize/`.
 The [system model layout](../../docs/model-layout.md) explains the responsibility of each area.
 
-The old `work/analysis` image-experiment paths, `work/ocr/outputs`, `work/ocr/logs`, and
-`work/vectorize` are compatibility symlinks to these physical locations. New references should
+The older river-pilot and segmentation-review paths in `work/analysis`, `work/ocr/outputs`,
+`work/ocr/logs`, and `work/vectorize` remain compatibility symlinks. River reference tools
+and modern overlays now use their physical experiment paths; their old links were removed. New references should
 use the physical paths. Preserve individual runs: methods, source images, coordinate frames and
 configurations can differ even on the same sheet.
 

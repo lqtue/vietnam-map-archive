@@ -10,7 +10,9 @@ Study-level measurements and placement diagnostics. [Work guide](../README.md) Â
 
 River pilots, visual reference crops and segmentation review packs now physically live in
 [image-processing/experiments](../image-processing/experiments/README.md). The older `1882/`,
-`river_pair/`, `seg-260919/`, `modern_overlay/` and `river_ref/` paths are compatibility symlinks.
+`river_pair/` and `seg-260919/` paths remain compatibility symlinks. River reference tools and
+modern overlays use their physical paths in `image-processing/experiments/`; their old
+`river_ref/` and `modern_overlay/` links were removed during branch integration.
 
 A measurement describes the images and annotations used at its run date. Recheck those inputs
 before treating a recorded result as current. Study assertions must cite the particular run,

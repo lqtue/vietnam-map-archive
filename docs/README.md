@@ -61,6 +61,7 @@ These are dated findings and experiments. Read their dates, inputs and caveats b
 | [Image processing record](research/image-processing-record.md) | Methods and recorded measurements, with links to their evidence |
 | [Field comparison](research/field-comparison.md)               | Comparison with published research and deployed systems         |
 | [Worked example: 1882](research/worked-example-1882.md)        | One sheet taken through the pipeline                            |
+| [1882 feature-layer plan](image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison |
 | [River reconstruction](research/river-reconstruction.md)       | Exploratory 1882/1898 work; no river layer approved             |
 | [Allmaps series note](research/allmaps-series-note.md)         | Dated technical note on georeferencing two map series           |
 | [Journals](journals/README.md)                                 | Dated runs, audits and handoffs                                 |

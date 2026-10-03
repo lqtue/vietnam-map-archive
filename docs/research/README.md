@@ -8,6 +8,7 @@ for run evidence use [journals](../journals/README.md) and [image experiments](.
 | -------------------------------------------------------- | ----------------------------------------------------- |
 | [Two series without an Editor](allmaps-series-note.md)   | Dated survey georeferencing technical note            |
 | [Image processing](image-processing-record.md)           | Methods, measurements and original evidence locations |
+| [1882 feature-layer plan](../image-processing-1882-plan.md) | Current delivery scope and verification gates |
 | [River reconstruction](river-reconstruction.md)          | Exploratory 1882/1898 work; no river layer approved   |
 | [Field comparison](field-comparison.md)                  | Comparison with research and deployed systems         |
 | [One sheet through the pipeline](worked-example-1882.md) | Dated 1882 case study                                 |

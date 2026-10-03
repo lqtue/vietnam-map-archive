@@ -5,6 +5,7 @@ use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../REA
 
 | Record | Subject |
 |---|---|
+| [261002](261002-colour-eda-1882-1898.md) | Colour, line and OSM-warp EDA on 1882/1898; current delivery narrowed to 1882 |
 | [261002](261002-research-direction.md) | Historical urban change: District 4 chronology, morphology and research focus |
 | [261001](261001-osm-roads-1882-1898.md) | OSM street centrelines on the 1882 and 1898 sheets |
 | [261001](261001-colour-pair-1882-1898.md) | Colour pass on 1882 and 1898 together — does one run serve both? |

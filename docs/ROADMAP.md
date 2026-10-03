@@ -457,15 +457,13 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 ## Shapes — segmentation, and the OCR ↔ shape join
 
-- [ ] **`river-reconstruction`** — build and evaluate the 1882 river first, with 1898 as the
-      paired transfer check. The 2026-10-01 VMA IIIF pilot exposed a nearly empty 1882 open-river
-      core at the current half-size colour cut; a wider cut recovers water but leaks into Arsenal
-      streets. Native-pixel EDA shows that 1882 and 1898 share ruled-water geometry but differ in
-      colour, and VMA pyramid levels shift the river ink. The current 0.09 mask is only a diagnostic
-      proposal. Exit: hand-traced water and adjacent land in held-out river, quay, creek and dry-land
-      windows on **both** sheets; a source-resolution, bank-aware proposal scored for missed water,
-      false water and shoreline distance by case; human review before any layer is approved. Method,
-      measurements and reproducible artefacts: `docs/research/river-reconstruction.md`.
+- [ ] **`river-reconstruction`** — ship approved 1882 water from the frozen v3 mask
+      `water-1006337f.png`, with hand correction of creek heads, the hatched Canal de ceinture
+      and dry citadel ramparts. The v1 method scored 96.5% on 289 blind owner point labels;
+      v3's 74/74 on batch 4 also holds for v2 and does not establish an improvement.
+      Exit: owner-reviewed 1882 water polygons approved and rendered on `/explore`.
+      1898 is deferred until 1882 ships. Current scope: `docs/image-processing-1882-plan.md`;
+      evidence: `docs/research/river-reconstruction.md`.
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any
       number means anything. Same blocker as `district4-table`.
