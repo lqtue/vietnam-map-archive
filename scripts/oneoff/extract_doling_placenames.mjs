@@ -389,7 +389,9 @@ if (flag('--check')) {
     const gv = gallicaVariants(rows);
     writeFileSync('work/research/doling/gallica-variants.json', JSON.stringify(gv, null, 2) + '\n');
     writeFileSync('work/research/doling/nlv-queries.txt', nlvQueries(rows));
-    console.log(`→ work/research/doling/gallica-variants.json (${Object.keys(gv).length} place names)`);
+    console.log(
+      `→ work/research/doling/gallica-variants.json (${Object.keys(gv).length} place names)`
+    );
     console.log('→ work/research/doling/nlv-queries.txt');
   }
 
