@@ -13,6 +13,7 @@
   import { applySort, type SortState } from '$lib/core/utils/tableSort';
   import { cellCamera, hasDenominator, printing } from '$lib/data/maps/seriesSheets';
   import SeriesCoverageMap from '$lib/features/catalog/SeriesCoverageMap.svelte';
+  import SeriesManage from '$lib/features/catalog/SeriesManage.svelte';
   import type { PageData } from './$types';
   import type { SeriesSheetView, SheetStatus } from '$lib/data/maps/seriesSheets';
   import type { SeriesNote } from './notes';
@@ -22,6 +23,7 @@
   $: series = data.series as {
     key: string;
     name: string;
+    collection: string | null;
     sheets: number;
     published_sheets: number;
     first_year: number | null;
@@ -36,8 +38,7 @@
     no_scan: number;
   };
 
-  // Fit the sheets this archive actually serves. `map_series.bounds` only
-  // covers the nine catalogue rows of L7014, not its larger raster mosaic.
+  // Fit the sheets this archive actually serves.
   $: coverage = data.coverage as { bbox: number[] | null; status: SheetStatus }[];
   $: heldBoxes = coverage
     .filter((cell) => cell.status === 'held' && cell.bbox?.length === 4)
@@ -304,12 +305,8 @@
       </div>
       <ul class="legend">
         <li><span class="dot is-held"></span>{counts.held} held</li>
-        <!-- "not yet fetched" was false for 116 of L7014's 123: 73 are PCL GeoPDFs
-           that carry no usable georeference and 43 are Texas Tech scans already
-           mirrored. What those cells lack is not the pixels, it is a place on
-           the ground — 083's three states have no term for a scan held and
-           unplaceable, so the wording claimed the one thing it could say, and
-           sent the next reader to download files the archive already has. -->
+        <!-- "Scan located elsewhere" is a scan the archive has or knows of but does not serve yet:
+           TTU sheets not yet placed on the ground, and plain scans awaiting review. -->
         <li>
           <span class="dot is-obtainable"></span>{counts.obtainable} scan located elsewhere, not served
           here
@@ -318,6 +315,8 @@
       </ul>
     {/if}
   </section>
+
+  <SeriesManage collection={series.collection ?? ''} cellCount={counts.total} />
 
   <div class="sheet-tools">
     <label class="sb-search is-page">
