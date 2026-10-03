@@ -1,11 +1,9 @@
 /**
  * /catalog/series/<key> — one survey, every sheet it contains.
  *
- * The list `maps` could never produce. A survey's sheets reach a reader by more
- * than one route: 9 of the L7014 1:50,000's held sheets are `maps` rows warped
- * live, and 452 are cells of a pre-tiled raster mosaic with no `maps` row at
- * all. Before this page the second group was drawable on the map and invisible
- * everywhere else.
+ * Every cell of a survey, held or not — the list `maps` alone cannot produce, since a
+ * cell nobody holds has no row. (Until 2026-10-03 L7014 was mostly a pre-tiled mosaic
+ * with no `maps` rows; every sheet is a `maps` row now.)
  *
  * Server-rendered, like the share and place pages, so the coverage of a survey
  * is readable without running JavaScript.
