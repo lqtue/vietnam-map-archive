@@ -78,7 +78,7 @@ while IFS=$'\t' read -r path T_NAME T_YEAR T_EXTRA T_SLUG; do
     --arg col "$COLLECTION" \
     --argjson year "${YEAR:-null}" \
     --argjson extra "$extra_json" --arg slug "${T_SLUG:-}" \
-    '{
+    '($extra.sheet_number // null) as $sheet | {
       id: $id,
       name: $name,
       year: $year,
@@ -87,7 +87,8 @@ while IFS=$'\t' read -r path T_NAME T_YEAR T_EXTRA T_SLUG; do
       status: "draft",
       map_type: "topographic",
       extra_metadata: $extra
-    } + (if $slug == "" then {} else {slug: $slug} end)')
+    } + (if $sheet == null then {} else {sheet_number: $sheet} end)
+      + (if $slug == "" then {} else {slug: $slug} end)')
   resp=$(curl -s -w "\n%{http_code}" -X POST "$SB_URL/rest/v1/maps" \
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" \
     -H "Content-Type: application/json" -H "Prefer: return=representation" \
