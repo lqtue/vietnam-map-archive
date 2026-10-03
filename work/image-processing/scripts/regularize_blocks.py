@@ -17,8 +17,8 @@ edited; the output sits beside it as `blocks.regularized.geojson`, same features
 `source_index`, plus `reg` (kept | cut | snap) and `iou_orig`. Holes are dropped (ten polygons
 carry one; the queue stores none) and the audit counts them.
 
-  python3 work/ocr/scripts/regularize_blocks.py --sheet 1882
-  python3 work/ocr/scripts/regularize_blocks.py --self-check
+  python3 work/image-processing/scripts/regularize_blocks.py --sheet 1882
+  python3 work/image-processing/scripts/regularize_blocks.py --self-check
 
 Reviewed by eye on 17 hand-kept 1882 cream parcels only. Buildings, the other pigment classes and
 the 1898 sheet are unreviewed.
@@ -34,6 +34,7 @@ from scipy import ndimage
 from shapely.geometry import Polygon, shape, mapping
 
 from clean_blocks import ROOT, SHEETS
+sys.path.insert(0, str(ROOT / "work" / "ocr" / "scripts"))
 
 SIMPLIFY, CUT_LEN, CUT_LOSS, SNAP_FRAC, SNAP_MAX, GUARD = .05, .3, .03, .10, 14, .85
 MAP_IDS = {"1882": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", "1898": "20ec4f9a-16bd-4895-a593-40c6ed9c9555"}

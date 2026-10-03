@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[2] / "ocr" / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 from modern_prior import fit_sheet  # noqa: E402
 from scale import annotation_for_map  # noqa: E402
 

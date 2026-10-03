@@ -1,7 +1,7 @@
 """Sheet-wide evidence layers for the river and road passes (1882 first, then 1898).
 
-    work/ocr/.venv/bin/python work/ocr/scripts/sheet_features.py --sheet 1882
-    work/ocr/.venv/bin/python work/ocr/scripts/sheet_features.py --self-check
+    work/ocr/.venv/bin/python work/image-processing/scripts/sheet_features.py --sheet 1882
+    work/ocr/.venv/bin/python work/image-processing/scripts/sheet_features.py --self-check
 
 Reads the native raster pinned in work/image-processing/experiments/river-reference/native.json (its sha is checked; build it
 with `river_ref/export.py --full <sheet>`) and writes work/image-processing/results/<map_id>/features/:

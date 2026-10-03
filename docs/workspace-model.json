@@ -89,8 +89,13 @@
       "description": "OCR labels, polygons, legends and layout regions with run provenance",
       "entries": [
         {
+          "path": "work/image-processing/scripts",
+          "purpose": "Feature extraction, polygon cleanup, registration and review commands",
+          "availability": "repository"
+        },
+        {
           "path": "work/ocr",
-          "purpose": "OCR and colour pipeline code and Python environment",
+          "purpose": "OCR commands, shared processing helpers and Python environment",
           "availability": "repository"
         },
         {
@@ -115,13 +120,13 @@
         },
         {
           "path": "work/image-processing/experiments/modern-overlays",
-          "purpose": "Local modern-map overlays",
-          "availability": "local"
+          "purpose": "Modern overlay tools with local derived outputs",
+          "availability": "repository"
         },
         {
           "path": "work/image-processing/experiments/river-reference",
-          "purpose": "Local river reference crops",
-          "availability": "local"
+          "purpose": "Blind windows, owner point labels, traces and reference tools; local crops",
+          "availability": "repository"
         },
         {
           "path": "work/image-processing/results",
@@ -334,14 +339,16 @@
       ]
     }
   ],
-  "historical": ["docs/archive", "docs/roadmap-record.md", "work/archive"],
+  "historical": [
+    "docs/archive",
+    "docs/roadmap-record.md",
+    "work/archive"
+  ],
   "compatibility": {
     "work/ocr/outputs": "work/image-processing/results",
     "work/ocr/logs": "work/image-processing/logs",
     "work/analysis/1882": "work/image-processing/experiments/river-1882",
     "work/analysis/river_pair": "work/image-processing/experiments/river-1882-1898",
-    "work/analysis/modern_overlay": "work/image-processing/experiments/modern-overlays",
-    "work/analysis/river_ref": "work/image-processing/experiments/river-reference",
     "work/analysis/seg-260919": "work/image-processing/experiments/segmentation-20260919",
     "work/vectorize": "work/archive/vectorize",
     "docs/allmaps-series-note.md": "docs/research/allmaps-series-note.md",

@@ -1,6 +1,6 @@
 # Image-processing consolidation and the 1882 feature layer — plan
 
-**Written 2026-10-03; Phase 0 steps 1–2 integrated on `feat/1882-processing-integration` for PR review.** The plan to stop researching feature extraction and ship one approved
+**Written 2026-10-03; Phase 0 steps 1–2 merged in PR #34; step 3 implemented on `refactor/image-processing-scripts` for PR review.** The plan to stop researching feature extraction and ship one approved
 1882 layer (water, plots, buildings, roads), after first cleaning up the image-processing WIP. Scope is the 1882 sheet only:
 1898 and District 4 are out of scope until this ships. The owner approved the direction and asked for this file
 so another session or model can pick it up cold. The briefing below is everything that session needs and would
@@ -59,7 +59,10 @@ Main’s reorganisation is now committed at `8a475366` (PR #33). The integration
 consolidates `feat/1882-1898-processing` without changing that original branch or its worktree.
 Reference tools are under `work/image-processing/experiments/river-reference/`; modern
 overlays use `experiments/modern-overlays/`. Selected OSM evidence stays local pending
-licence review. Phase 0 steps 3–7 remain, including script separation and final output cleanup.
+licence review. Image commands are separated from OCR on the step-3 branch, with shared
+helpers and the environment retained in OCR. Cached outputs were copied additively during
+integration; final output cleanup, the remaining compatibility-link audit, and remaining
+Phase 0 documentation/roadmap alignment still need completion.
 No layer has been approved or written to the database during integration.
 
 The checkout details below record the plan’s starting point, rather than the current checkout.
@@ -118,7 +121,7 @@ The checkout details below record the plan’s starting point, rather than the c
    - Commit the colour EDA journal and the kept `osm_warp` outputs (`summary.json`, `streets_warped_1882.geojson`, 3 figures; drop the ~20 fit scripts).
 3. **Split OCR from image processing (after the merge).** `sheet_features`, `river_pass`, `road_pass` and `review_sheet` exist only on the branch. `git mv` into `work/image-processing/scripts/`:
    - `colour_blocks`, `clean_blocks`, `seg_gemini`, `seg_eval`, `sheet_register`, `name_masks`, `review_figs`, `legend_probe`, `modern_prior`, `sheet_features`, `river_pass`, `road_pass`, `review_sheet`
-   - and `regularize_blocks`, which is untracked in main: move it and `git add` it
+   - and `regularize_blocks`, already tracked by PR #33: move it with the other image scripts
 
    `work/ocr/scripts/` keeps OCR only: `ocr`, `join_labels`, `prompt`, `pricing`, `gemini_client`, `cache`, `labels`, `local_vision`, `scale`, `iiif_tiles`, `supabase_client`, `eval`, `eval_metrics`, `audit_run`, `dictionary`, `test_*`, `oneoff/`. Shared modules (`scale`, `iiif_tiles`, `supabase_client`) stay in `ocr/scripts`; image scripts import them by path.
    - Fix each moved script's `sys.path`/`ROOT` line.
