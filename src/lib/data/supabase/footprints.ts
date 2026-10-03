@@ -231,33 +231,59 @@ export const REVIEW_QUEUE_STATUSES = ['submitted', 'needs_review'] as const;
 // SamFootprint = FootprintSubmission; kept for backward compat with ReviewTool/ReviewSidebar
 export type SamFootprint = FootprintSubmission;
 
+/**
+ * Every row of a query, one `.range()` page at a time. PostgREST caps an
+ * unbounded select at `max_rows` (1000, supabase/config.toml) and says nothing
+ * about it: the 1882 colour run puts 1,443 proposals in the queue, and the
+ * reviewer saw 1,000 — the 443 that never appeared were the buildings, because
+ * parcels were imported first. Pass a query with a unique `order` tail, or a
+ * page boundary can repeat or skip rows.
+ */
+export async function readAllPages<T>(
+	page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+	size = 1000
+): Promise<T[]> {
+	const out: T[] = [];
+	for (let from = 0; ; from += size) {
+		const { data, error } = await page(from, from + size - 1);
+		if (error) throw new Error(error.message);
+		out.push(...(data ?? []));
+		if (!data || data.length < size) return out;
+	}
+}
+
 export async function fetchSubmittedFootprints(
 	supabase: SupabaseClient<Database>,
 	mapId: string
 ): Promise<SamFootprint[]> {
-	const { data, error } = await supabase
-		.from('footprints')
-		.select(await footprintColumns(supabase))
-		.eq('map_id', mapId)
-		.in('review_status', REVIEW_QUEUE_STATUSES)
-		.order('created_at', { ascending: true });
-
-	if (error) throw new Error(error.message);
+	const columns = await footprintColumns(supabase);
+	const data = await readAllPages((from, to) =>
+		supabase
+			.from('footprints')
+			.select(columns)
+			.eq('map_id', mapId)
+			.in('review_status', REVIEW_QUEUE_STATUSES)
+			.order('created_at', { ascending: true })
+			.order('id')
+			.range(from, to)
+	);
 	return (data as unknown as DbFootprint[]).map(toFootprint);
 }
 
 export async function fetchMapsWithSubmittedFootprints(
 	supabase: SupabaseClient<Database>
 ): Promise<{ id: string; name: string; allmapsId: string; iiifImage: string | null; pendingCount: number }[]> {
-	const { data, error } = await supabase
-		.from('footprints')
-		.select('map_id, maps!inner(id, name, allmaps_id, iiif_image)')
-		.in('review_status', REVIEW_QUEUE_STATUSES);
-
-	if (error) throw new Error(error.message);
+	const data = await readAllPages((from, to) =>
+		supabase
+			.from('footprints')
+			.select('map_id, maps!inner(id, name, allmaps_id, iiif_image)')
+			.in('review_status', REVIEW_QUEUE_STATUSES)
+			.order('id')
+			.range(from, to)
+	);
 
 	const counts: Record<string, { id: string; name: string; allmapsId: string; iiifImage: string | null; count: number }> = {};
-	for (const row of (data ?? []) as unknown as MapJoinRow[]) {
+	for (const row of data as unknown as MapJoinRow[]) {
 		const mapRow = row.maps;
 		if (!mapRow) continue;
 		const mid = mapRow.id;

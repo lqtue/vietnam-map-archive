@@ -3,14 +3,14 @@
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **374** tests:
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **377** tests:
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **seven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 355 browser-less pure
+**read-only** (they hit the real Supabase project but never write), plus 358 browser-less pure
 checks that ride the same runner — `tests/press.spec.ts` (the Gallica CQL builder and the NLV year
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
 camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
@@ -201,6 +201,13 @@ and the archive looks correct while every link to the older sheet has quietly mo
 `status` out on every fixture, because `maps.status` still defaults to `pending_georef` (migration
 001) and migration 060 narrowed the check constraint without touching the default, so an insert that
 omits it is rejected — which presents as a null row rather than as an error about status.
+
+`tests/footprint-queue.spec.ts` pins the paged read behind the Validate queue
+(`readAllPages` in `src/lib/data/supabase/footprints.ts`). PostgREST caps an unbounded select at
+1000 rows without saying so; the 1882 colour run puts 1,443 proposals in the queue, parcels first,
+so the reviewer saw 1,000 and the 443 that never appeared were buildings. Three checks: a queue past
+one page is read whole, one that exactly fills a page still stops, and a failing page throws rather
+than returning a short queue.
 
 The migration-103 check saves a neatline through the real `PATCH` route and asserts **two**
 `georef_versions` rows, `mirror` then `neatline`, one per history file the route wrote, with
