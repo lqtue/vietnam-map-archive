@@ -197,7 +197,7 @@ check & scope & misregistration inside the frame & the frame/datum itself wrong 
 \endhead
 Corner residual vs sheet layout — \emph{Luft \& Schiewe 2021} & per-sheet & \ensuremath{\checkmark} & · & · & · & — \\ \hline
 Internal consistency: sides, diagonals, cm×dpi, paper bulge — \emph{Meijers \& Schoonman 2025} & per-sheet & \ensuremath{\checkmark} & · & · & \ensuremath{\checkmark} & — \\ \hline
-\texttt{\detokenize{graticule_error}} — sheet's GCPs vs the graticule it prints & per-sheet & \ensuremath{\checkmark} & \textbf{\ensuremath{\varnothing}} & · & · & — \\ \hline
+\texttt{\detokenize{graticule_error}} — sheet's GCPs vs the graticule it prints & per-sheet & \ensuremath{\checkmark} & \textbf{\ensuremath{\varnothing} ‖} & · & · & — \\ \hline
 Adjacency as a least-squares constraint — \emph{Janata \& Cajthaml 2020} & inter-sheet & \ensuremath{\checkmark} & · & · & · & — \\ \hline
 …the same adjacency read back as a residual & inter-sheet & \textbf{\ensuremath{\varnothing}} & \textbf{\ensuremath{\varnothing}} & \textbf{\ensuremath{\varnothing}} & \textbf{\ensuremath{\varnothing}} & — \\ \hline
 \textbf{Seam census} (adjacency left free) & inter-sheet & \ensuremath{\checkmark} & \textbf{\ensuremath{\checkmark} †} & \ensuremath{\checkmark} & · & — \\ \hline
@@ -212,11 +212,11 @@ Adjacency as a least-squares constraint — \emph{Janata \& Cajthaml 2020} & int
 \end{center}
 \end{landscape}
 
-\textbf{‡} Detects disagreement with the adopted frame when a cell score is available. The candidate and reference cell share Helmert parameters; the decision does not validate those parameters against independent absolute control. \textbf{§} Only when the index error changes the box's shape; an error that enlarges both axes by similar proportions passes (Tri Binh, §7.8). \textbf{¶} For the specific case of a boundary pinned to the wrong printed line: a ruled interior line fits straighter than a hand-engraved neatline, so the residual cannot flag the choice. Table entries describe diagnostic scope, not measured detection rates from running the published methods on this corpus.
+\textbf{‡} Detects disagreement with the adopted frame when a cell score is available. The candidate and reference cell share Helmert parameters; the decision does not validate those parameters against independent absolute control. \textbf{§} Only when the index error changes the box's shape; an error that enlarges both axes by similar proportions passes (Tri Binh, §7.8). \textbf{¶} For the specific case of a boundary pinned to the wrong printed line: a ruled interior line fits straighter than a hand-engraved neatline, so the residual cannot flag the choice. \textbf{‖} For a datum \emph{translation} only; an ellipsoid error is detected (§7.9). The L7014 cells of the four checks this paper runs (\texttt{\detokenize{graticule_error}}, lattice residual, \texttt{\detokenize{pick_crs}}, seam census) are tested by fault injection in §7.9. Every other entry describes diagnostic scope, not measured detection rates from running the published methods on this corpus.
 
 Three cells carry the argument, and each is sourced to a different paper's own design.
 
-First, \texttt{\detokenize{graticule_error}} on "frame/datum wrong" is \ensuremath{\varnothing}, not \texttt{\detokenize{·}}. It does not merely miss the fault; it cannot report it under those shared-input conditions. The sheet's control points are read into the sheet's own datum and compared against the graticule that same sheet prints, so a datum error moves both sides together — the check passed all 269 displaced sheets, and returns 2.167e-12 on a sheet it places correctly (§7.4). Luft and Schiewe's corner metric has the same shape, and says so without meaning to when it justifies corners on the grounds that neatlines "can be assumed to be drawn at the 'correct' place".
+First, \texttt{\detokenize{graticule_error}} on "frame/datum wrong" is \ensuremath{\varnothing}, not \texttt{\detokenize{·}}, for a datum translation. It does not merely miss the fault; it cannot report it under those shared-input conditions. The sheet's control points are read into the sheet's own datum and compared against the graticule that same sheet prints, so a datum error moves both sides together — the check passed all 269 displaced sheets, and returns 2.167e-12 on a sheet it places correctly (§7.4). Luft and Schiewe's corner metric has the same shape, and says so without meaning to when it justifies corners on the grounds that neatlines "can be assumed to be drawn at the 'correct' place".
 
 Second, adjacency-as-constraint turns an entire row to \ensuremath{\varnothing}. Once edge identity is a condition equation, the edges fit by construction; the information was spent. Our seam row is the same measurement left unspent, and it is the row that caught the fault (§7.3).
 
@@ -323,6 +323,38 @@ Quang Ngai marks the other side of the boundary. Its catalogue east edge was off
 The frame detector also has a blind spot of its own. Two sheets were once landed with a boundary on a kilometre-grid line about 52 px inside the true neatline. The ruled line fit with 0.28–0.48 px residual across 24 patches; the engraved frame fits at about 3.2 px. A straighter fit is not a more correct one, so the residual could not flag the choice (\textbf{¶} in Table 1). What caught it was a per-pixel profile of where the blank paper ends. That tests what the line bounds rather than how straight it is, which is a different property from the one the fit measures.
 
 These are cases, not rates. At the recorded state 314 of the 360 sheets are public and the series lattice check reports 328 clean placements with no conflicts. Printed ticks, however, were read only on the calibration sample and on sheets the gates had already held. How many public sheets carry an error like Tri Binh's is therefore unknown. The detector itself reached its 39th version within a week, each change justified on a handful of inspected sheets. That is a development record, not a held-out evaluation. §9 describes the measurement that would supply a rate.
+
+\subsection{Testing the table by fault injection}
+
+Table 1 is argued from each check's inputs and from one incident per cell. That is a claim about mechanism, not a measurement, so for the four checks this paper runs we tested the L7014 cells by injecting faults whose size is known by construction and running the checks unchanged (\texttt{\detokenize{scripts/paper_fault_injection.py}}; output \texttt{\detokenize{docs/paper/fault-injection.json}}). The predictions were written in the script before its first run and are graded against it. Thirty sheets were drawn with a fixed seed from the corrected build, after requiring a clean baseline of each (graticule error within tolerance, lattice error under 30 m); one drawn sheet failed that requirement and was replaced. Four faults were injected at 25, 50, 100, 150, 300, 455 and 800 m: a datum translation (the Helmert scaled so the displacement has the stated size, along the direction of the real fault); a misregistration of one sheet's control points with the frame correct; a sheet filed under a neighbouring cell; and, once, the WGS 84 ellipsoid substituted on the declared projection. The seam census was run on the whole series with 0, 10, 50 and 100\% of sheets displaced, five random subsets for the partial fractions, and on a single displaced sheet. Detection uses each check's own threshold: 5×10⁻⁴° for \texttt{\detokenize{graticule_error}}, 150 m for the lattice residual and \texttt{\detokenize{pick_crs}}, and the 100 m seam cutoff used in §7.3.
+
+\begin{landscape}
+\begin{center}
+\footnotesize
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.220\textheight}>{\raggedright\arraybackslash}p{0.090\textheight}>{\centering\arraybackslash}p{0.230\textheight}>{\centering\arraybackslash}p{0.230\textheight}>{\centering\arraybackslash}p{0.230\textheight}|}
+\hline
+fault & check & silent & fires & what was measured \\ \hline
+\endfirsthead
+\hline
+fault & check & silent & fires & what was measured \\ \hline
+\endhead
+datum translation & \texttt{\detokenize{graticule_error}} & every size & never & identical to the baseline within 10⁻⁹° at all seven sizes \\ \hline
+datum translation & lattice residual & ≤ 100 m & ≥ 300 m & 28 of 30 sheets at 150 m \\ \hline
+datum translation, all sheets & seam census & every size & never & largest edge median 72.4 m before, 73.5 m after an 800 m shift \\ \hline
+datum translation, 10\% or 50\% of sheets & seam census & ≤ 25 m & ≥ 100 m & at 50 m, 1 of 5 and 2 of 5 subsets \\ \hline
+ellipsoid substituted & \texttt{\detokenize{graticule_error}}, lattice & never & 30 of 30, both &  \\ \hline
+one sheet misregistered & \texttt{\detokenize{graticule_error}} & ≤ 50 m & ≥ 100 m &  \\ \hline
+one sheet misregistered & lattice residual, \texttt{\detokenize{pick_crs}} & ≤ 100 m & ≥ 300 m & 10 of 30 at 150 m \\ \hline
+one sheet misregistered & seam census & ≤ 50 m & ≥ 150 m & 2 of 5 at 100 m \\ \hline
+sheet filed under a neighbouring cell & \texttt{\detokenize{graticule_error}} & every case & never & identical to the baseline \\ \hline
+sheet filed under a neighbouring cell & lattice residual & never & 30 of 30 &  \\ \hline
+\end{longtable}
+\end{center}
+\end{landscape}
+
+Every prediction held, and three results sharpen the table. First, the \ensuremath{\varnothing} in the datum column is exact for a translation and does not extend to the datum as a whole: substituting the WGS 84 ellipsoid on the same projection moves the inverse-projected coordinates, and \texttt{\detokenize{graticule_error}} rejected all 30 sheets. The existing \texttt{\detokenize{check}} phase asserts the same thing, so the claim of §7.4 is a claim about the translation, and Table 1 now says so. Second, a common displacement is silent to the seam census at every size, as §7.3 states: this is measured, not only argued. The census fires only when the displaced sheets border undisplaced ones, and then from about 100 m. Third, the checks cover different ranges of one fault. A misregistration of 55–150 m is seen by \texttt{\detokenize{graticule_error}} and by neither the lattice residual nor \texttt{\detokenize{pick_crs}}, whose 150 m tolerance was chosen by inspection; above about 300 m all three agree. The 150 m figure is therefore a statement about which faults \texttt{\detokenize{pick_crs}} can refuse, not a calibrated error bound.
+
+The limits are the ones that decide how much this supports. The faults are synthetic and are injected into one series by the author who wrote the checks. "Truth" is the adopted Helmert and the lattice built from it, so this measures what each check can detect relative to that frame, not absolute accuracy. The thresholds are the code's own, so where a cell sits at a threshold (150 m for the lattice residual) the result describes the threshold. The 100 m seam cutoff was fixed from the same build whose baseline is used here, so a zero false-alarm rate at no injected fault holds by construction. Two faults in the harness itself, a sheet outline reduced to its first ring and a "neighbouring cell" that was the sheet's own, were found because the results disagreed with the predictions; they are fixed, and they are a reason to expect the same of any reader's harness. The rows for the published methods, the Indochine collision and the 1:100,000 index-box error (§7.8) are not tested here and remain argued from scope.
 
 \bigskip\hrule\bigskip
 

@@ -262,7 +262,7 @@ sheet. The metric survives; this evidence does not.
 | 118, unqualified | three different senses circulate — polygons produced, the retracted trace set, and rows scored |
 | any `cost_usd` as settled | the 3.5–4× thinking-token multiplier is still unverified against an invoice |
 | the monorepo in `platform-design.md` | a proposal; `contracts/` holds three schemas and a ~50-line subset walker |
-| anything from `work/deck-and-kg-2026-05/kg/` | frozen 2026-06-04 snapshot; migration head 048, 101 maps |
+| anything from `work/archive/deck-and-kg-2026-05/kg/` | frozen 2026-06-04 snapshot; migration head 048, 101 maps |
 
 ---
 

@@ -854,7 +854,7 @@ it reports none.
 
 ## Still to do in Phase 1
 
-- [x] Verify the remaining citations asserted in `work/deck-and-kg-2026-05/kg/AUDIT.md` and
+- [x] Verify the remaining citations asserted in `work/archive/deck-and-kg-2026-05/kg/AUDIT.md` and
       `docs/field-comparison.md` §Sources. **7 of 7 done 2026-09-19 — see §5 and §7 above.**
       - [x] **Tyagi & Dubey** — DOI and authorship verified; **closed access, numbers unverifiable**,
             and a decision is pending on whether to buy it (§5).

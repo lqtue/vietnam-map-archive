@@ -5,7 +5,7 @@ can never drift from the one in the manuscript. The PDF to upload is
 `docs/paper/blind-by-construction.pdf` (25 pages, A4).
 
 **Do the Zenodo deposit first.** §11 promises a data DOI; posting before it exists means a v2 whose
-only change is a DOI. `work/zenodo/zenodo-metadata.json` is the form-fill for it.
+only change is a DOI. `work/research/zenodo/zenodo-metadata.json` is the form-fill for it.
 
 ## Fields
 

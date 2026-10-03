@@ -1,0 +1,502 @@
+{
+ "seed": 20261001,
+ "sheets": [
+  "6050-4",
+  "6148-1",
+  "6154-3",
+  "6836-3",
+  "6430-1",
+  "6451-2",
+  "6637-3",
+  "6536-4",
+  "6231-3",
+  "6738-3",
+  "6833-4",
+  "5947-4",
+  "6531-3",
+  "5952-3",
+  "6029-1",
+  "6733-4",
+  "6639-4",
+  "5850-1",
+  "6632-2",
+  "5950-4",
+  "5653-4",
+  "6254-3",
+  "6229-4",
+  "6047-4",
+  "6152-1",
+  "6029-3",
+  "6442-3",
+  "6054-4",
+  "6053-1",
+  "6835-2"
+ ],
+ "skipped_baselines": 1,
+ "thresholds": {
+  "graticule_deg": 0.0005,
+  "lattice_m": 150.0,
+  "seam_m": 100.0
+ },
+ "graded": {
+  "datum_graticule_invariant": true,
+  "datum_lattice_by_d": {
+   "25": 0.0,
+   "50": 0.0,
+   "100": 0.0,
+   "150": 0.9333333333333333,
+   "300": 1.0,
+   "455": 1.0,
+   "800": 1.0
+  },
+  "ellipsoid_graticule": 30,
+  "ellipsoid_lattice": 30,
+  "ellipsoid_trials": 30,
+  "misreg_graticule_by_e": {
+   "25": 0.0,
+   "50": 0.0,
+   "100": 1.0,
+   "150": 1.0,
+   "300": 1.0,
+   "455": 1.0,
+   "800": 1.0
+  },
+  "misreg_lattice_by_e": {
+   "25": 0.0,
+   "50": 0.0,
+   "100": 0.0,
+   "150": 0.3333333333333333,
+   "300": 1.0,
+   "455": 1.0,
+   "800": 1.0
+  },
+  "misreg_pick_refuses_by_e": {
+   "25": 0.0,
+   "50": 0.0,
+   "100": 0.0,
+   "150": 0.3333333333333333,
+   "300": 1.0,
+   "455": 1.0,
+   "800": 1.0
+  },
+  "index_graticule_invariant": true,
+  "index_lattice_fires": 30,
+  "seam_by_fraction": {
+   "0.0/25": 0.0,
+   "0.0/50": 0.0,
+   "0.0/100": 0.0,
+   "0.0/150": 0.0,
+   "0.0/300": 0.0,
+   "0.0/455": 0.0,
+   "0.0/800": 0.0,
+   "0.1/25": 0.0,
+   "0.1/50": 0.2,
+   "0.1/100": 1.0,
+   "0.1/150": 1.0,
+   "0.1/300": 1.0,
+   "0.1/455": 1.0,
+   "0.1/800": 1.0,
+   "0.5/25": 0.0,
+   "0.5/50": 0.4,
+   "0.5/100": 1.0,
+   "0.5/150": 1.0,
+   "0.5/300": 1.0,
+   "0.5/455": 1.0,
+   "0.5/800": 1.0,
+   "1.0/25": 0.0,
+   "1.0/50": 0.0,
+   "1.0/100": 0.0,
+   "1.0/150": 0.0,
+   "1.0/300": 0.0,
+   "1.0/455": 0.0,
+   "1.0/800": 0.0,
+   "one sheet/25": 0.0,
+   "one sheet/50": 0.0,
+   "one sheet/100": 0.4,
+   "one sheet/150": 1.0,
+   "one sheet/300": 1.0,
+   "one sheet/455": 1.0,
+   "one sheet/800": 1.0
+  }
+ },
+ "seam": [
+  {
+   "fraction": 0.0,
+   "mag": 25,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 50,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 100,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 150,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 300,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 455,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.0,
+   "mag": 800,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.40664569236225
+  },
+  {
+   "fraction": 0.1,
+   "mag": 25,
+   "reps": 5,
+   "detected": 0.0,
+   "seams_over_100": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "max_edge_median_m": 90.42485810494361
+  },
+  {
+   "fraction": 0.1,
+   "mag": 50,
+   "reps": 5,
+   "detected": 0.2,
+   "seams_over_100": [
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "max_edge_median_m": 114.33578478822258
+  },
+  {
+   "fraction": 0.1,
+   "mag": 100,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    17,
+    20,
+    21,
+    18,
+    27
+   ],
+   "max_edge_median_m": 119.04209346265347
+  },
+  {
+   "fraction": 0.1,
+   "mag": 150,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    64,
+    63,
+    66,
+    65,
+    68
+   ],
+   "max_edge_median_m": 209.97949144541602
+  },
+  {
+   "fraction": 0.1,
+   "mag": 300,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    71,
+    84,
+    64,
+    57,
+    59
+   ],
+   "max_edge_median_m": 353.4450511441855
+  },
+  {
+   "fraction": 0.1,
+   "mag": 455,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    129,
+    121,
+    133,
+    136,
+    119
+   ],
+   "max_edge_median_m": 473.08980905979826
+  },
+  {
+   "fraction": 0.1,
+   "mag": 800,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    141,
+    116,
+    115,
+    131,
+    121
+   ],
+   "max_edge_median_m": 819.1053909570679
+  },
+  {
+   "fraction": 0.5,
+   "mag": 25,
+   "reps": 5,
+   "detected": 0.0,
+   "seams_over_100": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "max_edge_median_m": 90.42485810494361
+  },
+  {
+   "fraction": 0.5,
+   "mag": 50,
+   "reps": 5,
+   "detected": 0.4,
+   "seams_over_100": [
+    0,
+    1,
+    0,
+    1,
+    0
+   ],
+   "max_edge_median_m": 109.7894530679583
+  },
+  {
+   "fraction": 0.5,
+   "mag": 100,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    54,
+    57,
+    60,
+    47,
+    52
+   ],
+   "max_edge_median_m": 162.15763813528315
+  },
+  {
+   "fraction": 0.5,
+   "mag": 150,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    171,
+    177,
+    164,
+    196,
+    171
+   ],
+   "max_edge_median_m": 209.97949144541602
+  },
+  {
+   "fraction": 0.5,
+   "mag": 300,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    210,
+    190,
+    189,
+    208,
+    224
+   ],
+   "max_edge_median_m": 348.8562440665313
+  },
+  {
+   "fraction": 0.5,
+   "mag": 455,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    372,
+    339,
+    341,
+    355,
+    360
+   ],
+   "max_edge_median_m": 501.69279578355815
+  },
+  {
+   "fraction": 0.5,
+   "mag": 800,
+   "reps": 5,
+   "detected": 1.0,
+   "seams_over_100": [
+    353,
+    352,
+    354,
+    356,
+    369
+   ],
+   "max_edge_median_m": 831.6635808327351
+  },
+  {
+   "fraction": 1.0,
+   "mag": 25,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.44233475182487
+  },
+  {
+   "fraction": 1.0,
+   "mag": 50,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.47802545149736
+  },
+  {
+   "fraction": 1.0,
+   "mag": 100,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.54941176256864
+  },
+  {
+   "fraction": 1.0,
+   "mag": 150,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.62080460624071
+  },
+  {
+   "fraction": 1.0,
+   "mag": 300,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 72.83502214035644
+  },
+  {
+   "fraction": 1.0,
+   "mag": 455,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 73.05644129491043
+  },
+  {
+   "fraction": 1.0,
+   "mag": 800,
+   "reps": 1,
+   "detected": 0.0,
+   "seams_over_100": [
+    0
+   ],
+   "max_edge_median_m": 73.54949737371055
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 25,
+   "reps": 5,
+   "detected": 0.0
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 50,
+   "reps": 5,
+   "detected": 0.0
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 100,
+   "reps": 5,
+   "detected": 0.4
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 150,
+   "reps": 5,
+   "detected": 1.0
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 300,
+   "reps": 5,
+   "detected": 1.0
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 455,
+   "reps": 5,
+   "detected": 1.0
+  },
+  {
+   "fraction": "one sheet",
+   "mag": 800,
+   "reps": 5,
+   "detected": 1.0
+  }
+ ]
+}
