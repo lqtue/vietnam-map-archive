@@ -31,7 +31,7 @@ const series = (key: string): OverlayLayer => ({
     mapId: `series:${key}`,
     key,
     name: key,
-    parts: [{ kind: 'raster', key }],
+    parts: [{ kind: 'sheets', collection: key }],
     bounds: [102, 8, 110, 24],
   },
   opacity: 1,
@@ -122,24 +122,41 @@ test('a saved sheet still reads back', () => {
   expect(ref?.kind).toBe('historical');
 });
 
-test('a pre-`series` raster row becomes a one-part series', () => {
-  const ref = readOverlayRef({
-    kind: 'raster',
-    mapId: 'raster:l7014',
-    key: 'l7014',
-    name: 'AMS L7014 1:50,000 (mosaic)',
-    bounds: [102, 8, 110, 24],
-  });
-  expect(ref).toEqual({
-    kind: 'series',
-    // The OLD id, deliberately: `ExploreBrowsePanel` folds the pair back into
-    // one row by looking the halves up under the ids they were saved with.
-    mapId: 'raster:l7014',
-    key: 'l7014',
-    name: 'AMS L7014 1:50,000 (mosaic)',
-    parts: [{ kind: 'raster', key: 'l7014' }],
-    bounds: [102, 8, 110, 24],
-  });
+test('a retired raster row, or a raster part, is dropped rather than read', () => {
+  // L7014's PMTiles mosaic was retired 2026-10-03; nothing renders a raster part any more.
+  expect(
+    readOverlayRef({
+      kind: 'raster',
+      mapId: 'raster:l7014',
+      key: 'l7014',
+      name: 'mosaic',
+      bounds: [102, 8, 110, 24],
+    })
+  ).toBeNull();
+  expect(
+    readOverlayRef({
+      kind: 'series',
+      mapId: 'series:l7014',
+      key: 'l7014',
+      name: 'L7014',
+      bounds: [102, 8, 110, 24],
+      parts: [{ kind: 'raster', key: 'l7014' }],
+    })
+  ).toBeNull();
+  // Both halves saved: the series survives with only the sheets part.
+  expect(
+    readOverlayRef({
+      kind: 'series',
+      mapId: 'series:l7014',
+      key: 'l7014',
+      name: 'L7014',
+      bounds: [102, 8, 110, 24],
+      parts: [
+        { kind: 'raster', key: 'l7014' },
+        { kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' },
+      ],
+    })
+  ).toMatchObject({ parts: [{ kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' }] });
 });
 
 test('a pre-`series` sheets row keeps its collection', () => {
@@ -202,55 +219,45 @@ const savedSheetsHalf = {
   visible: true,
 } as OverlayLayer;
 
-const savedRasterHalf = {
-  id: 'layer-b',
-  ref: readOverlayRef({
+test('a stack saved with the mosaic row loses it and keeps the sheets', () => {
+  // The raster half cannot be read any more, so it never reaches the fold.
+  const raster = readOverlayRef({
     kind: 'raster',
     mapId: 'raster:l7014',
     key: 'l7014',
-    name: 'AMS L7014 1:50,000 (mosaic)',
-    bounds: [102.2499, 8.4999, 109.5001, 23.25],
-  })!,
-  opacity: 0.6,
-  visible: true,
-} as OverlayLayer;
-
-test('two saved halves of one survey become one row', () => {
-  const [row, ...rest] = foldLegacyOverlays([savedSheetsHalf, savedRasterHalf]);
+    name: 'mosaic',
+    bounds: [102, 8, 110, 24],
+  });
+  expect(raster).toBeNull();
+  const [row, ...rest] = foldLegacyOverlays([savedSheetsHalf]);
   expect(rest).toHaveLength(0);
   expect(row.ref).toMatchObject({
-    kind: 'series',
-    // The id the /explore list offers today. A restored row under any other id
-    // is a second row drawing the same pixels the moment the reader taps.
-    mapId: 'series:l7014',
-    name: 'AMS L7014 1:50,000',
-    parts: [
-      { kind: 'raster', key: 'l7014' },
-      { kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' },
-    ],
+    mapId: 'series:series-l7014-vietnam-1-50-000',
+    parts: [{ kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' }],
   });
-  // The higher of the two rows keeps its place, its opacity and its eye.
   expect(row.id).toBe('layer-a');
-  expect(row.opacity).toBe(1);
 });
 
-test('the folded row reaches both halves', () => {
-  const [row] = foldLegacyOverlays([savedSheetsHalf, savedRasterHalf]);
-  expect(row.ref.kind === 'series' && row.ref.bounds).toEqual([102.2499, 8.4999, 109.5001, 23.25]);
-});
-
-test('a survey kept as one half comes back whole', () => {
-  // The mosaic is added back under the sheets the reader kept, because it is
-  // the same survey and the archive knows its own key — a survey goes onto the
-  // map whole or the Saigon-shaped hole is a layer that looks broken.
-  const [row] = foldLegacyOverlays([savedSheetsHalf]);
+test('a row saved under the retired archive key becomes the survey the list offers', () => {
+  const old = {
+    id: 'layer-z',
+    ref: {
+      kind: 'series',
+      mapId: 'series:l7014',
+      key: 'l7014',
+      name: 'AMS L7014 1:50,000',
+      bounds: [102, 8, 110, 24],
+      parts: [{ kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' }],
+    },
+    opacity: 0.7,
+    visible: true,
+  } as OverlayLayer;
+  const [row] = foldLegacyOverlays([old]);
   expect(row.ref).toMatchObject({
-    mapId: 'series:l7014',
-    parts: [
-      { kind: 'raster', key: 'l7014' },
-      { kind: 'sheets', collection: 'Series L7014 (Vietnam 1:50,000)' },
-    ],
+    mapId: 'series:series-l7014-vietnam-1-50-000',
+    key: 'series-l7014-vietnam-1-50-000',
   });
+  expect(row.opacity).toBe(0.7);
 });
 
 test('a survey no archive claims is left alone but renamed to its own id', () => {
@@ -277,7 +284,11 @@ test('a survey no archive claims is left alone but renamed to its own id', () =>
 });
 
 test('sheets are left where they are, and folding twice changes nothing', () => {
-  const once = foldLegacyOverlays([sheet('abc'), savedSheetsHalf, savedRasterHalf, sheet('def')]);
-  expect(once.map((o) => o.ref.mapId)).toEqual(['abc', 'series:l7014', 'def']);
+  const once = foldLegacyOverlays([sheet('abc'), savedSheetsHalf, sheet('def')]);
+  expect(once.map((o) => o.ref.mapId)).toEqual([
+    'abc',
+    'series:series-l7014-vietnam-1-50-000',
+    'def',
+  ]);
   expect(foldLegacyOverlays(once)).toEqual(once);
 });

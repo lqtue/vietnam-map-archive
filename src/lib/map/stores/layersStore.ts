@@ -27,16 +27,10 @@ export type HistoricalRef = {
   thumbnail?: string;
 };
 /**
- * A whole survey as one stack row.
- *
- * A survey can reach the map by two routes, and they are complementary rather
- * than alternative: the AMS L7014 is 452 cells pre-tiled into a raster archive
- * on our own tile domain, **plus** 9 `maps` rows warped live by Allmaps — the
- * city sheets the source library published with no georeference attached, which
- * are exactly the ones the mosaic is missing. A reader does not want to hold
- * those two apart, so they are `parts` of one row: one name, one opacity, one
- * eye, one ×, one slot against `MAX_OVERLAYS`. `LayerRenderer` is where a part
- * becomes an OpenLayers layer, and `parts[0]` draws beneath `parts[1]`.
+ * A whole survey as one stack row: one name, one opacity, one eye, one ×, one slot against
+ * `MAX_OVERLAYS`. Its `parts` are the sheets of a collection, warped live by Allmaps in
+ * `LayerRenderer`. (Until 2026-10-03 a part could also be a pre-tiled raster archive — L7014's PMTiles
+ * mosaic, ~470 m out — retired once all 510 of its sheets were IIIF `maps` rows.)
  *
  * It is an overlay rather than a basemap because a series is one thing among
  * the archive's others, not a backdrop: the reader wants it *over* whichever
@@ -54,10 +48,8 @@ export type HistoricalRef = {
  * re-add it.
  */
 export type SeriesPart =
-  /** A pre-warped raster archive, by the key `buildRasterOverlayLayer` knows. */
-  | { kind: 'raster'; key: string }
   /** `maps.collection` — the sheets are whatever rows carry this string. */
-  | { kind: 'sheets'; collection: string };
+  { kind: 'sheets'; collection: string };
 
 export type SeriesRef = {
   kind: 'series';
@@ -117,8 +109,8 @@ function load(): LayersState {
       ? parsed.base
       : DEFAULT_BASE;
   // `readOverlayRef` is both the validator and half the migration: it drops a
-  // row it cannot read, and reads the two pre-`series` shapes (`raster`,
-  // `sheets`) as one-part series rows. `foldLegacyOverlays` is the other half —
+  // row it cannot read (including every retired `raster` one), and reads the
+  // pre-`series` `sheets` shape as a one-part series row. `foldLegacyOverlays` is the other half —
   // it puts the halves of one survey back together as the single row a survey
   // is added as today.
   const overlays: OverlayLayer[] = Array.isArray(parsed.overlays)

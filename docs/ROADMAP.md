@@ -9,7 +9,7 @@ anything worth re-learning goes into `docs/lessons.md`. Remove its name from
 
 Ordered where order is claimed. Each item names the check that says it is finished.
 
-**An item's name is what it acts on, not the pass it was born in.** `l7014-rebuild`, not `N1`. The
+**An item's name is what it acts on, not the pass it was born in.** `l7014-iiif`, not `N1`. The
 old letter codes were unmemorable, and worse, they moved: one item was `I3` and then `N1`, another
 shipped as `E2b` while its `B8` box stayed unticked, and two code comments ended up pointing at
 sections that no longer existed. A name taken from the subject survives every reordering. Use it in
@@ -25,56 +25,38 @@ model scored 7/7 on, a fixed pixel tile being a different amount of ground on ev
 L7014 mixed-datum fault, 56 published sheets drawing nothing. So: georeference quality, segmentation
 measurement, metadata that maintains itself, and corpus size.
 
-- [ ] **`l7014-rebuild`** — rebuild and verify the mosaic. The live `l7014-20260913` mosaic places
-      sheets
-      about **470 m out**, the datum fix is committed, and the warp/tile/upload has never run. This
-      is the only item on this list that is serving wrong data to readers right now, which is why
-      it is first. Preserve the old build until the replacement passes. Exit: `fit` and
-      `geo_audit.mjs` both clear on the new build, and the old one is retired only after.
-      **Phases A+B run 2026-09-21** on key `l7014-20260921` (436 sheets, matches the 2026-09-20 dry
-      run). `geo_audit.mjs` found one real FAIL beyond the known `fit` outliers: `hue-l7014-6541-4`
-      (public, 3 GCPs) sat 5,391 m from printed cell 6541-4, while a draft duplicate
-      `hue-l7014-6541-4-2` (4 GCPs) sat correctly on it. **Fixed 2026-09-22**: swapped the two
-      rows' status and re-pointed `series_cells` cell 6541-4 at the `-2` row.
-      `geo_audit.mjs --key l7014-20260921` now reports **0 FAIL** (47 WARN, all pre-existing
-      draft-sheet annotation gaps, unaffected by the swap). `fit`'s two known-bad sheets (`6630-4`,
-      `6349-4`, distorted outlines, see `work/l7014/regen/REGEN.md`) are expected on every run and
-      not part of this gate. Still open before this closes: `tile`/`upload` have never run — gated
-      on
-      a paper-framing decision (`docs/paper/draft.md` §7.6 / `blind-by-construction.tex` cite the
-      *unrebuilt* archive as evidentiary) that belongs to the user; and `rasterSeries.ts`'s
-      hand-carried `sheets: 452` needs updating to 436 (with `tests/series-rows.spec.ts:20,96`) as
-      part of that same pass. Separately, **a new bug surfaced while checking this**:
-      `series_cells.bbox` stores the raw unshifted Indian-1960 graticule instead of the corrected
-      WGS84 lattice, off by 448–498 m on every one of the 627 cells in the L7014 index — now its
-      own item, `series-sheets-bbox-datum`, below. See `.claude/handoff.md` for the full trail.
-- [ ] **`l7014-iiif`** — the 510 PCL GeoPDFs as IIIF sheets, replacing the 20 GB of COGs as the
-      source for the next mosaic. **Ingested 2026-10-02**: 510 `draft` rows (slug
-      `<place>-l7014-<sheet>`, `extra_metadata.source_archive = PCL`), tiles in R2 `tiles/<uuid>`,
-      none duplicating an existing L7014 row. **509 of 510 are annotated** (`l7014_annotate_pdf.py`),
-      all still `draft`: 436 from the PDF's own control points (outline within 0.8 m of the
-      mosaic's; the PDFs' own registration is ~12 m median, 35 m worst); 11 `--offcell` on the PDF
-      georeference, whose neatline corners land on round minutes (these are re-framed prints the
-      15' lattice does not describe, and the lattice check is what misfired); 7 autoplace passes;
-      and 55 with no georeference at all, placed by the printed neatline (`--hand`, corners read by
-      eye and snapped by `l7014_hand_corners.py`, each checked for shape against its cell and
-      recorded in `extra_metadata.georef_method`, with worst seam or affine misfit; **seven are
-      30-80 m off a parallelogram and want an eye**). Nine Chinese-border sheets (5454-1, 5554-4,
-      5654-1/-3, 5754-2/-4, 5854-4, 6155-2/-3) are 10' tall, not 15': the lattice has them wrong, the
-      printed corners are used. Left: `6835-4` (seam 119 m). The `series_cells` bbox for those
-      nine is wrong for the same reason. Open: eyeball a few in `/explore`, check
-      6330-3 / 6330-1 for same-edition duplicates, flip sheets to `public` only after
-      `geo_audit.mjs`, then build the PMTiles from them and close `l7014-rebuild`; `work/l7014/cogs*`
-      (~25 GB) can go after that. Names are ASCII; diacritics are a later pass.
+- [ ] **`l7014-iiif`** — L7014 as one IIIF series from three sources (PCL, TTU, ANU). **Done
+      2026-10-03**: all 510 PCL GeoPDFs are `public` IIIF `maps` rows (slug `<place>-l7014-<sheet>`,
+      `source_archive = PCL`, `maps.sheet_number` set so `map_series` counts them: 519 of 627), annotated
+      by `l7014_annotate_pdf.py` — 436 from the PDF's own control points, 11 `--offcell`, 7 autoplace, 56
+      by printed neatline (`--hand`; **seven are 30-80 m off a parallelogram and want an eye**) — plus
+      the 9 city sheets. The PMTiles mosaic (`l7014-20260913`, ~470 m out; the old `l7014-rebuild` plan) is
+      **retired from the app**: `rasterSeries.ts`, the raster part of a series row and
+      `L7014_PMTILES_URL` are gone, and `series_cells.held_by` is `'map'` for every held cell. Its R2
+      object and `work/l7014/cogs*` are not needed any more. A PMTiles overview may be built later from
+      the verified sheets. The paper's §7.6 / `blind-by-construction.tex` still cite the unrebuilt archive.
+      **Open:** (1) the 15 plain PCL scans are annotated (`l7014_scan_corners.py`,
+      `l7014_scan_refine.py`) but still `draft` — fits 1-43 m, none looked at in `/explore`; (2) **TTU**
+      (`vva.vietnam.ttu.edu`, 140 raster PDFs, none georeferenced): 131 more are being ingested as `draft`
+      rows (`l7014_ttu_ingest_list.py`, `source_archive = TTU`; titles were read off the scans by agents
+      because OCR cannot read the collars; 50 are cells no other source holds, the rest other editions of
+      PCL cells; same-edition ones skipped), then placed with `l7014_ttu_corners.py` — the detector fits
+      about half, the rest need a person; (3) **ANU** (`openresearch-repository.anu.edu.au`, 159
+      open-access JPG/TIFF masters, none georeferenced) adds **no new cell**: every one is already held by
+      PCL and 23 are the same edition. Record its handle on the PCL/TTU row rather than ingesting 159
+      duplicates; (4) 43 cells are in none of the three sources; (5) `hue-l7014-6541-4` was removed
+      2026-10-03 (the older of two rows for the cell; a 301 alias points at `-2`); (6) two draft scans are
+      named from their filenames, not their sheets: `kim-boi` is PCL's printed "Thúy Hiền" and `luong-son`
+      is TTU's "Chương Mỹ"; (7) `6835-4` was placed by hand from the detected neatline, its seams to
+      the neighbours unchecked; (8) diacritics.
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
       of the true lattice position, on the three cells checked (6150-4, 6330-4, 6541-4) — the same
-      direction and rough size as the L7014 datum fault `l7014-rebuild` fixes, but this is a
+      direction and rough size as the L7014 datum fault (fixed), but this is a
       separate bug: it's every unheld cell's ground rectangle, not a warped sheet's position. Affects
       all 627 cells in the L7014 index, so every gap the coverage page draws is ~470 m off from
-      where the survey actually places it. A database backfill, independent of `l7014-rebuild`'s
-      tile/upload gate — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
+      where the survey actually places it. A database backfill, independent of any mosaic build — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
       (`scripts/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
       `series_cells` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
       `CELL_TOL` (150 m) against `lattice.json`.
@@ -85,7 +67,7 @@ measurement, metadata that maintains itself, and corpus size.
       itself. A 4th point on each buys a number where there currently cannot be one. Do the five
       one-point GCP fixes and the 1912 Saigon-Cholon (three near-collinear points in one corner) in
       the same sitting. The 1880 *Plan annamite d'Hanoi* is 802 px and needs a new scan before it
-      needs GCPs. (Was 12 — `hue-l7014-6541-4` dropped off the list 2026-09-22: the `l7014-rebuild`
+      needs GCPs. (Was 12 — `hue-l7014-6541-4` dropped off the list 2026-09-22: the L7014 rebuild
       swap
       promoted the 4-GCP `hue-l7014-6541-4-2` in its place.) Exit: no georeferenced sheet in the
       corpus sits on fewer than 4 points, and `modern_prior.py --sweep` reports a residual for
@@ -314,7 +296,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
 Deliberately not first, but no longer blocked on it either: `stale-after-change` closed 2026-09-22
 (`docs/lessons.md`, `tests/stale-after-change.spec.ts`) — a corrected sheet's rebuild set is now
 named, not remembered. The three I-items that duplicated live work are gone: they were
-`l7014-rebuild`, `shape-precision` and `stale-after-change`. Rationale for the whole
+`l7014-iiif`, `shape-precision` and `stale-after-change`. Rationale for the whole
 system — what a result must retain, and the two kinds of check — is in the record.
 
 - [ ] **`next-action-view`** — show the next action for each sheet. Extend the staff status view
@@ -692,7 +674,7 @@ belong to work that is closed; they still name it in `docs/roadmap-record.md`.
 
 | Old | Now | Old | Now |
 | --- | --- | --- | --- |
-| N1, I3 | `l7014-rebuild` | 3b | `auto-priority` |
+| N1, I3 | `l7014-iiif` | 3b | `auto-priority` |
 | N2 | `three-point-residuals` | 3c | `gemini-second-key` |
 | N3 | `indochine-100k-ingest` | 3h | `hand-triage` |
 | N3a | `indochine-100k-licence` | 3 | `queue-the-pass` |

@@ -7,7 +7,6 @@
  * with a rule in them. Everything imported here is either a type or pure data,
  * for the same reason.
  */
-import { archiveFor, type RasterSeries } from '$lib/map/rasterSeries';
 import type { HistoricalRef, OverlayLayer, OverlayRef, SeriesPart, SeriesRef } from './layersStore';
 
 /**
@@ -30,11 +29,11 @@ function bbox(v: unknown): [number, number, number, number] | null {
  * which `load()` drops rather than handing a half-formed layer to OpenLayers.
  *
  * It is half of the migration. Until Sept 2026 a survey was one stack row per
- * route — `{ kind: 'raster' }` for a pre-tiled archive, `{ kind: 'sheets' }`
- * for live-warped `maps` rows — so a reader with L7014 on the map has **two**
- * saved rows for one survey. Each becomes a one-part `series` row here, under
- * the id it was saved with; `foldLegacyOverlays` is what puts the pair back
- * together.
+ * route — `{ kind: 'sheets' }` for live-warped `maps` rows, and `{ kind: 'raster' }` for a
+ * pre-tiled archive — and the raster route was retired on 2026-10-03 (L7014's PMTiles mosaic). So a
+ * saved `raster` row, or a `raster` part inside a `series` row, is dropped here rather than handed to
+ * a renderer that no longer has one. `foldLegacyOverlays` puts the remaining `sheets` rows of one
+ * survey back together.
  */
 export function readOverlayRef(raw: unknown): OverlayRef | null {
   const ref = raw as Record<string, any> | null;
@@ -47,11 +46,12 @@ export function readOverlayRef(raw: unknown): OverlayRef | null {
   if (!ref.mapId || !ref.key || !ref.name || !bounds) return null;
   const head = { kind: 'series' as const, mapId: ref.mapId, key: ref.key, name: ref.name, bounds };
 
-  if (ref.kind === 'series')
-    return Array.isArray(ref.parts) && ref.parts.length
-      ? ({ ...head, parts: ref.parts } as SeriesRef)
-      : null;
-  if (ref.kind === 'raster') return { ...head, parts: [{ kind: 'raster', key: ref.key }] };
+  if (ref.kind === 'series') {
+    const parts = Array.isArray(ref.parts)
+      ? ref.parts.filter((p: any) => p?.kind === 'sheets' && p.collection)
+      : [];
+    return parts.length ? ({ ...head, parts } as SeriesRef) : null;
+  }
   if (ref.kind === 'sheets')
     return ref.collection
       ? { ...head, parts: [{ kind: 'sheets', collection: ref.collection }] }
@@ -69,52 +69,33 @@ function union(
 
 /**
  * Merge a stored row into the row already standing for its survey — or build
- * that row, when this is the first half seen.
- *
- * The archive contributes its own raster part whether or not the reader had it
- * saved, so someone who kept only the nine warped city sheets gets the mosaic
- * back under them: a survey goes on the map whole, which is the property every
- * other path here defends. It cannot work the other way — a raster row does not
- * carry the collection name the sheets half needs — so a reader who kept only
- * the mosaic keeps only the mosaic.
+ * that row, when this is the first half seen. One part of each kind, the earlier one kept.
  */
-function merge(
-  key: string,
-  archive: RasterSeries | undefined,
-  into: SeriesRef | null,
-  ref: SeriesRef
-): SeriesRef {
+function merge(key: string, into: SeriesRef | null, ref: SeriesRef): SeriesRef {
   const parts: SeriesPart[] = [];
-  if (archive) parts.push({ kind: 'raster', key: archive.key });
-  // Raster under, warped sheets over, and one of each: the sheets are a sharper
-  // survey of the ground the archive is missing and belong above its pixels.
   for (const p of [...(into?.parts ?? []), ...ref.parts])
     if (!parts.some((q) => q.kind === p.kind)) parts.push(p);
   return {
     kind: 'series',
     mapId: `series:${key}`,
     key,
-    // The archive names the survey it is half of: that is what the /explore row
-    // is called, and a row the reader cannot match to the list reads as a
-    // different layer.
-    name: archive?.name ?? into?.name ?? ref.name,
+    name: into?.name ?? ref.name,
     parts,
-    bounds: [into?.bounds, ref.bounds, archive?.bounds]
-      .filter((b): b is [number, number, number, number] => !!b)
-      .reduce(union),
+    bounds: into ? union(into.bounds, ref.bounds) : ref.bounds,
   };
 }
+
+/** Series keys a saved row may still carry from before the L7014 mosaic was retired (2026-10-03). */
+const RETIRED_KEYS: Record<string, string> = { l7014: 'series-l7014-vietnam-1-50-000' };
 
 /**
  * Put a restored stack back together as one row per survey.
  *
- * A stack saved before Sept 2026 holds L7014 as two rows — the mosaic and the
- * nine warped city sheets — each with its own opacity slider, eye and ×, for
- * one survey. This is what makes them the single row they are added as today,
- * in the higher of the two positions and keeping that row's opacity and
- * visibility. It also canonicalises the id of a survey stored on its own, so a
- * restored row is the *same* row the /explore list offers rather than a second
- * one that draws the same pixels.
+ * A stack saved before Sept 2026 holds one survey as several rows, each with its own opacity
+ * slider, eye and ×. This makes them the single row they are added as today, in the higher of the
+ * positions and keeping that row's opacity and visibility. It also canonicalises the id of a
+ * survey stored under a retired key (L7014's mosaic archive), so a restored row is the *same* row
+ * the /explore list offers rather than a second one that draws the same pixels.
  *
  * Runs on every load, for every page that renders the stack, because the stack
  * outlives any one panel: a reader who never opens Browse must not be left with
@@ -128,16 +109,15 @@ export function foldLegacyOverlays(overlays: OverlayLayer[]): OverlayLayer[] {
       out.push(o);
       continue;
     }
-    const archive = archiveFor(o.ref.key);
-    const key = archive?.key ?? o.ref.key;
+    const key = RETIRED_KEYS[o.ref.key] ?? o.ref.key;
     const at = seen.get(key);
     if (at === undefined) {
       seen.set(key, out.length);
-      out.push({ ...o, ref: merge(key, archive, null, o.ref) });
+      out.push({ ...o, ref: merge(key, null, o.ref) });
     } else {
       // The row already standing is the higher of the two, so it keeps its
       // place, its opacity and its eye; this half only adds what it carries.
-      out[at] = { ...out[at], ref: merge(key, archive, out[at].ref as SeriesRef, o.ref) };
+      out[at] = { ...out[at], ref: merge(key, out[at].ref as SeriesRef, o.ref) };
     }
   }
   return out;

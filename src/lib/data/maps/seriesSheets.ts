@@ -67,16 +67,12 @@ export function sheetStatus(row: Pick<SeriesSheet, 'held_by' | 'source'>): Sheet
 }
 
 /**
- * `held_by` is either the literal `'map'` or a layer key such as
- * `'raster:l7014'`. The distinction matters to a reader: one is a sheet warped
- * live from its own scan, the other a cell of a mosaic that was warped once and
- * pre-tiled, which is why it has no catalogue record of its own.
+ * `held_by` is the literal `'map'` — a sheet warped live from its own scan. (It could also be a layer
+ * key such as `'raster:l7014'`, a cell of a pre-tiled mosaic, until that was retired 2026-10-03.)
  */
 function heldAs(held_by: string | null): string | null {
   if (!held_by) return null;
-  if (held_by === 'map') return 'Warped from its own scan';
-  if (held_by.startsWith('raster:')) return 'Part of the pre-tiled mosaic';
-  return held_by;
+  return held_by === 'map' ? 'Warped from its own scan' : held_by;
 }
 
 /**

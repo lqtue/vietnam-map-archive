@@ -2,10 +2,9 @@
   LayerRenderer.svelte — single component that owns all map-layer rendering.
   Subscribes to layersStore and maintains:
     - The basemap (modern TileLayer) OR a historical base (WarpedMapLayer at z=5)
-    - One OL layer per overlay PART (z = 10 + 2i, opacity from layer, visibility
-      toggle). A catalogued sheet is one part; a series row is up to two — a
-      pre-tiled raster archive and the sheets warped live above it — which is
-      why each row owns two z-slots rather than one.
+    - One warped layer per overlay row (z = 10 + 2i, opacity from layer, visibility
+      toggle). A catalogued sheet holds one annotation; a series row holds every
+      sheet of its collection in the same layer.
 
   Replaces HistoricalOverlay + HistoricalBaseLayer + manual StackedOverlay loops.
 
@@ -33,10 +32,8 @@
     type SeriesLoad,
   } from './warpedOverlay';
   import { layersStore, type OverlayLayer, type LayerRef } from '$lib/map/stores/layersStore';
-  import { buildRasterOverlayLayer } from '$lib/map/basemapStyle';
   import { fetchSeriesSheets } from '$lib/data/maps/service';
   import { getSupabaseContext } from '$lib/data/supabase/context';
-  import type TileLayer from 'ol/layer/Tile';
 
   const { map: mapWritable, layerStore } = getShellContext();
   // Set by the root layout, so it is there for every MapShell in the app. A
@@ -58,18 +55,6 @@
     string,
     { layer: WarpedMapLayer; loadedAllmapsId: string | null; series?: SeriesLoad }
   >();
-
-  // The raster part of a series row (a pre-warped tile archive), keyed by
-  // layer.id. Ordinary OL tile layers, so they are kept apart from the Allmaps
-  // ones — nothing about loading, clipping or teardown is shared. One row can
-  // have an entry in both maps: that is a survey held both ways.
-  const rasterInstances = new Map<string, TileLayer>();
-
-  function dropRaster(id: string) {
-    const layer = rasterInstances.get(id);
-    if (layer && olMap) olMap.removeLayer(layer);
-    rasterInstances.delete(id);
-  }
 
   function hideAllBasemaps(map: OlMap) {
     map.getLayers().forEach((layer) => {
@@ -167,40 +152,20 @@
         overlayInstances.delete(id);
       }
     }
-    for (const id of [...rasterInstances.keys()]) {
-      if (!wantedIds.has(id)) dropRaster(id);
-    }
 
     // Create or update
     const N = overlays.length;
     for (let i = 0; i < N; i++) {
       const o = overlays[i];
-      // Two z-slots per row: a series row draws its raster archive at `z` and
-      // its warped sheets at `z + 1`, because the sheets are the sharper survey
-      // of the ground the archive is missing and belong above its pixels.
+      // Two z-slots per row, the warped layer at `z + 1`; the spacing is what the rest of the stack
+      // (basemap at 5, annotations above) is laid out against.
       const z = 10 + 2 * (N - 1 - i); // topmost (i=0) → highest z
       // Side-by-side: the left pane shows ONLY the topmost overlay; the right
       // pane (DualMapPane) handles the second overlay independently.
       const visible = o.visible && !(sideBySide && i > 0);
       const parts = o.ref.kind === 'series' ? o.ref.parts : [];
 
-      const archive = parts.find((p) => p.kind === 'raster');
-      if (archive) {
-        let raster = rasterInstances.get(o.id);
-        if (!raster) {
-          raster = buildRasterOverlayLayer(archive.key);
-          rasterInstances.set(o.id, raster);
-          olMap.addLayer(raster);
-        }
-        raster.setZIndex(z);
-        raster.setOpacity(o.opacity);
-        raster.setVisible(visible);
-      } else if (rasterInstances.has(o.id)) {
-        dropRaster(o.id);
-      }
-
-      // Everything below is the Allmaps half: one WarpedMapLayer holding either
-      // a single sheet's annotation or a whole series' worth.
+      // One WarpedMapLayer holding either a single sheet's annotation or a whole series' worth.
       const sheets = parts.find((p) => p.kind === 'sheets');
       if (o.ref.kind === 'series' && !sheets) {
         const stale = overlayInstances.get(o.id);
@@ -347,6 +312,5 @@
     }
     for (const inst of overlayInstances.values()) destroyWarpedLayer(inst.layer);
     overlayInstances.clear();
-    for (const id of [...rasterInstances.keys()]) dropRaster(id);
   });
 </script>

@@ -70,9 +70,9 @@ def cross(v, h):  # v: x = m*y + c ; h: y = m*x + c
     return [round(v[0] * y + v[1], 1), round(y, 1)]
 
 
-def refine(s, rec):
+def refine(s, rec, jpg=None):
     c = rec["corners"]
-    im = np.asarray(Image.open(JPGS / f"txu-pclmaps-oclc-21713238-{s}.jpg").convert("L")).astype(float)
+    im = np.asarray(Image.open(jpg or JPGS / f"txu-pclmaps-oclc-21713238-{s}.jpg").convert("L")).astype(float)
     top = ransac(stations(im, c["NW"], c["NE"], 0)); bot = ransac(stations(im, c["SW"], c["SE"], 0))
     left = ransac(stations(im, c["NW"], c["SW"], 1)); right = ransac(stations(im, c["NE"], c["SE"], 1))
     out = {"NW": cross(left, top), "NE": cross(right, top), "SE": cross(right, bot), "SW": cross(left, bot)}
