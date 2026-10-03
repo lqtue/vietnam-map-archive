@@ -39,8 +39,22 @@ export type Database = {
   }
   public: {
     Tables: {
+      series: {
+        Row: { id: string; key: string; name: string; code: string | null; scale_denominator: number | null; created_at: string; updated_at: string }
+        Insert: { id?: string; key: string; name: string; code?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; key?: string; name?: string; code?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      sheet_printings: {
+        Row: { id: string; cell_id: string; printed_title: string | null; edition_statement: string | null; edition_label: string | null; issuing_agency: string | null; content_year: number | null; edition_year: number | null; printing_year: number | null; printing_month: number | null; printer: string | null; printing_statement: string | null; part: string | null; evidence: Json; review_status: string; created_at: string; updated_at: string }
+        Insert: { id?: string; cell_id: string; printed_title?: string | null; edition_statement?: string | null; edition_label?: string | null; issuing_agency?: string | null; content_year?: number | null; edition_year?: number | null; printing_year?: number | null; printing_month?: number | null; printer?: string | null; printing_statement?: string | null; part?: string | null; evidence?: Json; review_status?: string; created_at?: string; updated_at?: string }
+        Update: { id?: string; cell_id?: string; printed_title?: string | null; edition_statement?: string | null; edition_label?: string | null; issuing_agency?: string | null; content_year?: number | null; edition_year?: number | null; printing_year?: number | null; printing_month?: number | null; printer?: string | null; printing_statement?: string | null; part?: string | null; evidence?: Json; review_status?: string; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       cell_printings: {
         Row: {
+          printing_id: string | null
+          series_id: string | null
           created_at: string
           edition: string | null
           id: string
@@ -57,6 +71,8 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          printing_id?: string | null
+          series_id?: string | null
           created_at?: string
           edition?: string | null
           id?: string
@@ -73,6 +89,8 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          printing_id?: string | null
+          series_id?: string | null
           created_at?: string
           edition?: string | null
           id?: string
@@ -362,6 +380,11 @@ export type Database = {
       }
       map_images: {
         Row: {
+          source_item_id: string | null
+          width: number | null
+          height: number | null
+          content_sha256: string | null
+          asset_version: string | null
           created_at: string | null
           id: string
           iiif_image: string
@@ -373,6 +396,11 @@ export type Database = {
           source_type: string | null
         }
         Insert: {
+          source_item_id?: string | null
+          width?: number | null
+          height?: number | null
+          content_sha256?: string | null
+          asset_version?: string | null
           created_at?: string | null
           id?: string
           iiif_image: string
@@ -384,6 +412,11 @@ export type Database = {
           source_type?: string | null
         }
         Update: {
+          source_item_id?: string | null
+          width?: number | null
+          height?: number | null
+          content_sha256?: string | null
+          asset_version?: string | null
           created_at?: string | null
           id?: string
           iiif_image?: string
@@ -518,6 +551,10 @@ export type Database = {
       }
       maps: {
         Row: {
+          series_id: string | null
+          printing_id: string | null
+          duplicate_of_map_id: string | null
+          archive_reason: string | null
           allmaps_id: string | null
           annotation_url: string | null
           bbox: number[] | null
@@ -559,6 +596,10 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          series_id?: string | null
+          printing_id?: string | null
+          duplicate_of_map_id?: string | null
+          archive_reason?: string | null
           allmaps_id?: string | null
           annotation_url?: string | null
           bbox?: number[] | null
@@ -599,6 +640,10 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          series_id?: string | null
+          printing_id?: string | null
+          duplicate_of_map_id?: string | null
+          archive_reason?: string | null
           allmaps_id?: string | null
           annotation_url?: string | null
           bbox?: number[] | null
@@ -984,6 +1029,8 @@ export type Database = {
       }
       series_cells: {
         Row: {
+          id: string
+          series_id: string | null
           bbox: number[] | null
           created_at: string
           edition: string | null
@@ -999,6 +1046,8 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          id?: string
+          series_id?: string | null
           bbox?: number[] | null
           created_at?: string
           edition?: string | null
@@ -1014,6 +1063,8 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          id?: string
+          series_id?: string | null
           bbox?: number[] | null
           created_at?: string
           edition?: string | null
@@ -1240,6 +1291,18 @@ export type Database = {
       }
     }
     Views: {
+      series_cell_coverage: {
+        Row: { series_id: string | null; key: string | null; name: string | null; cell_count: number | null; publicly_held_cell_count: number | null; held_cell_count: number | null }
+        Relationships: []
+      }
+      series_printing_availability: {
+        Row: { series_id: string | null; key: string | null; name: string | null; printing_count: number | null; item_linked_printing_count: number | null; known_item_count: number | null; publicly_served_printing_count: number | null }
+        Relationships: []
+      }
+      series_cell_coverage_detail: {
+        Row: { series_id: string | null; key: string | null; sheet_number: string | null; publicly_held: boolean | null; held: boolean | null; public_map_id: string | null; known_source: boolean | null }
+        Relationships: []
+      }
       annotation_sets: {
         Row: {
           created_at: string | null

@@ -40,7 +40,7 @@ import { verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 // (`map_images`, aliased back to `map_iiif_sources` below), and nothing
 // replaces the subject field.
 const MAP_COLUMNS =
-  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type)';
+  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, duplicate_of_map_id, archive_reason, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type)';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const ref = decodeURIComponent(params.id);
@@ -68,6 +68,21 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     ({ data: map } = await anyStatus().eq('id', id).maybeSingle());
     if (!map) throw error(404, 'No published map at that address');
 
+    if (map.status === 'archived') {
+      if (!map.duplicate_of_map_id || !map.archive_reason?.trim()) {
+        throw error(404, 'No published map at that address');
+      }
+      const { data: survivor } = await supabase
+        .from('maps')
+        .select('slug')
+        .eq('id', map.duplicate_of_map_id)
+        .in('status', ['public', 'featured'])
+        .maybeSingle();
+      if (!survivor?.slug) throw error(404, 'No published map at that address');
+      const prefix = localeFromPath(url.pathname) ? '/vi' : '';
+      throw redirect(301, `${prefix}/catalog/${survivor.slug}`);
+    }
+
     // Check visibility before revealing the canonical address of a draft.
     if (map.status !== 'public' && map.status !== 'featured') {
       const { session } = await locals.safeGetSession();
@@ -79,6 +94,23 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     // rebuilding the target without it would silently drop them into English.
     const prefix = localeFromPath(url.pathname) ? '/vi' : '';
     throw redirect(301, `${prefix}/catalog/${map.slug}`);
+  }
+
+  if (map.status === 'archived') {
+    // Old addresses redirect only when staff explicitly recorded a duplicate
+    // target and that target is a settled public record.
+    if (!map.duplicate_of_map_id || !map.archive_reason?.trim()) {
+      throw error(404, 'No published map at that address');
+    }
+    const { data: survivor } = await supabase
+      .from('maps')
+      .select('slug,status')
+      .eq('id', map.duplicate_of_map_id)
+      .in('status', ['public', 'featured'])
+      .maybeSingle();
+    if (!survivor?.slug) throw error(404, 'No published map at that address');
+    const prefix = localeFromPath(url.pathname) ? '/vi' : '';
+    throw redirect(301, `${prefix}/catalog/${survivor.slug}`);
   }
 
   const published = map.status === 'public' || map.status === 'featured';

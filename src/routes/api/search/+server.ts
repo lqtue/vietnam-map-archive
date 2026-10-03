@@ -80,7 +80,7 @@ export interface LabelHit {
  * renamed (mig 095).
  */
 const FULL_MAP_COLUMNS =
-  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
+  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -88,7 +88,7 @@ const FULL_MAP_COLUMNS =
  * source fields are most of a map row and no slim caller renders one of them.
  */
 const SLIM_MAP_COLUMNS =
-  'id,slug,name,year,year_label:date_label,status,map_type,source_type,holding_institution,allmaps_id';
+  'id,slug,name,year,year_label:date_label,status,map_type,source_type,holding_institution,allmaps_id,series_key';
 
 // No pagination UI on the catalog/sidebar yet, so the page slice must be able
 // to hold the whole archive. Raw queries keep their own 2000-row safety ceiling.
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     // The select string is read *literally* by PostgREST's types, so a ternary
     // inside `select()` resolves to a ParserError. Pick the string first.
     const columns: string = slim ? SLIM_MAP_COLUMNS : FULL_MAP_COLUMNS;
-    let qMaps = supabase.from('maps').select(columns);
+    let qMaps = supabase.from('maps').select(columns).neq('status', 'archived');
     if (role !== 'admin' && role !== 'mod') {
       // Public users only see public/featured.
       qMaps = qMaps.in('status', ['public', 'featured']);
@@ -259,7 +259,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
   // ---------- LABELS ----------
   // Fuzzy match on the OCR text, one row per (map, label). Draft maps are gated
-  // in the RPC for public callers; staff see everything, like the maps block.
+  // in the RPC for public callers; staff also see drafts. Archived maps remain
+  // available through management, rather than ordinary search results.
   const loadLabels = async (): Promise<LabelHit[]> => {
     const labels: LabelHit[] = [];
     if (!includeLabels) return labels;
@@ -275,7 +276,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       const { data: labelMaps } = await supabase
         .from('maps')
         .select('id, name, year, allmaps_id, annotation_url')
-        .in('id', mapIds);
+        .in('id', mapIds)
+        .neq('status', 'archived');
       const byId = new Map((labelMaps ?? []).map((m) => [m.id, m]));
 
       // The RPC returns the stored position where one exists. Only the maps
@@ -463,6 +465,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     year: r.year,
     year_label: r.year_label,
     collection: r.collection,
+    series_key: r.series_key,
     source_type: r.source_type,
     status: r.status,
     bbox: r.bbox,

@@ -192,7 +192,11 @@ Do them when the surrounding work opens the file.
       obtainable L7014 sheets, or publishes a draft, the index still says *gap* and the coverage
       page still draws it missing: right about the survey, wrong about us, with no symptom but a
       plausible-looking number. Real fix: derive `held_by`/`map_id` in a view, or a trigger on
-      `maps`. Exit: publishing a draft moves its cell to *held* with nobody running anything.
+      `maps`. Pending migrations 105–106 add role-gated `series_cell_coverage` and
+      `series_printing_availability` views. These derive distinct public cells and printings, but
+      production readers still consume legacy snapshots until rollout. Exit: publishing a draft
+      moves its cell to *held* with nobody running anything, and service-role readers preserve the
+      same public gate.
       **Until then there is a detector, which is not the same thing** —
       `node --env-file=.env scripts/check_series_index.mjs` catches an adrift cell, a dangling
       `map_id` and (since 2026-09-15) a `maps` row whose `sheet_number` the index does not contain
@@ -395,22 +399,22 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 ## Survey layer and catalog
 
-- [ ] **`series-identity`** — `maps.collection` is the series key by accident: `series_key()` folds
-      the display string, so editing it re-files the sheet. **Migration 104 (pushed 2026-10-01)**
-      adds the generated `maps.series_key` and fills `sheet_number` on the 188 first-edition rows;
-      the series page and sheet editions read it. Still open: the catalog filter and the persisted
-      layer refs still carry the `collection` string, the key is only as stable as the label until a
-      `series` table exists, and curated non-survey groups (the city plans) need their own concept. Gated on the `evidence-chain`
-      pilot. Exit: no series fact lives only in `extra_metadata`. Plan:
-      `docs/knowledge-system-plan.md` §1.
+- [ ] **`series-identity`** — production migration 104 still derives `series_key()` from
+      `maps.collection`, so collection edits can re-file a sheet. Pending branch migration 105 adds
+      stable `series` UUIDs and synchronized `series_id` links on maps, cells and institution items;
+      renaming a map's display label then preserves membership. Migration 104's `series_key` stays
+      as a compatibility key. Still open: rollout/evidence on the target dataset, migrate catalog
+      filters and persisted layer references, and model curated non-survey groups such as city plans.
+      Do not close on local SQL checks. Exit: no series fact lives only in `extra_metadata` and the
+      deployed readers use stable identity. Plan: `docs/knowledge-system-plan.md` §1.
 
-- [ ] **`multi-printing-cells`** — `series_cells` can name only one printing of a cell. Its key is
-      `(series_key, sheet_number)`, one row per cell — but the archive holds **10 cells in more than
-      one edition**, three with two *published* printings fourteen years apart. Migration 086 hangs
-      a printing off the existing key, so the page can say which printing it serves and that others
-      exist; the index still cannot enumerate them. Widening the key is the whole item. Exit: a
-      coverage page lists both published printings of Indochine cell 1 without either hiding the
-      other.
+- [ ] **`multi-printing-cells`** — preserve `series_cells` as one index row per cell; do not widen
+      its primary key and count printings as cells. Pending branch migration 106 adds independent
+      `sheet_printings` rows linked by cell UUID, with optional reviewed links from source items and
+      map scans. It does not guess printing identity from years/edition labels or backfill old rows.
+      Still open: review margin/catalog evidence, exercise the approved pilot cells, roll out readers
+      and preserve W/E/assemblage and standalone cases. Exit: the deployed coverage page lists every
+      public printing and every unresolved item without inflating the cell denominator.
 - [ ] **`cochinchine-index`** — Cochinchine 1:25,000 is the next survey to index — 826 sheets across
       three series, Saigon
       and the Mekong delta, top of the scout queue at `/admin?tab=scout`. Pattern is

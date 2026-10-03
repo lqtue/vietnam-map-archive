@@ -45,6 +45,7 @@ export async function fetchGeorefFixList(
       'id, name, year, status, annotation_url, allmaps_id, map_images(iiif_image, iiif_manifest, source_type)'
     )
     .eq('is_georeferenced', true)
+    .neq('status', 'archived')
     .order('name');
 
   if (error) {

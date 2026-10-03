@@ -5,7 +5,7 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## The rules in one breath
 
-- `maps.status` is `draft | public | featured` and is the **only** visibility model (mig 060).
+- `maps.status` is `draft | public | featured | archived` and is the **only** visibility model (mig 060/107).
   Draft maps are readable by any signed-in user, never anonymously (mig 063). A published map must
   carry `annotation_url` **or** `allmaps_id` (mig 062) — `allmaps_id` alone is enough on purpose:
   a map may be published first and georeferenced by a volunteer afterwards (the sync-georef flip,
@@ -28,7 +28,13 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-Head is **104**, pushed 2026-10-01 (103 too: `supabase migration list` shows both on both sides). 104 adds
+The deployed head remains **104** until the reviewed additive migrations below are pushed. Local proposal head is 108. 105 creates stable `series` UUID identities; `maps.series_key` becomes a stored compatibility copy synced from `series_id`, so editing `collection` cannot change membership. `series_cells` retains its legacy composite key and gains an id/FK. 106 adds unresolved-capable `sheet_printings`, nullable printing/source-item links, image dimensions/version metadata and link-consistency triggers; it does not invent printing identities. `series_cell_coverage_detail` and `series_printing_availability` derive availability with explicit public/service-role gates. 107 adds staff-controlled archiving and a one-hop duplicate pointer; 108 corrects the `maps.status` default to `draft`. Do not push these until the coordinated app/types work is ready.
+
+An unknown `maps.collection` on insert keeps its legacy folded `series_key` for compatibility but has no `series_id`; it is not silently added to the curated `series` table. Resolve/create the stable series explicitly before linking it. An edit to `collection` on an already linked map never changes `series_id`.
+
+The proposed per-cell coverage view derives holding only from non-archived `maps` rows and institution items; it intentionally stops trusting legacy `series_cells.held_by`/`map_id` snapshots. A pre-tiled raster layer with no normalized source-item or map link therefore is not counted as held. Add an explicit raster asset/source relation before relying on derived coverage for those holdings.
+
+104 adds
 `maps.series_key`, a generated column (`series_key(collection)`, mig 082's function), and rebuilds
 `map_series` on it. The series coverage page and `fetchSheetEditions` now filter on it, so an app
 deployed ahead of the push would have answered 500 on every `/catalog/series/<key>` — and the read-only suite,

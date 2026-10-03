@@ -164,9 +164,15 @@
     institution: string | null;
     year: number | null;
     edition: string | null;
-    part: 'whole' | 'W' | 'E' | 'assemblage';
+    part: 'whole' | 'W' | 'E' | 'assemblage' | null;
     url: string | null;
     held: boolean;
+    printingId?: string | null;
+    unresolved?: boolean;
+    title?: string | null;
+    scans?: { url: string; name: string }[];
+    institutions?: string[];
+    sourceItems?: { institution: string | null; url: string | null; rights: string | null }[];
   }
 
   /**
@@ -190,6 +196,24 @@
    * sheets is a payload that says nothing.
    */
   $: printings = (data.printings ?? {}) as Record<string, SheetPrinting[]>;
+  $: canonicalPrintings = data.canonicalPrintings ?? {};
+
+  function canonicalLabel(number: string): string | null {
+    const rows = canonicalPrintings[number] ?? [];
+    if (!rows.length) return null;
+    return rows
+      .map((row) =>
+        [
+          row.printing_year ?? row.edition_year ?? row.content_year,
+          row.edition_label ?? row.edition_statement,
+          row.printed_title,
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      )
+      .filter(Boolean)
+      .join(' / ');
+  }
 
   const PART_LABEL: Record<string, string> = {
     whole: 'Whole sheet',
@@ -316,7 +340,7 @@
     {/if}
   </section>
 
-  <SeriesManage collection={series.collection ?? ''} cellCount={counts.total} />
+  <SeriesManage seriesKey={series.key} cellCount={counts.total} />
 
   <div class="sheet-tools">
     <label class="sb-search is-page">
@@ -365,7 +389,13 @@
         <td class="ver">
           {#if cell}
             {@const heldHere = cell.filter((p) => p.held)}
-            {@const elsewhere = cell.filter((p) => !p.held)}
+            {@const elsewhere = cell.filter(
+              (p) => !p.held && (!!p.institution || !!p.url || !!p.institutions?.length)
+            )}
+            {@const unservedCanonical = cell.filter(
+              (p) =>
+                !p.held && !!p.printingId && !p.institution && !p.url && !p.institutions?.length
+            )}
             <!-- A `<details>`, not a modal and not a second table: the question
                  ("which two?") is asked of one row at a time and the answer is
                  four lines long. The disclosure is the Version cell itself, so
@@ -373,7 +403,7 @@
                  taller row here is a taller table everywhere. -->
             <details>
               <summary>
-                {printing(sheet) ?? heldYears(cell) ?? '—'}
+                {canonicalLabel(sheet.sheet_number) ?? printing(sheet) ?? heldYears(cell) ?? '—'}
                 <!-- Three different facts, and the badge has to say which one
                      it is counting. `cell` holds our printings AND everyone
                      else's since the merge, so a bare `cell.length` called two
@@ -381,8 +411,12 @@
                      half-sheets" on a cell the archive does not hold at all —
                      wrong about the paper and wrong about whose it is. -->
                 <span class="ver-more">
-                  {#if count > 1}{count} editions{:else if heldHere.length > 1}{heldHere.length}
-                    half-sheets{:else}{elsewhere.length} elsewhere{/if}
+                  {#if count > 1}{count} printings{:else if heldHere.length > 0}{heldHere.reduce(
+                      (n, p) => n + (p.scans?.length ?? 1),
+                      0
+                    )}
+                    scans{:else if elsewhere.length}{elsewhere.length} elsewhere{:else if unservedCanonical.length}verified
+                    printing, no linked scan{:else}unresolved{/if}
                 </span>
               </summary>
 
@@ -392,20 +426,27 @@
                     <span class="p-when"
                       >{p.year ?? '—'}{p.edition ? ` · ed. ${p.edition}` : ''}</span
                     >
+                    {#if p.title}<span class="p-meta">{p.title}</span>{/if}
                     <span class="p-meta">
-                      {PART_LABEL[p.part]}
+                      {p.part ? PART_LABEL[p.part] : 'Part unknown'}
+                      {#if p.institutions?.length}<span>{p.institutions.join(', ')}</span>{/if}
                       <span class="badge-chip is-sm {STATUS_CHIP.held}">{STATUS_LABEL.held}</span>
                     </span>
-                    {#if p.url}<a href={p.url}>Open record →</a>{/if}
+                    {#if p.unresolved}<span class="p-meta">Printing unresolved</span>{/if}
+                    {#if p.scans?.length}
+                      {#each p.scans as scan (scan.url)}<a href={scan.url}>Scan: {scan.name} →</a
+                        >{/each}
+                    {:else if p.url}<a href={p.url}>Open record →</a>{/if}
+                    {#each p.sourceItems ?? [] as source (source.url ?? source.institution)}
+                      {#if source.url}<a href={source.url} rel="noreferrer external"
+                          >{source.institution ?? 'Institution source'} →</a
+                        >{/if}
+                      {#if source.rights}<span class="p-meta">Rights: {source.rights}</span>{/if}
+                    {/each}
                   </li>
                 {/each}
               </ul>
 
-              <!-- Empty until `sheetSources.ts` lands. Kept as its own list under
-                   its own heading because the two are different claims: one is
-                   "you can open this now", the other "this exists and we have
-                   not fetched it", and a reader who cannot tell them apart has
-                   been told the archive holds more than it does. -->
               {#if elsewhere.length}
                 <p class="p-head">Known elsewhere</p>
                 <ul class="printings">
@@ -415,16 +456,41 @@
                         >{p.year ?? '—'}{p.edition ? ` · ed. ${p.edition}` : ''}</span
                       >
                       <span class="p-meta">
-                        {PART_LABEL[p.part]}
-                        <span class="badge-chip is-sm {STATUS_CHIP.obtainable}"
-                          >{STATUS_LABEL.obtainable}</span
-                        >
+                        {p.part ? PART_LABEL[p.part] : 'Part unknown'}
+                        {#if p.unresolved}<span class="p-meta">Printing unresolved</span
+                          >{:else if p.url || p.sourceItems?.some((source) => source.url)}<span
+                            class="badge-chip is-sm {STATUS_CHIP.obtainable}"
+                            >{STATUS_LABEL.obtainable}</span
+                          >{:else}<span class="p-meta">Catalogued; digitized copy unknown</span
+                          >{/if}
                       </span>
                       {#if p.url}
                         <a href={p.url} rel="noreferrer external">{p.institution ?? 'Source'} →</a>
                       {:else if p.institution}
                         <span class="p-meta">{p.institution}</span>
                       {/if}
+                      {#each p.sourceItems ?? [] as source (source.url ?? source.institution)}
+                        {#if source.url}<a href={source.url} rel="noreferrer external"
+                            >{source.institution ?? 'Institution source'} →</a
+                          >{/if}
+                        {#if source.rights}<span class="p-meta">Rights: {source.rights}</span>{/if}
+                      {/each}
+                    </li>
+                  {/each}
+                </ul>
+              {/if}
+              {#if unservedCanonical.length}
+                <p class="p-head">Verified printings with no linked scan</p>
+                <ul class="printings">
+                  {#each unservedCanonical as p (p.printingId)}
+                    <li>
+                      <span class="p-when">{p.year ?? '—'}{p.edition ? ` · ${p.edition}` : ''}</span
+                      >
+                      {#if p.title}<span class="p-meta">{p.title}</span>{/if}
+                      <span class="p-meta"
+                        >{p.part ? PART_LABEL[p.part] : 'Part unknown'} · verified identity; no archive
+                        scan linked</span
+                      >
                     </li>
                   {/each}
                 </ul>

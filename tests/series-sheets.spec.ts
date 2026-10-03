@@ -79,19 +79,26 @@ test('a degenerate cell asks for a zoom a basemap has, not Infinity', () => {
 
 /** Enough of PostgREST's builder for `fetchSeriesSheetIndex`, counting its pages. */
 function stubDb(total: number, ranges: [number, number][]) {
-  const q = {
-    select: () => q,
-    eq: () => q,
-    range: (from: number, to: number) => {
-      ranges.push([from, to]);
-      const rows: SeriesSheet[] = [];
-      for (let i = from; i <= Math.min(to, total - 1); i++) {
-        rows.push(row({ sheet_number: String(i) }));
-      }
-      return Promise.resolve({ data: rows, error: null });
+  return {
+    from: (table: string) => {
+      const q = {
+        select: () => q,
+        eq: () => q,
+        order: () => q,
+        range: (from: number, to: number) => {
+          if (table === 'series_cells') ranges.push([from, to]);
+          const rows: SeriesSheet[] = [];
+          if (table === 'series_cells') {
+            for (let i = from; i <= Math.min(to, total - 1); i++) {
+              rows.push(row({ sheet_number: String(i) }));
+            }
+          }
+          return Promise.resolve({ data: rows, error: null });
+        },
+      };
+      return q;
     },
-  };
-  return { from: () => q } as unknown as SupabaseClient;
+  } as unknown as SupabaseClient;
 }
 
 test('a survey longer than one page is read whole', () => {

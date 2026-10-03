@@ -21,7 +21,11 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { fetchSeriesSheetIndex, tally } from '$lib/data/maps/seriesSheets';
-import { fetchSheetSources, type SheetPrinting } from '$lib/data/maps/sheetSources';
+import {
+  fetchCanonicalSheetPrintings,
+  fetchSheetSources,
+  type SheetPrinting,
+} from '$lib/data/maps/sheetSources';
 import { SERIES_NOTES } from './notes';
 
 /**
@@ -106,29 +110,7 @@ function sheetPart(
  * spread in the disclosure instead of pretending the cell was printed twice.
  */
 function distinctPrintings(printings: SheetPrinting[]): number {
-  let whole = 0;
-  let west = 0;
-  let east = 0;
-  let assembled = 0;
-  for (const p of printings) {
-    if (p.part === 'W') west++;
-    else if (p.part === 'E') east++;
-    else if (p.part === 'assemblage') assembled++;
-    else whole++;
-  }
-  const pairs = Math.max(west, east);
-  // An assemblage is not a third piece of paper. It is this cell's two halves
-  // joined by someone else, so once the archive holds halves to have joined it
-  // adds nothing to count -- and 58 of these cells hold both, which without
-  // this reads "2 editions" for one printing the moment the originals are
-  // published. Where no half is held the assemblage is the only record of its
-  // printing and counts as one, which is what keeps cells 2, 13 and 14 at the
-  // two they have always had.
-  //
-  // The case this does not distinguish -- an assemblage of one year beside a
-  // pair from another -- does not occur here, because each mirrored pair was
-  // chosen at its own composite's year. It would undercount if it ever did.
-  return whole + pairs + (pairs ? 0 : assembled);
+  return new Set(printings.flatMap((p) => (p.held && p.printingId ? [p.printingId] : []))).size;
 }
 
 /** The smallest box holding both; either may be absent. */
@@ -155,6 +137,10 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const sheets = await fetchSeriesSheetIndex(supabase, key);
   if (!sheets.length) throw error(404, 'That series has no index');
+  const canonicalPrintings = await fetchCanonicalSheetPrintings(supabase, key);
+  const verifiedPrintingIds = new Set(
+    Object.values(canonicalPrintings).flatMap((items) => items.map((printing) => printing.id))
+  );
 
   /**
    * Which printings of each cell the archive publishes.
@@ -171,7 +157,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const { data: rows } = await readAll((from, to) =>
     supabase
       .from('maps')
-      .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox')
+      .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox,printing_id')
       .eq('series_key', key)
       .in('status', ['public', 'featured'])
       .not('sheet_number', 'is', null)
@@ -181,6 +167,7 @@ export const load: PageServerLoad = async ({ params }) => {
   );
 
   const printings: Record<string, SheetPrinting[]> = {};
+  const scansByPrinting = new Map<string, { url: string; name: string }[]>();
   /** Per cell, the union of the georeferenced records' boxes — see `coverage` below. */
   const reach: Record<string, number[]> = {};
   for (const row of rows ?? []) {
@@ -193,7 +180,7 @@ export const load: PageServerLoad = async ({ params }) => {
       edition?: string;
       scan_provenance?: string;
     };
-    (printings[row.sheet_number] ??= []).push({
+    const item: SheetPrinting = {
       institution: null,
       year: row.year,
       edition: meta.edition ?? null,
@@ -201,7 +188,52 @@ export const load: PageServerLoad = async ({ params }) => {
       url: `/catalog/${row.id}`,
       rights: null,
       held: true,
-    });
+      printingId: row.printing_id ?? null,
+      unresolved: row.printing_id == null,
+    };
+    const verifiedPrintingId =
+      row.printing_id && verifiedPrintingIds.has(row.printing_id) ? row.printing_id : null;
+    item.printingId = verifiedPrintingId;
+    item.unresolved = !verifiedPrintingId;
+    if (verifiedPrintingId) {
+      const scans = scansByPrinting.get(verifiedPrintingId) ?? [];
+      scans.push({ url: `/catalog/${row.id}`, name: row.name });
+      scansByPrinting.set(verifiedPrintingId, scans);
+      if (!(printings[row.sheet_number] ?? []).some((p) => p.printingId === verifiedPrintingId)) {
+        (printings[row.sheet_number] ??= []).push(item);
+      }
+    } else {
+      (printings[row.sheet_number] ??= []).push(item);
+    }
+  }
+
+  for (const [number, canonical] of Object.entries(canonicalPrintings)) {
+    for (const printing of canonical) {
+      const existing = (printings[number] ?? []).find((p) => p.printingId === printing.id);
+      const scans = scansByPrinting.get(printing.id) ?? [];
+      if (existing) {
+        existing.year = printing.printing_year ?? printing.edition_year ?? printing.content_year;
+        existing.edition = printing.edition_label ?? printing.edition_statement;
+        existing.part = printing.part ?? existing.part;
+        existing.title = printing.printed_title;
+        existing.scans = scans;
+      } else {
+        (printings[number] ??= []).push({
+          institution: null,
+          year: printing.printing_year ?? printing.edition_year ?? printing.content_year,
+          edition: printing.edition_label ?? printing.edition_statement,
+          part: printing.part,
+          url: null,
+          rights: null,
+          held: false,
+          printingId: printing.id,
+          title: printing.printed_title,
+          reviewStatus: 'verified',
+          unresolved: false,
+          scans,
+        });
+      }
+    }
   }
 
   /**
@@ -212,15 +244,8 @@ export const load: PageServerLoad = async ({ params }) => {
    * When `$lib/data/maps/sheetSources.ts` lands, the printings the archive does
    * not hold merge in **here**, before the trim:
    *
-   *     const known = await fetchSheetSources(supabase, key);
-   *     for (const [n, external] of Object.entries(known)) {
-   *       (printings[n] ??= []).push(...external.filter((p) => !p.held));
-   *     }
-   *
-   * The trim then keeps any cell with something to say — including a cell the
-   * archive does not hold at all, whose only entries are elsewhere. `editions`
-   * stays a count of the printings *this archive serves*, which is what the
-   * badge claims, so it is computed before the merge would widen the list.
+   * The item catalogue is merged beside these verified identities below;
+   * unknown source items remain explicitly unresolved.
    */
   // `editions` counts only what the archive SERVES, which is what the badge
   // claims, so it is computed before the merge below widens the list.
@@ -234,7 +259,30 @@ export const load: PageServerLoad = async ({ params }) => {
   // Every printing anyone is known to hold, merged in beside ours.
   const known = await fetchSheetSources(supabase, key);
   for (const [number, external] of Object.entries(known)) {
-    (printings[number] ??= []).push(...external.filter((p) => !p.held));
+    for (const item of external) {
+      const matching = item.printingId
+        ? (printings[number] ?? []).find((p) => p.printingId === item.printingId)
+        : undefined;
+      if (matching) {
+        matching.institutions = [
+          ...new Set([...(matching.institutions ?? []), item.institution ?? '']),
+        ].filter(Boolean);
+        const sourceItem = { institution: item.institution, url: item.url, rights: item.rights };
+        const sourceItems = matching.sourceItems ?? [];
+        if (
+          !sourceItems.some(
+            (existing) =>
+              existing.url === sourceItem.url &&
+              existing.institution === sourceItem.institution &&
+              existing.rights === sourceItem.rights
+          )
+        ) {
+          matching.sourceItems = [...sourceItems, sourceItem];
+        }
+      } else {
+        (printings[number] ??= []).push(item);
+      }
+    }
   }
 
   // Keep a cell that has anything to say, which now includes one the archive
@@ -242,7 +290,13 @@ export const load: PageServerLoad = async ({ params }) => {
   // the whole answer the Source column can give for a gap. A cell with one
   // held printing and no second anywhere still carries nothing.
   for (const [number, cell] of Object.entries(printings)) {
-    if (cell.length < 2 && !cell.some((p) => !p.held)) delete printings[number];
+    if (
+      cell.length < 2 &&
+      !cell.some((p) => !p.held) &&
+      !cell.some((p) => p.unresolved) &&
+      !canonicalPrintings[number]?.length
+    )
+      delete printings[number];
   }
 
   /**
@@ -271,6 +325,7 @@ export const load: PageServerLoad = async ({ params }) => {
     counts: tally(sheets),
     editions,
     printings,
+    canonicalPrintings,
     note: SERIES_NOTES[key],
   };
 };

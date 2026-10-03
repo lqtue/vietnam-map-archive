@@ -47,9 +47,13 @@ export type HistoricalRef = {
  * of short fields and a series that gains a sheet does not need the reader to
  * re-add it.
  */
-export type SeriesPart =
-  /** `maps.collection` — the sheets are whatever rows carry this string. */
-  { kind: 'sheets'; collection: string };
+export type SeriesPart = {
+  kind: 'sheets';
+  /** Durable series key. Missing only in saved pre-model references. */
+  seriesKey?: string;
+  /** Display label and fallback for a legacy saved reference. */
+  collection: string;
+};
 
 export type SeriesRef = {
   kind: 'series';

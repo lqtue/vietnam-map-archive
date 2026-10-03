@@ -28,7 +28,7 @@
    *  `.sb-search.is-page`, at the top of the page above everything. */
   export let showSearch = true;
   /**
-   * The surveys offerable as a filter, `{ value: maps.collection, label }`.
+   * The surveys offerable as a filter, `{ value: maps.series_key, label }`.
    *
    * Passed in rather than derived from the rows, because which collections are
    * surveys is `map_series`' decision and only a server load can ask it — so a
@@ -44,7 +44,7 @@
   $: activeFacets =
     ($selected.area?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
-    ($selected.collection?.length ? 1 : 0) +
+    ($selected.series_key?.length ? 1 : 0) +
     ($selected.period?.length ? 1 : 0);
 
   $: hasFilters = !!$query.trim() || activeFacets > 0;
@@ -119,9 +119,9 @@
       {/if}
       {#if seriesChoices.length}
         <select
-          value={$selected.collection?.[0] ?? ''}
+          value={$selected.series_key?.[0] ?? ''}
           on:change={(e) =>
-            search.setSingle('collection', (e.currentTarget as HTMLSelectElement).value)}
+            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
           aria-label="Filter by series"
         >
           <option value="">{$t('All series')}</option>
