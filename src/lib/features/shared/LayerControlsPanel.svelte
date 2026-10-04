@@ -54,7 +54,8 @@
     ? ALL_DISPLAY_MODES
     : ALL_DISPLAY_MODES.filter((m) => m.mode !== 'dual');
   const BASE_CHOICES: { key: string; label: string }[] = [
-    { key: 'g-streets', label: 'Maps' },
+    { key: 'g-streets', label: 'OpenStreetMap' },
+    { key: 'g-archive', label: 'Archive' },
     { key: 'g-satellite', label: 'Satellite' },
     { key: 'g-custom', label: 'Custom' },
   ];
@@ -101,7 +102,7 @@
 
   <div class="mcp-row">
     <span class="mcp-leader">Base</span>
-    <div class="sb-pill-row mcp-grow">
+    <div class="sb-pill-row mcp-grow mcp-base">
       {#each BASE_CHOICES as c (c.key)}
         <button
           type="button"
@@ -198,6 +199,12 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--sb-text-meta);
+  }
+  .mcp-base {
+    flex-wrap: wrap;
+  }
+  .mcp-base .sb-pill {
+    flex-basis: 40%;
   }
   .mcp-grow {
     flex: 1;

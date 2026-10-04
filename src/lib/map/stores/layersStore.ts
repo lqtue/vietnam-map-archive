@@ -27,8 +27,8 @@ export type HistoricalRef = {
   thumbnail?: string;
 };
 /**
- * A whole survey as one stack row: one name, one opacity, one eye, one ×, one slot against
- * `MAX_OVERLAYS`. Its `parts` are the sheets of a collection, warped live by Allmaps in
+ * A whole survey as one stack row with shared opacity and visibility. Its
+ * `parts` are the sheets of a collection, warped live by Allmaps in
  * `LayerRenderer`. (Until 2026-10-03 a part could also be a pre-tiled raster archive — L7014's PMTiles
  * mosaic, ~470 m out — retired once all 510 of its sheets were IIIF `maps` rows.)
  *
@@ -102,7 +102,6 @@ export interface LayersState {
 
 const STORAGE_KEY = 'vma-layers-v1';
 const DEFAULT_BASE: BasemapRef = { kind: 'basemap', key: 'g-streets' };
-const MAX_OVERLAYS = 10;
 
 function load(): LayersState {
   if (!browser) return { base: DEFAULT_BASE, overlays: [] };
@@ -119,7 +118,6 @@ function load(): LayersState {
   // is added as today.
   const overlays: OverlayLayer[] = Array.isArray(parsed.overlays)
     ? parsed.overlays
-        .slice(0, MAX_OVERLAYS)
         .map((o: any) => ({
           id: String(o?.id ?? makeId()),
           ref: readOverlayRef(o?.ref),
@@ -160,7 +158,6 @@ function create() {
       let id = '';
       update((s) => {
         if (s.overlays.some((o) => o.ref.mapId === ref.mapId)) return s;
-        if (s.overlays.length >= MAX_OVERLAYS) return s;
         id = makeId();
         const layer: OverlayLayer = {
           id,
@@ -242,14 +239,12 @@ function create() {
 
 export const layersStore = create();
 
-export const MAX_OVERLAY_LAYERS = MAX_OVERLAYS;
-
 // ── Derived: top overlay ──
 // `createGeoMapStores()` mirrors this into the per-instance mapStore's
 // activeMapId/activeAllmapsId, which the URL hash + story playback read.
 /**
  * Add the map to the overlay stack, or remove it if it's already on.
- * No-op for maps without an annotation source, or when the stack is full.
+ * No-op for maps without an annotation source.
  * Returns the resulting membership (true = now an overlay).
  */
 export function toggleOverlayFor(map: Parameters<typeof toHistoricalRef>[0]): boolean {
@@ -259,14 +254,13 @@ export function toggleOverlayFor(map: Parameters<typeof toHistoricalRef>[0]): bo
     layersStore.removeOverlayByMapId(ref.mapId);
     return false;
   }
-  if (get(layersStore).overlays.length >= MAX_OVERLAYS) return false;
   layersStore.addOverlay(ref);
   return true;
 }
 
 /**
- * The topmost *sheet* on the stack — what `?map=`, the Info rail and story
- * playback all mean by "this sheet". A series row is skipped: it is a whole
+ * The topmost *sheet* on the stack — the default selection for `?map=` and story
+ * playback. Info and legend can independently inspect any sheet. A series row is skipped: it is a whole
  * survey, has no catalogue row, and putting it here would write a `?map=` that
  * resolves to nothing.
  */

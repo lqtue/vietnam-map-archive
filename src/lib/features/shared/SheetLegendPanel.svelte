@@ -20,6 +20,7 @@
 
   export let mapId: string | null = null;
   export let showLegendPoints = false;
+  export let mapActions = true;
   /** The row the reader last flew to — bound by the caller so Escape can clear it. */
   export let selectedN: number | null = null;
 
@@ -41,6 +42,7 @@
     // ponytail: the same GET LegendPointsLayer makes, so a sheet with the tab
     // open fetches it twice. One small request per map — give it a store if a
     // third reader turns up.
+    selectedN = null;
     legendFor = id;
     legendLoading = true;
     try {
@@ -50,7 +52,7 @@
     } catch {
       if (legendFor === id) legend = [];
     }
-    legendLoading = false;
+    if (legendFor === id) legendLoading = false;
   }
 
   // `loadLegend` writes `legendFor`, which this statement reads, so it
@@ -87,36 +89,46 @@
 {:else if legendRows.length === 0}
   <p class="sb-empty">{$t('This sheet has no numbered legend.')}</p>
 {:else}
-  <button
-    type="button"
-    class="sb-btn is-sm is-block"
-    class:is-on={showLegendPoints}
-    on:click={() => dispatch('toggleLegendPoints')}
-    title={$t('Show numbered legend references on the map')}
-  >
-    {showLegendPoints ? 'Legend points on' : 'Show legend points'}
-  </button>
+  {#if mapActions}
+    <button
+      type="button"
+      class="sb-btn is-sm is-block"
+      class:is-on={showLegendPoints}
+      on:click={() => dispatch('toggleLegendPoints')}
+      title={$t('Show numbered legend references on the map')}
+    >
+      {showLegendPoints ? 'Legend points on' : 'Show legend points'}
+    </button>
+  {/if}
   <ul class="lg-list">
     {#each legendRows as p (p.n)}
       <li>
-        <button
-          type="button"
-          class="lg-row"
-          class:is-on={selectedN === p.n}
-          aria-current={selectedN === p.n ? 'true' : undefined}
-          title={selectedN === p.n
-            ? 'Clear this highlight'
-            : p.accuracy_m
-              ? `Within about ${p.accuracy_m} m`
-              : 'Fly to this place'}
-          on:click={() => flyToLegend(p)}
-        >
-          <span class="lg-n">{p.n}</span>
-          <span class="lg-name">
-            {p.name ?? '—'}{#if p.vn}<em> · {p.vn}</em>{/if}
-          </span>
-          {#if p.grid}<span class="lg-grid">{p.grid}</span>{/if}
-        </button>
+        {#if mapActions}
+          <button
+            type="button"
+            class="lg-row"
+            class:is-on={selectedN === p.n}
+            aria-current={selectedN === p.n ? 'true' : undefined}
+            title={selectedN === p.n
+              ? 'Clear this highlight'
+              : p.accuracy_m
+                ? `Within about ${p.accuracy_m} m`
+                : 'Fly to this place'}
+            on:click={() => flyToLegend(p)}
+          >
+            <span class="lg-n">{p.n}</span>
+            <span class="lg-name">
+              {p.name ?? '—'}{#if p.vn}<em> · {p.vn}</em>{/if}
+            </span>
+            {#if p.grid}<span class="lg-grid">{p.grid}</span>{/if}
+          </button>
+        {:else}
+          <span class="lg-row"
+            ><span class="lg-n">{p.n}</span><span class="lg-name"
+              >{p.name ?? '—'}{#if p.vn}<em> · {p.vn}</em>{/if}</span
+            >{#if p.grid}<span class="lg-grid">{p.grid}</span>{/if}</span
+          >
+        {/if}
       </li>
     {/each}
   </ul>

@@ -53,7 +53,7 @@ and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line
   `{ base: LayerRef, overlays: OverlayLayer[] }` where `base` is either `{ kind: 'basemap', key }`
   (`'g-streets' | 'g-satellite' | 'none'`) or
   `{ kind: 'historical', mapId, allmapsId, name?, thumbnail? }`. `overlays` is top-of-stack-first;
-  each item has its own `opacity`, `visible`, and stable local `id`. Max 10 (`MAX_OVERLAY_LAYERS`).
+  each item has its own `opacity`, `visible`, and stable local `id`. There is no fixed overlay count limit. Hold and drag the three-dot layer menu to reorder, with a floating card and insertion marker; tapping opens actions and keyboard arrows also reorder. Order commits on release, and opacity sliders remain separate. Layer menus use the browser top layer and flip above cards near the viewport bottom.
   Persists to `localStorage` as `vma-layers-v1`. API: `setBase`, `addOverlay`, `removeOverlay`,
   `removeOverlayByMapId`, `setOpacity`, `setVisible`, `reorderOverlay`, `clearOverlays`,
   `isOverlay`; plus the free functions `toHistoricalRef(map)`, `toggleOverlayFor(map)`, `clamp01(n)`
@@ -695,7 +695,9 @@ map-selector source for `/scan?mode=prepare` and `?mode=shapes`.
 
 ### Map libraries
 
-**The basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
+**Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
+
+**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
 Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.5,8.5,108.5,21.6`, z0–15) in
 the `vma-tiles` R2 bucket at key `basemap/vietnam-20260906.pmtiles`, served straight off the bucket
 at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to

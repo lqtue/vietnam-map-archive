@@ -1,6 +1,7 @@
 import TileLayer from 'ol/layer/Tile';
 import { INK } from '$lib/core/ink';
 import XYZ from 'ol/source/XYZ';
+import OSM from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import LayerGroup from 'ol/layer/Group';
@@ -61,13 +62,10 @@ function buildVnClaimsLayer(): VectorLayer<VectorSource> {
 }
 
 function buildStreetsGroup(visible: boolean): LayerGroup {
-  // Self-hosted: one PMTiles archive in our own R2 bucket, styled in
-  // `basemapStyle.ts`. It replaced CARTO (which started stamping "API KEY
-  // REQUIRED" over every tile) and then the OSM Foundation's own tiles, whose
-  // usage policy does not cover a busy site. This depends on nobody.
+  // Optional regional archive; OpenStreetMap supplies the default global coverage.
   return new LayerGroup({
     visible,
-    properties: { name: 'g-streets', base: true },
+    properties: { name: 'g-archive', base: true },
     zIndex: 0,
     // Two archives, one style: the wide thin one below z8, the Vietnam one above
     // it. Their zoom ranges do not overlap, so only one draws at any zoom.
@@ -78,8 +76,20 @@ function buildStreetsGroup(visible: boolean): LayerGroup {
 export const BASEMAP_DEFS: BasemapDefinition[] = [
   {
     key: 'g-streets',
-    label: 'Streets',
-    layer: () => buildStreetsGroup(true),
+    label: 'OpenStreetMap',
+    // Retain the saved streets key so existing readers also receive the new default.
+    layer: () =>
+      new TileLayer({
+        source: new OSM({ crossOrigin: 'anonymous' }),
+        visible: true,
+        properties: { name: 'g-streets', base: true },
+        zIndex: 0,
+      }),
+  },
+  {
+    key: 'g-archive',
+    label: 'Archive streets',
+    layer: () => buildStreetsGroup(false),
   },
   {
     key: 'g-satellite',

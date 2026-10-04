@@ -1,25 +1,28 @@
-<!--
-  LayerStackPanel.svelte — unified layer stack used by both the desktop sidebar
-  and the mobile "Layers" drawer.
-
-  Behavior:
-    • Two lines per layer: name + actions on top, a native range slider for
-      opacity underneath. The name is the zoom-to-overlay button. It was one
-      line with the whole row as a drag surface until Sept 2026 — which cost
-      every sheet its name to an ellipsis and gave the row three gestures.
-    • Reorder via ▲ / ▼ buttons (works on touch and mouse).
-    • Per-row eye toggles visibility (LayerRenderer honours `visible`);
-      remove (×) drops the layer.
-    • Display mode + Base picker live in LayerControlsPanel, not here; the
-      "this sheet" action strip is TopSheetActions, in the right rail.
--->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
+  import { getShellContext } from '$lib/map/shell/context';
+  import { flip } from 'svelte/animate';
+  import { createLayerFocus } from '$lib/map/shell/layerFocus';
+  import LayerInspector from './LayerInspector.svelte';
+  import LayerActionsMenu from './LayerActionsMenu.svelte';
+  import SeriesLayerFolder from './SeriesLayerFolder.svelte';
+  import type { SeriesRef, OverlayRef } from '$lib/map/stores/layersStore';
   import { layersStore } from '$lib/map/stores/layersStore';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
 
+  export let inspectionInRail = false;
+  let draggedId: string | null = null;
+  let announcement = '';
+  let droppedId: string | null = null;
+  let dropTimer: ReturnType<typeof setTimeout>;
+  let inspection: {
+    mapId: string | null;
+    series: SeriesRef | null;
+    tab: 'info' | 'legend';
+  } | null = null;
   export let viewMode: ViewMode = 'overlay';
   /** Catalog list used to enrich rows with year. */
   export let mapList: MapListItem[] = [];
@@ -28,39 +31,91 @@
    *  is the whole stack. Same name and meaning as `ArchiveBrowser.filterIds`. */
   export let filterIds: string[] | null = null;
 
+  const { map: shellMap } = getShellContext();
+  const layerFocus = createLayerFocus(
+    () => get(shellMap),
+    () => mapList
+  );
+  onDestroy(() => {
+    layerFocus.destroy();
+    clearTimeout(dropTimer);
+  });
+
   // A raster archive has no catalogue row to look its extent up in, so it
   // carries its own bounds and hands them over with the request.
   const dispatch = createEventDispatcher<{
     zoomToOverlay: { mapId: string; bounds?: [number, number, number, number] };
+    inspectMap: { mapId: string; tab: 'info' | 'legend' };
+    inspectSeries: { ref: SeriesRef; tab: 'info' | 'legend' };
   }>();
 
   $: state = $layersStore;
   $: isSideBySide = viewMode === 'dual';
 
-  /** Rows carry their index in the *stack*, not in the filtered list: reorder,
-   *  the disabled arrows and the Top/Bottom badges all mean stack position. */
+  // Stack indices are retained for the two pane badges.
   $: shown = filterIds ? new Set(filterIds) : null;
+  function matchesFilter(ref: OverlayRef, matchingIds: Set<string> | null, maps: MapListItem[]) {
+    if (!matchingIds || matchingIds.has(ref.mapId)) return true;
+    if (ref.kind !== 'series') return false;
+    return maps.some(
+      (map) =>
+        matchingIds.has(map.id) &&
+        ref.parts.some((part) =>
+          map.series_key
+            ? map.series_key === (part.seriesKey ?? ref.key)
+            : map.collection === part.collection
+        )
+    );
+  }
   $: rows = state.overlays
     .map((o, i) => ({ o, i }))
-    .filter(({ o }) => !shown || shown.has(o.ref.mapId));
+    .filter(({ o }) => matchesFilter(o.ref, shown, mapList));
 
   $: yearByMapId = (() => {
     const m = new Map<string, number | string>();
-    for (const item of mapList) if (item?.id && item.year != null) m.set(item.id, item.year as any);
+    for (const item of mapList) if (item?.id && item.year != null) m.set(item.id, item.year);
     return m;
   })();
 
-  function moveUp(i: number) {
-    if (i > 0) layersStore.reorderOverlay(i, i - 1);
+  function moveLayer(id: string, targetId: string) {
+    const from = state.overlays.findIndex((layer) => layer.id === id);
+    const to = state.overlays.findIndex((layer) => layer.id === targetId);
+    if (from < 0 || to < 0 || from === to) return;
+    const name = state.overlays[from].ref.name ?? 'Layer';
+    layersStore.reorderOverlay(from, to);
+    droppedId = id;
+    clearTimeout(dropTimer);
+    dropTimer = setTimeout(() => {
+      droppedId = null;
+    }, 1000);
+    announcement = `${name} moved to position ${to + 1} of ${state.overlays.length}.`;
   }
-  function moveDown(i: number) {
-    if (i < state.overlays.length - 1) layersStore.reorderOverlay(i, i + 1);
+  function reorderOneStep(id: string, direction: -1 | 1) {
+    const index = state.overlays.findIndex((layer) => layer.id === id);
+    const target = state.overlays[index + direction];
+    if (target) moveLayer(id, target.id);
+  }
+
+  function inspect(ref: OverlayRef, tab: 'info' | 'legend') {
+    if (!inspectionInRail) {
+      inspection = {
+        mapId: ref.kind === 'historical' ? ref.mapId : null,
+        series: ref.kind === 'series' ? ref : null,
+        tab,
+      };
+      return;
+    }
+    if (ref.kind === 'series') dispatch('inspectSeries', { ref, tab });
+    else dispatch('inspectMap', { mapId: ref.mapId, tab });
   }
 </script>
 
 <div class="lsp">
+  <span class="lsp-announcement" aria-live="polite" aria-atomic="true">{announcement}</span>
   {#if state.overlays.length > 0}
-    <div class="lsp-sub">{$t('Tap a name to zoom · drag for opacity · eye hides a layer')}</div>
+    <div class="lsp-sub">
+      {$t('Hold and drag the three dots to reorder · tap for layer actions')}
+    </div>
   {/if}
 
   {#if state.overlays.length === 0}
@@ -72,28 +127,16 @@
   {:else}
     <ul class="lsp-list">
       {#each rows as { o, i } (o.id)}
-        <li class="lsp-row" class:is-hidden={!o.visible}>
-          <div class="lsp-reorder">
-            <button
-              type="button"
-              class="sb-btn lsp-arrow"
-              on:click={() => moveUp(i)}
-              disabled={i === 0}
-              aria-label="Move layer up"
-              title={$t('Move up')}>▲</button
-            >
-            <button
-              type="button"
-              class="sb-btn lsp-arrow"
-              on:click={() => moveDown(i)}
-              disabled={i === state.overlays.length - 1}
-              aria-label="Move layer down"
-              title={$t('Move down')}>▼</button
-            >
-          </div>
-
+        <li
+          class="lsp-row"
+          class:is-hidden={!o.visible}
+          class:is-dragging={draggedId === o.id}
+          class:is-dropped={droppedId === o.id}
+          animate:flip={{ duration: droppedId === o.id ? 0 : 160 }}
+          data-layer-id={o.id}
+        >
           <div class="lsp-body">
-            <div class="lsp-top">
+            <div class="lsp-top" data-layer-heading>
               {#if isSideBySide && (i === 0 || i === 1)}
                 <span
                   class="badge-chip is-sm lsp-pane"
@@ -108,7 +151,7 @@
                 type="button"
                 class="lsp-name"
                 on:click={() =>
-                  dispatch('zoomToOverlay', {
+                  layerFocus.focus({
                     mapId: o.ref.mapId,
                     bounds: o.ref.kind === 'historical' ? undefined : o.ref.bounds,
                   })}
@@ -147,13 +190,20 @@
                 </svg>
               </button>
 
-              <button
-                type="button"
-                class="sb-btn is-icon lsp-x"
-                on:click={() => layersStore.removeOverlay(o.id)}
-                aria-label="Remove layer"
-                title={$t('Remove')}>×</button
-              >
+              <LayerActionsMenu
+                name={o.ref.name ?? 'layer'}
+                drag={{ id: o.id, onDrag: (id) => (draggedId = id), onMove: moveLayer }}
+                on:reorder={(event) => reorderOneStep(o.id, event.detail.direction)}
+                removable
+                on:zoom={() =>
+                  layerFocus.focus({
+                    mapId: o.ref.mapId,
+                    bounds: o.ref.kind === 'series' ? o.ref.bounds : undefined,
+                  })}
+                on:info={() => inspect(o.ref, 'info')}
+                on:legend={() => inspect(o.ref, 'legend')}
+                on:remove={() => layersStore.removeOverlay(o.id)}
+              />
             </div>
 
             <div class="lsp-bottom">
@@ -169,14 +219,55 @@
               />
               <span class="lsp-pct">{Math.round(o.opacity * 100)}%</span>
             </div>
+            {#if o.ref.kind === 'series'}
+              <SeriesLayerFolder
+                ref={o.ref}
+                {mapList}
+                {filterIds}
+                on:zoomToOverlay={(event) => void layerFocus.focus(event.detail)}
+                on:inspectMap={(event) =>
+                  inspect(
+                    { kind: 'historical', mapId: event.detail.mapId, allmapsId: '' },
+                    event.detail.tab
+                  )}
+              />
+            {/if}
           </div>
         </li>
       {/each}
     </ul>
   {/if}
+  {#if inspection}
+    <button type="button" class="sb-btn is-sm" on:click={() => (inspection = null)}
+      >Close details</button
+    >
+    {#key `${inspection.mapId ?? inspection.series?.mapId}:${inspection.tab}`}
+      <LayerInspector
+        mapId={inspection.mapId}
+        series={inspection.series}
+        tab={inspection.tab}
+        {mapList}
+      />
+    {/key}
+  {/if}
 </div>
 
 <style>
+  .lsp-announcement {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .lsp-row.is-dragging {
+    visibility: hidden;
+  }
+  .lsp-row.is-dropped {
+    outline: 2px solid var(--sb-accent);
+  }
+
   .lsp {
     display: flex;
     flex-direction: column;
@@ -211,20 +302,6 @@
      control, so it dims rather than disappearing. */
   .lsp-row.is-hidden .lsp-body {
     opacity: 0.45;
-  }
-
-  .lsp-reorder {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  /* Size only — a stacked pair has to fit the two-line row. */
-  .lsp-arrow {
-    width: 28px;
-    height: 22px;
-    padding: 0;
-    font-size: 0.7rem;
   }
 
   .lsp-body {
@@ -298,19 +375,5 @@
     flex-shrink: 0;
     width: 28px;
     height: 28px;
-  }
-
-  /* The × keeps two things the shared button will not: a 28px touch target,
-     and a press that reads red, because it destroys a layer. */
-  .lsp-x {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    font-size: 1.05rem;
-    color: var(--sb-text-meta);
-  }
-  .lsp-x:active {
-    background: var(--sb-danger-bg);
-    color: var(--sb-danger);
   }
 </style>

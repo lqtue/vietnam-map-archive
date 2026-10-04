@@ -132,7 +132,12 @@
       attribution: false,
       rotate: false,
       zoom: false,
-    }).extend([new Attribution(), new Rotate({ autoHide: false }), new Zoom(), new ScaleLine()]);
+    }).extend([
+      new Attribution({ collapsible: false }),
+      new Rotate({ autoHide: false }),
+      new Zoom(),
+      new ScaleLine(),
+    ]);
 
     // 3. Create the map
     const center = getOlCenter(mapStore);

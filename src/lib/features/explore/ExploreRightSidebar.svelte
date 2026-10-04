@@ -28,6 +28,7 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
   import { createEventDispatcher } from 'svelte';
+  import type { SeriesRef } from '$lib/map/stores/layersStore';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
   import LayerControlsPanel from '$lib/features/shared/LayerControlsPanel.svelte';
@@ -45,6 +46,7 @@
     toggleLegendPoints: void;
     clearFocus: void;
     toggleVectors: { mapId: string };
+    inspectMap: { mapId: string; tab: 'info' | 'legend' };
   }>();
 
   export let viewMode: ViewMode = 'overlay';
@@ -63,7 +65,11 @@
     { key: 'legend', label: 'Legend' },
     { key: 'control', label: 'Control' },
   ];
-  let tab: Tab = 'info';
+  export let tab: Tab = 'info';
+  export let series: SeriesRef | null = null;
+  export let seriesMaps: MapListItem[] = [];
+  export let seriesLoading = false;
+  export let embedded = false;
 
   /**
    * The row the reader last flew to — the list's half of the map's pulse.
@@ -72,9 +78,9 @@
   export let selectedN: number | null = null;
 </script>
 
-<aside class="sb-rail is-right" data-tour="controls">
+<aside class="sb-rail is-right" data-tour="controls" class:embedded>
   <div class="sb-bar">
-    <span class="sb-bar-title">{$t('This sheet')}</span>
+    <span class="sb-bar-title">{series ? 'This series' : $t('This sheet')}</span>
     <button
       type="button"
       class="sb-btn is-icon is-ghost"
@@ -121,6 +127,28 @@
     </button>
   </div>
 
+  {#if series}
+    <div class="series-summary">
+      <strong>{series.name}</strong>
+      <p>{seriesLoading ? 'Loading sheets…' : `${seriesMaps.length} displayable sheets`}</p>
+      <label
+        >Inspect a sheet
+        <select
+          value={mapId ?? ''}
+          on:change={(event) =>
+            dispatch('inspectMap', {
+              mapId: event.currentTarget.value,
+              tab: tab === 'legend' ? 'legend' : 'info',
+            })}
+        >
+          <option value="" disabled>Choose a sheet…</option>
+          {#each seriesMaps as sheet (sheet.id)}<option value={sheet.id}>{sheet.name}</option
+            >{/each}
+        </select>
+      </label>
+      <p>Info and legends belong to individual sheets.</p>
+    </div>
+  {/if}
   <div class="sb-rail-tabs">
     <Tabs
       tone="rail"
@@ -168,3 +196,30 @@
     </SidebarCard>
   </div>
 </aside>
+
+<style>
+  .series-summary {
+    padding: 0.75rem;
+    border-bottom: var(--sb-border);
+  }
+  .series-summary p {
+    margin: 0.4rem 0;
+    font-size: 0.75rem;
+    color: var(--sb-text-meta);
+  }
+  .series-summary label {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .series-summary select {
+    width: 100%;
+    min-width: 0;
+    background: var(--sb-bg);
+    color: var(--sb-text);
+    border: var(--sb-border);
+  }
+  .embedded {
+    width: 100%;
+    height: auto;
+  }
+</style>

@@ -9,6 +9,23 @@ import type { WarpedMapLayer } from '@allmaps/openlayers';
 import { annotationUrlForSource } from '$lib/core/iiif/annotationUrl';
 import type Map from 'ol/Map';
 
+// Unmanaged Allmaps layers do not appear in map.getLayers(). Keep their loaded
+// source identities so layer actions can trace the same transformed edge they draw.
+const layersByMap = new WeakMap<Map, Set<WarpedMapLayer>>();
+const ownerByLayer = new WeakMap<WarpedMapLayer, Map>();
+const idsBySource = new WeakMap<WarpedMapLayer, globalThis.Map<string, string[]>>();
+
+export function loadedSheetEdges(map: Map, source: string): number[][][] {
+  const rings: number[][][] = [];
+  for (const layer of layersByMap.get(map) ?? []) {
+    for (const id of idsBySource.get(layer)?.get(source) ?? []) {
+      const ring = layer.getWarpedMap(id)?.geoMask;
+      if (ring?.length) rings.push(ring.map((point) => [...point]));
+    }
+  }
+  return rings;
+}
+
 // ── Create / destroy ─────────────────────────────────────────────
 
 /**
@@ -45,6 +62,12 @@ export async function createWarpedLayer(
   cast.setMap?.(map as unknown);
 
   clearBeforeEachFrame(layer);
+
+  const layers = layersByMap.get(map) ?? new Set<WarpedMapLayer>();
+  layers.add(layer);
+  layersByMap.set(map, layers);
+  ownerByLayer.set(layer, map);
+  idsBySource.set(layer, new globalThis.Map());
 
   return layer;
 }
@@ -89,6 +112,10 @@ function clearBeforeEachFrame(layer: WarpedMapLayer): void {
  * Detaches a WarpedMapLayer from the map.
  */
 export function destroyWarpedLayer(layer: WarpedMapLayer): void {
+  const owner = ownerByLayer.get(layer);
+  if (owner) layersByMap.get(owner)?.delete(layer);
+  ownerByLayer.delete(layer);
+  idsBySource.delete(layer);
   const cast = layer as unknown as { setMap?: (m: unknown) => void };
   cast.setMap?.(null);
 }
@@ -112,9 +139,14 @@ export async function loadOverlayByUrl(
 ): Promise<void> {
   // Clear any previous overlay
   layer.clear();
+  idsBySource.get(layer)?.clear();
 
   const url = annotationUrlForSource(source);
-  await layer.addGeoreferenceAnnotationByUrl(url);
+  const added = await layer.addGeoreferenceAnnotationByUrl(url);
+  idsBySource.get(layer)?.set(
+    source,
+    added.filter((id): id is string => typeof id === 'string')
+  );
 
   // Apply opacity directly on the layer (same as TripTracker)
   (layer as any).setOpacity(opacity);
@@ -219,7 +251,14 @@ export async function loadSeriesInView(
   for (const s of wanted) state.loaded.add(s.source);
 
   const results = await Promise.allSettled(
-    wanted.map((s) => layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s.source)))
+    wanted.map(async (s) => {
+      const added = await layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s.source));
+      idsBySource.get(layer)?.set(
+        s.source,
+        added.filter((id): id is string => typeof id === 'string')
+      );
+      return added;
+    })
   );
 
   let loaded = 0;
@@ -249,6 +288,7 @@ export function setOverlayOpacity(layer: WarpedMapLayer, map: Map, opacity: numb
 }
 
 export function clearOverlay(layer: WarpedMapLayer, map?: Map): void {
+  idsBySource.get(layer)?.clear();
   layer.clear();
   map?.render();
 }

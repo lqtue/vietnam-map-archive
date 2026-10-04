@@ -27,6 +27,7 @@
   import { page } from '$app/stores';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
+  import type { SeriesRef } from '$lib/map/stores/layersStore';
   import { layersStore } from '$lib/map/stores/layersStore';
   import ArchiveFilters from '$lib/features/shared/ArchiveFilters.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
@@ -41,7 +42,9 @@
     pickMap: any;
     pickLabel: LabelHit;
     removeOverlay: { mapId: string };
-    zoomToOverlay: { mapId: string };
+    zoomToOverlay: { mapId: string; bounds?: [number, number, number, number] };
+    inspectMap: { mapId: string; tab: 'info' | 'legend' };
+    inspectSeries: { ref: SeriesRef; tab: 'info' | 'legend' };
   }>();
 
   export let viewMode: ViewMode = 'overlay';
@@ -119,7 +122,7 @@
   $: stackedMapIds = $layersStore.overlays.map((o) => o.ref.mapId);
   $: matchedIds = new Set($results.map((r) => r.id));
   /** Null while nothing is filtered, so Picked shows the whole stack. */
-  $: pickedFilterIds = filterActive ? stackedMapIds.filter((id) => matchedIds.has(id)) : null;
+  $: pickedFilterIds = filterActive ? [...matchedIds] : null;
 
   // Deliberately does not read `tab`, so assigning it cannot re-trigger this.
   $: if (!tabSettled && !tourActive && stackedMapIds.length) {
@@ -179,10 +182,13 @@
         />
       {:else}
         <LayerStackPanel
+          inspectionInRail={true}
           {viewMode}
           {mapList}
           filterIds={pickedFilterIds}
           on:zoomToOverlay={(e) => dispatch('zoomToOverlay', e.detail)}
+          on:inspectMap
+          on:inspectSeries
         />
       {/if}
     </SidebarCard>

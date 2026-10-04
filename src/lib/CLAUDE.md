@@ -66,13 +66,13 @@ error, not a code-review catch.
 - **Exception: `ImageShell.svelte`** — the IIIF-canvas counterpart for pixel work (`/scan`,
   `NeatlineEditor`). Own map, own context (`getImageShellStore()`), no global stores. OL uses
   `ol_y = -image_y`; the flip helpers are `src/lib/core/geo/rectUtils.ts`.
-- **Map stores** (`src/lib/map/stores/`): `layersStore` (what is rendered — base + overlays, max 10,
+- **Map stores** (`src/lib/map/stores/`): `layersStore` (what is rendered — base + overlays, no fixed count limit,
   persisted `vma-layers-v1`), `mapStore` (camera + active map), `layerStore` (per-shell view
   settings), `urlStore` (hash carries camera + basemap; the selected map is `?map=<id>`).
 - **Canonical types** live in `src/lib/data/maps/` (`types.ts`, `footprintTypes.ts`,
   `triageTypes.ts`, `service.ts`, `iiifManifest.ts`, `georef.ts`). `src/lib/map/types.ts` is
   UI-only.
-- **Basemap and overlays are self-hosted PMTiles** on `tiles.maparchive.vn` — see
+- **The default basemap uses OpenStreetMap tiles.** Regional PMTiles on `tiles.maparchive.vn` remain an optional Archive base — see
   `docs/architecture.md` §Map libraries before changing a URL, a zoom range or a build key.
 - **`@allmaps/openlayers` is loaded on demand** — one runtime importer, `createWarpedLayer` in
   `map/shell/warpedOverlay.ts`, which is why it is `async`. Keep any new importer type-only or
