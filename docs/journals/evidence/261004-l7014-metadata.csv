@@ -1,0 +1,365 @@
+table,id,sheet_number,before_name,after_name,before_year,after_year,date_kind,date_transcription,source_url,source_sha256
+maps,0102e926-1aa0-42a7-b1bf-9f99fc3d2a0c,5728-1,Hòn Thơm,Hòn Thơm,,1957,content,MAP INFORMATION AS OF 1957,,5fe7bcda2893c47d324498048339258f20980d47b74a1f9875f59bd8fe469377
+maps,03b3bc63-e137-4d64-b603-635248134629,6542-3,Phu Vang,Phú Vang,1968,1968,,,,
+maps,03d879f9-888a-4beb-aedc-7b6ed8af0a57,5453-3,Li Mou Chang,Li Mou Chang,,1979,printing,In lẩn thứ hai năm 1979 theo tài liệu 1:50 000 của Mỹ,,4a78b1a04c8faa9c344ba9eadc5e92c5782b3da6d91038baacb3269e0065b20c
+maps,04149e91-1203-41c3-97c6-5a310a19422d,6537-4,Polei Jar Sieng,Polei Jar Sieng,,1965,content,MAP INFORMATION AS OF 1965,,65616bec5510b4ba3bec4abb2f803c2ad3b25f8b126511b015a3d7bc3803d226
+maps,06ac299c-3ffd-4d6d-880a-26d68394d2d3,6541-1,Phú Lộc,Phú Lộc,,1965,content,MAP INFORMATION AS OF 1965,,faf298d537473de25024373ceb58e3605e102993a55387d18dc002d355873ee2
+maps,075a8f76-685e-425d-a127-ad89c07fad93,5750-2,Ban Kêng Long,Ban Kêng Long,,1979,printing,IN THANG 5 NAM 1979. CHINH LY THEO BAN ĐỔ 1:100.000 UTM IN N,,b8bc77d2afcaf79b8102b81a51ec3da386d92318e969bfa5bc229bf4f90d5ee1
+maps,07859658-c9cd-4006-80b7-e3fbd45b6f2c,6329-4,Go Cong,Gò Công,1967,1967,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6329-4.jpg,
+maps,09b0f484-c12f-4a2c-938c-376ea06cb34b,6329-3,Binh Dai,Bình Đại,,1965,content,MAP INFORMATION AS OF 1965,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6329-3.jpg,d9ceb7a78ab1be7b69622da313cfe217fe09080d53e19f2272f814715f6d44af
+maps,0a7a5ec2-973f-4fa2-801d-15a3d44ddc03,5754-4,Ban Mac,Bản Mac,,1978,printing,In lần thư ba năm 1978 theo 1:50000 của Mỹ qn năm 1964,,75cc024a9ea5f5703d6be8d32b81eebc009c990ec0b7a652ccad31c4f799001f
+maps,0a7b36ed-b50f-430b-86f4-4c58a1056f5e,6243-3,Ban Vang Ala,Ban Vang Ala,,1971,printing,2nd Printing 3-71,,9704156786ccaa6583524e030e5f0e574847120dfc8958c110fab8e0f0925dd1
+maps,0bab1490-b6b9-45ca-b94a-b5c3ce210ab4,6030-4,Tan Chau,Tân Châu,,1965,content,MAP INFORMATION AS OF 1965,,a717e6eb695458c59fb28c6d93b54887b0f7eb846f991bb8126c99de2e222737
+maps,0e232803-e995-4e51-bcac-3797427b657f,5654-3,Ban Nam Cum,Bản Nam Cum,,1979,printing,in tháng 5 năm 1979,,182c896b4d8b3e5aa126cf9f60c324c83d87c0a11c9764cd714bfa289bf93e6b
+maps,10c5dd90-e815-47c9-8ff9-dcc5cae725eb,6552-2,Móng Cai,Móng Cai,,1978,printing,In lần thứ ba nam 1978 theo 1:50000 của Mỹ in năm 1965,,05945094b6eb8c70c25bbd2db861442194588068b1f28d1f604592d0f50f4a14
+maps,11ee737a-5237-4024-bed1-8f59ce9ddbdc,6436-1,Ph. Bà Khăm,Ph. Bà Khăm,,1989,printing,Tái bản lần thứ nhất tại Đà Lạt tháng 9 năm 1989,,9061e5d93bd972bc310c9320977545bf92d3dda344e4f2d8e48ef9335c7e9451
+maps,168160d8-5e14-44ad-af35-9730ca5fc007,6433-4,O Rang,O Rang,,1966,preparation,"AMS (SX), U.S. ARMY, 1966",,3cdf73a73a4fc517943097aec841f8e4299d70d87752cbf4537a3b67f9e8dd61
+maps,18a04302-4ff5-4642-b6fb-dd8e9c800c5a,5552-4,Na Khoa,Na Khoa,,1980,printing,In lấn thứ ba năm 1980 theo 1:50000 in năm 1966,,50b658d1b5edf7e54e7501bee71f80f911c2e4f418dbea59edca654ff32f81fb
+maps,1b14ef69-efe4-4c90-aff7-ad3c86dae661,5851-3,Ban Lot,Bản Lót,,1979,printing,IN THÁNG 5 NĂM 1979. CHỈNH LÝ THEO BẢN ĐỔ 1:100.000 UTM IN NĂM 1978.,,2f9519f2189a4f4af32e2dd35e03da08b2280b1a8d4c9a0bf23f50e2e29dc325
+maps,1ba8e89e-2453-42e2-90d9-7ba1056556e2,6437-1,Phu Kham Dorang,Phu Kham Dorang,,1965,content,MAP INFORMATION AS OF 1965,,869248857497afe2b5b3983462921ce0bfe019bf89860a7ae554b1761c23d509
+maps,1e036252-7cee-4443-86cf-19302b8526a3,6151-1,Pho Yen,Phổ Yên,,1967,preparation,"AMS (AM), U. S. ARMY, 1967",https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6151-1.jpg,d69473221f256374ef75264977023a89d6117b45d22cb482ab66448bceaa5474
+maps,1e9db0b4-0215-4a73-82cb-21df618d7311,6055-4,Phố Bảng,Phố Bảng,,1978,printing,In lan thứ banăm 1978 theo 1:50 000 cửa Mỹ in nam 1964,,d915dbde2d3a1ef24bacac65d770723d3fe8fe14d21227bdba9f8a6c5d8bda2a
+maps,1f800bfb-8945-4849-91ac-bd8f604ddc06,6131-3,Prey Nhay,Prey Nhay,,1984,printing,REPRINTED BY 29th ENGR BN (T) 10-84,,fb0243b2b8918201cda551b6c19f8920db429932c85ccc92f1278dacb439d29b
+maps,21f0f889-e5cb-441c-9fb5-f3603465b9a1,6130-1,Mộc Hòa,Mộc Hòa,,1965,content,MAP INFORMATION AS OF 1965,,42329c468e9574661ac3df66958fe4840c9dd5b2171c62bfc24d4e83fe8eb5c3
+maps,22b09719-3850-470b-b221-bb4cca7c2153,6534-4,Bon Drang Phôk,Bon Drang Phôk,,1970,printing,4'>Printing 6-70,,a891e51b2618936c9cebc4bad0fc747aaa738b2775c60e593f0c7d2a59b0d871
+maps,23042a21-1385-470c-b104-82733e4a6d92,6434-1,O Tea,O Téa,,1970,printing,4%Printing 6-70,,c1ef46a30616b22800ceaff19e1a933b2abc7d47a9a1b825dacf7690c6af2c7c
+maps,233a0800-eba1-4aaf-b397-ae7b28539af5,5750-2,Ban Keon Long,Ban Keon Long,,1979,printing,IN THANG 5 NAM 1979. CHINH LY THEO BAN ĐỔ 1:100.000 UTM IN N,,cdf9406ec55a9197623c2496a7ffd7db070cc81a885456e5b990147d9703a638
+maps,24e7ee44-802e-46dd-91cc-4b6fd2c986d6,6433-1,Dak Dăm,Dak Dăm,,1966,preparation,"AMS (SX), U.S. ARMY, 1966",,e2dfcbe304e208d3ebb99d589dc7d65a82b2f61631f8614ca432e7930c0b641b
+maps,25109e43-646f-4456-bccf-de9f02aa920c,6150-4,Chương Mỹ,Chương Mỹ,,1989,printing,In lẩn thứ năm năm 1989 theo 1:50.000 U.T.M in,,ed410f7d8dad80db313cd213c3c56d742c712700557f0cc959acf70b8f51fd8b
+maps,29eaf914-1eb6-4e5d-9c32-27d386568c35,6055-1,Đồng Văn,Đồng Văn,,1978,printing,In lan thứ ba năm 1978 theo 1:50000 cửa Mỹ in năm 1965,,f11b8f5e84216ac667f8e8f1e5c63335ae25691ebbf17dc186cc19f3340c3882
+maps,2a04ff32-d9fb-458e-8837-4e6c0ad8bf88,6342-1,Cam Lộ,Cam Lộ,,1973,printing,1*' Printing 6-73,,ac46f2ca2670bfd87838fe2d8187317773319f2c34ea7bd9aed4347490bdc1dc
+maps,2be34f49-80ee-4cd5-a67d-4f445ad52ac3,6636-4,Pleiku,Pleiku,,1965,content,MAP INFORMATION AS OF 1965,,3b0e0399adc96421abdff100161a2dab31d99f50970096cf29987cb042355508
+maps,2c8ad803-09b8-4468-ab37-5b5fe6dcd8d8,6150-3,Kim Boi,Thúy Hiền,,1965,content,MAP INFORMATION AS OF 1965,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6150-3.jpg,4550ce24c450573dfe850d323b5faa5cae2f30b5816a46ebfc4f0285ff7431a4
+maps,2c9e86c3-702d-4991-b897-0947dff9c1f4,6539-4,Peta Pac,Peta Pac,,1967,printing,nđ Printing 9-67,,bfe1168d73d542d96f63e5e2606e8a7a0714d6a42fb41f303bd4861e624a5264
+maps,2cd7c4e6-63a8-4aee-a164-ba90d8149ea4,6833-2,Hòn Tre,Hòn Tre,,1965,content,MAP INFORMATION AS OF 1965,,b968fa1712952c6d9b545dc8210cf16a3033f30f0ed0e47956eb5e64fdfde5ad
+maps,2d7eac7d-7c1c-48e1-957a-b8067a583d02,5552-2,Nà Lam,Nà Lam,,1979,printing,In lần thứ hai năm 1979 theo 1:50000 in năm 1975,,58bcd29c1ac22829ecfbe1eb8c820dde6fef7ef69a8899192ce0c4fe180e78c6
+maps,301eeed1-0d62-40cc-af34-9826b0ebed74,6341-1,Sa Moi,Sa Moi,,1970,content,MAP INFORMATION AS OF 1970,,e8605c250997ba94346e37c1d0788d18f4ada985ab5fce090463a55852e8105b
+maps,318afc6f-dde3-4948-9787-984d9354f7d3,6433-4,O Rang,O Rang,,1966,preparation,"AMS (SX), U.S. ARMY, 1966",,6560f14282c14e116fe03a5a4db97de99bf5feeb2ba2de032c793ab4600eadb4
+maps,31aa9f27-c6d2-42f9-8f97-640c73f0c5ef,6534-3,Bon Dak Ndrot,Bon Dak Ndrot,,1965,content,MAP INFORMATION AS OF 1965,,b69fe19a45ab7587ba639c22c8159fe047217164c076df6250560531491ca785
+maps,335d0af2-f784-48e8-bc3d-9472ee94916c,5854-4,Mường Khương,Mường Khương,,1979,printing,In lần thư tư năm 1979 theo 1:50000U.T.M,,71688ceeb189be610b6cf8d5ec998bf8476d1f3c723799fbb7218f44d59bef16
+maps,34b6ed24-558e-4b13-b88e-239696e9b031,5949-1,Piêng Yao,Piêng Yao,,1979,printing,In lần thứ hai năm 1979 theo 1:50000 in năm 1976.,,6533d913e2ec0e41c05707711df7c36ddd5dbd1d057392fe7befe88a08882e32
+maps,35bc8ce2-a5e7-4aa7-afe6-213d5a78dc70,6550-4,Île De La Table,Île De La Table,,1965,content,MAP INFORMATION AS OF 1965,,9ecb816d41ba0a8d206d7de75a05b93fb97f156ac089e45906fb0d91a8b0edf4
+maps,3616dca4-07d7-49a9-840f-b2047f2d9ab7,6534-4,Bon Drang Phok,Bon Drang Phôk,,1997,printing,Reprinted by NIMA 7-97,,95cae11e16b704c39da945449e21501e09cb686ee2f1fb3ba86bad50d25dd9e0
+maps,378fa3b5-db78-4044-8f2c-ae079af5f3c1,6030-1,Hồng Ngự,Hồng Ngự,,1965,content,MAP INFORMATION AS OF 1965,,387328c3a34aee56290177c8948fc22197086ed49ae0166a7bd54d80413c2dba
+maps,39b552f8-8dda-4b29-a011-383a6b41091a,6833-2,Hon Tre,Hòn Tre,,1965,content,MAP INFORMATION AS OF 1965,,7c3d41a608279f04c652b78828eb147f10fc054d3ad51da8a3644f3bc6c2f31f
+maps,3b3c0590-5d76-45f4-8b27-0b53ad78521d,6143-1,Ban Xé Nua,Ban Xé Nua,,1965,content,MAP INFORMATION AS OF 1965,,484688b77a250aa420e5f20b473f7d05bc8aadfa1faa07f37b11e700b8e2a3c9
+maps,3b4c98a7-fad1-4214-a337-3eea4c0ed9d8,5954-4,Hoàng Su Phì,Hoàng Su Phì,,1980,printing,In lần thứ tunăm 1980 theo1.50000 in năm 1965,,c3237cb1e5cf3463332af615b1c07c0d382ffd885774c7faf2cf5d1727be2bfe
+maps,3cb7e76c-897c-4301-b231-7296989e00ab,6144-3,Ban Nathin,Ban Nathin,,1965,content,MAP INFORMATION AS OF 1965,,53ea3d10d9a55d16b53e95aa795729f7de6f731fa49fdf23378199f2f714ba64
+maps,3ccd1b11-9fd7-4499-be59-9ee3b472d142,6151-4,Vinh Yen,Vĩnh Yên,,1996,printing,Printed by DMA 01-96,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6151-4.jpg,d32057da2402001cda826a815fa9c06b725915edb6eaf74ab40537bd4cb03053
+maps,3d0719d1-a591-46fc-ba02-2cb7fd6c164c,6329-2,Thua Duc,Thừa Đức,,1965,content,MAP INFORMATION AS OF 1965,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6329-2.jpg,6f77b919a1c806e9cd12a2d6d3da322e3f66db06b2da7b390e028ca166597ad8
+maps,3dcc3133-bf4f-4464-9c2a-3669a16edc34,6433-3,Bu Gia,Bu Gia,,1970,content,MAP INFORMATION AS OF 1970,,0b7e37069494cba229cbb16efcff2e6f4dee9543d2586fa66d0d59c8bee6c582
+maps,3dfabe3a-00c4-469b-83f2-7de60ee98cb5,6541-2,Bạch Mã,Bạch Mã,,1974,printing,6t» Printing 3-74,,3db88d9c67283eaee479a8e6a59a02e7bc8ab453aaa44cacf39ce6850f3682e7
+maps,3e59f8de-cf57-4533-b575-7f3d8139c40f,6155-2,Lung Cung,Lung Cung,,1978,printing,In lần thư ba nấm 1978 theo 1:50000 của Mỹ in năm 1964,,dcffb8461ddfd3ae514f7669bb298f36b2e53308293bcaa88b6f7ca0edd2f0de
+maps,3f64d4bf-72d2-48db-9fdd-5d10b2905c46,6438-1,Dak Palouat,Dak Palouat,,1972,printing,4‘Printing 6-72,,ac366c51294f11dab7d494594101f57c6904dd04c22d383c2a64dbf7ef905867
+maps,41114cf2-e36b-4ff5-a4c0-4d1c462fb91b,6144-4,Ban Buk,Ban Buk,,1965,content,MAP INFORMATION AS OF 1965,,9ea19964d891969b88b908e8d98d3b1641ee6979eecd42442de1e3eec2711bea
+maps,41b1b3a9-7feb-4423-ba1f-c830cd6ded44,6329-3,Bình Đại,Bình Đại,,1967,printing,%w Printing 3-67,,2fb0289ef91c138db28aa4362fac5bc1bf6898c70f0befe8df320415078594f3
+maps,44fca2c0-b31e-4e8c-826d-c2ef56e78ff4,5949-3,Ban Kho,Ban Kho,,1975,printing,In lần thứ nhất 7-1975,,4eed030dabfafb2e839814f7b3bc5e369e276f021eca7030cf4b11e2cf617f3e
+maps,45c50503-a010-46ca-8aba-25409b603878,6350-4,Hai Phong,Hải Phòng,1966,1966,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6350-4.jpg,
+maps,46f07203-1ae1-4ad9-ab99-12518b3e11c4,6434-1,O Téa,O Téa,,1970,printing,4%Printing 6-70,,fcbcd6c4a8a346f740d4899f0b1c64f15afb78a61471a50a3425798cb29eecdf
+maps,47b4dc36-672b-4d8c-90a4-08f154801175,6231-3,An Thanh,An Thanh,,1969,content,MAP INFORMATION AS OF 1969,,589361ae6280c25f61284c63a45ba779cbf02b067d5443c039b3c081375eac27
+maps,481e6eb7-a65f-4183-86fd-f51b899bae01,6550-1,Ile Cu Xu,Ile Cu Xu,,1965,content,MAP INFORMATION AS OF 1965,,7bba26a26594494f1fa08f66578b9d1f6c362bf5906109b386b1fd39362426d9
+maps,496b8287-207c-4a92-9661-9ea594a75895,6150-2,Phủ Lý,Phủ Lý,,1979,printing,In lan thứ hai nấm 1979 theo 1:50000 in năm 1976,,f959255e01f62b143c8d23005e2ef171a33fa73fca3f2a3128a2b2b64672be61
+maps,4a782c22-d882-4325-8303-d8e42deaed9e,6350-2,Do Son,Đồ Sơn,,1985,printing,PRINTED BY DMAHTC 7-85,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6350-2.jpg,22ca69f493bb0801e024ecde511559da81753a13795d284ff37066033ec07bfb
+maps,4a7fd880-b393-4eb5-a11a-e0cd550bece9,5750-1,Mường Hung,Mường Hung,,1979,printing,IN THANG 5 NAM 1979. CHỈNH LY THEO BAN BO 1:100.000 UTM IN NĂM 1978,,85021829ce51e65e76f124f4383dc6fb341c4f1ab7519d3943266cbfb002fbc4
+maps,50085cbe-8d7a-4990-920b-3770ed418850,5554-2,Phu Sì Lùng,Phu Sì Lùng,,1979,printing,in tháng 5 năm 1979. Chỉnh lý theo bản đồ 1:100.000 UTM in năm 1978,,5ca601e1d9a9bc685163a60fba75f50c7dbd6cf4f83b966041d5834c30382a3b
+maps,509cdfb6-161b-4b94-a098-6785fdf20cc9,5854-1,Bản Po,Bản Po,,1976,printing,In lần thú II tai Đà lạt tháng 11 năm 1976 theo ban đồ 1: 50.000 năm 1964 (số hiệu cũ 5825 Nt),,ba03c5e5551b7b66cbf7bf861475db5061fdc73720b63de3b35608a74aa376d8
+maps,5205a536-79c7-45fa-b4ce-129425871743,5929-4,Kien Luong,Kiên Lương,,1965,content,MAP INFORMATION AS OF 1965,,4e274ddec02dcc6ee87ef52ec2c5357b58fd260d9420adeea54bafc412ea283c
+maps,5261f070-2766-4e17-9c75-d782d756bebf,6232-1,Chôam Krâviên,Chôam Krâviên,,1984,printing,REPRINTED BY 29th ENGR BN (T) 11-84,,54cd63705ef68b651576c9e8f325f93fbf1cb65114cd4635b7a8c5fbefa093b9
+maps,52ce8c55-aa09-41c1-ac4f-fbb4165dc57f,5650-4,Nam Mat,Nam Mat,,1979,printing,IN TẠI XƯỞNG IN CUC BAN ĐỒ BO TONG THAM MƯU QUAN ĐỘI NHÂN DÂN VIET NAM THANG 5 NĂM 1979,,22a39a178d353e2bd101cd7eeee2e78814d68366af6c5fe27ea730ca6f310247
+maps,534d9d35-12df-4f75-8d53-ccddd217d6be,5846-1,Ban Muangchouan,Ban Muangchouan,,1977,printing,In lển thứ nhất năm 1977 theo 1:50 000củaMỹ in năm 1965,,7252cd2d78860b8c957e54d2e54178a690db45a20347f4d2f392b2f9c64e9b5e
+maps,53884283-8a70-41db-96c2-012cda30e842,6541-1,Phu Loc,Phú Lộc,,2002,printing,Reprinted By NIMA 03-02,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6541-1.jpg,658fe4f8f110ec0f6d4730d50587ad8f0139fa79ab8bd2047682b58172a9c5ac
+maps,53ab3602-0f24-48f4-8880-222f7da9049c,6832-3,Thanh Hai,Thanh Hai,0,1996,printing,Printed by NIMA 11-96,,201bea2cf152080743bd7fef9fea5f034405d85c0f703522625ecde4df5c083d
+maps,5568c2fd-9adb-428d-b7f0-586abcc13cff,5853-1,Nghĩa Đô Tong,Nghĩa Đô Tong,,1975,printing,In lần thứ nhầt 10 - 75,,22d2b8878c6aaa8e4086250817cb17d1e86d3dde4e3a7d340e8cd6de696c373b
+maps,55f30aab-8cba-4a56-9a96-a2193607f4ef,6835-4,Dong Xuan,Đồng Xuân,,1965,content,MAP INFORMATION AS OF 1965,,8cbcb33e37fd142bd4acbc86cbe0e51ee8139caaa940ded3e9a7fe7f77c675f7
+maps,56a09c0f-7e2b-4d4e-8a46-a8f7e5636ded,6333-3,Méak Say,Méak Say,,1967,printing,1# Printing 9-67,,f88e5dfe55a3c8f170c6f73d88d9f4e8b2ede8400e525c9f3664115e5608d1b8
+maps,57005681-7aee-4611-a461-216d35fd1b2f,5851-3,Bản Lót,Bản Lót,,1979,printing,IN THÁNG 5 NĂM 1979. CHỈNH LÝ THEO BẢN ĐỔ 1:100.000 UTM IN NĂM 1978.,,ae3c77c095dc65efa668e2da62187d9e024a265d5239d2e9c3e2377ec83326c4
+maps,57cf6db6-5153-4546-80b6-bfaa45d2169d,5551-1,Co Mé,Co Mé,,1982,printing,In lẩn thứ hoi nếm 1982 theo 1:50 000U.T M in năm 1979,,4a4dd31e364e54ad7753754e2f9022bb0269a470df811545b2c7eb93ba475d86
+maps,589bc8e6-ba9a-4af5-a80b-ab8b737eb3c1,6539-3,Đ. Go Kram,D. Go Kram,,1965,content,MAP INFORMATION AS OF 1965,,6940939b09e7109d56559c8ece97eb048c73310c5b47c65927f0b549e3956f7a
+maps,5a72b473-1686-415b-8b07-5b7ae2428add,5949-1,Pieng Yao,Piêng Yao,,1965,content,MAP INFORMATION AS OF 1965,,c014c3eeaa012467bf217df66c99c86ec717b17e894b610a20f6f26007432319
+maps,5b05e6ff-6f34-4779-bfb2-5c72be1d98da,5847-2,Ban Tem,Bản Tèm,,1971,printing,254Printing 6 - 71,,9b1e224f6c85be8f046686de028b9336dfb4a0901d166506136911bd3ce51d0a
+maps,5bc49ac8-4054-4470-b8c7-29d50b62edae,5750-3,Ban Xaosi,Ban Xaosi,,1980,printing,In lần thứ hai năm 1980,,c542bcff7d464787f1f08d8ff7bdf12beed184b5ddda34f4b9ebfdbf2555b36a
+maps,5c9d2191-8562-4620-af4f-f2ace1fbf124,6341-4,Sheet 6341-4,Ha Shin Pe Nu,,1965,content,MAP INFORMATION AS OF 1965,,abb05322b58bf4d0b1ecb903cf6a41e2836f10805eac9560af26ebe7b9ed688e
+maps,5db94d41-1ed6-4d06-b746-58d499862e64,6030-3,Châu Phú,Châu Phú,,1969,content,MAP INFORMATION AS OF 1969,,37bce8cdda63f00e88b69cdb9cf616a62050735dd354e69cee68a0361ec1f51b
+maps,60ab4182-6f05-4285-a1f9-705d43528a9c,6437-1,Phum Kham Dorang,Phum Kham Dorang,,1965,content,MAP INFORMATION AS OF 1965,,f213cbe5407132809b0d50f9ffd2c7f7010aaa7b853c616cff02b2766c7fdb62
+maps,6117a44b-9099-4550-a9b8-8c769d33abb0,5453-2,Muang Hat Hin,Muang Hat Hin,,1975,printing,In lần thứ nhat — 7-1975,,68fadced9c5fb20d9b9a8bd2d366fe906147416546760b001f2977ddf381287a
+maps,627d0813-0a92-40c2-b1f6-9af8045dd433,6538-4,Dak Sut,Dak Sut,,1972,printing,2n4Printing 6 -72,,e53c5d58882d7f0e28dca2167a73dfbdc4beba770fd4a3451955457571fbf56c
+maps,638ceb3e-7cae-4e15-b9cf-076f62ab5a2c,5554-4,Phu Nằm Sau,Phu Nằm Sau,,1979,printing,in tháng 5 năm 1979. Chỉnh lý theo bản đồ 1:100.000 UTM in năm 1978,,983a7950b15cd99954ea9c6d858a2ef6c972c67ab0491d4f6afa0f5a43cc62aa
+maps,639a25fc-5c76-40fd-b9db-f2f4f1093ae6,6150-3,Kim Bôi,Kim Bôi,,1979,printing,In lần hw hai năm 1979 theo 1:50000 in năm 1976,,d9057b34bf78b049e36f62ace81d6bfe19ea9ffb54a7653929cfae83f8d2132a
+maps,65fd71f2-7c3d-43ee-a1ad-7c1fa2a47b14,6736-1,Binh Khe,Bình Khê,,1969,content,MAP INFORMATION AS OF 1969,,d3d560ed23a552814c4e3086443ceb7eb0d34b8c7ce489eaf120b5eb0ec9d444
+maps,66a8b5c1-f0c8-434e-a7b2-80a4e25d6354,6641-2,Khu Pho Nam Tho,Khu Phố Nam Thọ,,1999,printing,Reprinted by NIMA 12-99,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6641-2.jpg,a8a2c0bdcaf8991a7b8d3dde4aeefdd785ce0703e802d983a79d7f3bed4d1048
+maps,690a092a-0e53-4251-824a-f6c479a87e95,5926-2,Xom Ong Trang,Xóm Ông Trang,1965,1965,,,,
+maps,69831a7f-392d-4b2d-a111-59fe569dbaf7,5946-2,Ban Sang,Ban Sang,,1977,printing,In lẩn thứ nhất năm 1977 theo 1: 50000 của Mỹ in năm 1965,,3cb50464e55209a34dc1f0f069e87f655218c9abaf1c019fec0b7fa4c80e60d8
+maps,6a29c2d1-3fa1-4b61-b9e2-05b66d7cc1b0,6440-2,A Ro,A Ro,,1999,printing,Reprinted by NIMA 11-99,,9f2382070e9dcc46652e1fa73dd3aef396577e080f21f32f9885100a8200b823
+maps,6af2b1e9-3a55-4a57-887a-42db087e3654,6535-4,Ya Lop,Ya Lôp,,1999,printing,Reprinted by NIMA 12-99,,3226eb1d8315f68b4859d77367b02a5b53cc698196b5a0b47d7ad1ce8eb6fd83
+maps,6b41f075-1baa-4ca0-b297-dadebca724b6,6441-2,A Sap,A Sap,,1970,content,MAP INFORMATION AS OF 1970,,463e8ae1301b3e0108922883187fb27d5acfaa2030eaa320829bae1a46f65921
+maps,6b651276-28dc-45d0-a414-5a513c6afdf3,5654-1,Giáo San,Giáo San,,1991,printing,In nếm 1991 theo 1:50 000 U.T.M in năm 1964,,ae569758a6ac408646f51ac73314513fd667ea8d7b2b93f9e733bcbe2d5d2e20
+maps,6bb6b439-1d40-4e09-a74f-4fd48465287e,6150-4,Luong Son,Luong Son,,1996,printing,NIMA 11-96,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6150-4.jpg,94243175424733aa3814a127a3c4ceba78721bf9082506cea790f1a45e7d7722
+maps,6cbc048f-b2f2-4280-8cf3-5d7d323ed53c,6551-2,Ile Tching Lan Xan,Ile Tching Lan Xan,,1965,content,MAP INFORMATION AS OF 1965,,86a60b6580da1b74a3de62692cc99b2b1ea661927f543b21922e934a3754a565
+maps,6f58d7a8-f156-4c17-8622-445baf46de3b,6030-4,Tân Châu,Tân Châu,,1965,content,MAP INFORMATION AS OF 1965,,9d687b9b788962e1be8b864a042ae9924fa08207afcd4f90bf9fd46b7bd409e9
+maps,704b0427-3783-407a-b68f-3afdb2e9e644,6441-2,A Sap,A Sap,,1970,printing,4⁄Printing 3-70,,69bbdb9c8d128f9db8be844497ddba361fea2ecb295bb512b040da28bea35445
+maps,70b5104f-9a3b-41a4-ac0a-9ee0e3bbf6ec,6440-3,Ban Tangyoun,Ban Tangyoun,,1966,edition,COPIED IN 1966 BY THE NATIONAL GEOGRAPHIC SERVICE,,05a24b83694d50fdf73e17beaff4f7bd84b371d26ca386d95ea4053273e20a70
+maps,70d9938a-6820-4d24-9116-5e9e2f69f5ba,6433-1,Dak Dam,Dak Dăm,,1966,preparation,"AMS (SX), U.S. ARMY, 1966",,dd48aff69f4906f001c75b2e395cdefb940436c255e6e525416eeea28d496bfe
+maps,712ecadb-610c-43ac-b2a9-05207e1f456c,6836-1,Hai Dong,Hai Dong,,1965,content,MAP INFORMATION AS OF 1965,,e0838dc6e8614126b0c2e4a8705837bad3d3cc620300b2feb25e0d59e2704630
+maps,7441fa55-feb9-404b-80d3-9177ff3b0a54,6433-3,Bù Gia Mập,Bù Gia Mập,,1965,content,MAP INFORMATION AS OF 1965,,203776d165efe60addc948d8f28e44302bee68b1b776dacbc4fba75927e6a79c
+maps,745ec632-efa3-4566-a299-9013244ea4a2,6333-2,Ấp Phước Thiện,Ấp Phước Thiện,,1969,content,MAP INFORMATION AS OF 1969,,da1f307948d2da5c31bae78ce4c7a95fcf27152ff9d1ae8d81260d6696a781f2
+maps,7a019b9c-fb1b-4ccd-9430-6101f3577cf8,6350-2,Đồ Sơn,Đồ Sơn,,1979,printing,In lần thứ hai năm 1979,,9f70c39d0e0ed6cac6c3a55bbd7f3f505391310e66b6ee5414e10ac60fb79895
+maps,7a0a1eb8-f834-44d8-969a-63c1ee82aa1a,6131-2,Svay Riĕng,Svay Riĕng,,1984,printing,REPRINTED BY 29th ENGR BN (T) 10-84,,2d1882aabdb5d5e947ddb1cf1ab0c9f1db6a08987766aaa3f97934bd50b2fb71
+maps,7ac490dd-5170-4a99-ac53-3c1ee2d09ac2,6641-4,Thôn Trung Kiên,Thôn Trung Kiên,,1965,content,MAP INFORMATION AS OF 1965,,52b70c0ed8b3aa37565ccd432b3193668d8a073523f19e9c6378eb98e0b5005f
+maps,7b395510-32de-4b7b-9824-a389e7ffbec8,6835-4,Đồng Xuân,Đồng Xuân,,1965,content,MAP INFORMATION AS OF 1965,,42f0136d79c521ec1d84062b4a6047dd85d57f35bc1a6e2937896f5b84b499a3
+maps,7beb3150-2564-4fb9-be4a-60f201426d4b,5754-2,Lao Kay,Lào Kay,,1978,printing,In lần thi’ banim 1978 theo 1:50000 cửa Mỹ in nam 196,,a42df7ebe882eb2107b27c13a272fa97655819d2a0bffa37440058e81030c0cd
+maps,7c02ff16-dd01-4c4e-974c-a7bd8ab3fceb,6342-1,Cam Lo,Cam Lộ,,1973,printing,1*' Printing 6-73,,6c50cec0c5ab7847fd57ba49cb678f748aec9312fbc9d2664f9411f5f3ec7c90
+maps,7c2166bd-e3e2-4809-a038-6371a28d5674,5849-1,Xieng Louang,Xieng Louang,,1980,printing,In lần thứ hai năm 1980,,688884295b3bf8d522357dc4b0f3978343b435cb3f57e41c4228f91498e571c1
+maps,7c4e2eaa-2113-4561-a339-d031f1161429,6329-1,Can Gio,Cần Giờ,1983,1983,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6329-1.jpg,
+maps,7e8c281e-bce3-4f3b-942a-ac6158eddf6d,6353-4,Ta Lung,Ta Lung,,1976,printing,"In lần thứ Hl tại Đà lạt tháng 11 năm 1976 theo bản dd 1: 50.000 năm 1965 (số hiệu cũ 6522 It, 6377 IV)",,c2778431db84eaba19c36be48fa437891a47db12daabd5c9e272623b768c77a4
+maps,807d624e-abc8-4f0f-b221-03096d806713,5930-2,Tinh Bien,Tinh Bien,,1974,printing,1% Printing 6:74 -,,d3a83341f84782df6a7bd6461e99ca2537086b8ff4282d2dffb1d6eeea2d6e53
+maps,8192d9c1-bd9a-43fb-9182-db3b9b50d2da,6232-4,Mémŭt,Mémŭt,,1972,printing,41% Printing 6-72,,4df1a42f39268d12c1ba8feb386b25c8887fd16c1ce10f25ce4d4bd8fca4b571
+maps,83a4bf57-79c8-4715-8c61-85ebd4fbc5ed,5946-1,Ban Tai,Bản Tài,,1965,content,MAP INFORMATION AS OF 1965,,f940d0ac45adf9e34a823443586f716203424a49f99c00f6a21b6a6b2765aa47
+maps,844bad0e-16f6-4eb3-82d9-746d372b6676,6354-2,Bản Kiềng,Bản Kiềng,,1980,printing,In lan thử nhất năm 1980 theo:,,465cc0fc292dc96cfadf88c171baac74b6ed4e19764dcc03f8c32fcd49876197
+maps,855b71a4-c220-46a0-9569-c5f4fe986952,6530-3,Ấp Bình Châu,Ấp Bình Châu,,1968,content,MAP INFORMATION AS OF 1968,,726a6fc1d6aa530486c46ab959a03af1fd836a964c550086468afb75d10c0d29
+maps,85abb52b-7d80-409f-9618-2c3771c283e7,6541-4,Huế,Huế,,1965,content,MAP INFORMATION AS OF 1965,,1913c4d6deb5d0c3c73bc5305b49f7e35f464f820310ad22e2486c1e4cd148a0
+maps,86970bc3-724c-4c6a-b14c-7df4a04550b3,6144-2,Hung Trung,Hung Trung,,1974,printing,REPRINTED BY 652d ENGR BN (TOPO) (ARMY) 2-74,,92b3f3f6a5904e131f5f7f4b22c78c088984b4891b79f199c25fedc7239cbc5f
+maps,8716b8cc-1ee3-4e4a-9026-e2995d466a49,6330-3,Can Giuoc,Cần Giuộc,1970,1970,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6330-3.jpg,
+maps,88a72bc9-a1dd-4b83-9a95-bc6dc27ad7c4,5930-3,Giang Thành,Giang Thành,,1982,printing,Tái bản lần thứ hai tại Đà Lạt năm 1982,,024f1f9bcab9d41a914f65fde195bb9a8c0e1128aa42c7a9a9fd633227154587
+maps,88dcbc90-9c81-44ec-aede-8624f0f1512f,6232-2,Bo Tuc,Bo Tuc,,1970,content,MAP INFORMATION AS OF 1970,,6b5251771a275f0a1950bb9d820bf2fee127116a66df8892788117b7e2fc7cc7
+maps,8919c523-68f1-4c66-a683-47c26f7df4e6,5729-2,Dương Đông,Dương Đông,,1965,content,MAP INFORMATION AS OF 1965,,b0196e18392b9c4c7f33d7c80949c8f3f42552e777943006800e679b099dffbe
+maps,895955bf-3adc-4c54-b61e-f93fdeab5306,5946-4,Phu Đen Đin,Phu Đen Đin,,1995,printing,in nöm 1995 theo 1: 50.000 UTM in nam 1965.,,f4cc845697c4461b84e71ca827fd6085b1adb3e05e374e7676be3e325cacb959
+maps,8a46c269-1ad5-45a2-a6f9-e6a1c2135fb3,6441-3,Ban Ko,Ban Kô,,1970,printing,@*34Printing 3-70,,b901f56c4e22ddb62ea6722ba3a6b0342118be70de705669e6f1b055bea3a403
+maps,8bb23b06-3f98-4e27-9a1e-118ca5d6092c,6330-1,Bien Hoa,Biên Hòa,1969,1969,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6330-1.jpg,
+maps,8c594cff-efb7-4a28-9ec9-40baf80a8d3c,5729-1,Xom Ong Thay,Xóm Ông Thầy,1965,1965,,,,
+maps,8c6d179b-fa28-46b8-83af-cda7d571652f,5554-4,Phu Nam Sau,Phu Nằm Sau,,1979,printing,in tháng 5 năm 1979. Chỉnh lý theo bản đồ 1:100.000 UTM in năm 1978,,e0023c0b4a8b687bde376e39544e4584dab073ce1cee47e34509ac4280b988f4
+maps,8c7710be-1b47-42ac-9087-3462144a2c7c,6551-2,Quần Đảo Cô Tô,Quần Đảo Cô Tô,,1980,printing,In lan thứ nhất năm 1980 theo:,,b18a1d7f8aca0ad8e32c6c6a39a4bfe33f35b23ec99c76ba6197ccd0b6a7c243
+maps,8cff6529-5577-43d3-a654-67714cdacc47,6232-3,Ta Dath,Ta Dath,,1970,content,MAP INFORMATION AS OF 1970,,d3b0a07da97a3b6de0931adcc27ee25600852e756fd209b04377d77cef719644
+maps,8d3471f1-8ada-4ade-8723-6a94ca6e4da8,5829-1,Krŏng Kép,Krŏng Kép,,1967,printing,4 Printing 6-67,,a962c5a9a925c96cff109022f4f74701321b973935b6bf3c79bece4ca00a5085
+maps,8e8f81f6-4941-462e-8bcf-91ba5a78863b,6350-3,Cua Van Uc,Thái Thụy,,1985,printing,PRINTED BY DMAHTC 4-85,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6350-3.jpg,adf200d295911caab8e81cfb1f8df5aae7bf4775b96e93e428d290d45ed37de9
+maps,8fd695ff-735c-41d5-a7c3-30e949de1f5a,6230-4,Duc Hue,Đức Huệ,,1999,printing,Reprinted by NIMA 11-99,,bc1b4598f51ed5a3f8d5b0235f5a9c569a6f7e4b8bc5d991c63e1b31b7fef57f
+maps,8fe6f597-d88c-4ef6-88f0-35e96d279a8d,6440-4,Ban Alot,Ban Alôt,,1967,printing,1# Printing 6-67,,bb45a1a6a47bda871ac4703b4c19a73e7282c4fcaf7006614b9074536a109ac4
+maps,9466821f-2e1f-4432-8e94-efe4bbf027f4,6440-2,A Ro,A Ro,,1974,printing,ðt? Printing 3-74,,dc8fd330e5f859357f62184a6df5d5d4ac0c828adb244ab21da6d5e282a9dca9
+maps,95c2e848-5d27-4f89-91fc-a4352fd48331,6350-3,Cửa Văn Úc,Cửa Văn Úc,,1979,printing,In lần thứ hai năm 1979 theo 1:50000 in năm 1975,,76495ad9da3afa5dc418689e503a4a78d144750921a05b5f58b63142a6dca4e0
+maps,95d68720-46c4-4238-a490-7729ab909a05,6537-4,Polei Jar Sieng,Polei Jar Sieng,,1997,printing,Reprinted by NIMA 7-97,,49973912f8aad5bcaafcf33eed626412eec9e0c165bd0dee11b8f94959ffb846
+maps,9725ae8f-f7c7-44ad-923f-d91c26942e39,6652-3,Chiang-p'ing-hsŭ,Chiang P'ing Hsŭ,,1980,printing,in lần thứ ba năm 1980 theo 1: 50000 in năm 1976,,dd1f18d642eb4f338c145afba6cd53ab73205d994620a21150cf049a90ab866e
+maps,98ba8841-bddd-4a8c-b92c-0e08bc2aa522,6329-2,Thừa Đức,Thừa Đức,,1965,content,MAP INFORMATION AS OF 1965,,5411858c022288083997a3bc08516a750227afb76efa8ea04ccf08fe3585e496
+maps,98eeb7ad-5431-4954-868c-72fdae221448,5847-2,Bản Tèm,Bản Tèm,,1971,printing,254Printing 6 - 71,,0485a6f65bd2bc13d476ab5bcd8f5df39882d52bf80508261e47a587e11edb2e
+maps,9997582b-fefd-49e2-9d51-c8ae6f3bc370,6326-3,Côn Sơn,Côn Sơn,,1969,printing,and Printing 12-69,,0a7029d8120ff77bbe9e9fc838397826acfeb925c1b93df655a2d5a6feacaed9
+maps,9bd799e9-6694-4032-bc18-0b1f4f0f19e2,5850-2,Sôp Long,Sôp Long,,1965,content,MAP INFORMATION AS OF 1965,,0827527ebe1be020225afd860a1a838f2c460b6bbf6af61f9e3842743f02fec8
+maps,9cd5a41b-cde6-4b26-bd8a-06b92d9fd983,6132-2,Khum Trâpeãng Phlŏng,Khum Trâpeãng Phlŏng,,1984,printing,REPRINTED BY 29th ENGR BN (T) 11-84,,d507987aca11287fcd04f2b8813b097e952c2b5286518938607775528aa67f46
+maps,9d0f2e56-30d8-4d2c-a5f7-b8b22f045b34,6230-4,Đức Huệ,Đức Huệ,,1965,content,MAP INFORMATION AS OF 1965,,9e87c7fab0df956fd5d4e8b50ac88d73bc709481471a18d5b836200cd9805e4a
+maps,9d507313-9cd0-40cd-917b-8e96f3aebd9c,5551-2,Hua Thanh,Hua Thanh,,1982,printing,In lẩn thứ hai nốm 1982 theo 1:50000 UT.M,,41247801ad57271c1b38a894dc46c6a8440c649143a9fd64a146b4efba685273
+maps,9e86fe30-dfbc-454b-854a-6b8d06c1759f,6452-4,Chi Mã,Chi Mã,,1976,printing,In lần thứ Il tại Đà lạt tháng 11 năm 1976 theo bản đồ 1: 50.000 năm 1965 (số hiệu cũ 6420 IV - 6476 I),,ae19342802f75b5c66cc5b2acb882b62141a4bf425cbf0f5a48c094800b03b50
+maps,9f1bb303-5005-477d-a84f-a6232a0f964a,5754-4,Bản Mac,Bản Mac,,1978,printing,In lần thư ba năm 1978 theo 1:50000 của Mỹ qn năm 1964,,56d80fc699e6afd0fc2e69a6185bf85b082f90d137160b498a5082501c1c0ce2
+maps,a19becac-9d06-43e9-8f1c-8985e697e294,6350-1,Quảng Yên,Quảng Yên,,1980,printing,In lẩn thư nhất năm 1980 theo1:50000 in năm1976,,7e5aa9eeff004b3313cd3ae0c97e45459eb99433b9e8d47f368005845d788ebc
+maps,a3303cb4-55cf-4969-b5dc-c2b88eb9eb76,6731-1,Thôn Vụ Bổn,Thôn Vụ Bổn,,1966,printing,4 Printing 12-66,,8cd27efcb62bbbb0ba27f0031505f56a215fdb7433c8045fcd4c18b181017077
+maps,a5074d25-5ba8-4cbc-ac34-db99d4b9f705,5850-4,Muong Het,Muong Het,,1975,printing,In lần thứ nhất 10-75,,13b975e5d221660d934996238114a30bc610091a344c9a0ba6ae10da02eba07d
+maps,a5d83da9-2631-4c22-ad7a-32d9eddd1503,6350-1,Quang Yen,Quảng Yên,,1985,printing,PRINTED BY DMAHTC 4-85,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6350-1.jpg,302bcb167207c498e0b555ad99e635cfc27bf064cd724f405478c2844381daec
+maps,a83f9d52-a548-41b0-b9ba-c4524ad92384,6436-1,Ph Ba Kham,Ph. Bà Khăm,,1989,printing,Tái bản lần thứ nhất tại Đà Lạt tháng 9 năm 1989,,81e5c923ebe977f3bb46713ccf528ace4d848404eedbaed93def0cfd7560a796
+maps,a88a5367-831f-488f-918f-369978246197,6332-4,Loc Ninh,Lộc Ninh,,1999,printing,Reprinted by NIMA 11-99,,6015c958e5bd3eb57cd072170094426d88ebc25b4acc560857ab84cf01a94181
+maps,a96e4a1f-e155-4455-9027-4cb9d773216e,6538-2,Dak To,Dak Tô,,1973,printing,2**Printing 6 - 73,,d04e5ca7488abba11fb584a73b9ee91bdcd9d870a8129830f5f57cac6d7d6704
+maps,a9ccda10-6e34-4458-b472-a716143e69f4,6541-3,Nong Truong Nam Dong,Nông Trường Nam Đồng,,1999,printing,Reprinted by NIMA 11-99,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6541-3.jpg,0137a2143eab68d63f1e21f38f8cb75714a080aff65677e95bdf7b05600a7f7b
+maps,ad415246-356d-4771-a5f3-eeb5ae3f8289,6538-4,Dak Sut,Dak Sut,,2002,printing,Reprinted By NIMA 09-02,,f21ccf5eac241df2086247700daafab8ae584afdf11ebaffff5535e4856a3872
+maps,b046976c-2e2e-4293-ab83-77f65e5eec3e,6538-2,Dak Tô,Dak Tô,,1973,printing,2**Printing 6 - 73,,e44d20d17c93b50e98158632a8ffab2dd60ec1deae1d0d88cd81d17c204ef26f
+maps,b063a081-9590-468a-a841-107c0318ccaf,6534-3,Bon Dak Ndrot,Bon Dak Ndrot,,2001,printing,Reprinted by NIMA 08-01,,cee2ac64254740157b80e94e06974f810d5dccc91f40c5a28b6e03418c6df24e
+maps,b53696ff-6869-40e2-a1c2-098948884a2d,5853-1,Nghia Do Tong,Nghĩa Đô Tong,,1975,printing,In lần thứ nhầt 10 - 75,,544bdad313b830bd3141f39797095cb01090f8a5100b9311631d518cd15f62c8
+maps,b548e20d-4fcc-49e8-9027-450bae0a6360,6541-2,Bach Ma,Bạch Mã,,2000,printing,Reprinted by NIMA 10-00,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6541-2.jpg,b6ae719b0509393b75b1510b770816ce60de786dd0ac5ca6e54c38caccbafdab
+maps,b62ccacb-59e9-4575-8203-71f0ca931304,6441-1,Ấp Lai Bằng,Ấp Lai Bằng,,1965,content,MAP INFORMATION AS OF 1965,,1232eeb5b4921e45b526ed04a42aa7ecc2f9ab4f1c2483f5cbd6fefda5c7c4ab
+maps,b74c9249-0303-4d00-aeb6-6fdfb88ba399,6151-4,Vĩnh Yên,Vĩnh Yên,,1995,printing,In năm 1995. theo 1:50.000 U.T.M in năm 1965,,6db7e198ba8904f823fe59e1438a87e3c0162182063ee1f4ce968f17aa9a33c6
+maps,ba6b7804-1430-44ce-8741-506f0bb06fe6,6350-4,Hải Phòng,Hải Phòng,,1980,printing,In lần thứ hai năm 1980,,05e262539d9ec634ffba285f70bd49ba041852fe68a74f8f49c62859453af1c5
+maps,baa4f48c-206c-4bea-b2e1-91e7f4d85c1f,6440-4,Ban Alôt,Ban Alôt,,1967,printing,1# Printing 6-67,,76442cf7ed355941e4021c61b65700e8d0b9b0543983f6032b80eb45e3cec839
+maps,bbb827a7-de99-4728-990b-e03cfc8b5a9d,5948-4,Xamtai,Xamtai,,1965,content,MAP INFORMATION AS OF 1965,,83a91628c8323535ec72db9a8e61cb6a2f6b1aacdf86928f785c86c06746e022
+maps,bc212e29-aaf7-4747-a418-8fccec98761c,5729-2,Duong Dong,Dương Đông,,1997,printing,Printed by NIMA 7-97,,234b6d68f78f35f52246b810088fc967d541e5ec0d7ddd8c173f09c08b8ccc2d
+maps,bc4ca0a3-d4bc-4533-ab1e-45cf7f374779,5654-3,Bản Nam Cum,Bản Nam Cum,,1979,printing,in tháng 5 năm 1979,,730a2442527ac60fcc285119226aab9f4c0df3b5a59a7ed185867d84a3fda9ca
+maps,bc70d97e-b68c-4305-9547-afd6a90cc8b9,6535-4,Ya Lôp,Ya Lôp,,1969,printing,8rd Printing 6 - 69,,19dec91ea4227052e5ec0b508a88e8126e29dc202b3a5f6e6b22cc7e4be8df1f
+maps,bf25b149-a3b1-4a0e-97f4-267b9f5868ad,5929-4,Kiên Lương,Kiên Lương,,1965,content,MAP INFORMATION AS OF 1965,,9c2d99312d98c67c6f5ee1b4ed3dcaca2030d2fdcc72a364a39e7f9a7e19990b
+maps,bfa0a2e0-25dd-44a4-8ac0-13ba69f6e93c,6533-4,Duc Minh,Duc Minh,,1965,content,MAP INFORMATION AS OF 1965,,d1680286b385ac06ae54b8936e8fdbbec4e7963c4d605ebf067d523c85fb0007
+maps,c013807c-4dc7-4e57-bd39-399d86921f8e,5854-4,Muong Khuong,Mường Khương,,1979,printing,In lần thư tư năm 1979 theo 1:50000U.T.M,,a409fb4a3ca393b97e3666068d92b4a22c69f23744a549f4b137c46519fd7fc4
+maps,c017072d-6b69-49c4-99ec-d57b3ecf5613,6354-1,Bản Không,Bản Không,,1980,printing,In lần thứ nhất năm 1980 theo:,,955a861322cdaa57ab246264c7a9b893cf6e60dbbf5a306abff07e002fdf3cf0
+maps,c26dd758-4dbc-4560-a1db-ba3a7ab78008,5948-4,Xamtai,Xamtai,,1965,content,MAP INFORMATION AS OF 1965,,19076692260bbc3a69f6f3efc8143175795812a6371d7267747d2f7ad8134410
+maps,c28ee942-2036-447a-a294-b27615b43440,5454-1,Phu Tu Lum,Phu Tu Lủm,,1979,printing,in thang 5 năm 1979. Chỉnh lý theo bản đồ 1:100.000 UTM in năm 1978,,33c6b87de3eb1b0c8a8de0b12c23e49386259504223ebd2951a8bf5e1a303a36
+maps,c2a41d59-4fb0-42c0-be55-dde868b2efee,6148-4,Ngo Xa Thong,Ngo Xa Thong,,1966,content,MAP INFORMATION AS OF 1966,,51ec8a1295dae19b1e821cff06eab53083e94f8194c2a3aa62df0ad719d2ac8d
+maps,c3565287-9ce7-4186-bc55-440a70f79e8b,6151-1,Phổ Yên,Phổ Yên,,1979,printing,In lần thứ hai năm 1979 theo tài liệu,,7cc938197f926921fc1d60928b167cb7bbb5c104afb7967d01d96da8cd344bba
+maps,c37ea760-b3c6-49ef-aa8e-bb04125fbd7f,5654-1,Giao San,Giáo San,,1991,printing,In nếm 1991 theo 1:50 000 U.T.M in năm 1964,,59f4c902f95dcb8748ab0f521a81a4701cc2fb5e75eb74990f74d1452521ceb3
+maps,c49e8d84-cae3-43be-92c7-cfac193ca943,5950-3,Muong Lat,Muong Lat,,1979,printing,IN THANG 5 NĂM 1979. CHỈNH LY THEO BAN BO 1:100.000 UTM IN NĂM 1978,,386784d8643061cc5193833844d5d00eec90db74e7ce863f765b0e7b1f0e12ab
+maps,c58ac749-a7ec-44ff-a932-0ab5791eff73,5754-2,Lào Kay,Lào Kay,,1978,printing,In lần thi’ banim 1978 theo 1:50000 cửa Mỹ in nam 196,,4eaef9c7ff264848447fbd508e29dac434e77a12f1518ffc8ec044c523bffec1
+maps,c79c778d-06db-44ae-9776-3ebac7abb0bd,5949-4,Muang Soi,Muang Soi,,1965,content,MAP INFORMATION AS OF 1965,,45b4a93570b5615860280a9fb101be9bae316a5637c928a3444b37f722b48813
+maps,c79cc224-7be2-4280-9641-c75bd89a958e,6242-1,Sheet 6242-1,Ban Nathôn,,1965,content,MAP INFORMATION AS OF 1965,,4e72899887e1706d258ec879ea716f67b63aebbd6a47f11f88fab091433a93a2
+maps,c90a718c-6549-42cd-8c7a-2875c71e0cc6,6243-3,Ban Vang-ala,Ban Vang Ala,,1971,printing,2nd Printing 3-71,,b0a3bddea7a45298dcfea273f6d3f8b0f76d623dfca29346aaafc193be1e2128
+maps,c937e72e-dee8-4f07-a704-d59514d7b48c,6439-1,Ban Mangha Noy,Ban Mangha Noy,,1973,edition,"Đồ Nha Địa Dư Quốc Gia Việt Nam, ghi chờ năm 1973 với sự thay đổi về số loại bản đồ và bảng chú từ",,08995cb5991dd2e04606b3b219c8ec37b7f536b18d09c2a0c34d1620e5738bce
+maps,cb655dce-d2d4-4e48-8ae7-8e23ac566b8e,6636-4,Pleiku,Pleiku,,2006,printing,Reprinted by NGA 10-06,,a294f01c0cc033b771bd557d9cfdc5073124e3e8e0da1a6b6f8250da03cb052e
+maps,cbb562ea-1a01-4afc-9025-fa1a450aa34b,5747-1,Nong Hèt,Nong Hèt,,1971,printing,1st Printing 3-71,,1ca72abd98775f2b09e6c5e4fca033e5f2f12cec729d34405cd21a1202fb1361
+maps,ccd0cb56-24b3-4c1f-868e-202b6acfe8cb,5552-3,Phou Ta Te Son,Phou Ta Te Son,,1980,printing,In lần thứ hai năm 1980,,daa31f1eb567b77e0c7aa16d5540dab7e2fdf180c5e6905f8497a8cd26a5135e
+maps,cdb25733-03ef-4782-925e-8fd499f4b89b,6535-3,Yok Mbre,Yôk Mbré,,1965,content,MAP INFORMATION AS OF 1965,,1808d3d739b71fa527a0cc113211c5b4f480ed149b997dd47cfb9b6f53b2d8eb
+maps,cdef2d04-4749-48a8-99f9-1a8b8f1c14ad,6541-4,Hue,Huế,1968,1968,,,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6541-4.jpg,
+maps,d138ef33-7de6-4fde-b22d-1d6e086a6182,6150-2,Phu Ly,Phủ Lý,,1965,content,MAP INFORMATION AS OF 1965,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6150-2.jpg,5b67e99bfbeb3e15affe0b5f3c2d926aba93e99ea054ac521810a6eeb7746559
+maps,d20f7527-feed-4b6a-a1df-5d68a79d547d,5650-1,Bản Pou Sung,Bản Pou Sung,,1965,content,MAP INFORMATION AS OF 1965,,61c3ace1d8ce2fb9c38bf998ee137475f15e8e6036f749e2b73876935fff019b
+maps,d338378a-fb7f-4ba7-8ddd-b1e4f1b7a006,5950-3,Muong Lat,Muong Lat,,1965,content,MAP INFORMATION AS OF 1965,,6375db6a410697937be95849ca0d98762b447f940ae49c56b3fdbc394ae90c6a
+maps,d4e07fa3-ff94-4d3b-b979-12ad2170c83f,6441-1,Ap Lai Bang,Ấp Lai Bằng,,1965,content,MAP INFORMATION AS OF 1965,,659e93cf24ae4358327269076c4bfc0675c279dafae32674058f93ce0513e00f
+maps,d63ed125-d77e-41e4-bfac-9d0cd217f566,6641-3,Đà Nẵng,Đà Nẵng,,1967,content,MAP INFORMATION AS OF 1967,,aa7ad152c4b44ccd644e7d8351bd5b0fdb76bde254a6f82860b70d4ce0e78fe1
+maps,d665e342-4d13-411e-b6f5-2daf7e586d8f,6731-1,Thon Vu Bon,Thôn Vụ Bổn,1984,1984,,,,
+maps,d700cb7b-b045-4fe7-ad76-e094df8437ae,6130-4,Vinh Thanh,Vinh Thanh,,1965,content,MAP INFORMATION AS OF 1965,,c24db8d6a47446e0fec12ae1868f10c0efbc5c3b7520f99aeca880a048ef1d91
+maps,d759ab21-4ad5-4fce-897e-40380c050534,6539-4,Peta Pac,Peta Pac,,1999,printing,‘reprinted by NIMA 12-99.,,ef1520bf0af52baa15a844ae8d4435e862463fea19d2bcc6623ae8ddecbc582c
+maps,d8eb6cbc-f29f-48e0-8146-4503239020df,6045-2,Phou Kounkanin,Phou Kounkanin,,1982,printing,In lần thứ ba năm 1982,,7a0bc86dc0495637f9e65e2dcb99fb0232241b969179d705438dc89049e79596
+maps,d9339fc1-b559-4ec1-8fd2-382ab587888a,6441-3,Ban Kô,Ban Kô,,1970,printing,@*34Printing 3-70,,116a0bdb13061d491e79f5b0a22dda7f2dcf92e9150935815390d5eff290b750
+maps,db04c87f-7687-4cb8-85e8-711a91b54831,6541-3,Nông Trường Nam Đồng,Nông Trường Nam Đồng,,1974,printing,7%» Printing 3-74,,98f48ba3034c62c2cc412ba6dc6cff1dbb932e1d250858cb622962f78dec658a
+maps,db1c0336-61e2-47e6-b5e5-dcfe1f3086b3,6326-3,Con Son,Côn Sơn,,1969,printing,and Printing 12-69,,407d2c58de0c1bd917243d7fa4fa85fb1b5851c2b88baeb14e881f0d3c304247
+maps,dc08a8fc-40bd-4120-af15-270e8d723e0c,5847-3,Na Cáng,Na Cáng,,1992,printing,In năm 1992 theo 1; 50.000 U.T.M in năm 1966,,d276d178b1d65d2a43972b314782a03bf02ef1053213af664e53e0fddd58d555
+maps,dc1aa174-6808-495d-ba49-de8a8a8af7f1,6550-4,Ile De La Table,Île De La Table,,1965,content,MAP INFORMATION AS OF 1965,,48d0553c1e072d9bac7be8ce9e28c4b10dbce855dfd33e98354a6e8540c7c5c1
+maps,dcc1e479-0df6-4e39-b380-fac558a93dc5,5946-1,Bản Tài,Bản Tài,,1976,printing,In lần thứ nhất 2-1976,,29402413fbbb11b479550e656e6dd897819aefb84d4238c50927c08d1b8b0827
+maps,dd7a75b9-2cf4-4115-82bf-7d278003a47d,6332-4,Lộc Ninh,Lộc Ninh,,1965,content,MAP INFORMATION AS OF 1965,,e155f3e6f8bb33d1c5428e3f6720910289ce213b4375120fb79298def064c039
+maps,e121acfd-d001-4cc3-adbf-ae0dc11befaa,5650-1,Ban Pou Sung,Bản Pou Sung,,1966,content,",MAP INFORMATION AS OF 1966",,d3a98788e3fcadc16b2716ac92248777bbbdbb40ab5f8fec6fb65b2366731717
+maps,e1b3b3a6-5edb-4b83-81ef-03c6b3f570c8,6539-3,D Go Kram,D. Go Kram,,2001,printing,Reprinted by NIMA 3-01,,ad3fa7788eac34a86253b4d5440e7ceb921cc66202e735be367a6a3f02d39681
+maps,e22d22ee-b012-4020-b26a-3a9b37f40f3c,5452-1,Lao Fu Chai,Lao Fu Chai,,1980,printing,In lẩn thừ ba năm 1980 theo 1.50000 in năm 1978,,a947736cafd3c7c6e9a0081a5ebba3a4b3e5b5c8c279744b8e974238530a033f
+maps,e42349ca-a203-4bf0-9642-e3de2d9e7277,5949-2,Sốp Phua,Sốp Phua,,1979,printing,In lần thứ hai năm 1979 theo 1:50000 in năm 1975,,276df43346d433327f9a894da29afe02e6db50ddd879ee3950ebcabad18629a6
+maps,e4dbb5bf-cf21-4a3b-a766-82a5fb1a1936,6030-3,Chau Phu,Châu Phú,,1969,content,MAP INFORMATION AS OF 1969,,017abe36cacf5e54c094d05d937347b96d41823bca2a61e99ee0e82d1c5bc8c2
+maps,e7d849d5-d1af-4b03-b066-e0bfbbf508fd,6130-1,Moc Hoa,Mộc Hòa,,2000,printing,Reprinted by NIMA 10-00,,912c689d97a13906d60e506593e03c20aa21b2be811ad7f97d078aba054af1dd
+maps,ea9a1a04-b749-4a0d-893e-ef6581cb5f4a,6836-1,Hai Dong,Hai Dong,,1965,content,MAP INFORMATION AS OF 1965,,565d7f27e558197023f857369a4cb3f599131555f0326671d9b64aa710068b86
+maps,ec1d8319-0a9a-44bd-b0af-552e73667012,5453-4,Tao Phya,Tao Phya,,1975,printing,In lần thử nhầt — 7 -1975,,6be47d5b056dfe10c7b6ba5ab19faf4ca1509c1eb6efdc3d2e6c1092f6bfddb8
+maps,eca48e56-ca09-479a-9d90-361f8dacb4c0,6641-4,Thon Trung Kien,Thôn Trung Kiên,,1965,content,MAP INFORMATION AS OF 1965,https://maps.lib.utexas.edu/maps/topo/vietnam/txu-pclmaps-oclc-21713238-6641-4.jpg,498a0b57f88b9a40b7536d20459e5ffff26a3532cec01a1d19715da7ab19ff33
+maps,ed87ea22-f44a-4818-9df8-63a8a2cb1165,6641-2,Khu Phố Nam Thọ,Khu Phố Nam Thọ,,1967,content,MAP INFORMATION AS OF 1967,,495dda3834868520bca715ac5bfecd26b62630bb38198d4bf6beea6fb58bd363
+maps,ee98e764-6fe6-406c-8a38-0b3e2f8c3682,5454-1,Phu Tu Lům,Phu Tu Lủm,,1979,printing,in thang 5 năm 1979. Chỉnh lý theo bản đồ 1:100.000 UTM in năm 1978,,2f423d158729ac5f5d5adca3a4d60ef4bdd726d83bf3de561bc5e89089bc370e
+maps,efc717f0-9b97-4232-8dd0-356a6635071d,5750-1,Muong Hung,Mường Hung,,1979,printing,IN THANG 5 NAM 1979. CHỈNH LY THEO BAN BO 1:100.000 UTM IN NĂM 1978,,a38bde952680871ae1dcd2212a308517234cfaeaba4f0c96a7edaf55bc04aea5
+maps,f01d4609-033a-4ac3-884b-2d500239e9f5,6736-1,Bình Khê,Bình Khê,,1973,printing,5+ Printing 6-73,,63978b821d5c6409330668290cc0bdde61406d837b62f3b9adebe28a058461a9
+maps,f0474ce6-3abe-44c7-aebc-247ab9f29998,6438-1,Dak Palouat,Dak Palouat,,1972,printing,4‘Printing 6-72,,7538391eca3069626a5316f5db1d7b7327c3bfcd7507b18a44767fe1009736a3
+maps,f4c27aca-1962-4354-914f-e768683e40aa,6439-1,Ban Mangha Noy,Ban Mangha Noy,,1973,edition,"Đồ Nha Địa Dư Quốc Gia Việt Nam, ghi chờ năm 1973 với sự thay đổi về số loại bản đồ và bảng chú từ",,92cbd4bc62f916e228fe75c1700d37d1e9da5f260c07e74fbf71c6e4a38cf6ec
+maps,f59fd377-54d9-47fd-989c-7b0dfa22257b,5949-3,Ban Kho,Ban Kho,,1975,printing,In lần thứ nhất 7-1975,,b26d33b16e87e7080970c663919100495643d188dbdfe8da508f83da801eebee
+maps,f5c6fff8-8a9e-445b-9e0d-f5e52c48a9dd,5728-1,Hon Thom,Hòn Thơm,,1957,content,MAP INFORMATION AS OF 1957,,52727a9b4991ffe8af1105c69ecafc1b502c0e7d67075846f1c4262693cb4578
+maps,f6d9012f-ed69-4d43-ae6a-a97b485426c6,6155-3,Luong Mang,Luong Mang,,1979,printing,In lẩn thứ tư nấm 1979 theo 1:50000 của Mỹ,,a4b393b8d1bdc9315276e418be0f21427dfa1b1f04bf52a9061f62f80843e35d
+maps,f7106215-75fa-4a90-aa25-47e3c7975773,6030-1,Hong Ngu,Hồng Ngự,,1965,content,MAP INFORMATION AS OF 1965,,bf8139e7e5d8bc236355f332c5e8f676a354447584cecc7918150c63e1efb7b9
+maps,f8c88434-bef6-41dd-8204-afd14a4f6b22,6131-1,Ph Kâmpông Trach,Ph Kâmpông Trach,,1984,printing,REPRINTED BY 29th ENGR BN (T) 10-84,,b9e393d001ded6f9c48b6ddddf6f1d0829ab3064523ef6c6d5fd9e3f24c1f42e
+maps,fac4d8fd-2b8d-42ae-adec-83042fb6ec9f,6440-3,Ban Tangyoun,Ban Tangyoun,,1966,edition,COPIED IN 1966 BY THE NATIONAL GEOGRAPHIC SERVICE,,fc72eed2f9943763988f1ebdb1312a5527f72da3ae1c0414854b6013b9a536c2
+maps,fc13d7dd-6d17-496b-a873-17060f874c02,5747-2,Ban Namkhaohou,Ban Namkhaohou,,1971,printing,4# Printing 3- 71,,da0b204a9d803c22f4ec70bd971b8f044d3434acbdc8b7ae73943903a5b3a967
+maps,fc20e4b0-25af-4a8c-8fff-2428ccd16188,6550-1,Đảo Cú Xú,Đảo Cú Xú,,1976,printing,In lần thứ nhầt — 3-1976,,3b5a4487428521800df13b34295ab80bc94c31074dff7d7d7e957744c2980815
+maps,ff0c1801-1865-4d7a-b181-5a85a868c8d0,6535-3,Yôk Mbré,Yôk Mbré,,1965,content,MAP INFORMATION AS OF 1965,,87450220292ac17ffbb7142ccc6919c8b5f5ca491c2e7644ec2ab94e962209bd
+series_cells,00e9fe48-d537-48e5-a653-55e27d09503d,6552-2,Mong Cai,Móng Cai,,,,,,
+series_cells,02de54c1-c0b5-43f0-95ae-16c04077f8e5,6438-1,Dak Palouat,Dak Palouat,,1972,,,,
+series_cells,05d7722f-4d5b-4a51-a37c-4b7bb8f5df93,5949-2,Sop Phua,Sốp Phua,,,,,,
+series_cells,0acbedbc-fb4c-43dc-898b-0f9a190188cb,6434-1,O Tea,O Téa,,1970,,,,
+series_cells,0e4ae63f-b615-4a72-b921-500102491da2,5650-1,Ban Pou Sung,Bản Pou Sung,,1966,,,,
+series_cells,0ec4c39d-8dfb-442f-afb2-9ae2ba791a5d,5729-2,Duong Dong,Dương Đông,,1997,,,,
+series_cells,10654a51-8dac-4e2e-a8ae-7f9d5edbeebd,6143-1,Ban Xe Nua,Ban Xé Nua,,,,,,
+series_cells,111b28b4-536f-4223-bbbf-428c023d412e,6440-4,Ban Alot,Ban Alôt,,1967,,,,
+series_cells,120c4bd5-5514-4fe1-912d-cf33071820b1,6030-3,Chau Phu (Chau Doc),Châu Phú (Chau Doc),,1969,,,,
+series_cells,1b3c3008-a518-47b5-9e55-1b885f5b6d5c,6731-1,Thon Vu Bon / Phan Ri,Thôn Vụ Bổn / Phan Ri,1984,1984,,,,
+series_cells,1d34a33d-b3b8-488b-9f92-2b85ca19810b,6055-4,Pho Bang,Phố Bảng,,,,,,
+series_cells,1d5210a2-7842-46fb-bcac-cb1bb19b4536,6541-3,Nong Truong Nam Dong,Nông Trường Nam Đồng,,,,,,
+series_cells,1e3d1e55-8dd9-45c8-a2ca-155c051df09b,6350-3,Cua Van Uc / Thai Thuy,Cửa Văn Úc / Thái Thụy,,,,,,
+series_cells,1e72ea2f-c89e-49ca-ad2b-6823ad4fd447,6232-1,Choam Kravien,Chôam Krâviên,,,,,,
+series_cells,1f2868b0-7ede-46e5-ac22-f798afbc8452,6440-2,A Ro,A Ro,,1999,,,,
+series_cells,24ecdbff-8dfc-42e2-9bea-ab61cb8baf12,6249-1,Thai-Binh,Thai Binh,1984,1984,,,,
+series_cells,266416af-a0e6-44dc-82f0-47c1ac4a9286,5954-4,Hoang Su Phi,Hoàng Su Phì,,,,,,
+series_cells,2691c30e-946c-4d33-be0d-58473c636176,6836-1,Hai Dong,Hai Dong,,1965,,,,
+series_cells,27fcf7ee-5b18-4a5b-b7d4-8af5b4c8c95a,6542-3,Phu Vang,Phú Vang,1968,1968,,,,
+series_cells,2a29b889-3b10-4440-921b-c11e54fc6e0c,5851-3,Ban Lot,Bản Lót,,1979,,,,
+series_cells,2bc64ca5-5b27-461b-b857-e0fe7b17a372,6533-4,Duc Minh,Duc Minh,,1965,,,,
+series_cells,2dad9bbe-c253-4617-a97b-4ba66ee6c105,6440-3,Ban Tangyoun,Ban Tangyoun,,1966,,,,
+series_cells,2feb6709-34a6-48d0-966e-67c1c7646705,6441-3,Ban Ko,Ban Kô,,1970,,,,
+series_cells,381dda41-2038-42be-b440-5877b996a013,6132-2,Khum Trapeang Phlong,Khum Trâpeãng Phlŏng,,,,,,
+series_cells,39bf1f3f-551c-4e9e-ac3c-64c16098174c,6342-1,Cam Lo,Cam Lộ,,1973,,,,
+series_cells,3a5fd7f0-828f-446f-8f88-0063a104a168,6151-1,Pho Yen,Phổ Yên,,,,,,
+series_cells,3c39064d-8d65-434b-8860-d7b672681bbe,5847-2,Ban Tem,Bản Tèm,,1971,,,,
+series_cells,3c5a4a5b-0438-4d41-9b9b-8d861bc2e33f,6148-4,Ngo Xa Thuong,Ngo Xa Thuong,,1966,,,,
+series_cells,3f01724e-0fc4-4072-9913-1722628f88ef,6151-4,Vinh Yen,Vĩnh Yên,,,,,,
+series_cells,418241d0-c42d-49aa-9e57-4be681caeb91,5854-1,Ban Po,Bản Po,,,,,,
+series_cells,43358442-1ccf-4271-bf99-38940714a9e1,5554-4,Phu Nam Sau,Phu Nằm Sau,,1979,,,,
+series_cells,442515c5-55b1-4eb6-b6f9-99227298bb06,6436-1,Ph. Ba Kham,Ph. Bà Khăm,,1989,,,,
+series_cells,4437be64-f9c8-446d-88ab-f980b9cb0975,6329-3,Binh Dai,Bình Đại,,,,,,
+series_cells,47a58653-66b4-4093-ac07-91205eff729b,6232-2,Bo Tuc (Uyen Binh),Bo Tuc (Uyen Binh),,1970,,,,
+series_cells,49961d5b-0f71-4104-9f20-2eca9193143d,6329-1,Can Gio,Cần Giờ,1983,1983,,,,
+series_cells,4c7c001e-f37a-4632-94a8-1ef529570377,6232-4,Memut (Memot),Mémŭt (Memot),,,,,,
+series_cells,4cd1368b-52f3-4bf4-8d0b-f131bc673867,6330-1,Bien Hoa,Biên Hòa,1969,1969,,,,
+series_cells,4e22f7fd-c2b7-4a30-9009-f3e4ab1acb80,6539-4,Peta Pac,Peta Pac,,1999,,,,
+series_cells,4ee7a072-1310-4356-9442-4c97d2211913,6242-1,Ban Nathon,Ban Nathôn,,,,,,
+series_cells,53902a1a-5444-423e-9535-632742d2086f,5949-3,Ban kho,Ban Kho,,1975,,,,
+series_cells,5751ae03-c2a5-49a5-b758-f5bf14f99d92,6350-2,Do Son,Đồ Sơn,,,,,,
+series_cells,5bba12a7-3f48-40ec-b0eb-33bcecac9062,6155-2,Lung Cung,Lung Cung,,1978,,,,
+series_cells,5e631308-07a5-4c9b-8ce6-c2352f5b571b,5847-3,Na Cang,Na Cáng,,,,,,
+series_cells,5ea5361c-16d9-4f52-b24d-0f25ec2cfa96,6538-2,Dak To,Dak Tô,,1973,,,,
+series_cells,5f20a949-bc73-42cf-a127-0de1a9055ec4,6437-1,Phum Kham Dorang,Phum Kham Dorang,,1965,,,,
+series_cells,60a90ab6-df7a-43cb-b8a5-9a41b04c6d5c,5554-2,Phu Si Lung,Phu Sì Lùng,,,,,,
+series_cells,6213444f-b403-48bb-b5f7-9d6884869ce2,6231-3,An Thanh,An Thanh,,1969,,,,
+series_cells,62c4ceb4-2b78-4986-beb9-f56918d8bb30,6030-1,Hong Ngu,Hồng Ngự,,1965,,,,
+series_cells,64d3beb6-a5e8-4dad-9371-389d4d7984ad,5929-4,Kien Luong,Kiên Lương,,1965,,,,
+series_cells,64f9e2ac-1a90-44ad-aaed-ff7fd6f3180d,5454-1,Phu Tu Lum,Phu Tu Lủm,,1979,,,,
+series_cells,6550d2bd-c63a-40bf-aacc-e1533be9e834,5729-1,Xom Ong Thay,Xóm Ông Thầy,1965,1965,,,,
+series_cells,68038d1a-6cf0-4b5e-8e99-c5048dde8803,5551-1,Co Me / Muong Cha,Co Mé / Muong Cha,,,,,,
+series_cells,68b5f3c7-1ba0-4a8b-91ee-2922d0aa83ac,6439-1,Ban Mangha Noy,Ban Mangha Noy,,1973,,,,
+series_cells,6f9dfb9f-b50e-41ab-96b8-ec417d9324e4,6055-1,Dong Van,Đồng Văn,,,,,,
+series_cells,700ba793-baeb-4094-9e9c-91706eb06bf0,6245-2,Ky anh,Ky Anh,1965,1965,,,,
+series_cells,7381110f-8e24-491c-bf74-4a0aea00ca22,6550-1,Dao Cu Xu,Đảo Cú Xú,,1965,,,,
+series_cells,748fc9ce-da1e-42c0-b027-1af599c4cd59,6333-3,Meak Say,Méak Say,,,,,,
+series_cells,755ee867-0827-405d-9eb7-1482c3cc8e88,6433-1,Dak Dam,Dak Dăm,,1966,,,,
+series_cells,758f5259-f999-4524-9cf7-e7ff788957ca,6452-4,Chi Ma,Chi Mã,,,,,,
+series_cells,76fd32d8-8f25-409a-ba65-776ffbf811fd,6541-2,Bach Ma,Bạch Mã,,,,,,
+series_cells,78a148ec-28ee-4d70-ba7b-4d4c6b30b661,6534-3,Bon Dak N'Drot,Bon Dak N'Drot,,2001,,,,
+series_cells,793d9269-ebc3-46a7-ae96-3f2f49e52f19,6329-4,Go Cong,Gò Công,1967,1967,,,,
+series_cells,79475a7f-b632-4c17-b7a2-2439dcb6b4b6,6329-2,Thua Duc,Thừa Đức,,,,,,
+series_cells,7ab3c846-fee9-4e71-9c16-1e70c31cbbfa,5750-2,Ban Keng Long,Ban Kêng Long,,1979,,,,
+series_cells,7e312d35-6490-4681-adbb-e0253fd5cb1d,6551-2,Quan Dao Co To,Quần Đảo Cô Tô,,1965,,,,
+series_cells,7fc123dd-f522-4fd2-9cde-683d19e1b54a,6131-2,Svay Rieng,Svay Riĕng,,,,,,
+series_cells,8140c259-3580-4c46-b2da-db1c8a545908,6832-3,Thanh Hai,Thanh Hai,,1996,,,,
+series_cells,81daafd3-a1d6-4dd4-b252-37d4167a1e32,6243-3,Ban Vang-ala,Ban Vang Ala,,1971,,,,
+series_cells,83616be3-0141-4236-8d7e-5ad890e8b5ae,5754-4,Ban Mac,Bản Mac,,1978,,,,
+series_cells,837662a6-1649-41ce-9104-26117164b9fa,5747-1,Nong Het,Nong Hèt,,,,,,
+series_cells,850a1add-da78-490a-8287-3de4cce97c53,6641-4,Thon Trung Kien,Thôn Trung Kiên,,,,,,
+series_cells,8579dfc2-9105-4bf6-ae11-507aa4c3eb6b,6534-4,Bon Drang Phok,Bon Drang Phôk,,1997,,,,
+series_cells,860c9c18-1fb4-4765-9bb1-0cc145c51e85,5950-3,Muong Lat,Muong Lat,,1965,,,,
+series_cells,89098c80-eb84-4072-ab83-12ca7b501f3c,6652-3,Chiang-Ping-Hsu,Chiang Ping Hsu,,,,,,
+series_cells,8a7c4101-9efa-44c7-9cb1-26c9becd212d,6441-1,Ap Lai Bang,Ấp Lai Bằng,,1965,,,,
+series_cells,8ccd54f2-bd32-4799-b93c-d406d3532ed9,5854-4,Muong Khuong,Mường Khương,,1979,,,,
+series_cells,93c1a5d7-93b6-41a7-99ab-532d099ad22f,6636-4,Pleiku,Pleiku,,2006,,,,
+series_cells,95e7a8d9-5835-4164-9550-af7850bb8289,6030-4,Tan Chau,Tân Châu,,1965,,,,
+series_cells,990abb42-d968-4ba8-aecd-7ef467b8d153,5930-3,Giang Thanh,Giang Thành,,,,,,
+series_cells,99a13e48-8efd-47a3-8af8-f704956ea728,5946-1,Ban Tai,Bản Tài,,1965,,,,
+series_cells,9df8ea3b-af1e-43f5-9ceb-e383fe8446a6,6332-4,Loc Ninh,Lộc Ninh,,1999,,,,
+series_cells,a2a01ed1-2aa6-4d1f-92e9-b7d8e55eb7a2,6155-3,Loung Mang,Loung Mang,,1979,,,,
+series_cells,a33c7886-07dc-470e-b713-d5958add5982,6835-4,Dong Xuan,Đồng Xuân,,1965,,,,
+series_cells,a3710cd2-f524-4f48-8a98-8607ae320a33,6144-2,Hung Trung,Hung Trung,,1974,,,,
+series_cells,a8d0a908-62d3-40b9-98de-622756288acd,5750-1,Muong Hung,Mường Hung,,1979,,,,
+series_cells,a986dac8-cd96-4d85-adba-830d59fe627f,6130-1,Moc Hoa,Mộc Hòa,,2000,,,,
+series_cells,ac5bcc1a-732c-40a9-8844-3adf932d58a0,5948-4,Xamtai,Xamtai,,1965,,,,
+series_cells,aee0d1d2-06c8-4f15-acf9-c0134be1eb52,5654-3,Ban Nam Cum,Bản Nam Cum,,1979,,,,
+series_cells,afa7a3c9-c9b1-4c85-b684-447b85ec60af,6350-1,Quang Yen,Quảng Yên,,,,,,
+series_cells,b1d41504-704a-40ca-8a37-e41a12ab09ee,6131-3,Prey Nhay,Prey Nhay,,1984,,,,
+series_cells,b229f161-cec3-4c10-87b4-35cbf128e451,5853-1,Nghia Do Tong,Nghĩa Đô Tong,,1975,,,,
+series_cells,b47bc845-2d06-4abc-b45d-762dc2bcef26,6433-3,Bu Gia Map,Bù Gia Mập,,1970,,,,
+series_cells,b5115618-ccd3-4151-ab03-663ab6a0ef1a,6736-1,Binh Khe (Binh Lien),Bình Khê (Binh Lien),,1969,,,,
+series_cells,b53a1944-0bdb-4d16-8084-b9f671af9d99,6541-4,Hue,Huế,1968,1968,,,,
+series_cells,b5c33cec-ed22-4e59-a24d-449619c60159,5754-2,Lao Kay,Lào Kay,,1978,,,,
+series_cells,b705c998-1889-4575-b158-1754015eaf62,6130-4,Vinh Thanh,Vinh Thanh,,1965,,,,
+series_cells,b770b2d2-37de-4b1c-b50c-5507489ae5ca,5850-2,Sop Long,Sôp Long,,,,,,
+series_cells,ba522f62-108f-4f20-bc15-a8e30bd2634b,6150-3,Kim Boi / Thuy Hien,Kim Bôi / Thúy Hiền,,,,,,
+series_cells,bb5ab81f-09a2-4005-bbb1-57767efd19a5,6538-4,Dak Sut,Dak Sut,,2002,,,,
+series_cells,bc2b0f46-db08-4d50-bbd1-622291878b2f,6641-2,Khu Pho Nam Tho,Khu Phố Nam Thọ,,,,,,
+series_cells,bd4b3c60-decf-4c02-bfb8-b331f033a3e1,6150-2,Phu Ly,Phủ Lý,,,,,,
+series_cells,bec66183-a828-488a-a79e-ed39c299aadb,6541-1,Phu Loc (Q Phu Loc),Phú Lộc (Q Phu Loc),,,,,,
+series_cells,c1748c9e-7208-4ffc-9f36-bd880b54bb3a,6535-4,Ya Lop,Ya Lôp,,1999,,,,
+series_cells,c24fff2c-d74e-4ade-868b-cc74914dbb7a,5926-2,Xom Ong Trang,Xóm Ông Trang,1965,1965,,,,
+series_cells,c37a7524-5cd4-4082-ac6d-d78b4363caf2,5946-4,Phu Den Din,Phu Đen Đin,,,,,,
+series_cells,c4600590-e000-43d4-bc01-7c9b1303de6b,6833-2,Hon Tre,Hòn Tre,,1965,,,,
+series_cells,c51ac176-1724-4807-b23c-1937a097ab6e,6131-1,Ph Kampong Trach,Ph Kâmpông Trach,,,,,,
+series_cells,c6ae015c-38f8-4522-91f7-a17d9504dc19,6633-2,Ap Dan-Kia,Ap Dan Kia,1989,1989,,,,
+series_cells,c8b8a560-1dc6-44b0-adf7-cb8654e643c8,6537-4,Polei Jar Sieng,Polei Jar Sieng,,1997,,,,
+series_cells,c8b9d4da-6b7c-4eab-a43b-d2951cc14af2,5949-1,Pieng Yao,Piêng Yao,,1965,,,,
+series_cells,c9bcb4ca-5c89-4cf1-8bb8-8718000ee9e0,6631-3,Ap An-Lam,Ap An Lam,1989,1989,,,,
+series_cells,cbb2ef91-95a5-443f-9784-b78816f3e105,6354-2,Ban Kieng,Bản Kiềng,,,,,,
+series_cells,ccaefdaf-b132-469d-a187-b1c1c5ea38c6,5552-2,Na Lam,Nà Lam,,,,,,
+series_cells,cebafae3-94f0-4201-b826-26fae009c381,6330-3,Can Giuoc,Cần Giuộc,1970,1970,,,,
+series_cells,cf50a7c4-0df5-4611-b366-abd175c49b8d,6333-2,Ap Phuoc Thien,Ấp Phước Thiện,,,,,,
+series_cells,d2e13032-1f8c-4c74-8526-2acc42abe8d5,6535-3,Yok Mbre,Yôk Mbré,,1965,,,,
+series_cells,d3a05e19-fa31-41aa-ac4e-34989346bf55,6330-4,Saigon / Thanh Pho Ho Chi Minh (Ho Chi Minh City),Sài Gòn / Thành phố Hồ Chí Minh (Ho Chi Minh City),1984,1984,,,,
+series_cells,d669aecf-0a30-432a-876b-c20c3dc3f275,6144-3,Ban Nathin,Ban Nathin,,1965,,,,
+series_cells,d75f6ec0-aea4-462b-8971-2ea0dfda4d86,6433-4,O Rang,O Rang,,1966,,,,
+series_cells,d98c3276-43a1-4ba8-80f1-355989d4e587,6232-3,Ta Dath,Ta Dath,,1970,,,,
+series_cells,e1245340-eee4-423c-91ea-555c026926a3,6550-4,Ile De La Table / Ile Tching Lan Xan,Île De La Table / Ile Tching Lan Xan,,1965,,,,
+series_cells,e237819d-38ce-48c3-81a2-70a852e17de4,6230-4,Duc Hue,Đức Huệ,,1999,,,,
+series_cells,e59809ab-ecfa-4900-adfd-780a0de45f71,6530-3,Ap Binh Chau,Ấp Bình Châu,1983,1983,,,,
+series_cells,e6587069-c7d2-4a4d-91e6-86b2e3b5f4a6,6354-1,Ban Khong,Bản Không,,,,,,
+series_cells,e81581f8-4bfe-474c-b4bd-cffc9a01e237,5955-2,Quan Ba,Quản Bạ,,,,,,
+series_cells,e93c8799-4ae2-42dd-b446-648481453bff,6632-3,Di-Linh,Di Linh,1965,1965,,,,
+series_cells,ecf441cb-d1bf-462e-b119-67440e46dab3,6150-4,Luong Son / Chuong My,Luong Son / Chương Mỹ,,,,,,
+series_cells,ee1e3027-b122-4868-ae97-8e1dacdce485,6631-4,Ap Gia-Bac,Ap Gia Bac,1965,1965,,,,
+series_cells,ef36003b-af0d-428f-851c-84f26d768b81,6331-2,Tan Uyen (Xa Uyen-Hung),Tan Uyen (Xa Uyen Hung),1969,1969,,,,
+series_cells,efd84bcc-b16d-4c1c-9f6a-0720360e2a5f,5728-1,Hon Thom,Hòn Thơm,,1957,,,,
+series_cells,f3dc1f3c-75be-40d7-a0ac-e870d1025287,5829-1,Krong Kep,Krŏng Kép,,,,,,
+series_cells,f4303259-b0da-47ec-879e-13b394993094,6350-4,Hai Phong,Hải Phòng,1966,1966,,,,
+series_cells,f44900ae-9520-4813-959e-e1ef8d808899,6326-3,Con Son,Côn Sơn,,1969,,,,
+series_cells,f4d22607-f8d8-4e7d-b1ac-7ac155d4d144,6539-3,D. Go Kram,D. Go Kram,,2001,,,,
+series_cells,f6339d40-7df4-4cde-8f32-bbb243035d87,6441-2,A Sap,A Sap,,1970,,,,
+series_cells,fcf2a9a4-4bac-4bc1-bf29-bc674a783243,5654-1,Giao San,Giáo San,,1991,,,,

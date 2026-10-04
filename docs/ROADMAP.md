@@ -45,15 +45,20 @@ measurement, metadata that maintains itself, and corpus size.
       open-access JPG/TIFF masters, none georeferenced) adds **no new cell**: every one is already held by
       PCL and 23 are the same edition. Record its handle on the PCL/TTU row rather than ingesting 159
       duplicates; (4) 43 cells are in none of the three sources; (5) `hue-l7014-6541-4` was removed
-      2026-10-03 (the older of two rows for the cell; a 301 alias points at `-2`); (6) two draft scans are
-      named from their filenames, not their sheets: `kim-boi` is PCL's printed "Thúy Hiền" and `luong-son`
-      is TTU's "Chương Mỹ"; (7) `6835-4` was placed by hand from the detected neatline, its seams to
-      the neighbours unchecked; (8) diacritics. **Audit 2026-10-03:** the live snapshot has 671 map
+      2026-10-03 (the older of two rows for the cell; a 301 alias points at `-2`); (6) remaining medium/low-confidence title readings need review; the original PCL `kim-boi`
+      was corrected to printed "Thúy Hiền" on 2026-10-04, while "Lương Sơn" and "Chương Mỹ"
+      remain distinct titles on different scans of cell 6150-4; (7) `6835-4` was placed by hand from the detected neatline, its seams to
+      the neighbours unchecked; (8) resolve the two remaining undated copies if stronger source evidence appears. **Audit 2026-10-03:** the live snapshot has 671 map
       rows and 627 cells: 519 public, 152 draft, 586 placed. Of 137 TTU rows, 85 remain unplaced;
       34 completed rough readings are not merged, and margin reading stopped on API limits. Seven
       TTU map rows lack source records, three source records lack map rows, and 132 TTU rows lack a
       year. The 15 plain scans and 52 placed TTU sheets remain drafts without visual acceptance.
       Audit findings and the six-step review/close gates: [L7014 inventory audit](journals/261003-l7014-audit.md).
+      **Metadata recovery 2026-10-04:** names normalized across map/index records and 218 missing
+      years recovered from reviewed margins, with date kind recorded. Gò Công 6329-4 and Quản Bạ
+      5955-2 remain undated. Printed titles corrected for Phu Tu Lủm, Thúy Hiền and Thái Thụy;
+      two placeholder sheet names replaced. Distinct historical titles remain distinct.
+      [Recovery and evidence](journals/261004-l7014-metadata.md).
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW

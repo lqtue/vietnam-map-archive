@@ -43,6 +43,16 @@ import. Preview's values are deliberately nonfunctional; CI has no dashboard, so
 `.github/workflows` does `cp .env.test .env` before `check` and `build` — which is why CI
 stayed green through all ten build failures.
 
+## Database changes before an app release
+
+Apply reviewed additive migrations before deploying the app that queries their new tables,
+columns or views. Confirm the deployed head with `supabase migration list`. A successful app
+build does not prove the production database has that schema.
+
+On 2026-10-04 the series catalog returned 500 because PR #36 had deployed while production
+remained at migration 104. Applying 105–108 restored the page without redeploying the app.
+See [the recovery record](journals/261004-l7014-metadata.md).
+
 ## Blank page right after a deploy
 
 Expected, and self-heals. Pages serves the new HTML and `entry/app.<hash>.js` before every
