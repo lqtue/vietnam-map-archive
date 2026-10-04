@@ -2,6 +2,11 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { readAll } from '$lib/data/supabase/paged';
+import { queryError } from '$lib/data/supabase/queryError';
+
+// Large .in() URLs are echoed in response headers. Node's fetch rejects them
+// above its header limit, even when the same query succeeds in Cloudflare.
+const ID_BATCH = 100;
 
 /**
  * One printing, as a reader would be shown it.
@@ -64,22 +69,25 @@ export async function fetchCanonicalSheetPrintings(
       .order('sheet_number')
       .range(from, to)
   );
-  if (cellsResult.error) throw cellsResult.error;
+  if (cellsResult.error) throw queryError('Printing cells', cellsResult.error);
   const cells = cellsResult.data ?? [];
   const cellIds = cells.map((cell) => cell.id);
   if (!cellIds.length) return {};
-  const printingsResult = await readAll((from, to) =>
-    db
-      .from('sheet_printings')
-      .select(
-        'id,cell_id,printed_title,edition_statement,edition_label,issuing_agency,content_year,edition_year,printing_year,printing_month,printer,printing_statement,part,review_status'
-      )
-      .in('cell_id', cellIds)
-      .order('id')
-      .range(from, to)
-  );
-  if (printingsResult.error) throw printingsResult.error;
-  const data = printingsResult.data ?? [];
+  const data: CanonicalSheetPrinting[] = [];
+  for (let start = 0; start < cellIds.length; start += ID_BATCH) {
+    const printingsResult = await readAll((from, to) =>
+      db
+        .from('sheet_printings')
+        .select(
+          'id,cell_id,printed_title,edition_statement,edition_label,issuing_agency,content_year,edition_year,printing_year,printing_month,printer,printing_statement,part,review_status'
+        )
+        .in('cell_id', cellIds.slice(start, start + ID_BATCH))
+        .order('id')
+        .range(from, to)
+    );
+    if (printingsResult.error) throw queryError('Sheet printings', printingsResult.error);
+    data.push(...(printingsResult.data as CanonicalSheetPrinting[]));
+  }
   const numberByCell = new Map(cells.map((cell) => [cell.id, cell.sheet_number]));
   const result: Record<string, CanonicalSheetPrinting[]> = {};
   for (const row of data ?? []) {
@@ -160,7 +168,7 @@ export async function fetchSheetSources(
       .eq('series_key', seriesKey)
       .order('id')
       .range(from, from + page - 1);
-    if (error) throw error;
+    if (error) throw queryError('Source items', error);
     rows.push(...((data ?? []) as SheetSourceRow[]));
     if (!data || data.length < page) break;
   }
@@ -175,18 +183,18 @@ export async function fetchSheetSources(
       .order('id')
       .range(from, to)
   );
-  if (archiveResult.error) throw archiveResult.error;
+  if (archiveResult.error) throw queryError('Source maps', archiveResult.error);
   const archiveRows = archiveResult.data ?? [];
   const linkedPrintingIds = [
     ...new Set(rows.flatMap((row) => (row.printing_id ? [row.printing_id] : []))),
   ];
   const verifiedPrintingIds = new Set<string>();
-  if (linkedPrintingIds.length) {
+  for (let start = 0; start < linkedPrintingIds.length; start += ID_BATCH) {
     const { data: linkedPrintings, error: printingError } = await db
       .from('sheet_printings')
       .select('id,review_status')
-      .in('id', linkedPrintingIds);
-    if (printingError) throw printingError;
+      .in('id', linkedPrintingIds.slice(start, start + ID_BATCH));
+    if (printingError) throw queryError('Source printings', printingError);
     for (const printing of linkedPrintings ?? []) {
       if (printing.review_status === 'verified') verifiedPrintingIds.add(printing.id);
     }
