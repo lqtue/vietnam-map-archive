@@ -1,0 +1,306 @@
+[
+  {
+    "sheet": "6330-4",
+    "id": "08f9e044-c324-4291-99da-69783768e85f",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        4624,
+        5949
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 26716
+    }
+  },
+  {
+    "sheet": "6630-4",
+    "id": "1ec00ffd-c173-4fe3-a0aa-5b85c59075e5",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        6824,
+        8723
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 3919
+    }
+  },
+  {
+    "sheet": "6835-4",
+    "id": "55f30aab-8cba-4a56-9a96-a2193607f4ef",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        3622,
+        4407
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 4799
+    }
+  },
+  {
+    "sheet": "6349-4",
+    "id": "a6d27059-fca2-401a-abcb-2ec0f9175393",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        6924,
+        9016
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 4804
+    }
+  },
+  {
+    "sheet": "5454-1",
+    "id": "c28ee942-2036-447a-a294-b27615b43440",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        3922,
+        2920
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 9362
+    }
+  },
+  {
+    "sheet": "6731-1",
+    "id": "d665e342-4d13-411e-b6f5-2daf7e586d8f",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        3389,
+        4396
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 5246
+    }
+  },
+  {
+    "sheet": "6146-2",
+    "id": "e677f646-b50b-49b4-b3a0-3716094e9bdf",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        6784,
+        8728
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 4903
+    }
+  },
+  {
+    "sheet": "6150-1",
+    "id": "fb8ea013-57c4-4f52-9ab9-0630038e2f60",
+    "info": {
+      "status": 200,
+      "type": "application/json",
+      "size": [
+        6780,
+        8704
+      ],
+      "tiles": [
+        {
+          "scaleFactors": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64
+          ],
+          "width": 256,
+          "height": 256
+        }
+      ]
+    },
+    "annotation": {
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "typeJSON": "AnnotationPage",
+      "hasContent": true
+    },
+    "tile": {
+      "status": 200,
+      "type": "image/jpeg",
+      "bytes": 6261
+    }
+  },
+  {
+    "route": "https://maparchive.vn/catalog/series/series-l7014-vietnam-1-50-000?audit=1791018352019",
+    "status": 200,
+    "has519": true,
+    "bytes": 888608
+  }
+]

@@ -62,6 +62,8 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+          # Release discovery otherwise uses GitHub's small anonymous quota.
+          github-token: ${{ github.token }}
       - run: npm ci
       - run: cp .env.test .env
       # Same command as a laptop runs, so the two stacks cannot drift:

@@ -24,6 +24,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { queryError } from '$lib/data/supabase/queryError';
 
 export type SheetStatus = 'held' | 'obtainable' | 'no_scan';
 
@@ -112,7 +113,7 @@ async function publicCoverageByCell(
       .eq('key', seriesKey)
       .order('sheet_number')
       .range(from, from + page - 1);
-    if (error) throw error;
+    if (error) throw queryError('Series coverage', error);
     for (const cell of data ?? []) {
       if (cell.sheet_number)
         result.set(cell.sheet_number, {
@@ -147,7 +148,7 @@ export async function fetchSeriesSheetIndex(
       .eq('series_key', seriesKey)
       .order('sheet_number')
       .range(from, from + page - 1);
-    if (error) throw error;
+    if (error) throw queryError('Series index', error);
     out.push(...((data ?? []) as SeriesSheet[]));
     if (!data || data.length < page) break;
   }
@@ -179,7 +180,7 @@ export async function fetchSeriesSheet(
     .eq('series_key', seriesKey)
     .eq('sheet_number', sheetNumber)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throw queryError('Series sheet', error);
   if (!data) return null;
   const coverage = await publicCoverageByCell(db, seriesKey);
   const cellCoverage = coverage.get(data.sheet_number);
