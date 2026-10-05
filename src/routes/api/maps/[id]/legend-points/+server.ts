@@ -30,12 +30,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
-import { assertUuid, dbError } from '$lib/server/http';
+import { assertUuid } from '$lib/server/http';
 import { getRole } from '$lib/server/auth';
-import { legendNote, manualLegendPoint } from '$lib/server/legendEntry';
-import { readAll } from '$lib/data/supabase/paged';
+import { readLegendEntries, readNumeralCandidates } from '$lib/server/legendRead';
 import { getTransformer } from '$lib/server/transformer';
-import { cellBox, cellCentre, cellSize, parseGrid } from '$lib/core/geo/mapGrid';
+import { cellAgreement, cellCentre, cellSize, parseGrid } from '$lib/core/geo/mapGrid';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -55,108 +54,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   // Either source counts: pipeline-made georeferences (the Indochine 1:100,000
   // halves) carry an `annotation_url` and no `allmaps_id` — Allmaps never held them.
 
-  // Legend entries → number→name map + the legend box rect (shared tile bbox).
-  // Skip rows a human rejected; prefer their corrected text over the raw model
-  // output so HITL fixes actually reach the public map.
-  const { data: entries, error: entryError } = await readAll((from, to) =>
-    supabase
-      .from('ocr_labels')
-      .select(
-        'id,run_id,text,text_corrected,notes,review_status,tile_x,tile_y,tile_w,tile_h,global_x,global_y,global_w,global_h'
-      )
-      .eq('map_id', mapId)
-      .eq('category', 'legend_entry')
-      .neq('review_status', 'rejected')
-      .order('id')
-      .range(from, to)
-  );
-  if (entryError) dbError(entryError, 'Could not read legend entries');
-
-  const nameByN = new Map<
-    number,
-    {
-      id: string;
-      name: string;
-      vn: string | null;
-      grid: string | null;
-      manualPoint: ReturnType<typeof manualLegendPoint>;
-      validated: boolean;
-    }
-  >();
-  const legendBounds = new Map<
-    string,
-    { minX: number; minY: number; maxX: number; maxY: number }
-  >();
-  for (const e of entries ?? []) {
-    const eText = e.text_corrected ?? e.text;
-    const m = /^(\d+)\.\s*(.*)$/.exec(eText ?? '');
-    const n = m ? parseInt(m[1], 10) : parseInt(/n=(\d+)/.exec(e.notes ?? '')?.[1] ?? '', 10);
-    if (!Number.isFinite(n)) continue;
-    const grid = legendNote(e.notes, 'grid');
-    const vn = legendNote(e.notes, 'vn');
-    if (!nameByN.get(n)?.validated || e.review_status === 'validated')
-      nameByN.set(n, {
-        id: e.id,
-        name: m ? m[2] : (eText ?? ''),
-        vn,
-        grid,
-        manualPoint: e.review_status === 'validated' ? manualLegendPoint(e.notes) : null,
-        validated: e.review_status === 'validated',
-      });
-    if (e.global_x != null && e.global_y != null) {
-      const key = e.run_id ?? 'default';
-      const x = e.global_x;
-      const y = e.global_y;
-      const maxX = x + (e.global_w ?? 0);
-      const maxY = y + (e.global_h ?? 0);
-      const bounds = legendBounds.get(key);
-      if (bounds) {
-        bounds.minX = Math.min(bounds.minX, x);
-        bounds.minY = Math.min(bounds.minY, y);
-        bounds.maxX = Math.max(bounds.maxX, maxX);
-        bounds.maxY = Math.max(bounds.maxY, maxY);
-      } else {
-        legendBounds.set(key, { minX: x, minY: y, maxX, maxY });
-      }
-    } else if (e.tile_w && e.tile_h) {
-      // Old extractions may not have per-label pixel bounds. Their tile rect
-      // is a coarse fallback for the printed index region.
-      const key = e.run_id ?? 'default';
-      const x = e.tile_x ?? 0;
-      const y = e.tile_y ?? 0;
-      const bounds = legendBounds.get(key);
-      if (bounds) {
-        bounds.minX = Math.min(bounds.minX, x);
-        bounds.minY = Math.min(bounds.minY, y);
-        bounds.maxX = Math.max(bounds.maxX, x + e.tile_w);
-        bounds.maxY = Math.max(bounds.maxY, y + e.tile_h);
-      } else {
-        legendBounds.set(key, { minX: x, minY: y, maxX: x + e.tile_w, maxY: y + e.tile_h });
-      }
-    }
-  }
-  const rects = [...legendBounds.values()].map((bounds) => ({
-    x: bounds.minX,
-    y: bounds.minY,
-    w: bounds.maxX - bounds.minX,
-    h: bounds.maxY - bounds.minY,
-  }));
-  const maxN = nameByN.size ? Math.max(...nameByN.keys()) : 0;
-
-  // Feature-reference numerals: bare digits sitting out on the map body. Gemini
-  // tags them 'other'; the old Tesseract pass used 'legend_ref'. Either way the
-  // digit + ≤maxN + outside-legend-box filters below isolate the real refs.
-  const { data: refs, error: refError } = await readAll((from, to) =>
-    supabase
-      .from('ocr_labels')
-      .select('text, text_corrected, global_x, global_y, global_w, global_h')
-      .eq('map_id', mapId)
-      .in('category', ['legend_ref', 'other'])
-      .neq('review_status', 'rejected')
-      .order('id')
-      .range(from, to)
-  );
-  if (refError) dbError(refError, 'Could not read legend references');
+  // Legend entries → number→name map + the legend box rect (shared tile bbox),
+  // and the numerals out on the map body that might mark them.
+  const { nameByN, rects, maxN } = await readLegendEntries(supabase, mapId);
+  const candidates = await readNumeralCandidates(supabase, mapId, maxN, rects);
 
   type Point = {
     n: number;
@@ -225,50 +126,14 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const { transformer } = resolved;
   const manual = placeManual((px) => transformer.transformToGeo(px) as [number, number]);
 
-  const inRect = (x: number, y: number) =>
-    rects.some(
-      (rect) => x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h
-    );
-
   // Parsed before the numerals, because it is what decides whether to believe
   // them.
   const grid = parseGrid((map.triage as SavedTriage | null)?.grid);
 
-  /**
-   * Does this numeral land where its own index entry says it should?
-   *
-   * Tolerance is the stated cell inflated by a full cell on each side: the
-   * index cell is itself approximate, and a feature near a boundary is often
-   * catalogued one cell over. That still rejects a numeral kilometres away,
-   * which is the failure this guards.
-   */
-  const agreesWithIndex = (n: number, px: number, py: number): boolean => {
-    if (!grid) return true;
-    const ref = nameByN.get(n)?.grid;
-    if (!ref) return true; // nothing to check against
-    const box = cellBox(grid, ref);
-    const cell = cellSize(grid);
-    if (!box || !cell) return true;
-    return (
-      px >= box[0] - cell.w &&
-      px <= box[0] + box[2] + cell.w &&
-      py >= box[1] - cell.h &&
-      py <= box[1] + box[3] + cell.h
-    );
-  };
-
   const byN = new Map<number, Point>(manual.map((point) => [point.n, point]));
-  for (const r of refs ?? []) {
-    const t = (r.text_corrected ?? r.text ?? '').trim();
-    if (!/^\d+$/.test(t)) continue;
-    const n = parseInt(t, 10);
+  for (const { n, x: cx, y: cy } of candidates) {
     if (nameByN.get(n)?.manualPoint) continue;
-    if (n < 1 || n > maxN) continue; // only numerals that name a legend entry
-    if (r.global_x == null || r.global_y == null) continue;
-    const cx = r.global_x + (r.global_w || 0) / 2;
-    const cy = r.global_y + (r.global_h || 0) / 2;
-    if (inRect(cx, cy)) continue; // drop legend-internal column numbers
-    if (!agreesWithIndex(n, cx, cy)) continue; // a digit that is not this reference
+    if (cellAgreement(grid, nameByN.get(n)?.grid, cx, cy) === false) continue; // not this reference
     const [lng, lat] = transformer.transformToGeo([cx, cy]);
     const info = nameByN.get(n);
     byN.set(n, {

@@ -5,6 +5,7 @@
       /scan?mode=prepare    layout · neatline · tile grid · save · queue OCR
       /scan?mode=text       check what came back: Names · Index · Numbers · Other
       /scan?mode=shapes     draw · segment · validate
+      /scan?mode=legend     place the numbered legend on the scan, in pixels (staff)
       /scan?mode=inspect    unlisted — a plain look at a draft scan
 
     These all mount ImageShell on the same IIIF canvas in pixel coordinates, so
@@ -32,6 +33,7 @@
   import InspectPage from '$lib/features/contribute/inspect/InspectPage.svelte';
   import DigitalizePage from '$lib/features/contribute/digitalize/DigitalizePage.svelte';
   import ShapesPage from '$lib/features/contribute/trace/ShapesPage.svelte';
+  import LegendPage from '$lib/features/contribute/legend/LegendPage.svelte';
 
   $: mode = resolveScanMode($page.url.searchParams.get('mode'));
 
@@ -54,6 +56,8 @@
   <DigitalizePage {mode} />
 {:else if mode === 'shapes'}
   <ShapesPage />
+{:else if mode === 'legend'}
+  <LegendPage />
 {:else if mode === 'inspect'}
   <InspectPage />
 {/if}

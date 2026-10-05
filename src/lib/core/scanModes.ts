@@ -14,7 +14,7 @@
  * scan that a signed-in volunteer can still reach by typing it.
  */
 
-export const SCAN_MODES = ['inspect', 'prepare', 'text', 'shapes'] as const;
+export const SCAN_MODES = ['inspect', 'prepare', 'text', 'shapes', 'legend'] as const;
 export type ScanMode = (typeof SCAN_MODES)[number];
 
 /**

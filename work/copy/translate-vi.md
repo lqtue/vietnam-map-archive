@@ -496,6 +496,33 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
    Keep the mailto next to it.
 7. **Sài Gòn vs TP.HCM.** Kept as Sài Gòn throughout, matching the historical subject. Confirm.
 
+## 13b · Legend tool
+
+| English | Tiếng Việt |
+|---|---|
+| {N} of {M} placed | Đã đặt {N}/{M} |
+| Unplaced only | Chỉ mục chưa đặt |
+| Save {N} | Lưu {N} |
+| Saved {N}. | Đã lưu {N}. |
+| placed | đã đặt |
+| unplaced | chưa đặt |
+| Vietnamese name | Tên tiếng Việt |
+| Grid reference | Ô lưới tham chiếu |
+| Reset point | Đặt lại vị trí |
+| N next unplaced · Enter accept numeral · Esc cancel · Delete reset | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete đặt lại |
+| Placed points | Điểm đã đặt |
+| Numeral candidates | Số ứng viên |
+| Index grid | Lưới chỉ mục |
+| The legend tool is for staff. | Công cụ chú giải chỉ dành cho quản trị viên. |
+| Could not load this sheet’s legend. | Không thể tải chú giải của tờ này. |
+| Could not save the legend. | Không thể lưu chú giải. |
+| Pick a map to place its legend. | Chọn một bản đồ để đặt chú giải. |
+| Place the legend | Đặt chú giải |
+| Open legend tool | Mở công cụ chú giải |
+| Legend | Chú giải |
+| Saving… | Đang lưu… |
+| Name | Tên |
+
 # PENDING — translated, not yet wired
 
 These strings are translated but the app still renders them in English, because

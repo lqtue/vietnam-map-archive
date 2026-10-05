@@ -223,6 +223,11 @@
   {#each saveErrors as failure (failure.id)}<p class="sb-empty" role="alert">
       №{legend.find((point) => point.id === failure.id)?.n ?? ''}: {failure.message}
     </p>{/each}
+  {#if canEdit}
+    <a class="sb-btn is-sm is-block" href={`/scan?mode=legend&map=${mapId}`}
+      >{$t('Open legend tool')}</a
+    >
+  {/if}
   {#if mapActions}
     <button
       type="button"

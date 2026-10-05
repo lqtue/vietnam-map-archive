@@ -38,6 +38,39 @@ export function manualLegendPoint(
   return ll && Math.abs(ll[0]) <= 180 && Math.abs(ll[1]) <= 90 ? { lngLat: ll } : null;
 }
 
+export type PixelRect = { x: number; y: number; w: number; h: number };
+
+export function inRects(rects: readonly PixelRect[], x: number, y: number): boolean {
+  return rects.some((r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+}
+
+/**
+ * A body numeral that could name a legend entry: bare digits, 1..maxN, with a
+ * pixel box, centred outside the legend box (a number inside it is a column of
+ * the index itself). Returns its centre in image pixels, or null.
+ */
+export function numeralCandidate(
+  row: {
+    text: string | null;
+    text_corrected: string | null;
+    global_x: number | null;
+    global_y: number | null;
+    global_w: number | null;
+    global_h: number | null;
+  },
+  maxN: number,
+  rects: readonly PixelRect[]
+): { n: number; x: number; y: number } | null {
+  const t = (row.text_corrected ?? row.text ?? '').trim();
+  if (!/^\d+$/.test(t)) return null;
+  const n = parseInt(t, 10);
+  if (n < 1 || n > maxN) return null;
+  if (row.global_x == null || row.global_y == null) return null;
+  const x = row.global_x + (row.global_w || 0) / 2;
+  const y = row.global_y + (row.global_h || 0) / 2;
+  return inRects(rects, x, y) ? null : { n, x, y };
+}
+
 /** Replace only the fields being edited; keep unrelated OCR/provenance notes. */
 export function editLegendNotes(
   notes: string | null,

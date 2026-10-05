@@ -116,7 +116,13 @@ Public / other:
   Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`. Reviewed manual positions
   override numeral/grid positions. Staff with MFA also receive `canEdit` and `entries`,
   including entries without a position. Responses are private and not cached.
-- `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** PATCH
+- `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** GET: the legend in **image
+  pixels**, for `/scan?mode=legend`. `{ entries: [{ id, n, name, vn, grid, x, y, src: 'manual'|null,
+  validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.
+  No georeference is read, so drafts work; `inCell` is whether a body numeral agrees with its
+  entry's grid reference (`null`: nothing to check). A legacy ground `point=` has no pixel and reads
+  as unplaced. Shares its reads with the public GET (`$lib/server/legendRead.ts`). Same route,
+  PATCH
   `{ id, name, vn, grid, x, y }` (image pixels) or `{ id, name, vn, grid, lng, lat }` or `{ entries: [...] }` (up to 200 entries). Corrects existing
   numbered OCR legend entries; the batch response returns `{ saved: [id], failed: [{ id, message }] }`
   so clients can retain and retry only failed drafts. The request validates every entry before writing
