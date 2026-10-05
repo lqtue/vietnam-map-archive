@@ -14,7 +14,7 @@
   The facets sit inside one native `<details class="sb-more">` rather than
   abreast: at a 300px rail's width three selects each got a third of a line and
   read as three abbreviations. They stay separate controls — area AND type AND
-  series AND period still combine — the disclosure just folds them out of the
+  series AND year still combine — the disclosure just folds them out of the
   way, and its summary carries how many are set.
 -->
 <script lang="ts">
@@ -31,18 +31,27 @@
   /**
    * The surveys offerable as a filter, `{ value: maps.series_key, label }`.
    *
-   * Passed in rather than derived from the rows, because which collections are
-   * surveys is `map_series`' decision and only a server load can ask it — so a
-   * caller with no server load (the /explore rail, the /scan picker) passes
-   * none and gets no series control, which is right: /explore has a series
-   * rail of its own, one that puts the survey on the map.
+   * /catalog passes them from `map_series`, which is where a survey is named, and with them gets the
+   * Surveys / Plans switch. A caller with no server load (the /explore rail, the /scan picker) passes
+   * none, and the bar offers the surveys the engine's own rows carry, labelled by their collection.
    */
   export let seriesChoices: { value: string; label: string }[] = [];
 
   /** Staff get the Type select; for a reader it is one value in 96% of rows, so it filters nothing. */
   export let staff = false;
 
-  const { query, areaChoices, typeChoices, institutionChoices, yearBins, selected } = search;
+  const {
+    query,
+    areaChoices,
+    typeChoices,
+    institutionChoices,
+    seriesChoices: corpusSeries,
+    yearBins,
+    selected,
+  } = search;
+
+  /** The caller's own list of surveys when it passed one, else the surveys the corpus holds. */
+  $: seriesOpts = seriesChoices.length ? seriesChoices : $corpusSeries;
 
   /** The caller that offers surveys also offers the Surveys / Plans switch — same reason. */
   $: hasKinds = seriesChoices.length > 0;
@@ -68,11 +77,10 @@
   $: activeFacets =
     ($selected.area?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
-    ($selected.series_key?.length ? 1 : 0) +
     ($selected.institution?.length ? 1 : 0) +
     ($selected.year?.length ? 1 : 0);
 
-  $: hasFilters = !!$query.trim() || activeFacets > 0 || !!kind;
+  $: hasFilters = !!$query.trim() || activeFacets > 0 || !!kind || !!$selected.series_key?.length;
 
   function resetFilters() {
     query.set('');
@@ -122,6 +130,23 @@
       />
     </div>
   {/if}
+  {#if seriesOpts.length > 1}
+    <!-- Out of the disclosure: the survey is the archive's real structure, and the first thing a
+         reader narrows by. -->
+    <div class="dropdowns">
+      <select
+        value={$selected.series_key?.[0] ?? ''}
+        on:change={(e) =>
+          search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
+        aria-label="Filter by series"
+      >
+        <option value="">{$t('All series')}</option>
+        {#each seriesOpts as s (s.value)}
+          <option value={s.value}>{s.label}</option>
+        {/each}
+      </select>
+    </div>
+  {/if}
   <details class="sb-more">
     <summary
       >Filters{#if activeFacets}
@@ -152,19 +177,6 @@
           <option value="">{$t('All types')}</option>
           {#each $typeChoices as t (t)}
             <option value={t}>{t}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if seriesChoices.length}
-        <select
-          value={$selected.series_key?.[0] ?? ''}
-          on:change={(e) =>
-            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by series"
-        >
-          <option value="">{$t('All series')}</option>
-          {#each seriesChoices as s (s.value)}
-            <option value={s.value}>{s.label}</option>
           {/each}
         </select>
       {/if}
@@ -250,8 +262,7 @@
   /* `max-width` because the same controls sit on a 1280px page as well as in a
      300px rail: without it each one grew to 400px of chrome around two words.
      The 110px basis is still what makes them wrap in the rail — and what lets
-     the fourth one (series, /catalog only) wrap rather than squeeze the three
-     beside it. */
+     the fourth one wrap rather than squeeze the three beside it. */
   .dropdowns select {
     flex: 1 1 110px;
     max-width: 240px;

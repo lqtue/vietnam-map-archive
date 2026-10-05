@@ -12,6 +12,8 @@ import {
   passYear,
   yearRange,
   passInstitution,
+  seriesOptions,
+  sheetLabel,
 } from '../src/lib/features/shared/catalogFilters';
 
 const rows = [
@@ -51,4 +53,23 @@ test('decadeBins runs oldest to newest and keeps the empty decades between', () 
 test('institution matches the exact holding name', () => {
   expect(passInstitution({ holding_institution: 'BnF' }, { institution: ['BnF'] })).toBe(true);
   expect(passInstitution({ holding_institution: null }, { institution: ['BnF'] })).toBe(false);
+});
+
+test('a sheet label carries the half only when the sheet is cut in two', () => {
+  expect(sheetLabel({ sheet_number: '5929-3', sheet_half: 'E' })).toBe('5929-3 E');
+  expect(sheetLabel({ sheet_number: '5929-3', sheet_half: 'whole' })).toBe('5929-3');
+  expect(sheetLabel({ sheet_number: null })).toBe('');
+});
+
+test('series options list each survey once, the biggest first, and skip plans', () => {
+  const rs = [
+    { series_key: 'a', collection: 'A survey' },
+    { series_key: 'b', collection: 'B survey' },
+    { series_key: 'b', collection: 'B survey' },
+    { series_key: null, collection: null },
+  ];
+  expect(seriesOptions(rs)).toEqual([
+    { value: 'b', label: 'B survey' },
+    { value: 'a', label: 'A survey' },
+  ]);
 });

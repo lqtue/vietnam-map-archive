@@ -41,7 +41,7 @@
   export let activeIds: string[] | null = null;
   export let badges: Record<string, string> = {};
   /** Forwarded to ArchiveMapRows — see its `showTypes`. */
-  export let showTypes = true;
+  export let showTypes = false;
   /** Label hits open /explore at a spot, which a /scan tool cannot do. */
   export let showLabels = true;
   /** An engine created by the caller, so several lists can share one filter

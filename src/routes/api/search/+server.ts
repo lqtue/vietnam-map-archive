@@ -78,11 +78,13 @@ export interface LabelHit {
  * Everything a catalog card and the facet rail read. Not `extra_metadata` — about a fifth of the
  * response and read by nothing that takes a search result: the admin editor loads the whole row
  * itself (`fetchMapRow`, catalog/+page.svelte).
- * `dc_description`/`year_label`/`georef_done`/`dc_publisher` stay this
+ * The description, rights and physical description are not here either: the drawer fetches them when
+ * it opens (`fetchMapLongFields`), which is 170 kB off the list. They are not in the search index.
+ * `year_label`/`georef_done`/`dc_publisher` stay this
  * response's own field names (`mapsOut` below) — only the column read from
  * renamed (mig 095).
  */
-const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,dc_description:description,year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language`;
+const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,language`;
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -506,7 +508,6 @@ async function answer(
     location: r.location,
     region: r.region,
     map_type: r.map_type,
-    dc_description: r.dc_description,
     thumbnail: r.thumbnail,
     isFeatured: r.status === 'featured',
     year: r.year,
@@ -527,8 +528,6 @@ async function answer(
     original_title: r.original_title,
     dc_publisher: r.dc_publisher,
     shelfmark: r.shelfmark,
-    physical_description: r.physical_description,
-    rights: r.rights,
     language: r.language,
     source_url: r.source_url,
     _table: 'maps' as const,

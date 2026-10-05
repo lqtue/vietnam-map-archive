@@ -26,6 +26,7 @@ import {
   passKind,
   passType,
   passYear,
+  seriesOptions,
   type Row,
   type Selected,
 } from './catalogFilters';
@@ -74,6 +75,8 @@ export interface CatalogSearchController {
   areaChoices: Readable<string[]>;
   typeChoices: Readable<string[]>;
   institutionChoices: Readable<string[]>;
+  /** The surveys in the corpus, for a caller with no `map_series` read of its own. */
+  seriesChoices: Readable<{ value: string; label: string }[]>;
   /** Rows per decade, counted against every other facet — the histogram under the year range. */
   yearBins: Readable<{ decade: number; count: number }[]>;
   toggleFacet: (group: string, value: string) => void;
@@ -326,6 +329,9 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const institutionChoices = derived(searchedMaps, ($m) =>
     distinct($m, 'holding_institution', requireGeoref)
   );
+  const seriesChoices = derived(searchedMaps, ($m) =>
+    seriesOptions(requireGeoref ? $m.filter((r) => r.georef_done) : $m)
+  );
   const yearBins = derived([searchedMaps, selected], ([$maps, $sel]) =>
     decadeBins(
       $maps.filter((r) => passExcept($sel, 'year')(r) && (!requireGeoref || !!r.georef_done))
@@ -363,6 +369,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     areaChoices,
     typeChoices,
     institutionChoices,
+    seriesChoices,
     yearBins,
     toggleFacet,
     clearGroup,

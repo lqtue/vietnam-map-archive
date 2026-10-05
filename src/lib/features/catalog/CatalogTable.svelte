@@ -18,6 +18,7 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import { inView } from '$lib/ui/inView';
   import { sliceGroups } from './sliceGroups';
+  import { sheetLabel } from '$lib/features/shared/catalogFilters';
 
   export let items: MapListItem[] = [];
   export let compact: boolean = false;
@@ -34,11 +35,7 @@
   let sort = { key: 'year' as SortKey, asc: true };
   let groupBy: GroupKey = 'none';
 
-  /** Sheet number, with the half when the sheet is cut in two ("5929-3 E"). */
-  const sheetOf = (i: any) =>
-    i.sheet_number
-      ? `${i.sheet_number}${i.sheet_half && i.sheet_half !== 'whole' ? ' ' + i.sheet_half : ''}`
-      : '';
+  const sheetOf = sheetLabel;
 
   $: COLUMNS = [
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },

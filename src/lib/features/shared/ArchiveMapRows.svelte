@@ -4,9 +4,10 @@
   browser), the /scan left rail, and /catalog's own compact sidebar.
 
   It is **the catalog table with its columns reduced** — the same `DataTable`,
-  the same header, the same row rules, dropping the four columns a 380px rail
-  cannot carry (Area, Collection, Status) and making the thumbnail the pick
-  control: the picture of the sheet *is* the button that puts it on the map. Until Sept 2026 it was a hand-built `<ul>`
+  the same header, the same row rules, dropping the columns a 380px rail
+  cannot carry (Area, Series, Institution, Status, Type) and making the
+  thumbnail the pick control. The sheet number and the survey ride in a line
+  under the title: the picture of the sheet *is* the button that puts it on the map. Until Sept 2026 it was a hand-built `<ul>`
   of bordered buttons, and `CatalogTableCompact` was a *second* hand-built
   `<ul>` beside it: same data, same sidebar job, and no two details alike —
   year 1rem extrabold against 0.82rem bold, title semibold-muted against
@@ -29,6 +30,7 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { applySort, type SortState } from '$lib/core/utils/tableSort';
+  import { sheetLabel } from '$lib/features/shared/catalogFilters';
 
   export let rows: any[] = [];
   /** Ids to draw as "on". Null (the default) means the /explore layer stack,
@@ -37,10 +39,10 @@
   /** id → short text drawn where the type chip goes. The catalog rows carry no
    *  pass progress, so /scan supplies "OCR'd" / "12 pending" from its own list. */
   export let badges: Record<string, string> = {};
-  /** Draw the map_type chip when a row has no badge. /scan turns it off: that
-   *  column is "have I done this sheet yet?", and a type chip on the rows with
-   *  no pass yet reads as a status the sheet does not have. */
-  export let showTypes = true;
+  /** Draw the map_type chip when a row has no badge. Off by default: for a reader it is one value
+   *  in 96% of rows. /scan keeps it off too — that column is "have I done this sheet yet?", and a
+   *  type chip on the rows with no pass yet reads as a status the sheet does not have. */
+  export let showTypes = false;
   /** What a tap on the row body means — see the header. */
   export let rowAction: 'toggle' | 'open' = 'toggle';
   /** `open` mode only: the row drawn as the current one. */
@@ -64,11 +66,16 @@
     key === 'year' ? (m.year ?? null) : key === 'type' ? (m.map_type ?? null) : (m.name ?? null)
   );
 
-  const columns = [
+  /** The line under a title: the sheet number (23 names repeat) and the survey it belongs to. */
+  const subOf = (m: any) =>
+    [sheetLabel(m), m.series_key ? m.collection : ''].filter(Boolean).join(' · ');
+
+  $: hasLast = showTypes || Object.keys(badges).length > 0;
+  $: columns = [
     { key: 'pick', label: '', klass: 'col-pick', srLabel: 'Sheet', sortable: false },
     { key: 'year', label: 'Year', klass: 'col-year num' },
     { key: 'name', label: 'Title', klass: 'col-name' },
-    { key: 'type', label: 'Type', klass: 'col-type' },
+    ...(hasLast ? [{ key: 'type', label: showTypes ? 'Type' : '', klass: 'col-type' }] : []),
   ] satisfies TableColumn[];
 
   function onRowClick(map: any) {
@@ -129,15 +136,19 @@
           <span class="title">{m.name || '—'}</span>
           <!-- The creator line is the catalog sidebar's: a rail beside a map
                wants as many sheets on screen as will fit. -->
-          {#if rowAction === 'open' && m.creator}<span class="sub">{m.creator}</span>{/if}
+          {#if rowAction === 'open' && m.creator && !subOf(m)}<span class="sub">{m.creator}</span
+            >{/if}
+          {#if subOf(m)}<span class="sub">{subOf(m)}</span>{/if}
         </td>
-        <td class="col-type">
-          {#if badges[m.id]}
-            <span class="badge-chip is-sm chip-green">{badges[m.id]}</span>
-          {:else if showTypes && m.map_type}
-            <span class="type-chip">{m.map_type}</span>
-          {/if}
-        </td>
+        {#if hasLast}
+          <td class="col-type">
+            {#if badges[m.id]}
+              <span class="badge-chip is-sm chip-green">{badges[m.id]}</span>
+            {:else if showTypes && m.map_type}
+              <span class="type-chip">{m.map_type}</span>
+            {/if}
+          </td>
+        {/if}
       </tr>
     {/each}
   </DataTable>
@@ -241,6 +252,9 @@
   }
   .sub {
     display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 0.68rem;
     color: var(--sb-text-muted);
   }

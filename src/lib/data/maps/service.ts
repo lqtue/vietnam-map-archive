@@ -173,6 +173,26 @@ export async function fetchMapRow(
   return data as DbRow;
 }
 
+/** What a detail panel adds to a list row: the three fields too long to ship with every row. */
+export interface MapLongFields {
+  dc_description: string | null;
+  physical_description: string | null;
+  rights: string | null;
+}
+
+export async function fetchMapLongFields(
+  supabase: SupabaseClient<Database>,
+  id: string
+): Promise<MapLongFields | null> {
+  const { data, error } = await supabase
+    .from('maps')
+    .select('dc_description:description,physical_description,rights')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) console.error('fetchMapLongFields:', error);
+  return data ?? null;
+}
+
 /** One printing of a sheet: what tells two rows of the same cell apart. */
 export interface SheetEdition {
   id: string;

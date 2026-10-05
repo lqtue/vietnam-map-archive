@@ -58,3 +58,22 @@ export function decadeBins(rows: Row[]): { decade: number; count: number }[] {
     out.push({ decade: d, count: counts.get(d) ?? 0 });
   return out;
 }
+
+/** Sheet number, with the half when the sheet is cut in two ("5929-3 E"). */
+export const sheetLabel = (r: Row) =>
+  r.sheet_number
+    ? `${r.sheet_number}${r.sheet_half && r.sheet_half !== 'whole' ? ' ' + r.sheet_half : ''}`
+    : '';
+
+/** The surveys present in `rows` as `{ value: series_key, label: collection }`, most sheets first.
+ *  What a caller with no `map_series` read (the /explore rail, the /scan picker) offers as Series. */
+export function seriesOptions(rows: Row[]): { value: string; label: string }[] {
+  const seen = new Map<string, { label: string; n: number }>();
+  for (const r of rows) {
+    if (!r.series_key) continue;
+    const e = seen.get(r.series_key) ?? { label: String(r.collection || r.series_key), n: 0 };
+    e.n++;
+    seen.set(r.series_key, e);
+  }
+  return [...seen].sort((a, b) => b[1].n - a[1].n).map(([value, { label }]) => ({ value, label }));
+}

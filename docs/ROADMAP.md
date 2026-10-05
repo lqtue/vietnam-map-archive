@@ -456,10 +456,12 @@ system — what a result must retain, and the two kinds of check — is in the r
       institution facet; a "Surveys / Plans & other" switch decides whether Area applies. Show the
       sheet number beside the name — 23 names repeat. Long fields load when the drawer opens.
       Depends on `georef-flag-one-meaning`. Exit: no public column that is a single value.
-      **Done on /catalog:** the table columns, year range + histogram, institution facet,
-      Surveys / Plans switch, Type for staff only. Area is now the province (`region`) on both views. **Left:** `ArchiveMapRows` (the rail's
-      columns) and the series facet in /explore's rail — both in `ArchiveBrowser`, which another
-      branch was editing — and loading the long drawer fields on open.
+      **Built, not yet deployed:** the table columns, year range + histogram, institution facet,
+      Surveys / Plans switch, Type for staff only, Area as the province (`region`); the rail's rows
+      (`ArchiveMapRows`: sheet number and survey under the title, no Type column), the series
+      select above the Filters disclosure (the engine derives the surveys from its rows when a
+      caller passes none), and the description, rights and physical description fetched when the
+      drawer opens (`fetchMapLongFields`, 170 kB off the list). Close it once it is live.
 - [ ] **`catalog-local-search`** — search the public maps in the browser instead of through
       `/api/search`: every field `search_vector` indexes is already in the list row. Accent-fold
       and prefix-match per token — `hue` cannot find `Huế` today, because the index is the
