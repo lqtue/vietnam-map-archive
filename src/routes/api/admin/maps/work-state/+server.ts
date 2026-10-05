@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
   for (const m of maps.data as {
     id: string;
-    regions: { category?: string }[] | null;
+    regions: { category?: string; source?: string }[] | null;
     neatline: number[] | null;
     validated: string | null;
     triage_reviewed_at: string | null;
@@ -97,7 +97,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     f.triage = triage;
     for (const r of regions) {
       if (r.category === 'title') f.found.title = true;
-      else if (r.category === 'legend') f.found.legend = true;
+      // The model's legend guess is not trusted (see WorkFacts); only a person's region counts.
+      else if (r.category === 'legend' && r.source !== 'model') f.found.legend = true;
       else if (r.category === 'name_list') f.found.index = true;
     }
   }

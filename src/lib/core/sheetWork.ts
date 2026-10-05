@@ -10,7 +10,11 @@
 import type { TriageState } from '$lib/data/maps/triageTypes';
 
 export type WorkFacts = {
-  /** Regions the layout pass found. */
+  /**
+   * Regions the layout pass found. `legend` counts only a region a person confirmed: the layout
+   * model labels a legend on ~90% of sheets, including topographic sheets that have none, so its
+   * guess is not a fact about the sheet.
+   */
   found: { title: boolean; legend: boolean; index: boolean };
   /** Categories with at least one non-rejected label. */
   read: { title: boolean; legend: boolean; body: boolean };
@@ -61,13 +65,19 @@ export function sheetTracks(f: WorkFacts | undefined): Track[] {
       key: 'legend',
       label: 'Legend',
       state: pick(w.read.legend, w.found.legend),
-      hint: 'Legend read (yellow: found, not read)',
+      hint: 'Legend read (yellow: a person marked the region, not read yet)',
+    },
+    {
+      key: 'body',
+      label: 'Body',
+      state: pick(w.read.body || w.ocrRan, false),
+      hint: 'Place names read off the map',
     },
     {
       key: 'text',
       label: 'Text',
-      state: pick(w.textReviewed, w.ocrRan || w.read.body),
-      hint: 'Place names checked (yellow: read, not checked)',
+      state: pick(w.textReviewed, false),
+      hint: 'Place names checked by a person',
     },
     {
       key: 'shapes',
@@ -93,6 +103,30 @@ export function overallState(f: WorkFacts | undefined): TrackState {
       ? 'doing'
       : 'todo';
 }
+
+const stateOf = (f: WorkFacts | undefined, key: string): TrackState =>
+  sheetTracks(f).find((t) => t.key === key)!.state;
+
+/** The "Work" filter: what a person scanning the catalog is hunting for. */
+export const WORK_FILTERS = [
+  { key: '', label: 'Work: any', test: () => true },
+  { key: 'triage', label: 'Needs triage', test: (f) => stateOf(f, 'triage') !== 'done' },
+  { key: 'legend', label: 'Legend found, not read', test: (f) => stateOf(f, 'legend') === 'doing' },
+  {
+    key: 'text',
+    label: 'Text not checked',
+    test: (f) => stateOf(f, 'body') === 'done' && stateOf(f, 'text') !== 'done',
+  },
+  { key: 'shapes', label: 'Shapes not checked', test: (f) => stateOf(f, 'shapes') !== 'done' },
+  { key: 'done', label: 'All done', test: (f) => overallState(f) === 'done' },
+] as const satisfies readonly {
+  key: string;
+  label: string;
+  test: (f: WorkFacts | undefined) => boolean;
+}[];
+
+export const matchesWork = (key: string, f: WorkFacts | undefined): boolean =>
+  (WORK_FILTERS.find((w) => w.key === key) ?? WORK_FILTERS[0]).test(f);
 
 /** Where a sheet stands for legend work. `ready` = legend region found, not yet read. */
 export type LegendReadiness = 'read' | 'ready' | 'unlocated';

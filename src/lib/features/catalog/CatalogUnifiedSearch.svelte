@@ -21,6 +21,9 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
   import { inView } from '$lib/ui/inView';
+  import SheetStatus from '$lib/features/catalog/SheetStatus.svelte';
+  import { WORK_FILTERS, matchesWork, type WorkFactsById } from '$lib/core/sheetWork';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
 
   export let searchQuery: string = '';
   let groupBy: GroupKey = 'none';
@@ -53,6 +56,20 @@
   export let atRest: boolean = true;
 
   $: staff = role === 'admin' || role === 'mod';
+
+  // Staff: what has been done to each sheet, read once, to show and to filter by.
+  let work: WorkFactsById = {};
+  let workLoaded = false;
+  let workFilter = '';
+  async function loadWork() {
+    workLoaded = true;
+    work = (await fetchSheetWork()) ?? {};
+  }
+  $: if (staff && !compact && !workLoaded) void loadWork();
+  // A scout candidate has no work state, so a work filter leaves it out.
+  $: listed = workFilter
+    ? $results.filter((r) => (r as any)._table !== 'scout' && matchesWork(workFilter, work[r.id]))
+    : $results;
 
   const dispatch = createEventDispatcher<{ pick: any; edit: any }>();
 
@@ -134,11 +151,18 @@
     showSearch={false}
     {seriesChoices}
     {staff}
-    extraActive={groupBy === 'none' || compact || view === 'grid' ? 0 : 1}
+    extraActive={(groupBy === 'none' || compact || view === 'grid' ? 0 : 1) + (workFilter ? 1 : 0)}
   >
     <!-- Grouping is a way of looking at the filtered list, so it sits in the same
          disclosure as the filters and is counted on its summary. The grid has no
          groups, and the compact rail never did. -->
+    {#if staff && !compact}
+      <select bind:value={workFilter} aria-label="Filter by work">
+        {#each WORK_FILTERS as w (w.key)}
+          <option value={w.key}>{$t(w.label)}</option>
+        {/each}
+      </select>
+    {/if}
     {#if !compact && view !== 'grid'}
       <select bind:value={groupBy} aria-label={$t('Group by')}>
         <option value="none">{$t('Group by')}: {$t('None')}</option>
@@ -172,6 +196,7 @@
           >
         {/if}
         <Tabs
+          tone="rail"
           tabs={VIEWS}
           active={view}
           label={$t('Catalog view')}
@@ -195,22 +220,27 @@
       <!-- A card opens the same drawer a row does, so it carries no `href`:
            the grid is the list in another shape, not a different destination. -->
       <div class="cus-grid">
-        {#each $results.slice(0, shown) as item (item.id)}
+        {#each listed.slice(0, shown) as item (item.id)}
           <MapCard
             map={item as any}
             href={null}
             thumbnail={atWidth(item.thumbnail, 400)}
             showSourceBadge
             on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
-          />
+          >
+            <svelte:fragment slot="status">
+              {#if staff}<SheetStatus {item} state={work[item.id]} />{/if}
+            </svelte:fragment>
+          </MapCard>
         {/each}
       </div>
-      {#if shown < $results.length}
+      {#if shown < listed.length}
         <div use:inView={() => (shown += SLICE)}></div>
       {/if}
     {:else}
       <CatalogTable
-        items={$results as any}
+        items={listed as any}
+        {work}
         {compact}
         {activeId}
         {showLayerActions}
@@ -254,17 +284,15 @@
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
-    padding: 0.5rem 0.75rem;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--sb-radius-sm);
+    padding: 0.25rem 0;
     font-family: var(--font-family-base);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    color: var(--sb-text-meta);
   }
   .v2-tools {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.75rem;
   }
   .v2-loading {
     margin-left: 0.4rem;
@@ -278,7 +306,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-weight: var(--font-bold);
     cursor: pointer;
   }
 

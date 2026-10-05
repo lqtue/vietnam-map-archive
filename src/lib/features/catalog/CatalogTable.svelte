@@ -16,8 +16,8 @@
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { sortRows, groupRows, type SortKey, type GroupKey } from './catalogTableModel';
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
-  import SheetWork from './SheetWork.svelte';
-  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import SheetStatus from './SheetStatus.svelte';
+  import OpenInMenu from './OpenInMenu.svelte';
   import type { WorkFactsById } from '$lib/core/sheetWork';
   import { inView } from '$lib/ui/inView';
   import { sliceGroups } from './sliceGroups';
@@ -30,6 +30,8 @@
   export let showLayerActions: boolean = false;
   /** Staff also see Type and Status; for a reader Type is one value in 96% of rows and Status is "map". */
   export let staff: boolean = false;
+  /** What has been done to each sheet (staff), loaded by the catalog that also filters on it. */
+  export let work: WorkFactsById = {};
   /** Chosen in the catalog's filter group, not here. */
   export let groupBy: GroupKey = 'none';
 
@@ -51,18 +53,10 @@
       ? [
           { key: 'map_type', label: 'Type' },
           { key: 'status', label: 'Status', klass: 'status-col' },
+          { key: 'open', label: '', srLabel: 'Open in', klass: 'open-col', sortable: false },
         ]
       : []),
   ] satisfies TableColumn[];
-
-  // Staff: the Status cell shows what has been done to each sheet, read once.
-  let work: WorkFactsById = {};
-  let workLoaded = false;
-  async function loadWork() {
-    workLoaded = true;
-    work = (await fetchSheetWork()) ?? {};
-  }
-  $: if (staff && !compact && !workLoaded) void loadWork();
 
   $: ctx = staff && !compact ? work : null;
   $: sorted = sortRows(items, sort, ctx);
@@ -183,19 +177,9 @@
               </td>
               {#if staff}
                 <td>{item.map_type || '—'}</td>
-                <td class="status-col">
-                  {#if isScout}
-                    <span class="badge-chip is-sm scout">scout</span>
-                  {:else if (item as any).georef_done}
-                    <span class="badge-chip is-sm status-map" title={$t('Available on map')}
-                      >{$t('Map')}</span
-                    >
-                  {:else}
-                    <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
-                      >{$t('Image')}</span
-                    >
-                  {/if}
-                  {#if !isScout}<SheetWork mapId={item.id} state={work[item.id]} />{/if}
+                <td class="status-col"><SheetStatus item={item as any} state={work[item.id]} /></td>
+                <td class="open-col">
+                  {#if !isScout}<OpenInMenu mapId={item.id} />{/if}
                 </td>
               {/if}
             </tr>
@@ -270,18 +254,12 @@
      elements are `DataTable`'s; a column's geometry has to reach both halves of
      it. The `.ct` wrapper is this component's, so it keeps them from leaking. */
   .ct :global(.status-col) {
-    width: 90px;
-    text-align: right;
+    width: 9rem;
     white-space: nowrap;
   }
-  /* Two tones only: both are tints of a token, and the shared `.chip-green` /
-     `.chip-yellow` are a solid fill and a white face — too loud and too blank
-     for a badge repeated down every row. */
-  .scout {
-    background: var(--sb-accent-yellow);
-  }
-  .status-map {
-    background: var(--sb-badge-map);
+  .ct :global(.open-col) {
+    width: 6rem;
+    text-align: right;
   }
   .group-row {
     cursor: pointer;

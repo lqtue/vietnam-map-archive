@@ -110,6 +110,7 @@ test('a sheet has independent work tracks: done, in between, or not yet', () => 
     triage: 'todo',
     title: 'todo',
     legend: 'todo',
+    body: 'todo',
     text: 'todo',
     shapes: 'todo',
   });
@@ -120,7 +121,11 @@ test('a sheet has independent work tracks: done, in between, or not yet', () => 
     found: { ...NO_WORK.found, legend: true },
     read: { ...NO_WORK.read, legend: true },
   };
-  expect(states(legendOnly)).toMatchObject({ triage: 'doing', legend: 'done', text: 'todo' });
+  expect(states(legendOnly)).toMatchObject({
+    triage: 'doing',
+    legend: 'done',
+    body: 'todo',
+  });
   const reviewed: WorkFacts = {
     ...NO_WORK,
     triage: 'ready',
@@ -128,7 +133,14 @@ test('a sheet has independent work tracks: done, in between, or not yet', () => 
     textReviewed: true,
     segRan: true,
   };
-  expect(states(reviewed)).toMatchObject({ triage: 'done', text: 'done', shapes: 'doing' });
+  expect(states(reviewed)).toMatchObject({
+    triage: 'done',
+    body: 'done',
+    text: 'done',
+    shapes: 'doing',
+  });
+  // A region the model guessed is not a fact: the track stays grey until a person confirms it.
+  expect(states({ ...NO_WORK, found: { ...NO_WORK.found, legend: false } }).legend).toBe('todo');
 });
 
 test('the legend list filters, searches without accents, and keeps the open row', () => {

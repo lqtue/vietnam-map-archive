@@ -9,6 +9,10 @@
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchMapLongFields, type MapLongFields } from '$lib/data/maps/service';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import type { WorkFacts } from '$lib/core/sheetWork';
+  import WorkPips from './WorkPips.svelte';
+  import OpenInMenu from './OpenInMenu.svelte';
 
   export let item: any | null = null;
   /** Staff get an Edit action that opens the admin map editor. */
@@ -31,6 +35,16 @@
     if (item?.id === it.id) more = got;
   }
   $: shown = item ? { ...item, ...more } : null;
+
+  // Staff: what has been done to this sheet, read when the drawer opens.
+  let work: WorkFacts | undefined;
+  $: loadWork(item);
+  async function loadWork(it: any | null) {
+    work = undefined;
+    if (!it?.id || it._table === 'scout' || !(role === 'admin' || role === 'mod')) return;
+    const got = await fetchSheetWork(it.id);
+    if (item?.id === it.id) work = got?.[it.id];
+  }
 
   function close() {
     dispatch('close');
@@ -90,6 +104,14 @@
 
     <div class="badge-chip status-pill">{statusLabel()}</div>
 
+    {#if canEdit}
+      <!-- Staff: what has been done to the sheet, and where to open it. Grey = not yet. -->
+      <div class="work">
+        <WorkPips state={work} />
+        <OpenInMenu mapId={item.id} />
+      </div>
+    {/if}
+
     {#if shown?.dc_description}
       <p class="description">{shown.dc_description}</p>
     {/if}
@@ -142,6 +164,13 @@
 {/if}
 
 <style>
+  .work {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.6rem 0;
+  }
   .drawer-backdrop {
     position: fixed;
     inset: 0;
