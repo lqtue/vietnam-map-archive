@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Backfill `maps.bbox` from each map's Allmaps annotation.
 //
-//   node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs [--dry] [--force] [--concurrency N]
+//   node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs [--dry] [--force] [--only slug,slug] [--concurrency N]
 //   node --env-file=.env scripts/oneoff/backfill_map_bbox.mjs --report-drift
 //
 // Measured on 2026-09-04: 0 of 101 maps had a bbox, so every "where is this
@@ -44,6 +44,8 @@ const reportDrift = args.includes('--report-drift');
 const dry = args.includes('--dry') || reportDrift;
 // Drift is meaningful only when every existing bbox is recomputed.
 const force = args.includes('--force') || reportDrift;
+const oIdx = args.indexOf('--only');
+const only = oIdx > -1 ? new Set(args[oIdx + 1].split(',')) : null;
 const cIdx = args.indexOf('--concurrency');
 const concurrency = cIdx > -1 ? Number(args[cIdx + 1]) : 10;
 
@@ -148,13 +150,15 @@ function sheetExtent(annotation) {
 
 const { data: maps, error } = await db
   .from('maps')
-  .select('id, name, year, bbox, allmaps_id, annotation_url')
+  .select('id, slug, name, year, bbox, allmaps_id, annotation_url')
   .order('year', { nullsFirst: false });
 if (error) throw error;
 
 const todo = maps.filter(
   (m) =>
-    (m.annotation_url || m.allmaps_id) && (force || !Array.isArray(m.bbox) || m.bbox.length !== 4)
+    (!only || only.has(m.slug)) &&
+    (m.annotation_url || m.allmaps_id) &&
+    (force || !Array.isArray(m.bbox) || m.bbox.length !== 4)
 );
 console.log(
   `${maps.length} maps · ${maps.filter((m) => m.bbox?.length === 4).length} already have a bbox → ${todo.length} to fetch${dry ? ' (dry run)' : ''}`
@@ -199,11 +203,13 @@ for (const r of writable) {
     Array.isArray(cur) && cur.length === 4 && cur.every((v, i) => Math.abs(v - b[i]) < 1e-6);
   if (same) continue;
   changed++;
-  const metres = bboxDriftMetres(cur, b);
-  drift.push({ metres, m: r.m, bbox: b, n: r.n, how: r.how });
-  if (reportDrift && metres < 0.25) continue;
+  // A null stored bbox has nothing to drift from: it is a first write.
+  const fresh = !Array.isArray(cur) || cur.length !== 4;
+  const metres = fresh ? null : bboxDriftMetres(cur, b);
+  if (!fresh) drift.push({ metres, m: r.m, bbox: b, n: r.n, how: r.how });
+  if (reportDrift && metres !== null && metres < 0.25) continue;
   console.log(
-    `  ${String(r.m.year ?? '????')}  ${r.n}gcp ${r.how.padEnd(4)}  ${metres.toFixed(2).padStart(8)} m  [${b}]  ${r.m.name.slice(0, 48)}`
+    `  ${String(r.m.year ?? '????')}  ${r.n}gcp ${r.how.padEnd(4)}  ${(metres === null ? 'new' : metres.toFixed(2) + ' m').padStart(10)}  [${b}]  ${r.m.name.slice(0, 48)}`
   );
   if (dry) continue;
   const { error: upErr } = await db.from('maps').update({ bbox: b }).eq('id', r.m.id);
