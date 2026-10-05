@@ -19,6 +19,7 @@
   import LabelHits from '$lib/features/shared/LabelHits.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
+  import { inView } from '$lib/ui/inView';
 
   export let searchQuery: string = '';
   export let role: 'user' | 'mod' | 'admin' = 'user';
@@ -95,6 +96,14 @@
   ];
   let view: string = readJson<string>(VIEW_KEY, 'list');
   $: writeJson(VIEW_KEY, view);
+
+  /* The grid draws a slice and the sentinel under it asks for the next, as CatalogTable does. */
+  const SLICE = 60;
+  let shown = SLICE;
+  $: resetSlice($results);
+  function resetSlice(_: unknown) {
+    shown = SLICE;
+  }
 
   // ── Admin edit: the page owns MapEditModal (catalog UI must not import admin) ──
   /** Re-run the current query (call after an admin edit lands). */
@@ -179,7 +188,7 @@
       <!-- A card opens the same drawer a row does, so it carries no `href`:
            the grid is the list in another shape, not a different destination. -->
       <div class="cus-grid">
-        {#each $results as item (item.id)}
+        {#each $results.slice(0, shown) as item (item.id)}
           <MapCard
             map={item as any}
             href={null}
@@ -189,6 +198,9 @@
           />
         {/each}
       </div>
+      {#if shown < $results.length}
+        <div use:inView={() => (shown += SLICE)}></div>
+      {/if}
     {:else}
       <CatalogTable
         items={$results as any}

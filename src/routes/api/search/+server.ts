@@ -22,7 +22,7 @@ import { getRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { tally } from '$lib/server/facets';
-import { readAll } from '$lib/data/supabase/paged';
+import { readAll, readAllParallel } from '$lib/data/supabase/paged';
 import { getTransformer } from '$lib/server/transformer';
 import { placeKey, placeCoreKey } from '$lib/core/utils/placeKey';
 
@@ -74,13 +74,15 @@ export interface LabelHit {
 }
 
 /**
- * Everything a catalog card, the facet rail and the admin editor read.
+ * Everything a catalog card and the facet rail read. Not `extra_metadata` — about a fifth of the
+ * response and read by nothing that takes a search result: the admin editor loads the whole row
+ * itself (`fetchMapRow`, catalog/+page.svelte).
  * `dc_description`/`year_label`/`georef_done`/`dc_publisher` stay this
  * response's own field names (`mapsOut` below) — only the column read from
  * renamed (mig 095).
  */
 const FULL_MAP_COLUMNS =
-  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,extra_metadata,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
+  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -136,8 +138,47 @@ function periodOf(year: number | null | undefined): string | null {
   return null;
 }
 
-export const GET: RequestHandler = async ({ locals, url }) => {
-  const role = await getRole(locals);
+/**
+ * Public answers are the same for everyone, so they are kept at the edge for five minutes
+ * (docs/catalog-plan.md decision 1). Pages Functions run *before* Cloudflare's CDN, so a
+ * `Cache-Control` header alone caches nothing here: the Cache API is what does it. Staff see drafts and
+ * must see their own edits at once, so they bypass it, and `X-VMA-Cache` says which path answered.
+ */
+const PUBLIC_TTL = 300;
+
+/** The two Cloudflare bindings used here; the adapter's ambient types are not loaded in this project. */
+interface EdgePlatform {
+  caches?: { default: Cache };
+  ctx?: { waitUntil(p: Promise<unknown>): void };
+}
+
+export const GET: RequestHandler = async (event) => {
+  const role = await getRole(event.locals);
+  const staff = role === 'admin' || role === 'mod';
+  const edge = event.platform as EdgePlatform | undefined;
+  const cache = staff ? undefined : edge?.caches?.default;
+  if (!cache) return answer(event, role);
+
+  const key = new Request(event.url.toString());
+  const hit = await cache.match(key);
+  if (hit) {
+    const res = new Response(hit.body, hit);
+    res.headers.set('X-VMA-Cache', 'HIT');
+    return res;
+  }
+  const res = await answer(event, role);
+  if (res.ok) {
+    res.headers.set('Cache-Control', `public, s-maxage=${PUBLIC_TTL}`);
+    edge?.ctx?.waitUntil(cache.put(key, res.clone()));
+  }
+  res.headers.set('X-VMA-Cache', 'MISS');
+  return res;
+};
+
+async function answer(
+  { url }: Parameters<RequestHandler>[0],
+  role: Awaited<ReturnType<typeof getRole>>
+): Promise<Response> {
   const supabase = adminClient();
 
   const q = (url.searchParams.get('q') || '').trim();
@@ -177,24 +218,29 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     // The select string is read *literally* by PostgREST's types, so a ternary
     // inside `select()` resolves to a ParserError. Pick the string first.
     const columns: string = slim ? SLIM_MAP_COLUMNS : FULL_MAP_COLUMNS;
-    let qMaps = supabase.from('maps').select(columns).neq('status', 'archived');
-    if (role !== 'admin' && role !== 'mod') {
-      // Public users only see public/featured.
-      qMaps = qMaps.in('status', ['public', 'featured']);
-    }
     const tsq = prefixQuery(q);
-    // A sheet number ("5929-3") is not in `search_vector`, so it matches the sheet_number the series
-    // rows carry. The dash form only: a bare four digits is also a year. Digits only, so no filter syntax.
-    if (/^\d{4}-\d$/.test(q)) qMaps = qMaps.eq('extra_metadata->>sheet_number', q);
-    else if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
+    // A builder is mutable — `.range()` rewrites its own URL — so two pages in flight need two
+    // builders, not one shared. A shared one answered with whichever range was set last.
+    const build = () => {
+      let qMaps = supabase.from('maps').select(columns).neq('status', 'archived');
+      if (role !== 'admin' && role !== 'mod') {
+        // Public users only see public/featured.
+        qMaps = qMaps.in('status', ['public', 'featured']);
+      }
+      // A sheet number ("5929-3") is not in `search_vector`, so it matches the sheet_number the series
+      // rows carry. The dash form only: a bare four digits is also a year. Digits only, so no filter syntax.
+      if (/^\d{4}-\d$/.test(q)) qMaps = qMaps.eq('extra_metadata->>sheet_number', q);
+      else if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
+      return qMaps;
+    };
     // Slim callers get no facets, so there is nothing to tally the broad set
     // for — Postgres can do the cutting. Everyone else fetches broadly and
     // filters in JS, because a facet count needs the unfiltered set.
     // `.limit(2000)` was silently cut to PostgREST's 1,000 with no order, so once the archive passed
     // 1,000 rows every facet and filter ran over an arbitrary subset (L7014 showed 172 of 510).
     const { data, error: err } = slim
-      ? await qMaps.limit(Math.min(limit + offset, MAX_LIMIT))
-      : await readAll((from, to) => qMaps.order('id').range(from, to));
+      ? await build().limit(Math.min(limit + offset, MAX_LIMIT))
+      : await readAllParallel((from, to) => build().order('id').range(from, to));
     if (err) dbError(err, 'Map search failed');
     return (data as unknown as Record<string, unknown>[]) || [];
   };
@@ -469,7 +515,6 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     source_type: r.source_type,
     status: r.status,
     bbox: r.bbox,
-    extra_metadata: r.extra_metadata,
     iiif_image: r.iiif_image,
     allmaps_id: r.allmaps_id,
     annotation_url: r.annotation_url,
@@ -528,4 +573,4 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     periods: PERIODS,
     role,
   });
-};
+}

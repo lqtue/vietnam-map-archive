@@ -16,6 +16,8 @@
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { sortRows, groupRows, type SortKey, type GroupKey } from './catalogTableModel';
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
+  import { inView } from '$lib/ui/inView';
+  import { sliceGroups } from './sliceGroups';
 
   export let items: MapListItem[] = [];
   export let compact: boolean = false;
@@ -42,6 +44,18 @@
 
   $: sorted = sortRows(items, sort);
   $: groups = groupRows(sorted, groupBy);
+
+  /* 938 rows is 15,000 DOM nodes and a 1.3 s first render, and nobody has scrolled to most of them.
+     Draw a slice; the sentinel under the table asks for the next one. A new result set, sort or
+     grouping starts over from the top. */
+  const SLICE = 100;
+  let shown = SLICE;
+  $: resetSlice(groups);
+  function resetSlice(_: unknown) {
+    shown = SLICE;
+  }
+  $: drawn = sliceGroups(groups, shown);
+  $: total = items.length;
 
   let collapsed = new Set<string>();
   function toggleGroup(label: string | null) {
@@ -81,13 +95,13 @@
        still reach the `<table>`, `<thead>` and `<th>`s that are DataTable's. -->
   <div class="ct">
     <DataTable columns={COLUMNS} klass="is-card" bind:sort>
-      {#each groups as g (g.label)}
+      {#each drawn as g (g.label)}
         {#if g.label !== null}
           <tr class="group-row" on:click={() => toggleGroup(g.label)}>
             <td colspan={COLUMNS.length}>
               <span class="caret">{collapsed.has(g.label) ? '▸' : '▾'}</span>
               <strong>{g.label}</strong>
-              <span class="group-count">{g.rows.length}</span>
+              <span class="group-count">{g.count}</span>
             </td>
           </tr>
         {/if}
@@ -198,6 +212,9 @@
         {/if}
       {/each}
     </DataTable>
+    {#if shown < total}
+      <div class="ct-more" use:inView={() => (shown += SLICE)}></div>
+    {/if}
   </div>
 {/if}
 

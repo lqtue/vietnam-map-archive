@@ -442,6 +442,9 @@ system — what a result must retain, and the two kinds of check — is in the r
       once no reader is confirmed. Cloudflare Pages may not honour the header on a Function
       response — if `cf-cache-status` never reads `HIT`, build a static snapshot on deploy/edit.
       Exit: rows visible in about 1 s on a cold load (was 4.5 s), `HIT` on the second request.
+      **Built, not yet deployed:** the Cache API (Functions run before the CDN, so the header alone
+      caches nothing; `X-VMA-Cache: HIT|MISS` says which path answered), two pages in parallel,
+      100-row slices, `extra_metadata` dropped. What is left is the production probe.
       Plan for this item and the four after it: `docs/catalog-plan.md`.
 - [ ] **`catalog-columns`** — the public list shows columns that do not vary. Of 1,038 public
       maps: all are `is_georeferenced`, 1,000 of 1,036 `map_type` are "topographic", `location`
