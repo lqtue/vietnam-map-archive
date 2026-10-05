@@ -15,7 +15,7 @@ this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-09-15**, six rows added by hand 2026-09-18. **72 markers, 14 with no trigger.**
+Scanned **2026-10-05**: **92 tracked markers** (the grep also hits gitignored output under `work/image-processing/results/` — skip those). Previous scan 2026-09-15 (72).
 Against the
 2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
 the ledger had gone stale in both directions, so this is a full rewrite rather
@@ -29,7 +29,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## src/lib/core/iiif/annotationUrl.ts
 
-- **:28** — `allmapsTileUrl` leans on `allmaps.xyz`, a free public service. ceiling: someone else's
+- **:38** — `allmapsTileUrl` leans on `allmaps.xyz`, a free public service. ceiling: someone else's
   rate limit and uptime. upgrade: self-host `@allmaps/tileserver` on the R2 worker if it ever
   throttles us.
 
@@ -61,7 +61,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## src/lib/map/shell/warpedOverlay.ts
 
-- **:69** — monkey-patch instead of forking `@allmaps/render`. ceiling: six lines against an
+- **:92** — monkey-patch instead of forking `@allmaps/render`. ceiling: six lines against an
   upstream beta that may fix this itself. upgrade: drop it when `@allmaps/render` clears the frame
   for itself.
 
@@ -83,7 +83,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   on its own and nothing else on the map animates. upgrade: reach for `postrender` only if a second
   animated layer shows up.
 
-## src/lib/features/explore/FootprintsLayer.svelte
+## src/lib/features/shared/FootprintsLayer.svelte
 
 - **:75** — one request per set of ids, re-fetched whenever the set changes, no per-map cache.
   ceiling: a sheet's fabric is a few hundred polygons and the response is edge-cacheable. upgrade:
@@ -91,19 +91,14 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## src/lib/features/explore/ExploreBrowsePanel.svelte
 
-- **:110** — an inbound `?series=` selects the series but does not fit the map to its bounds.
+- **:100** — an inbound `?series=` selects the series but does not fit the map to its bounds.
   ceiling: the key is accepted in either spelling — the database series or the raster archive's own
   — so a reader copying one out of a URL cannot take the wrong half, and the param is consumed once
   and dropped. upgrade: wire the bounds fit through if a bare `?series=` is ever shared.
 
-## src/lib/features/explore/ExploreRightSidebar.svelte
-
-- **:89** — the Legend tab issues the same GET `LegendPointsLayer` makes, so an open tab fetches it
-  twice. ceiling: one small request per map. upgrade: give it a store if a third reader turns up.
-
 ## src/lib/features/explore/HeroMap.svelte
 
-- **:184** — `fitSheet` runs once, when the map appears; not on resize. ceiling: a refit would undo
+- **:183** — `fitSheet` runs once, when the map appears; not on resize. ceiling: a refit would undo
   a reader who has panned or ⌘-zoomed, and the frame only has to be right for the beats. upgrade:
   re-fit on `change:size` the day the stage becomes resizable.
 
@@ -134,13 +129,6 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 - **:172** — one PATCH per keypress when rotating a label. ceiling: no debounce at all. upgrade:
   debounce if holding a key ever matters.
 
-## src/lib/server/auth.ts
-
-- **:77** — `assertUnderRateLimit` counts the target table directly instead of keeping a rate-limit
-  store. ceiling: trades exactness under bursts for having no moving parts — a counter table would
-  need its own writer, cleanup and migration. upgrade: a real limiter if a single count query ever
-  shows up in the slow log.
-
 ## src/lib/server/gallica.ts
 
 - **:41** — no per-IP rate limit. ceiling: the platform has no shared counter to keep one in (the
@@ -166,7 +154,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## src/lib/server/warp.ts
 
-- **:104** — `pointEwkt` hands PostgREST EWKT text rather than a geometry object. ceiling: the
+- **:44** — `pointEwkt` hands PostgREST EWKT text rather than a geometry object. ceiling: the
   string goes straight to the geography input function, so there is nothing to install — but the
   numbers are not readable back out of it. upgrade: use `transformToGeo` directly if a writer ever
   needs them, rather than parsing this.
@@ -247,7 +235,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## scripts/oneoff/backfill_indochine_descriptions.mjs
 
-- **:38** — writes `dc_description`, `source_url` and (opt-in) `name`; leaves `rights` at "Public
+- **:41** — writes `dc_description`, `source_url` and (opt-in) `name`; leaves `rights` at "Public
   domain". ceiling: a 1900s French colonial survey probably is public domain, but CartoMundi's
   Nakala items for the neighbouring 1:100,000 series are CC-BY-NC-SA-4.0, and guessing a licence is
   the same error as guessing a source. Flagged, not changed. upgrade: _none named_ — `no-trigger`.
@@ -306,7 +294,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## tests/write.spec.ts
 
-- **:22** — the write smokes drive supabase-js on the same contract the data layer uses, not the
+- **:23** — the write smokes drive supabase-js on the same contract the data layer uses, not the
   drawing UI. ceiling: canvas-dragging tests would cost far more than the coverage they add.
   upgrade: add them when a UI wiring bug actually escapes.
 
@@ -336,13 +324,13 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## work/ocr/scripts/iiif_tiles.py
 
-- **:492** — CLAHE in pure numpy + Pillow, ~30 lines. ceiling: there is no cv2 wheel for Python 3.14
+- **:519** — CLAHE in pure numpy + Pillow, ~30 lines. ceiling: there is no cv2 wheel for Python 3.14
   and this must add no dependency; a full 2048px tile costs ~0.2 s and four 256-entry float32 LUT
   gathers (~64 MB peak), and the bilinear interpolation matches cv2's so output is equivalent but
   not bit-identical. upgrade: if it ever shows up in the profile,
   `cv2.createCLAHE(clipLimit, tileGridSize).apply(L)` on the same L channel, same flag surface, then
   delete `_clahe_lut`.
-- **:762** — the AOI is an axis-aligned rectangle in pixel space. ceiling: a rotated or skewed map
+- **:789** — the AOI is an axis-aligned rectangle in pixel space. ceiling: a rotated or skewed map
   means the caller's pixel bbox over-covers the true geo polygon, so a few extra tiles survive;
   over-covering costs API calls where under-covering would lose labels, so this is the safe side.
   upgrade: _none named_ — `no-trigger`.
@@ -374,14 +362,33 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## work/image-processing/scripts/colour_blocks.py
 
-- **:84** — a block's ring is a concave hull over its boundary pixels, not a trace. ceiling: a block
+- **:115** — a block's ring is a concave hull over its boundary pixels, not a trace. ceiling: a block
   with a genuine notch comes back filled, and `blocks_to_seeds` reads only the bounds anyway.
   upgrade: marching squares on the component mask; the signal to do it is `seg_eval` cover running
   high while IoU stays flat, which is what over-coverage looks like.
+- **:846** — the road/gap pass subtracts hull from hull, so it leans on the block hulls being roughly
+  right. upgrade: a true raster trace of both (`rasterio.features.shapes`) — a GDAL dependency this
+  script does not have.
+- **:1187** — seven water-line constants tuned on one sheet; `WATER_LINE_RB` (0.07) is the
+  load-bearing gap between this sheet's blue and its black. ceiling: a sheet that draws water in
+  black, or whose ink has aged to the same hue. upgrade: fit the cut from the sheet's own dark-pixel
+  histogram, the way `cream_ink` sweeps its threshold.
+- **:1291** — building splitting has no precision figure: no window has been exhaustively traced.
+  `--no-split-buildings` restores the run without it. upgrade: trace one dense window and score it
+  with `seg_eval --window`.
+- **:1361** — the water-texture threshold (0.30) is one number on one sheet. ceiling: stippled rather
+  than ruled water, where it would erase the river. upgrade: read it off the distribution inside the
+  hydrology labels' own cells.
+- **:1519** — `MIN_CIRCULARITY = 0.10`, measured two steps away. ceiling: genuinely long thin parcels
+  (canal frontage, rice-field strips), where the shape prior is false. upgrade: lower it or turn the
+  flag off on such a sheet.
+- **:1607** — `HATCH_COHERENCE = 0.30` is one constant, not a voted trough, and it scales with
+  `--render` (the same two blocks score 0.81 and 0.75 at full resolution). upgrade: re-measure or sweep
+  it before trusting it at another render.
 
 ## work/image-processing/scripts/seg_eval.py
 
-- **:88** — the ground truth is filtered on `source=volunteer` alone, not on
+- **:89** — the ground truth is filtered on `source=volunteer` alone, not on
   `status`. ceiling: a volunteer trace counts the moment it is submitted, so a
   careless or mid-edit trace is ground truth until someone deletes it. upgrade:
   add `status=eq.approved` if volunteer tracing ever gets a review queue worth
@@ -452,16 +459,16 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 ## work/image-processing/scripts/modern_prior.py
 
-- **:133** — `BLOCK_BUFFER_M = 8.0`, one constant for the whole corpus. ceiling: it is a per-sheet
+- **:138** — `BLOCK_BUFFER_M = 8.0`, one constant for the whole corpus. ceiling: it is a per-sheet
   quantity really — alley width varies by district and by era. upgrade: pass `buffer_m` explicitly
   if a sheet comes back visibly over- or under-merged.
-- **:429** — `difference` against the whole page in one call. ceiling: fine at one sheet — 1.3 s
+- **:434** — `difference` against the whole page in one call. ceiling: fine at one sheet — 1.3 s
   over a 3.3 km window with 1,783 road polygons. upgrade: a grid if a sheet ever covers the full
   74k, and measure before splitting it.
-- **:461** — junction counting by vertex, not true noding. ceiling: it finds junctions where ways
+- **:466** — junction counting by vertex, not true noding. ceiling: it finds junctions where ways
   are split, which OSM does at every intersection, and misses a crossing where one way passes over
   another unsplit. upgrade: swap in `shapely.node` if bridges and flyovers start mattering.
-- **:481** — buildings are binned by centroid and counted whole, not clipped to the cell. ceiling: a
+- **:486** — buildings are binned by centroid and counted whole, not clipped to the cell. ceiling: a
   building is ~10 m across and a cell here is hundreds, so the error is edge-only. upgrade: clip
   properly if the grid ever gets fine enough that a cell and a building are the same size.
 
@@ -476,7 +483,7 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   are under 16 px on a side, which is one tube house rather than a block — both are prompts SAM2
   answers badly. upgrade: a `MIN_BLOCK_PX` floor here, set from a run's measured mask IoU rather
   than from taste.
-- **:365** — `MAX_BOX_TILE_FRACTION = 0.9`: an oversized block is dropped, not rescued. ceiling: the
+- **:373** — `MAX_BOX_TILE_FRACTION = 0.9`: an oversized block is dropped, not rescued. ceiling: the
   count is a rounding error today. upgrade: segment an oversized block on a coarser scale factor
   where it does fit — a second pass at another zoom — when that stops being true.
 
@@ -485,6 +492,9 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 - **:398** — the seg runner reads its checkpoint and MapSAM2 directory from the environment.
   ceiling: they are properties of the machine, not the job; a job payload may still override either.
   upgrade: _none named_ — `no-trigger`.
+- **:502** — one blocking readline loop, no threads, while waiting on a child process. ceiling: the
+  child writes to one pipe and nobody else is waiting on this worker. upgrade: _none named_ —
+  `no-trigger`.
 
 ## work/analysis/district4/metrics.py
 
@@ -496,6 +506,95 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 ---
 
 **66 markers, 14 with no trigger.**
+
+<!-- added 2026-10-05 -->
+
+## src/lib/core/georef/version.ts
+
+- **:65** — `gcpSrcHash` hashes the GCPs only, so changing the transformation type with the same
+  points keeps the hash and leaves derived rows looking fresh. upgrade: add the type together with
+  `rewarp-on-sync`, which can absorb re-marking every warped row stale at once.
+
+## src/lib/features/contribute/review/reviewQueue.ts
+
+- **:302** — `decideMany` writes verdicts serially. upgrade: batch the ids into one endpoint if a
+  sheet ever arrives with thousands of polygons.
+
+## scripts/import-seg-geojson.mjs
+
+- **:53** — dedupe matches exact rings only. upgrade: canonicalise rotation/winding if a producer
+  ever emits the same polygon from a different start vertex.
+
+## scripts/md2pdf.py
+
+- **:4** — needs `markdown` + `weasyprint`, kept out of the repo's deps because nothing else makes a
+  PDF; run from its own venv. upgrade: _none named_ — `no-trigger`.
+
+## scripts/oneoff/extract_doling_placenames.mjs
+
+- **:131** — the entity table covers what this export contains, not HTML5. upgrade: a real decoder
+  if the corpus widens.
+- **:163** — regex over one known 13 MB export instead of an XML parser. ceiling: a post whose body
+  contains `]]>` is split across CDATA sections and would be truncated; none do today, and a drop in
+  the post count is the signal. upgrade: a real parser.
+
+## scripts/spot_history.mjs
+
+- **:11** — greedy single-link grouping, not real clustering. ceiling: fine at District 4 sheet
+  density. upgrade: revisit if a cluster needs splitting by `feature_type` as well as distance.
+
+## work/analysis/district4/georef_error.py
+
+- **:363** — the archive-wide coverage run (274 maps) appends one `--csv` row per sheet and runs in
+  batches rather than one process holding 274 HTTP calls. upgrade: _none named_ — `no-trigger`.
+
+## work/analysis/district4/river_full_map.py
+
+- **:313** — strip-wise occupancy, because a float32 grid over the whole 1923 sheet is 900 MB and a
+  4096 px run was already killed. upgrade: _none named_ — `no-trigger`.
+
+## work/image-processing/experiments/river-reference/qgis.py
+
+- **:24** — the `.pgw` ignores the half-pixel offset (< 1 px). upgrade: _none named_ — `no-trigger`.
+- **:47** — bbox overlap test; a near-miss lands as an empty clip, which the scorer ignores.
+  upgrade: _none named_ — `no-trigger`.
+
+## work/image-processing/scripts/clean_blocks.py
+
+- **:20** — shoelace area on the exterior ring, no shapely; holes pass through untouched and slivers
+  are not dropped (upstream floors at ~100 px²). upgrade: _none named_ — `no-trigger`.
+
+## work/image-processing/scripts/legend_probe.py
+
+- **:53** — one sheet's legend box and the five 1882 class names in source order. ceiling: every
+  other sheet; reading class names off the adjacent lettering is unbuilt, so both paths still assume
+  the 1882 class order.
+
+## work/image-processing/scripts/regularize_blocks.py
+
+- **:26** — the ink map is background-subtracted grey, so a thick stroke (a road edge, a printed
+  diamond's shadow) pulls an edge as hard as a thin plot line. upgrade: a stroke-width cap.
+
+## work/image-processing/scripts/review_figs.py
+
+- **:81** — a sheet nobody has read gets a 3×3 grid, not borrowed place names. upgrade: its own
+  `WINDOWS` list once someone reads it.
+
+## work/image-processing/scripts/sheet_features.py
+
+- **:120** — clipped least squares, not true NNLS; exact when both concentrations are ≥ 0. upgrade:
+  _none named_ — `no-trigger`.
+
+## work/image-processing/scripts/sheet_register.py
+
+- **:31** — similarity only (4 dof), no affine or TPS; `georef_error.md` measures 1.4% differential
+  scale on the 1882 scan, so ~1% is left on the table. upgrade: affine when a measured residual says
+  that 1% hurts.
+
+## work/proto/fabric/viewer.js
+
+- **:218** — the pinch-to-zoom range (0.03–0.25) is eyeballed against one webcam at arm's length.
+  upgrade: retune if zoom feels dead or pinned at an end.
 
 ## What changed since 2026-09-10
 

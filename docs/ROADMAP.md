@@ -25,40 +25,26 @@ model scored 7/7 on, a fixed pixel tile being a different amount of ground on ev
 L7014 mixed-datum fault, 56 published sheets drawing nothing. So: georeference quality, segmentation
 measurement, metadata that maintains itself, and corpus size.
 
-- [ ] **`l7014-iiif`** — L7014 as one IIIF series from three sources (PCL, TTU, ANU). **Done
-      2026-10-03**: all 510 PCL GeoPDFs are `public` IIIF `maps` rows (slug `<place>-l7014-<sheet>`,
-      `source_archive = PCL`, `maps.sheet_number` set so `map_series` counts them: 519 of 627), annotated
-      by `l7014_annotate_pdf.py` — 436 from the PDF's own control points, 11 `--offcell`, 7 autoplace, 56
-      by printed neatline (`--hand`; **seven are 30-80 m off a parallelogram and want an eye**) — plus
-      the 9 city sheets. The PMTiles mosaic (`l7014-20260913`, ~470 m out; the old `l7014-rebuild` plan) is
-      **retired from the app**: `rasterSeries.ts`, the raster part of a series row and
-      `L7014_PMTILES_URL` are gone, and `series_cells.held_by` is `'map'` for every held cell. Its R2
-      object and `work/l7014/cogs*` are not needed any more. A PMTiles overview may be built later from
-      the verified sheets. The paper's §7.6 / `blind-by-construction.tex` still cite the unrebuilt archive.
-      **Open:** (1) the 15 plain PCL scans are annotated (`l7014_scan_corners.py`,
-      `l7014_scan_refine.py`) but still `draft` — fits 1-43 m, none looked at in `/explore`; (2) **TTU**
-      (`vva.vietnam.ttu.edu`, 140 raster PDFs, none georeferenced): 131 more are being ingested as `draft`
-      rows (`l7014_ttu_ingest_list.py`, `source_archive = TTU`; titles were read off the scans by agents
-      because OCR cannot read the collars; 50 are cells no other source holds, the rest other editions of
-      PCL cells; same-edition ones skipped), then placed with `l7014_ttu_corners.py` — the detector fits
-      about half, the rest need a person; (3) **ANU** (`openresearch-repository.anu.edu.au`, 159
-      open-access JPG/TIFF masters, none georeferenced) adds **no new cell**: every one is already held by
-      PCL and 23 are the same edition. Record its handle on the PCL/TTU row rather than ingesting 159
-      duplicates; (4) 43 cells are in none of the three sources; (5) `hue-l7014-6541-4` was removed
-      2026-10-03 (the older of two rows for the cell; a 301 alias points at `-2`); (6) remaining medium/low-confidence title readings need review; the original PCL `kim-boi`
-      was corrected to printed "Thúy Hiền" on 2026-10-04, while "Lương Sơn" and "Chương Mỹ"
-      remain distinct titles on different scans of cell 6150-4; (7) `6835-4` was placed by hand from the detected neatline, its seams to
-      the neighbours unchecked; (8) resolve the two remaining undated copies if stronger source evidence appears. **Audit 2026-10-03:** the live snapshot has 671 map
-      rows and 627 cells: 519 public, 152 draft, 586 placed. Of 137 TTU rows, 85 remain unplaced;
-      34 completed rough readings are not merged, and margin reading stopped on API limits. Seven
-      TTU map rows lack source records, three source records lack map rows, and 132 TTU rows lack a
-      year. The 15 plain scans and 52 placed TTU sheets remain drafts without visual acceptance.
-      Audit findings and the six-step review/close gates: [L7014 inventory audit](journals/261003-l7014-audit.md).
-      **Metadata recovery 2026-10-04:** names normalized across map/index records and 218 missing
-      years recovered from reviewed margins, with date kind recorded. Gò Công 6329-4 and Quản Bạ
-      5955-2 remain undated. Printed titles corrected for Phu Tu Lủm, Thúy Hiền and Thái Thụy;
-      two placeholder sheet names replaced. Distinct historical titles remain distinct.
-      [Recovery and evidence](journals/261004-l7014-metadata.md).
+- [ ] **`l7014-iiif`** — L7014 as one IIIF series from three sources (PCL, TTU, ANU). The PCL
+      ingest shipped 2026-10-03 (510 GeoPDFs public; the PMTiles mosaic retired) — record in
+      [L7014 inventory audit](journals/261003-l7014-audit.md), metadata recovery in
+      [261004](journals/261004-l7014-metadata.md). Open:
+      1. The 15 plain PCL scans are annotated (fits 1–43 m) but still `draft`, none looked at in
+         `/explore`.
+      2. **TTU** (140 raster PDFs): of 137 rows ingested as `draft`, 85 are unplaced
+         (`l7014_ttu_corners.py` fits about half; the rest need a person); 52 placed sheets await
+         visual acceptance; 34 rough readings are unmerged; margin reading stopped on API limits.
+         Seven TTU map rows lack source records, three source records lack map rows.
+      3. **ANU** (159 masters) adds no new cell: record its handle on the PCL/TTU row instead of
+         ingesting duplicates.
+      4. 43 cells are in none of the three sources.
+      5. Seven `--hand` sheets are 30–80 m off a parallelogram and want an eye; `6835-4`'s seams to
+         its neighbours are unchecked.
+      6. Remaining medium/low-confidence title readings need review; Gò Công 6329-4 and Quản Bạ
+         5955-2 are undated.
+      7. The paper's §7.6 / `blind-by-construction.tex` still cite the unrebuilt archive.
+      8. `work/l7014/cogs*` and the old PMTiles R2 object are no longer needed — delete when sure.
+
 - [ ] **`series-sheets-bbox-datum`** — `series_cells.bbox` holds the raw, unshifted Indian 1960
       graticule straight from `index.geojson`, not the corrected WGS84 lattice `l7014_mosaic.py
       corners` already derives (Everest 1830 (1937 Adjustment) → WGS84). Measured 448–498 m off, NW
@@ -247,7 +233,7 @@ Do them when the surrounding work opens the file.
 gazetteer and `/api/press`'s spelling variants all look thin for one single reason. Measured budget
 is **$31–63 for all 38 maps** on `gemini-3.8-flash`, so cost is not the constraint; unattended
 quality is. This run is also the gate on the project's first paper
-(`docs/private/260912-postgrad-route.md`) — the toponym measurement needs all 39 sheets, not 6.
+(private planning notes) — the toponym measurement needs all 39 sheets, not 6.
 Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR pass".
 
 - [ ] **`hand-triage`** — the first sheets, by hand, one at a time at `/scan?mode=prepare`: draw the
@@ -409,12 +395,12 @@ system — what a result must retain, and the two kinds of check — is in the r
 
 ## Survey layer and catalog
 
-- [ ] **`series-identity`** — production migration 104 still derives `series_key()` from
-      `maps.collection`, so collection edits can re-file a sheet. Pending branch migration 105 adds
-      stable `series` UUIDs and synchronized `series_id` links on maps, cells and institution items;
-      renaming a map's display label then preserves membership. Migration 104's `series_key` stays
-      as a compatibility key. Still open: rollout/evidence on the target dataset, migrate catalog
-      filters and persisted layer references, and model curated non-survey groups such as city plans.
+- [ ] **`series-identity`** — migration 105 (in production, verified 2026-10-04) adds stable
+      `series` UUIDs and synchronized `series_id` links on maps, cells and institution items, so
+      renaming a map's display label preserves membership; 104's `series_key` stays as a
+      compatibility key. Still open: the catalog series facet and `seriesIndex.ts` still match
+      `maps.collection`; persisted layer references; and curated non-survey groups such as city
+      plans.
       Do not close on local SQL checks. Exit: no series fact lives only in `extra_metadata` and the
       deployed readers use stable identity. Plan: `docs/knowledge-system-plan.md` §1.
 

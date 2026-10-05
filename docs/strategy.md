@@ -324,4 +324,4 @@ designed to still be useful in fifty years.
 
 ---
 
-_Progress: the live platform · the GitHub repository · vietnam.ma.project@gmail.com_
+_Progress: the live platform · the GitHub repository · vietnamma.project@gmail.com_
