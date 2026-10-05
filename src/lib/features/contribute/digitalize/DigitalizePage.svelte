@@ -434,8 +434,7 @@
   function loadRun(e: CustomEvent<{ runId: string }>) {
     toText();
     tick().then(() => {
-      if (ocrSidebar) ocrSidebar.filterRunId = e.detail.runId;
-      ocrSidebar?.load?.();
+      ocrSidebar?.showRun(e.detail.runId);
     });
   }
 

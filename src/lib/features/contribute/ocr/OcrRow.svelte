@@ -7,11 +7,13 @@
   part hardest to find.
 
   It owns no state. `ext` is the sidebar's own row object, edited in place
-  through `bind:value` and committed by the parent on `commit`; `rowEl` and
-  `inputEl` are bound back up so the controller can scroll to a row and put the
-  cursor in it. The `_edit*` fields are the unsaved edit, `text`/`category` what
-  the pipeline wrote, `*_validated` what a person last saved — the dot compares
-  them to say whether there is anything to save.
+  through `bind:value`; nothing is written from here. An edit or a verdict is a
+  draft until the panel's one Save, as in the legend tool, so `rowEl` and
+  `inputEl` are bound back up only so the controller can scroll to a row and put
+  the cursor in it. The `_edit*` fields are the draft, `text`/`category` what the
+  pipeline wrote, `*_validated` and `status` what a person last saved — the dot
+  compares them to say whether there is anything to save, and wears the draft
+  verdict's colour.
 
   `printedView` is the Index job: a line of a printed table has a cell and a
   number where a mark on the map has a category and a confidence.
@@ -20,6 +22,7 @@
   import { createEventDispatcher } from 'svelte';
   import { OCR_CATEGORIES, STATUS_COLORS } from '../shared/constants';
   import type { EditableOcrExtraction } from '../shared/types';
+  import { isRowDirty } from '../shared/ocrApi';
   import type { LegendEntry, PrintedLine, SuspectReason } from './legendIndex';
 
   export let ext: EditableOcrExtraction;
@@ -47,14 +50,14 @@
   const dispatch = createEventDispatcher<{
     select: { id: string };
     zoomToExtraction: { globalX: number; globalY: number; globalW: number; globalH: number };
-    /** The edit is in `ext` already; the parent decides when it is written. */
-    commit: void;
+    /** A draft was typed or picked — the parent recounts what is unsaved. Not per keystroke. */
+    edit: void;
     verdict: { status: 'pending' | 'validated' | 'rejected' };
   }>();
 </script>
 
 <tr
-  class="shape-tr status-{ext.status}"
+  class="shape-tr status-{ext._editStatus}"
   class:row-suspect={reasons}
   class:row-selected={selected}
   bind:this={rowEl}
@@ -74,10 +77,9 @@
     {:else}
       <span
         class="dot"
-        class:dot--dirty={ext._editText !== (ext.text_validated ?? ext.text) ||
-          ext._editCategory !== (ext.category_validated ?? ext.category)}
-        style="background:{STATUS_COLORS[ext.status]}"
-        title={ext.status}
+        class:dot--dirty={isRowDirty(ext)}
+        style="background:{STATUS_COLORS[ext._editStatus]}"
+        title={isRowDirty(ext) ? `${ext._editStatus} · unsaved` : ext.status}
       ></span>
     {/if}
   </td>
@@ -89,12 +91,9 @@
       bind:this={inputEl}
       placeholder="Text…"
       title={ext._editText}
-      on:blur={() => dispatch('commit')}
+      on:blur={() => dispatch('edit')}
       on:keydown={(e) => {
-        if (e.key === 'Enter') {
-          dispatch('commit');
-          (e.currentTarget as HTMLInputElement).blur();
-        }
+        if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
       }}
       aria-label="Extraction text"
     />
@@ -122,7 +121,7 @@
         <select
           class="cell-select"
           bind:value={ext._editCategory}
-          on:change={() => dispatch('commit')}
+          on:change={() => dispatch('edit')}
           aria-label="Category"
         >
           {#each OCR_CATEGORIES as cat (cat)}
@@ -160,9 +159,11 @@
         type="button"
         class="row-action validate-action"
         on:click={() =>
-          dispatch('verdict', { status: ext.status === 'validated' ? 'pending' : 'validated' })}
-        title={ext.status === 'validated' ? 'Unvalidate' : 'Validate (✓)'}
-        class:active-validate={ext.status === 'validated'}
+          dispatch('verdict', {
+            status: ext._editStatus === 'validated' ? 'pending' : 'validated',
+          })}
+        title={ext._editStatus === 'validated' ? 'Unvalidate' : 'Validate (✓)'}
+        class:active-validate={ext._editStatus === 'validated'}
       >
         <svg
           width="12"
@@ -179,9 +180,9 @@
         type="button"
         class="row-action reject-action"
         on:click={() =>
-          dispatch('verdict', { status: ext.status === 'rejected' ? 'pending' : 'rejected' })}
-        title={ext.status === 'rejected' ? 'Unreject' : 'Reject (✗)'}
-        class:active-reject={ext.status === 'rejected'}
+          dispatch('verdict', { status: ext._editStatus === 'rejected' ? 'pending' : 'rejected' })}
+        title={ext._editStatus === 'rejected' ? 'Unreject' : 'Reject (✗)'}
+        class:active-reject={ext._editStatus === 'rejected'}
       >
         <svg
           width="12"

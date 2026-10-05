@@ -7,6 +7,7 @@
   import PaletteSearchField from '$lib/ui/PaletteSearchField.svelte';
   import SortHeader from '$lib/ui/SortHeader.svelte';
   import DataTable from '$lib/ui/DataTable.svelte';
+  import GroupRow from '$lib/ui/GroupRow.svelte';
   import MapCard from '$lib/ui/MapCard.svelte';
   import LibraryGrid from '$lib/ui/LibraryGrid.svelte';
   import InlineRename from '$lib/ui/InlineRename.svelte';
@@ -610,6 +611,30 @@
             >
               <tr><td>●</td><td>Plan Cadastral</td><td class="num">1882</td></tr>
               <tr><td>●</td><td>Plan de Saigon</td><td class="num">1799</td></tr>
+            </DataTable>
+          </div>
+        </div>
+
+        <div class="sc-item">
+          <div class="sc-item-head">
+            <code class="sc-code">GroupRow</code>
+            <span class="sc-role">
+              The heading row of a grouped table: the group's name and its full size, spanning every
+              column. The rows under it are the caller's. The text review table groups by category,
+              status or run with it; <code>/catalog</code> still draws its own.
+            </span>
+          </div>
+          <div class="sc-stage">
+            <DataTable
+              columns={[
+                { key: 'name', label: 'Title' },
+                { key: 'year', label: 'Year', klass: 'num' },
+              ]}
+              klass="is-dense"
+            >
+              <GroupRow label="Plan Cadastral" count={2} span={2} />
+              <tr><td>Saigon, sheet 1</td><td class="num">1882</td></tr>
+              <tr><td>Saigon, sheet 2</td><td class="num">1882</td></tr>
             </DataTable>
           </div>
         </div>

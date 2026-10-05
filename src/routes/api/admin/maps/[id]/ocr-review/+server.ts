@@ -69,7 +69,7 @@ async function pageAll<T>(
 }
 
 /** GET /api/admin/maps/[id]/ocr-review
- *  Query params: run_id (optional), status (optional), limit (default 200), offset (default 0)
+ *  Query params: run_id (optional), status (optional, comma-separated: `pending,validated`), limit (default 200), offset (default 0)
  *  Returns extractions for the map ordered by category, confidence desc.
  */
 export const GET: RequestHandler = async ({ params, url, locals }) => {
@@ -77,7 +77,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
   const mapId = assertUuid(params.id, 'map id');
   const supabase = adminClient();
   const runId = url.searchParams.get('run_id');
-  const status = url.searchParams.get('status');
+  const statuses = (url.searchParams.get('status') ?? '').split(',').filter(isOcrReviewStatus);
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '200'), 2000);
   const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
@@ -100,7 +100,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         .order('id', { ascending: true })
         .range(offset + from, offset + to);
       if (runId) q = q.eq('run_id', runId);
-      if (status) q = q.eq('review_status', status);
+      if (statuses.length) q = q.in('review_status', statuses);
       return q;
     },
     limit,

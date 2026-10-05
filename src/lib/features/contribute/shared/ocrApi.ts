@@ -77,10 +77,11 @@ const base = (mapId: string) => `/api/admin/maps/${mapId}/ocr-review`;
 
 export async function fetchExtractions(
   mapId: string,
-  params: { status?: string; runId?: string; limit?: number; offset?: number } = {}
+  params: { status?: string | string[]; runId?: string; limit?: number; offset?: number } = {}
 ): Promise<OcrReviewPage> {
   const qs = new URLSearchParams({ limit: String(params.limit ?? 200) });
-  if (params.status) qs.set('status', params.status);
+  const status = [params.status ?? []].flat().join(',');
+  if (status) qs.set('status', status);
   if (params.runId?.trim()) qs.set('run_id', params.runId.trim());
   if (params.offset) qs.set('offset', String(params.offset));
   const page = await request<OcrReviewPage>(`${base(mapId)}?${qs}`);
@@ -140,6 +141,7 @@ export function withEditState(rows: OcrExtraction[]): EditableOcrExtraction[] {
     ...e,
     _editText: e.text_validated ?? e.text,
     _editCategory: e.category_validated ?? e.category,
+    _editStatus: e.status,
     _saving: false,
   }));
 }
@@ -232,10 +234,74 @@ export async function saveRowText(
   );
 }
 
-/** True when a row's edit buffer has diverged from what is stored. */
-export function isRowDirty(row: EditableOcrExtraction): boolean {
+/** True when a row's text or category has diverged from what is stored. */
+export function isTextDirty(row: EditableOcrExtraction): boolean {
   return (
     row._editText !== (row.text_validated ?? row.text) ||
     row._editCategory !== (row.category_validated ?? row.category)
   );
+}
+
+/** True when a row holds a draft — an edit or a verdict — that is not saved yet. */
+export function isRowDirty(row: EditableOcrExtraction): boolean {
+  return isTextDirty(row) || row._editStatus !== row.status;
+}
+
+/**
+ * Writes every draft at once, the way the legend tool saves its staged entries.
+ *
+ * A row with a text or category edit goes as one PATCH carrying its verdict too;
+ * rows that only changed verdict go as one PUT per status, so fifty ✓ presses
+ * are three requests, not fifty. Stops at the first failure and says which rows
+ * made it, so the caller keeps the rest as drafts and Save can simply be pressed
+ * again. Never throws.
+ */
+export async function saveDrafts(
+  mapId: string,
+  rows: EditableOcrExtraction[]
+): Promise<{ saved: Set<string>; error: string }> {
+  const dirty = rows.filter(isRowDirty);
+  const saved = new Set<string>();
+  try {
+    for (const r of dirty.filter(isTextDirty)) {
+      await patchExtraction(mapId, {
+        id: r.id,
+        text: r._editText,
+        category: r._editCategory,
+        status: r._editStatus,
+      });
+      saved.add(r.id);
+    }
+    const verdictOnly = dirty.filter((r) => !isTextDirty(r));
+    for (const status of ['pending', 'validated', 'rejected'] as OcrStatus[]) {
+      const ids = verdictOnly.filter((r) => r._editStatus === status).map((r) => r.id);
+      if (!ids.length) continue;
+      await batchSetStatus(mapId, ids, status);
+      for (const id of ids) saved.add(id);
+    }
+    return { saved, error: '' };
+  } catch (e: any) {
+    return { saved, error: e.message };
+  }
+}
+
+/** Rows and counts after `saved` reached the server: those drafts are now what is stored. */
+export function promoteSaved(state: RowSaveState, saved: Set<string>): RowSaveState {
+  const statusCounts = { ...state.statusCounts };
+  const stamp = new Date().toISOString();
+  const rows = state.rows.map((r) => {
+    if (!saved.has(r.id)) return r;
+    if (r._editStatus !== r.status) {
+      statusCounts[r._editStatus] = (statusCounts[r._editStatus] ?? 0) + 1;
+      statusCounts[r.status] = Math.max(0, (statusCounts[r.status] ?? 1) - 1);
+    }
+    return {
+      ...r,
+      status: r._editStatus,
+      validated_at: r._editStatus === 'validated' ? stamp : null,
+      text_validated: r._editText,
+      category_validated: r._editCategory,
+    };
+  });
+  return { rows, statusCounts };
 }

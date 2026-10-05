@@ -151,6 +151,10 @@ from the dead; it reads the source rather than the page, because that is where t
 `tests/table-sort.spec.ts` (the one sort behind every `.data-table` — blanks last in **both**
 directions, `numeric` collation so `Rue 100` follows `Rue 11`, and that the value function runs once
 per row rather than once per comparison, which is what the decorate-sort-undecorate is for),
+`tests/facets.spec.ts` (the filter/count/group layer under `FacetFilters` — a chip's count must
+ignore its **own** facet, because a reviewer turns `validated` on beside `pending` to see what is
+already done, and a count that went to 0 would hide the chip they turned it on to compare; plus that
+an empty choice is no constraint, a chosen chip survives a zero count, and groups keep row order),
 `tests/ocr-jobs.spec.ts` (the four reading jobs of `?mode=text` — the property is that they
 **partition** the loaded rows, because the tabs carry counts and that is a promise that clearing all
 four clears the sheet; a row matching two jobs is checked twice and one matching none is never seen,

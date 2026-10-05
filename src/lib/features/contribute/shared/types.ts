@@ -26,6 +26,8 @@ export type OcrExtraction = {
   /** client-side edit buffer, never persisted */
   _editText?: string;
   _editCategory?: string;
+  /** A verdict not yet saved — `status` stays what the server holds until it is. */
+  _editStatus?: 'pending' | 'validated' | 'rejected';
   _saving?: boolean;
 };
 
@@ -33,5 +35,6 @@ export type OcrExtraction = {
 export type EditableOcrExtraction = OcrExtraction & {
   _editText: string;
   _editCategory: string;
+  _editStatus: 'pending' | 'validated' | 'rejected';
   _saving: boolean;
 };

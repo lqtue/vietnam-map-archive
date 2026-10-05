@@ -12,12 +12,20 @@
  * `ocrReviewController`, which keeps them; the old code then mutated those same
  * objects in place and self-assigned the array to repaint. These cases pin both:
  * the counts move by exactly one each way, and the input array is never touched.
+ *
+ * The second half is the draft save (`saveDrafts`, `promoteSaved`): the text
+ * review table now stages edits and verdicts and writes them in one Save, as the
+ * legend tool does. What it must get right is the count of requests (fifty ✓
+ * presses are not fifty writes), and that a failure part-way says exactly which
+ * rows made it — the rest stay drafts, so pressing Save again is always safe.
  */
 import { test, expect } from '@playwright/test';
 import {
   saveRowStatus,
   markRowSaving,
   isRowDirty,
+  saveDrafts,
+  promoteSaved,
   reviewedCategory,
   type RowSaveState,
 } from '../src/lib/features/contribute/shared/ocrApi';
@@ -45,6 +53,7 @@ const row = (
   status,
   _editText: text,
   _editCategory: 'street',
+  _editStatus: status,
   _saving: false,
 });
 
@@ -158,4 +167,70 @@ test('a saved category correction is the category every review surface uses', ()
   const corrected = { ...row('a', 'pending'), category_validated: 'place' };
   expect(reviewedCategory(corrected)).toBe('place');
   expect(reviewedCategory(row('b', 'pending'))).toBe('street');
+});
+
+/** Every request, with its verb, for the draft save. */
+let calls: { method: string; body: any }[] = [];
+const record = (failOn?: number) => {
+  calls = [];
+  globalThis.fetch = (async (_url: string, init?: RequestInit) => {
+    calls.push({ method: init?.method ?? 'GET', body: JSON.parse(String(init?.body)) });
+    if (calls.length === failOn) return new Response('boom', { status: 500 });
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }) as typeof fetch;
+};
+const drafted = (id: string, status: EditableOcrExtraction['status'], to: typeof status) => ({
+  ...row(id, status),
+  _editStatus: to,
+});
+
+test('a verdict alone is a draft, and so is a text edit', () => {
+  expect(isRowDirty(drafted('a', 'pending', 'validated'))).toBe(true);
+  expect(isRowDirty(drafted('a', 'pending', 'pending'))).toBe(false);
+});
+
+test('fifty verdicts are three requests; an edited row carries its verdict with it', async () => {
+  record();
+  const rows = [
+    ...Array.from({ length: 30 }, (_, i) => drafted(`v${i}`, 'pending', 'validated')),
+    ...Array.from({ length: 20 }, (_, i) => drafted(`r${i}`, 'pending', 'rejected')),
+    drafted('back', 'validated', 'pending'),
+    { ...drafted('typo', 'pending', 'validated'), _editText: 'Rue Pasteur' },
+  ];
+  const { saved, error } = await saveDrafts('m1', rows);
+
+  expect(error).toBe('');
+  expect(saved.size).toBe(52);
+  expect(calls.map((c) => c.method)).toEqual(['PATCH', 'PUT', 'PUT', 'PUT']);
+  expect(calls[0].body).toMatchObject({ id: 'typo', text: 'Rue Pasteur', status: 'validated' });
+  expect(calls.slice(1).map((c) => [c.body.status, c.body.ids.length])).toEqual([
+    ['pending', 1],
+    ['validated', 30],
+    ['rejected', 20],
+  ]);
+});
+
+test('a failure names the rows that made it, and promoting them leaves the rest drafts', async () => {
+  record(3); // PATCH ok, PUT pending ok, PUT validated fails
+  const rows = [
+    { ...drafted('typo', 'pending', 'validated'), _editText: 'Rue Pasteur' },
+    drafted('back', 'validated', 'pending'),
+    drafted('v', 'pending', 'validated'),
+  ];
+  const { saved, error } = await saveDrafts('m1', rows);
+  expect(error).toBeTruthy();
+  expect([...saved].sort()).toEqual(['back', 'typo']);
+
+  const next = promoteSaved({ rows, statusCounts: { pending: 2, validated: 1 } }, saved);
+  expect(next.rows.map((r) => isRowDirty(r))).toEqual([false, false, true]);
+  expect(next.rows[0].text_validated).toBe('Rue Pasteur');
+  // typo: pending → validated; back: validated → pending. Net zero.
+  expect(next.statusCounts).toEqual({ pending: 2, validated: 1 });
+});
+
+test('with nothing drafted nothing is sent', async () => {
+  record();
+  const { saved } = await saveDrafts('m1', [row('a', 'pending')]);
+  expect(saved.size).toBe(0);
+  expect(calls).toEqual([]);
 });
