@@ -1,7 +1,7 @@
 <!--
   CatalogTable — sortable, groupable table for the unified catalog.
   Click a column header to sort (toggle direction). Use the "Group by" dropdown
-  to collapse rows by Year / Area / Type / Source.
+  to collapse rows by Year / Area / Series / Institution.
 
   `compact` delegates to `ArchiveMapRows` — this same table with four columns
   dropped, which is what a 380px rail can carry. It was `CatalogTableCompact`,
@@ -18,7 +18,7 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import { inView } from '$lib/ui/inView';
   import { sliceGroups } from './sliceGroups';
-  import { sheetLabel } from '$lib/features/shared/catalogFilters';
+  import { sheetLabel, seriesShort } from '$lib/features/shared/catalogFilters';
 
   export let items: MapListItem[] = [];
   export let compact: boolean = false;
@@ -41,8 +41,8 @@
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
     { key: 'name', label: 'Title' },
     { key: 'year', label: 'Year', klass: 'num' },
+    { key: 'region', label: 'Area' },
     { key: 'collection', label: 'Series' },
-    { key: 'holding_institution', label: 'Institution' },
     ...(staff
       ? [
           { key: 'map_type', label: 'Type' },
@@ -80,7 +80,7 @@
 </script>
 
 {#if compact}
-  <ArchiveMapRows rows={sorted} rowAction="open" {activeId} showTypes={showLayerActions} on:open />
+  <ArchiveMapRows rows={sorted} rowAction="open" {activeId} on:open />
 {:else}
   <div class="ct-toolbar">
     <label class="group-pick">
@@ -88,6 +88,7 @@
       <select bind:value={groupBy}>
         <option value="none">{$t('None')}</option>
         <option value="year">{$t('Year')}</option>
+        <option value="region">{$t('Area')}</option>
         <option value="collection">{$t('Series')}</option>
         <option value="holding_institution">{$t('Institution')}</option>
         {#if staff}
@@ -171,17 +172,17 @@
                     >
                   {/if}
                 </div>
-                {#if sheetOf(item) || (item as any).creator || item.location}
+                {#if sheetOf(item) || item.location}
                   <div class="sub">
                     {#if sheetOf(item)}<span class="sheet">{sheetOf(item)}</span>{/if}
-                    {[(item as any).creator, item.location].filter(Boolean).join(' · ')}
+                    {item.location ?? ''}
                   </div>
                 {/if}
               </td>
               <td class="num">{item.year ?? '—'}</td>
-              <td title={item.collection || ''} class="collection-col">{item.collection || '—'}</td>
-              <td title={(item as any).holding_institution || ''} class="collection-col">
-                {(item as any).holding_institution || '—'}
+              <td class="area-col">{item.region || '—'}</td>
+              <td title={item.collection || ''} class="collection-col">
+                {seriesShort(item.collection) || '—'}
               </td>
               {#if staff}
                 <td>{item.map_type || '—'}</td>
@@ -246,6 +247,11 @@
   }
   .ct :global(tbody tr:hover .title-link) {
     text-decoration: underline;
+  }
+  .area-col {
+    white-space: nowrap;
+    color: var(--sb-text-meta);
+    font-size: 0.85rem;
   }
   .collection-col {
     max-width: 16rem;

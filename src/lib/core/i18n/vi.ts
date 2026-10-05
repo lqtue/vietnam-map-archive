@@ -46,6 +46,7 @@ export const vi: Record<string, string> = {
   Surveys: 'Bản đồ địa hình',
   Series: 'Bộ bản đồ',
   Institution: 'Cơ quan lưu trữ',
+  Area: 'Khu vực',
   'Plans & other': 'Bình đồ và khác',
   'Kind of map': 'Loại bản đồ',
   'Maps per decade': 'Số bản đồ theo thập niên',

@@ -12,7 +12,14 @@ import { statusOf } from '$lib/features/shared/catalogSearch';
 import { applySort, type SortState } from '$lib/core/utils/tableSort';
 
 export type SortKey =
-  'name' | 'year' | 'location' | 'map_type' | 'collection' | 'holding_institution' | 'status';
+  | 'name'
+  | 'year'
+  | 'location'
+  | 'region'
+  | 'map_type'
+  | 'collection'
+  | 'holding_institution'
+  | 'status';
 export type GroupKey = 'none' | SortKey;
 
 export interface TableGroup<T> {
@@ -27,6 +34,7 @@ export function keyOf(item: any, k: SortKey | GroupKey): string | number | null 
   if (k === 'name') return item.name;
   if (k === 'year') return item.year;
   if (k === 'location') return item.location;
+  if (k === 'region') return item.region;
   if (k === 'map_type') return item.map_type;
   if (k === 'collection') return item.collection;
   if (k === 'holding_institution') return item.holding_institution;

@@ -5,7 +5,7 @@
 
   It is **the catalog table with its columns reduced** — the same `DataTable`,
   the same header, the same row rules, dropping the columns a 380px rail
-  cannot carry (Area, Series, Institution, Status, Type) and making the
+  cannot carry (Area, Series, Status, Type) and making the
   thumbnail the pick control. The sheet number and the survey ride in a line
   under the title: the picture of the sheet *is* the button that puts it on the map. Until Sept 2026 it was a hand-built `<ul>`
   of bordered buttons, and `CatalogTableCompact` was a *second* hand-built
@@ -30,7 +30,7 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { applySort, type SortState } from '$lib/core/utils/tableSort';
-  import { sheetLabel } from '$lib/features/shared/catalogFilters';
+  import { sheetLabel, seriesShort } from '$lib/features/shared/catalogFilters';
 
   export let rows: any[] = [];
   /** Ids to draw as "on". Null (the default) means the /explore layer stack,
@@ -39,10 +39,6 @@
   /** id → short text drawn where the type chip goes. The catalog rows carry no
    *  pass progress, so /scan supplies "OCR'd" / "12 pending" from its own list. */
   export let badges: Record<string, string> = {};
-  /** Draw the map_type chip when a row has no badge. Off by default: for a reader it is one value
-   *  in 96% of rows. /scan keeps it off too — that column is "have I done this sheet yet?", and a
-   *  type chip on the rows with no pass yet reads as a status the sheet does not have. */
-  export let showTypes = false;
   /** What a tap on the row body means — see the header. */
   export let rowAction: 'toggle' | 'open' = 'toggle';
   /** `open` mode only: the row drawn as the current one. */
@@ -66,16 +62,19 @@
     key === 'year' ? (m.year ?? null) : key === 'type' ? (m.map_type ?? null) : (m.name ?? null)
   );
 
-  /** The line under a title: the sheet number (23 names repeat) and the survey it belongs to. */
+  /** The line under a title: the sheet number (46 names repeat) and the survey it belongs to; a
+   *  plan, which has neither, gets its province. */
   const subOf = (m: any) =>
-    [sheetLabel(m), m.series_key ? m.collection : ''].filter(Boolean).join(' · ');
+    [sheetLabel(m), m.series_key ? seriesShort(m.collection) : m.region]
+      .filter(Boolean)
+      .join(' · ');
 
-  $: hasLast = showTypes || Object.keys(badges).length > 0;
+  $: hasLast = Object.keys(badges).length > 0;
   $: columns = [
     { key: 'pick', label: '', klass: 'col-pick', srLabel: 'Sheet', sortable: false },
     { key: 'year', label: 'Year', klass: 'col-year num' },
     { key: 'name', label: 'Title', klass: 'col-name' },
-    ...(hasLast ? [{ key: 'type', label: showTypes ? 'Type' : '', klass: 'col-type' }] : []),
+    ...(hasLast ? [{ key: 'type', label: '', klass: 'col-type' }] : []),
   ] satisfies TableColumn[];
 
   function onRowClick(map: any) {
@@ -134,18 +133,12 @@
         <td class="col-year num">{m.year ?? '—'}</td>
         <td class="col-name">
           <span class="title">{m.name || '—'}</span>
-          <!-- The creator line is the catalog sidebar's: a rail beside a map
-               wants as many sheets on screen as will fit. -->
-          {#if rowAction === 'open' && m.creator && !subOf(m)}<span class="sub">{m.creator}</span
-            >{/if}
           {#if subOf(m)}<span class="sub">{subOf(m)}</span>{/if}
         </td>
         {#if hasLast}
           <td class="col-type">
             {#if badges[m.id]}
               <span class="badge-chip is-sm chip-green">{badges[m.id]}</span>
-            {:else if showTypes && m.map_type}
-              <span class="type-chip">{m.map_type}</span>
             {/if}
           </td>
         {/if}
@@ -257,17 +250,5 @@
     white-space: nowrap;
     font-size: 0.68rem;
     color: var(--sb-text-muted);
-  }
-  /* The catalog's Type cell, minus the click: there it adds a facet, and a rail
-     has its own facet row above the list. */
-  .type-chip {
-    display: inline-block;
-    padding: 0.1rem 0.45rem;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-pill);
-    font-size: 0.68rem;
-    text-transform: capitalize;
-    white-space: nowrap;
-    color: var(--sb-text-meta);
   }
 </style>
