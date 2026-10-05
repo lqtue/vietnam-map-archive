@@ -3,7 +3,8 @@
  *
  * Public. Returns the map's numbered-legend references placed on the ground.
  *
- * Two ways an entry gets a position, and the response says which:
+ * Three ways an entry gets a position, and the response says which:
+ *   src: 'manual' — a reviewed position explicitly placed by staff. Wins over OCR/grid.
  *
  *   src: 'numeral' — a body numeral (category 'legend_ref') warped to lng/lat.
  *     Exact, but only for numerals the OCR pass actually spotted.
@@ -29,14 +30,19 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
-import { assertUuid } from '$lib/server/http';
+import { assertUuid, dbError } from '$lib/server/http';
+import { getRole } from '$lib/server/auth';
+import { legendNote, manualLegendPoint } from '$lib/server/legendEntry';
+import { readAll } from '$lib/data/supabase/paged';
 import { getTransformer } from '$lib/server/transformer';
 import { cellBox, cellCentre, cellSize, parseGrid } from '$lib/core/geo/mapGrid';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
   const mapId = assertUuid(params.id, 'map id');
   const supabase = adminClient();
+  const role = await getRole(locals);
+  const canEdit = role === 'admin' || role === 'mod';
 
   const { data: map } = await supabase
     .from('maps')
@@ -48,52 +54,175 @@ export const GET: RequestHandler = async ({ params }) => {
     return json({ points: [], reason: 'not public' });
   // Either source counts: pipeline-made georeferences (the Indochine 1:100,000
   // halves) carry an `annotation_url` and no `allmaps_id` — Allmaps never held them.
-  if (!map.allmaps_id && !map.annotation_url)
-    return json({ points: [], reason: 'not georeferenced' });
 
   // Legend entries → number→name map + the legend box rect (shared tile bbox).
   // Skip rows a human rejected; prefer their corrected text over the raw model
   // output so HITL fixes actually reach the public map.
-  const { data: entries } = await supabase
-    .from('ocr_labels')
-    .select('text, text_corrected, notes, tile_x, tile_y, tile_w, tile_h')
-    .eq('map_id', mapId)
-    .eq('category', 'legend_entry')
-    .neq('review_status', 'rejected');
+  const { data: entries, error: entryError } = await readAll((from, to) =>
+    supabase
+      .from('ocr_labels')
+      .select(
+        'id,run_id,text,text_corrected,notes,review_status,tile_x,tile_y,tile_w,tile_h,global_x,global_y,global_w,global_h'
+      )
+      .eq('map_id', mapId)
+      .eq('category', 'legend_entry')
+      .neq('review_status', 'rejected')
+      .order('id')
+      .range(from, to)
+  );
+  if (entryError) dbError(entryError, 'Could not read legend entries');
 
-  const nameByN = new Map<number, { name: string; vn: string | null; grid: string | null }>();
-  let rect: { x: number; y: number; w: number; h: number } | null = null;
+  const nameByN = new Map<
+    number,
+    {
+      id: string;
+      name: string;
+      vn: string | null;
+      grid: string | null;
+      manualPoint: [number, number] | null;
+      validated: boolean;
+    }
+  >();
+  const legendBounds = new Map<
+    string,
+    { minX: number; minY: number; maxX: number; maxY: number }
+  >();
   for (const e of entries ?? []) {
     const eText = e.text_corrected ?? e.text;
     const m = /^(\d+)\.\s*(.*)$/.exec(eText ?? '');
     const n = m ? parseInt(m[1], 10) : parseInt(/n=(\d+)/.exec(e.notes ?? '')?.[1] ?? '', 10);
     if (!Number.isFinite(n)) continue;
-    const grid = /grid=([^;]+)/.exec(e.notes ?? '')?.[1]?.trim() ?? null;
-    const vn = /vn=([^;]+)/.exec(e.notes ?? '')?.[1]?.trim() ?? null;
-    nameByN.set(n, { name: m ? m[2] : (eText ?? ''), vn, grid });
-    if (!rect && e.tile_w)
-      rect = { x: e.tile_x ?? 0, y: e.tile_y ?? 0, w: e.tile_w, h: e.tile_h ?? 0 };
+    const grid = legendNote(e.notes, 'grid');
+    const vn = legendNote(e.notes, 'vn');
+    if (!nameByN.get(n)?.validated || e.review_status === 'validated')
+      nameByN.set(n, {
+        id: e.id,
+        name: m ? m[2] : (eText ?? ''),
+        vn,
+        grid,
+        manualPoint: e.review_status === 'validated' ? manualLegendPoint(e.notes) : null,
+        validated: e.review_status === 'validated',
+      });
+    if (e.global_x != null && e.global_y != null) {
+      const key = e.run_id ?? 'default';
+      const x = e.global_x;
+      const y = e.global_y;
+      const maxX = x + (e.global_w ?? 0);
+      const maxY = y + (e.global_h ?? 0);
+      const bounds = legendBounds.get(key);
+      if (bounds) {
+        bounds.minX = Math.min(bounds.minX, x);
+        bounds.minY = Math.min(bounds.minY, y);
+        bounds.maxX = Math.max(bounds.maxX, maxX);
+        bounds.maxY = Math.max(bounds.maxY, maxY);
+      } else {
+        legendBounds.set(key, { minX: x, minY: y, maxX, maxY });
+      }
+    } else if (e.tile_w && e.tile_h) {
+      // Old extractions may not have per-label pixel bounds. Their tile rect
+      // is a coarse fallback for the printed index region.
+      const key = e.run_id ?? 'default';
+      const x = e.tile_x ?? 0;
+      const y = e.tile_y ?? 0;
+      const bounds = legendBounds.get(key);
+      if (bounds) {
+        bounds.minX = Math.min(bounds.minX, x);
+        bounds.minY = Math.min(bounds.minY, y);
+        bounds.maxX = Math.max(bounds.maxX, x + e.tile_w);
+        bounds.maxY = Math.max(bounds.maxY, y + e.tile_h);
+      } else {
+        legendBounds.set(key, { minX: x, minY: y, maxX: x + e.tile_w, maxY: y + e.tile_h });
+      }
+    }
   }
+  const rects = [...legendBounds.values()].map((bounds) => ({
+    x: bounds.minX,
+    y: bounds.minY,
+    w: bounds.maxX - bounds.minX,
+    h: bounds.maxY - bounds.minY,
+  }));
   const maxN = nameByN.size ? Math.max(...nameByN.keys()) : 0;
 
   // Feature-reference numerals: bare digits sitting out on the map body. Gemini
   // tags them 'other'; the old Tesseract pass used 'legend_ref'. Either way the
   // digit + ≤maxN + outside-legend-box filters below isolate the real refs.
-  const { data: refs } = await supabase
-    .from('ocr_labels')
-    .select('text, text_corrected, global_x, global_y, global_w, global_h')
-    .eq('map_id', mapId)
-    .in('category', ['legend_ref', 'other'])
-    .neq('review_status', 'rejected');
+  const { data: refs, error: refError } = await readAll((from, to) =>
+    supabase
+      .from('ocr_labels')
+      .select('text, text_corrected, global_x, global_y, global_w, global_h')
+      .eq('map_id', mapId)
+      .in('category', ['legend_ref', 'other'])
+      .neq('review_status', 'rejected')
+      .order('id')
+      .range(from, to)
+  );
+  if (refError) dbError(refError, 'Could not read legend references');
+
+  type Point = {
+    n: number;
+    name: string | null;
+    vn: string | null;
+    grid: string | null;
+    lng: number;
+    lat: number;
+    src: 'numeral' | 'grid' | 'manual';
+    accuracy_m?: number;
+  };
+  const manual = [...nameByN].flatMap(([n, info]): Point[] =>
+    info.manualPoint
+      ? [
+          {
+            n,
+            name: info.name,
+            vn: info.vn,
+            grid: info.grid,
+            lng: info.manualPoint[0],
+            lat: info.manualPoint[1],
+            src: 'manual',
+          },
+        ]
+      : []
+  );
+  function response(points: Point[], reason?: string) {
+    return json(
+      {
+        points,
+        reason,
+        canEdit,
+        ...(canEdit
+          ? {
+              entries: [...nameByN]
+                .map(([n, info]) => {
+                  const point = points.find((item) => item.n === n);
+                  return {
+                    id: info.id,
+                    n,
+                    name: info.name,
+                    vn: info.vn,
+                    grid: info.grid,
+                    lng: point?.lng ?? null,
+                    lat: point?.lat ?? null,
+                    src: point?.src ?? null,
+                  };
+                })
+                .sort((a, b) => a.n - b.n),
+            }
+          : {}),
+      },
+      { headers: { 'Cache-Control': 'private, no-store' } }
+    );
+  }
 
   // Build the pixel→geo transformer from the stored annotation (mirror override
   // first, else the public Allmaps annotation).
   const resolved = await getTransformer(map.allmaps_id, map.annotation_url);
-  if (!resolved) return json({ points: [], reason: 'no annotation' });
+  if (!resolved) return response(manual, 'no annotation');
   const { transformer } = resolved;
 
   const inRect = (x: number, y: number) =>
-    rect !== null && x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
+    rects.some(
+      (rect) => x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h
+    );
 
   // Parsed before the numerals, because it is what decides whether to believe
   // them.
@@ -122,21 +251,12 @@ export const GET: RequestHandler = async ({ params }) => {
     );
   };
 
-  type Point = {
-    n: number;
-    name: string | null;
-    vn: string | null;
-    grid: string | null;
-    lng: number;
-    lat: number;
-    src: 'numeral' | 'grid';
-    accuracy_m?: number;
-  };
-  const byN = new Map<number, Point>();
+  const byN = new Map<number, Point>(manual.map((point) => [point.n, point]));
   for (const r of refs ?? []) {
     const t = (r.text_corrected ?? r.text ?? '').trim();
     if (!/^\d+$/.test(t)) continue;
     const n = parseInt(t, 10);
+    if (nameByN.get(n)?.manualPoint) continue;
     if (n < 1 || n > maxN) continue; // only numerals that name a legend entry
     if (r.global_x == null || r.global_y == null) continue;
     const cx = r.global_x + (r.global_w || 0) / 2;
@@ -178,10 +298,19 @@ export const GET: RequestHandler = async ({ params }) => {
         const dy = (lat2 - lat) * 110574;
         accuracy_m = Math.round(Math.hypot(dx, dy));
       }
-      byN.set(n, { n, ...info, lng, lat, src: 'grid', ...(accuracy_m ? { accuracy_m } : {}) });
+      byN.set(n, {
+        n,
+        name: info.name,
+        vn: info.vn,
+        grid: info.grid,
+        lng,
+        lat,
+        src: 'grid',
+        ...(accuracy_m ? { accuracy_m } : {}),
+      });
     }
   }
 
   const points = [...byN.values()].sort((a, b) => a.n - b.n);
-  return json({ points });
+  return response(points);
 };

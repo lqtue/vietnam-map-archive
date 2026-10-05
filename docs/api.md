@@ -113,7 +113,16 @@ Public / other:
 - `/api/maps/[id]/legend-points/` — **public** GET. Numbered-legend references placed on the ground:
   each body numeral (`category = 'legend_ref'`) warped to lng/lat via the map's Allmaps
   georeference, joined to its `legend_entry` for a name. Legend-internal numbers are dropped.
-  Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`.
+  Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`. Reviewed manual positions
+  override numeral/grid positions. Staff with MFA also receive `canEdit` and `entries`,
+  including entries without a position. Responses are private and not cached.
+- `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** PATCH
+  `{ id, name, vn, grid, lng, lat }` or `{ entries: [...] }` (up to 200 entries). Corrects existing
+  numbered OCR legend entries; the batch response returns `{ saved: [id], failed: [{ id, message }] }`
+  so clients can retain and retry only failed drafts. The request validates every entry before writing
+  and preserves raw OCR text and unrelated notes. Manual WGS84 coordinates are saved as
+  `point=longitude,latitude` in its existing notes; two null coordinates restore automatic
+  positioning. Review stamps go through `set_extraction_status`. No new schema required.
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
   small failed-job list). Admin or mod.

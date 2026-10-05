@@ -8,6 +8,7 @@
 -->
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { legendRevision } from '$lib/data/maps/legendRevision';
   import { INK } from '$lib/core/ink';
   import Feature from 'ol/Feature';
   import Point from 'ol/geom/Point';
@@ -45,6 +46,9 @@
 
   let points: LegendPoint[] = [];
   let loadedFor = '';
+  let loadedRevision = -1;
+  let loadVersion = 0;
+  let destroyed = false;
 
   const markerStyle = (n: number) =>
     new Style({
@@ -64,7 +68,7 @@
   function render() {
     if (!source) return;
     source.clear();
-    if (!enabled) return;
+    if (!enabled || mapId !== loadedFor) return;
     for (const p of points) {
       const f = new Feature({ geometry: new Point(fromLonLat([p.lng, p.lat])) });
       f.setStyle(markerStyle(p.n));
@@ -73,40 +77,37 @@
     }
   }
 
-  async function load(id: string) {
+  async function load(id: string, revision: number) {
+    const version = ++loadVersion;
+    loadedFor = id;
+    loadedRevision = revision;
+    points = [];
+    render();
     try {
       const res = await fetch(`/api/maps/${id}/legend-points`);
-      if (!res.ok) {
-        points = [];
-        return;
-      }
-      const data = await res.json();
-      points = (data.points ?? []) as LegendPoint[];
+      const data = res.ok ? await res.json() : null;
+      if (destroyed || version !== loadVersion || mapId !== id) return;
+      points = (data?.points ?? []) as LegendPoint[];
     } catch {
+      if (destroyed || version !== loadVersion || mapId !== id) return;
       points = [];
     }
-    // eslint-disable-next-line svelte/infinite-reactive-loop
-    loadedFor = id;
     render();
   }
 
-  // Fetch on (map, enabled) change; re-render whenever enabled or points change
-  // (referencing both so Svelte tracks them as dependencies).
-  //
-  // `load` writes `loadedFor`, which this statement reads, so it does re-enter
-  // once — and then `mapId !== loadedFor` is false and it stops. The guard is
-  // the termination condition, which the linter cannot see.
-  // eslint-disable-next-line svelte/infinite-reactive-loop
-  $: if (enabled && mapId && mapId !== loadedFor) load(mapId);
+  $: currentRevision = mapId ? ($legendRevision[mapId] ?? 0) : 0;
+  $: if (enabled && mapId && (mapId !== loadedFor || currentRevision !== loadedRevision))
+    void load(mapId, currentRevision);
   $: {
     void enabled;
     void points;
+    void mapId;
     if (source) render();
-    if (!enabled && overlay) overlay.setPosition(undefined);
+    if ((!enabled || mapId !== loadedFor) && overlay) overlay.setPosition(undefined);
   }
 
   function onMove(e: any) {
-    if (!olMap || !overlay || !enabled) return;
+    if (!olMap || !overlay || !enabled || olMap.get('legendPointPicking')) return;
     const hit = olMap.forEachFeatureAtPixel(
       e.pixel,
       (f) => f.get('legend') as LegendPoint | undefined,
@@ -151,6 +152,8 @@
   });
 
   onDestroy(() => {
+    destroyed = true;
+    loadVersion += 1;
     if (olMap) {
       olMap.un('pointermove', onMove);
       if (layer) olMap.removeLayer(layer);
