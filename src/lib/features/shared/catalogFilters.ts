@@ -65,6 +65,17 @@ export const sheetLabel = (r: Row) =>
     ? `${r.sheet_number}${r.sheet_half && r.sheet_half !== 'whole' ? ' ' + r.sheet_half : ''}`
     : '';
 
+/** A survey's name short enough for a table cell: "L7014 1:50,000", "Indochine 1:100,000". The
+ *  head of the collection name (before " — " or " (") with its scale appended when the head lacks
+ *  one. ponytail: derived from the collection string, so a new series with an odd name falls back
+ *  to its head; a `series.short_name` column is the upgrade. */
+export function seriesShort(collection?: string | null): string {
+  if (!collection) return '';
+  const scale = collection.match(/\b1:\d[\d,]*/)?.[0];
+  const head = collection.split(/ — | \(/)[0].replace(/^Series /, '');
+  return scale && !head.includes(scale) ? `${head} ${scale}` : head;
+}
+
 /** The surveys present in `rows` as `{ value: series_key, label: collection }`, most sheets first.
  *  What a caller with no `map_series` read (the /explore rail, the /scan picker) offers as Series. */
 export function seriesOptions(rows: Row[]): { value: string; label: string }[] {

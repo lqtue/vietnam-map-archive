@@ -14,6 +14,7 @@ import {
   passInstitution,
   seriesOptions,
   sheetLabel,
+  seriesShort,
 } from '../src/lib/features/shared/catalogFilters';
 
 const rows = [
@@ -72,4 +73,14 @@ test('series options list each survey once, the biggest first, and skip plans', 
     { value: 'b', label: 'B survey' },
     { value: 'a', label: 'A survey' },
   ]);
+});
+
+test('a series name shortens to its head plus the scale', () => {
+  expect(seriesShort('Series L7014 (Vietnam 1:50,000)')).toBe('L7014 1:50,000');
+  expect(seriesShort('Indochine 1:100,000 — 2nd édition SGI (1947–1959)')).toBe(
+    'Indochine 1:100,000'
+  );
+  expect(seriesShort('Indochine 1:25,000 — Tonkin & Thanh Hóa')).toBe('Indochine 1:25,000');
+  expect(seriesShort('AMS L909 — Việt Nam City Maps 1:12,500')).toBe('AMS L909 1:12,500');
+  expect(seriesShort(null)).toBe('');
 });
