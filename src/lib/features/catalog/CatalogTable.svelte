@@ -171,7 +171,7 @@
                 {/if}
               </td>
               <td class="num">{item.year ?? '—'}</td>
-              <td class="area-col">{item.region || '—'}</td>
+              <td class="area-col">{item.regions?.join(', ') || item.region || '—'}</td>
               <td title={item.collection || ''} class="collection-col">
                 {seriesShort(item.collection) || '—'}
               </td>

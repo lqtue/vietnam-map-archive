@@ -84,7 +84,7 @@ export interface LabelHit {
  * response's own field names (`mapsOut` below) — only the column read from
  * renamed (mig 095).
  */
-const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,language`;
+const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,language`;
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -507,6 +507,8 @@ async function answer(
     name: r.name,
     location: r.location,
     region: r.region,
+    regions: r.regions,
+    regions_2025: r.regions_2025,
     map_type: r.map_type,
     thumbnail: r.thumbnail,
     isFeatured: r.status === 'featured',

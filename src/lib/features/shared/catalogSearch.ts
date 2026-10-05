@@ -120,9 +120,10 @@ const passScoutCat = (r: Row, sel: Selected) =>
 function tally(rows: Row[], key: string): Record<string, number> {
   const m: Record<string, number> = {};
   for (const r of rows) {
-    const v = r?.[key];
-    if (v == null || v === '') continue;
-    m[String(v)] = (m[String(v)] ?? 0) + 1;
+    for (const v of [r?.[key]].flat()) {
+      if (v == null || v === '') continue;
+      m[String(v)] = (m[String(v)] ?? 0) + 1;
+    }
   }
   return m;
 }
@@ -131,9 +132,10 @@ function distinct(rows: Row[], field: string, requireGeoref: boolean): string[] 
   const counts: Record<string, number> = {};
   for (const r of rows) {
     if (requireGeoref && !r.georef_done) continue;
-    const v = r?.[field];
-    if (v == null || v === '') continue;
-    counts[String(v)] = (counts[String(v)] ?? 0) + 1;
+    for (const v of [r?.[field]].flat()) {
+      if (v == null || v === '') continue;
+      counts[String(v)] = (counts[String(v)] ?? 0) + 1;
+    }
   }
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
@@ -303,7 +305,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       }
 
       return {
-        area: tally(but('area'), 'region'),
+        area: tally(but('area'), 'regions'),
         map_type: tally(but('type'), 'map_type'),
         series_key: tally(but('series_key'), 'series_key'),
         institution: tally(but('institution'), 'holding_institution'),
@@ -324,7 +326,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     scout: $s.length,
   }));
 
-  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'region', requireGeoref));
+  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'regions', requireGeoref));
   const typeChoices = derived(searchedMaps, ($m) => distinct($m, 'map_type', requireGeoref));
   const institutionChoices = derived(searchedMaps, ($m) =>
     distinct($m, 'holding_institution', requireGeoref)

@@ -46,7 +46,7 @@ export function keyOf(
   if (k === 'name') return item.name;
   if (k === 'year') return item.year;
   if (k === 'location') return item.location;
-  if (k === 'region') return item.region;
+  if (k === 'region') return item.regions?.join(', ') || item.region;
   if (k === 'map_type') return item.map_type;
   if (k === 'collection') return item.collection;
   if (k === 'holding_institution') return item.holding_institution;

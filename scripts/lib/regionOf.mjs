@@ -57,8 +57,9 @@ const BY_OLD = new Map();
 for (const [now, olds] of Object.entries(MERGED)) for (const o of olds) BY_OLD.set(o, now);
 export const provinceNow = (old) => BY_OLD.get(old) ?? SAME[old] ?? old;
 
-/** A bbox wider than this is a country-scale sheet no single province describes. 'Province de
- *  Thua-thien' is 1.5° wide and is one province; the next widest is 4°. */
+/** A bbox wider than this is a country-scale sheet no single province describes: it gets the list
+ *  (`regions`) but no dominant `region`. 'Province de Thua-thien' is 1.5° wide and is one province;
+ *  the next widest is 4°. */
 export const MAX_WIDTH_DEG = 2;
 
 /** Ray casting over a ring of [lng, lat]. */
@@ -110,11 +111,19 @@ export function makeLocator(geojson) {
 
 /** Grid points per side sampled across a bbox. */
 const GRID = 7;
+/** A wide sheet is sampled finer and lists a province at a lower share: at 7×7 over 5° each province
+ *  gets about one sample, so the 10% cutoff would keep one or two of the dozen it spans. */
+const WIDE_GRID = 40;
+const WIDE_SHARE = 0.02;
 /** Samples on Vietnamese land needed to label a sheet at all (3 of 49): open water is not "in" a province. */
 const MIN_LAND = 0.05;
+/** A province joins `regions` when it holds this share of the sheet's land samples (5 of 49 at 7×7
+ *  = 10%): a sheet cut by a boundary lists both sides, a large sheet lists every province it spans,
+ *  and a sliver of one sample does not. The dominant one is still `region`. */
+export const MIN_SHARE = 0.1;
 
-/** `[minLng, minLat, maxLng, maxLat]` → `{ region, region_2025, land }`, or null when the bbox is
- *  missing, country-scale, has almost no Vietnamese land, or has more neighbouring land than
+/** `[minLng, minLat, maxLng, maxLat]` → `{ region, region_2025, regions, regions_2025, land }`, or null when the bbox is
+ *  missing, has almost no Vietnamese land, or has more neighbouring land than
  *  Vietnamese. The province is the one holding most of a 7×7 grid over the sheet, not the one under
  *  its centre: a harbour plan's centre is on the water, and a centre can sit across a boundary from
  *  most of its ground. Open water counts for neither side, so a coastal sheet keeps its province.
@@ -126,22 +135,32 @@ export function regionOf(bbox, locate, locateAbroad = () => null) {
   if (!Array.isArray(bbox) || bbox.length !== 4 || bbox.some((n) => typeof n !== 'number'))
     return null;
   const [w, s, e, n] = bbox;
-  if (e - w > MAX_WIDTH_DEG || n - s > MAX_WIDTH_DEG) return null;
+  const wide = e - w > MAX_WIDTH_DEG || n - s > MAX_WIDTH_DEG;
+  const G = wide ? WIDE_GRID : GRID;
   const counts = new Map();
   let land = 0;
   let abroad = 0;
-  for (let i = 0; i < GRID; i++)
-    for (let j = 0; j < GRID; j++) {
-      const name = locate(w + ((i + 0.5) / GRID) * (e - w), s + ((j + 0.5) / GRID) * (n - s));
+  for (let i = 0; i < G; i++)
+    for (let j = 0; j < G; j++) {
+      const name = locate(w + ((i + 0.5) / G) * (e - w), s + ((j + 0.5) / G) * (n - s));
       if (!name) {
-        if (locateAbroad(w + ((i + 0.5) / GRID) * (e - w), s + ((j + 0.5) / GRID) * (n - s)))
-          abroad++;
+        if (locateAbroad(w + ((i + 0.5) / G) * (e - w), s + ((j + 0.5) / G) * (n - s))) abroad++;
         continue;
       }
       land++;
       counts.set(name, (counts.get(name) ?? 0) + 1);
     }
-  if (land / GRID ** 2 < MIN_LAND || abroad >= land) return null;
-  const region = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  return { region, region_2025: provinceNow(region), land: land / GRID ** 2 };
+  if (land / G ** 2 < MIN_LAND || (!wide && abroad >= land)) return null;
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  const region = ranked[0][0];
+  const regions = ranked
+    .filter(([, c]) => c / land >= (wide ? WIDE_SHARE : MIN_SHARE))
+    .map(([n]) => n);
+  return {
+    region: wide ? null : region,
+    region_2025: wide ? null : provinceNow(region),
+    regions,
+    regions_2025: [...new Set(regions.map(provinceNow))],
+    land: land / G ** 2,
+  };
 }

@@ -46,6 +46,10 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 ## 7.4 — September 2026
 
+### October 5, 2026 — Province coverage
+
+Migration 111 adds `maps.regions` and `regions_2025`. Catalog Area filters, counts and the table use all listed provinces. The bbox backfill uses a 10% share of sampled Vietnamese land for normal sheets and 2% with a 40×40 grid for sheets spanning over 2° on either axis. Wide sheets retain no dominant province. Final database read-back found 933 maps with lists (392 spanning multiple provinces), 566 without lists (325 without a bbox), and no dominant province missing from its list. These are modern locators, not historical administrative claims.
+
 **Current.** Every sheet was addressed by its uuid —
 `/catalog/787439c7-8015-496d-a458-df61b89a4391` — which is the URL a reader is
 asked to paste into a message, and which says nothing about what is on the

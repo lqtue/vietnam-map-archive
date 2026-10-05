@@ -555,6 +555,8 @@ export type Database = {
           printing_id: string | null
           region: string | null
           region_2025: string | null
+          regions: string[] | null
+          regions_2025: string[] | null
           duplicate_of_map_id: string | null
           archive_reason: string | null
           allmaps_id: string | null
@@ -603,6 +605,8 @@ export type Database = {
           printing_id?: string | null
           region?: string | null
           region_2025?: string | null
+          regions?: string[] | null
+          regions_2025?: string[] | null
           duplicate_of_map_id?: string | null
           archive_reason?: string | null
           allmaps_id?: string | null
@@ -650,6 +654,8 @@ export type Database = {
           printing_id?: string | null
           region?: string | null
           region_2025?: string | null
+          regions?: string[] | null
+          regions_2025?: string[] | null
           duplicate_of_map_id?: string | null
           archive_reason?: string | null
           allmaps_id?: string | null

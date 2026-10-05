@@ -122,9 +122,21 @@ test("open water keeps its province; a neighbour's land does not", () => {
   expect(regionOf([3, 3, 3.1, 3.1], vn, kh)).toBeNull();
 });
 
+test('a sheet over a boundary lists both provinces; a sliver does not', () => {
+  const both = regionOf([0.5, 0.1, 1.5, 0.2], vn, kh);
+  expect(both?.regions.sort()).toEqual(['Hồ Chí Minh', 'Long An']);
+  // 1 of 7 columns in Hồ Chí Minh (14%) still counts; none of 49 does not.
+  expect(regionOf([0.1, 0.1, 0.9, 0.2], vn, kh)?.regions).toEqual(['Long An']);
+});
+
+test('a country-scale sheet gets the list but no single region', () => {
+  const wide = regionOf([-0.5, 0, 2.5, 1], vn, kh);
+  expect(wide?.region).toBeNull();
+  expect(wide?.regions.sort()).toEqual(['Hồ Chí Minh', 'Long An']);
+});
+
 test('country-scale and missing bboxes get no region', () => {
   expect(regionOf([0, 0, 1.9, 1], vn, kh)).not.toBeNull();
-  expect(regionOf([-5, 0, 3, 1], vn, kh)).toBeNull(); // 8° wide
   expect(regionOf(null, vn, kh)).toBeNull();
   expect(regionOf([1, 2, 3], vn, kh)).toBeNull();
 });

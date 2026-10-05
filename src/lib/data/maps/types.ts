@@ -58,6 +58,8 @@ export interface MapListItem {
   annotation_url?: string; // Optional override URL to the annotation JSON
   name: string;
   location?: string; // city / region (renamed from `type`)
+  regions?: string[] | null; // modern provinces covered by the bbox (mig 111)
+  regions_2025?: string[] | null;
   region?: string | null; // modern province from the bbox (mig 109); null for sheets mostly abroad
   map_type?: string; // cartographic type: cadastral, topographic, city_plan, panorama
   dc_description?: string; // dc:description — read from maps.description (renamed mig 095)
