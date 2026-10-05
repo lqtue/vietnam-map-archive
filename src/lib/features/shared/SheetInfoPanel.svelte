@@ -16,6 +16,7 @@
   export let mapId: string | null = null;
   export let map: MapListItem | null = null;
   export let vectorsOn = false;
+  export let showVectorAction = true;
 
   $: published = map?.status === 'public' || map?.status === 'featured';
 
@@ -39,6 +40,7 @@
     slug={map?.slug ?? null}
     {published}
     {vectorsOn}
+    {showVectorAction}
     on:toggleVectors={(e) => dispatch('toggleVectors', e.detail)}
   />
   <dl class="if-dl">

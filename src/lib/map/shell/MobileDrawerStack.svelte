@@ -12,6 +12,7 @@
   Slots: layers · controls · browse · legacy
 -->
 <script lang="ts">
+  import { legendPicking } from '$lib/map/stores/legendPicking';
   type DrawerKey = 'layers' | 'controls' | 'browse';
 
   /** Which drawer is open. Bindable so a parent (e.g. the /explore tour) can switch tabs. */
@@ -52,11 +53,25 @@
   }
 </script>
 
-{#if openDrawer !== 'none'}
+{#if openDrawer !== 'none' && !$legendPicking}
   <div class="drawer-backdrop" on:click={() => (openDrawer = 'none')} role="presentation"></div>
 {/if}
 
-<div class="drawer-stack" class:open={openDrawer !== 'none'} class:is-expanded={drawerExpanded}>
+<div
+  class="drawer-stack"
+  class:open={openDrawer !== 'none'}
+  class:is-expanded={drawerExpanded}
+  class:is-picking={!!$legendPicking}
+>
+  {#if $legendPicking}
+    <div class="picking-hint" role="status">
+      <span>Tap the map to place the legend point.</span><button
+        type="button"
+        class="sb-btn is-sm"
+        on:click={() => $legendPicking?.cancel()}>Cancel selection</button
+      >
+    </div>
+  {/if}
   <!-- Shared body: shows the active drawer's content. Hidden when closed. -->
   <div class="drawer-body" aria-hidden={openDrawer === 'none'} on:scroll|capture={onDrawerScroll}>
     {#if hasLayers}
@@ -189,6 +204,20 @@
   }
   .drawer-stack.open.is-expanded .drawer-body {
     max-height: 90vh;
+  }
+  .drawer-stack.open.is-picking .drawer-body {
+    max-height: 24vh;
+  }
+  .picking-hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--sb-bg);
+    color: var(--sb-text);
+    border-top: var(--sb-border);
+    font-size: 0.75rem;
   }
   .drawer-pane {
     display: none;

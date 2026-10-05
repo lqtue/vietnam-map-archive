@@ -27,18 +27,21 @@
    *  but a draft's page is not a link anyone can share. */
   export let published = false;
   export let vectorsOn = false;
+  export let showVectorAction = true;
 </script>
 
 {#if mapId}
   <div class="tsa">
-    <button
-      type="button"
-      class="sb-btn is-sm"
-      class:is-on={vectorsOn}
-      on:click={() => dispatch('toggleVectors', { mapId })}
-      aria-pressed={vectorsOn}
-      title="Traced footprints">⬡ Traced</button
-    >
+    {#if showVectorAction}
+      <button
+        type="button"
+        class="sb-btn is-sm"
+        class:is-on={vectorsOn}
+        on:click={() => dispatch('toggleVectors', { mapId })}
+        aria-pressed={vectorsOn}
+        title="Traced footprints">⬡ Traced</button
+      >
+    {/if}
     <a class="sb-btn is-sm" href="/explore?mode=studio&map={ref}">Studio</a>
     <!-- Was two buttons to two places, and is one because the places merged:
          the scan is on the sheet's own page now, not behind /scan?map=. -->

@@ -22,7 +22,6 @@ export const vi: Record<string, string> = {
   Share: 'Chia sẻ',
   Submit: 'Gửi',
   Delete: 'Xóa',
-  Remove: 'Gỡ bỏ',
   None: 'Không có',
   Year: 'Năm',
   Title: 'Tiêu đề',
@@ -338,8 +337,8 @@ export const vi: Record<string, string> = {
   'What happens when I share my location?': 'Điều gì xảy ra khi chia sẻ vị trí?',
   'Remember my choice on this device': 'Ghi nhớ lựa chọn trên thiết bị này',
   'Search maps…': 'Tìm kiếm bản đồ…',
-  'Tap a name to zoom · drag for opacity · eye hides a layer':
-    'Nhấn vào tên để phóng to · kéo để chỉnh độ mờ · biểu tượng mắt để ẩn lớp',
+  'Hold and drag the three dots to reorder · tap for layer actions':
+    'Giữ và kéo ba chấm để sắp xếp lại · nhấn để xem thao tác với lớp',
   'No stacked map matches those filters.': 'Không có lớp bản đồ phù hợp với bộ lọc.',
   Opacity: 'Độ mờ',
   'This sheet': 'Bản đồ này',

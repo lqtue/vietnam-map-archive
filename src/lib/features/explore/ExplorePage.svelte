@@ -11,7 +11,7 @@
   Deeplinks bypass the welcome modal entirely.
 -->
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
   import type Map from 'ol/Map';
 
@@ -20,7 +20,12 @@
   import { mapRef } from '$lib/core/utils/mapSlug';
   import { createGeoMapStores } from '$lib/map/shell/geoMapSetup';
   import type { Bbox } from '$lib/core/geo/mapBounds';
-  import { layersStore, toHistoricalRef, isSheetLayer } from '$lib/map/stores/layersStore';
+  import {
+    layersStore,
+    toHistoricalRef,
+    isSheetLayer,
+    type SeriesRef,
+  } from '$lib/map/stores/layersStore';
   import { fetchPublicStories } from '$lib/data/supabase/stories';
   import { fetchUserRole } from '$lib/data/supabase/role';
   import { createStoryPlayerStore } from '$lib/features/stories/shared/storyStore';
@@ -38,9 +43,10 @@
   import StoryPlayback from '$lib/features/stories/shared/StoryPlayback.svelte';
   import LayerStackPanel from '$lib/features/shared/LayerStackPanel.svelte';
   import TopSheetActions from '$lib/features/shared/TopSheetActions.svelte';
-  import LayerControlsPanel from '$lib/features/shared/LayerControlsPanel.svelte';
 
   import ExploreSidebar from '$lib/features/explore/ExploreSidebar.svelte';
+  import ExploreMapContextMenu from './ExploreMapContextMenu.svelte';
+  import { createExploreInspection } from './exploreInspection';
   import ExploreRightSidebar from '$lib/features/explore/ExploreRightSidebar.svelte';
   import ExploreBrowsePanel from '$lib/features/explore/ExploreBrowsePanel.svelte';
   import ExplorePrivacyNotice from '$lib/features/explore/ExplorePrivacyNotice.svelte';
@@ -136,6 +142,26 @@
   $: activeOverlayMap = activeOverlayMapId
     ? (mapList.find((m) => m.id === activeOverlayMapId) ?? null)
     : null;
+  let inspectorTab: 'info' | 'legend' | 'control' = 'info';
+  const inspection = createExploreInspection({
+    supabase,
+    maps: () => mapList,
+    open: (tab) => {
+      inspectorTab = tab;
+      showLegendPoints = false;
+      legendN = null;
+      rightSidebarCollapsed = false;
+      if (isMobile) openDrawer = 'controls';
+    },
+  });
+  $: inspectionMapId = $inspection.mapId ?? ($inspection.series ? null : activeOverlayMapId);
+  $: inspectionMap =
+    [...$inspection.maps, ...mapList].find((item) => item.id === inspectionMapId) ?? null;
+  const handleInspectMap = (event: CustomEvent<{ mapId: string; tab: 'info' | 'legend' }>) =>
+    void inspection.inspectMap(event.detail);
+  const handleInspectSeries = (event: CustomEvent<{ ref: SeriesRef; tab: 'info' | 'legend' }>) =>
+    void inspection.inspectSeries(event.detail);
+  onDestroy(inspection.destroy);
   let showLegendPoints = false;
   /** The spot a search hit sent us to, pulsed once so it is findable. */
   let focusPoint: { lng: number; lat: number } | null = null;
@@ -145,7 +171,7 @@
   let vectorMapIds: string[] = [];
   /** The place and year the press panel is showing, if any. */
   let pressFor: { q: string; year: number | null } | null = null;
-  $: if (!activeOverlayMapId) showLegendPoints = false;
+  $: if (!inspectionMapId) showLegendPoints = false;
   $: playerState = $storyPlayer;
   $: activeStoryProgress = activeStory ? (playerState.progress[activeStory.id] ?? null) : null;
 
@@ -332,7 +358,7 @@
       if (!next) return;
       e.preventDefault();
       // Add first, then drop the old one, so the map never renders bare. A
-      // refused add (the stack is at MAX_OVERLAY_LAYERS, or the map is already
+      // refused add (the map is already
       // on) must not remove anything: swapping a sheet for nothing is worse
       // than not swapping.
       if (!layersStore.addOverlay(toHistoricalRef(next), { opacity: top.opacity })) return;
@@ -449,6 +475,8 @@
         bind:tab={sidebarTab}
         tourActive={tourOpen || tourPending}
         on:zoomToOverlay={handleZoomToOverlay}
+        on:inspectMap={handleInspectMap}
+        on:inspectSeries={handleInspectSeries}
         on:pickMap={handlePickMap}
         on:pickLabel={handlePickLabel}
         on:removeOverlay={handleRemoveOverlay}
@@ -460,11 +488,16 @@
       <ExploreRightSidebar
         {viewMode}
         {gpsActive}
-        mapId={activeOverlayMapId}
-        map={activeOverlayMap}
+        mapId={inspectionMapId}
+        map={inspectionMap}
         {showLegendPoints}
         bind:selectedN={legendN}
-        vectorsOn={!!activeOverlayMapId && vectorMapIds.includes(activeOverlayMapId)}
+        bind:tab={inspectorTab}
+        series={$inspection.series}
+        seriesMaps={$inspection.maps}
+        seriesLoading={$inspection.loading}
+        on:inspectMap={handleInspectMap}
+        vectorsOn={!!inspectionMapId && vectorMapIds.includes(inspectionMapId)}
         on:changeViewMode={(e) => layerStore.setViewMode(e.detail.mode)}
         on:pickLocation={handlePickLocation}
         on:toggleGps={toggleGps}
@@ -477,13 +510,19 @@
 
     <svelte:fragment slot="mobile-layers">
       <div class="mobile-pane" data-tour="layers-mobile">
-        <LayerStackPanel {viewMode} {mapList} on:zoomToOverlay={handleZoomToOverlay} />
+        <LayerStackPanel
+          inspectionInRail={true}
+          {viewMode}
+          {mapList}
+          on:zoomToOverlay={handleZoomToOverlay}
+          on:inspectMap={handleInspectMap}
+          on:inspectSeries={handleInspectSeries}
+        />
         <TopSheetActions
-          mapId={activeOverlayMapId}
-          slug={activeOverlayMap?.slug ?? null}
-          published={activeOverlayMap?.status === 'public' ||
-            activeOverlayMap?.status === 'featured'}
-          vectorsOn={!!activeOverlayMapId && vectorMapIds.includes(activeOverlayMapId)}
+          mapId={inspectionMapId}
+          slug={inspectionMap?.slug ?? null}
+          published={inspectionMap?.status === 'public' || inspectionMap?.status === 'featured'}
+          vectorsOn={!!inspectionMapId && vectorMapIds.includes(inspectionMapId)}
           on:toggleVectors={handleToggleVectors}
         />
       </div>
@@ -491,15 +530,27 @@
 
     <svelte:fragment slot="mobile-controls">
       <div class="mobile-pane" data-tour="controls-mobile">
-        <LayerControlsPanel
+        <ExploreRightSidebar
+          embedded
           {viewMode}
           {gpsActive}
-          legendPointsAvailable={!!activeOverlayMapId}
+          mapId={inspectionMapId}
+          map={inspectionMap}
+          bind:tab={inspectorTab}
+          bind:selectedN={legendN}
+          series={$inspection.series}
+          seriesMaps={$inspection.maps}
+          seriesLoading={$inspection.loading}
           {showLegendPoints}
+          vectorsOn={!!inspectionMapId && vectorMapIds.includes(inspectionMapId)}
+          on:inspectMap={handleInspectMap}
           on:changeViewMode={(e) => layerStore.setViewMode(e.detail.mode)}
           on:pickLocation={handlePickLocation}
           on:toggleGps={toggleGps}
           on:toggleLegendPoints={() => (showLegendPoints = !showLegendPoints)}
+          on:clearFocus={() => (focusPoint = null)}
+          on:toggleVectors={handleToggleVectors}
+          on:toggleCollapse={() => (openDrawer = 'none')}
         />
       </div>
     </svelte:fragment>
@@ -517,12 +568,13 @@
     </svelte:fragment>
 
     <svelte:fragment slot="map-children">
+      <ExploreMapContextMenu {mapList} on:inspectMap={handleInspectMap} />
       <GpsTracker
         active={gpsActive && gpsAllowed}
         on:position={handleGpsPosition}
         on:error={handleGpsError}
       />
-      <LegendPointsLayer mapId={activeOverlayMapId} enabled={showLegendPoints} />
+      <LegendPointsLayer mapId={inspectionMapId} enabled={showLegendPoints} />
       <GpsDot position={userPosition} />
       <FocusPulse point={focusPoint} />
       <FootprintsLayer mapIds={vectorMapIds} />

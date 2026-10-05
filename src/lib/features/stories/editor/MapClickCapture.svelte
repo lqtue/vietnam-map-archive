@@ -23,7 +23,7 @@
   let unsub: Unsubscriber | null = null;
 
   function handleClick(event: any) {
-    if (!enabled || !olMap) return;
+    if (!enabled || !olMap || olMap.get('legendPointPicking')) return;
     const coord = event.coordinate;
     const [lon, lat] = toLonLat(coord);
     dispatch('mapClick', { lon, lat });
