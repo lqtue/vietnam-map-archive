@@ -98,7 +98,6 @@
     {badges}
     {extraActive}
     waiting={maps ? maps.length === 0 : !fetched}
-    showTypes={false}
     showLabels={false}
     on:pick={handlePick}
   >

@@ -58,12 +58,16 @@
       {/if}
     </label>
   {/if}
+  <!-- Controls that stay visible when the disclosure is folded (a caller's primary facet). -->
+  <slot name="before" />
   <details class="sb-more">
     <summary
       >{$t('Filters')}{#if active}
         · {active}{/if}</summary
     >
     <div class="dropdowns"><slot /></div>
+    <!-- Anything that is not a select, under them: the year bars. -->
+    <slot name="more" />
   </details>
 </div>
 

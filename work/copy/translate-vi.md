@@ -40,8 +40,6 @@ that is the point of keying the whole line rather than the two halves.
 | Year | Năm |
 | Title | Tiêu đề |
 | Description | Mô tả |
-| Status | Trạng thái |
-| Type | Loại |
 | Collection | Bộ sưu tập |
 | Map | Bản đồ |
 | Image | Hình ảnh |
@@ -275,6 +273,10 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Grid | Lưới |
 | Try another keyword, or clear a filter and start over. | Thử từ khóa khác hoặc xóa bộ lọc để bắt đầu lại. |
 | Group by | Nhóm theo |
+| Open in | Mở trong |
+| Legend found, not read | Đã thấy chú giải, chưa đọc |
+| No legend located | Chưa xác định chú giải |
+| Contribute to this sheet | Đóng góp cho tờ bản đồ này |
 | No maps match those filters. | Không có bản đồ phù hợp với bộ lọc. |
 | Available on map | Có sẵn trên bản đồ |
 | Static image only | Chỉ có hình ảnh tĩnh |

@@ -553,6 +553,8 @@ export type Database = {
         Row: {
           series_id: string | null
           printing_id: string | null
+          region: string | null
+          region_2025: string | null
           duplicate_of_map_id: string | null
           archive_reason: string | null
           allmaps_id: string | null
@@ -565,6 +567,7 @@ export type Database = {
           date_label: string | null
           description: string | null
           extra_metadata: Json | null
+          edition: string | null
           holding_institution: string | null
           id: string
           iiif_image: string | null
@@ -598,6 +601,8 @@ export type Database = {
         Insert: {
           series_id?: string | null
           printing_id?: string | null
+          region?: string | null
+          region_2025?: string | null
           duplicate_of_map_id?: string | null
           archive_reason?: string | null
           allmaps_id?: string | null
@@ -610,6 +615,7 @@ export type Database = {
           date_label?: string | null
           description?: string | null
           extra_metadata?: Json | null
+          edition?: string | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null
@@ -642,6 +648,8 @@ export type Database = {
         Update: {
           series_id?: string | null
           printing_id?: string | null
+          region?: string | null
+          region_2025?: string | null
           duplicate_of_map_id?: string | null
           archive_reason?: string | null
           allmaps_id?: string | null
@@ -654,6 +662,7 @@ export type Database = {
           date_label?: string | null
           description?: string | null
           extra_metadata?: Json | null
+          edition?: string | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null

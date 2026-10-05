@@ -7,6 +7,8 @@
   import { t } from '$lib/core/i18n';
   import { mapHref, exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { fetchMapLongFields, type MapLongFields } from '$lib/data/maps/service';
 
   export let item: any | null = null;
   /** Staff get an Edit action that opens the admin map editor. */
@@ -14,7 +16,21 @@
 
   const dispatch = createEventDispatcher();
 
+  const { supabase } = getSupabaseContext();
+
   $: open = !!item;
+
+  // The list row carries no description, rights or physical description — they are most of a row's
+  // weight and the list never draws them — so the drawer asks for them when it opens.
+  let more: MapLongFields | null = null;
+  $: loadMore(item);
+  async function loadMore(it: any | null) {
+    more = null;
+    if (!it?.id || it._table === 'scout') return;
+    const got = await fetchMapLongFields(supabase, it.id);
+    if (item?.id === it.id) more = got;
+  }
+  $: shown = item ? { ...item, ...more } : null;
 
   function close() {
     dispatch('close');
@@ -38,22 +54,22 @@
   }
 
   // Metadata rows in display order. Filter out empties before render.
-  $: fields = item
+  $: fields = shown
     ? ([
-        ['Original title', item.original_title],
-        ['Creator', item.creator],
-        ['Publisher', item.dc_publisher],
-        ['Year', item.year_label || item.year],
-        ['Area', item.location],
-        ['Type', item.map_type],
-        ['Collection', item.collection],
-        ['Holding institution', item.holding_institution],
-        ['Shelfmark', item.shelfmark],
-        ['Physical', item.physical_description],
-        ['Rights', item.rights],
-        ['Language', item.language],
-        ['Source URL', item.source_url],
-        ['Allmaps ID', item.allmaps_id],
+        ['Original title', shown.original_title],
+        ['Creator', shown.creator],
+        ['Publisher', shown.dc_publisher],
+        ['Year', shown.year_label || shown.year],
+        ['Area', shown.location],
+        ['Type', shown.map_type],
+        ['Collection', shown.collection],
+        ['Holding institution', shown.holding_institution],
+        ['Shelfmark', shown.shelfmark],
+        ['Physical', shown.physical_description],
+        ['Rights', shown.rights],
+        ['Language', shown.language],
+        ['Source URL', shown.source_url],
+        ['Allmaps ID', shown.allmaps_id],
       ].filter(([_, v]) => v != null && v !== '') as [string, string][])
     : [];
 </script>
@@ -74,8 +90,8 @@
 
     <div class="badge-chip status-pill">{statusLabel()}</div>
 
-    {#if item.dc_description}
-      <p class="description">{item.dc_description}</p>
+    {#if shown?.dc_description}
+      <p class="description">{shown.dc_description}</p>
     {/if}
 
     <dl class="meta">

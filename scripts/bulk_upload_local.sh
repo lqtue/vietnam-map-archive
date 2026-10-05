@@ -8,7 +8,8 @@
 #   "<sheet#> <place> <year>.jpg"  → name="<sheet#> <place>", year=<year>
 # A line may instead be tab-separated "path<TAB>name<TAB>year<TAB>extra_metadata-json<TAB>slug"
 # (year "-" for none: `read` collapses empty tab fields), which skips the filename parsing — the slug is derived from
-# name + extra_metadata, so it has to be right at insert.
+# name + extra_metadata, so it has to be right at insert. `sheet_number`, `sheet_half` and `edition` in that
+# JSON are written to their `maps` columns and left out of extra_metadata (mig 110 needed for `edition`).
 #
 # Requires: .env with PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_KEY,
 #           rclone "r2:" remote, vips, jq, uuidgen.
@@ -78,7 +79,7 @@ while IFS=$'\t' read -r path T_NAME T_YEAR T_EXTRA T_SLUG; do
     --arg col "$COLLECTION" \
     --argjson year "${YEAR:-null}" \
     --argjson extra "$extra_json" --arg slug "${T_SLUG:-}" \
-    '($extra.sheet_number // null) as $sheet | {
+    '($extra | {sheet_number, sheet_half, edition} | with_entries(select(.value != null))) as $cols | {
       id: $id,
       name: $name,
       year: $year,
@@ -86,8 +87,8 @@ while IFS=$'\t' read -r path T_NAME T_YEAR T_EXTRA T_SLUG; do
       source_type: "self",
       status: "draft",
       map_type: "topographic",
-      extra_metadata: $extra
-    } + (if $sheet == null then {} else {sheet_number: $sheet} end)
+      extra_metadata: ($extra | del(.sheet_number, .sheet_half, .edition))
+    } + $cols
       + (if $slug == "" then {} else {slug: $slug} end)')
   resp=$(curl -s -w "\n%{http_code}" -X POST "$SB_URL/rest/v1/maps" \
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" \

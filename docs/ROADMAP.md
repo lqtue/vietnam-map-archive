@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-01)
+# Roadmap — open work (updated 2026-10-05)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -430,6 +430,16 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`coverage-page-weight`** — the L7014 page is ~500 kB of HTML for 627 rows, server-rendered
       per request. Fine
       today; revisit before Cochinchine's 826 lands.
+
+- [ ] **`map-json-to-columns`** — `sheet_number`, `sheet_half` and `edition` are columns and the
+      readers, the edit form and `bulk_upload_local.sh` use them (mig 110). Left:
+      `extra_metadata.mirrors_original_for` is still filtered in JSON
+      (`catalog/[id]/+page.server.ts`, `fetchSeriesSheets`); `source_archive` stays a JSON tag the
+      L7014 scripts use to tell PCL from TTU, and `l7014_ingest_list.py` /
+      `l7014_ttu_ingest_list.py` do not set `holding_institution`, so the next ingest reopens the
+      gap 110 closed; the old JSON copies of the three keys stay on rows nobody re-saves. Not
+      `created_by` (the RLS policies need it) and not `printing_id`. Exit: no filter or sort in
+      `src/` reads `extra_metadata`.
 
 ## After 7.3
 

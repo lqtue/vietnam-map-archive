@@ -1,7 +1,7 @@
 <!--
   CatalogTable — sortable, groupable table for the unified catalog.
-  Click a column header to sort (toggle direction). The Group by choice
-  comes from the filter group above (CatalogUnifiedSearch).
+  Click a column header to sort (toggle direction). The Group by choice (Year / Area /
+  Series / Institution) comes from the filter group above, in CatalogUnifiedSearch.
 
   `compact` delegates to `ArchiveMapRows` — this same table with four columns
   dropped, which is what a 380px rail can carry. It was `CatalogTableCompact`,
@@ -19,34 +19,43 @@
   import SheetWork from './SheetWork.svelte';
   import { fetchSheetWork } from '$lib/data/admin/sheetWork';
   import type { WorkFactsById } from '$lib/core/sheetWork';
+  import { inView } from '$lib/ui/inView';
+  import { sliceGroups } from './sliceGroups';
+  import { sheetLabel, seriesShort } from '$lib/features/shared/catalogFilters';
 
   export let items: MapListItem[] = [];
   export let compact: boolean = false;
   export let activeId: string | null = null;
   /** Show the "+ overlay" toggle (only on the /explore sidebar). */
   export let showLayerActions: boolean = false;
-  /** Admin/mod: the Status cell also shows what has run on the sheet and where to open it. */
+  /** Staff also see Type and Status; for a reader Type is one value in 96% of rows and Status is "map". */
   export let staff: boolean = false;
+  /** Chosen in the catalog's filter group, not here. */
+  export let groupBy: GroupKey = 'none';
 
   const dispatch = createEventDispatcher();
 
   $: overlayMapIds = new Set($layersStore.overlays.map((o) => o.ref.mapId));
 
   let sort = { key: 'year' as SortKey, asc: true };
-  /** Chosen in the catalog's filter group, not here. */
-  export let groupBy: GroupKey = 'none';
 
-  const COLUMNS: TableColumn[] = [
+  const sheetOf = sheetLabel;
+
+  $: COLUMNS = [
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
     { key: 'name', label: 'Title' },
     { key: 'year', label: 'Year', klass: 'num' },
-    { key: 'location', label: 'Area' },
-    { key: 'map_type', label: 'Type' },
-    { key: 'collection', label: 'Collection' },
-    { key: 'status', label: 'Status', klass: 'status-col' },
-  ];
+    { key: 'region', label: 'Area' },
+    { key: 'collection', label: 'Series' },
+    ...(staff
+      ? [
+          { key: 'map_type', label: 'Type' },
+          { key: 'status', label: 'Status', klass: 'status-col' },
+        ]
+      : []),
+  ] satisfies TableColumn[];
 
-  // One read for the whole table, once a reader is known to be staff.
+  // Staff: the Status cell shows what has been done to each sheet, read once.
   let work: WorkFactsById = {};
   let workLoaded = false;
   async function loadWork() {
@@ -55,10 +64,21 @@
   }
   $: if (staff && !compact && !workLoaded) void loadWork();
 
-  // Staff: Status and the work tracks read the loaded work state.
   $: ctx = staff && !compact ? work : null;
   $: sorted = sortRows(items, sort, ctx);
   $: groups = groupRows(sorted, groupBy, ctx);
+
+  /* 938 rows is 15,000 DOM nodes and a 1.3 s first render, and nobody has scrolled to most of them.
+     Draw a slice; the sentinel under the table asks for the next one. A new result set, sort or
+     grouping starts over from the top. */
+  const SLICE = 100;
+  let shown = SLICE;
+  $: resetSlice(groups);
+  function resetSlice(_: unknown) {
+    shown = SLICE;
+  }
+  $: drawn = sliceGroups(groups, shown);
+  $: total = items.length;
 
   let collapsed = new Set<string>();
   function toggleGroup(label: string | null) {
@@ -71,26 +91,22 @@
   function openItem(item: MapListItem) {
     dispatch('open', item);
   }
-  function chip(group: string, value: string | null | undefined) {
-    if (!value) return;
-    dispatch('facet', { group, value: String(value) });
-  }
 </script>
 
 {#if compact}
-  <ArchiveMapRows rows={sorted} rowAction="open" {activeId} showTypes={showLayerActions} on:open />
+  <ArchiveMapRows rows={sorted} rowAction="open" {activeId} on:open />
 {:else}
   <!-- The `.ct` wrapper is this component's own element, so its scoped CSS can
        still reach the `<table>`, `<thead>` and `<th>`s that are DataTable's. -->
-  <div class="ct" class:is-staff={staff}>
+  <div class="ct">
     <DataTable columns={COLUMNS} klass="is-card" bind:sort>
-      {#each groups as g (g.label)}
+      {#each drawn as g (g.label)}
         {#if g.label !== null}
           <tr class="group-row" on:click={() => toggleGroup(g.label)}>
             <td colspan={COLUMNS.length}>
               <span class="caret">{collapsed.has(g.label) ? '▸' : '▾'}</span>
               <strong>{g.label}</strong>
-              <span class="group-count">{g.rows.length}</span>
+              <span class="group-count">{g.count}</span>
             </td>
           </tr>
         {/if}
@@ -153,55 +169,43 @@
                     >
                   {/if}
                 </div>
-                {#if (item as any).creator}<div class="sub">{(item as any).creator}</div>{/if}
-              </td>
-              <td class="num">
-                {#if item.year}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('year', String(item.year))}
-                    >{item.year}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td>
-                {#if item.location}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('area', item.location)}
-                    >{item.location}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td>
-                {#if item.map_type}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('type', item.map_type)}
-                    >{item.map_type}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td title={item.collection || ''} class="collection-col">{item.collection || '—'}</td>
-              <td class="status-col">
-                {#if isScout}
-                  <span class="badge-chip is-sm scout">scout</span>
-                {:else if (item as any).georef_done}
-                  <span class="badge-chip is-sm status-map" title={$t('Available on map')}
-                    >{$t('Map')}</span
-                  >
-                {:else}
-                  <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
-                    >{$t('Image')}</span
-                  >
+                {#if sheetOf(item) || item.location}
+                  <div class="sub">
+                    {#if sheetOf(item)}<span class="sheet">{sheetOf(item)}</span>{/if}
+                    {item.location ?? ''}
+                  </div>
                 {/if}
-                {#if staff && !isScout}<SheetWork mapId={item.id} state={work[item.id]} />{/if}
               </td>
+              <td class="num">{item.year ?? '—'}</td>
+              <td class="area-col">{item.region || '—'}</td>
+              <td title={item.collection || ''} class="collection-col">
+                {seriesShort(item.collection) || '—'}
+              </td>
+              {#if staff}
+                <td>{item.map_type || '—'}</td>
+                <td class="status-col">
+                  {#if isScout}
+                    <span class="badge-chip is-sm scout">scout</span>
+                  {:else if (item as any).georef_done}
+                    <span class="badge-chip is-sm status-map" title={$t('Available on map')}
+                      >{$t('Map')}</span
+                    >
+                  {:else}
+                    <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
+                      >{$t('Image')}</span
+                    >
+                  {/if}
+                  {#if !isScout}<SheetWork mapId={item.id} state={work[item.id]} />{/if}
+                </td>
+              {/if}
             </tr>
           {/each}
         {/if}
       {/each}
     </DataTable>
+    {#if shown < total}
+      <div class="ct-more" use:inView={() => (shown += SLICE)}></div>
+    {/if}
   </div>
 {/if}
 
@@ -221,23 +225,16 @@
   .ct :global(tbody tr:hover .title-link) {
     text-decoration: underline;
   }
-  /* Not `.chip.ghost`: this is a dense inline affordance inside a table cell,
-     and the shared pill's 2.5rem min-height would set the row height. */
-  .tag-chip {
-    background: transparent;
-    border: 1.5px solid transparent;
-    padding: 0.15rem var(--space-2);
-    border-radius: var(--radius-pill);
-    font: inherit;
+  .area-col {
+    white-space: nowrap;
+    color: var(--sb-text-meta);
     font-size: 0.85rem;
-    cursor: pointer;
-    color: var(--color-text);
-  }
-  .tag-chip:hover {
-    background: var(--color-white);
-    border-color: var(--color-border);
   }
   .collection-col {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--sb-text-meta);
     font-size: 0.85rem;
   }
@@ -255,6 +252,15 @@
     background: var(--sb-thumb-bg);
     display: block;
   }
+  .sheet {
+    margin-right: 0.35rem;
+    padding: 0 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--sb-radius-sm);
+    font-size: 0.72rem;
+    font-weight: var(--font-bold);
+    white-space: nowrap;
+  }
   .ct .title-col .sub {
     font-size: 0.8rem;
     color: var(--sb-text-soft);
@@ -267,12 +273,6 @@
     width: 90px;
     text-align: right;
     white-space: nowrap;
-  }
-  /* Staff: the cell also carries the work chips and the Open-in menu. */
-  .ct.is-staff :global(.status-col) {
-    width: 14rem;
-    text-align: left;
-    white-space: normal;
   }
   /* Two tones only: both are tints of a token, and the shared `.chip-green` /
      `.chip-yellow` are a solid fill and a white face — too loud and too blank

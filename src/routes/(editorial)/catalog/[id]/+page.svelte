@@ -49,8 +49,8 @@
     map.thumbnail ??
     (map.iiif_image ? `${map.iiif_image.replace(/\/$/, '')}/full/800,/0/default.jpg` : null);
 
-  /* Falls back to the host when the row has no `holding_institution` — thirteen
-     published maps are in that state, all with a usable `source_url`. */
+  /* Falls back to the host when the row has no `holding_institution` (none of the
+     published maps since mig 110, but a new row may). */
   $: sourceHost = (() => {
     try {
       return new URL(map.source_url ?? '').hostname.replace(/^www\./, '');

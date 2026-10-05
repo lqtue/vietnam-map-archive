@@ -55,6 +55,7 @@ export const MAP_WRITABLE_FIELDS: Record<string, Coerce> = {
   triage: asObject,
   sheet_number: orNull,
   sheet_half: orNull,
+  edition: orNull,
   series_id: orNull,
   printing_id: orNull,
   duplicate_of_map_id: orNull,

@@ -20,6 +20,7 @@
   import LabelHits from '$lib/features/shared/LabelHits.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
+  import { inView } from '$lib/ui/inView';
 
   export let searchQuery: string = '';
   let groupBy: GroupKey = 'none';
@@ -51,18 +52,17 @@
    */
   export let atRest: boolean = true;
 
+  $: staff = role === 'admin' || role === 'mod';
+
   const dispatch = createEventDispatcher<{ pick: any; edit: any }>();
 
   const search = createCatalogSearch({ requireGeoref });
   const {
     query,
     loading,
-    periods,
     results,
     facets,
     total,
-    areaChoices,
-    typeChoices,
     includeScout,
     labels,
     selected,
@@ -98,6 +98,14 @@
   let view: string = readJson<string>(VIEW_KEY, 'list');
   $: writeJson(VIEW_KEY, view);
 
+  /* The grid draws a slice and the sentinel under it asks for the next, as CatalogTable does. */
+  const SLICE = 60;
+  let shown = SLICE;
+  $: resetSlice($results);
+  function resetSlice(_: unknown) {
+    shown = SLICE;
+  }
+
   // ── Admin edit: the page owns MapEditModal (catalog UI must not import admin) ──
   /** Re-run the current query (call after an admin edit lands). */
   export function refresh() {
@@ -114,19 +122,6 @@
   export function filterSeries(seriesKey: string) {
     setSingle('series_key', seriesKey);
   }
-
-  function handleRowFacet(e: CustomEvent<{ group: string; value: string }>) {
-    const { group, value } = e.detail;
-    // Only the area chip is a filter. Other clicks (year, type, etc.) are no-ops.
-    if (group !== 'area') return;
-    toggleFacet('area', value);
-  }
-
-  $: activeAreas = $selected.area ?? [];
-  // Type selections live under the `type` key — the same key the engine's
-  // filter and the FacetRail use. (The compact <select> below previously wrote
-  // `map_type`, which the filter never read, so it silently did nothing.)
-  $: activeTypes = $selected.type ?? [];
 </script>
 
 <div class="cus" class:compact>
@@ -138,6 +133,7 @@
     {search}
     showSearch={false}
     {seriesChoices}
+    {staff}
     extraActive={groupBy === 'none' || compact || view === 'grid' ? 0 : 1}
   >
     <!-- Grouping is a way of looking at the filtered list, so it sits in the same
@@ -145,11 +141,11 @@
          groups, and the compact rail never did. -->
     {#if !compact && view !== 'grid'}
       <select bind:value={groupBy} aria-label={$t('Group by')}>
-        <option value="none">{$t('Group by: none')}</option>
-        <option value="year">{$t('Group by year')}</option>
-        <option value="location">{$t('Group by area')}</option>
-        <option value="map_type">{$t('Group by type')}</option>
-        <option value="collection">{$t('Group by collection')}</option>
+        <option value="none">{$t('Group by')}: {$t('None')}</option>
+        <option value="year">{$t('Group by')}: {$t('Year')}</option>
+        <option value="region">{$t('Group by')}: {$t('Area')}</option>
+        <option value="collection">{$t('Group by')}: {$t('Series')}</option>
+        <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
       </select>
     {/if}
   </ArchiveFilters>
@@ -199,7 +195,7 @@
       <!-- A card opens the same drawer a row does, so it carries no `href`:
            the grid is the list in another shape, not a different destination. -->
       <div class="cus-grid">
-        {#each $results as item (item.id)}
+        {#each $results.slice(0, shown) as item (item.id)}
           <MapCard
             map={item as any}
             href={null}
@@ -209,16 +205,18 @@
           />
         {/each}
       </div>
+      {#if shown < $results.length}
+        <div use:inView={() => (shown += SLICE)}></div>
+      {/if}
     {:else}
       <CatalogTable
         items={$results as any}
         {compact}
         {activeId}
         {showLayerActions}
-        staff={role === 'admin' || role === 'mod'}
+        {staff}
         {groupBy}
         on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
-        on:facet={handleRowFacet}
       />
     {/if}
   {/if}

@@ -44,7 +44,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (381 tests)
+npm run test         # Playwright smoke suite, read-only (399 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (37 tests)
@@ -55,7 +55,7 @@ npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 `npm run test` starts a dev server on 5173, or reuses one already running. It runs nineteen
 read-only
 browser checks — twelve in `tests/smoke.spec.ts`, seven in `tests/catalog-series.spec.ts` (they hit
-the real Supabase project but never write) — plus 362 browser-less pure checks riding the same
+the real Supabase project but never write) — plus 380 browser-less pure checks riding the same
 runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a
 check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
@@ -80,7 +80,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 108**; 095–108 are in production (verified 2026-10-04 via
+- **Migration head is 110**; 095–110 are in production (110 and 109 pushed 2026-10-05; the rest verified 2026-10-04 via
   `supabase migration list`) — see `supabase/CLAUDE.md` for what each one does. Adding one, and
   regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
@@ -120,7 +120,7 @@ Each file's opening paragraph says what it covers. Read before acting:
 
 - **Before code:** `architecture.md` (map runtime) · `conventions.md` · `design-system.md` ·
   `system-guidelines.md` (layering, §11 live debt table) · `api.md` · `testing.md` (what each of the
-  381 tests pins)
+  399 tests pins)
 - **Before a migration or DB write:** `db-guidelines.md` · `lessons.md` (rules this project paid for
   more than once — also before any unattended run or any pass that produces a number)
 - **Before deploying:** `deploy.md`
