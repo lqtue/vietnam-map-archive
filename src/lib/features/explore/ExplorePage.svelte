@@ -199,25 +199,32 @@
     (paramMapId || (paramStoryId && stories.length > 0))
   ) {
     appliedUrl = deeplinkKey;
-    void applyExploreUrlParams({
-      mapId: paramMapId,
-      at: paramAt,
-      storyId: paramStoryId,
-      maps: mapList,
-      stories,
-      keepCamera: hasHashCamera(location.hash),
-      addMapOverlay,
-      tallyMapOpen,
-      zoomToMap,
-      setView: (v) => {
-        mapStore.setView(v);
-        focusPoint = { lng: v.lng, lat: v.lat };
-      },
-      startStory: (story) => {
-        activeStory = story;
-        storyPlayer.startStory(story.id);
-      },
-    });
+    // Deferred: this block runs inside Svelte's update pass, and a store write made there lands
+    // after the `$:` statements that read it have already run. `activeOverlayMapId`, and with it
+    // the Info rail, never saw the sheet the link had just added; a reload showed it only because
+    // the stack was restored before first render.
+    queueMicrotask(
+      () =>
+        void applyExploreUrlParams({
+          mapId: paramMapId,
+          at: paramAt,
+          storyId: paramStoryId,
+          maps: mapList,
+          stories,
+          keepCamera: hasHashCamera(location.hash),
+          addMapOverlay,
+          tallyMapOpen,
+          zoomToMap,
+          setView: (v) => {
+            mapStore.setView(v);
+            focusPoint = { lng: v.lng, lat: v.lat };
+          },
+          startStory: (story) => {
+            activeStory = story;
+            storyPlayer.startStory(story.id);
+          },
+        })
+    );
   }
 
   // Admins/mods get draft maps in coverage too (mirrors the browse panel).
