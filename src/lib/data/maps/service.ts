@@ -7,6 +7,7 @@ import type { Database } from '$lib/data/supabase/types';
 import type { MapListItem, MapSeries, MapSourceType, MapStatus } from './types';
 import { looksValidBbox } from '$lib/core/geo/mapBounds';
 import { readAll } from '$lib/data/supabase/paged';
+import { MAP_BASE_COLUMNS } from '$lib/data/maps/columns';
 
 export type DbRow = Database['public']['Tables']['maps']['Row'];
 
@@ -16,8 +17,7 @@ export type DbRow = Database['public']['Tables']['maps']['Row'];
  * long source fields no list ever renders; this is 9 KB. `fetchMapRow` still
  * takes the whole row — the admin editor writes back columns no list carries.
  */
-const LIST_COLUMNS =
-  'id,slug,allmaps_id,annotation_url,name,location,map_type,description,thumbnail,status,year,date_label,collection,series_id,series_key,printing_id,holding_institution,source_url,source_type,bbox,iiif_image,is_georeferenced';
+const LIST_COLUMNS = `${MAP_BASE_COLUMNS},description,date_label,series_id,printing_id,is_georeferenced`;
 
 // `MapListItem` keeps the pre-095 field names (`dc_description`, `year_label`,
 // `georef_done`) — it is also what `/api/search` hands the browser, under
@@ -256,7 +256,7 @@ export async function fetchSheetEditions(
   const { data, error } = await supabase
     .from('maps')
     .select(
-      'id,name,year,status,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced,printing_id'
+      'id,name,year,status,edition,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced,printing_id'
     )
     .eq('sheet_number', sheet)
     .eq('series_key', series)
@@ -293,7 +293,7 @@ export async function fetchSheetEditions(
       name: row.name,
       year: row.year ?? undefined,
       status: (row.status ?? 'draft') as MapStatus,
-      edition: typeof rowMeta.edition === 'string' ? rowMeta.edition : undefined,
+      edition: row.edition ?? undefined,
       printing: typeof rowMeta.printing === 'string' ? rowMeta.printing : undefined,
       allmaps_id: row.allmaps_id ?? undefined,
       annotation_url: row.annotation_url ?? undefined,

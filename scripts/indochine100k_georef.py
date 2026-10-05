@@ -1688,7 +1688,7 @@ def rows():
     offset = 0
     while True:
         response = requests.get(f"{url}/rest/v1/maps", headers=headers, timeout=30,
-                                params={"select": "id,name,status,is_georeferenced,extra_metadata,iiif_image",
+                                params={"select": "id,name,status,is_georeferenced,sheet_number,sheet_half,extra_metadata,iiif_image",
                                         "collection": f"eq.{COLLECTION}", "order": "id",
                                         "limit": 500, "offset": offset})
         response.raise_for_status()
@@ -2156,7 +2156,7 @@ def check():
         w = got["wgs84"]
         key = (round(w["NW"][0], 3), round(w["NW"][1], 3),
                round(w["SE"][0], 3), round(w["SE"][1], 3))
-        cell = (row["extra_metadata"].get("sheet_number"), row["extra_metadata"].get("sheet_half"))
+        cell = (row["sheet_number"], row["sheet_half"])
         cells.setdefault(cell, []).append((key, got["id"]))
         footprints.append((cell, got["id"],
                            (min(p[0] for p in w.values()), min(p[1] for p in w.values()),

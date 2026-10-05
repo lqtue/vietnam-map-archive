@@ -468,14 +468,15 @@ system — what a result must retain, and the two kinds of check — is in the r
       (MiniSearch) only if typo tolerance is wanted. Exit: typing never waits on the network.
       **Built, not yet deployed** (`localSearch.ts`; the server's map search stays for the
       palette). Close it once it is live.
-- [ ] **`map-json-to-columns`** — `db-guidelines.md` §8 says filtered fields get columns, and
-      three do not. `sheet_number` and `sheet_half` are columns but `api/search/+server.ts` still
-      matches `extra_metadata->>sheet_number` and the JSON copy is still written; `edition` (456
-      rows) and `source_archive` (510) live only in JSON — check `source_archive` against
-      `holding_institution` before promoting. Also collapse `LIST_COLUMNS`, `FULL_MAP_COLUMNS` and
-      `SLIM_MAP_COLUMNS` into one shared constant. Not `created_by` (the RLS policies need it) and
-      not `printing_id` (waiting on 106). Exit: no filter or sort in `src/` reads
-      `extra_metadata`.
+- [ ] **`map-json-to-columns`** — **Built, not yet pushed or deployed** (mig 110 adds `maps.edition`
+      and copies `source_archive = 'PCL'` into `holding_institution`; the search API, the series
+      page and `SeriesManage` read the columns; `LIST_COLUMNS` and the API's full set share
+      `MAP_BASE_COLUMNS`; the edit form and `bulk_upload_local.sh` stop writing the JSON copies).
+      Left: `extra_metadata.mirrors_original_for` is still filtered in JSON
+      (`catalog/[id]/+page.server.ts`, `fetchSeriesSheets`), and `source_archive` stays a JSON tag
+      the L7014 scripts use to tell PCL from TTU. The old JSON copies of `sheet_number`,
+      `sheet_half` and `edition` stay on rows nobody re-saves. Close it once 110 is pushed and the
+      code is live.
 
 ## After 7.3
 

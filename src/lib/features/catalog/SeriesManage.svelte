@@ -57,7 +57,7 @@
       supabase
         .from('maps')
         .select(
-          'id,slug,name,year,status,sheet_number,is_georeferenced,iiif_image,source:extra_metadata->>source_archive,edition:extra_metadata->>edition'
+          'id,slug,name,year,status,sheet_number,is_georeferenced,iiif_image,source:holding_institution,edition'
         )
         .eq('series_key', seriesKey)
         .not('sheet_number', 'is', null)
@@ -82,7 +82,7 @@
     return n;
   }, {});
   $: bySource = recs.reduce<Record<string, number>>((n, r) => {
-    const k = r.source ?? 'PCL';
+    const k = r.source ?? '—';
     n[k] = (n[k] ?? 0) + 1;
     return n;
   }, {});
@@ -144,7 +144,7 @@
           <tr>
             <td class="num">{r.sheet_number}</td>
             <td><a href="/catalog/{r.slug ?? r.id}">{r.name ?? '—'}</a></td>
-            <td>{r.source ?? 'PCL'}</td>
+            <td>{r.source ?? '—'}</td>
             <td>{[r.year, r.edition && `ed. ${r.edition}`].filter(Boolean).join(' · ') || '—'}</td>
             <td>{STAGES[stageOf(r)]}</td>
             <td>

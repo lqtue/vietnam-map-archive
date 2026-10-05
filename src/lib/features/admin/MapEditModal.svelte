@@ -37,11 +37,17 @@
   let dc_description = map.description || '';
   let physical_description = map.physical_description || '';
   let language = map.language || '';
+  // Keys that now have a column and their own field below: left out of the custom list, so a save
+  // writes the column and stops re-writing the JSON copy.
+  const PROMOTED = ['sheet_number', 'sheet_half', 'edition'];
   let extraPairs: { key: string; value: string }[] = Object.entries(
     (map.extra_metadata as Record<string, string>) || {}
-  ).map(([k, v]) => ({ key: k, value: String(v ?? '') }));
+  )
+    .filter(([k]) => !PROMOTED.includes(k))
+    .map(([k, v]) => ({ key: k, value: String(v ?? '') }));
   let sheet_number = map.sheet_number || '';
   let sheet_half = map.sheet_half || '';
+  let edition = map.edition || '';
   let series_id = map.series_id || '';
   let printing_id = map.printing_id || '';
   let duplicate_of_map_id = map.duplicate_of_map_id || '';
@@ -144,6 +150,7 @@
         extraPairs,
         sheet_number,
         sheet_half,
+        edition,
         series_id,
         printing_id,
         duplicate_of_map_id,
@@ -265,6 +272,7 @@
           bind:extraPairs
           bind:sheet_number
           bind:sheet_half
+          bind:edition
           bind:series_id
           bind:printing_id
           bind:duplicate_of_map_id

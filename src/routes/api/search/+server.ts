@@ -23,6 +23,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { tally } from '$lib/server/facets';
 import { readAll, readAllParallel } from '$lib/data/supabase/paged';
+import { MAP_BASE_COLUMNS } from '$lib/data/maps/columns';
 import { getTransformer } from '$lib/server/transformer';
 import { placeKey, placeCoreKey } from '$lib/core/utils/placeKey';
 
@@ -81,8 +82,7 @@ export interface LabelHit {
  * response's own field names (`mapsOut` below) — only the column read from
  * renamed (mig 095).
  */
-const FULL_MAP_COLUMNS =
-  'id,slug,name,location,region,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
+const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,dc_description:description,year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language`;
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -229,7 +229,7 @@ async function answer(
       }
       // A sheet number ("5929-3") is not in `search_vector`, so it matches the sheet_number the series
       // rows carry. The dash form only: a bare four digits is also a year. Digits only, so no filter syntax.
-      if (/^\d{4}-\d$/.test(q)) qMaps = qMaps.eq('extra_metadata->>sheet_number', q);
+      if (/^\d{4}-\d$/.test(q)) qMaps = qMaps.eq('sheet_number', q);
       else if (tsq) qMaps = qMaps.textSearch('search_vector', tsq, { config: 'simple' });
       return qMaps;
     };

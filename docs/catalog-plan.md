@@ -177,6 +177,8 @@ Exit: every public map with a bounded `bbox` has a `region`, and the Area facet 
 
 ## `map-json-to-columns`
 
+**Built 2026-10-05.** `source_archive` was not `holding_institution`'s twin but its complement: 'PCL' on exactly the 510 rows with none (the L7014 scripts also write 'TTU'), so it stays a JSON tag and the PCL value is copied across. `edition` became a column (mig 110). `mirrors_original_for` was not in the plan and is still a JSON filter.
+
 - Read `sheet_number` from the column in `api/search/+server.ts` (or drop the branch once local
   search owns it) and stop writing the JSON copy; same for `sheet_half`. Writers: `mapFields.ts`,
   `MapEditModal.svelte`, `mapEditPayload.ts`, the ingest scripts.

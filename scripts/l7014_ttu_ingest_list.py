@@ -36,13 +36,13 @@ def titlecase(t):
 
 def main(out, *reads):
     url, key = env()
-    r = urllib.request.Request(f"{url}/rest/v1/maps?select=slug,name,extra_metadata&slug=like.*l7014*&limit=5000",
+    r = urllib.request.Request(f"{url}/rest/v1/maps?select=slug,name,sheet_number,edition,extra_metadata&slug=like.*l7014*&limit=5000",
                                headers={"apikey": key, "Authorization": f"Bearer {key}"})
     rows = json.load(urllib.request.urlopen(r))
     slugs = {x["slug"] for x in rows}
-    pcl_ed = {(x["extra_metadata"] or {}).get("sheet_number"): (x["extra_metadata"] or {}).get("edition") for x in rows
+    pcl_ed = {x["sheet_number"]: x["edition"] for x in rows
               if (x["extra_metadata"] or {}).get("source_archive") == "PCL"}
-    pcl_name = {(x["extra_metadata"] or {}).get("sheet_number"): x["name"] for x in rows
+    pcl_name = {x["sheet_number"]: x["name"] for x in rows
                 if (x["extra_metadata"] or {}).get("source_archive") == "PCL"}
     items = sorted((i for f in reads for i in json.load(open(f))), key=lambda i: i["cell"])
     lines, notes = [], []

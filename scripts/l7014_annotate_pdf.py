@@ -269,7 +269,7 @@ def main():
     CORNERS_FILE = args.corners
 
     base, key = env()
-    rows = req(f"{base}/rest/v1/maps?select=id,slug,iiif_image,annotation_url,bbox,extra_metadata"
+    rows = req(f"{base}/rest/v1/maps?select=id,slug,sheet_number,iiif_image,annotation_url,bbox,extra_metadata"
                f"&collection=ilike.*L7014*&limit=1000"
                + ("&extra_metadata->>source_archive=eq.TTU" if args.archive == "TTU"
                   else "&or=(extra_metadata->>source_archive.is.null,extra_metadata->>source_archive.eq.PCL)"), key)
@@ -279,8 +279,8 @@ def main():
 
     src = corner_sources() if args.hand else None
     ok, skipped = [], []
-    for m in sorted(rows, key=lambda r: r["extra_metadata"]["sheet_number"]):
-        sheet = m["extra_metadata"]["sheet_number"]
+    for m in sorted(rows, key=lambda r: r["sheet_number"]):
+        sheet = m["sheet_number"]
         if args.sheet and sheet not in args.sheet:
             continue
         if args.bbox_only:

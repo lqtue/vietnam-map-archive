@@ -263,7 +263,7 @@ function checkLattice(maps, extents, lattice) {
   let checked = 0,
     unmasked = 0;
   for (const m of maps) {
-    const sheet = m.sheet_number ?? m.pcl;
+    const sheet = m.sheet_number;
     const cell = sheet && lattice[sheet];
     const ext = extents.get(m.id);
     if (!cell || !ext?.drawn) continue;
@@ -304,7 +304,7 @@ function checkLattice(maps, extents, lattice) {
 function checkDoubleHeld(maps, extents, mosaic) {
   let pairs = 0;
   for (const m of maps) {
-    const sheet = m.sheet_number ?? m.pcl;
+    const sheet = m.sheet_number;
     const outline = sheet && mosaic.get(sheet);
     const ext = extents.get(m.id);
     if (!outline || !ext?.drawn || !ext.hasMask) continue;
@@ -433,9 +433,7 @@ const maps = [];
 for (let from = 0; ; from += 1000) {
   const { data, error } = await db()
     .from('maps')
-    .select(
-      'id,name,status,collection,bbox,allmaps_id,annotation_url,sheet_number,pcl:extra_metadata->>sheet_number'
-    )
+    .select('id,name,status,collection,bbox,allmaps_id,annotation_url,sheet_number')
     .order('id')
     .range(from, from + 999);
   if (error) {

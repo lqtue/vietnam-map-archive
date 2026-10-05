@@ -567,6 +567,7 @@ export type Database = {
           date_label: string | null
           description: string | null
           extra_metadata: Json | null
+          edition: string | null
           holding_institution: string | null
           id: string
           iiif_image: string | null
@@ -614,6 +615,7 @@ export type Database = {
           date_label?: string | null
           description?: string | null
           extra_metadata?: Json | null
+          edition?: string | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null
@@ -660,6 +662,7 @@ export type Database = {
           date_label?: string | null
           description?: string | null
           extra_metadata?: Json | null
+          edition?: string | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null
