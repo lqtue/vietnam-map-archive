@@ -11,8 +11,10 @@ export type Selected = Record<string, string[]>;
 /** A survey sheet carries a series key; a city plan or a one-off does not. */
 export const isSurvey = (r: Row) => !!r.series_key;
 
+/** Area is `maps.region` — the province, derived from the bbox (mig 109). `location` is the
+ *  hand-written place and is filled on the one-off plans only, so it filters nothing on a survey. */
 export const passArea = (r: Row, sel: Selected) =>
-  !sel.area?.length || sel.area.includes(String(r.location ?? ''));
+  !sel.area?.length || sel.area.includes(String(r.region ?? ''));
 export const passType = (r: Row, sel: Selected) =>
   !sel.type?.length || sel.type.includes(String(r.map_type ?? ''));
 export const passInstitution = (r: Row, sel: Selected) =>

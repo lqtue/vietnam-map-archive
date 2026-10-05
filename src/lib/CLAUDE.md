@@ -96,7 +96,7 @@ carries.
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
-- `src/lib/data/supabase/types.ts` is generated and current against migration head **108** (verified
+- `src/lib/data/supabase/types.ts` is generated and current against migration head **109** (`region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified
   2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
   changes only a default). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift

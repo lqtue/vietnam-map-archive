@@ -457,7 +457,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       sheet number beside the name — 23 names repeat. Long fields load when the drawer opens.
       Depends on `georef-flag-one-meaning`. Exit: no public column that is a single value.
       **Done on /catalog:** the table columns, year range + histogram, institution facet,
-      Surveys / Plans switch, Type for staff only. **Left:** `ArchiveMapRows` (the rail's
+      Surveys / Plans switch, Type for staff only. Area is now the province (`region`) on both views. **Left:** `ArchiveMapRows` (the rail's
       columns) and the series facet in /explore's rail — both in `ArchiveBrowser`, which another
       branch was editing — and loading the long drawer fields on open.
 - [ ] **`catalog-local-search`** — search the public maps in the browser instead of through
@@ -473,13 +473,12 @@ system — what a result must retain, and the two kinds of check — is in the r
       facet without hand entry. Decided 2026-10-05: derive, do not hand-fill. Additive migration;
       regenerate `types.ts` after it. Exit: every public map that lies on Vietnamese land has a
       `region`, and /catalog's Area facet reads it.
-      **Written, not pushed:** `109_map_region.sql` (`region` = the 63 provinces to June 2025,
-      `region_2025` = the 34 since) and `scripts/oneoff/backfill_map_region.mjs` (dry by default).
-      `bbox` is [minLng, minLat, maxLng, maxLat], confirmed. The dry run labels 816 of 1,038
-      public maps; the other 222 are mostly the ~150 Cambodia/Laos sheets and sheets that are
-      mostly sea, left null on purpose. After the push: run `--apply`, regenerate `types.ts`,
-      bump the head note in `CLAUDE.md` and `supabase/CLAUDE.md`, add `region` to the list
-      columns, and show the page that it is a modern locator.
+      **Pushed 2026-10-05:** `109_map_region.sql` (`region` = the 63 provinces to June 2025,
+      `region_2025` = the 34 since); the types, head notes, API column and Area facet (now
+      "province", on both views) follow. The dry run labels 816 of 1,038 public maps; the other
+      222 are mostly the ~150 Cambodia/Laos sheets and sheets that are mostly sea, left null on
+      purpose. **Left:** run `scripts/oneoff/backfill_map_region.mjs --apply` (the facet is
+      hidden until `region` is filled), then close this item.
 - [ ] **`map-json-to-columns`** — `db-guidelines.md` §8 says filtered fields get columns, and
       three do not. `sheet_number` and `sheet_half` are columns but `api/search/+server.ts` still
       matches `extra_metadata->>sheet_number` and the JSON copy is still written; `edition` (456

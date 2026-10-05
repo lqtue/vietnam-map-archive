@@ -300,7 +300,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       }
 
       return {
-        area: tally(but('area'), 'location'),
+        area: tally(but('area'), 'region'),
         map_type: tally(but('type'), 'map_type'),
         series_key: tally(but('series_key'), 'series_key'),
         institution: tally(but('institution'), 'holding_institution'),
@@ -321,7 +321,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     scout: $s.length,
   }));
 
-  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'location', requireGeoref));
+  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'region', requireGeoref));
   const typeChoices = derived(searchedMaps, ($m) => distinct($m, 'map_type', requireGeoref));
   const institutionChoices = derived(searchedMaps, ($m) =>
     distinct($m, 'holding_institution', requireGeoref)

@@ -37,7 +37,9 @@ export const vi: Record<string, string> = {
   'Continue with Google': 'Tiếp tục với Google',
   'Nothing matches.': 'Không có kết quả phù hợp.',
   'Nothing here yet.': 'Chưa có dữ liệu.',
-  'All areas': 'Tất cả khu vực',
+  'All provinces': 'Tất cả tỉnh thành',
+  'Modern province, as it stood until mid-2025 — a locator, not the name the map used':
+    'Tỉnh theo ranh giới đến giữa năm 2025 — chỉ để định vị, không phải tên gọi trên bản đồ',
   'All types': 'Tất cả loại',
   'All institutions': 'Tất cả cơ quan lưu trữ',
   'All maps': 'Tất cả bản đồ',

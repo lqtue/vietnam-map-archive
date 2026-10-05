@@ -52,11 +52,8 @@
     { key: 'surveys', label: $t('Surveys') },
     { key: 'plans', label: $t('Plans & other') },
   ];
-  /** Area is filled on the one-off plans and empty on survey sheets, so it belongs to that view. */
-  $: showArea = $areaChoices.length > 0 && (!hasKinds || kind === 'plans');
   function setKind(k: string) {
     search.setSingle('kind', k);
-    if (k !== 'plans') search.clearGroup('area');
   }
 
   $: [yFrom, yTo] = [$selected.year?.[0] ?? '', $selected.year?.[1] ?? ''];
@@ -131,13 +128,16 @@
         · {activeFacets}{/if}</summary
     >
     <div class="dropdowns">
-      {#if showArea}
+      {#if $areaChoices.length}
         <select
           value={$selected.area?.[0] ?? ''}
           on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by area"
+          aria-label="Filter by province"
+          title={$t(
+            'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
+          )}
         >
-          <option value="">{$t('All areas')}</option>
+          <option value="">{$t('All provinces')}</option>
           {#each $areaChoices as a (a)}
             <option value={a}>{a}</option>
           {/each}

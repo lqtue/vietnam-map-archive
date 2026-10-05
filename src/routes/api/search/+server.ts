@@ -82,7 +82,7 @@ export interface LabelHit {
  * renamed (mig 095).
  */
 const FULL_MAP_COLUMNS =
-  'id,slug,name,location,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
+  'id,slug,name,location,region,map_type,dc_description:description,thumbnail,year,year_label:date_label,collection,series_key,source_type,status,bbox,iiif_image,allmaps_id,annotation_url,georef_done:is_georeferenced,creator,holding_institution,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,physical_description,rights,language,source_url';
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -504,6 +504,7 @@ async function answer(
     slug: r.slug,
     name: r.name,
     location: r.location,
+    region: r.region,
     map_type: r.map_type,
     dc_description: r.dc_description,
     thumbnail: r.thumbnail,
