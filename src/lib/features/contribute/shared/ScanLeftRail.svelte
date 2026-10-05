@@ -66,7 +66,9 @@
 <ToolSidebarShell title="Map" {onCollapse} showFooter={!!mode}>
   <div class="rail-cards">
     <SidebarCard grow={1} flush={true}>
-      <ToolMapPicker {selectedMapId} {maps} {requireGeoref} on:select on:loaded on:error />
+      <ToolMapPicker {selectedMapId} {maps} {requireGeoref} on:select on:loaded on:error>
+        <slot name="picker-head" />
+      </ToolMapPicker>
     </SidebarCard>
 
     <!-- Fixed height, not a share of the rail: this card is a handful of rows and

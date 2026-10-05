@@ -24,7 +24,17 @@
   import EmptyPanel from '$lib/features/contribute/shared/EmptyPanel.svelte';
   import LegendTool from './LegendTool.svelte';
   import LegendSidebar from './LegendSidebar.svelte';
-  import { bestCandidate, nextUnplaced, type LegendCandidate, type LegendRow } from './legendStage';
+  import {
+    bestCandidate,
+    mapStatus,
+    nextUnplaced,
+    type LegendCandidate,
+    type LegendRow,
+    type LegendStats,
+    type MapStatus,
+    type RowFilter,
+    type RowSort,
+  } from './legendStage';
   import '$styles/layouts/tool-page.css';
   import { INK } from '$lib/core/ink';
   import { getSupabaseContext } from '$lib/data/supabase/context';
@@ -35,6 +45,13 @@
   import type { LabelMapInfo } from '$lib/data/supabase/footprints';
 
   const { supabase } = getSupabaseContext();
+
+  $: statusChips = [
+    { key: 'all', label: $t('All') },
+    { key: 'todo', label: $t('To do') },
+    { key: 'doing', label: $t('In progress') },
+    { key: 'done', label: $t('Done') },
+  ] as const;
 
   let maps: MapListItem[] = [];
   let currentMap: MapListItem | null = null;
@@ -59,7 +76,13 @@
   let staged: Record<string, LegendRow> = {};
   let failures: Record<string, string> = {};
   let selectedId: string | null = null;
-  let unplacedOnly = false;
+  let filter: RowFilter = 'all';
+  let sort: RowSort = 'n';
+  let query = '';
+
+  // ── Progress per sheet, for the picker ─────────────────────────────────────
+  let stats: LegendStats = {};
+  let statusFilter: MapStatus | 'all' = 'all';
   let saving = false;
   let message = '';
 
@@ -71,8 +94,23 @@
     { id: 'candidates', label: $t('Numeral candidates'), on: show.candidates, color: INK.green },
     { id: 'grid', label: $t('Index grid'), on: show.grid, color: INK.purple },
   ];
+  // The open sheet's own counts beat the loaded ones, so a save moves its badge.
+  $: liveStats =
+    currentMap && rows.length
+      ? {
+          ...stats,
+          [currentMap.id]: { total: rows.length, placed: rows.filter((r) => r.x != null).length },
+        }
+      : stats;
+  $: statusCounts = maps.reduce(
+    (acc, m) => ({ ...acc, [mapStatus(liveStats[m.id])]: acc[mapStatus(liveStats[m.id])] + 1 }),
+    { todo: 0, doing: 0, done: 0, none: 0 } as Record<MapStatus, number>
+  );
   $: railMaps = maps
-    .filter((m) => !!m.iiif_image)
+    .filter(
+      (m) =>
+        !!m.iiif_image && (statusFilter === 'all' || mapStatus(liveStats[m.id]) === statusFilter)
+    )
     .map((m): LabelMapInfo => ({
       id: m.id,
       name: m.name,
@@ -84,6 +122,7 @@
       year: m.year,
       location: m.location,
       description: m.dc_description,
+      badge: liveStats[m.id] ? `${liveStats[m.id].placed}/${liveStats[m.id].total}` : undefined,
     }));
 
   async function loadLegend(id: string) {
@@ -215,7 +254,17 @@
     }
   }
 
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/admin/maps/legend-stats');
+      if (res.ok) stats = await res.json();
+    } catch {
+      // The picker still works without badges.
+    }
+  }
+
   onMount(async () => {
+    void loadStats();
     try {
       maps = await fetchMaps(supabase, { includeArchived: true });
     } catch (err: any) {
@@ -251,7 +300,19 @@
         onCollapse={() => (sidebarCollapsed = true)}
         on:select={(e) => selectMap(maps.find((m) => m.id === e.detail.map.id)!)}
         on:toggle={(e) => (show = { ...show, [e.detail.id]: e.detail.on })}
-      />
+      >
+        <div slot="picker-head" class="status-chips" role="group" aria-label={$t('Sheet status')}>
+          {#each statusChips as chip (chip.key)}
+            <button
+              type="button"
+              class="chip"
+              class:is-on={statusFilter === chip.key}
+              on:click={() => (statusFilter = chip.key)}
+              >{chip.label}{chip.key === 'all' ? '' : ` ${statusCounts[chip.key]}`}</button
+            >
+          {/each}
+        </div>
+      </ScanLeftRail>
     </svelte:fragment>
 
     <svelte:fragment slot="right-sidebar">
@@ -266,7 +327,9 @@
           <LegendSidebar
             rows={view}
             {selectedId}
-            bind:unplacedOnly
+            bind:filter
+            bind:sort
+            bind:query
             staged={stagedIds}
             {failures}
             {saving}
@@ -313,3 +376,11 @@
     {/if}
   </ToolLayout>
 </div>
+
+<style>
+  .status-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+</style>

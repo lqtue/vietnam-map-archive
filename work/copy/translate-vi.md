@@ -501,7 +501,21 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | English | Tiếng Việt |
 |---|---|
 | {N} of {M} placed | Đã đặt {N}/{M} |
-| Unplaced only | Chỉ mục chưa đặt |
+| Search number, name or grid | Tìm số, tên hoặc ô lưới |
+| Search the legend | Tìm trong chú giải |
+| Show | Hiển thị |
+| All | Tất cả |
+| Unplaced | Chưa đặt |
+| Placed | Đã đặt |
+| Edited, unsaved | Đã sửa, chưa lưu |
+| Sort | Sắp xếp |
+| Number | Số |
+| Unplaced first | Chưa đặt trước |
+| No entries match. | Không có mục phù hợp. |
+| Sheet status | Trạng thái tờ bản đồ |
+| To do | Cần làm |
+| In progress | Đang làm |
+| Done | Xong |
 | Save {N} | Lưu {N} |
 | Saved {N}. | Đã lưu {N}. |
 | placed | đã đặt |

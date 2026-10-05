@@ -116,6 +116,10 @@ Public / other:
   Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`. Reviewed manual positions
   override numeral/grid positions. Staff with MFA also receive `canEdit` and `entries`,
   including entries without a position. Responses are private and not cached.
+- `/api/admin/maps/legend-stats` — **admin or mod with MFA** GET: `{ [mapId]: { total, placed } }`,
+  entries read off each sheet's legend and how many have a pixel position (`px=` only). One paged
+  read over every sheet; feeds the progress badges and status chips in the `/scan?mode=legend`
+  map picker.
 - `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** GET: the legend in **image
   pixels**, for `/scan?mode=legend`. `{ entries: [{ id, n, name, vn, grid, x, y, src: 'manual'|null,
   validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.

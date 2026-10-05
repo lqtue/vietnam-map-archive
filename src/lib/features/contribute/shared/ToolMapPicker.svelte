@@ -88,6 +88,7 @@
      showLabels={false}: a label hit flies /explore to a spot, which an
      ImageShell tool has nowhere to go with. -->
 <div class="tool-map-picker">
+  <slot />
   <ArchiveBrowser
     sortRows={byYear}
     {requireGeoref}

@@ -11,11 +11,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '$lib/core/i18n';
-  import type { LegendRow } from './legendStage';
+  import { visibleRows, type LegendRow, type RowFilter, type RowSort } from './legendStage';
 
   export let rows: LegendRow[] = [];
   export let selectedId: string | null = null;
-  export let unplacedOnly = false;
+  export let filter: RowFilter = 'all';
+  export let sort: RowSort = 'n';
+  export let query = '';
   export let staged: Set<string> = new Set();
   export let failures: Record<string, string> = {};
   export let saving = false;
@@ -28,7 +30,7 @@
     save: void;
   }>();
 
-  $: shown = unplacedOnly ? rows.filter((r) => r.x == null || r.id === selectedId) : rows;
+  $: shown = visibleRows(rows, { filter, sort, query, staged, keepId: selectedId });
   $: placedCount = rows.filter((r) => r.x != null).length;
 
   function field(id: string, name: 'name' | 'vn' | 'grid', e: Event) {
@@ -40,10 +42,33 @@
   <p class="lg-count">
     {$t('{N} of {M} placed', { N: placedCount, M: rows.length })}
   </p>
-  <label class="lg-filter">
-    <input type="checkbox" bind:checked={unplacedOnly} />
-    {$t('Unplaced only')}
-  </label>
+  <input
+    type="search"
+    class="lg-search"
+    placeholder={$t('Search number, name or grid')}
+    aria-label={$t('Search the legend')}
+    bind:value={query}
+  />
+  <div class="lg-controls">
+    <label
+      >{$t('Show')}
+      <select bind:value={filter}>
+        <option value="all">{$t('All')}</option>
+        <option value="unplaced">{$t('Unplaced')}</option>
+        <option value="placed">{$t('Placed')}</option>
+        <option value="edited">{$t('Edited, unsaved')}</option>
+      </select>
+    </label>
+    <label
+      >{$t('Sort')}
+      <select bind:value={sort}>
+        <option value="n">{$t('Number')}</option>
+        <option value="name">{$t('Name')}</option>
+        <option value="grid">{$t('Grid')}</option>
+        <option value="unplaced">{$t('Unplaced first')}</option>
+      </select>
+    </label>
+  </div>
   <button
     type="button"
     class="sb-btn is-sm is-block"
@@ -54,6 +79,7 @@
   </button>
   {#if message}<p class="lg-msg" role="status">{message}</p>{/if}
 
+  {#if !shown.length}<p class="lg-msg">{$t('No entries match.')}</p>{/if}
   <ul class="lg-list">
     {#each shown as row (row.id)}
       <li>
@@ -134,8 +160,21 @@
     font-size: 0.72rem;
     color: var(--sb-text-meta);
   }
-  .lg-filter {
-    font-size: 0.78rem;
+  .lg-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .lg-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .lg-controls label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.72rem;
+    color: var(--sb-text-meta);
   }
   .lg-list {
     list-style: none;

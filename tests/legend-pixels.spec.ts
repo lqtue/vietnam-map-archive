@@ -9,7 +9,9 @@ import { numeralCandidate } from '../src/lib/server/legendEntry';
 import { cellAgreement } from '../src/lib/core/geo/mapGrid';
 import {
   bestCandidate,
+  mapStatus,
   nextUnplaced,
+  visibleRows,
   type LegendRow,
 } from '../src/lib/features/contribute/legend/legendStage';
 
@@ -70,4 +72,48 @@ test('n walks to the next unplaced entry, wrapping; Enter never takes a disagree
   expect(bestCandidate([c(null, 'a')], 2)?.labelId).toBe('a');
   expect(bestCandidate([c(false, 'a')], 2)).toBeNull();
   expect(bestCandidate([c(true, 'a')], 3)).toBeNull();
+});
+
+test('a map is todo, doing, done or has no legend', () => {
+  expect(mapStatus(undefined)).toBe('none');
+  expect(mapStatus({ total: 0, placed: 0 })).toBe('none');
+  expect(mapStatus({ total: 40, placed: 0 })).toBe('todo');
+  expect(mapStatus({ total: 40, placed: 12 })).toBe('doing');
+  expect(mapStatus({ total: 40, placed: 40 })).toBe('done');
+});
+
+test('the legend list filters, searches without accents, sorts, and keeps the open row', () => {
+  const row = (n: number, name: string, grid: string | null, x: number | null): LegendRow => ({
+    id: `r${n}`,
+    n,
+    name,
+    vn: null,
+    grid,
+    x,
+    y: x,
+    validated: false,
+  });
+  const rows = [
+    row(1, 'Théâtre', 'B2', 5),
+    row(2, 'Casino', null, null),
+    row(3, 'Hôtel', 'A10', null),
+  ];
+  const base = {
+    filter: 'all',
+    sort: 'n',
+    query: '',
+    staged: new Set<string>(),
+    keepId: null,
+  } as const;
+  const ns = (o: object) => visibleRows(rows, { ...base, ...o }).map((r) => r.n);
+  expect(ns({})).toEqual([1, 2, 3]);
+  expect(ns({ filter: 'unplaced' })).toEqual([2, 3]);
+  expect(ns({ filter: 'placed' })).toEqual([1]);
+  expect(ns({ filter: 'edited', staged: new Set(['r3']) })).toEqual([3]);
+  expect(ns({ query: 'theatre' })).toEqual([1]);
+  expect(ns({ query: 'hotel' })).toEqual([3]);
+  expect(ns({ sort: 'name' })).toEqual([2, 3, 1]);
+  expect(ns({ sort: 'grid' })).toEqual([3, 1, 2]);
+  expect(ns({ sort: 'unplaced' })).toEqual([2, 3, 1]);
+  expect(ns({ filter: 'placed', keepId: 'r2' })).toEqual([1, 2]);
 });
