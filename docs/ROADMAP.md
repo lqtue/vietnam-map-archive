@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-01)
+# Roadmap — open work (updated 2026-10-05)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -430,6 +430,48 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`coverage-page-weight`** — the L7014 page is ~500 kB of HTML for 627 rows, server-rendered
       per request. Fine
       today; revisit before Cochinchine's 826 lands.
+
+- [ ] **`catalog-list-speed`** — `/api/search` rebuilds the same public list for every reader:
+      2.4–3.3 s unfiltered, `cf-cache-status: DYNAMIC`, two sequential 1,000-row pages
+      (`readAll`), then a 1.3 s blocking render of 1,038 rows (15,350 DOM nodes). Measured
+      2026-10-05 from a laptop against production; the gzipped body is only 153 kB, so the cost is
+      server time and first paint, not bandwidth. Do: `Cache-Control: public, s-maxage=300,
+      stale-while-revalidate` on non-staff responses only (staff see drafts; a publish may take up
+      to 5 minutes to reach the public — accepted); fetch the pages in parallel; render ~100 rows
+      and extend on scroll, table and grid, slicing after grouping; stop sending `extra_metadata`
+      once no reader is confirmed. Cloudflare Pages may not honour the header on a Function
+      response — if `cf-cache-status` never reads `HIT`, build a static snapshot on deploy/edit.
+      Exit: rows visible in about 1 s on a cold load (was 4.5 s), `HIT` on the second request.
+      Plan for this item and the four after it: `docs/catalog-plan.md`.
+- [ ] **`catalog-columns`** — the public list shows columns that do not vary. Of 1,038 public
+      maps: all are `is_georeferenced`, 1,000 of 1,036 `map_type` are "topographic", `location`
+      is filled on 46 (34 of the 36 maps with no series — the city plans — and almost none of the
+      1,002 survey sheets). Replace Status/Type/Area in the public table and in `ArchiveMapRows`
+      with series + sheet number + institution; keep Status/Type for staff. Promote the series
+      facet out of the collapsed Filters disclosure and into /explore's rail; swap the six period
+      buckets for a year range with a histogram (1950s + 1960s hold 680 of 1,038); add an
+      institution facet; a "Surveys / Plans & other" switch decides whether Area applies. Show the
+      sheet number beside the name — 23 names repeat. Long fields load when the drawer opens.
+      Depends on `georef-flag-one-meaning`. Exit: no public column that is a single value.
+- [ ] **`catalog-local-search`** — search the public maps in the browser instead of through
+      `/api/search`: every field `search_vector` indexes is already in the list row. Accent-fold
+      and prefix-match per token — `hue` cannot find `Huế` today, because the index is the
+      `simple` config. Keep the server call for OCR labels and places only; the palette's slim
+      mode is unchanged. The `^\d{4}-\d$` sheet-number match moves with it. A library
+      (MiniSearch) only if typo tolerance is wanted. Exit: typing never waits on the network.
+- [ ] **`map-region-from-bbox`** — a derived province-level `maps.region`, backfilled from the
+      `bbox` centroid (100% filled; confirm it is lng/lat first), so survey sheets get a place
+      facet without hand entry. Decided 2026-10-05: derive, do not hand-fill. Additive migration;
+      regenerate `types.ts` after it. Exit: every public map has a `region`, and /catalog's Area
+      facet reads it.
+- [ ] **`map-json-to-columns`** — `db-guidelines.md` §8 says filtered fields get columns, and
+      three do not. `sheet_number` and `sheet_half` are columns but `api/search/+server.ts` still
+      matches `extra_metadata->>sheet_number` and the JSON copy is still written; `edition` (456
+      rows) and `source_archive` (510) live only in JSON — check `source_archive` against
+      `holding_institution` before promoting. Also collapse `LIST_COLUMNS`, `FULL_MAP_COLUMNS` and
+      `SLIM_MAP_COLUMNS` into one shared constant. Not `created_by` (the RLS policies need it) and
+      not `printing_id` (waiting on 106). Exit: no filter or sort in `src/` reads
+      `extra_metadata`.
 
 ## After 7.3
 

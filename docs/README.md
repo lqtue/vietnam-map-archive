@@ -48,6 +48,7 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Theory](theory.md)                          | Intellectual framework                               |
 | [Knowledge system](knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
 | [Search](search-plan.md)                     | Finding labels, shapes and period sources            |
+| [Catalog](catalog-plan.md)                   | The public list: columns, facets, speed, search       |
 | [Walk](walk-plan.md)                         | Proposed district walks; forks the separate HACW app |
 | [Evidence chain](evidence-chain-plan.md)     | Source-backed claims, review and reuse               |
 | [Platform design](platform-design.md)        | Proposed shared platform architecture                |
