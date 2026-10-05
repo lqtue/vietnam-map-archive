@@ -641,6 +641,15 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 - [ ] **`merge-keeps-box`** — `merge` drops the label box today. 514 of the 1959 rows carry a
       non-zero `rotation_deg` but no
       `label_w`/`label_h`, so the review canvas only ever gets a point.
+- [ ] **`legend-numeral-misses`** — hand review of numbered legends done 2026-10-05 (positions now
+      `px=` image pixels, PR #40). **1959:** numeral detection is good; it misses numbers in dense
+      blocks and numbers sitting on a grid line or cell corner (likely cut at a tile edge — tile
+      overlap, plus a check that the in-cell test tolerates a boundary). **1923:** poor — no printed
+      grid, so no in-cell check and no fallback; the numerals are hard to read; other numbers on the
+      sheet compete; and the model reads numbers *inside the legend* as map references. Fix: read
+      numerals only inside the layout pass's map body (`ocr-reads-regions`). 168 of 182 entries are
+      hand-placed; **14 still sit at a wrong OCR numeral position and were not corrected:** 36, 53,
+      73, 74, 78, 93, 94, 97, 102, 109, 145, 146, 177, 179. Place them in `/scan?mode=legend`.
 
 ## Debt — burn down when it hurts
 
