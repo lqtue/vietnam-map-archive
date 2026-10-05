@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       name: string;
       vn: string | null;
       grid: string | null;
-      manualPoint: [number, number] | null;
+      manualPoint: ReturnType<typeof manualLegendPoint>;
       validated: boolean;
     }
   >();
@@ -168,21 +168,26 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     src: 'numeral' | 'grid' | 'manual';
     accuracy_m?: number;
   };
-  const manual = [...nameByN].flatMap(([n, info]): Point[] =>
-    info.manualPoint
-      ? [
-          {
-            n,
-            name: info.name,
-            vn: info.vn,
-            grid: info.grid,
-            lng: info.manualPoint[0],
-            lat: info.manualPoint[1],
-            src: 'manual',
-          },
-        ]
-      : []
-  );
+  // A manual point is stored in image pixels; with no georeference only a
+  // legacy lng/lat one can still be placed.
+  const placeManual = (toGeo: ((px: [number, number]) => [number, number]) | null): Point[] =>
+    [...nameByN].flatMap(([n, info]): Point[] => {
+      const p = info.manualPoint;
+      const ll = !p ? null : 'lngLat' in p ? p.lngLat : toGeo ? toGeo(p.px) : null;
+      return ll
+        ? [
+            {
+              n,
+              name: info.name,
+              vn: info.vn,
+              grid: info.grid,
+              lng: ll[0],
+              lat: ll[1],
+              src: 'manual',
+            },
+          ]
+        : [];
+    });
   function response(points: Point[], reason?: string) {
     return json(
       {
@@ -216,8 +221,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   // Build the pixel→geo transformer from the stored annotation (mirror override
   // first, else the public Allmaps annotation).
   const resolved = await getTransformer(map.allmaps_id, map.annotation_url);
-  if (!resolved) return response(manual, 'no annotation');
+  if (!resolved) return response(placeManual(null), 'no annotation');
   const { transformer } = resolved;
+  const manual = placeManual((px) => transformer.transformToGeo(px) as [number, number]);
 
   const inRect = (x: number, y: number) =>
     rects.some(
