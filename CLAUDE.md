@@ -5,7 +5,7 @@ Guidance for Claude Code (claude.ai/code) working in this repository.
 Vietnam Map Archive (VMA) — a SvelteKit 5 app for exploring georeferenced historical maps of
 Saigon/Ho Chi Minh City. Integrates Allmaps with OpenLayers.
 
-**This file is one of five, and the only one that loads every session.** The others load when you
+**This file is one of six, and the only one that loads every session.** The others load when you
 open a file in their tree, which is why their content is not repeated here:
 
 | File | Covers |
@@ -14,6 +14,7 @@ open a file in their tree, which is why their content is not repeated here:
 | `src/routes/CLAUDE.md` | Route groups · the modes table · the API contract · admin tooling |
 | `supabase/CLAUDE.md` | Schema rules · adding a migration · the local write-test stack |
 | `work/CLAUDE.md` | The worker · OCR · MapSAM2 |
+| `docs/paper/CLAUDE.md` | The manuscript: source of truth, number ledger, claim discipline |
 
 Working in one of those trees? Read its file first.
 
@@ -126,7 +127,7 @@ Each file's opening paragraph says what it covers. Read before acting:
 - **Pipelines:** `pipelines.md` (OCR + MapSAM2) · `digitalize-guide.md` (`/scan?mode=prepare`) ·
   `admin-tooling.md` · `allmaps-series-note.md`
 - **Open work:** `ROADMAP.md` is the one tracker, open items only, named for what they act on.
-  Close an item by moving it out, not by ticking it. Plans: `search-plan.md`, `walk-plan.md`,
+  Close an item by moving it out, not by ticking it. Plans: `image-processing-1882-plan.md` (active), `search-plan.md`, `walk-plan.md`,
   `knowledge-system-plan.md`, `evidence-chain-plan.md`, `platform-design.md`
 - **Research records:** `research/README.md` indexes `image-processing-record.md`, `field-comparison.md`,
   `worked-example-1882.md` and `river-reconstruction.md` (exploratory, 1882 + 1898; no river layer approved), `journals/` (dated
@@ -143,10 +144,11 @@ Special rules:
   with contact addresses, personal application material. The repo is public.
 - `docs/roadmap-record.md` — **frozen 2026-09-22**; read it for what something cost, never for what
   is open. `docs/archive/` is frozen too — do not cite it as current.
-- `docs/ponytail-debt.md` — ledger of `ponytail:` comments; the generating plugin is gone, so
-  maintain it by hand with the grep at the top of that file.
-- `.claude/handoff.md` — gitignored; the last session's state, written by `/handoff`. Read it first
-  when resuming; it lists which dirty files are another session's.
+- `docs/ponytail-debt.md` — ledger of `ponytail:` comments; maintain it by hand with the grep at
+  the top of that file.
+- `.claude/handoff*.md` — gitignored; one file per workstream, written by `/handoff <stream>`
+  (`handoff.md` when no stream is given). Read the one for your stream first when resuming; it
+  lists which dirty files are another session's.
 - `contracts/` — JSON Schemas for shapes shared with other apps, checked by `tests/schemaCheck.ts`.
 - `CHANGELOG.md` — 1.0 (Apr 2025) to **7.4** (current); the number moves on a structural change,
   not a build. Its public twin is `/changelog` (`src/routes/(editorial)/changelog/releases.ts`) —

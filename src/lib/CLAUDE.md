@@ -17,10 +17,11 @@ HTML→CSS→template→JS ladder, `$:` discipline, reassign-don't-mutate, keyed
 component size and teardown. `skills-lock.json` still carries the upstream hash, so `npx skills add`
 would revert the fork.
 
-**Svelte MCP server** (plugin `svelte`, from `sveltejs/ai-tools`): `list-sections` first, then
-`get-documentation`, then `svelte-autofixer` on any code before showing it (re-run until clean);
-`playground-link` only for standalone components. Delegate more-than-small `.svelte` / `.svelte.ts`
-work to the `svelte-file-editor` agent — it iterates with the autofixer in its own context.
+**If the Svelte MCP server is connected** (plugin `svelte`, from `sveltejs/ai-tools`):
+`list-sections` first, then `get-documentation`, then `svelte-autofixer` on any code before showing
+it (re-run until clean); `playground-link` only for standalone components. If the
+`svelte-file-editor` agent is listed, delegate more-than-small `.svelte` / `.svelte.ts` work to it.
+Without them, the skill above and `npm run check` are the verification.
 
 **Caveat:** the autofixer and the Svelte skills assume runes, and their "avoid legacy features" list
 is exactly this repo's house style — `$:`, `export let`, `on:click`, `<slot>`/`<svelte:fragment>`,
@@ -95,9 +96,9 @@ carries.
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
-- `src/lib/data/supabase/types.ts` is generated and current against migration head **091** (verified
-  2026-09-19: 091's `review_tags` / `review_note` / `reviewed_by` / `reviewed_at` are present).
-  Nothing
+- `src/lib/data/supabase/types.ts` is generated and current against migration head **108** (verified
+  2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
+  changes only a default). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
   history and the `--local` trap: `docs/conventions.md` §Supabase types.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is

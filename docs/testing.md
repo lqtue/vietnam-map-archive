@@ -33,7 +33,15 @@ moves every decoded reference exactly 100 km, which reads as a different bug ent
 `XD 850 418` is then checked against the combat base's own coordinates. Also pins the two directions
 a parser on a keystroke can fail: a place name that is read as a coordinate outranks the real place
 results, and a square from another zone or another country is a position invented out of nothing),
-`tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes. The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
+`tests/authCallback.spec.ts` (where `/auth/callback` may send someone after sign-in — every
+off-site spelling, `/\evil.com` above all, falls back to the root, because the old guard returned the
+attacker's string and the redirect looked exactly like a successful sign-in),
+`tests/route-modes.spec.ts` (`/explore` accepts only its current modes plus the shipped `annotate`
+alias, and `/admin` never resolves an unknown tab to the write-capable bulk screen),
+`tests/stale-after-change.spec.ts` (the rebuild set when a published map's pixels or georeference
+change: a re-georeference re-derives exactly `ocr_labels.geom` and `footprints.geom` from stored
+pixels, so a schema change there is a deliberate edit here; a rescan has no equivalent yet —
+`stale-after-change` in the ROADMAP), `tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes. The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
 copy of it: `ocr street-index` reads a sheet's printed street directory and has to place each street
 as it writes, because the box columns are NOT NULL, so `_cell_rect` in `ocr.py` and `cellBox` here
 are checked against one committed fixture — a drift between them does not look like a bug, it looks

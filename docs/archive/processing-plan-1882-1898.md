@@ -6,14 +6,14 @@
 **Plan, 2026-10-01. Nothing here is approved or measured unless a number is cited.** The 1882
 Plan Cadastral (`0e02b9d9-…`, 12102 × 8982 px) is the in-depth sheet; the 1898 Bertaux plan
 (`20ec4f9a-…`, 16267 × 14859 px) is the paired transfer check. Open items live in
-[ROADMAP.md](ROADMAP.md); river detail is in [river-reconstruction.md](research/river-reconstruction.md).
+[ROADMAP.md](../ROADMAP.md); river detail is in [river-reconstruction.md](../research/river-reconstruction.md).
 
 ## Rules for every stage
 
 1. **One method, two calibrations.** Develop a method on both sheets; fit its appearance model
    on each sheet separately. Swapping 1882's and 1898's auto-derived colour constants cost 1882
    0.08 `land_plot` IoU and erased its road proposals
-   ([journal](journals/261001-colour-pair-1882-1898.md)).
+   ([journal](../journals/261001-colour-pair-1882-1898.md)).
 2. **Source pixels, one pinned native tile level.** Pyramid levels shift thin-ink colour
    (`work/analysis/river_pair/README.md`). Record the scale of anything not at native.
 3. **Reference windows, not whole sheets.** Hand-trace small windows, hold some out of all
@@ -51,7 +51,7 @@ these were screened for retractions or citation context.
 
 ## Stage 1 — River
 
-*Defined and gated in [river-reconstruction.md](research/river-reconstruction.md).* Summary: trace
+*Defined and gated in [river-reconstruction.md](../research/river-reconstruction.md).* Summary: trace
 `river_ref` windows → seeded region graph on native tiles (water likelihood from paper-relative
 colour, line density, direction; bank-aware cost) → score by case → human review.
 **Output:** a water mask and shoreline in source pixels, with a per-reach confidence.

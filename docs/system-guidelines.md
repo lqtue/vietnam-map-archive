@@ -294,7 +294,7 @@ from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Data
 supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
 ```
 
-It is current against migration head 051. Insert/Update payloads use `?:` optional fields, not
+It is current against migration head 108 (`docs/conventions.md` §Supabase types keeps the date). Insert/Update payloads use `?:` optional fields, not
 `Partial<{...}>` (which resolves as `never`).
 
 ---

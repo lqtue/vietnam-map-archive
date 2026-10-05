@@ -2,8 +2,7 @@
 
 **2026-10-02.** Session record of the research focus discussed alongside organization of
 `work/` and `docs/`, and higher education planning. Personal education and application
-details are recorded separately in `docs/private/session-notes/261002-research-and-higher-education.md`
-(gitignored). This note records discussion and proposed directions, not completed experiments.
+details are recorded separately in private, gitignored notes. This note records discussion and proposed directions, not completed experiments.
 
 ## Focus
 

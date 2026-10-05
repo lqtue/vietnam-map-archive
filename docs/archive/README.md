@@ -12,3 +12,4 @@ for open work.
 - [mode layout](mode-layout.md)
 - [page structure redesign](page-structure-redesign.md)
 - [pipeline 3d](pipeline-3d.md)
+- [processing plan 1882 1898](processing-plan-1882-1898.md) — superseded 2026-10-03 by `docs/image-processing-1882-plan.md`
