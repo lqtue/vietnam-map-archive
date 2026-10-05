@@ -135,6 +135,13 @@ and a feature may not import another; it sorts decorate-sort-undecorate (the val
 once per row, not once per comparison — `OcrSidebar`'s parses a regex), keeps blanks last in
 **both** directions, and collates `numeric` so `Rue 100` follows `Rue 11`.
 
+The numbered legend is one too: `features/shared/LegendTable.svelte` is `DataTable` with the legend's
+columns (№ · Name · Grid, and State in the staff tool), used by `SheetLegendPanel` on /explore and
+`LegendSidebar` on `/scan?mode=legend`. It sorts itself; the caller filters and searches. Until
+Oct 2026 both were hand-built `<ul>`s, so the two rails of the legend tool looked unrelated. A
+`<table class="data-table">` written by hand (SeriesManage, NeatlineEditor, BulkUploadPage did)
+is the same mistake the four sort headers were: use `DataTable`.
+
 **Styling:** all CSS in `src/styles/`, imported via the `$styles` alias. **One sidebar design
 system.** `src/styles/components/sidebar.css` owns it (`.sb-card`, `.sb-btn`, `.sb-pill`,
 `.sb-input`, …) and its `--sb-*` block is now nothing but views onto `tokens.css` — it used to be a

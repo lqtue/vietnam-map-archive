@@ -50,6 +50,8 @@
   /** Render the filter bar. False for a caller that renders `ArchiveFilters`
    *  itself, above its own tabs. */
   export let showFilters = true;
+  /** Filters the caller adds inside the filter disclosure, and how many are set. */
+  export let extraActive = 0;
   /** The caller's own list has not arrived yet, so an empty result is not "no match". */
   export let waiting = false;
 
@@ -65,7 +67,7 @@
 </script>
 
 {#if showFilters}
-  <ArchiveFilters search={engine} />
+  <ArchiveFilters search={engine} {extraActive}><slot name="filters" /></ArchiveFilters>
 {/if}
 
 <div class="count-row">

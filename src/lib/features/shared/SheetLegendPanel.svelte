@@ -9,6 +9,7 @@
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
   import { legendRevision, invalidateLegend } from '$lib/data/maps/legendRevision';
+  import LegendTable from './LegendTable.svelte';
   import LegendEntryEditor, { type LegendDraft } from './LegendEntryEditor.svelte';
 
   /** Same zoom a label hit lands at — `LABEL_ZOOM` in explore/exploreUrl.ts,
@@ -239,118 +240,57 @@
       {showLegendPoints ? 'Legend points on' : 'Show legend points'}
     </button>
   {/if}
-  <ul class="lg-list">
-    {#each legendRows as p (p.n)}
-      <li>
-        {#if mapActions && p.lng != null && p.lat != null}
-          <button
-            type="button"
-            class="lg-row"
-            class:is-on={selectedN === p.n}
-            aria-current={selectedN === p.n ? 'true' : undefined}
-            title={selectedN === p.n
-              ? 'Clear this highlight'
-              : p.accuracy_m
-                ? `Within about ${p.accuracy_m} m`
-                : 'Fly to this place'}
-            on:click={() => flyToLegend(p)}
-          >
-            <span class="lg-n">{p.n}</span>
-            <span class="lg-name">
-              {p.name ?? '—'}{#if p.vn}<em> · {p.vn}</em>{/if}
-            </span>
-            {#if p.grid}<span class="lg-grid">{p.grid}</span>{/if}
-          </button>
-        {:else}
-          <span class="lg-row"
-            ><span class="lg-n">{p.n}</span><span class="lg-name"
-              >{p.name ?? '—'}{#if p.vn}<em> · {p.vn}</em>{/if}</span
-            >{#if p.grid}<span class="lg-grid">{p.grid}</span>{/if}</span
+  <LegendTable
+    rows={legendRows}
+    {selectedN}
+    actionable={(p) => mapActions && p.lng != null && p.lat != null}
+    rowTitle={(p) =>
+      mapActions && p.lng != null && p.lat != null
+        ? selectedN === p.n
+          ? 'Clear this highlight'
+          : p.accuracy_m
+            ? `Within about ${p.accuracy_m} m`
+            : 'Fly to this place'
+        : undefined}
+    on:select={(e) => {
+      const point = legendRows.find((p) => p.n === e.detail.n);
+      if (point) flyToLegend(point);
+    }}
+  >
+    <svelte:fragment slot="extra" let:row={p}>
+      {#if canEdit && p.id && mapId}
+        <button
+          type="button"
+          class="sb-btn is-sm"
+          disabled={savingDrafts}
+          on:click={() => (editingId = editingId === p.id ? null : (p.id ?? null))}
+          >Edit text / point{drafts[p.id] ? ' · draft' : ''}</button
+        >
+        {#if drafts[p.id]}
+          <span class="lg-draft-point"
+            >{drafts[p.id].coordinateOverride
+              ? `Draft manual point · ${drafts[p.id].lng}, ${drafts[p.id].lat}`
+              : 'Draft automatic point'}</span
           >
         {/if}
-        {#if canEdit && p.id && mapId}
-          <button
-            type="button"
-            class="sb-btn is-sm"
-            disabled={savingDrafts}
-            on:click={() => (editingId = editingId === p.id ? null : (p.id ?? null))}
-            >Edit text / point{drafts[p.id] ? ' · draft' : ''}</button
-          >
-          {#if drafts[p.id]}
-            <span class="lg-draft-point"
-              >{drafts[p.id].coordinateOverride
-                ? `Draft manual point · ${drafts[p.id].lng}, ${drafts[p.id].lat}`
-                : 'Draft automatic point'}</span
-            >
-          {/if}
-          {#if editingId === p.id}
-            {#key `${mapId}:${p.id}`}
-              <LegendEntryEditor
-                entry={{ ...p, id: p.id }}
-                draft={drafts[p.id] ?? null}
-                on:draft={(event) => keepDraft(event.detail)}
-                on:close={() => (editingId = null)}
-              />
-            {/key}
-          {/if}
+        {#if editingId === p.id}
+          {#key `${mapId}:${p.id}`}
+            <LegendEntryEditor
+              entry={{ ...p, id: p.id }}
+              draft={drafts[p.id] ?? null}
+              on:draft={(event) => keepDraft(event.detail)}
+              on:close={() => (editingId = null)}
+            />
+          {/key}
         {/if}
-      </li>
-    {/each}
-  </ul>
+      {/if}
+    </svelte:fragment>
+  </LegendTable>
 {/if}
 
 <style>
   .lg-draft-point {
     display: block;
-    font-size: 0.68rem;
-    color: var(--sb-text-meta);
-  }
-  .lg-list {
-    list-style: none;
-    margin: 0.4rem 0 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .lg-row {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    width: 100%;
-    padding: 0.25rem 0.2rem;
-    background: none;
-    border: 0;
-    border-top: var(--sb-border);
-    text-align: left;
-    font-size: 0.78rem;
-    color: var(--sb-text);
-    cursor: pointer;
-  }
-  .lg-row:hover {
-    background: var(--sb-row-hover);
-  }
-  /* Same yellow as the map's pulse ring, so the row and the spot read as one. */
-  .lg-row.is-on {
-    background: var(--sb-accent-yellow);
-  }
-  .lg-n {
-    flex: 0 0 1.4rem;
-    font-family: var(--sb-font-display);
-    font-weight: 800;
-    font-size: 0.72rem;
-    color: var(--sb-text-meta);
-  }
-  .lg-name {
-    flex: 1;
-    min-width: 0;
-  }
-  .lg-name em {
-    font-style: normal;
-    color: var(--sb-text-meta);
-  }
-  .lg-grid {
-    flex: 0 0 auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.68rem;
     color: var(--sb-text-meta);
   }

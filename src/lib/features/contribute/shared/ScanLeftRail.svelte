@@ -39,6 +39,8 @@
   export let maps: LabelMapInfo[] | null = null;
   /** Only maps that can be laid on the world; see `ToolMapPicker`. */
   export let requireGeoref = true;
+  /** How many of the filters the caller adds (slot `filters`) are set. */
+  export let extraActive = 0;
   /** One switchable thing drawn over the scan. `color` draws the swatch that
    *  ties the row to what is on the canvas. */
   export let layers: { id: string; label: string; on: boolean; color?: string }[] = [];
@@ -66,8 +68,16 @@
 <ToolSidebarShell title="Map" {onCollapse} showFooter={!!mode}>
   <div class="rail-cards">
     <SidebarCard grow={1} flush={true}>
-      <ToolMapPicker {selectedMapId} {maps} {requireGeoref} on:select on:loaded on:error>
-        <slot name="picker-head" />
+      <ToolMapPicker
+        {selectedMapId}
+        {maps}
+        {requireGeoref}
+        {extraActive}
+        on:select
+        on:loaded
+        on:error
+      >
+        <slot name="filters" slot="filters" />
       </ToolMapPicker>
     </SidebarCard>
 

@@ -54,6 +54,7 @@ that is the point of keying the whole line rather than the two halves.
 | All areas | Tất cả khu vực |
 | All types | Tất cả loại |
 | All periods | Tất cả thời kỳ |
+| Filters | Bộ lọc |
 | Reset filters | Đặt lại bộ lọc |
 | Move up | Di chuyển lên |
 | Move down | Di chuyển xuống |
@@ -504,13 +505,20 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Search number, name or grid | Tìm số, tên hoặc ô lưới |
 | Search the legend | Tìm trong chú giải |
 | Show | Hiển thị |
+| State | Trạng thái |
+| Remove | Xóa |
+| Add another point | Thêm điểm khác |
+| Click the scan… | Nhấp vào bản quét… |
+| Or hold Shift and click the scan | Hoặc giữ Shift và nhấp vào bản quét |
+| Point {N} | Điểm {N} |
+| Suggested | Gợi ý |
+| suggested | gợi ý |
+| Accept detected numeral | Nhận số đã phát hiện |
+| Accept {N} matching numerals | Nhận {N} số khớp |
 | All | Tất cả |
 | Unplaced | Chưa đặt |
 | Placed | Đã đặt |
 | Edited, unsaved | Đã sửa, chưa lưu |
-| Sort | Sắp xếp |
-| Number | Số |
-| Unplaced first | Chưa đặt trước |
 | No entries match. | Không có mục phù hợp. |
 | Sheet status | Trạng thái tờ bản đồ |
 | To do | Cần làm |
@@ -523,7 +531,7 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Vietnamese name | Tên tiếng Việt |
 | Grid reference | Ô lưới tham chiếu |
 | Remove point | Xóa điểm |
-| N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete xóa điểm · kéo điểm để dời |
+| N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it · Shift+click adds a point | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete xóa điểm · kéo điểm để dời · Shift+nhấp để thêm điểm |
 | Placed points | Điểm đã đặt |
 | Numeral candidates | Số ứng viên |
 | Index grid | Lưới chỉ mục |

@@ -8,6 +8,8 @@ export type LegendRow = {
   grid: string | null;
   x: number | null;
   y: number | null;
+  /** Further positions of the same number (a legend entry printed on several plots). */
+  more: [number, number][];
   validated: boolean;
 };
 
@@ -51,43 +53,34 @@ export function mapStatus(s: { total: number; placed: number } | undefined): Map
   return s.placed === 0 ? 'todo' : s.placed >= s.total ? 'done' : 'doing';
 }
 
-export type RowFilter = 'all' | 'unplaced' | 'placed' | 'edited';
-export type RowSort = 'n' | 'name' | 'grid' | 'unplaced';
+export type RowFilter = 'all' | 'unplaced' | 'suggested' | 'placed' | 'edited';
 
 const plain = (text: string | null) =>
   (text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 /**
- * The legend list as shown: filtered, searched (number, name, Vietnamese name,
- * grid; accents ignored), then sorted. The `keepId` row always stays so the
- * entry being edited does not vanish under its own edit.
+ * The legend list as shown: filtered, then searched (number, name, Vietnamese
+ * name, grid; accents ignored). Sorting is `LegendTable`'s. The `keepId` row
+ * always stays so the entry being edited does not vanish under its own edit.
  */
-export function visibleRows(
+export function filterRows(
   rows: readonly LegendRow[],
   opts: {
     filter: RowFilter;
-    sort: RowSort;
     query: string;
     staged: ReadonlySet<string>;
+    /** Entry numbers that have a detected numeral to take. */
+    suggested: ReadonlySet<number>;
     keepId: string | null;
   }
 ): LegendRow[] {
   const q = plain(opts.query.trim());
-  const kept = rows.filter((row) => {
+  return rows.filter((row) => {
     if (row.id === opts.keepId) return true;
     if (opts.filter === 'unplaced' && row.x != null) return false;
+    if (opts.filter === 'suggested' && !opts.suggested.has(row.n)) return false;
     if (opts.filter === 'placed' && row.x == null) return false;
     if (opts.filter === 'edited' && !opts.staged.has(row.id)) return false;
     return !q || plain(`${row.n} ${row.name} ${row.vn ?? ''} ${row.grid ?? ''}`).includes(q);
   });
-  const text = (a: string | null, b: string | null) =>
-    (a ?? '').localeCompare(b ?? '', undefined, { numeric: true });
-  const by: Record<RowSort, (a: LegendRow, b: LegendRow) => number> = {
-    n: (a, b) => a.n - b.n,
-    name: (a, b) => text(a.name, b.name),
-    // An entry with no grid reference sorts last, not first.
-    grid: (a, b) => (a.grid ? 0 : 1) - (b.grid ? 0 : 1) || text(a.grid, b.grid) || a.n - b.n,
-    unplaced: (a, b) => (a.x == null ? 0 : 1) - (b.x == null ? 0 : 1) || a.n - b.n,
-  };
-  return [...kept].sort(by[opts.sort]);
 }

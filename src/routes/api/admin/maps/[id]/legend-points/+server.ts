@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
-import { editLegendNotes, legendNumber } from '$lib/server/legendEntry';
+import { editLegendNotes, legendNumber, MAX_EXTRA_POINTS } from '$lib/server/legendEntry';
 import { readLegendEntries, readNumeralCandidates } from '$lib/server/legendRead';
 import { cellAgreement, parseGrid } from '$lib/core/geo/mapGrid';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
@@ -17,6 +17,8 @@ type LegendEdit = {
   grid: string | null;
   /** Image pixels as sent, or ground lng/lat to be taken back to pixels. */
   point: { px: [number, number] } | { lngLat: [number, number] } | null;
+  /** Further image-pixel positions of this entry. */
+  more: [number, number][];
 };
 
 function noteText(value: unknown, label: string): string | null {
@@ -57,12 +59,27 @@ function parseEdit(body: unknown): LegendEdit {
       throw error(400, 'Enter valid longitude and latitude, or reset both');
     point = { lngLat: [value.lng, value.lat] };
   }
+  const more: [number, number][] = [];
+  if (value.more != null) {
+    if (!Array.isArray(value.more) || value.more.length > MAX_EXTRA_POINTS)
+      throw error(400, `Give at most ${MAX_EXTRA_POINTS} extra points`);
+    for (const p of value.more) {
+      if (
+        !Array.isArray(p) ||
+        p.length !== 2 ||
+        p.some((v) => typeof v !== 'number' || !Number.isFinite(v) || v < 0)
+      )
+        throw error(400, 'Extra points are image x and y');
+      more.push([p[0], p[1]]);
+    }
+  }
   return {
     id,
     name: value.name.trim(),
     vn: noteText(value.vn, 'Vietnamese name'),
     grid: noteText(value.grid, 'Grid reference'),
     point,
+    more,
   };
 }
 
@@ -100,6 +117,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
             x: px?.[0] ?? null,
             y: px?.[1] ?? null,
             src: px ? 'manual' : null,
+            more: px ? info.more : [],
             validated: info.validated,
           };
         })
@@ -190,6 +208,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
             vn: edit.vn,
             grid: edit.grid,
             px: pixel(edit.point),
+            more: edit.more,
           }),
         })
         .eq('id', edit.id)

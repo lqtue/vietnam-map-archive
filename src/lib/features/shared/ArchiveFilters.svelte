@@ -20,6 +20,7 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
+  import FilterBar from './FilterBar.svelte';
 
   /** The search engine this bar drives. Created by the caller, because the
    *  point of the component is that several lists can share one. */
@@ -38,6 +39,9 @@
    */
   export let seriesChoices: { value: string; label: string }[] = [];
 
+  /** Filters the caller adds inside the same disclosure (slot), counted on its summary. */
+  export let extraActive = 0;
+
   const { query, areaChoices, typeChoices, periodChoices, selected } = search;
 
   /** How many facets are set — the number on the summary. */
@@ -55,150 +59,62 @@
   }
 </script>
 
-<div class="filters">
-  {#if showSearch}
-    <label class="sb-search">
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <input
-        class="sb-search-input"
-        type="search"
-        placeholder={$t('Search maps…')}
-        bind:value={$query}
-      />
-      {#if $query}
-        <button
-          type="button"
-          class="sb-search-clear"
-          on:click={() => query.set('')}
-          aria-label={$t('Clear')}>×</button
-        >
-      {/if}
-    </label>
-  {/if}
-  <details class="sb-more">
-    <summary
-      >Filters{#if activeFacets}
-        · {activeFacets}{/if}</summary
+<FilterBar
+  bind:query={$query}
+  placeholder={$t('Search maps…')}
+  active={activeFacets + extraActive}
+  {showSearch}
+  resettable={hasFilters}
+  on:reset={resetFilters}
+>
+  {#if $areaChoices.length}
+    <select
+      value={$selected.area?.[0] ?? ''}
+      on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by area"
     >
-    <div class="dropdowns">
-      {#if $areaChoices.length}
-        <select
-          value={$selected.area?.[0] ?? ''}
-          on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by area"
-        >
-          <option value="">{$t('All areas')}</option>
-          {#each $areaChoices as a (a)}
-            <option value={a}>{a}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if $typeChoices.length}
-        <select
-          value={$selected.type?.[0] ?? ''}
-          on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by map type"
-        >
-          <option value="">{$t('All types')}</option>
-          {#each $typeChoices as t (t)}
-            <option value={t}>{t}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if seriesChoices.length}
-        <select
-          value={$selected.series_key?.[0] ?? ''}
-          on:change={(e) =>
-            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by series"
-        >
-          <option value="">{$t('All series')}</option>
-          {#each seriesChoices as s (s.value)}
-            <option value={s.value}>{s.label}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if $periodChoices.length}
-        <select
-          value={$selected.period?.[0] ?? ''}
-          on:change={(e) =>
-            search.setSingle('period', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by period"
-        >
-          <option value="">{$t('All periods')}</option>
-          {#each $periodChoices as p (p.key)}
-            <option value={p.key}>{$t(p.label)}</option>
-          {/each}
-        </select>
-      {/if}
-    </div>
-  </details>
-</div>
-
-{#if hasFilters}
-  <div class="reset-row">
-    <button type="button" class="reset" on:click={resetFilters}>{$t('Reset filters')}</button>
-  </div>
-{/if}
-
-<style>
-  /* No `gap`: `.sb-more` brings its own vertical margin, and doubling the two
-     is what separates the search box from the disclosure under it. */
-  .filters {
-    display: flex;
-    flex-direction: column;
-  }
-  .dropdowns {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    padding-top: 0.3rem;
-  }
-  /* `max-width` because the same controls sit on a 1280px page as well as in a
-     300px rail: without it each one grew to 400px of chrome around two words.
-     The 110px basis is still what makes them wrap in the rail — and what lets
-     the fourth one (series, /catalog only) wrap rather than squeeze the three
-     beside it. */
-  .dropdowns select {
-    flex: 1 1 110px;
-    max-width: 240px;
-    padding: 0.35rem 0.45rem;
-    font-family: inherit;
-    font-size: 0.82rem;
-    background: var(--sb-card-bg);
-    border: var(--border-thin);
-    border-radius: var(--sb-radius-sm);
-    box-shadow: 1px 1px 0 var(--shadow-ink);
-    cursor: pointer;
-  }
-
-  /* Its own row, so the link sits under the bar it resets whether or not the
-     list beside it has a count to show. */
-  .reset-row {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .reset {
-    background: transparent;
-    border: none;
-    padding: 0;
-    font: inherit;
-    font-size: 0.76rem;
-    font-weight: var(--font-bold);
-    color: var(--sb-accent);
-    text-decoration: underline;
-    cursor: pointer;
-  }
-</style>
+      <option value="">{$t('All areas')}</option>
+      {#each $areaChoices as a (a)}
+        <option value={a}>{a}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if $typeChoices.length}
+    <select
+      value={$selected.type?.[0] ?? ''}
+      on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by map type"
+    >
+      <option value="">{$t('All types')}</option>
+      {#each $typeChoices as t (t)}
+        <option value={t}>{t}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if seriesChoices.length}
+    <select
+      value={$selected.series_key?.[0] ?? ''}
+      on:change={(e) =>
+        search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by series"
+    >
+      <option value="">{$t('All series')}</option>
+      {#each seriesChoices as s (s.value)}
+        <option value={s.value}>{s.label}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if $periodChoices.length}
+    <select
+      value={$selected.period?.[0] ?? ''}
+      on:change={(e) => search.setSingle('period', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by period"
+    >
+      <option value="">{$t('All periods')}</option>
+      {#each $periodChoices as p (p.key)}
+        <option value={p.key}>{$t(p.label)}</option>
+      {/each}
+    </select>
+  {/if}
+  <slot />
+</FilterBar>

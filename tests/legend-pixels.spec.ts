@@ -11,7 +11,7 @@ import {
   bestCandidate,
   mapStatus,
   nextUnplaced,
-  visibleRows,
+  filterRows,
   type LegendRow,
 } from '../src/lib/features/contribute/legend/legendStage';
 
@@ -57,6 +57,7 @@ const row = (n: number, x: number | null): LegendRow => ({
   grid: null,
   x,
   y: x,
+  more: [],
   validated: false,
 });
 
@@ -82,7 +83,7 @@ test('a map is todo, doing, done or has no legend', () => {
   expect(mapStatus({ total: 40, placed: 40 })).toBe('done');
 });
 
-test('the legend list filters, searches without accents, sorts, and keeps the open row', () => {
+test('the legend list filters, searches without accents, and keeps the open row', () => {
   const row = (n: number, name: string, grid: string | null, x: number | null): LegendRow => ({
     id: `r${n}`,
     n,
@@ -91,6 +92,7 @@ test('the legend list filters, searches without accents, sorts, and keeps the op
     grid,
     x,
     y: x,
+    more: [],
     validated: false,
   });
   const rows = [
@@ -100,20 +102,18 @@ test('the legend list filters, searches without accents, sorts, and keeps the op
   ];
   const base = {
     filter: 'all',
-    sort: 'n',
     query: '',
     staged: new Set<string>(),
+    suggested: new Set<number>(),
     keepId: null,
   } as const;
-  const ns = (o: object) => visibleRows(rows, { ...base, ...o }).map((r) => r.n);
+  const ns = (o: object) => filterRows(rows, { ...base, ...o }).map((r) => r.n);
   expect(ns({})).toEqual([1, 2, 3]);
   expect(ns({ filter: 'unplaced' })).toEqual([2, 3]);
   expect(ns({ filter: 'placed' })).toEqual([1]);
   expect(ns({ filter: 'edited', staged: new Set(['r3']) })).toEqual([3]);
+  expect(ns({ filter: 'suggested', suggested: new Set([3]) })).toEqual([3]);
   expect(ns({ query: 'theatre' })).toEqual([1]);
   expect(ns({ query: 'hotel' })).toEqual([3]);
-  expect(ns({ sort: 'name' })).toEqual([2, 3, 1]);
-  expect(ns({ sort: 'grid' })).toEqual([3, 1, 2]);
-  expect(ns({ sort: 'unplaced' })).toEqual([2, 3, 1]);
   expect(ns({ filter: 'placed', keepId: 'r2' })).toEqual([1, 2]);
 });

@@ -24,7 +24,11 @@
  * Legend-internal numbers (those inside the legend box) are dropped — only
  * numerals out on the map body count.
  *
- * Response: { points: [{ n, name, vn, grid, lng, lat, src, accuracy_m? }], reason? }
+ * Response: { points: [{ n, name, vn, grid, lng, lat, src, accuracy_m? }], more, reason? }
+ *
+ * `points` is one per number — the list and the fly-to rely on that. `more`
+ * is the further positions of a number printed on several plots (same shape,
+ * `src: 'manual'`), for the map's pins only.
  */
 
 import { json } from '@sveltejs/kit';
@@ -89,10 +93,31 @@ export const GET: RequestHandler = async ({ params, locals }) => {
           ]
         : [];
     });
-  function response(points: Point[], reason?: string) {
+  // Further positions of an entry that has a reviewed first one (pixels → ground).
+  const placeMore = (toGeo: ((px: [number, number]) => [number, number]) | null): Point[] =>
+    !toGeo
+      ? []
+      : [...nameByN].flatMap(([n, info]) =>
+          info.manualPoint
+            ? info.more.map((px): Point => {
+                const [lng, lat] = toGeo(px);
+                return {
+                  n,
+                  name: info.name,
+                  vn: info.vn,
+                  grid: info.grid,
+                  lng,
+                  lat,
+                  src: 'manual',
+                };
+              })
+            : []
+        );
+  function response(points: Point[], reason?: string, more: Point[] = []) {
     return json(
       {
         points,
+        more,
         reason,
         canEdit,
         ...(canEdit
@@ -124,7 +149,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const resolved = await getTransformer(map.allmaps_id, map.annotation_url);
   if (!resolved) return response(placeManual(null), 'no annotation');
   const { transformer } = resolved;
-  const manual = placeManual((px) => transformer.transformToGeo(px) as [number, number]);
+  const toGeo = (px: [number, number]) => transformer.transformToGeo(px) as [number, number];
+  const manual = placeManual(toGeo);
 
   // Parsed before the numerals, because it is what decides whether to believe
   // them.
@@ -183,5 +209,5 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   }
 
   const points = [...byN.values()].sort((a, b) => a.n - b.n);
-  return response(points);
+  return response(points, undefined, placeMore(toGeo));
 };

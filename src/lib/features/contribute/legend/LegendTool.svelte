@@ -7,10 +7,10 @@
   `candidate`; a click anywhere else is `place`.
 
   Dispatches:
-    place     { x, y }
-    candidate { labelId }
-    pick      { n }          a placed pin was clicked: select its row
-    move      { n, x, y }    a placed pin was dragged
+    place     { x, y, extra }       extra: Shift was held — one more point for the entry
+    candidate { labelId, extra }
+    pick      { n }                 a placed pin was clicked: select its row
+    move      { n, index, x, y }    a pin was dragged; index -1 is the first point, else into `more`
 -->
 <script lang="ts">
   import { onDestroy, createEventDispatcher } from 'svelte';
@@ -44,10 +44,10 @@
   export let showGrid = true;
 
   const dispatch = createEventDispatcher<{
-    place: { x: number; y: number };
-    candidate: { labelId: string };
+    place: { x: number; y: number; extra: boolean };
+    candidate: { labelId: string; extra: boolean };
     pick: { n: number };
-    move: { n: number; x: number; y: number };
+    move: { n: number; index: number; x: number; y: number };
   }>();
   const shellStore = getImageShellStore();
 
@@ -64,7 +64,12 @@
     const point = feature?.getGeometry() as Point | undefined;
     if (!feature || !point) return;
     const [x, y] = olPointToImage(point.getCoordinates());
-    dispatch('move', { n: feature.get('n'), x: Math.round(x), y: Math.round(y) });
+    dispatch('move', {
+      n: feature.get('n'),
+      index: feature.get('index'),
+      x: Math.round(x),
+      y: Math.round(y),
+    });
   });
 
   const CANDIDATE_INK = { true: INK.green, false: INK.red, null: INK.grey } as const;
@@ -129,11 +134,21 @@
     cands: LegendCandidate[],
     gridValue: MapGrid | null,
     legendRects: typeof rects,
-    on: { placed: boolean; candidates: boolean; grid: boolean }
+    on: { placed: boolean; candidates: boolean; grid: boolean },
+    openN: number | null
   ) {
     const features: Feature[] = [];
-    // A placed entry's detected numeral is spent: drawing both shows the number twice.
-    const done = new Set(placedRows.filter((r) => r.x != null).map((r) => r.n));
+    // A placed entry's detected numeral is spent — drawing both shows the number
+    // twice — except for the open entry, whose *other* numerals stay clickable:
+    // a number printed on a second plot is how it gets its extra point.
+    const spent = (c: LegendCandidate) => {
+      const row = placedRows.find((r) => r.n === c.n);
+      if (!row || row.x == null || row.y == null) return false;
+      if (c.n !== openN) return true;
+      return [[row.x, row.y] as [number, number], ...row.more].some(
+        ([x, y]) => Math.hypot(x - c.x, y - c.y) < 30
+      );
+    };
     for (const r of legendRects)
       features.push(
         new Feature({ kind: 'legend', geometry: new Polygon([toOlRing(r.x, r.y, r.w, r.h)]) })
@@ -143,7 +158,7 @@
         new Feature({ kind: 'grid', geometry: new MultiLineString(gridLines(gridValue)) })
       );
     if (on.candidates)
-      for (const c of cands.filter((k) => !done.has(k.n)))
+      for (const c of cands.filter((k) => !spent(k)))
         features.push(
           new Feature({
             kind: 'candidate',
@@ -160,8 +175,17 @@
             new Feature({
               kind: 'placed',
               n: row.n,
+              index: -1,
               geometry: new Point(toOlPoint([row.x, row.y])),
             })
+          );
+    if (on.placed)
+      for (const row of placedRows)
+        if (row.x != null)
+          row.more.forEach((p, index) =>
+            features.push(
+              new Feature({ kind: 'placed', n: row.n, index, geometry: new Point(toOlPoint(p)) })
+            )
           );
     source.clear();
     source.addFeatures(features);
@@ -173,7 +197,8 @@
       (feature) => (feature.get('kind') === 'candidate' ? feature : undefined),
       { layerFilter: (l) => l === layer, hitTolerance: 4 }
     );
-    if (hit) return dispatch('candidate', { labelId: hit.get('labelId') });
+    const extra = (event.originalEvent as MouseEvent).shiftKey;
+    if (hit) return dispatch('candidate', { labelId: hit.get('labelId'), extra });
     const pinned = event.map.forEachFeatureAtPixel(
       event.pixel,
       (feature) => (feature.get('kind') === 'placed' ? feature : undefined),
@@ -181,7 +206,7 @@
     );
     if (pinned) return dispatch('pick', { n: pinned.get('n') });
     const [x, y] = olPointToImage(event.coordinate);
-    dispatch('place', { x: Math.round(x), y: Math.round(y) });
+    dispatch('place', { x: Math.round(x), y: Math.round(y), extra });
   }
 
   const unsubscribe = shellStore.subscribe((ctx) => {
@@ -199,11 +224,18 @@
     }
   });
 
-  $: sync(placed, candidates, grid, rects, {
-    placed: showPlaced,
-    candidates: showCandidates,
-    grid: showGrid,
-  });
+  $: sync(
+    placed,
+    candidates,
+    grid,
+    rects,
+    {
+      placed: showPlaced,
+      candidates: showCandidates,
+      grid: showGrid,
+    },
+    selectedN
+  );
   // Selecting an entry (a card, or its pin) brings its point to the middle,
   // zooming in only if the view is wider than 2 image px per screen px.
   function flyTo(n: number | null) {

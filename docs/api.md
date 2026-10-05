@@ -122,7 +122,7 @@ Public / other:
   map picker.
 - `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** GET: the legend in **image
   pixels**, for `/scan?mode=legend`. `{ entries: [{ id, n, name, vn, grid, x, y, src: 'manual'|null,
-  validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.
+  more: [[x, y]…], validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.
   No georeference is read, so drafts work; `inCell` is whether a body numeral agrees with its
   entry's grid reference (`null`: nothing to check). A legacy ground `point=` has no pixel and reads
   as unplaced. Shares its reads with the public GET (`$lib/server/legendRead.ts`). Same route,
@@ -136,6 +136,10 @@ Public / other:
   Pre-2026-10-05 rows carried `point=longitude,latitude` and are still read
   (`scripts/oneoff/legend_points_to_pixels.mjs` converts them). Null coordinates restore automatic
   positioning. Review stamps go through `set_extraction_status`. No new schema required.
+  `more` is the entry's further pixel positions — a number printed on several plots (1878's №21, a
+  depot of two yards). The first stays `px=`; the rest are `more=x,y|x,y` in the notes, at most 20,
+  dropped when the entry has no first point. The public GET keeps `points` one per number and adds a
+  separate `more: Point[]` that only the map's pins read.
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
   small failed-job list). Admin or mod.

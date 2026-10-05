@@ -33,7 +33,6 @@
     type LegendStats,
     type MapStatus,
     type RowFilter,
-    type RowSort,
   } from './legendStage';
   import '$styles/layouts/tool-page.css';
   import { INK } from '$lib/core/ink';
@@ -46,11 +45,11 @@
 
   const { supabase } = getSupabaseContext();
 
-  $: statusChips = [
-    { key: 'all', label: $t('All') },
-    { key: 'todo', label: $t('To do') },
-    { key: 'doing', label: $t('In progress') },
-    { key: 'done', label: $t('Done') },
+  $: statusOptions = [
+    { key: 'all', label: $t('All sheets') },
+    { key: 'todo', label: `${$t('To do')} · ${statusCounts.todo}` },
+    { key: 'doing', label: `${$t('In progress')} · ${statusCounts.doing}` },
+    { key: 'done', label: `${$t('Done')} · ${statusCounts.done}` },
   ] as const;
 
   let maps: MapListItem[] = [];
@@ -77,7 +76,6 @@
   let failures: Record<string, string> = {};
   let selectedId: string | null = null;
   let filter: RowFilter = 'all';
-  let sort: RowSort = 'n';
   let query = '';
 
   // ── Progress per sheet, for the picker ─────────────────────────────────────
@@ -85,8 +83,24 @@
   let statusFilter: MapStatus | 'all' = 'all';
   let saving = false;
   let message = '';
+  /** "Add another point" is armed: the next click on the scan adds a point to the open entry. */
+  let addingMore = false;
 
   $: view = rows.map((row) => staged[row.id] ?? row);
+  // A detected numeral that could name an unplaced entry, and the subset that
+  // also sits in the entry's index cell — safe to take in one go.
+  $: suggestions = new Map(
+    view.flatMap((row) => {
+      const c = row.x == null ? bestCandidate(candidates, row.n) : null;
+      return c ? [[row.n, c] as const] : [];
+    })
+  );
+  // A number printed twice on the sheet is a choice for a person, not for a bulk
+  // accept: only an entry with exactly one candidate that could be it is taken.
+  $: matching = [...suggestions.values()].filter(
+    (c) =>
+      c.inCell === true && candidates.filter((k) => k.n === c.n && k.inCell !== false).length === 1
+  );
   $: selected = view.find((row) => row.id === selectedId) ?? null;
   $: stagedIds = new Set(Object.keys(staged));
   $: railLayers = [
@@ -180,17 +194,48 @@
 
   function select(id: string | null) {
     selectedId = id === selectedId ? null : id;
+    addingMore = false;
   }
 
-  function place(x: number, y: number) {
-    if (selected) stage(selected.id, { x, y });
+  /** A position for an entry: its first, or — Shift held, or "Add another point" armed —
+   *  one more, for a number printed on several plots. */
+  function put(row: LegendRow, x: number, y: number, extra: boolean) {
+    if ((extra || addingMore) && row.x != null) stage(row.id, { more: [...row.more, [x, y]] });
+    else stage(row.id, { x, y });
+    addingMore = false;
   }
 
-  function acceptCandidate(c: LegendCandidate) {
+  function place(x: number, y: number, extra: boolean) {
+    if (selected) put(selected, x, y, extra);
+  }
+
+  function acceptCandidate(c: LegendCandidate, extra = false) {
     const row = view.find((r) => r.n === c.n);
     if (!row) return;
     selectedId = row.id;
-    stage(row.id, { x: c.x, y: c.y });
+    put(row, c.x, c.y, extra);
+  }
+
+  function movePoint(n: number, index: number, x: number, y: number) {
+    const row = view.find((r) => r.n === n);
+    if (!row) return;
+    if (index < 0) stage(row.id, { x, y });
+    else
+      stage(row.id, {
+        more: row.more.map((p, i) => (i === index ? ([x, y] as [number, number]) : p)),
+      });
+  }
+
+  function removeMore(id: string, index: number) {
+    const row = view.find((r) => r.id === id);
+    if (row) stage(id, { more: row.more.filter((_, i) => i !== index) });
+  }
+
+  function acceptMatching() {
+    for (const c of matching) {
+      const row = view.find((r) => r.n === c.n);
+      if (row) stage(row.id, { x: c.x, y: c.y });
+    }
   }
 
   function onKey(e: KeyboardEvent) {
@@ -202,9 +247,11 @@
     } else if (e.key === 'Enter' && selected) {
       const c = bestCandidate(candidates, selected.n);
       if (c) acceptCandidate(c);
-    } else if (e.key === 'Escape') selectedId = null;
-    else if ((e.key === 'Delete' || e.key === 'Backspace') && selected)
-      stage(selected.id, { x: null, y: null });
+    } else if (e.key === 'Escape') {
+      if (addingMore) addingMore = false;
+      else selectedId = null;
+    } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected)
+      stage(selected.id, { x: null, y: null, more: [] });
     else return;
     e.preventDefault();
   }
@@ -227,6 +274,7 @@
             grid: r.grid,
             x: r.x,
             y: r.y,
+            more: r.more,
           })),
         }),
       });
@@ -296,22 +344,17 @@
         requireGeoref={false}
         layers={railLayers}
         selectedMapId={currentMap?.id ?? null}
+        extraActive={statusFilter === 'all' ? 0 : 1}
         bind:imageOpacity
         onCollapse={() => (sidebarCollapsed = true)}
         on:select={(e) => selectMap(maps.find((m) => m.id === e.detail.map.id)!)}
         on:toggle={(e) => (show = { ...show, [e.detail.id]: e.detail.on })}
       >
-        <div slot="picker-head" class="status-chips" role="group" aria-label={$t('Sheet status')}>
-          {#each statusChips as chip (chip.key)}
-            <button
-              type="button"
-              class="chip"
-              class:is-on={statusFilter === chip.key}
-              on:click={() => (statusFilter = chip.key)}
-              >{chip.label}{chip.key === 'all' ? '' : ` ${statusCounts[chip.key]}`}</button
-            >
+        <select slot="filters" bind:value={statusFilter} aria-label={$t('Sheet status')}>
+          {#each statusOptions as option (option.key)}
+            <option value={option.key}>{option.label}</option>
           {/each}
-        </div>
+        </select>
       </ScanLeftRail>
     </svelte:fragment>
 
@@ -328,15 +371,25 @@
             rows={view}
             {selectedId}
             bind:filter
-            bind:sort
             bind:query
+            suggested={new Set(suggestions.keys())}
+            matching={matching.length}
             staged={stagedIds}
             {failures}
             {saving}
             {message}
             on:select={(e) => select(e.detail.id)}
             on:edit={(e) => edit(e.detail.id, e.detail.field, e.detail.value)}
-            on:reset={(e) => stage(e.detail.id, { x: null, y: null })}
+            on:reset={(e) => stage(e.detail.id, { x: null, y: null, more: [] })}
+            {addingMore}
+            on:addMore={() => (addingMore = !addingMore)}
+            on:removeMore={(e) => removeMore(e.detail.id, e.detail.index)}
+            on:accept={(e) => {
+              const row = view.find((r) => r.id === e.detail.id);
+              const c = row && suggestions.get(row.n);
+              if (c) acceptCandidate(c);
+            }}
+            on:acceptMatching={acceptMatching}
             on:save={save}
           />
         {/if}
@@ -354,18 +407,17 @@
           showPlaced={show.placed}
           showCandidates={show.candidates}
           showGrid={show.grid}
-          on:place={(e) => place(e.detail.x, e.detail.y)}
+          on:place={(e) => place(e.detail.x, e.detail.y, e.detail.extra)}
           on:pick={(e) => {
             const row = view.find((r) => r.n === e.detail.n);
             if (row) selectedId = row.id;
           }}
           on:move={(e) => {
-            const row = view.find((r) => r.n === e.detail.n);
-            if (row) stage(row.id, { x: e.detail.x, y: e.detail.y });
+            movePoint(e.detail.n, e.detail.index, e.detail.x, e.detail.y);
           }}
           on:candidate={(e) => {
             const c = candidates.find((k) => k.labelId === e.detail.labelId);
-            if (c) acceptCandidate(c);
+            if (c) acceptCandidate(c, e.detail.extra);
           }}
         />
       </ImageShell>
@@ -376,11 +428,3 @@
     {/if}
   </ToolLayout>
 </div>
-
-<style>
-  .status-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-  }
-</style>

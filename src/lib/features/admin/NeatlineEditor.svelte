@@ -11,8 +11,17 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import '$styles/components/admin-modals.css';
+  import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import { DATUM_PRESETS, shiftToWgs84 } from './neatlineDatum';
   import { clampPan, rescale, zoomAt, MIN_ZOOM, MAX_ZOOM, type Viewport } from './neatlineViewport';
+
+  const gcpColumns = [
+    { key: 'corner', label: 'Corner' },
+    { key: 'px', label: 'Pixel X' },
+    { key: 'py', label: 'Pixel Y' },
+    { key: 'lng', label: 'Longitude' },
+    { key: 'lat', label: 'Latitude' },
+  ] satisfies TableColumn[];
 
   export let mapId: string;
   export let annotationUrl: string;
@@ -312,49 +321,36 @@
     </div>
 
     <!-- GCP table -->
-    <div class="gcp-table-wrap table-wrap">
-      <table class="gcp-table data-table">
-        <thead>
-          <tr>
-            <th>Corner</th>
-            <th>Pixel X</th>
-            <th>Pixel Y</th>
-            <th>Longitude</th>
-            <th>Latitude</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each gcps as gcp, idx (idx)}
-            <tr>
-              <td>
-                <span class="corner-badge {CORNER_CLASS[CORNERS[idx]]}">{CORNERS[idx]}</span>
-              </td>
-              {#each [0, 1] as axis (axis)}
-                <td>
-                  <input
-                    type="number"
-                    class="coord-input"
-                    value={gcp.resourceCoords[axis]}
-                    on:change={(e) => handlePixelInput(idx, axis as 0 | 1, e.currentTarget.value)}
-                  />
-                </td>
-              {/each}
-              {#each [0, 1] as axis (axis)}
-                <td>
-                  <input
-                    type="number"
-                    class="coord-input"
-                    step="0.000001"
-                    value={gcp.geo[axis]}
-                    on:change={(e) => handleGeoInput(idx, axis as 0 | 1, e.currentTarget.value)}
-                  />
-                </td>
-              {/each}
-            </tr>
+    <DataTable columns={gcpColumns} klass="gcp-table" wrapClass="gcp-table-wrap">
+      {#each gcps as gcp, idx (idx)}
+        <tr>
+          <td>
+            <span class="corner-badge {CORNER_CLASS[CORNERS[idx]]}">{CORNERS[idx]}</span>
+          </td>
+          {#each [0, 1] as axis (axis)}
+            <td>
+              <input
+                type="number"
+                class="coord-input"
+                value={gcp.resourceCoords[axis]}
+                on:change={(e) => handlePixelInput(idx, axis as 0 | 1, e.currentTarget.value)}
+              />
+            </td>
           {/each}
-        </tbody>
-      </table>
-    </div>
+          {#each [0, 1] as axis (axis)}
+            <td>
+              <input
+                type="number"
+                class="coord-input"
+                step="0.000001"
+                value={gcp.geo[axis]}
+                on:change={(e) => handleGeoInput(idx, axis as 0 | 1, e.currentTarget.value)}
+              />
+            </td>
+          {/each}
+        </tr>
+      {/each}
+    </DataTable>
 
     <!-- Datum correction panel -->
     <details class="datum-panel">

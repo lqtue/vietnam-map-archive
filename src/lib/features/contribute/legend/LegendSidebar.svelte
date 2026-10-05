@@ -11,13 +11,19 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '$lib/core/i18n';
-  import { visibleRows, type LegendRow, type RowFilter, type RowSort } from './legendStage';
+  import LegendTable from '$lib/features/shared/LegendTable.svelte';
+  import FilterBar from '$lib/features/shared/FilterBar.svelte';
+  import { filterRows, type LegendRow, type RowFilter } from './legendStage';
 
   export let rows: LegendRow[] = [];
   export let selectedId: string | null = null;
   export let filter: RowFilter = 'all';
-  export let sort: RowSort = 'n';
   export let query = '';
+  /** Entry numbers with a detected numeral to take, and how many of those agree with their index cell. */
+  export let suggested: Set<number> = new Set();
+  export let matching = 0;
+  /** "Add another point" is armed. */
+  export let addingMore = false;
   export let staged: Set<string> = new Set();
   export let failures: Record<string, string> = {};
   export let saving = false;
@@ -27,10 +33,22 @@
     select: { id: string };
     edit: { id: string; field: 'name' | 'vn' | 'grid'; value: string };
     reset: { id: string };
+    accept: { id: string };
+    acceptMatching: void;
+    addMore: void;
+    removeMore: { id: string; index: number };
     save: void;
   }>();
 
-  $: shown = visibleRows(rows, { filter, sort, query, staged, keepId: selectedId });
+  $: shown = filterRows(rows, { filter, query, staged, suggested, keepId: selectedId }).map(
+    (row) => ({
+      ...row,
+      placed: row.x != null,
+      suggested: suggested.has(row.n),
+      mark: (row.more.length ? ` +${row.more.length}` : '') + (staged.has(row.id) ? ' *' : ''),
+    })
+  );
+  $: selected = rows.find((r) => r.id === selectedId) ?? null;
   $: placedCount = rows.filter((r) => r.x != null).length;
 
   function field(id: string, name: 'name' | 'vn' | 'grid', e: Event) {
@@ -42,33 +60,30 @@
   <p class="lg-count">
     {$t('{N} of {M} placed', { N: placedCount, M: rows.length })}
   </p>
-  <input
-    type="search"
-    class="lg-search"
+  <FilterBar
+    bind:query
     placeholder={$t('Search number, name or grid')}
-    aria-label={$t('Search the legend')}
-    bind:value={query}
-  />
-  <div class="lg-controls">
-    <label
-      >{$t('Show')}
-      <select bind:value={filter}>
-        <option value="all">{$t('All')}</option>
-        <option value="unplaced">{$t('Unplaced')}</option>
-        <option value="placed">{$t('Placed')}</option>
-        <option value="edited">{$t('Edited, unsaved')}</option>
-      </select>
-    </label>
-    <label
-      >{$t('Sort')}
-      <select bind:value={sort}>
-        <option value="n">{$t('Number')}</option>
-        <option value="name">{$t('Name')}</option>
-        <option value="grid">{$t('Grid')}</option>
-        <option value="unplaced">{$t('Unplaced first')}</option>
-      </select>
-    </label>
-  </div>
+    searchLabel={$t('Search the legend')}
+    active={filter === 'all' ? 0 : 1}
+    resettable={!!query.trim() || filter !== 'all'}
+    on:reset={() => {
+      query = '';
+      filter = 'all';
+    }}
+  >
+    <select bind:value={filter} aria-label={$t('Show')}>
+      <option value="all">{$t('All')}</option>
+      <option value="unplaced">{$t('Unplaced')}</option>
+      <option value="suggested">{$t('Suggested')}</option>
+      <option value="placed">{$t('Placed')}</option>
+      <option value="edited">{$t('Edited, unsaved')}</option>
+    </select>
+  </FilterBar>
+  {#if matching}
+    <button type="button" class="sb-btn is-sm is-block" on:click={() => dispatch('acceptMatching')}
+      >{$t('Accept {N} matching numerals', { N: matching })}</button
+    >
+  {/if}
   <button
     type="button"
     class="sb-btn is-sm is-block"
@@ -79,67 +94,81 @@
   </button>
   {#if message}<p class="lg-msg" role="status">{message}</p>{/if}
 
-  {#if !shown.length}<p class="lg-msg">{$t('No entries match.')}</p>{/if}
-  <ul class="lg-list">
-    {#each shown as row (row.id)}
-      <li>
-        <button
-          type="button"
-          class="lg-row"
-          class:is-on={row.id === selectedId}
-          aria-current={row.id === selectedId ? 'true' : undefined}
-          on:click={() => dispatch('select', { id: row.id })}
-        >
-          <span class="lg-n">{row.n}</span>
-          <span class="lg-name"
-            >{row.name}{#if row.vn}<em> · {row.vn}</em>{/if}</span
-          >
-          {#if row.grid}<span class="lg-grid">{row.grid}</span>{/if}
-          <span class="lg-state" class:is-placed={row.x != null}
-            >{row.x != null ? $t('placed') : $t('unplaced')}{staged.has(row.id) ? ' *' : ''}</span
-          >
-        </button>
-        {#if failures[row.id]}<p class="lg-msg" role="alert">{failures[row.id]}</p>{/if}
-        {#if row.id === selectedId}
-          <div class="lg-edit">
-            <label
-              >{$t('Name')}
-              <input
-                value={row.name}
-                maxlength="1000"
-                on:change={(e) => field(row.id, 'name', e)}
-              />
-            </label>
-            <label
-              >{$t('Vietnamese name')}
-              <input
-                value={row.vn ?? ''}
-                maxlength="1000"
-                on:change={(e) => field(row.id, 'vn', e)}
-              />
-            </label>
-            <label
-              >{$t('Grid reference')}
-              <input
-                value={row.grid ?? ''}
-                maxlength="1000"
-                on:change={(e) => field(row.id, 'grid', e)}
-              />
-            </label>
+  <LegendTable
+    rows={shown}
+    selectedN={selected?.n ?? null}
+    showState
+    empty={$t('No entries match.')}
+    on:select={(e) => {
+      const row = rows.find((r) => r.n === e.detail.n);
+      if (row) dispatch('select', { id: row.id });
+    }}
+  >
+    <svelte:fragment slot="extra" let:row>
+      {#if failures[row.id]}<p class="lg-msg" role="alert">{failures[row.id]}</p>{/if}
+      {#if row.id === selectedId}
+        <div class="lg-edit">
+          <label
+            >{$t('Name')}
+            <input value={row.name} maxlength="1000" on:change={(e) => field(row.id, 'name', e)} />
+          </label>
+          <label
+            >{$t('Vietnamese name')}
+            <input
+              value={row.vn ?? ''}
+              maxlength="1000"
+              on:change={(e) => field(row.id, 'vn', e)}
+            />
+          </label>
+          <label
+            >{$t('Grid reference')}
+            <input
+              value={row.grid ?? ''}
+              maxlength="1000"
+              on:change={(e) => field(row.id, 'grid', e)}
+            />
+          </label>
+          {#if row.suggested}
             <button
               type="button"
-              class="sb-btn is-sm"
-              disabled={row.x == null}
-              on:click={() => dispatch('reset', { id: row.id })}>{$t('Remove point')}</button
+              class="sb-btn is-sm is-primary"
+              on:click={() => dispatch('accept', { id: row.id })}
+              >{$t('Accept detected numeral')}</button
             >
-          </div>
-        {/if}
-      </li>
-    {/each}
-  </ul>
+          {/if}
+          {#each row.more as point, index (index)}
+            <p class="lg-more">
+              {$t('Point {N}', { N: index + 2 })} · {point[0]}, {point[1]}
+              <button
+                type="button"
+                class="sb-btn is-sm"
+                on:click={() => dispatch('removeMore', { id: row.id, index })}
+                >{$t('Remove')}</button
+              >
+            </p>
+          {/each}
+          <button
+            type="button"
+            class="sb-btn is-sm"
+            class:is-on={addingMore}
+            disabled={row.x == null}
+            title={$t('Or hold Shift and click the scan')}
+            on:click={() => dispatch('addMore')}
+            >{addingMore ? $t('Click the scan…') : $t('Add another point')}</button
+          >
+          <button
+            type="button"
+            class="sb-btn is-sm"
+            disabled={row.x == null}
+            on:click={() => dispatch('reset', { id: row.id })}>{$t('Remove point')}</button
+          >
+        </div>
+      {/if}
+    </svelte:fragment>
+  </LegendTable>
   <p class="lg-keys">
     {$t(
-      'N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it'
+      'N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it · Shift+click adds a point'
     )}
   </p>
 </div>
@@ -160,70 +189,6 @@
     font-size: 0.72rem;
     color: var(--sb-text-meta);
   }
-  .lg-search {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .lg-controls {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .lg-controls label {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    font-size: 0.72rem;
-    color: var(--sb-text-meta);
-  }
-  .lg-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .lg-row {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    width: 100%;
-    padding: 0.25rem 0.2rem;
-    background: none;
-    border: 0;
-    border-top: var(--sb-border);
-    text-align: left;
-    font-size: 0.78rem;
-    color: var(--sb-text);
-    cursor: pointer;
-  }
-  .lg-row:hover {
-    background: var(--sb-row-hover);
-  }
-  .lg-row.is-on {
-    background: var(--sb-accent-yellow);
-  }
-  .lg-n {
-    flex: 0 0 1.4rem;
-    font-weight: 800;
-    font-size: 0.72rem;
-    color: var(--sb-text-meta);
-  }
-  .lg-name {
-    flex: 1;
-    min-width: 0;
-  }
-  .lg-name em {
-    font-style: normal;
-    color: var(--sb-text-meta);
-  }
-  .lg-grid,
-  .lg-state {
-    flex: 0 0 auto;
-    font-size: 0.68rem;
-    color: var(--sb-text-meta);
-  }
-  .lg-state.is-placed {
-    color: var(--color-text);
-  }
   .lg-edit {
     display: flex;
     flex-direction: column;
@@ -235,6 +200,15 @@
     flex-direction: column;
     gap: 0.15rem;
     font-size: 0.72rem;
+  }
+  .lg-more {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--sb-text-meta);
   }
   .lg-edit input {
     width: 100%;

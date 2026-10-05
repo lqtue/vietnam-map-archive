@@ -7,6 +7,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { readAll } from '$lib/data/supabase/paged';
 import {
+  extraLegendPoints,
   legendNote,
   manualLegendPoint,
   numeralCandidate,
@@ -19,6 +20,8 @@ export type LegendInfo = {
   vn: string | null;
   grid: string | null;
   manualPoint: ReturnType<typeof manualLegendPoint>;
+  /** Further pixel positions of the same entry; see `extraLegendPoints`. */
+  more: [number, number][];
   validated: boolean;
 };
 
@@ -61,6 +64,7 @@ export async function readLegendEntries(
         vn,
         grid,
         manualPoint: e.review_status === 'validated' ? manualLegendPoint(e.notes) : null,
+        more: e.review_status === 'validated' ? extraLegendPoints(e.notes) : [],
         validated: e.review_status === 'validated',
       });
     if (e.global_x != null && e.global_y != null) {

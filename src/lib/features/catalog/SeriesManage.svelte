@@ -11,6 +11,16 @@
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole } from '$lib/data/supabase/role';
   import { readAll } from '$lib/data/supabase/paged';
+  import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
+
+  const columns = [
+    { key: 'sheet', label: 'Sheet', klass: 'num' },
+    { key: 'name', label: 'Name' },
+    { key: 'source', label: 'Source' },
+    { key: 'version', label: 'Version' },
+    { key: 'stage', label: 'Stage' },
+    { key: 'action', label: '', srLabel: 'Action' },
+  ] satisfies TableColumn[];
 
   export let seriesKey: string;
   export let cellCount: number;
@@ -135,31 +145,26 @@
       {/each}
     </div>
     {#if failed}<p class="err" role="alert">Could not publish {failed}</p>{/if}
-    <table class="data-table is-dense">
-      <thead>
-        <tr><th>Sheet</th><th>Name</th><th>Source</th><th>Version</th><th>Stage</th><th></th></tr>
-      </thead>
-      <tbody>
-        {#each rows as r (r.id)}
-          <tr>
-            <td class="num">{r.sheet_number}</td>
-            <td><a href="/catalog/{r.slug ?? r.id}">{r.name ?? '—'}</a></td>
-            <td>{r.source ?? 'PCL'}</td>
-            <td>{[r.year, r.edition && `ed. ${r.edition}`].filter(Boolean).join(' · ') || '—'}</td>
-            <td>{STAGES[stageOf(r)]}</td>
-            <td>
-              {#if stageOf(r) === 'ready'}
-                <button class="btn is-sm" disabled={!!busy} on:click={() => publish(r)}>
-                  {busy === r.id ? 'Publishing…' : 'Publish'}
-                </button>
-              {:else if stageOf(r) === 'needs_placement'}
-                <a href="/catalog/{r.slug ?? r.id}">Place →</a>
-              {/if}
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+    <DataTable {columns} klass="is-dense">
+      {#each rows as r (r.id)}
+        <tr>
+          <td class="num">{r.sheet_number}</td>
+          <td><a href="/catalog/{r.slug ?? r.id}">{r.name ?? '—'}</a></td>
+          <td>{r.source ?? 'PCL'}</td>
+          <td>{[r.year, r.edition && `ed. ${r.edition}`].filter(Boolean).join(' · ') || '—'}</td>
+          <td>{STAGES[stageOf(r)]}</td>
+          <td>
+            {#if stageOf(r) === 'ready'}
+              <button class="btn is-sm" disabled={!!busy} on:click={() => publish(r)}>
+                {busy === r.id ? 'Publishing…' : 'Publish'}
+              </button>
+            {:else if stageOf(r) === 'needs_placement'}
+              <a href="/catalog/{r.slug ?? r.id}">Place →</a>
+            {/if}
+          </td>
+        </tr>
+      {/each}
+    </DataTable>
     {#if !rows.length}<p class="found">Nothing in this stage.</p>{/if}
   </section>
 {/if}

@@ -87,7 +87,7 @@
       const res = await fetch(`/api/maps/${id}/legend-points`);
       const data = res.ok ? await res.json() : null;
       if (destroyed || version !== loadVersion || mapId !== id) return;
-      points = (data?.points ?? []) as LegendPoint[];
+      points = [...(data?.points ?? []), ...(data?.more ?? [])] as LegendPoint[];
     } catch {
       if (destroyed || version !== loadVersion || mapId !== id) return;
       points = [];

@@ -37,6 +37,8 @@
   export let maps: LabelMapInfo[] | null = null;
   /** Only maps that can be laid on the world. False for /scan?mode=inspect. */
   export let requireGeoref = true;
+  /** Set filters the caller puts in the Filters disclosure (slot `filters`). */
+  export let extraActive = 0;
 
   const dispatch = createEventDispatcher<{
     loaded: { maps: LabelMapInfo[] };
@@ -88,18 +90,20 @@
      showLabels={false}: a label hit flies /explore to a spot, which an
      ImageShell tool has nowhere to go with. -->
 <div class="tool-map-picker">
-  <slot />
   <ArchiveBrowser
     sortRows={byYear}
     {requireGeoref}
     filterIds={list.map((m) => m.id)}
     activeIds={selectedMapId ? [selectedMapId] : []}
     {badges}
+    {extraActive}
     waiting={maps ? maps.length === 0 : !fetched}
     showTypes={false}
     showLabels={false}
     on:pick={handlePick}
-  />
+  >
+    <svelte:fragment slot="filters"><slot name="filters" /></svelte:fragment>
+  </ArchiveBrowser>
 </div>
 
 <style>
