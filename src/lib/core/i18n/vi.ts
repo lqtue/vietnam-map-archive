@@ -362,6 +362,7 @@ export const vi: Record<string, string> = {
   'On map': 'Trên bản đồ',
   Compare: 'So sánh',
   Add: 'Thêm',
+  print: 'bản in',
   'not georeferenced': 'chưa định vị',
   'Add a map layer to read its legend.': 'Thêm lớp bản đồ để xem chú giải.',
   'Reading the legend…': 'Đang đọc chú giải…',

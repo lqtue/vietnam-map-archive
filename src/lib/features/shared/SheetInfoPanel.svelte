@@ -10,6 +10,7 @@
   import type { MapListItem } from '$lib/data/maps/types';
   import TopSheetActions from './TopSheetActions.svelte';
   import SheetEditions from './SheetEditions.svelte';
+  import { yearLine } from './catalogFilters';
 
   const dispatch = createEventDispatcher<{ toggleVectors: { mapId: string } }>();
 
@@ -22,7 +23,7 @@
 
   $: infoRows = map
     ? ([
-        ['Year', map.year_label ?? (map.year ? String(map.year) : '')],
+        ['Year', yearLine(map.year, map.year_label, $t('print'))],
         ['Creator', map.creator ?? ''],
         ['Collection', map.collection ?? map.holding_institution ?? ''],
         ['Type', map.map_type ?? ''],
