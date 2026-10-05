@@ -14,6 +14,13 @@ import {
   filterRows,
   type LegendRow,
 } from '../src/lib/features/contribute/legend/legendStage';
+import {
+  NO_WORK,
+  legendReadiness,
+  readSummary,
+  sheetTracks,
+  type WorkFacts,
+} from '../src/lib/core/sheetWork';
 
 const box = (text: string, x: number, y: number) => ({
   text,
@@ -81,6 +88,47 @@ test('a map is todo, doing, done or has no legend', () => {
   expect(mapStatus({ total: 40, placed: 0 })).toBe('todo');
   expect(mapStatus({ total: 40, placed: 12 })).toBe('doing');
   expect(mapStatus({ total: 40, placed: 40 })).toBe('done');
+});
+
+test('a sheet is read, ready to read (region found), or unlocated', () => {
+  const st = (found: Partial<WorkFacts['found']>, read: Partial<WorkFacts['read']>): WorkFacts => ({
+    ...NO_WORK,
+    found: { ...NO_WORK.found, ...found },
+    read: { ...NO_WORK.read, ...read },
+  });
+  expect(legendReadiness(undefined)).toBe('unlocated');
+  expect(legendReadiness(st({ title: true }, {}))).toBe('unlocated');
+  expect(legendReadiness(st({ legend: true }, {}))).toBe('ready');
+  expect(legendReadiness(st({ legend: true }, { legend: true }))).toBe('read');
+  expect(readSummary(undefined)).toBeUndefined();
+  expect(readSummary(st({ legend: true }, { title: true }))).toBe('legend found · title read');
+});
+
+test('a sheet has independent work tracks: done, in between, or not yet', () => {
+  const states = (f?: WorkFacts) => Object.fromEntries(sheetTracks(f).map((x) => [x.key, x.state]));
+  expect(states(undefined)).toEqual({
+    triage: 'todo',
+    title: 'todo',
+    legend: 'todo',
+    text: 'todo',
+    shapes: 'todo',
+  });
+  // Legend read on a sheet whose body never was: the case one linear stage cannot say.
+  const legendOnly: WorkFacts = {
+    ...NO_WORK,
+    triage: 'proposed',
+    found: { ...NO_WORK.found, legend: true },
+    read: { ...NO_WORK.read, legend: true },
+  };
+  expect(states(legendOnly)).toMatchObject({ triage: 'doing', legend: 'done', text: 'todo' });
+  const reviewed: WorkFacts = {
+    ...NO_WORK,
+    triage: 'ready',
+    ocrRan: true,
+    textReviewed: true,
+    segRan: true,
+  };
+  expect(states(reviewed)).toMatchObject({ triage: 'done', text: 'done', shapes: 'doing' });
 });
 
 test('the legend list filters, searches without accents, and keeps the open row', () => {

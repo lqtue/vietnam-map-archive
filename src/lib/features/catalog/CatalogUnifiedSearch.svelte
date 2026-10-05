@@ -11,6 +11,7 @@
   import { t } from '$lib/core/i18n';
   import ArchiveFilters from '$lib/features/shared/ArchiveFilters.svelte';
   import CatalogTable from '$lib/features/catalog/CatalogTable.svelte';
+  import type { GroupKey } from '$lib/features/catalog/catalogTableModel';
   import MapCard from '$lib/ui/MapCard.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
@@ -21,6 +22,7 @@
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
 
   export let searchQuery: string = '';
+  let groupBy: GroupKey = 'none';
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** When true, row clicks dispatch `pick` instead of opening the detail drawer. */
   export let pickMode: boolean = false;
@@ -132,7 +134,25 @@
        rail of chips put its filters in a column nobody scrolled back up to,
        and the rail cost the results a third of the page's width. /catalog
        gets a fourth control there, series; nothing else passes choices. -->
-  <ArchiveFilters {search} showSearch={false} {seriesChoices} />
+  <ArchiveFilters
+    {search}
+    showSearch={false}
+    {seriesChoices}
+    extraActive={groupBy === 'none' || compact || view === 'grid' ? 0 : 1}
+  >
+    <!-- Grouping is a way of looking at the filtered list, so it sits in the same
+         disclosure as the filters and is counted on its summary. The grid has no
+         groups, and the compact rail never did. -->
+    {#if !compact && view !== 'grid'}
+      <select bind:value={groupBy} aria-label={$t('Group by')}>
+        <option value="none">{$t('Group by: none')}</option>
+        <option value="year">{$t('Group by year')}</option>
+        <option value="location">{$t('Group by area')}</option>
+        <option value="map_type">{$t('Group by type')}</option>
+        <option value="collection">{$t('Group by collection')}</option>
+      </select>
+    {/if}
+  </ArchiveFilters>
 
   {#if !compact}
     <div class="v2-toolbar">
@@ -195,6 +215,8 @@
         {compact}
         {activeId}
         {showLayerActions}
+        staff={role === 'admin' || role === 'mod'}
+        {groupBy}
         on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
         on:facet={handleRowFacet}
       />

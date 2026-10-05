@@ -23,6 +23,9 @@
   import SupersededSheet from '$lib/features/catalog/SupersededSheet.svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole, type UserRole } from '$lib/data/supabase/role';
+  import SheetWork from '$lib/features/catalog/SheetWork.svelte';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import type { WorkFactsById } from '$lib/core/sheetWork';
 
   export let data;
   $: map = data.map;
@@ -130,6 +133,15 @@
     role = (await fetchUserRole(supabase, session?.user?.id)) ?? 'user';
   });
   $: canFixGeoref = role === 'admin' || role === 'mod';
+
+  // Staff only: what has run on this sheet, and the tools to open it in.
+  let work: WorkFactsById = {};
+  let workFor = '';
+  async function loadWork(id: string) {
+    workFor = id;
+    work = (await fetchSheetWork(id)) ?? {};
+  }
+  $: if (canFixGeoref && workFor !== map.id) void loadWork(map.id);
   $: editorSource = allmapsEditorSourceUrl(map, map.map_iiif_sources ?? [], data.editorSourceId);
   $: editorUrl = editorSource
     ? `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(editorSource)}`
@@ -229,6 +241,13 @@
         </a>
       {/if}
     </div>
+
+    {#if canFixGeoref}
+      <section class="share-trace">
+        <h2>{$t('Contribute to this sheet')}</h2>
+        <SheetWork mapId={map.id} state={work[map.id]} />
+      </section>
+    {/if}
 
     {#if tileUrl}
       <section class="share-trace">

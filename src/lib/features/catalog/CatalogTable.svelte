@@ -1,7 +1,7 @@
 <!--
   CatalogTable — sortable, groupable table for the unified catalog.
-  Click a column header to sort (toggle direction). Use the "Group by" dropdown
-  to collapse rows by Year / Area / Type / Source.
+  Click a column header to sort (toggle direction). The Group by choice
+  comes from the filter group above (CatalogUnifiedSearch).
 
   `compact` delegates to `ArchiveMapRows` — this same table with four columns
   dropped, which is what a 380px rail can carry. It was `CatalogTableCompact`,
@@ -16,19 +16,25 @@
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { sortRows, groupRows, type SortKey, type GroupKey } from './catalogTableModel';
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
+  import SheetWork from './SheetWork.svelte';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import type { WorkFactsById } from '$lib/core/sheetWork';
 
   export let items: MapListItem[] = [];
   export let compact: boolean = false;
   export let activeId: string | null = null;
   /** Show the "+ overlay" toggle (only on the /explore sidebar). */
   export let showLayerActions: boolean = false;
+  /** Admin/mod: the Status cell also shows what has run on the sheet and where to open it. */
+  export let staff: boolean = false;
 
   const dispatch = createEventDispatcher();
 
   $: overlayMapIds = new Set($layersStore.overlays.map((o) => o.ref.mapId));
 
   let sort = { key: 'year' as SortKey, asc: true };
-  let groupBy: GroupKey = 'none';
+  /** Chosen in the catalog's filter group, not here. */
+  export let groupBy: GroupKey = 'none';
 
   const COLUMNS: TableColumn[] = [
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
@@ -40,8 +46,19 @@
     { key: 'status', label: 'Status', klass: 'status-col' },
   ];
 
-  $: sorted = sortRows(items, sort);
-  $: groups = groupRows(sorted, groupBy);
+  // One read for the whole table, once a reader is known to be staff.
+  let work: WorkFactsById = {};
+  let workLoaded = false;
+  async function loadWork() {
+    workLoaded = true;
+    work = (await fetchSheetWork()) ?? {};
+  }
+  $: if (staff && !compact && !workLoaded) void loadWork();
+
+  // Staff: Status and the work tracks read the loaded work state.
+  $: ctx = staff && !compact ? work : null;
+  $: sorted = sortRows(items, sort, ctx);
+  $: groups = groupRows(sorted, groupBy, ctx);
 
   let collapsed = new Set<string>();
   function toggleGroup(label: string | null) {
@@ -63,23 +80,9 @@
 {#if compact}
   <ArchiveMapRows rows={sorted} rowAction="open" {activeId} showTypes={showLayerActions} on:open />
 {:else}
-  <div class="ct-toolbar">
-    <label class="group-pick">
-      {$t('Group by')}
-      <select bind:value={groupBy}>
-        <option value="none">{$t('None')}</option>
-        <option value="year">{$t('Year')}</option>
-        <option value="location">Area</option>
-        <option value="map_type">{$t('Type')}</option>
-        <option value="collection">{$t('Collection')}</option>
-        <option value="status">{$t('Status')}</option>
-      </select>
-    </label>
-  </div>
-
   <!-- The `.ct` wrapper is this component's own element, so its scoped CSS can
        still reach the `<table>`, `<thead>` and `<th>`s that are DataTable's. -->
-  <div class="ct">
+  <div class="ct" class:is-staff={staff}>
     <DataTable columns={COLUMNS} klass="is-card" bind:sort>
       {#each groups as g (g.label)}
         {#if g.label !== null}
@@ -192,6 +195,7 @@
                     >{$t('Image')}</span
                   >
                 {/if}
+                {#if staff && !isScout}<SheetWork mapId={item.id} state={work[item.id]} />{/if}
               </td>
             </tr>
           {/each}
@@ -202,27 +206,6 @@
 {/if}
 
 <style>
-  .ct-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-1) 0 var(--space-2);
-    font-family: var(--font-family-base);
-    font-size: 0.85rem;
-  }
-  .group-pick {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: var(--font-semibold);
-  }
-  .group-pick select {
-    font: inherit;
-    padding: 0.2rem 0.4rem;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--sb-radius-sm);
-    background: var(--color-white);
-  }
   /* Shape, header, row rules and the sort indicator come from
      `.data-table.is-card` in components/table.css. */
   .ct :global(tbody tr) {
@@ -284,6 +267,12 @@
     width: 90px;
     text-align: right;
     white-space: nowrap;
+  }
+  /* Staff: the cell also carries the work chips and the Open-in menu. */
+  .ct.is-staff :global(.status-col) {
+    width: 14rem;
+    text-align: left;
+    white-space: normal;
   }
   /* Two tones only: both are tints of a token, and the shared `.chip-green` /
      `.chip-yellow` are a solid fill and a white face — too loud and too blank

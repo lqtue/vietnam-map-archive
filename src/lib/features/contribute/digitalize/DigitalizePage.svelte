@@ -22,6 +22,7 @@
 <script lang="ts">
   import { tick, onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import OlMap from 'ol/Map';
   import ToolLayout from '$lib/map/shell/ToolLayout.svelte';
   import ImageShell from '$lib/map/shell/ImageShell.svelte';
@@ -296,6 +297,13 @@
   $: if (currentMap?.id) saveTriageState(currentMap.id, triage);
 
   // ── Map loading ───────────────────────────────────────────────────────────────
+  /** `?map=<uuid>` — a link from the catalog opens the sheet it names. */
+  function openRequestedMap(e: CustomEvent<{ maps: LabelMapInfo[] }>) {
+    const wanted = $page.url.searchParams.get('map');
+    const match = wanted ? e.detail.maps.find((m) => m.id === wanted) : null;
+    if (match) selectMap(match);
+  }
+
   async function selectMap(m: LabelMapInfo) {
     if (currentMap?.id === m.id) return;
     currentMap = m;
@@ -470,6 +478,7 @@
         bind:imageOpacity
         onCollapse={() => (sidebarCollapsed = true)}
         on:select={(e) => selectMap(e.detail.map)}
+        on:loaded={openRequestedMap}
         on:error={(e) => (mapsError = e.detail.message)}
         on:toggle={toggleLayer}
       />

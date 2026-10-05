@@ -41,6 +41,8 @@
   import { invalidateLegend } from '$lib/data/maps/legendRevision';
   import type { MapGrid } from '$lib/core/geo/mapGrid';
   import type { MapListItem } from '$lib/data/maps/types';
+  import { legendReadiness, readSummary, type WorkFactsById } from '$lib/core/sheetWork';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
   import type { LabelMapInfo } from '$lib/data/supabase/footprints';
 
   const { supabase } = getSupabaseContext();
@@ -50,6 +52,8 @@
     { key: 'todo', label: `${$t('To do')} · ${statusCounts.todo}` },
     { key: 'doing', label: `${$t('In progress')} · ${statusCounts.doing}` },
     { key: 'done', label: `${$t('Done')} · ${statusCounts.done}` },
+    { key: 'ready', label: `${$t('Legend found, not read')} · ${readyCount}` },
+    { key: 'unlocated', label: `${$t('No legend located')} · ${unlocatedCount}` },
   ] as const;
 
   let maps: MapListItem[] = [];
@@ -80,7 +84,8 @@
 
   // ── Progress per sheet, for the picker ─────────────────────────────────────
   let stats: LegendStats = {};
-  let statusFilter: MapStatus | 'all' = 'all';
+  let work: WorkFactsById = {};
+  let statusFilter: MapStatus | 'ready' | 'unlocated' | 'all' = 'all';
   let saving = false;
   let message = '';
   /** "Add another point" is armed: the next click on the scan adds a point to the open entry. */
@@ -120,10 +125,18 @@
     (acc, m) => ({ ...acc, [mapStatus(liveStats[m.id])]: acc[mapStatus(liveStats[m.id])] + 1 }),
     { todo: 0, doing: 0, done: 0, none: 0 } as Record<MapStatus, number>
   );
+  // A sheet whose legend has no entries yet: is there a region to read, or not even that.
+  $: unread = maps.filter((m) => !liveStats[m.id]?.total);
+  $: readyCount = unread.filter((m) => legendReadiness(work[m.id]) === 'ready').length;
+  $: unlocatedCount = unread.filter((m) => legendReadiness(work[m.id]) === 'unlocated').length;
   $: railMaps = maps
     .filter(
       (m) =>
-        !!m.iiif_image && (statusFilter === 'all' || mapStatus(liveStats[m.id]) === statusFilter)
+        !!m.iiif_image &&
+        (statusFilter === 'all' ||
+          (statusFilter === 'ready' || statusFilter === 'unlocated'
+            ? !liveStats[m.id]?.total && legendReadiness(work[m.id]) === statusFilter
+            : mapStatus(liveStats[m.id]) === statusFilter))
     )
     .map((m): LabelMapInfo => ({
       id: m.id,
@@ -136,7 +149,9 @@
       year: m.year,
       location: m.location,
       description: m.dc_description,
-      badge: liveStats[m.id] ? `${liveStats[m.id].placed}/${liveStats[m.id].total}` : undefined,
+      badge: liveStats[m.id]
+        ? `${liveStats[m.id].placed}/${liveStats[m.id].total}`
+        : readSummary(work[m.id]),
     }));
 
   async function loadLegend(id: string) {
@@ -311,8 +326,13 @@
     }
   }
 
+  async function loadWork() {
+    work = (await fetchSheetWork()) ?? {};
+  }
+
   onMount(async () => {
     void loadStats();
+    void loadWork();
     try {
       maps = await fetchMaps(supabase, { includeArchived: true });
     } catch (err: any) {
