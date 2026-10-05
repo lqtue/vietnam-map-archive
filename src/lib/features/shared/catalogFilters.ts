@@ -65,6 +65,18 @@ export const sheetLabel = (r: Row) =>
     ? `${r.sheet_number}${r.sheet_half && r.sheet_half !== 'whole' ? ' ' + r.sheet_half : ''}`
     : '';
 
+/** The year a sheet shows in its Info tab. `year` is the surveyed or depicted year and `year_label`
+ *  the item's own date (BnF "1937" on the Hanoï plan of 1873), so when the label is a plain, different
+ *  year both are shown: "1873 (print 1937)". Any other label is free text ("c. 1882", "1898–1902") and
+ *  is shown as it is, which is what the tab did before. */
+export function yearLine(year?: number | null, label?: string | null, printWord = 'print'): string {
+  if (!year) return label ?? '';
+  if (!label) return String(year);
+  return /^\d{4}$/.test(label) && label !== String(year)
+    ? `${year} (${printWord} ${label})`
+    : label;
+}
+
 /** A survey's name short enough for a table cell: "L7014 1:50,000", "Indochine 1:100,000". The
  *  head of the collection name (before " — " or " (") with its scale appended when the head lacks
  *  one. ponytail: derived from the collection string, so a new series with an odd name falls back

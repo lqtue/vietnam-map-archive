@@ -15,6 +15,7 @@ import {
   seriesOptions,
   sheetLabel,
   seriesShort,
+  yearLine,
 } from '../src/lib/features/shared/catalogFilters';
 
 const rows = [
@@ -83,4 +84,17 @@ test('a series name shortens to its head plus the scale', () => {
   expect(seriesShort('Indochine 1:25,000 — Tonkin & Thanh Hóa')).toBe('Indochine 1:25,000');
   expect(seriesShort('AMS L909 — Việt Nam City Maps 1:12,500')).toBe('AMS L909 1:12,500');
   expect(seriesShort(null)).toBe('');
+});
+
+test('the Info year shows the survey year and, when it differs, the item date', () => {
+  // Hanoï plan: BnF titles it 1873 and dates the item 1937.
+  expect(yearLine(1873, '1937')).toBe('1873 (print 1937)');
+  expect(yearLine(1873, '1937', 'bản in')).toBe('1873 (bản in 1937)');
+  // The same year twice, no label, and free-text labels keep the old behaviour.
+  expect(yearLine(1905, '1905')).toBe('1905');
+  expect(yearLine(1905, null)).toBe('1905');
+  expect(yearLine(1882, 'c. 1882')).toBe('c. 1882');
+  expect(yearLine(1900, '1898–1902')).toBe('1898–1902');
+  expect(yearLine(null, '1931')).toBe('1931');
+  expect(yearLine(undefined, undefined)).toBe('');
 });
