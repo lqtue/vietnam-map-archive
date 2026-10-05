@@ -224,5 +224,9 @@ to be tracked over time, add them as `scripts/catalog_probe.mjs`.
   `FETCH_LIMIT` in `catalogSearch.ts` is the ceiling to watch.
 - **Region labels are modern.** A historical map filed under a modern province can mislead if the
   page does not say so.
-- **The Cloudflare caching assumption is unverified.** Step 1 of `catalog-list-speed` is where it
-  gets tested; the snapshot fallback is the plan B.
+- **The Cloudflare caching assumption held (2026-10-05, live).** `cf-cache-status` still reads
+  DYNAMIC, because the Cache API sits inside the Function, but a repeat request carries a rising `age`
+  and answers in 0.3–0.4 s (was 2.4–3.3 s), 112 kB gzipped. The `X-VMA-Cache: HIT` label does not
+  survive the hit path, so read `age`; a URL not seen before shows `MISS`. The snapshot fallback was
+  not needed. `/catalog` after the change: 100 rows and ~1,430 DOM nodes (was 1,038 rows, 15,350
+  nodes); typing "hue" settles in under 100 ms and finds `Huế`.

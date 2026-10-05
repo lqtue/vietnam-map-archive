@@ -57,6 +57,9 @@ const STUCK_HOURS = 3;
  */
 const SERIES_URL_MIN = 4;
 
+/** A filesystem path, an image filename or HTML tag/entity inside a title. */
+const JUNK_TEXT = /\/Users\/|\.(jpe?g|png|tiff?)\b|<\/?[a-z][^>]*>|&(amp|#\d+);/i;
+
 const published = (m) => m.status === 'public' || m.status === 'featured';
 
 /** True if `year` is named in `label`, either literally or as inside a "YYYY-YYYY" range. */
@@ -122,6 +125,49 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (!m.holding_institution) say('WARN', 'provenance', who(m), 'no holding_institution');
     if (!m.source_url)
       say('WARN', 'provenance', who(m), 'no source_url — nothing links back to the holder');
+  }
+
+  // ── text a reader sees: names and printed titles (added 2026-10-05) ───────
+  // Found by hand over the public list: a local file path inside an original_title,
+  // three original_titles that were only a year, and "Cam Pha est (E)". Nothing here
+  // reads a title as language — only as a field that should not hold these.
+  for (const m of maps) {
+    for (const k of ['name', 'original_title'])
+      if (m[k] && JUNK_TEXT.test(m[k]))
+        say(
+          'WARN',
+          'title',
+          who(m),
+          `${k} holds a path, filename or markup: ${JSON.stringify(m[k].slice(0, 80))}`
+        );
+    if (m.original_title && /^[\d\s.\-/]+$/.test(m.original_title))
+      say(
+        'WARN',
+        'title',
+        who(m),
+        `original_title is only digits: ${JSON.stringify(m.original_title)}`
+      );
+    if (m.name && /\b(est|ouest)\b.*\((E|W)\)\s*$/i.test(m.name))
+      say('WARN', 'title', who(m), `name says the half twice: ${JSON.stringify(m.name)}`);
+    if (published(m) && !m.map_type) say('WARN', 'metadata', who(m), 'published with no map_type');
+    // Sheet numbers are checked for L7014 (a four-digit cell and a quarter) and for the
+    // 0 / "0 bis" placeholder; the AMS L909 city maps are keyed by city name on purpose.
+    if (m.sheet_number != null) {
+      if (/^0( bis)?$/.test(m.sheet_number))
+        say(
+          'WARN',
+          'sheet',
+          who(m),
+          `sheet_number ${JSON.stringify(m.sheet_number)} looks like a placeholder`
+        );
+      else if (/l7014/.test(m.series_key ?? '') && !/^\d{4}-[1-4]$/.test(m.sheet_number))
+        say(
+          'WARN',
+          'sheet',
+          who(m),
+          `L7014 sheet_number ${JSON.stringify(m.sheet_number)} is not NNNN-Q`
+        );
+    }
   }
 
   // ── slugs: a sheet's address (mig 088) ────────────────────────────────────
@@ -340,6 +386,7 @@ function selfCheck() {
     holding_institution: 'BnF',
     source_url: 'https://bnf/a',
     date_label: '1920',
+    map_type: 'plan',
   };
   // The iiif checks read map_images rows, not a maps column, so `run` gives
   // every case a healthy primary source by default; override `sources` to
@@ -360,6 +407,32 @@ function selfCheck() {
     findings.some((f) => f.check === check && f.level === level);
 
   ok(run({}).length === 0, 'a healthy published map produces nothing');
+  ok(
+    has(run({ original_title: '/Users/x/Downloads/default (2).jpgPlan de Huê' }), 'title', 'WARN'),
+    'a local path inside an original_title is flagged'
+  );
+  ok(
+    has(run({ original_title: '1863' }), 'title', 'WARN'),
+    'an original_title that is only a year is flagged'
+  );
+  ok(
+    has(run({ name: 'Cam Pha est (E)' }), 'title', 'WARN'),
+    'a name that says the half twice is flagged'
+  );
+  ok(!has(run({ name: 'Tây Ninh (E)' }), 'title', 'WARN'), 'a name with one half marker passes');
+  ok(
+    has(run({ map_type: null }), 'metadata', 'WARN'),
+    'a published map with no map_type is flagged'
+  );
+  ok(has(run({ sheet_number: '0 bis' }), 'sheet', 'WARN'), 'a 0 / "0 bis" sheet_number is flagged');
+  ok(
+    has(run({ series_key: 'series-l7014-x', sheet_number: '6541' }), 'sheet', 'WARN'),
+    'an L7014 sheet_number that is not NNNN-Q is flagged'
+  );
+  ok(
+    !has(run({ series_key: 'ams-l909-x', sheet_number: 'Huế' }), 'sheet', 'WARN'),
+    'an AMS city map keyed by city name passes'
+  );
 
   // The queue, which must stay silent. A draft with a minted allmaps_id and
   // is_georeferenced false is a sheet waiting for control points, not a fault --
@@ -686,7 +759,7 @@ async function main() {
     readAll(
       db,
       'maps',
-      'id,slug,name,status,year,date_label,bbox,iiif_image,annotation_url,allmaps_id,is_georeferenced,thumbnail,source_type,source_url,holding_institution,collection'
+      'id,slug,name,original_title,map_type,sheet_number,series_key,status,year,date_label,bbox,iiif_image,annotation_url,allmaps_id,is_georeferenced,thumbnail,source_type,source_url,holding_institution,collection'
     ),
     readAll(db, 'map_slug_aliases', 'slug,map_id', 'slug'),
     readAll(db, 'map_images', 'id,map_id,source_type,is_primary,iiif_image,iiif_manifest'),
