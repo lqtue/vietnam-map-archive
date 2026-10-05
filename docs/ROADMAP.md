@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-01)
+# Roadmap — open work (updated 2026-10-05)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -430,6 +430,55 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`coverage-page-weight`** — the L7014 page is ~500 kB of HTML for 627 rows, server-rendered
       per request. Fine
       today; revisit before Cochinchine's 826 lands.
+
+- [ ] **`catalog-list-speed`** — `/api/search` rebuilds the same public list for every reader:
+      2.4–3.3 s unfiltered, `cf-cache-status: DYNAMIC`, two sequential 1,000-row pages
+      (`readAll`), then a 1.3 s blocking render of 1,038 rows (15,350 DOM nodes). Measured
+      2026-10-05 from a laptop against production; the gzipped body is only 153 kB, so the cost is
+      server time and first paint, not bandwidth. Do: `Cache-Control: public, s-maxage=300,
+      stale-while-revalidate` on non-staff responses only (staff see drafts; a publish may take up
+      to 5 minutes to reach the public — accepted); fetch the pages in parallel; render ~100 rows
+      and extend on scroll, table and grid, slicing after grouping; stop sending `extra_metadata`
+      once no reader is confirmed. Cloudflare Pages may not honour the header on a Function
+      response — if `cf-cache-status` never reads `HIT`, build a static snapshot on deploy/edit.
+      Exit: rows visible in about 1 s on a cold load (was 4.5 s), `HIT` on the second request.
+      **Built, not yet deployed:** the Cache API (Functions run before the CDN, so the header alone
+      caches nothing; `X-VMA-Cache: HIT|MISS` says which path answered), two pages in parallel,
+      100-row slices, `extra_metadata` dropped. What is left is the production probe.
+      Plan for this item and the four after it: `docs/catalog-plan.md`.
+- [ ] **`catalog-columns`** — the public list shows columns that do not vary. Of 1,038 public
+      maps: all are `is_georeferenced`, 1,000 of 1,036 `map_type` are "topographic", `location`
+      is filled on 46 (34 of the 36 maps with no series — the city plans — and almost none of the
+      1,002 survey sheets). Replace Status/Type/Area in the public table and in `ArchiveMapRows`
+      with series + sheet number + institution; keep Status/Type for staff. Promote the series
+      facet out of the collapsed Filters disclosure and into /explore's rail; swap the six period
+      buckets for a year range with a histogram (1950s + 1960s hold 680 of 1,038); add an
+      institution facet; a "Surveys / Plans & other" switch decides whether Area applies. Show the
+      sheet number beside the name — 23 names repeat. Long fields load when the drawer opens.
+      Depends on `georef-flag-one-meaning`. Exit: no public column that is a single value.
+      **Built, not yet deployed:** the table columns, year range + histogram, institution facet,
+      Surveys / Plans switch, Type for staff only, Area as the province (`region`); the rail's rows
+      (`ArchiveMapRows`: sheet number and survey under the title, no Type column), the series
+      select above the Filters disclosure (the engine derives the surveys from its rows when a
+      caller passes none), and the description, rights and physical description fetched when the
+      drawer opens (`fetchMapLongFields`, 170 kB off the list). Close it once it is live.
+- [ ] **`catalog-local-search`** — search the public maps in the browser instead of through
+      `/api/search`: every field `search_vector` indexes is already in the list row. Accent-fold
+      and prefix-match per token — `hue` cannot find `Huế` today, because the index is the
+      `simple` config. Keep the server call for OCR labels and places only; the palette's slim
+      mode is unchanged. The `^\d{4}-\d$` sheet-number match moves with it. A library
+      (MiniSearch) only if typo tolerance is wanted. Exit: typing never waits on the network.
+      **Built, not yet deployed** (`localSearch.ts`; the server's map search stays for the
+      palette). Close it once it is live.
+- [ ] **`map-json-to-columns`** — **Built, not yet pushed or deployed** (mig 110 adds `maps.edition`
+      and copies `source_archive = 'PCL'` into `holding_institution`; the search API, the series
+      page and `SeriesManage` read the columns; `LIST_COLUMNS` and the API's full set share
+      `MAP_BASE_COLUMNS`; the edit form and `bulk_upload_local.sh` stop writing the JSON copies).
+      Left: `extra_metadata.mirrors_original_for` is still filtered in JSON
+      (`catalog/[id]/+page.server.ts`, `fetchSeriesSheets`), and `source_archive` stays a JSON tag
+      the L7014 scripts use to tell PCL from TTU. The old JSON copies of `sheet_number`,
+      `sheet_half` and `edition` stay on rows nobody re-saves. Close it once 110 is pushed and the
+      code is live.
 
 ## After 7.3
 

@@ -38,10 +38,10 @@ def slugify(s):
 def existing():
     url, key = env()
     r = urllib.request.Request(
-        f"{url}/rest/v1/maps?select=slug,extra_metadata&slug=like.*l7014*&limit=5000",
+        f"{url}/rest/v1/maps?select=slug,sheet_number&slug=like.*l7014*&limit=5000",
         headers={"apikey": key, "Authorization": f"Bearer {key}"})
     rows = json.load(urllib.request.urlopen(r))
-    return {(x["extra_metadata"] or {}).get("sheet_number") for x in rows}, {x["slug"] for x in rows}
+    return {x["sheet_number"] for x in rows}, {x["slug"] for x in rows}
 
 
 def main(out, jpgs):

@@ -111,8 +111,8 @@
       ].filter(Boolean)
     : [];
 
-  /* Who to credit for the scan. Thirteen published rows carry a `source_url`
-     with no `holding_institution`, so the host stands in — 'gallica.bnf.fr'
+  /* Who to credit for the scan. No published row lacked a `holding_institution` after mig 110, but a new
+     one may, so the host stands in — 'gallica.bnf.fr'
      says where you are going, and cannot go stale the way a lookup table can. */
   function sourceLabel(m: MapListItem): string {
     if (m.holding_institution) return m.holding_institution;

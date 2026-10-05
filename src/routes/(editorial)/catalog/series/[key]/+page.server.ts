@@ -157,7 +157,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const { data: rows } = await readAll((from, to) =>
     supabase
       .from('maps')
-      .select('id,name,year,sheet_number,sheet_half,extra_metadata,bbox,printing_id')
+      .select('id,name,year,sheet_number,sheet_half,edition,extra_metadata,bbox,printing_id')
       .eq('series_key', key)
       .in('status', ['public', 'featured'])
       .not('sheet_number', 'is', null)
@@ -174,16 +174,12 @@ export const load: PageServerLoad = async ({ params }) => {
     if (!row.sheet_number) continue;
     const box = unionBox(reach[row.sheet_number], row.bbox);
     if (box) reach[row.sheet_number] = box;
-    // `edition`/`scan_provenance` have no columns of their own (mig 095) — only
-    // `sheet_number`/`sheet_half` moved off `extra_metadata`.
-    const meta = (row.extra_metadata ?? {}) as {
-      edition?: string;
-      scan_provenance?: string;
-    };
+    // `scan_provenance` has no column of its own; the sheet's address and edition do.
+    const meta = (row.extra_metadata ?? {}) as { scan_provenance?: string };
     const item: SheetPrinting = {
       institution: null,
       year: row.year,
-      edition: meta.edition ?? null,
+      edition: row.edition ?? null,
       part: sheetPart(row.sheet_half, row.name, meta.scan_provenance),
       url: `/catalog/${row.id}`,
       rights: null,

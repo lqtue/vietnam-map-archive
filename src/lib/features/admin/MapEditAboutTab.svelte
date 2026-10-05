@@ -20,6 +20,7 @@
   export let extraPairs: { key: string; value: string }[];
   export let sheet_number: string;
   export let sheet_half: string;
+  export let edition: string;
   export let series_id: string;
   export let printing_id: string;
   export let duplicate_of_map_id: string;
@@ -185,6 +186,10 @@
       <option value="whole">Whole</option>
     </select>
   </label>
+  <label class="form-label">
+    <span>Edition <span class="field-hint">as printed, e.g. 2-AMS</span></span>
+    <input type="text" bind:value={edition} class="form-input" placeholder="e.g. 5-DMA" />
+  </label>
 </div>
 
 <!-- ── Description ───────────────────────────── -->
@@ -226,7 +231,7 @@
 
 <!-- ── Custom fields ───────────────────────────── -->
 <div class="section-heading">
-  Custom fields <span class="field-hint">e.g. edition, mirrors_original_for</span>
+  Custom fields <span class="field-hint">e.g. mirrors_original_for</span>
 </div>
 <div class="extra-meta-section">
   {#each extraPairs as pair, i (pair)}

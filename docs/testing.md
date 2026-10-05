@@ -10,7 +10,7 @@ public viewer merged into `/catalog/[id]`, and every bookmark, every /explore ac
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **seven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 362 browser-less pure
+**read-only** (they hit the real Supabase project but never write), plus 379 browser-less pure
 checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
 after a display-label change and omit unlinked maps; two scans group only when they have the same
 printing UUID; unresolved scans remain separate, and an institution is held only through
@@ -21,6 +21,10 @@ dates are not guessed from booleans/fractions, and metadata edits preserve exist
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
 camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
 animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker),
+`tests/map-region.spec.ts` (the 63 provinces fold into exactly 34, a sheet takes the province under most of it rather than under its centre, open water keeps its province but a neighbour's land does not, a country-scale bbox gets none),
+`tests/local-search.spec.ts` (the catalog's in-browser search: accents and đ fold both ways, every token must start a word, `1920s` is a prefix, a sheet number matches its column exactly),
+`tests/catalog-filters.spec.ts` (the year range is inclusive, open-ended and drops undated rows; the Surveys / Plans split; the decade histogram keeps empty decades; a sheet label carries its half only when the sheet is cut in two; series options list each survey once, biggest first, and skip plans),
+`tests/catalog-slice.spec.ts` (the catalog's drawn slice keeps each group's full count, and the two-page read returns every row at 0, 1, 2 and 3 pages — a shared query builder once answered with whichever range was set last),
 `tests/triage-suggest.spec.ts` (level0 tile addressing and the triage proposal),
 `tests/map-grid.spec.ts` (the printed reference grid, cell to point), `tests/coordinates.spec.ts`
 (typing a position into the location search — and mostly the **military grid reference** the US Army
