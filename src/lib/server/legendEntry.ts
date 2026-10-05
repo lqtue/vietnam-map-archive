@@ -16,28 +16,39 @@ export function legendNumber(text: string | null, notes: string | null): number 
   return Number.isSafeInteger(number) && number > 0 ? number : null;
 }
 
-export function manualLegendPoint(notes: string | null): [number, number] | null {
-  const raw = legendNote(notes, 'point');
-  if (!raw) return null;
-  const parts = raw.split(',');
+function pair(raw: string | null): [number, number] | null {
+  const parts = raw?.split(',') ?? [];
   if (parts.length !== 2 || parts.some((part) => !part.trim())) return null;
-  const [lng, lat] = parts.map(Number);
-  return Number.isFinite(lng) && Number.isFinite(lat) && Math.abs(lng) <= 180 && Math.abs(lat) <= 90
-    ? [lng, lat]
-    : null;
+  const [a, b] = parts.map(Number);
+  return Number.isFinite(a) && Number.isFinite(b) ? [a, b] : null;
+}
+
+/**
+ * A staff-placed position, kept in image pixels (`px=x,y`) so it is a fact
+ * about the sheet and follows any later re-georeference. `point=lng,lat` is the
+ * pre-2026-10-05 form, read until `scripts/oneoff/legend_points_to_pixels.mjs`
+ * has converted every row; a save rewrites it as `px=`.
+ */
+export function manualLegendPoint(
+  notes: string | null
+): { px: [number, number] } | { lngLat: [number, number] } | null {
+  const px = pair(legendNote(notes, 'px'));
+  if (px && px[0] >= 0 && px[1] >= 0) return { px };
+  const ll = pair(legendNote(notes, 'point'));
+  return ll && Math.abs(ll[0]) <= 180 && Math.abs(ll[1]) <= 90 ? { lngLat: ll } : null;
 }
 
 /** Replace only the fields being edited; keep unrelated OCR/provenance notes. */
 export function editLegendNotes(
   notes: string | null,
-  fields: { vn: string | null; grid: string | null; point: [number, number] | null }
+  fields: { vn: string | null; grid: string | null; px: [number, number] | null }
 ): string {
   const retained = (notes ?? '')
     .split(';')
     .map((part) => part.trim())
-    .filter((part) => part && !/^(vn|grid|point)=/.test(part));
+    .filter((part) => part && !/^(vn|grid|point|px)=/.test(part));
   if (fields.vn) retained.push(`vn=${fields.vn}`);
   if (fields.grid) retained.push(`grid=${fields.grid}`);
-  if (fields.point) retained.push(`point=${fields.point.join(',')}`);
+  if (fields.px) retained.push(`px=${fields.px.map((v) => Math.round(v)).join(',')}`);
   return retained.join('; ');
 }

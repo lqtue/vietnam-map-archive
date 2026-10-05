@@ -5,13 +5,15 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
 import { editLegendNotes, legendNumber } from '$lib/server/legendEntry';
 import { bulkSetStatus } from '$lib/server/ocrReview';
+import { getTransformer } from '$lib/server/transformer';
 
 type LegendEdit = {
   id: string;
   name: string;
   vn: string | null;
   grid: string | null;
-  point: [number, number] | null;
+  /** Image pixels as sent, or ground lng/lat to be taken back to pixels. */
+  point: { px: [number, number] } | { lngLat: [number, number] } | null;
 };
 
 function noteText(value: unknown, label: string): string | null {
@@ -28,8 +30,19 @@ function parseEdit(body: unknown): LegendEdit {
   const id = assertUuid(typeof value.id === 'string' ? value.id : '', 'entry id');
   if (typeof value.name !== 'string' || !value.name.trim() || value.name.length > 1000)
     throw error(400, 'Enter a legend name of up to 1000 characters');
-  let point: [number, number] | null = null;
-  if (value.lng !== null || value.lat !== null) {
+  let point: LegendEdit['point'] = null;
+  if (value.x != null || value.y != null) {
+    if (
+      typeof value.x !== 'number' ||
+      typeof value.y !== 'number' ||
+      !Number.isFinite(value.x) ||
+      !Number.isFinite(value.y) ||
+      value.x < 0 ||
+      value.y < 0
+    )
+      throw error(400, 'Enter valid image x and y, or reset both');
+    point = { px: [value.x, value.y] };
+  } else if (value.lng != null || value.lat != null) {
     if (
       typeof value.lng !== 'number' ||
       typeof value.lat !== 'number' ||
@@ -39,7 +52,7 @@ function parseEdit(body: unknown): LegendEdit {
       Math.abs(value.lat) > 90
     )
       throw error(400, 'Enter valid longitude and latitude, or reset both');
-    point = [value.lng, value.lat];
+    point = { lngLat: [value.lng, value.lat] };
   }
   return {
     id,
@@ -82,6 +95,27 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     );
   if (readError) dbError(readError, 'Could not read legend entries');
   const byId = new Map((rows ?? []).map((row) => [row.id, row]));
+
+  // A position is stored in image pixels, so a click on the warped map goes back
+  // through this map's own georeference before it is saved.
+  let transformer: Awaited<ReturnType<typeof getTransformer>> = null;
+  if (edits.some((edit) => edit.point && 'lngLat' in edit.point)) {
+    const { data: map, error: mapError } = await db
+      .from('maps')
+      .select('allmaps_id, annotation_url')
+      .eq('id', mapId)
+      .single();
+    if (mapError) dbError(mapError, 'Could not read map');
+    transformer = await getTransformer(map?.allmaps_id, map?.annotation_url);
+    if (!transformer) throw error(409, 'This map has no georeference to place a point through');
+  }
+  const pixel = (point: LegendEdit['point']): [number, number] | null =>
+    !point
+      ? null
+      : 'px' in point
+        ? point.px
+        : transformer!.transformer.transformToResource(point.lngLat);
+
   for (const edit of edits) {
     const row = byId.get(edit.id);
     if (!row || row.review_status === 'rejected') throw error(404, 'Legend entry not found');
@@ -97,7 +131,11 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
         .from('ocr_labels')
         .update({
           text_corrected: `${n}. ${edit.name}`,
-          notes: editLegendNotes(row.notes, { vn: edit.vn, grid: edit.grid, point: edit.point }),
+          notes: editLegendNotes(row.notes, {
+            vn: edit.vn,
+            grid: edit.grid,
+            px: pixel(edit.point),
+          }),
         })
         .eq('id', edit.id)
         .eq('map_id', mapId)

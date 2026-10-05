@@ -117,11 +117,14 @@ Public / other:
   override numeral/grid positions. Staff with MFA also receive `canEdit` and `entries`,
   including entries without a position. Responses are private and not cached.
 - `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** PATCH
-  `{ id, name, vn, grid, lng, lat }` or `{ entries: [...] }` (up to 200 entries). Corrects existing
+  `{ id, name, vn, grid, x, y }` (image pixels) or `{ id, name, vn, grid, lng, lat }` or `{ entries: [...] }` (up to 200 entries). Corrects existing
   numbered OCR legend entries; the batch response returns `{ saved: [id], failed: [{ id, message }] }`
   so clients can retain and retry only failed drafts. The request validates every entry before writing
-  and preserves raw OCR text and unrelated notes. Manual WGS84 coordinates are saved as
-  `point=longitude,latitude` in its existing notes; two null coordinates restore automatic
+  and preserves raw OCR text and unrelated notes. A manual position is saved in **image
+  pixels** as `px=x,y` in its existing notes — a ground click is taken back through the map's own
+  annotation first (409 if it has none) — so it follows any re-georeference; the GET warps it.
+  Pre-2026-10-05 rows carried `point=longitude,latitude` and are still read
+  (`scripts/oneoff/legend_points_to_pixels.mjs` converts them). Null coordinates restore automatic
   positioning. Review stamps go through `set_extraction_status`. No new schema required.
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
