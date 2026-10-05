@@ -1,7 +1,7 @@
 # Modern HCMC layers on the 1882 and 1898 sheets
 
 **2026-10-01.** A look at whether 2023 geodata can seed the river/road/block/building work
-(`docs/processing-plan-1882-1898.md`, "Using today's HCMC layers"). **Not a score**: no trace exists yet.
+(`docs/archive/processing-plan-1882-1898.md`, "Using today's HCMC layers"). **Not a score**: no trace exists yet.
 Data: `~/Work/Projects/hcmc-buildings/{hcmc_vector,hcmc_buildings_3d}.parquet` (government portal,
 licence unresolved, so `out/` is gitignored). Run with the **system** `python3` (geopandas, pyarrow;
 the `work/ocr` venv has neither), `.env` exported, after `river_ref/export.py`:

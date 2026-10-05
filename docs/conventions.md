@@ -50,25 +50,14 @@ moving a public page's `mentions` and `years`.
 
 ## Supabase types
 
-- `src/lib/data/supabase/types.ts` is current against migration head 086
-  (`series_sheets.year`/`.edition` from 086 — regenerated from the linked project after the push, a
-  clean six-line diff across Row/Insert/Update and nothing else). Was current against 085
-  (`map_series.survey_sheets` from 084; 085 changes only a check constraint, which the types do not
-  carry). The column was hand-typed before the push — `check` fails without it — and regenerating
-  after the push produced a **zero-line diff**, which is the cheapest confirmation that a hand edit
-  matched the generator. Was current against 082 (`map_series` plus `series_key`, regenerated from
-  the linked project after the push — the view and the function and nothing else, so nothing
-  drifted). Was current against 081 (`place_names.core_key` plus
-  `place_core_key`/`place_generic_words`). One trap if you reach for `--local` instead: the local
-  stack image emits an older template and churns ~30 unrelated lines of scaffolding that have
-  nothing to do with the schema. Was current against 078 (`label_w`/`label_h` from 076;
-  `global_xi`/`global_yi`, non-null `global_x`/`global_y` and `set_triage_key` from 077;
-  `scout_candidates.review_note` from 078). 076, 077 and 078 are all pushed, and the file was
-  regenerated from the linked project — the earlier note that 076/077 were unpushed and 077
-  hand-applied is stale. It had drifted: the file still declared `legend_submissions`,
-  `map_help_requests`, `metadata_submissions` and `story_progress` long after 075 dropped them,
-  because nothing regenerates it automatically — do it after every push. Prefer the real types over
-  `as any`; ~25 casts remain, mostly in Svelte components.
+- `src/lib/data/supabase/types.ts` is current against migration head **108** (verified 2026-10-05:
+  106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108 changes
+  only a column default, which the types do not carry). Regenerate from the linked project after
+  every push; a zero-line diff after a hand edit is the cheapest confirmation it was right.
+  One trap if you reach for `--local` instead: the local stack image emits an older template and
+  churns ~30 unrelated lines of scaffolding that have nothing to do with the schema. Nothing
+  regenerates the file automatically — before 075 it still declared four tables long dropped.
+  Prefer the real types over `as any`; ~25 casts remain, mostly in Svelte components.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
   what forces most `as any` casts downstream.
 - **Realtime is stubbed out of the browser bundle.** Nothing in `src/` calls `.channel()` or

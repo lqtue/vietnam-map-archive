@@ -1,6 +1,6 @@
 # Image-processing consolidation and the 1882 feature layer — plan
 
-**Written 2026-10-03; Phase 0 steps 1–2 merged in PR #34; step 3 implemented on `refactor/image-processing-scripts` for PR review.** The plan to stop researching feature extraction and ship one approved
+**Written 2026-10-03. Phase 0 is done: the reorganisation merged in PR #33, the branch integration in PR #34, the OCR/image-processing script split in PR #35. Phase 1 has not started.** The plan to stop researching feature extraction and ship one approved
 1882 layer (water, plots, buildings, roads), after first cleaning up the image-processing WIP. Scope is the 1882 sheet only:
 1898 and District 4 are out of scope until this ships. The owner approved the direction and asked for this file
 so another session or model can pick it up cold. The briefing below is everything that session needs and would
@@ -9,6 +9,10 @@ otherwise have to rediscover.
 ---
 
 ## Briefing for the session that picks this up
+
+> The checkouts, conflicts and merge steps below describe the repo **as of 2026-10-03, before Phase 0**.
+> They are kept as the record of how Phase 0 was done; do not act on them. Scripts now live in
+> `work/image-processing/scripts/` (e.g. `modern_prior.py`), not `work/ocr/scripts/`.
 
 ### The project in one paragraph
 Vietnam Map Archive (VMA): a SvelteKit app over georeferenced historical maps of Saigon. Read `/CLAUDE.md`,
@@ -39,7 +43,7 @@ footprints via `work/ocr/scripts/join_labels.py` (migration 050, smallest contai
   - `docs/research/image-processing-record.md`
   - `work/ocr/EVAL-BASELINE.md`
   - `river-reconstruction.md`: `docs/river-reconstruction.md` on the branch, which holds all the scores; main has an uncommitted move to `docs/research/`
-  - `docs/processing-plan-1882-1898.md` (branch only): the earlier two-sheet plan, superseded by this one
+  - `docs/archive/processing-plan-1882-1898.md`: the earlier two-sheet plan, superseded by this one
   - `docs/journals/260918-colour-blocks.md`, `260919-seg-audit.md` and `261001-colour-pair-1882-1898.md`
 
 ### The 1882 sheet

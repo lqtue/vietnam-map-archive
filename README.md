@@ -55,7 +55,7 @@ live archive read-only. Writes need the local stack (below).
 ```bash
 npm run check        # type-check — the primary gate, kept at 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
-npm run test         # 354 tests: 18 read-only Playwright smokes + 336 pure checks
+npm run test         # 378 tests: 19 read-only Playwright smokes + 359 pure checks
 npm run db:test      # start a local Supabase stack and seed it
 npm run test:write   # write-path smokes, local stack only — refuses a non-loopback URL
 ```
