@@ -100,8 +100,13 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
 
   // ── the publish gate, and what it does not prove ──────────────────────────
   for (const m of maps) {
-    if (!['draft', 'public', 'featured'].includes(m.status))
-      say('FAIL', 'status', who(m), `status '${m.status}' is outside draft/public/featured`);
+    if (!['draft', 'public', 'featured', 'archived'].includes(m.status))
+      say(
+        'FAIL',
+        'status',
+        who(m),
+        `status '${m.status}' is outside draft/public/featured/archived`
+      );
 
     if (!published(m)) continue;
     if (!m.annotation_url && !m.allmaps_id)
@@ -210,6 +215,9 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
   const byImage = new Map();
   const byUrl = new Map();
   for (const m of maps) {
+    // Archived rows are kept for provenance (mig 107); one that shares a scan with the map that
+    // replaced it is the point, not a fault.
+    if (m.status === 'archived') continue;
     if (m.iiif_image) push(byImage, m.iiif_image, m);
     if (m.source_url) push(byUrl, m.source_url, m);
   }
@@ -465,7 +473,18 @@ function selfCheck() {
     'a published map not yet georeferenced is flagged, not failed'
   );
 
-  ok(has(run({ status: 'archived' }), 'status', 'FAIL'), 'a status outside the three is rejected');
+  ok(has(run({ status: 'retired' }), 'status', 'FAIL'), 'a status outside the four is rejected');
+  ok(!has(run({ status: 'archived' }), 'status', 'FAIL'), 'an archived map is a valid status');
+  ok(
+    !auditCatalog({
+      maps: [
+        { ...good, id: 'x1', slug: 'x1' },
+        { ...good, id: 'x2', slug: 'x2', status: 'archived' },
+      ],
+      now: NOW,
+    }).some((f) => f.check === 'duplicate'),
+    'an archived map sharing a scan with a live one is not a duplicate'
+  );
   ok(
     has(run({ iiif_image: null }), 'publish', 'FAIL'),
     'a published map with no image is rejected'
