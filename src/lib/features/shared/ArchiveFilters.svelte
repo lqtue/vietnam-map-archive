@@ -100,33 +100,37 @@
   on:reset={resetFilters}
 >
   <svelte:fragment slot="before">
-    {#if hasKinds}
-      <div class="kinds">
-        <Tabs
-          tabs={KINDS}
-          active={kind}
-          label={$t('Kind of map')}
-          on:change={(e) => setKind(e.detail.key)}
-        />
-      </div>
-    {/if}
-    {#if seriesOpts.length > 1}
-      <!-- Out of the disclosure: the survey is the archive's real structure, and the first thing a
+    <!-- One line: the kind switch and the survey select. -->
+    <div class="primary">
+      {#if hasKinds}
+        <div class="kinds">
+          <Tabs
+            tone="rail"
+            tabs={KINDS}
+            active={kind}
+            label={$t('Kind of map')}
+            on:change={(e) => setKind(e.detail.key)}
+          />
+        </div>
+      {/if}
+      {#if seriesOpts.length > 1}
+        <!-- Out of the disclosure: the survey is the archive's real structure, and the first thing a
            reader narrows by. -->
-      <div class="dropdowns">
-        <select
-          value={$selected.series_key?.[0] ?? ''}
-          on:change={(e) =>
-            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by series"
-        >
-          <option value="">{$t('All series')}</option>
-          {#each seriesOpts as s (s.value)}
-            <option value={s.value}>{s.label}</option>
-          {/each}
-        </select>
-      </div>
-    {/if}
+        <div class="dropdowns">
+          <select
+            value={$selected.series_key?.[0] ?? ''}
+            on:change={(e) =>
+              search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
+            aria-label="Filter by series"
+          >
+            <option value="">{$t('All series')}</option>
+            {#each seriesOpts as s (s.value)}
+              <option value={s.value}>{s.label}</option>
+            {/each}
+          </select>
+        </div>
+      {/if}
+    </div>
   </svelte:fragment>
   {#if $areaChoices.length}
     <select
@@ -240,8 +244,24 @@
     cursor: pointer;
   }
 
-  .kinds {
-    padding-top: 0.2rem;
+  .primary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .primary .dropdowns {
+    padding-top: 0;
+  }
+  .primary .dropdowns select {
+    flex: 0 1 14rem;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.78rem;
+  }
+  /* The pill row shrinks inside a flex line and clips its longest label. */
+  .kinds :global(.sb-pill) {
+    flex: none;
+    white-space: nowrap;
   }
   .years {
     padding-top: 0.5rem;
