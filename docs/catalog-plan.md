@@ -155,7 +155,9 @@ New `src/lib/features/shared/localSearch.ts` (pure, with a check), wired into
 
 Exit: typing never waits on the network for the maps list.
 
-## `map-region-from-bbox`
+## `map-region-from-bbox` — done 2026-10-05
+
+Built as below with three changes: two columns (`region`, 63 provinces; `region_2025`, 34), the province is the one under most of a 7×7 grid over the `bbox` rather than the centroid, and a sheet with more neighbouring-country land (Cambodia, Laos, China) than Vietnamese is left null. 928 of 1,499 rows labelled, 816 of 1,038 public.
 
 Migration `109_map_region.sql` (the head is 108; re-check when this starts) adds nullable
 `maps.region text`, plus a script in `scripts/` that fills it from the `bbox` centroid using province

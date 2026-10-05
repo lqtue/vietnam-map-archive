@@ -307,7 +307,7 @@ any one period of work, fix the lowest broken layer first.
 | Layer | What it holds | Open items |
 |---|---|---|
 | **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `indochine-100k-licence` · `hue-rescans` · `gallica-text-harvest` |
-| **1. Holdings** | the map row, its scans and tiles, its address | `map-region-from-bbox` · `map-json-to-columns` · `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
+| **1. Holdings** | the map row, its scans and tiles, its address | `map-json-to-columns` · `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
 | **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-iiif` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
 | **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `legend-numeral-misses` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
 | **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
@@ -318,7 +318,7 @@ any one period of work, fix the lowest broken layer first.
 The current scope of `river-reconstruction` is approved 1882 water; its 1898 work is
 deferred by the [1882 feature-layer plan](image-processing-1882-plan.md). The item stays in layer 3.
 
-That is 86 named items, plus the 7 unnamed debt lines, as of 2026-10-05.
+That is 85 named items, plus the 7 unnamed debt lines, as of 2026-10-05.
 
 **Reading the table.** Layer 3 holds the most items (20), but the layers are not equally healthy
 underneath. Placement (layer 2) has 11 open items and three of them were stale or wrong this week,

@@ -468,17 +468,6 @@ system — what a result must retain, and the two kinds of check — is in the r
       (MiniSearch) only if typo tolerance is wanted. Exit: typing never waits on the network.
       **Built, not yet deployed** (`localSearch.ts`; the server's map search stays for the
       palette). Close it once it is live.
-- [ ] **`map-region-from-bbox`** — a derived province-level `maps.region`, backfilled from the
-      `bbox` centroid (100% filled; confirm it is lng/lat first), so survey sheets get a place
-      facet without hand entry. Decided 2026-10-05: derive, do not hand-fill. Additive migration;
-      regenerate `types.ts` after it. Exit: every public map that lies on Vietnamese land has a
-      `region`, and /catalog's Area facet reads it.
-      **Pushed 2026-10-05:** `109_map_region.sql` (`region` = the 63 provinces to June 2025,
-      `region_2025` = the 34 since); the types, head notes, API column and Area facet (now
-      "province", on both views) follow. The dry run labels 816 of 1,038 public maps; the other
-      222 are mostly the ~150 Cambodia/Laos sheets and sheets that are mostly sea, left null on
-      purpose. **Left:** run `scripts/oneoff/backfill_map_region.mjs --apply` (the facet is
-      hidden until `region` is filled), then close this item.
 - [ ] **`map-json-to-columns`** — `db-guidelines.md` §8 says filtered fields get columns, and
       three do not. `sheet_number` and `sheet_half` are columns but `api/search/+server.ts` still
       matches `extra_metadata->>sheet_number` and the JSON copy is still written; `edition` (456
