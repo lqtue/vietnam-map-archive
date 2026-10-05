@@ -36,7 +36,6 @@ that is the point of keying the whole line rather than the two halves.
 | Share | Chia sẻ |
 | Submit | Gửi |
 | Delete | Xóa |
-| Remove | Gỡ bỏ |
 | None | Không có |
 | Year | Năm |
 | Title | Tiêu đề |
@@ -407,7 +406,7 @@ the catalogue.
 | Browse the archive | Duyệt kho lưu trữ |
 | {N} maps cover this spot | {N} bản đồ bao phủ khu vực này |
 | Search maps… | Tìm kiếm bản đồ… |
-| Tap a name to zoom · drag for opacity · eye hides a layer | Nhấn vào tên để phóng to · kéo để chỉnh độ mờ · biểu tượng mắt để ẩn lớp |
+| Hold and drag the three dots to reorder · tap for layer actions | Giữ và kéo ba chấm để sắp xếp lại · nhấn để xem thao tác với lớp |
 | No stacked map matches those filters. | Không có lớp bản đồ phù hợp với bộ lọc. |
 | Opacity | Độ mờ |
 | This sheet | Bản đồ này |

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/core/i18n';
   import { createEventDispatcher } from 'svelte';
   import { layerDrag } from '$lib/map/shell/layerDrag';
   import { randomId } from '$lib/core/utils/id';
@@ -118,8 +119,12 @@
     {#if drag}
       <section class="reorder-section" aria-label="Reorder layer">
         <p>Hold and drag the three dots to reorder.</p>
-        <button type="button" class="sb-btn is-ghost" on:click={() => reorder(-1)}>Move up</button>
-        <button type="button" class="sb-btn is-ghost" on:click={() => reorder(1)}>Move down</button>
+        <button type="button" class="sb-btn is-ghost" on:click={() => reorder(-1)}
+          >{$t('Move up')}</button
+        >
+        <button type="button" class="sb-btn is-ghost" on:click={() => reorder(1)}
+          >{$t('Move down')}</button
+        >
       </section>
     {/if}
     {#if removable}<button type="button" class="sb-btn is-ghost" on:click={() => choose('remove')}
@@ -149,12 +154,12 @@
   .layer-options {
     position: fixed;
     inset: auto;
-    left: var(--menu-left);
-    top: var(--menu-top);
+    left: var(--menu-left, 0);
+    top: var(--menu-top, 0);
     margin: 0;
     width: max-content;
-    max-width: var(--menu-max-width);
-    max-height: var(--menu-max-height);
+    max-width: var(--menu-max-width, none);
+    max-height: var(--menu-max-height, none);
     box-sizing: border-box;
     overflow: auto;
     flex-direction: column;
