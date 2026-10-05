@@ -140,6 +140,15 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'moderate approve reject submissions queue footprints',
   },
 
+  {
+    href: '/scan?mode=legend',
+    label: 'Place the legend',
+    hint: 'Pin numbered legend entries on the scan',
+    group: 'Contribute',
+    role: 'mod',
+    keywords: 'legend index numerals numbers pixels place entries staff',
+  },
+
   // Read
   {
     href: '/about',

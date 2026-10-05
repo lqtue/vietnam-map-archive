@@ -29,6 +29,7 @@ and `paletteDestinations.ts`.
 | `/scan?mode=prepare` | Layout · neatline · tile grid · save · queue OCR | `src/lib/features/contribute/digitalize/` |
 | `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
 | `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
+| `/scan?mode=legend` | Staff: place the numbered legend on the scan in image pixels — select, click to place, accept a numeral, batch save | `src/lib/features/contribute/legend/` |
 | `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
 | `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
 | `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |

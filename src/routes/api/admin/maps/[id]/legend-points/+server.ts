@@ -4,6 +4,9 @@ import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
 import { editLegendNotes, legendNumber } from '$lib/server/legendEntry';
+import { readLegendEntries, readNumeralCandidates } from '$lib/server/legendRead';
+import { cellAgreement, parseGrid } from '$lib/core/geo/mapGrid';
+import type { SavedTriage } from '$lib/data/maps/triageTypes';
 import { bulkSetStatus } from '$lib/server/ocrReview';
 import { getTransformer } from '$lib/server/transformer';
 
@@ -62,6 +65,58 @@ function parseEdit(body: unknown): LegendEdit {
     point,
   };
 }
+
+/**
+ * The legend in image pixels, for the staff legend tool. No georeference is
+ * read, so a draft or an ungeoreferenced sheet works. `x`/`y` are a reviewed
+ * manual position (`px=`); a legacy ground `point=` has no pixel and reads as
+ * unplaced. A candidate's `inCell` is whether it agrees with its entry's grid
+ * reference (null: nothing to check against).
+ */
+export const GET: RequestHandler = async ({ params, locals }) => {
+  await requireRole(locals, ['admin', 'mod']);
+  const mapId = assertUuid(params.id, 'map id');
+  const db = adminClient();
+  const { data: map, error: mapError } = await db
+    .from('maps')
+    .select('triage')
+    .eq('id', mapId)
+    .single();
+  if (mapError || !map) throw error(404, 'Map not found');
+  const grid = parseGrid((map.triage as SavedTriage | null)?.grid);
+  const { nameByN, rects, maxN } = await readLegendEntries(db, mapId);
+  const found = await readNumeralCandidates(db, mapId, maxN, rects);
+  return json(
+    {
+      entries: [...nameByN]
+        .map(([n, info]) => {
+          const px = info.manualPoint && 'px' in info.manualPoint ? info.manualPoint.px : null;
+          return {
+            id: info.id,
+            n,
+            name: info.name,
+            vn: info.vn,
+            grid: info.grid,
+            x: px?.[0] ?? null,
+            y: px?.[1] ?? null,
+            src: px ? 'manual' : null,
+            validated: info.validated,
+          };
+        })
+        .sort((a, b) => a.n - b.n),
+      candidates: found.map(({ n, x, y, labelId }) => ({
+        n,
+        x,
+        y,
+        inCell: cellAgreement(grid, nameByN.get(n)?.grid, x, y),
+        labelId,
+      })),
+      grid,
+      legendRects: rects,
+    },
+    { headers: { 'Cache-Control': 'private, no-store' } }
+  );
+};
 
 /** Save one legend correction or a batch of staged corrections. */
 export const PATCH: RequestHandler = async ({ params, request, locals }) => {

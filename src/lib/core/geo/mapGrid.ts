@@ -108,6 +108,33 @@ export function cellSize(grid: MapGrid): { w: number; h: number } | null {
   return { w: grid.bbox[2] / grid.columns.length, h: grid.bbox[3] / grid.rows.length };
 }
 
+/**
+ * Does a point land where an index entry's grid reference says it should?
+ *
+ * Tolerance is the stated cell inflated by a full cell on each side: the index
+ * cell is itself approximate, and a feature near a boundary is often catalogued
+ * one cell over. That still rejects a point kilometres away. `null` means there
+ * is nothing to check against (no grid, no reference, or a reference the grid
+ * does not contain).
+ */
+export function cellAgreement(
+  grid: MapGrid | null,
+  ref: string | null | undefined,
+  px: number,
+  py: number
+): boolean | null {
+  if (!grid || !ref) return null;
+  const box = cellBox(grid, ref);
+  const cell = cellSize(grid);
+  if (!box || !cell) return null;
+  return (
+    px >= box[0] - cell.w &&
+    px <= box[0] + box[2] + cell.w &&
+    py >= box[1] - cell.h &&
+    py <= box[1] + box[3] + cell.h
+  );
+}
+
 /** Validate a grid off the wire. Returns null rather than throwing, so one bad
  *  answer costs the fallback and not the request. */
 export function parseGrid(raw: unknown): MapGrid | null {
