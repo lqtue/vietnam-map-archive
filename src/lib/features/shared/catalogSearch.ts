@@ -3,7 +3,7 @@
  * surface in the app.
  *
  * `/api/search` does the heavy lifting (Postgres tsvector full-text search,
- * server-side role gating, the 2000-row safety ceiling). This module wraps it
+ * server-side role gating, the 5000-row ceiling). This module wraps it
  * in a Svelte store-factory so multiple UIs can share one implementation:
  *   - /catalog            → CatalogUnifiedSearch.svelte (full facet rail)
  *   - /explore?mode=story, /scan → CatalogSidebarPanel → CatalogUnifiedSearch (compact)
@@ -17,30 +17,21 @@ import { writable, derived, get, type Readable, type Writable } from 'svelte/sto
 import { browser } from '$app/environment';
 import { debounce } from '$lib/core/utils/debounce';
 import { matchesSeriesFacet } from '$lib/data/maps/seriesFacet';
-
-export interface PeriodDef {
-  key: string;
-  label: string;
-  from?: number;
-  to?: number;
-}
-
-/** Fallback until /api/search responds. Mirrors the server's PERIODS. */
-const DEFAULT_PERIODS: PeriodDef[] = [
-  { key: 'pre_colonial', label: 'Pre-colonial (≤1858)', from: 0, to: 1858 },
-  { key: 'early_colonial', label: 'Early colonial (1859–1887)', from: 1859, to: 1887 },
-  { key: 'indochina', label: 'French Indochina (1888–1939)', from: 1888, to: 1939 },
-  { key: 'war_years', label: 'War years (1940–1954)', from: 1940, to: 1954 },
-  { key: 'republic', label: 'Republic era (1955–1975)', from: 1955, to: 1975 },
-  { key: 'reunification', label: 'Reunification+ (1976–)', from: 1976, to: 9999 },
-];
+import {
+  decadeBins,
+  isSurvey,
+  passArea,
+  passInstitution,
+  passKind,
+  passType,
+  passYear,
+  type Row,
+  type Selected,
+} from './catalogFilters';
 
 /** Match /api/search's row cap; with no pagination UI we want the whole archive. */
 const FETCH_LIMIT = 5000;
 const DEBOUNCE_MS = 100;
-
-type Row = Record<string, any>;
-type Selected = Record<string, string[]>;
 
 /** One OCR'd label matched inside a map — `/api/search?include=labels`. */
 export interface LabelHit {
@@ -64,7 +55,6 @@ export interface CatalogSearchController {
   selected: Writable<Selected>;
   includeScout: Writable<boolean>;
   loading: Readable<boolean>;
-  periods: Readable<PeriodDef[]>;
   rawMaps: Readable<Row[]>;
   rawScout: Readable<Row[]>;
   filteredMaps: Readable<Row[]>;
@@ -82,8 +72,9 @@ export interface CatalogSearchController {
   /** Distinct areas/types present in the corpus, frequency-sorted (for dropdowns). */
   areaChoices: Readable<string[]>;
   typeChoices: Readable<string[]>;
-  /** Periods that actually have a map, in chronological order (for dropdowns). */
-  periodChoices: Readable<PeriodDef[]>;
+  institutionChoices: Readable<string[]>;
+  /** Rows per decade, counted against every other facet — the histogram under the year range. */
+  yearBins: Readable<{ decade: number; count: number }[]>;
   toggleFacet: (group: string, value: string) => void;
   clearGroup: (group: string) => void;
   /** Single-select helper for native <select> dropdowns. Empty value clears. */
@@ -101,20 +92,6 @@ export function statusOf(r: Row): 'scout' | 'map' | 'image' {
   return r.georef_done ? 'map' : 'image';
 }
 
-function periodOfYear(year: number | null | undefined, defs: PeriodDef[]): string | null {
-  if (year == null) return null;
-  for (const p of defs) {
-    const from = p.from ?? -Infinity;
-    const to = p.to ?? Infinity;
-    if (year >= from && year <= to) return p.key;
-  }
-  return null;
-}
-
-const passArea = (r: Row, sel: Selected) =>
-  !sel.area?.length || sel.area.includes(String(r.location ?? ''));
-const passType = (r: Row, sel: Selected) =>
-  !sel.type?.length || sel.type.includes(String(r.map_type ?? ''));
 const passStatus = (r: Row, sel: Selected) =>
   !sel.status?.length || sel.status.includes(statusOf(r));
 /**
@@ -133,11 +110,6 @@ const passStatus = (r: Row, sel: Selected) =>
  * `requireGeoref`, because it can only overlay what is warped.)
  */
 const passSeries = (r: Row, sel: Selected) => matchesSeriesFacet(r, sel.series_key ?? []);
-const passPeriod = (r: Row, sel: Selected, defs: PeriodDef[]) => {
-  if (!sel.period?.length) return true;
-  const p = periodOfYear(r.year, defs);
-  return p ? sel.period.includes(p) : false;
-};
 const passScoutCat = (r: Row, sel: Selected) =>
   !sel.category?.length || sel.category.includes(String(r._scout?.category ?? ''));
 
@@ -179,12 +151,8 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const rawMaps = writable<Row[]>([]);
   const rawScout = writable<Row[]>([]);
   const labels = writable<LabelHit[]>([]);
-  const periods = writable<PeriodDef[]>(DEFAULT_PERIODS);
 
-  const cache = new Map<
-    string,
-    { maps: Row[]; scout: Row[]; labels: LabelHit[]; periods: PeriodDef[] }
-  >();
+  const cache = new Map<string, { maps: Row[]; scout: Row[]; labels: LabelHit[] }>();
   let inflight: AbortController | null = null;
   let started = false;
 
@@ -208,7 +176,6 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     const key = cacheKey(q, scout);
     const hit = cache.get(key);
     if (hit) {
-      periods.set(hit.periods);
       rawMaps.set(hit.maps);
       rawScout.set(hit.scout);
       labels.set(hit.labels);
@@ -226,10 +193,8 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
         maps: json.maps ?? [],
         scout: json.scout ?? [],
         labels: json.labels ?? [],
-        periods: json.periods ?? DEFAULT_PERIODS,
       };
       cache.set(key, entry);
-      periods.set(entry.periods);
       rawMaps.set(entry.maps);
       rawScout.set(entry.scout);
       labels.set(entry.labels);
@@ -257,87 +222,56 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     doFetch();
   }
 
-  const filteredMaps = derived([rawMaps, selected, periods], ([$maps, $sel, $periods]) =>
-    $maps.filter(
-      (r) =>
-        passArea(r, $sel) &&
-        passType(r, $sel) &&
-        passSeries(r, $sel) &&
-        passPeriod(r, $sel, $periods) &&
-        passStatus(r, $sel) &&
-        (!requireGeoref || !!r.georef_done)
-    )
+  // Every dimension, so a tally can skip its own: `passExcept(sel, 'area')` is "everything but area".
+  const mapTests: Record<string, (r: Row, sel: Selected) => boolean> = {
+    area: passArea,
+    type: passType,
+    series_key: passSeries,
+    year: passYear,
+    institution: passInstitution,
+    kind: passKind,
+    status: passStatus,
+  };
+  const passExcept = (sel: Selected, skip?: string) => (r: Row) =>
+    Object.entries(mapTests).every(([k, test]) => k === skip || test(r, sel));
+
+  const filteredMaps = derived([rawMaps, selected], ([$maps, $sel]) =>
+    $maps.filter((r) => passExcept($sel)(r) && (!requireGeoref || !!r.georef_done))
   );
 
-  const filteredScout = derived([rawScout, selected, periods], ([$scout, $sel, $periods]) =>
+  const filteredScout = derived([rawScout, selected], ([$scout, $sel]) =>
     $scout.filter(
-      (r) =>
-        passArea(r, $sel) &&
-        passPeriod(r, $sel, $periods) &&
-        passScoutCat(r, $sel) &&
-        passStatus(r, $sel)
+      (r) => passArea(r, $sel) && passYear(r, $sel) && passScoutCat(r, $sel) && passStatus(r, $sel)
     )
   );
 
   // "All-but-this-dimension" facet tallies, so a chip shows the count you'd
   // get if you toggled it on.
   const facets = derived(
-    [rawMaps, rawScout, selected, periods, includeScout],
-    ([$maps, $scout, $sel, $periods, $scoutOn]) => {
-      const mapsForArea = $maps.filter(
-        (r) =>
-          passType(r, $sel) &&
-          passSeries(r, $sel) &&
-          passPeriod(r, $sel, $periods) &&
-          passStatus(r, $sel)
-      );
-      const mapsForType = $maps.filter(
-        (r) =>
-          passArea(r, $sel) &&
-          passSeries(r, $sel) &&
-          passPeriod(r, $sel, $periods) &&
-          passStatus(r, $sel)
-      );
-      const mapsForSeries = $maps.filter(
-        (r) =>
-          passArea(r, $sel) &&
-          passType(r, $sel) &&
-          passPeriod(r, $sel, $periods) &&
-          passStatus(r, $sel)
-      );
-      const mapsForStatus = $maps.filter(
-        (r) =>
-          passArea(r, $sel) &&
-          passType(r, $sel) &&
-          passSeries(r, $sel) &&
-          passPeriod(r, $sel, $periods)
-      );
-      const mapsForPeriod = $maps.filter(
-        (r) => passArea(r, $sel) && passType(r, $sel) && passSeries(r, $sel) && passStatus(r, $sel)
-      );
-
-      const periodCounts: Record<string, number> = {};
-      for (const r of mapsForPeriod) {
-        const p = periodOfYear(r.year, $periods);
-        if (p) periodCounts[p] = (periodCounts[p] ?? 0) + 1;
-      }
+    [rawMaps, rawScout, selected, includeScout],
+    ([$maps, $scout, $sel, $scoutOn]) => {
+      const but = (skip: string) => $maps.filter(passExcept($sel, skip));
       const statusCounts: Record<string, number> = {};
-      for (const r of mapsForStatus) {
-        const s = statusOf(r);
-        statusCounts[s] = (statusCounts[s] ?? 0) + 1;
+      for (const r of but('status')) {
+        const st = statusOf(r);
+        statusCounts[st] = (statusCounts[st] ?? 0) + 1;
       }
-      const scoutForCat = $scout.filter((r) => passArea(r, $sel) && passPeriod(r, $sel, $periods));
+      const kindRows = but('kind');
       const scoutCatTally: Record<string, number> = {};
-      for (const r of scoutForCat) {
+      for (const r of $scout.filter((r) => passArea(r, $sel) && passYear(r, $sel))) {
         const c = r._scout?.category;
         if (c) scoutCatTally[c] = (scoutCatTally[c] ?? 0) + 1;
       }
 
       return {
-        area: tally(mapsForArea, 'location'),
-        map_type: tally(mapsForType, 'map_type'),
-        series_key: tally(mapsForSeries, 'series_key'),
-        period: periodCounts,
+        area: tally(but('area'), 'location'),
+        map_type: tally(but('type'), 'map_type'),
+        series_key: tally(but('series_key'), 'series_key'),
+        institution: tally(but('institution'), 'holding_institution'),
+        kind: {
+          surveys: kindRows.filter(isSurvey).length,
+          plans: kindRows.filter((r) => !isSurvey(r)).length,
+        },
         status: statusCounts,
         scout_category: $scoutOn ? scoutCatTally : {},
       };
@@ -353,15 +287,14 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
 
   const areaChoices = derived(rawMaps, ($m) => distinct($m, 'location', requireGeoref));
   const typeChoices = derived(rawMaps, ($m) => distinct($m, 'map_type', requireGeoref));
-  const periodChoices = derived([periods, rawMaps], ([$periods, $m]) => {
-    const present = new Set(
-      $m
-        .filter((r) => !requireGeoref || r.georef_done)
-        .map((r) => periodOfYear(r.year, $periods))
-        .filter(Boolean)
-    );
-    return $periods.filter((p) => present.has(p.key));
-  });
+  const institutionChoices = derived(rawMaps, ($m) =>
+    distinct($m, 'holding_institution', requireGeoref)
+  );
+  const yearBins = derived([rawMaps, selected], ([$maps, $sel]) =>
+    decadeBins(
+      $maps.filter((r) => passExcept($sel, 'year')(r) && (!requireGeoref || !!r.georef_done))
+    )
+  );
 
   function toggleFacet(group: string, value: string) {
     selected.update((s) => {
@@ -383,7 +316,6 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     selected,
     includeScout,
     loading,
-    periods,
     rawMaps,
     rawScout,
     labels,
@@ -394,7 +326,8 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     total,
     areaChoices,
     typeChoices,
-    periodChoices,
+    institutionChoices,
+    yearBins,
     toggleFacet,
     clearGroup,
     setSingle,

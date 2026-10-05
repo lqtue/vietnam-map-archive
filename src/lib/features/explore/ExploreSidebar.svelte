@@ -117,7 +117,7 @@
     !!$query.trim() ||
     ($selected.area?.length ?? 0) > 0 ||
     ($selected.type?.length ?? 0) > 0 ||
-    ($selected.period?.length ?? 0) > 0;
+    ($selected.year?.length ?? 0) > 0;
 
   $: stackedMapIds = $layersStore.overlays.map((o) => o.ref.mapId);
   $: matchedIds = new Set($results.map((r) => r.id));

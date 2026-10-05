@@ -24,6 +24,8 @@
   export let activeId: string | null = null;
   /** Show the "+ overlay" toggle (only on the /explore sidebar). */
   export let showLayerActions: boolean = false;
+  /** Staff also see Type and Status; for a reader Type is one value in 96% of rows and Status is "map". */
+  export let staff: boolean = false;
 
   const dispatch = createEventDispatcher();
 
@@ -32,15 +34,25 @@
   let sort = { key: 'year' as SortKey, asc: true };
   let groupBy: GroupKey = 'none';
 
-  const COLUMNS: TableColumn[] = [
+  /** Sheet number, with the half when the sheet is cut in two ("5929-3 E"). */
+  const sheetOf = (i: any) =>
+    i.sheet_number
+      ? `${i.sheet_number}${i.sheet_half && i.sheet_half !== 'whole' ? ' ' + i.sheet_half : ''}`
+      : '';
+
+  $: COLUMNS = [
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
     { key: 'name', label: 'Title' },
     { key: 'year', label: 'Year', klass: 'num' },
-    { key: 'location', label: 'Area' },
-    { key: 'map_type', label: 'Type' },
-    { key: 'collection', label: 'Collection' },
-    { key: 'status', label: 'Status', klass: 'status-col' },
-  ];
+    { key: 'collection', label: 'Series' },
+    { key: 'holding_institution', label: 'Institution' },
+    ...(staff
+      ? [
+          { key: 'map_type', label: 'Type' },
+          { key: 'status', label: 'Status', klass: 'status-col' },
+        ]
+      : []),
+  ] satisfies TableColumn[];
 
   $: sorted = sortRows(items, sort);
   $: groups = groupRows(sorted, groupBy);
@@ -68,10 +80,6 @@
   function openItem(item: MapListItem) {
     dispatch('open', item);
   }
-  function chip(group: string, value: string | null | undefined) {
-    if (!value) return;
-    dispatch('facet', { group, value: String(value) });
-  }
 </script>
 
 {#if compact}
@@ -83,10 +91,12 @@
       <select bind:value={groupBy}>
         <option value="none">{$t('None')}</option>
         <option value="year">{$t('Year')}</option>
-        <option value="location">Area</option>
-        <option value="map_type">{$t('Type')}</option>
-        <option value="collection">{$t('Collection')}</option>
-        <option value="status">{$t('Status')}</option>
+        <option value="collection">{$t('Series')}</option>
+        <option value="holding_institution">{$t('Institution')}</option>
+        {#if staff}
+          <option value="map_type">{$t('Type')}</option>
+          <option value="status">{$t('Status')}</option>
+        {/if}
       </select>
     </label>
   </div>
@@ -164,49 +174,34 @@
                     >
                   {/if}
                 </div>
-                {#if (item as any).creator}<div class="sub">{(item as any).creator}</div>{/if}
-              </td>
-              <td class="num">
-                {#if item.year}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('year', String(item.year))}
-                    >{item.year}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td>
-                {#if item.location}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('area', item.location)}
-                    >{item.location}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td>
-                {#if item.map_type}
-                  <button
-                    class="tag-chip"
-                    on:click|stopPropagation={() => chip('type', item.map_type)}
-                    >{item.map_type}</button
-                  >
-                {:else}—{/if}
-              </td>
-              <td title={item.collection || ''} class="collection-col">{item.collection || '—'}</td>
-              <td class="status-col">
-                {#if isScout}
-                  <span class="badge-chip is-sm scout">scout</span>
-                {:else if (item as any).georef_done}
-                  <span class="badge-chip is-sm status-map" title={$t('Available on map')}
-                    >{$t('Map')}</span
-                  >
-                {:else}
-                  <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
-                    >{$t('Image')}</span
-                  >
+                {#if sheetOf(item) || (item as any).creator || item.location}
+                  <div class="sub">
+                    {#if sheetOf(item)}<span class="sheet">{sheetOf(item)}</span>{/if}
+                    {[(item as any).creator, item.location].filter(Boolean).join(' · ')}
+                  </div>
                 {/if}
               </td>
+              <td class="num">{item.year ?? '—'}</td>
+              <td title={item.collection || ''} class="collection-col">{item.collection || '—'}</td>
+              <td title={(item as any).holding_institution || ''} class="collection-col">
+                {(item as any).holding_institution || '—'}
+              </td>
+              {#if staff}
+                <td>{item.map_type || '—'}</td>
+                <td class="status-col">
+                  {#if isScout}
+                    <span class="badge-chip is-sm scout">scout</span>
+                  {:else if (item as any).georef_done}
+                    <span class="badge-chip is-sm status-map" title={$t('Available on map')}
+                      >{$t('Map')}</span
+                    >
+                  {:else}
+                    <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
+                      >{$t('Image')}</span
+                    >
+                  {/if}
+                </td>
+              {/if}
             </tr>
           {/each}
         {/if}
@@ -255,23 +250,11 @@
   .ct :global(tbody tr:hover .title-link) {
     text-decoration: underline;
   }
-  /* Not `.chip.ghost`: this is a dense inline affordance inside a table cell,
-     and the shared pill's 2.5rem min-height would set the row height. */
-  .tag-chip {
-    background: transparent;
-    border: 1.5px solid transparent;
-    padding: 0.15rem var(--space-2);
-    border-radius: var(--radius-pill);
-    font: inherit;
-    font-size: 0.85rem;
-    cursor: pointer;
-    color: var(--color-text);
-  }
-  .tag-chip:hover {
-    background: var(--color-white);
-    border-color: var(--color-border);
-  }
   .collection-col {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--sb-text-meta);
     font-size: 0.85rem;
   }
@@ -288,6 +271,15 @@
     border-radius: var(--sb-radius-sm);
     background: var(--sb-thumb-bg);
     display: block;
+  }
+  .sheet {
+    margin-right: 0.35rem;
+    padding: 0 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--sb-radius-sm);
+    font-size: 0.72rem;
+    font-weight: var(--font-bold);
+    white-space: nowrap;
   }
   .ct .title-col .sub {
     font-size: 0.8rem;

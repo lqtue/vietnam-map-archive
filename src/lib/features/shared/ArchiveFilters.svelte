@@ -1,5 +1,5 @@
 <!--
-  ArchiveFilters.svelte — the search box, the three facet dropdowns and the
+  ArchiveFilters.svelte — the search box, the facet dropdowns and the
   reset link that steer a catalog list.
 
   Extracted from `ArchiveBrowser` (Sept 2026) so one bar can steer more than
@@ -19,6 +19,7 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
+  import Tabs from '$lib/ui/Tabs.svelte';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
 
   /** The search engine this bar drives. Created by the caller, because the
@@ -38,16 +39,43 @@
    */
   export let seriesChoices: { value: string; label: string }[] = [];
 
-  const { query, areaChoices, typeChoices, periodChoices, selected } = search;
+  /** Staff get the Type select; for a reader it is one value in 96% of rows, so it filters nothing. */
+  export let staff = false;
+
+  const { query, areaChoices, typeChoices, institutionChoices, yearBins, selected } = search;
+
+  /** The caller that offers surveys also offers the Surveys / Plans switch — same reason. */
+  $: hasKinds = seriesChoices.length > 0;
+  $: kind = $selected.kind?.[0] ?? '';
+  $: KINDS = [
+    { key: '', label: $t('All maps') },
+    { key: 'surveys', label: $t('Surveys') },
+    { key: 'plans', label: $t('Plans & other') },
+  ];
+  /** Area is filled on the one-off plans and empty on survey sheets, so it belongs to that view. */
+  $: showArea = $areaChoices.length > 0 && (!hasKinds || kind === 'plans');
+  function setKind(k: string) {
+    search.setSingle('kind', k);
+    if (k !== 'plans') search.clearGroup('area');
+  }
+
+  $: [yFrom, yTo] = [$selected.year?.[0] ?? '', $selected.year?.[1] ?? ''];
+  $: maxBin = Math.max(1, ...$yearBins.map((b) => b.count));
+  function setYears(from: string, to: string) {
+    selected.update((s) => ({ ...s, year: from || to ? [from, to] : [] }));
+  }
+  const inRange = (decade: number) =>
+    (!yFrom || decade + 9 >= Number(yFrom)) && (!yTo || decade <= Number(yTo));
 
   /** How many facets are set — the number on the summary. */
   $: activeFacets =
     ($selected.area?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
     ($selected.series_key?.length ? 1 : 0) +
-    ($selected.period?.length ? 1 : 0);
+    ($selected.institution?.length ? 1 : 0) +
+    ($selected.year?.length ? 1 : 0);
 
-  $: hasFilters = !!$query.trim() || activeFacets > 0;
+  $: hasFilters = !!$query.trim() || activeFacets > 0 || !!kind;
 
   function resetFilters() {
     query.set('');
@@ -87,13 +115,23 @@
       {/if}
     </label>
   {/if}
+  {#if hasKinds}
+    <div class="kinds">
+      <Tabs
+        tabs={KINDS}
+        active={kind}
+        label={$t('Kind of map')}
+        on:change={(e) => setKind(e.detail.key)}
+      />
+    </div>
+  {/if}
   <details class="sb-more">
     <summary
       >Filters{#if activeFacets}
         · {activeFacets}{/if}</summary
     >
     <div class="dropdowns">
-      {#if $areaChoices.length}
+      {#if showArea}
         <select
           value={$selected.area?.[0] ?? ''}
           on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
@@ -105,7 +143,7 @@
           {/each}
         </select>
       {/if}
-      {#if $typeChoices.length}
+      {#if staff && $typeChoices.length}
         <select
           value={$selected.type?.[0] ?? ''}
           on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
@@ -130,20 +168,63 @@
           {/each}
         </select>
       {/if}
-      {#if $periodChoices.length}
+      {#if $institutionChoices.length > 1}
         <select
-          value={$selected.period?.[0] ?? ''}
+          value={$selected.institution?.[0] ?? ''}
           on:change={(e) =>
-            search.setSingle('period', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by period"
+            search.setSingle('institution', (e.currentTarget as HTMLSelectElement).value)}
+          aria-label="Filter by institution"
         >
-          <option value="">{$t('All periods')}</option>
-          {#each $periodChoices as p (p.key)}
-            <option value={p.key}>{$t(p.label)}</option>
+          <option value="">{$t('All institutions')}</option>
+          {#each $institutionChoices as i (i)}
+            <option value={i}>{i}</option>
           {/each}
         </select>
       {/if}
     </div>
+    {#if $yearBins.length}
+      <!-- A decade bar is a shortcut for the two boxes under it: click one for that decade, or
+           type any span. The bars are counted against every other filter, so they say what is
+           left, and drawn on a square-root scale — ~1,000 sheets are from the 1960s and a handful
+           before, so a straight scale left every other decade a hairline. -->
+      <div class="years">
+        <div class="bars" role="group" aria-label={$t('Maps per decade')}>
+          {#each $yearBins as b (b.decade)}
+            <button
+              type="button"
+              class="bar"
+              class:is-on={inRange(b.decade)}
+              style="height: {b.count ? Math.max(8, Math.sqrt(b.count / maxBin) * 100) : 2}%"
+              title="{b.decade}s · {b.count}"
+              aria-label="{b.decade}s, {b.count}"
+              on:click={() => setYears(String(b.decade), String(b.decade + 9))}
+            ></button>
+          {/each}
+        </div>
+        <div class="span">
+          <label
+            >{$t('From')}
+            <input
+              type="number"
+              inputmode="numeric"
+              placeholder={String($yearBins[0].decade)}
+              value={yFrom}
+              on:change={(e) => setYears(e.currentTarget.value, yTo)}
+            /></label
+          >
+          <label
+            >{$t('To')}
+            <input
+              type="number"
+              inputmode="numeric"
+              placeholder={String($yearBins[$yearBins.length - 1].decade + 9)}
+              value={yTo}
+              on:change={(e) => setYears(yFrom, e.currentTarget.value)}
+            /></label
+          >
+        </div>
+      </div>
+    {/if}
   </details>
 </div>
 
@@ -182,6 +263,49 @@
     border-radius: var(--sb-radius-sm);
     box-shadow: 1px 1px 0 var(--shadow-ink);
     cursor: pointer;
+  }
+
+  .kinds {
+    padding-top: 0.2rem;
+  }
+  .years {
+    padding-top: 0.5rem;
+  }
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 2.2rem;
+  }
+  .bar {
+    flex: 1 1 0;
+    min-width: 3px;
+    padding: 0;
+    border: none;
+    background: color-mix(in srgb, var(--color-text) 22%, transparent);
+    cursor: pointer;
+  }
+  .bar.is-on {
+    background: var(--sb-accent);
+  }
+  .span {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.3rem;
+    font-size: 0.78rem;
+  }
+  .span label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .span input {
+    width: 4.5rem;
+    padding: 0.25rem 0.35rem;
+    font: inherit;
+    background: var(--sb-card-bg);
+    border: var(--border-thin);
+    border-radius: var(--sb-radius-sm);
   }
 
   /* Its own row, so the link sits under the bar it resets whether or not the

@@ -50,18 +50,17 @@
    */
   export let atRest: boolean = true;
 
+  $: staff = role === 'admin' || role === 'mod';
+
   const dispatch = createEventDispatcher<{ pick: any; edit: any }>();
 
   const search = createCatalogSearch({ requireGeoref });
   const {
     query,
     loading,
-    periods,
     results,
     facets,
     total,
-    areaChoices,
-    typeChoices,
     includeScout,
     labels,
     selected,
@@ -121,19 +120,6 @@
   export function filterSeries(seriesKey: string) {
     setSingle('series_key', seriesKey);
   }
-
-  function handleRowFacet(e: CustomEvent<{ group: string; value: string }>) {
-    const { group, value } = e.detail;
-    // Only the area chip is a filter. Other clicks (year, type, etc.) are no-ops.
-    if (group !== 'area') return;
-    toggleFacet('area', value);
-  }
-
-  $: activeAreas = $selected.area ?? [];
-  // Type selections live under the `type` key — the same key the engine's
-  // filter and the FacetRail use. (The compact <select> below previously wrote
-  // `map_type`, which the filter never read, so it silently did nothing.)
-  $: activeTypes = $selected.type ?? [];
 </script>
 
 <div class="cus" class:compact>
@@ -141,7 +127,7 @@
        rail of chips put its filters in a column nobody scrolled back up to,
        and the rail cost the results a third of the page's width. /catalog
        gets a fourth control there, series; nothing else passes choices. -->
-  <ArchiveFilters {search} showSearch={false} {seriesChoices} />
+  <ArchiveFilters {search} showSearch={false} {seriesChoices} {staff} />
 
   {#if !compact}
     <div class="v2-toolbar">
@@ -207,8 +193,8 @@
         {compact}
         {activeId}
         {showLayerActions}
+        {staff}
         on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
-        on:facet={handleRowFacet}
       />
     {/if}
   {/if}
