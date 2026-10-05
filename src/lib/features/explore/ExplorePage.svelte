@@ -189,16 +189,7 @@
     mode = 'all';
   }
 
-  // Reactive deeplink application — both `mapList` (from MapWorkspace) and
-  // `stories` (from onMount fetch) arrive async, so a one-shot in onMount
-  // races with whichever finishes second. Run once when both are ready.
-  $: deeplinkKey = [paramMapId ?? '', paramAt ?? '', paramStoryId ?? ''].join('|');
-  $: if (
-    appliedUrl !== deeplinkKey &&
-    mapList.length > 0 &&
-    (paramMapId || (paramStoryId && stories.length > 0))
-  ) {
-    appliedUrl = deeplinkKey;
+  function applyDeeplink() {
     void applyExploreUrlParams({
       mapId: paramMapId,
       at: paramAt,
@@ -218,6 +209,23 @@
         storyPlayer.startStory(story.id);
       },
     });
+  }
+
+  // Reactive deeplink application — both `mapList` (from MapWorkspace) and
+  // `stories` (from onMount fetch) arrive async, so a one-shot in onMount
+  // races with whichever finishes second. Run once when both are ready.
+  $: deeplinkKey = [paramMapId ?? '', paramAt ?? '', paramStoryId ?? ''].join('|');
+  $: if (
+    appliedUrl !== deeplinkKey &&
+    mapList.length > 0 &&
+    (paramMapId || (paramStoryId && stories.length > 0))
+  ) {
+    appliedUrl = deeplinkKey;
+    // Deferred: this block runs inside Svelte's update pass, and a store write made there lands
+    // after the `$:` statements that read it have already run. `activeOverlayMapId`, and with it
+    // the Info rail, never saw the sheet the link had just added; a reload showed it only because
+    // the stack was restored before first render.
+    queueMicrotask(applyDeeplink);
   }
 
   // Admins/mods get draft maps in coverage too (mirrors the browse panel).

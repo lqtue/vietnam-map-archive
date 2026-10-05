@@ -177,6 +177,10 @@ test('an overlay renders on the map', async ({ page }) => {
   // over an opacity line. `.lsp-row` would pass on an empty `<li>`; the name
   // is what proves the overlay actually reached the store.
   await expect(page.locator('.lsp-name').first()).toBeVisible({ timeout: 20_000 });
+  // And the Info rail describes it. The deep link used to add the layer from inside a `$:` block,
+  // after the statements that derive the top sheet had run, so the rail said "Add a map layer"
+  // until the page was reloaded.
+  await expect(page.locator('.if-name').first()).toBeVisible({ timeout: 20_000 });
 });
 
 test('picking a map writes ?map= and tallies the open', async ({ page }) => {
