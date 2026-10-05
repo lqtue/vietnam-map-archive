@@ -102,6 +102,8 @@ this whether a row contradicts the rest of its own table.
 | 2–3 maps sharing one `source_url` | WARN |
 | `source_type` outside mig 027/041; an impossible `year` | FAIL |
 | `year` appearing nowhere in `date_label`; one holder spelled two ways | WARN |
+| a path, filename or markup in `name`/`original_title`; an `original_title` that is only digits; a name that says the half twice (`Cam Pha est (E)`) | WARN |
+| a published map with no `map_type`; an L7014 `sheet_number` that is not `NNNN-Q`; a `0` / `0 bis` placeholder | WARN |
 | two primary IIIF sources, none primary, or a primary disagreeing with `maps.iiif_image` | FAIL |
 | a published map with no non-r2 IIIF source, so the Allmaps Editor cannot open it | WARN |
 | a job out of retries, held past 3 h, or pointing at a deleted map | WARN / FAIL |
@@ -137,7 +139,7 @@ flagged the three `map_type: regional` sheets and nothing else. Whether a bbox i
 --force`.
 
 `--self-check` hands every rule input it must refuse and the healthy row that
-must pass beside it — 28 cases, no database. A checker that only ever runs
+must pass beside it — 40 cases, no database. A checker that only ever runs
 against a healthy archive reports the same thing whether it works or not, which
 is how `check_series_index` once reported clean over 79 sheets it could not see.
 
