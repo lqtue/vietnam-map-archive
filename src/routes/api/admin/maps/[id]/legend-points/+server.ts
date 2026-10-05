@@ -3,7 +3,12 @@ import type { RequestHandler } from './$types';
 import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
-import { editLegendNotes, legendNumber, MAX_EXTRA_POINTS } from '$lib/server/legendEntry';
+import {
+  editLegendNotes,
+  extraLegendPoints,
+  legendNumber,
+  MAX_EXTRA_POINTS,
+} from '$lib/server/legendEntry';
 import { readLegendEntries, readNumeralCandidates } from '$lib/server/legendRead';
 import { cellAgreement, parseGrid } from '$lib/core/geo/mapGrid';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
@@ -17,8 +22,9 @@ type LegendEdit = {
   grid: string | null;
   /** Image pixels as sent, or ground lng/lat to be taken back to pixels. */
   point: { px: [number, number] } | { lngLat: [number, number] } | null;
-  /** Further image-pixel positions of this entry. */
-  more: [number, number][];
+  /** Further image-pixel positions of this entry; undefined keeps the stored ones
+   *  (the map-mode editor does not know about them and never sends the field). */
+  more?: [number, number][];
 };
 
 function noteText(value: unknown, label: string): string | null {
@@ -59,8 +65,9 @@ function parseEdit(body: unknown): LegendEdit {
       throw error(400, 'Enter valid longitude and latitude, or reset both');
     point = { lngLat: [value.lng, value.lat] };
   }
-  const more: [number, number][] = [];
+  let more: [number, number][] | undefined;
   if (value.more != null) {
+    more = [];
     if (!Array.isArray(value.more) || value.more.length > MAX_EXTRA_POINTS)
       throw error(400, `Give at most ${MAX_EXTRA_POINTS} extra points`);
     for (const p of value.more) {
@@ -208,7 +215,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
             vn: edit.vn,
             grid: edit.grid,
             px: pixel(edit.point),
-            more: edit.more,
+            more: edit.more ?? extraLegendPoints(row.notes),
           }),
         })
         .eq('id', edit.id)
