@@ -104,14 +104,18 @@
               type="button"
               class="sb-btn is-sm"
               disabled={row.x == null}
-              on:click={() => dispatch('reset', { id: row.id })}>{$t('Reset point')}</button
+              on:click={() => dispatch('reset', { id: row.id })}>{$t('Remove point')}</button
             >
           </div>
         {/if}
       </li>
     {/each}
   </ul>
-  <p class="lg-keys">{$t('N next unplaced · Enter accept numeral · Esc cancel · Delete reset')}</p>
+  <p class="lg-keys">
+    {$t(
+      'N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it'
+    )}
+  </p>
 </div>
 
 <style>

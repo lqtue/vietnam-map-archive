@@ -122,11 +122,9 @@
       <ImageShell {iiifInfoUrl} {imageOpacity} />
     {:else}
       <div class="empty-stage">
-        <p>Pick a map to inspect its scan.</p>
         {#if mapsError}
           <p class="empty-state error">Couldn't load the map list: {mapsError}</p>
         {/if}
-        <a href="/catalog" class="catalog-link">Browse the catalog →</a>
       </div>
     {/if}
   </ToolLayout>

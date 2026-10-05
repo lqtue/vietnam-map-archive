@@ -579,11 +579,9 @@
         >
           <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" />
         </svg>
-        <p>Select a map to begin digitalization.</p>
         {#if mapsError}
           <p class="empty-state error">Couldn't load the map list: {mapsError}</p>
         {/if}
-        <a href="/catalog" class="catalog-link">Browse catalog →</a>
       </div>
     {:else}
       <div class="loading-stage">

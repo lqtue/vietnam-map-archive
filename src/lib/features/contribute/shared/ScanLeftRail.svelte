@@ -65,7 +65,7 @@
 
 <ToolSidebarShell title="Map" {onCollapse} showFooter={!!mode}>
   <div class="rail-cards">
-    <SidebarCard title="Browse the archive" grow={1} flush={true}>
+    <SidebarCard grow={1} flush={true}>
       <ToolMapPicker {selectedMapId} {maps} {requireGeoref} on:select on:loaded on:error />
     </SidebarCard>
 

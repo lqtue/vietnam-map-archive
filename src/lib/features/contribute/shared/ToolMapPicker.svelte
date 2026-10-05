@@ -47,6 +47,7 @@
   const { supabase } = getSupabaseContext();
 
   let loaded: LabelMapInfo[] = [];
+  let fetched = false;
   $: list = maps ?? loaded;
   $: byId = new Map(list.map((m) => [m.id, m]));
 
@@ -74,6 +75,7 @@
     if (maps) return;
     try {
       loaded = await fetchLabelMaps(supabase);
+      fetched = true;
       dispatch('loaded', { maps: loaded });
     } catch (err: any) {
       dispatch('error', { message: err?.message ?? 'Failed to load maps' });
@@ -92,6 +94,7 @@
     filterIds={list.map((m) => m.id)}
     activeIds={selectedMapId ? [selectedMapId] : []}
     {badges}
+    waiting={maps ? maps.length === 0 : !fetched}
     showTypes={false}
     showLabels={false}
     on:pick={handlePick}

@@ -357,17 +357,9 @@
         >
           <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
         </svg>
-        <p>
-          {tab === 'validate'
-            ? $queue.queue.length === 0 && !$queue.queueError
-              ? "Queue's clear — no shapes waiting on review."
-              : 'Pick a sheet from the queue to start checking.'
-            : 'Pick a map to start tracing.'}
-        </p>
         {#if mapsError || $queue.queueError}
           <p class="empty-state error">{mapsError || $queue.queueError}</p>
         {/if}
-        <a href="/catalog" class="catalog-link">Browse the catalog →</a>
       </div>
     {:else}
       <div class="loading-stage">

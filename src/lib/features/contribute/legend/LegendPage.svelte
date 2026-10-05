@@ -10,6 +10,7 @@
 
   Keys (ignored while typing in a field):
     n       next unplaced entry        Enter   accept the best numeral for it
+    click a pin selects it; drag moves it
     Esc     deselect                   Delete or Backspace (a Mac's delete key)  reset its position
 -->
 <script lang="ts">
@@ -291,6 +292,14 @@
           showCandidates={show.candidates}
           showGrid={show.grid}
           on:place={(e) => place(e.detail.x, e.detail.y)}
+          on:pick={(e) => {
+            const row = view.find((r) => r.n === e.detail.n);
+            if (row) selectedId = row.id;
+          }}
+          on:move={(e) => {
+            const row = view.find((r) => r.n === e.detail.n);
+            if (row) stage(row.id, { x: e.detail.x, y: e.detail.y });
+          }}
           on:candidate={(e) => {
             const c = candidates.find((k) => k.labelId === e.detail.labelId);
             if (c) acceptCandidate(c);
@@ -299,9 +308,7 @@
       </ImageShell>
     {:else}
       <div class="empty-stage">
-        <p>{$t('Pick a map to place its legend.')}</p>
         {#if mapsError}<p class="empty-state error">{mapsError}</p>{/if}
-        <a href="/catalog" class="catalog-link">{$t('Browse the catalog')} →</a>
       </div>
     {/if}
   </ToolLayout>

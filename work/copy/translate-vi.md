@@ -508,8 +508,8 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | unplaced | chưa đặt |
 | Vietnamese name | Tên tiếng Việt |
 | Grid reference | Ô lưới tham chiếu |
-| Reset point | Đặt lại vị trí |
-| N next unplaced · Enter accept numeral · Esc cancel · Delete reset | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete đặt lại |
+| Remove point | Xóa điểm |
+| N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete xóa điểm · kéo điểm để dời |
 | Placed points | Điểm đã đặt |
 | Numeral candidates | Số ứng viên |
 | Index grid | Lưới chỉ mục |
