@@ -83,10 +83,6 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
     ...STATIC_PATHS.map((p) => entry(withLocale(p))),
     ...posts.map((p) => entry(`/blog/${p.slug}`, p.date)),
     ...(maps ?? []).map((m) => entry(`/catalog/${m.slug}`, m.updated_at as string | null)),
-    /* Listed here rather than in `LOCALIZED_PATHS`: the index is a page, but
-       its prose is not translated, and a `/vi` twin with an hreflang pair
-       would be the same document claiming to be two. */
-    entry('/catalog/series'),
     ...(series ?? []).map((s) => entry(`/catalog/series/${s.key}`)),
     ...(places ?? [])
       .filter((p) => p.name_key)

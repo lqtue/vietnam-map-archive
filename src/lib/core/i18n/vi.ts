@@ -121,7 +121,6 @@ export const vi: Record<string, string> = {
   'No maps match this view — try another tab or the catalog.':
     'Không có bản đồ nào phù hợp với góc nhìn này — hãy thử tab khác hoặc danh mục.',
   'Browse the catalog': 'Duyệt danh mục',
-  'Map series': 'Bộ bản đồ',
   'Build something on top of the archive — a scrollytelling story across historical layers, or your own points, lines and shapes on a sheet.':
     'Xây dựng nội dung dựa trên kho dữ liệu — câu chuyện lịch sử theo lớp không gian, hoặc thêm điểm, đường và hình khối trên bản đồ.',
   'Walk readers through a place, one layer at a time':
@@ -249,9 +248,6 @@ export const vi: Record<string, string> = {
   'Static image only': 'Chỉ có hình ảnh tĩnh',
   'Browse by series': 'Duyệt theo bộ bản đồ',
   'All series': 'Tất cả bộ bản đồ',
-  'A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not.':
-    'Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không.',
-  'catalogued {years}': 'biên mục {years}',
   '{held} of {total} sheets — {pct}%': '{held} trên {total} mảnh — {pct}%',
   'Series details': 'Thông tin bộ bản đồ',
   'Distinct public cells': 'Số ô bản đồ công khai riêng biệt',

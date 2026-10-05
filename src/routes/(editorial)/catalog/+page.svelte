@@ -132,16 +132,8 @@
          what they asked for. -->
     {#if atRest && series.length}
       <section class="series-band" aria-labelledby="series-band-title">
-        <div class="band-head">
-          <h2 id="series-band-title">{$t('Browse by series')}</h2>
-          <a class="band-all" href="/catalog/series">{$t('All series')} →</a>
-        </div>
-        <p class="band-lead">
-          {$t(
-            'A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not.'
-          )}
-        </p>
-        <SeriesList {series} dense drawer on:open={(e) => (openedSeries = e.detail)} />
+        <h2 id="series-band-title" class="band-title">{$t('Browse by series')}</h2>
+        <SeriesList {series} on:open={(e) => (openedSeries = e.detail)} />
       </section>
     {/if}
 
@@ -194,30 +186,10 @@
     padding-bottom: 1rem;
     border-bottom: var(--border-thin);
   }
-  .band-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .band-head h2 {
+  .band-title {
     margin: 0;
     font-family: var(--font-family-display);
     font-weight: var(--font-extrabold);
     font-size: 1.1rem;
-  }
-  .band-all {
-    font-size: 0.82rem;
-    font-weight: var(--font-bold);
-    color: var(--sb-accent);
-    text-decoration: underline;
-    white-space: nowrap;
-  }
-  .band-lead {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--color-gray-500);
-    max-width: 52ch;
   }
 </style>

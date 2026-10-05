@@ -14,6 +14,7 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/studio': '/explore?mode=studio',
   '/create': '/explore?mode=story',
   '/image': '/catalog',
+  '/catalog/series': '/catalog',
   '/contribute/label': '/scan?mode=prepare',
   '/contribute/digitalize': '/scan?mode=prepare',
   '/contribute/trace': '/scan?mode=shapes',

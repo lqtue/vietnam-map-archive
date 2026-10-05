@@ -1,12 +1,8 @@
 /**
  * seriesIndex.ts — the surveys the archive holds part of, and how much of each.
  *
- * Read by two surfaces that must agree: `/catalog/series`, which lists every
- * survey, and the band at the top of `/catalog`, which is the way in to it.
- * They were one function's worth of logic in a route load until the band
- * needed the same rows — and two copies of "which surveys qualify" is exactly
- * the drift this is here to prevent, because the qualifying rule below is a
- * filter the database does not apply for us.
+ * Read by the band at the top of `/catalog`, the way in to the coverage pages.
+ * The qualifying rule below is a filter the database does not apply for us.
  *
  * Which surveys qualify is `map_series`'s decision (migration 082/084), not
  * this module's — a numbered sheet, more than one of them, and this reader
@@ -58,12 +54,11 @@ export async function fetchSeriesIndex(
   supabase: SupabaseClient<Database>
 ): Promise<SeriesIndexEntry[]> {
   const all = await fetchMapSeries(supabase);
-  /* A survey whose index was never imported has no coverage page — that route
-     404s on purpose — so it is not offered here either. AMS L909 is the one:
-     three sheets, and nobody has decided what the survey contains. It appears
-     the moment someone imports its index, which is the point of reading this
-     rather than listing surveys by hand. */
-  const series = all.filter((s) => s.publishedSheets > 0 && s.surveySheets != null);
+  /* Every series with a published sheet. One whose index was never imported (AMS L909) has no
+     coverage page — that route 404s on purpose — so `hasDenominator` is false for it and the band
+     opens its drawer instead of linking. It gets a coverage page the moment someone imports its
+     index. */
+  const series = all.filter((s) => s.publishedSheets > 0);
 
   const [
     { data: coverage, error: coverageError },

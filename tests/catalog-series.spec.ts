@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
  * the outside, which is why each gets a check rather than a glance:
  *
  *  - the band is server-rendered, so a crawler and a reader with no JavaScript
- *    both reach the coverage pages. `/catalog/series` existed for a day with
+ *    both reach the coverage pages. the coverage pages once had
  *    exactly one way in — a control inside an `ssr = false` tool.
  *  - the row keeps its `href` while opening a drawer. A button here would have
  *    silently removed the only crawlable path to the coverage pages, and
@@ -27,7 +27,6 @@ test('the band is in the HTML, with a link to every coverage page', async ({ pag
   expect(html).toContain('series-band');
   const hrefs = [...html.matchAll(/href="(\/catalog\/series\/[^"]+)"/g)].map((m) => m[1]);
   expect(hrefs.length).toBeGreaterThan(0);
-  expect(html).toContain('href="/catalog/series"');
 
   // Every row's href resolves — a 404 here is a survey with no imported index
   // that the band should have filtered out.
@@ -55,13 +54,13 @@ test('the band is in the HTML, with a link to every coverage page', async ({ pag
  */
 async function ready(page: import('@playwright/test').Page) {
   await expect(page.locator('.v2-count')).not.toHaveText(/^\s*0\s+in archive/);
-  await expect(page.locator('.series-band a.section-card').first()).toBeVisible();
+  await expect(page.locator('.series-band a.drow').first()).toBeVisible();
 }
 
 test('a row opens the drawer and still carries its link', async ({ page }) => {
   await page.goto('/catalog');
   await ready(page);
-  const row = page.locator('.series-band a.section-card').first();
+  const row = page.locator('.series-band a.drow').first();
   const href = await row.getAttribute('href');
   expect(href).toMatch(/^\/catalog\/series\//);
 
@@ -108,7 +107,7 @@ test('the drawer is over the nav, not under it', async ({ page }) => {
    */
   await page.goto('/catalog');
   await ready(page);
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   await expect(page.getByRole('dialog', { name: /series details/i })).toBeVisible();
   await expect(page.locator('.drawer-head')).toBeVisible();
 
@@ -141,7 +140,7 @@ test('"Filter the catalog" narrows the list to that survey, and the band steps a
   const count = page.locator('.v2-count');
   const all = Number((await count.textContent())!.match(/(\d+)/)![1]);
 
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   await page.getByRole('button', { name: 'Filter the catalog' }).click();
 
   // The drawer closes, the band goes away, and the list is smaller than the
@@ -162,7 +161,7 @@ test('"Filter the catalog" narrows the list to that survey, and the band steps a
 test('"Open in map" actually puts the survey on the map', async ({ page }) => {
   await page.goto('/catalog');
   await ready(page);
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   const name = (await page.getByRole('dialog').getByRole('heading').textContent())!.trim();
   await page.getByRole('link', { name: 'Open in map' }).click();
 
@@ -181,7 +180,7 @@ test('"Open in map" actually puts the survey on the map', async ({ page }) => {
 test('a series page opens its survey alone, clearing a previously selected survey', async ({
   page,
 }) => {
-  await page.goto('/catalog/series');
+  await page.goto('/catalog');
   const hrefs = await page
     .locator('a[href^="/catalog/series/"]')
     .evaluateAll((links) => [

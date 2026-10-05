@@ -157,7 +157,6 @@ keyed on its own rather than as part of a sentence.
 | Heart any map and it lands here, on every device you sign in from. | Thả tim bất kỳ bản đồ nào để lưu vào đây trên mọi thiết bị đăng nhập của bạn. |
 | No maps match this view — try another tab or the catalog. | Không có bản đồ nào phù hợp với góc nhìn này — hãy thử tab khác hoặc danh mục. |
 | Browse the catalog | Duyệt danh mục |
-| Map series | Bộ bản đồ |
 | Build something on top of the archive — a scrollytelling story across historical layers, or your own points, lines and shapes on a sheet. | Xây dựng nội dung dựa trên kho dữ liệu — câu chuyện lịch sử theo lớp không gian, hoặc thêm điểm, đường và hình khối trên bản đồ. |
 | Walk readers through a place, one layer at a time | Dẫn dắt người đọc qua từng lớp thời gian của một địa điểm |
 | Draw on any map and save it as a set | Vẽ trên bất kỳ bản đồ nào và lưu lại thành tập dữ liệu |
@@ -291,8 +290,6 @@ the catalogue.
 |---|---|
 | Browse by series | Duyệt theo bộ bản đồ |
 | All series | Tất cả bộ bản đồ |
-| A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not. | Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không. |
-| catalogued {years} | biên mục {years} |
 | {held} of {total} sheets — {pct}% | {held} trên {total} mảnh — {pct}% |
 
 | English | Tiếng Việt |
