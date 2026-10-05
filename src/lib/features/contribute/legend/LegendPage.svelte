@@ -10,7 +10,7 @@
 
   Keys (ignored while typing in a field):
     n       next unplaced entry        Enter   accept the best numeral for it
-    Esc     deselect                   Delete  reset its position
+    Esc     deselect                   Delete or Backspace (a Mac's delete key)  reset its position
 -->
 <script lang="ts">
   import { onMount } from 'svelte';
@@ -163,7 +163,8 @@
       const c = bestCandidate(candidates, selected.n);
       if (c) acceptCandidate(c);
     } else if (e.key === 'Escape') selectedId = null;
-    else if (e.key === 'Delete' && selected) stage(selected.id, { x: null, y: null });
+    else if ((e.key === 'Delete' || e.key === 'Backspace') && selected)
+      stage(selected.id, { x: null, y: null });
     else return;
     e.preventDefault();
   }
@@ -193,8 +194,14 @@
       if (!res.ok) throw new Error(result.message ?? 'save');
       if (currentMap?.id !== id) return;
       const saved = new Set<string>(result.saved ?? []);
-      rows = rows.map((row) => (saved.has(row.id) ? { ...staged[row.id], validated: true } : row));
-      staged = Object.fromEntries(Object.entries(staged).filter(([k]) => !saved.has(k)));
+      const sentById = new Map(sent.map((row) => [row.id, row]));
+      rows = rows.map((row) =>
+        saved.has(row.id) ? { ...sentById.get(row.id)!, validated: true } : row
+      );
+      // An entry edited again while the save was in flight keeps its newer, unsent edit.
+      staged = Object.fromEntries(
+        Object.entries(staged).filter(([k, row]) => !saved.has(k) || row !== sentById.get(k))
+      );
       failures = Object.fromEntries(
         (result.failed ?? []).map((f: { id: string; message: string }) => [f.id, f.message])
       );
