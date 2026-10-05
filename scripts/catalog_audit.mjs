@@ -157,8 +157,10 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (published(m) && !m.map_type) say('WARN', 'metadata', who(m), 'published with no map_type');
     // Sheet numbers are checked for L7014 (a four-digit cell and a quarter) and for the
     // 0 / "0 bis" placeholder; the AMS L909 city maps are keyed by city name on purpose.
+    // The Tonkin 1:25,000 survey really does print "Feuille N° 0" and "N° 0 bis" (Ha Chau,
+    // Nha Nam; read off the scans 2026-10-05, the index diagram shows 0, 0 bis, 4, 5, 5 bis).
     if (m.sheet_number != null) {
-      if (/^0( bis)?$/.test(m.sheet_number))
+      if (/^0( bis)?$/.test(m.sheet_number) && !/tonkin-thanh-hoa/.test(m.series_key ?? ''))
         say(
           'WARN',
           'sheet',
@@ -433,6 +435,14 @@ function selfCheck() {
     'a published map with no map_type is flagged'
   );
   ok(has(run({ sheet_number: '0 bis' }), 'sheet', 'WARN'), 'a 0 / "0 bis" sheet_number is flagged');
+  ok(
+    !has(
+      run({ sheet_number: '0 bis', series_key: 'indochine-1-25-000-tonkin-thanh-hoa' }),
+      'sheet',
+      'WARN'
+    ),
+    'the Tonkin 1:25,000 survey prints sheets 0 and 0 bis, so they are not placeholders'
+  );
   ok(
     has(run({ series_key: 'series-l7014-x', sheet_number: '6541' }), 'sheet', 'WARN'),
     'an L7014 sheet_number that is not NNNN-Q is flagged'
