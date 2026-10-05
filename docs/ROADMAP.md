@@ -471,8 +471,15 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`map-region-from-bbox`** — a derived province-level `maps.region`, backfilled from the
       `bbox` centroid (100% filled; confirm it is lng/lat first), so survey sheets get a place
       facet without hand entry. Decided 2026-10-05: derive, do not hand-fill. Additive migration;
-      regenerate `types.ts` after it. Exit: every public map has a `region`, and /catalog's Area
-      facet reads it.
+      regenerate `types.ts` after it. Exit: every public map that lies on Vietnamese land has a
+      `region`, and /catalog's Area facet reads it.
+      **Written, not pushed:** `109_map_region.sql` (`region` = the 63 provinces to June 2025,
+      `region_2025` = the 34 since) and `scripts/oneoff/backfill_map_region.mjs` (dry by default).
+      `bbox` is [minLng, minLat, maxLng, maxLat], confirmed. The dry run labels 816 of 1,038
+      public maps; the other 222 are mostly the ~150 Cambodia/Laos sheets and sheets that are
+      mostly sea, left null on purpose. After the push: run `--apply`, regenerate `types.ts`,
+      bump the head note in `CLAUDE.md` and `supabase/CLAUDE.md`, add `region` to the list
+      columns, and show the page that it is a modern locator.
 - [ ] **`map-json-to-columns`** — `db-guidelines.md` §8 says filtered fields get columns, and
       three do not. `sheet_number` and `sheet_half` are columns but `api/search/+server.ts` still
       matches `extra_metadata->>sheet_number` and the JSON copy is still written; `edition` (456
