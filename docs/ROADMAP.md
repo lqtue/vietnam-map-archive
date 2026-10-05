@@ -466,6 +466,8 @@ system — what a result must retain, and the two kinds of check — is in the r
       `simple` config. Keep the server call for OCR labels and places only; the palette's slim
       mode is unchanged. The `^\d{4}-\d$` sheet-number match moves with it. A library
       (MiniSearch) only if typo tolerance is wanted. Exit: typing never waits on the network.
+      **Built, not yet deployed** (`localSearch.ts`; the server's map search stays for the
+      palette). Close it once it is live.
 - [ ] **`map-region-from-bbox`** — a derived province-level `maps.region`, backfilled from the
       `bbox` centroid (100% filled; confirm it is lng/lat first), so survey sheets get a place
       facet without hand entry. Decided 2026-10-05: derive, do not hand-fill. Additive migration;

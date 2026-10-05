@@ -16,6 +16,7 @@
 import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { debounce } from '$lib/core/utils/debounce';
+import { matchesQuery } from './localSearch';
 import { matchesSeriesFacet } from '$lib/data/maps/seriesFacet';
 import {
   decadeBins,
@@ -152,75 +153,110 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const rawScout = writable<Row[]>([]);
   const labels = writable<LabelHit[]>([]);
 
-  const cache = new Map<string, { maps: Row[]; scout: Row[]; labels: LabelHit[] }>();
+  /*
+   * Two fetches, because they answer different questions. The maps are the whole archive, fetched
+   * once and searched here (`localSearch`), so typing never waits on the network. Labels (OCR text
+   * inside the maps) and the staff scout queue are searched by the server, per query, and arrive
+   * after — the list is already filtered by then.
+   */
+  let mapsLoaded: Promise<void> | null = null;
+  let mapsPending = false;
+  let extrasPending = false;
+  const extras = new Map<string, { scout: Row[]; labels: LabelHit[] }>();
   let inflight: AbortController | null = null;
   let started = false;
 
-  const cacheKey = (q: string, scout: boolean) => `${q.trim().toLowerCase()}|${scout ? 1 : 0}`;
+  const syncLoading = () => loading.set(mapsPending || extrasPending);
 
-  function buildQS(q: string, scout: boolean): string {
-    const sp = new URLSearchParams();
-    if (q.trim()) sp.set('q', q.trim());
-    // Labels only mean something against a query; the server skips them otherwise.
-    sp.set(
-      'include',
-      ['maps', ...(scout ? ['scout'] : []), ...(q.trim() ? ['labels'] : [])].join(',')
-    );
-    sp.set('limit', String(FETCH_LIMIT));
-    return sp.toString();
+  function loadMaps(): Promise<void> {
+    if (mapsLoaded) return mapsLoaded;
+    mapsPending = true;
+    syncLoading();
+    mapsLoaded = (async () => {
+      try {
+        const res = await fetch(`/api/search?include=maps&limit=${FETCH_LIMIT}`);
+        if (!res.ok) throw new Error(await res.text());
+        rawMaps.set((await res.json()).maps ?? []);
+      } catch (e) {
+        mapsLoaded = null; // so the next keystroke tries again
+        console.error('catalog search failed:', e);
+      } finally {
+        mapsPending = false;
+        syncLoading();
+      }
+    })();
+    return mapsLoaded;
   }
 
-  async function doFetch() {
-    const q = get(query);
+  async function loadExtras() {
+    const q = get(query).trim();
     const scout = get(includeScout);
-    const key = cacheKey(q, scout);
-    const hit = cache.get(key);
-    if (hit) {
-      rawMaps.set(hit.maps);
-      rawScout.set(hit.scout);
-      labels.set(hit.labels);
-      loading.set(false);
+    if (!q && !scout) {
+      inflight?.abort();
+      extrasPending = false;
+      rawScout.set([]);
+      labels.set([]);
+      syncLoading();
       return;
     }
-    if (inflight) inflight.abort();
+    const key = `${q.toLowerCase()}|${scout ? 1 : 0}`;
+    const hit = extras.get(key);
+    if (hit) {
+      rawScout.set(hit.scout);
+      labels.set(hit.labels);
+      extrasPending = false;
+      syncLoading();
+      return;
+    }
+    inflight?.abort();
     inflight = new AbortController();
-    loading.set(true);
+    extrasPending = true;
+    syncLoading();
+    const sp = new URLSearchParams({
+      include: [...(scout ? ['scout'] : []), ...(q ? ['labels'] : [])].join(','),
+      limit: String(FETCH_LIMIT),
+    });
+    if (q) sp.set('q', q);
     try {
-      const res = await fetch(`/api/search?${buildQS(q, scout)}`, { signal: inflight.signal });
+      const res = await fetch(`/api/search?${sp}`, { signal: inflight.signal });
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
-      const entry = {
-        maps: json.maps ?? [],
-        scout: json.scout ?? [],
-        labels: json.labels ?? [],
-      };
-      cache.set(key, entry);
-      rawMaps.set(entry.maps);
+      const entry = { scout: json.scout ?? [], labels: json.labels ?? [] };
+      extras.set(key, entry);
       rawScout.set(entry.scout);
       labels.set(entry.labels);
+      extrasPending = false;
     } catch (e: any) {
-      if (e?.name !== 'AbortError') console.error('catalog search failed:', e);
-    } finally {
-      loading.set(false);
+      if (e?.name === 'AbortError') return; // a newer request owns the flag now
+      extrasPending = false;
+      console.error('catalog search failed:', e);
     }
+    syncLoading();
   }
 
-  const scheduleFetch = debounce(doFetch, DEBOUNCE_MS);
+  const scheduleExtras = debounce(loadExtras, DEBOUNCE_MS);
 
   function start() {
     if (started || !browser) return;
     started = true;
-    // The immediate subscriber callback fires the initial fetch; subsequent
-    // query/include changes re-trigger it (debounced + cached).
-    query.subscribe(() => scheduleFetch());
-    includeScout.subscribe(() => scheduleFetch());
+    loadMaps();
+    // Typing filters the loaded maps at once; only the server-side extras are debounced.
+    query.subscribe(() => scheduleExtras());
+    includeScout.subscribe(() => scheduleExtras());
   }
 
-  /** Drop cached results and re-fetch — call after an edit changes the data. */
+  /** Drop what was fetched and fetch again — call after an edit changes the data. */
   function refresh() {
-    cache.clear();
-    doFetch();
+    extras.clear();
+    mapsLoaded = null;
+    loadMaps();
+    loadExtras();
   }
+
+  /** The maps the query leaves, before any facet — what every tally and choice list counts. */
+  const searchedMaps = derived([rawMaps, query], ([$maps, $q]) =>
+    $q.trim() ? $maps.filter((r) => matchesQuery(r, $q)) : $maps
+  );
 
   // Every dimension, so a tally can skip its own: `passExcept(sel, 'area')` is "everything but area".
   const mapTests: Record<string, (r: Row, sel: Selected) => boolean> = {
@@ -235,7 +271,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const passExcept = (sel: Selected, skip?: string) => (r: Row) =>
     Object.entries(mapTests).every(([k, test]) => k === skip || test(r, sel));
 
-  const filteredMaps = derived([rawMaps, selected], ([$maps, $sel]) =>
+  const filteredMaps = derived([searchedMaps, selected], ([$maps, $sel]) =>
     $maps.filter((r) => passExcept($sel)(r) && (!requireGeoref || !!r.georef_done))
   );
 
@@ -248,7 +284,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   // "All-but-this-dimension" facet tallies, so a chip shows the count you'd
   // get if you toggled it on.
   const facets = derived(
-    [rawMaps, rawScout, selected, includeScout],
+    [searchedMaps, rawScout, selected, includeScout],
     ([$maps, $scout, $sel, $scoutOn]) => {
       const but = (skip: string) => $maps.filter(passExcept($sel, skip));
       const statusCounts: Record<string, number> = {};
@@ -285,12 +321,12 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     scout: $s.length,
   }));
 
-  const areaChoices = derived(rawMaps, ($m) => distinct($m, 'location', requireGeoref));
-  const typeChoices = derived(rawMaps, ($m) => distinct($m, 'map_type', requireGeoref));
-  const institutionChoices = derived(rawMaps, ($m) =>
+  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'location', requireGeoref));
+  const typeChoices = derived(searchedMaps, ($m) => distinct($m, 'map_type', requireGeoref));
+  const institutionChoices = derived(searchedMaps, ($m) =>
     distinct($m, 'holding_institution', requireGeoref)
   );
-  const yearBins = derived([rawMaps, selected], ([$maps, $sel]) =>
+  const yearBins = derived([searchedMaps, selected], ([$maps, $sel]) =>
     decadeBins(
       $maps.filter((r) => passExcept($sel, 'year')(r) && (!requireGeoref || !!r.georef_done))
     )
