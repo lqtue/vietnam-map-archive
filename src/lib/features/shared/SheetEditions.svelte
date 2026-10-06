@@ -54,6 +54,7 @@
 
   $: onStack = new Set($layersStore.overlays.map((o) => o.ref.mapId));
   $: groups = groupSheetScans(editions);
+  $: isParts = editions.some((e) => e.part);
 
   onDestroy(() => {
     requestId++;
@@ -69,13 +70,17 @@
 
 {#if editions.length > 0}
   <div class="se">
-    <h4 class="se-title">{$t('Other scans and printings of this cell')}</h4>
+    <h4 class="se-title">
+      {isParts ? $t('Other sheets of this plan') : $t('Other scans and printings of this cell')}
+    </h4>
     <ul class="se-list">
       {#each groups as group (group.printingId ?? group.scans[0].id)}
         <li class="se-row">
           <div class="se-meta">
             <span class="se-name">{group.scans[0].name}</span>
-            {#if group.unresolved}<span class="se-sub">{$t('Printing identity unresolved')}</span>
+            {#if group.unresolved && !isParts}<span class="se-sub"
+                >{$t('Printing identity unresolved')}</span
+              >
             {:else}<span class="se-sub">{label(group.scans[0])}</span>{/if}
             {#if group.scans.length > 1}<span class="se-printing">{group.scans.length} scans</span
               >{/if}
@@ -90,7 +95,7 @@
                 title={edition.name}
                 on:click={() => toggleOverlayFor(edition)}
               >
-                {onStack.has(edition.id) ? $t('On map') : $t('Compare')}
+                {onStack.has(edition.id) ? $t('On map') : isParts ? $t('Add') : $t('Compare')}
               </button>
             {:else}<span class="se-nogeo">{$t('not georeferenced')}</span>{/if}
           {/each}

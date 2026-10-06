@@ -39,14 +39,14 @@ is linked while its count is described as indexed cities.
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **450** tests (`npx playwright test --list`, 2026-10-06):
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **468** tests (`npx playwright test --list`, 2026-10-06):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **eleven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 427 browser-less pure
+**read-only** (they hit the real Supabase project but never write), plus 445 browser-less pure
 checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
 after a display-label change and omit unlinked maps; two scans group only when they have the same
 printing UUID; unresolved scans remain separate, and an institution is held only through
@@ -59,7 +59,7 @@ camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easin
 animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker),
 `tests/map-region.spec.ts` (the 63 provinces fold into exactly 34, a sheet takes the province under most of it rather than under its centre, open water keeps its province but a neighbour's land does not, a country-scale bbox gets none),
 `tests/local-search.spec.ts` (the catalog's in-browser search: accents and đ fold both ways, every token must start a word, `1920s` is a prefix, a sheet number matches its column exactly),
-`tests/catalog-filters.spec.ts` (the year range is inclusive, open-ended and drops undated rows; the Surveys / Plans split; the decade histogram keeps empty decades; a sheet label carries its half only when the sheet is cut in two; series options list each survey once, biggest first, and skip plans; a series name shortens to its head plus the scale),
+`tests/catalog-filters.spec.ts` (the year range is inclusive, open-ended and drops undated rows; the Surveys / Plans split; the decade histogram keeps empty decades; a sheet label carries its half only when the sheet is cut in two; series options list each survey once, biggest first, and skip plans; a series name shortens to its head plus the scale; the Info year shows the survey year and, when a plain different item date exists, "1873 (print 1937)"),
 `tests/catalog-slice.spec.ts` (the catalog's drawn slice keeps each group's full count, and the two-page read returns every row at 0, 1, 2 and 3 pages — a shared query builder once answered with whichever range was set last),
 `tests/triage-suggest.spec.ts` (level0 tile addressing and the triage proposal),
 `tests/map-grid.spec.ts` (the printed reference grid, cell to point), `tests/coordinates.spec.ts`

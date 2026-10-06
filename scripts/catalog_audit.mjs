@@ -100,8 +100,13 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
 
   // ── the publish gate, and what it does not prove ──────────────────────────
   for (const m of maps) {
-    if (!['draft', 'public', 'featured'].includes(m.status))
-      say('FAIL', 'status', who(m), `status '${m.status}' is outside draft/public/featured`);
+    if (!['draft', 'public', 'featured', 'archived'].includes(m.status))
+      say(
+        'FAIL',
+        'status',
+        who(m),
+        `status '${m.status}' is outside draft/public/featured/archived`
+      );
 
     if (!published(m)) continue;
     if (!m.annotation_url && !m.allmaps_id)
@@ -152,8 +157,10 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
     if (published(m) && !m.map_type) say('WARN', 'metadata', who(m), 'published with no map_type');
     // Sheet numbers are checked for L7014 (a four-digit cell and a quarter) and for the
     // 0 / "0 bis" placeholder; the AMS L909 city maps are keyed by city name on purpose.
+    // The Tonkin 1:25,000 survey really does print "Feuille N° 0" and "N° 0 bis" (Ha Chau,
+    // Nha Nam; read off the scans 2026-10-05, the index diagram shows 0, 0 bis, 4, 5, 5 bis).
     if (m.sheet_number != null) {
-      if (/^0( bis)?$/.test(m.sheet_number))
+      if (/^0( bis)?$/.test(m.sheet_number) && !/tonkin-thanh-hoa/.test(m.series_key ?? ''))
         say(
           'WARN',
           'sheet',
@@ -210,6 +217,9 @@ export function auditCatalog({ maps, aliases = [], sources = [], jobs = [], now 
   const byImage = new Map();
   const byUrl = new Map();
   for (const m of maps) {
+    // Archived rows are kept for provenance (mig 107); one that shares a scan with the map that
+    // replaced it is the point, not a fault.
+    if (m.status === 'archived') continue;
     if (m.iiif_image) push(byImage, m.iiif_image, m);
     if (m.source_url) push(byUrl, m.source_url, m);
   }
@@ -426,6 +436,14 @@ function selfCheck() {
   );
   ok(has(run({ sheet_number: '0 bis' }), 'sheet', 'WARN'), 'a 0 / "0 bis" sheet_number is flagged');
   ok(
+    !has(
+      run({ sheet_number: '0 bis', series_key: 'indochine-1-25-000-tonkin-thanh-hoa' }),
+      'sheet',
+      'WARN'
+    ),
+    'the Tonkin 1:25,000 survey prints sheets 0 and 0 bis, so they are not placeholders'
+  );
+  ok(
     has(run({ series_key: 'series-l7014-x', sheet_number: '6541' }), 'sheet', 'WARN'),
     'an L7014 sheet_number that is not NNNN-Q is flagged'
   );
@@ -465,7 +483,18 @@ function selfCheck() {
     'a published map not yet georeferenced is flagged, not failed'
   );
 
-  ok(has(run({ status: 'archived' }), 'status', 'FAIL'), 'a status outside the three is rejected');
+  ok(has(run({ status: 'retired' }), 'status', 'FAIL'), 'a status outside the four is rejected');
+  ok(!has(run({ status: 'archived' }), 'status', 'FAIL'), 'an archived map is a valid status');
+  ok(
+    !auditCatalog({
+      maps: [
+        { ...good, id: 'x1', slug: 'x1' },
+        { ...good, id: 'x2', slug: 'x2', status: 'archived' },
+      ],
+      now: NOW,
+    }).some((f) => f.check === 'duplicate'),
+    'an archived map sharing a scan with a live one is not a duplicate'
+  );
   ok(
     has(run({ iiif_image: null }), 'publish', 'FAIL'),
     'a published map with no image is rejected'

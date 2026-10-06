@@ -223,6 +223,8 @@ export interface SheetEdition {
   /** A reviewed bibliographic identity; multiple map rows may scan this same printing. */
   printing_id?: string | null;
   unresolved_printing: boolean;
+  /** One piece of a plan cut into sheets, not another printing of this cell (`extra_metadata.part_of`). */
+  part?: boolean;
 }
 
 /** Group map scans by reviewed printing, keeping unresolved scans visibly separate. */
@@ -270,25 +272,31 @@ export async function fetchSheetEditions(
 ): Promise<SheetEdition[]> {
   const { data: self, error: selfError } = await supabase
     .from('maps')
-    .select('sheet_number, series_key, printing_id')
+    .select('sheet_number, series_key, printing_id, extra_metadata')
     .eq('id', mapId)
     .single();
   if (selfError || !self) return [];
 
   const sheet = self.sheet_number;
   const series = self.series_key;
-  if (!sheet || !series) return [];
+  // A plan has no series or sheet number. When one is published as several sheets, each carries
+  // the same `extra_metadata.part_of` key, and that is its only link to the others.
+  const partOf = (self.extra_metadata as Record<string, unknown> | null)?.part_of;
+  const isCell = Boolean(sheet && series);
+  if (!isCell && typeof partOf !== 'string') return [];
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('maps')
     .select(
       'id,name,year,status,edition,extra_metadata,allmaps_id,annotation_url,thumbnail,is_georeferenced,printing_id'
     )
-    .eq('sheet_number', sheet)
-    .eq('series_key', series)
     .neq('id', mapId)
     .in('status', ['public', 'featured'])
     .order('year', { ascending: true });
+  query = isCell
+    ? query.eq('sheet_number', sheet!).eq('series_key', series!)
+    : query.eq('extra_metadata->>part_of', partOf as string);
+  const { data, error } = await query;
   if (error || !data) {
     console.error('fetchSheetEditions:', error);
     return [];
@@ -328,6 +336,7 @@ export async function fetchSheetEditions(
       printing_id:
         row.printing_id && verifiedPrintingIds.has(row.printing_id) ? row.printing_id : null,
       unresolved_printing: !(row.printing_id && verifiedPrintingIds.has(row.printing_id)),
+      part: !isCell,
     };
   });
 }
