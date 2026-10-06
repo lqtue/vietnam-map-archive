@@ -41,7 +41,7 @@ by what sits under them:
 
 So **20 rows (6%) are genuine misreadings, and 19 more are the reviewer scoping the legend out**. There is no
 hallucination class worth the name: the model did not invent text. Its failure on this sheet is geometry (the
-fragments) and what it leaves out (house numbers), not transcription.
+fragments) and what it leaves out (road numbers), not transcription.
 
 The 133 dup twins sit a median 9.5 px (3.2 m) from the row that was kept; p90 32 px, p95 40 m, p99 77 m.
 
@@ -80,7 +80,7 @@ exact). The `v1b` figure is flattered: it is the older run and the reviewer favo
 Diacritics are not the problem on this sheet: 2 of 60 validated rows with a mark in the final text lacked it in the raw
 text, both in capitals.
 
-The dominant change is **house numbers**. 30 of the 76 validated road and river rows end in `No. NN`; in 19 of the 22
+The dominant change is **road numbers**. 30 of the 76 validated road and river rows end in `No. NN`; in 19 of the 22
 model-read ones the model's raw text lacked the number. The reviewer typed `No.` 21 times and kept `N°` in 6 more
 rows, so the final corpus has both spellings.
 
@@ -107,15 +107,15 @@ p10 0.58, p90 2.37, max 3.83.
 | mid (1.01–1.59) | 25 | 5 | 7 misread | 9 | 4 |
 | wide (≥ 1.59) | 25 | 5 | 10 misread | 7 | 3 |
 
-This looks like a spacing effect and is partly a number-tail effect: the human box encloses the house number, which
+This looks like a spacing effect and is partly a number-tail effect: the human box encloses the road number, which
 is printed some way along the line, so a name with `No. NN` measures wider. Splitting by tail: **wide rows with a
 tail: 10 misread, 3 missed, 0 ok (13); wide rows without one: 5 ok, 7 split (12).** The model also cut wide names into
 more pieces: mean rejected fragments per validated name box 0.95 (tight), 0.95 (mid), **2.45 (wide)**; 31 of 64
 model-read name boxes hold at least one rejected fragment (up to 10).
 
-**Fragments.** Of 21 text groups, 14 are a street plus a separate house-number box (`Rue Vannier` + `N° 5`) and 7
+**Fragments.** Of 21 text groups, 14 are a street plus a separate road-number box (`Rue Vannier` + `N° 5`) and 7
 are one name in pieces (`Route Basse de` + `Cholon`, `Arroyo` + `Chinois`, `Rue` + `Mac` + `Rue Mac-Mahon`). The 35
-bare-number fragments among the rejected rows are the same house numbers read as their own boxes. Only the 7 name-piece
+bare-number fragments among the rejected rows are the same road numbers read as their own boxes. Only the 7 name-piece
 groups (12 member pairs) bear on a grouping heuristic. Pieces of one name (13 of the 21 groups have one name piece plus a number, 6 have two pieces, 2 have three) sit:
 
 | measure (12 pairs) | median | p90 | max |
@@ -161,7 +161,7 @@ is mostly "no single box covered the whole line".
 
 Not in `LABEL_PREFIXES`: `arroyo` (3 mentions in validated text, always a river; the one river generic the sheet uses that the list lacks),
 `r.` (abbreviation of `Rue`, 2), `vge` (`Vge de Tân An`, 15 validated place rows: the single most frequent first
-word after `Rue`), and `n°`/`no` which are house numbers, not generics, but arrive as the first token of 10 street
+word after `Rue`), and `n°`/`no` which are road numbers, not generics, but arrive as the first token of 10 street
 rows and defeat `label_core`. Printed abbreviations in validated text: `No.` 29, `R.` 2, `Imp.` 1.
 
 ## Transfer rules for the District 4 sheets
@@ -169,12 +169,13 @@ rows and defeat `label_core`. Printed abbreviations in validated text: `No.` 29,
 Evidence counts are rows on the 1882 sheet. "French" rules assume the French typography and generics of 1882, 1895,
 1923 and 1942; 1959 and 1968 are Vietnamese and English.
 
-1. **Treat house numbers as part of the street line** *(prompt proposal, needs approval)*. n = 30 name rows end in a
+1. **Treat road numbers as part of the street line** *(prompt proposal, needs approval)*. n = 30 name rows end in a
    number; the model omitted it in 19 of 22; 35 rejected fragments are bare numbers; 14 of 21 groups are
    name + number; the reviewer typed `No.` 21 times. Ask the street pass to return one box and one string per printed
    line (`Rue Bourdais No. 32`), or to return the number as its own typed item so it can be attached
-   deterministically. *Applies to:* 1882, probably 1895, 1923, 1942 (French `N°`/`No.`). 1959 and 1968 print numerals as
-   index keys, not house numbers: **not French-only in kind but untested there**.
+   deterministically. The number is the colonial **road number** (the road's administrative number), not a house
+   number. *Applies to:* French-era sheets only — 1882, 1895/1898, 1923, 1942. Under the RVN roads carry Vietnamese
+   names and the number drops away, so 1959 and 1968 should not get this rule (correction from the user, 2026-10-06).
 2. **Normalise the numeral token in post-processing, not in the prompt.** n = 29 `No.` against ≥ 6 `N°` in
    validated text; the reviewer fixed `N°` → `No.` in 3 diffs and left it in 6. Fold `N°`, `N.°`, `No`, `No.` to
    `No.` (French-only). Low risk: it also lets the dedupe and the eval stop disagreeing about spelling.
@@ -214,7 +215,7 @@ Evidence counts are rows on the 1882 sheet. "French" rules assume the French typ
    neatline or accept the cost. 1923 already has a separate legend run; check that the body pass does not read it
    again.
 10. **Vocabulary additions** (`labels.py` and `dictionary.py`): add `arroyo` (river, n = 3) and the abbreviation `r.`
-    (n = 2) to `LABEL_PREFIXES`; consider `vge`/`village` as a place generic (n = 15); strip a trailing house number
+    (n = 2) to `LABEL_PREFIXES`; consider `vge`/`village` as a place generic (n = 15); strip a trailing road number
     before `label_core` so `Rue Dayot No. 5` and `Rue Dayot` share a key (n = 30 rows with tails). French-only except
     the number strip. `Quai` → `Rue` and `Boulevard` → `Rue` swaps happened 3 times (`Quai Charner No. 18` was
     `Rue Charner No. 18`): a watch item, too few to act on.

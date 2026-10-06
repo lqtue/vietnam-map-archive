@@ -304,7 +304,7 @@ def covered_by(r: dict, v: dict) -> float:
 def fragment_kind(text: str, container_text: str) -> str:
     t = (text or "").strip()
     if is_number_only(t):
-        return "house number alone"
+        return "road number alone"
     if nchars(t) <= 4:
         return "generic/short piece"
     if _is_subsequence(t, container_text):
@@ -799,7 +799,7 @@ def section_f(sh: Sheet, radius_px=3500) -> dict:
     has_tail = lambda t: bool(NUM_TAIL_RE.search(t or ""))  # noqa: E731
     tailed = [r for r in names if has_tail(r["_eff_text"])]
     f["house_number_tails"] = {
-        "name rows whose effective text ends in a house number": len(tailed), "of": len(names),
+        "name rows whose effective text ends in a road number": len(tailed), "of": len(names),
         "of those, the model's raw text lacked the number": sum(not has_tail(r["text"]) for r in tailed if not r["_manual"]),
         "model-read rows (excl. manual) among them": sum(not r["_manual"] for r in tailed),
         "manual rows with a number tail": sum(r["_manual"] for r in tailed),
@@ -1099,7 +1099,7 @@ def _self_check() -> None:
     assert incomplete_name("R. aux") and not incomplete_name("Rue Sohier") and not incomplete_name("Rue de Singapore")
     assert covered_by({"global_x": 10, "global_y": 10, "global_w": 20, "global_h": 20},
                       {"global_x": 0, "global_y": 0, "global_w": 100, "global_h": 100}) == 1.0
-    assert fragment_kind("N° 8", "Rue de Bang Kok No. 8") == "house number alone"
+    assert fragment_kind("N° 8", "Rue de Bang Kok No. 8") == "road number alone"
     assert fragment_kind("Rue", "Rue Thabert") == "generic/short piece"
     # group kinds
     assert group_kind([{"_eff_text": "Rue Dayot"}, {"_eff_text": "No. 5"}]) == "name+number"
