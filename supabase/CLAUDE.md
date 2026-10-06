@@ -28,7 +28,35 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-The head is **110** (`maps.edition`, backfilled from `extra_metadata`; `holding_institution` filled from `source_archive = 'PCL'` on the 510 rows that had none — pushed 2026-10-05). Before it, **109** (pushed 2026-10-05: nullable `maps.region`, the 63-province name to June 2025, and `region_2025`, the 34 since, both derived from `bbox` by `scripts/oneoff/backfill_map_region.mjs` — a modern locator, not the historical place name). Through 108 it was pushed 2026-10-04 during the series-page recovery. The coordinated app/types work had deployed before migrations 105–108, causing 500 responses on missing tables/views. 105 creates stable `series` UUID identities; `maps.series_key` becomes a stored compatibility copy synced from `series_id`, so editing `collection` cannot change membership. `series_cells` retains its legacy composite key and gains an id/FK. 106 adds unresolved-capable `sheet_printings`, nullable printing/source-item links, image dimensions/version metadata and link-consistency triggers; it does not invent printing identities. `series_cell_coverage_detail` and `series_printing_availability` derive availability with explicit public/service-role gates. 107 adds staff-controlled archiving and a one-hop duplicate pointer; 108 corrects the `maps.status` default to `draft`.
+**The head is 116**, pushed 2026-10-06: seven canonical map genres, independent
+subjects and depicted state, image content roles, legacy classification and review
+evidence. Migration 116 alone was pushed from an isolated migration directory;
+115 was pushed after 116 on 2026-10-06 with `--include-all`; local and remote history now match.
+The source-backed audit changed three charts to hydrographic and one administrative
+map to thematic; six ambiguous originals remain needs_review. No publication or
+identity fields changed. Linked maps/map_images types were regenerated and reconciled.
+`tests/sql/map-taxonomy.sql` checks constraints, old plan/regional inputs and review
+invalidation in disposable local PostgreSQL. Migration 115, in production 2026-10-06: `context_at` returned `legend_entry`,
+`legend_ref` and `title` rows as "labels" (no category filter); it now takes only the five
+gazetteer categories, by effective category. Before it, **114**, pushed 2026-10-06: boxes from different OCR runs on the same
+map can be grouped. Each original keeps its run; the combined label uses the first
+selected box’s run for existing run filters. Migration 113, pushed the same day,
+ensures the group envelope comparison tolerates
+one millionth of a source pixel, so PostgreSQL → JSON → JavaScript rounding does
+not reject an unchanged selection; actual movement still fails. Migration 112,
+pushed the same day, adds text-box grouping that preserves original
+labels and their oriented geometry under a separate combined OCR label, using
+ordered self-FKs and atomic group/ungroup RPCs. Search, context and the gazetteer
+expose root labels; review verdicts preserve member states. The app remains
+compatible with pre-112 databases and enables grouping after detecting the columns.
+Read-back verified the OCR handler returns 200 with grouping available. Linked types
+were regenerated to a temporary file and the grouping columns, relationships and
+RPC signatures reconciled; nullable geography arguments remain explicit because
+the generator omits SQL argument nullability. The app changes are local, not deployed.
+`tests/sql/text-groups.sql` verifies membership and reversibility in disposable local
+PostgreSQL with spatial stand-ins.
+
+Before it, **111** (pushed 2026-10-05: nullable `maps.regions` and `regions_2025` province arrays, derived from bbox; catalog Area facets match every listed province. Normal sheets use a 10% land-sample cutoff; sheets spanning over 2° on either axis use 2% and a finer grid, with no dominant region. Final read-back: 933 lists, 392 multi-province maps, 566 without lists, and no dominant province missing from its list). Before it, **110** (`maps.edition`, backfilled from `extra_metadata`; `holding_institution` filled from `source_archive = 'PCL'` on the 510 rows that had none — pushed 2026-10-05). Before it, **109** (pushed 2026-10-05: nullable `maps.region`, the 63-province name to June 2025, and `region_2025`, the 34 since, both derived from `bbox` by `scripts/oneoff/backfill_map_region.mjs` — a modern locator, not the historical place name). Through 108 it was pushed 2026-10-04 during the series-page recovery. The coordinated app/types work had deployed before migrations 105–108, causing 500 responses on missing tables/views. 105 creates stable `series` UUID identities; `maps.series_key` becomes a stored compatibility copy synced from `series_id`, so editing `collection` cannot change membership. `series_cells` retains its legacy composite key and gains an id/FK. 106 adds unresolved-capable `sheet_printings`, nullable printing/source-item links, image dimensions/version metadata and link-consistency triggers; it does not invent printing identities. `series_cell_coverage_detail` and `series_printing_availability` derive availability with explicit public/service-role gates. 107 adds staff-controlled archiving and a one-hop duplicate pointer; 108 corrects the `maps.status` default to `draft`.
 
 An unknown `maps.collection` on insert keeps its legacy folded `series_key` for compatibility but has no `series_id`; it is not silently added to the curated `series` table. Resolve/create the stable series explicitly before linking it. An edit to `collection` on an already linked map never changes `series_id`.
 
@@ -123,7 +151,7 @@ password; use the Dashboard SQL Editor or `db push` instead of pulling. Repair m
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 37 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 38 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done

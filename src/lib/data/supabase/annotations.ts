@@ -103,16 +103,19 @@ export async function updateAnnotationSet(
 	const { mapIds, ...rest } = updates;
 	const payload =
 		rest.features && mapIds ? { ...rest, features: withMapIds(rest.features, mapIds) } : rest;
-	const { error } = await supabase
+	const { data, error } = await supabase
 		.from('user_layers')
 		.update({ ...payload, updated_at: new Date().toISOString() } as AnnotationSetUpdate)
-		.eq('id', id);
+		.eq('id', id)
+		.select('id')
+		.maybeSingle();
 
 	if (error) {
 		console.error('Failed to update annotation set:', error);
 		return false;
 	}
-	return true;
+	// An RLS-hidden or nonexistent row is not a confirmed save.
+	return data?.id === id;
 }
 
 export async function deleteAnnotationSet(

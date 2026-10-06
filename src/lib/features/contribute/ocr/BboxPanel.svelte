@@ -16,16 +16,20 @@
   export let saving = false;
 
   const dispatch = createEventDispatcher<{
+    draft: { status: OcrStatus; text: string; category: string };
     save: { status: OcrStatus; text: string; category: string };
     rotate: { deg: number };
     close: void;
+    ungroup: void;
+    duplicate: { text: string; category: string };
   }>();
 
   $: angle = Math.round(extraction.rotation_deg ?? 0);
 
+  let actionsOpen = false;
   let text = '';
   let category = '';
-  let textEl: HTMLInputElement | undefined;
+  let textEl: HTMLTextAreaElement | undefined;
 
   /** Called by the page when the operator presses `e`. */
   export function focusText() {
@@ -35,10 +39,14 @@
 
   // Re-seed whenever the selection (or the row behind it) changes.
   $: if (extraction) {
-    text = extraction.text_validated ?? extraction.text;
-    category = extraction.category_validated ?? extraction.category;
+    text = extraction._editText ?? extraction.text_validated ?? extraction.text;
+    category = extraction._editCategory ?? extraction.category_validated ?? extraction.category;
   }
 
+  $: status = extraction._editStatus ?? extraction.status;
+  function draft() {
+    dispatch('draft', { status, text, category });
+  }
   function save(status: OcrStatus) {
     dispatch('save', { status, text, category });
   }
@@ -48,40 +56,75 @@
   <div class="bbox-panel-row">
     <span
       class="bbox-panel-cat-dot"
-      style="background: {CAT_COLORS[reviewedCategory(extraction)] ?? CAT_COLORS.other}"
+      style="background: {CAT_COLORS[extraction._editCategory ?? reviewedCategory(extraction)] ??
+        CAT_COLORS.other}"
     ></span>
-    <input
+    <textarea
       class="bbox-panel-text"
-      type="text"
+      rows="3"
       bind:value={text}
       bind:this={textEl}
+      aria-label="Label text"
       placeholder="Label text…"
+      disabled={saving}
+      on:input={draft}
       on:keydown={(e) => {
-        if (e.key === 'Enter') save('validated');
-      }}
-    />
-    <select class="bbox-panel-cat" bind:value={category}>
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          save('validated');
+        }
+      }}></textarea>
+    <select
+      aria-label="Label type"
+      class="bbox-panel-cat"
+      bind:value={category}
+      disabled={saving}
+      on:change={draft}
+    >
       {#each OCR_CATEGORIES as cat (cat)}
         <option value={cat}>{cat}</option>
       {/each}
     </select>
   </div>
   <div class="bbox-panel-actions">
-    <span class="bbox-panel-conf">{((extraction.confidence ?? 0) * 100).toFixed(0)}%</span>
-    <button
-      class="sb-btn is-sm"
-      on:click={() => dispatch('rotate', { deg: 0 })}
-      disabled={angle === 0}
-      title="Drag the round handle to turn the label · , and . nudge 1° · click to reset"
-    >
-      {angle}°
-    </button>
+    <details class="box-actions" bind:open={actionsOpen}>
+      <summary class="sb-btn is-sm" aria-label="Box actions" title="Box actions">⋯</summary>
+      <div class="box-actions-menu">
+        {#if extraction.is_text_group}
+          <button
+            class="sb-btn is-sm"
+            disabled={saving}
+            on:click={() => {
+              actionsOpen = false;
+              dispatch('ungroup');
+            }}>Ungroup</button
+          >
+        {:else}
+          <button
+            class="sb-btn is-sm"
+            disabled={saving}
+            on:click={() => {
+              actionsOpen = false;
+              dispatch('duplicate', { text, category });
+            }}>Duplicate box</button
+          >
+          <button
+            class="sb-btn is-sm"
+            disabled={saving || angle === 0}
+            on:click={() => {
+              actionsOpen = false;
+              dispatch('rotate', { deg: 0 });
+            }}>Reset box angle ({angle}°)</button
+          >
+        {/if}
+      </div>
+    </details>
     <button
       class="sb-btn is-sm validate"
-      class:is-on={extraction.status === 'validated'}
+      class:is-on={status === 'validated'}
       disabled={saving}
-      on:click={() => save(extraction.status === 'validated' ? 'pending' : 'validated')}
-      title={extraction.status === 'validated' ? 'Unvalidate' : 'Validate'}
+      on:click={() => save(status === 'validated' ? 'pending' : 'validated')}
+      title={status === 'validated' ? 'Unvalidate' : 'Validate'}
     >
       <svg
         width="13"
@@ -93,14 +136,14 @@
         stroke-linecap="round"
         stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg
       >
-      {extraction.status === 'validated' ? 'Validated' : 'Validate'}
+      {status === 'validated' ? 'Validated' : 'Validate'}
     </button>
     <button
       class="sb-btn is-sm reject"
-      class:is-on={extraction.status === 'rejected'}
+      class:is-on={status === 'rejected'}
       disabled={saving}
-      on:click={() => save(extraction.status === 'rejected' ? 'pending' : 'rejected')}
-      title={extraction.status === 'rejected' ? 'Unreject' : 'Reject'}
+      on:click={() => save(status === 'rejected' ? 'pending' : 'rejected')}
+      title={status === 'rejected' ? 'Unreject' : 'Reject'}
     >
       <svg
         width="13"
@@ -111,7 +154,7 @@
         stroke-width="3"
         stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg
       >
-      {extraction.status === 'rejected' ? 'Rejected' : 'Reject'}
+      {status === 'rejected' ? 'Rejected' : 'Reject'}
     </button>
     <button class="bbox-panel-close" on:click={() => dispatch('close')} title="Deselect">
       <svg
@@ -143,8 +186,9 @@
     flex-direction: column;
     gap: 0.35rem;
     padding: 0.55rem 0.7rem;
-    min-width: 320px;
     max-width: min(560px, calc(100vw - 2rem));
+    width: min(560px, calc(100% - 2rem));
+    min-width: 0;
   }
   .bbox-panel-row {
     display: flex;
@@ -158,6 +202,12 @@
     flex-shrink: 0;
   }
   .bbox-panel-text {
+    field-sizing: content;
+    max-height: 35vh;
+    overflow-y: auto;
+    color: var(--color-text);
+    resize: vertical;
+    overflow-wrap: anywhere;
     flex: 1;
     min-width: 0;
     font-family: var(--font-family-base);
@@ -187,12 +237,29 @@
     align-items: center;
     gap: 0.4rem;
   }
-  .bbox-panel-conf {
-    font-size: 0.68rem;
-    font-weight: var(--font-bold);
-    font-variant-numeric: tabular-nums;
-    opacity: 0.45;
-    margin-right: 0.2rem;
+  .box-actions {
+    position: relative;
+  }
+  .box-actions summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .box-actions summary::-webkit-details-marker {
+    display: none;
+  }
+  .box-actions-menu {
+    position: absolute;
+    bottom: calc(100% + 0.4rem);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    white-space: nowrap;
+    padding: 0.5rem;
+    background: var(--color-white);
+    border: var(--sb-border);
+    border-radius: var(--sb-radius-sm);
+    box-shadow: var(--shadow-solid-sm);
   }
   /* The buttons are `.sb-btn.is-sm` (sidebar.css). Only the two tones are
      local: validate and reject answer in green and red rather than the shared

@@ -15,6 +15,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
 import { keyToSlug } from '$lib/core/utils/placeKey';
 import { LOCALIZED_PATHS, withLocale } from '$lib/core/i18n';
 import { SITE_ORIGIN } from '$lib/core/site';
+import { fetchAreaIndex } from '$lib/data/maps/areas';
 import { posts } from '../(editorial)/blog/posts';
 
 /**
@@ -38,7 +39,7 @@ const esc = (s: string) =>
 export const GET: RequestHandler = async ({ setHeaders }) => {
   const supabase = adminClient();
 
-  const [{ data: maps }, { data: places }, { data: series }] = await Promise.all([
+  const [{ data: maps }, { data: places }, { data: series }, areas] = await Promise.all([
     supabase
       .from('maps')
       .select('slug, updated_at')
@@ -58,14 +59,15 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
        `noindex` — a sitemap entry for those would be asking for a page we have
        told the crawler to skip. */
     /* `survey_sheets` is null for a survey whose index was never imported (mig
-       084's left join), and that page 404s deliberately — AMS L909 has three
-       sheets and nobody has decided what the survey contains. A sitemap entry
-       for it would be a crawl invitation to a 404. */
+       084's left join), and that page 404s deliberately. Indexed surveys,
+       including the partial L909 city list, have a page; unindexed surveys
+       must not advertise a 404. */
     supabase
       .from('map_series')
       .select('key')
       .gt('published_sheets', 0)
       .not('survey_sheets', 'is', null),
+    fetchAreaIndex(supabase),
   ]);
 
   /* The pinned origin, not the request's: a preview deploy would otherwise
@@ -83,11 +85,9 @@ export const GET: RequestHandler = async ({ setHeaders }) => {
     ...STATIC_PATHS.map((p) => entry(withLocale(p))),
     ...posts.map((p) => entry(`/blog/${p.slug}`, p.date)),
     ...(maps ?? []).map((m) => entry(`/catalog/${m.slug}`, m.updated_at as string | null)),
-    /* Listed here rather than in `LOCALIZED_PATHS`: the index is a page, but
-       its prose is not translated, and a `/vi` twin with an hreflang pair
-       would be the same document claiming to be two. */
-    entry('/catalog/series'),
     ...(series ?? []).map((s) => entry(`/catalog/series/${s.key}`)),
+    ...areas.map((area) => entry(`/catalog/area/${area.slug}`)),
+    ...areas.map((area) => entry(withLocale(`/catalog/area/${area.slug}`))),
     ...(places ?? [])
       .filter((p) => p.name_key)
       .map((p) => entry(`/catalog/place/${keyToSlug(p.name_key as string)}`)),

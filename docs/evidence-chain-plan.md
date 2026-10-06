@@ -31,7 +31,7 @@ closes three gaps; it does not rebuild what is below.
 | Need | Already carried by | Gap |
 |---|---|---|
 | Pixel geometry as the durable citation | `footprints.pixel_polygon` (mig 016), the OCR box on `ocr_labels`; `geom` is derived and disposable (mig 066) | Which image the pixels refer to: `map_images` has no width, height, or fingerprint |
-| Georeference version | `geom_src` — hash of the GCP set (mig 066); 1882 is `245d98f7f8d61572` | The hash is not reversible; a packet must carry the annotation JSON itself |
+| Georeference version | `geom_src` — hash of the GCP set (mig 066); 1882 live mirror is `93c4487e621f83c9` (read 2026-10-05, 8 GCPs, 12102 × 8982) | The hash is not reversible; a packet must carry the annotation JSON itself |
 | Label ↔ shape link | `ocr_labels.footprint_id` (mig 050) | — |
 | Machine vs human reading | `ocr_labels.run_id`, `review_status`, `text_corrected`, `reviewed_by`; `footprints.source`, `run_id`, `review_status` | No canonical-run marker; `v1b` is canonical by prose only |
 | Known printings, held or not | `cell_printings` (mig 087) — one row per printing per institution, no FK so an unmatched printing survives; loaded from IGN, ANU, TTU | Raw payload, fetch time, content hash |
@@ -127,7 +127,9 @@ feature pages are projections of these records. No graph database or universal
    1882 there are three figures in circulation — 12.7 m (similarity RMSE, 10
    GCPs, `worked-example-1882.md`, corrected 2026-09-19 from 11.3 m), 10.6 m
    (affine), and `geom_rmse` 16.50 (a stored per-map constant, not a per-point
-   residual). The packet reports one with its method and source. Absence of a
+   residual); all three are for the ten-point set of 2026-09-19. The current set has 8 GCPs, similarity
+   RMSE 12.3 m (2026-10-01, `ROADMAP.md` `georef-figures-refresh`), and the stored `geom_rmse` is now
+   15.1354 (`gcp-roundtrip-rms`). The packet reports one with its method and source. Absence of a
    feature on a sheet is not evidence of real-world absence without a coverage
    and legibility assessment.
 
@@ -250,7 +252,9 @@ after step 4's exit passes.
       if that tracing has landed, so one session serves both.
 - [ ] Diff the stored annotation mirror against live Allmaps
       `9be3d4b042bc18fb`; sync if stale; record the `geom_src` to cite
-      (`245d98f7f8d61572` as of 2026-09-30).
+      (`93c4487e621f83c9` from the live mirror, rehashed 2026-10-05; the previously cited
+      `245d98f7f8d61572` is historical). Upstream equality remains unchecked in this follow-up;
+      inspect the difference before syncing.
 - [ ] Fetch Gallica's verbatim rights statement for `btv1b52508901z`, with
       URL and retrieval time.
 - [ ] Record which `map_images` row the annotation is fit to (R2, IA and

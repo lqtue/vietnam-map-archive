@@ -12,7 +12,7 @@ match. So the hand-drawn HTML app keeps **1.x–2.x**, the SvelteKit rewrite kee
 **3.x**, and everything after that continues from `v3.3` — the last number
 anyone wrote down.
 
-Versions 6.0, 7.0, 7.1, 7.2, 7.3 and 7.4 are written out in full, because that is the
+Versions 6.0, 7.0, 7.1, 7.2, 7.3, 7.4 and 7.5 are written out in full, because that is the
 architecture that exists today. Everything earlier is summarised; the detail is in `git log`,
 and most of it has been replaced.
 
@@ -24,6 +24,7 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 | Version | Date | In one line |
 |---|---|---|
+| [7.5](#75--october-2026) | Oct 2026 | Map genre, subjects, depicted state and scan role are independent; app changes await deployment |
 | [7.4](#74--september-2026) | Sept 2026 | A sheet is addressed by its name: `/catalog/plan-de-la-ville-de-saigon-1799`, with every uuid link still landing |
 | [7.3](#73--september-2026) | Sept 2026 | One page per sheet: the scan itself moved onto the catalogue record, and `/scan` stopped being a public address |
 | [7.2](#72--september-2026) | Sept 2026 | A survey is one thing: 514 sheets on the map as two layers, and a page for every sheet a survey contains, held or not |
@@ -44,7 +45,29 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 ---
 
+## 7.5 — October 2026
+
+Migration 116 is in production; the app changes are local and await deployment.
+Seven primary map genres replace the mixed form/extent vocabulary. Controlled
+subjects, depicted state and image content roles are independent. Previous types
+and source-backed classification notes remain available; ambiguous originals are
+marked for review. Old ingest type names normalize to canonical values.
+
+Three navigational charts became hydrographic, one administrative map became
+thematic, Coffyn's proposal is explicitly marked proposed, and two L909 versos
+have index roles. Six ambiguous originals await native-legend review. Migration
+115 remains pending and was not included in this schema push.
+
+The editor uses the canonical vocabulary and offers subjects/state/evidence.
+Selected OCR text wraps in the bottom bar and has a multiline edit field; canvas
+boxes no longer overlay captions on the original lettering. SQL checks, linked
+schema read-back and type checking verify the migration and local integration.
+
 ## 7.4 — September 2026
+
+### October 5, 2026 — Province coverage
+
+Migration 111 adds `maps.regions` and `regions_2025`. Catalog Area filters, counts and the table use all listed provinces. The bbox backfill uses a 10% share of sampled Vietnamese land for normal sheets and 2% with a 40×40 grid for sheets spanning over 2° on either axis. Wide sheets retain no dominant province. Final database read-back found 933 maps with lists (392 spanning multiple provinces), 566 without lists (325 without a bbox), and no dominant province missing from its list. These are modern locators, not historical administrative claims.
 
 **Current.** Every sheet was addressed by its uuid —
 `/catalog/787439c7-8015-496d-a458-df61b89a4391` — which is the URL a reader is

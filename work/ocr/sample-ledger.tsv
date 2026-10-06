@@ -1,0 +1,22 @@
+when	map	run	calls	in_tok	out_tok	think_tok	cost_usd	note
+2026-10-05T20:14	3a446d85	lowthink-tm700	12	69607	25400	0	0.1344	earlier test: 3000px crop @700m
+2026-10-05T20:14	3a446d85	lowthink-tm1400	5	28763	19415	0	0.089	earlier test: 3000px crop @1400m
+2026-10-05T20:26	dc2eda7d	sample-dc2eda7d-tm1400	6	35892	27524	0	0.1236	sample: main_map crop, 1400m, low-think, no --db
+2026-10-05T20:40	20ec4f9a	scout-eval-20ec4f9a	1	2471	974	1221	0.0092	scout-eval human-truth
+2026-10-05T20:41	3a446d85	scout-eval-3a446d85	1	2459	1151	1043	0.0091	scout-eval human-truth
+2026-10-05T20:42	76cc876f	scout-eval-76cc876f	1	2466	1131	624	0.0075	scout-eval human-truth
+2026-10-05T20:42	787439c7	scout-eval-787439c7	1	2459	1189	688	0.0079	scout-eval human-truth
+2026-10-05T20:43	6989a04e	scout-eval-6989a04e	1	2488	1482	1229	0.0111	scout-eval plan-nolayout
+2026-10-05T20:44	8c605819	scout-eval-8c605819	1	2478	1446	693	0.0089	scout-eval plan-nolayout
+2026-10-05T20:44	02350bd7	scout-eval-02350bd7	1	2459	693	644	0.0059	scout-eval L7014
+2026-10-05T20:45	3e7d4554	scout-eval-3e7d4554	1	2459	775	815	0.0069	scout-eval L7014
+2026-10-05T20:45	7beb3150	scout-eval-7beb3150	1	2459	734	402	0.0052	scout-eval L7014
+2026-10-05T20:46	bb08a4eb	scout-eval-bb08a4eb	1	2488	617	623	0.0056	scout-eval L7014
+2026-10-05T20:48	00270fcf	scout-eval-00270fcf	1	2478	803	472	0.0057	scout-eval Indochine100k
+2026-10-05T20:49	435e35c6	scout-eval-435e35c6	1	2466	941	986	0.0081	scout-eval Indochine100k
+2026-10-05T20:50	7597af1f	scout-eval-7597af1f	1	2478	857	870	0.0074	scout-eval Indochine100k
+2026-10-05T20:51	b5bdbead	scout-eval-b5bdbead	1	2466	864	699	0.0068	scout-eval Indochine100k
+2026-10-05T20:52	039a3912	scout-eval-039a3912	1	2466	1053	945	0.0084	scout-eval Indochine25k
+2026-10-05T20:53	5877f37a	scout-eval-5877f37a	1	2466	725	688	0.0062	scout-eval Indochine25k
+2026-10-05T20:54	aa921556	scout-eval-aa921556	1	2466	781	715	0.0065	scout-eval Indochine25k
+2026-10-05T22:16	f9b3c9b2	legend-1862	1	1158	799	1022	0.0077	legend 1862 Coffyn, no --db

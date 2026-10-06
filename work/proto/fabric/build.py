@@ -6,9 +6,12 @@ another sheet. Raster images are always present; block outlines only render
 for a sheet whose SHEETS entry carries a `blocks` path (none currently do —
 the 1882/1898 traces were pulled pending a redo).
 """
-import argparse, csv, json, math, pathlib, re, unicodedata, urllib.request
+import argparse, csv, json, math, pathlib, re, sys, unicodedata, urllib.request
 
 import numpy as np
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "ocr/scripts"))
+from labels import fold  # Đ -> d and tone marks off; key() below drops Đ outright
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 ANN = ROOT / "work/ocr/outputs/annotations"
@@ -70,6 +73,20 @@ def key(text):
     return " ".join(w[:-1] if len(w) > 3 and w.endswith("s") else w for w in words)
 
 
+# Twin of src/lib/core/utils/placeKey.ts (placeCoreKey). labels.name_key is not
+# equivalent: a different prefix list, one prefix only, no four-character floor.
+GENERIC = ("rue|r|ruelle|boulevard|boul|bould|bd|blvd|avenue|av|ave|quai|quay|impasse|imp|"
+           "place|pl|chemin|ch|route|rte|passage|village|vge|vlge|hameau|marche|pont|canal|"
+           "arroyo|riviere|riv|fleuve|faubourg|duong|dg|pho|hem|rach|song|kenh|cho|ap|xom|"
+           "cau|ben|khu|phuong|quan|xa|thon|lang|de|du|des|d|le|la|les|l|au|aux")
+
+
+def core_key(text):
+    full = " ".join(re.sub(r"[^a-z0-9]+", " ", fold(text)).split())
+    core = re.sub(r" (de|du|des|d|le|la|les|l)$", "", re.sub(rf"^(({GENERIC}) )+", "", full))
+    return core if len(core) >= 4 else full
+
+
 def load_doling():
     """key(colonial or modern name) -> {modern, kind, sightings, post_title, post_date,
     post_url}, from Tim Doling's Historic Vietnam (work/research/doling/street-name-pairs.csv,
@@ -119,7 +136,75 @@ def read(sheet):
     return dict(sheet=sheet, M=M, georef=georef, polys=polys, n_blocks=n_blocks, labels=seen, all_labels=labels, width=source["width"], height=source["height"], iiif=source["id"])
 
 
-def main(out, link_max_m):
+# --- Legend entries: ocr_labels rows (category legend_entry) read from Supabase ---
+# Parser twin of src/lib/server/legendEntry.ts; reads follow legendRead.ts.
+
+def note(notes, name):
+    for part in (notes or "").split(";"):
+        if part.strip().startswith(f"{name}="): return part.strip()[len(name) + 1:].strip() or None
+
+
+def pair(raw):
+    try: v = [float(x) for x in (raw or "").split(",")]
+    except ValueError: return None
+    return v if len(v) == 2 and all(map(math.isfinite, v)) else None
+
+
+def legend_points(notes):
+    """[(src, x, y)]: px / more are image pixels, point is legacy lng,lat."""
+    px, ll = pair(note(notes, "px")), pair(note(notes, "point"))
+    pts = [("px", *px)] if px and px[0] >= 0 and px[1] >= 0 else [("point", *ll)] if ll and abs(ll[0]) <= 180 and abs(ll[1]) <= 90 else []
+    more = [pair(p) for p in (note(notes, "more") or "").split("|")]
+    return pts + [("more", *p) for p in more[:20] if p and p[0] >= 0 and p[1] >= 0]
+
+
+def read_legend(sheets):
+    """One record per placed point. An entry with no placed point takes its
+    body numeral (src "numeral") only when exactly one sits outside the legend box."""
+    from eval import _rest_get  # service key from the repo-root .env
+    ids = [s["sheet"].get("annotation_id", s["sheet"]["map_id"]) for s in sheets]
+    rows = _rest_get("ocr_labels", {"select": "id,map_id,run_id,text,text_corrected,category,category_corrected,review_status,notes,global_x,global_y,global_w,global_h",
+                                    "map_id": f"in.({','.join(ids)})", "or": "(category.eq.legend_entry,category_corrected.eq.legend_entry)", "order": "id"})
+    rows = [r for r in rows if (r["category_corrected"] or r["category"]) == "legend_entry" and r["review_status"] != "rejected"]
+    records, stats = [], []
+    for i, (s, mid) in enumerate(zip(sheets, ids)):
+        entries, rects, M = {}, {}, s["M"]
+        for r in (r for r in rows if r["map_id"] == mid):
+            text = r["text_corrected"] or r["text"] or ""
+            m = re.match(r"(\d+)\.\s*(.*)$", text)
+            n = int(m[1]) if m else int(note(r["notes"], "n") or 0)
+            if n <= 0: print(f"legend: no number, skipped: {text!r} {r['notes']!r}"); continue
+            if n in entries and entries[n]["ok"] and r["review_status"] != "validated": continue
+            entries[n] = dict(name=m[2] if m else text, vn=note(r["notes"], "vn"), pts=legend_points(r["notes"]), ok=r["review_status"] == "validated")
+            if r["global_x"] is not None:
+                b = rects.setdefault(r["run_id"], [math.inf, math.inf, -math.inf, -math.inf])
+                b[:] = [min(b[0], r["global_x"]), min(b[1], r["global_y"]), max(b[2], r["global_x"] + (r["global_w"] or 0)), max(b[3], r["global_y"] + (r["global_h"] or 0))]
+        unplaced = [n for n, e in entries.items() if not e["pts"]]
+        if unplaced:
+            refs = _rest_get("ocr_labels", {"select": "text,text_corrected,global_x,global_y,global_w,global_h", "map_id": f"eq.{mid}",
+                                            "category": "in.(legend_ref,other)", "review_status": "neq.rejected", "order": "id"})
+            cand = {}
+            for r in refs:
+                t = (r["text_corrected"] or r["text"] or "").strip()
+                if not t.isdigit() or not 1 <= int(t) <= max(entries) or r["global_x"] is None: continue
+                x, y = r["global_x"] + (r["global_w"] or 0) / 2, r["global_y"] + (r["global_h"] or 0) / 2
+                if not any(b[0] <= x <= b[2] and b[1] <= y <= b[3] for b in rects.values()): cand.setdefault(int(t), []).append(("numeral", x, y))
+            for n in unplaced:
+                if len(cand.get(n, [])) == 1: entries[n]["pts"] = cand[n]
+        outside = 0
+        for n, e in sorted(entries.items()):
+            keys = {k for k in (core_key(e["name"]), core_key(e["vn"] or "")) if k}
+            for src, x, y in e["pts"]:
+                if src == "point": g = np.array([x, y]) * K
+                elif 0 <= x <= s["width"] and 0 <= y <= s["height"]: g = warp(M, [[x, y]])[0]
+                else: outside += 1; continue
+                records.append(dict(sheet=i, year=s["sheet"]["year"], n=n, name=e["name"], vn=e["vn"], g=g, src=src, keys=keys))
+        stats.append(f"{s['sheet']['year']}: {len(entries)} entries, {sum(r['sheet'] == i for r in records)} points" + (f", {outside} outside the image" if outside else ""))
+    print("legend " + "; ".join(stats))
+    return records
+
+
+def main(out, link_max_m, legend_link_max_m):
     sheets = [read(s) for s in SHEETS]
     corners = np.vstack([warp(s["M"], [[0, 0], [s["width"], 0], [s["width"], s["height"]], [0, s["height"]]]) for s in sheets])
     lo, hi = corners.min(axis=0), corners.max(axis=0)
@@ -162,16 +247,46 @@ def main(out, link_max_m):
             union(node_a, node_b)
             links.append(dict(a=i, b=i+1, t=t_a, m=round(distance,1), p=put(c_a).tolist(), q=put(c_b).tolist(), d=DOLING.get(name)))
             link_node.append(node_a)
+    # Legend pass. Legend points mark buildings, not text, so the radius is looser.
+    # Legend<->legend links to the nearest LATER sheet with a match (not only the
+    # adjacent one: the placed sheets are not neighbours); legend<->body links to
+    # every other sheet. Both union into the same chains as the body links.
+    legend = read_legend(sheets)
+    body = {}
+    for j, s in enumerate(sheets):
+        for name, occ in s["labels"].items():
+            for idx, (text, pt) in enumerate(occ): body.setdefault((j, core_key(text)), []).append(((j, name, idx), pt))
+    legend_links, legend_node = [], []
+    def link_to(a, ai, b_sheet, cands, kind):
+        """cands: [(node, point)] already key-matched."""
+        if not cands: return False
+        node, pt = min(cands, key=lambda c: np.linalg.norm(c[1] - a["g"]))
+        d = float(np.linalg.norm(pt - a["g"]))
+        if d > legend_link_max_m: return False
+        parent.setdefault(("L", ai), ("L", ai)); parent.setdefault(node, node); union(("L", ai), node)
+        legend_links.append(dict(a=a["sheet"], b=b_sheet, t=a["name"], m=round(d, 1), p=put(a["g"]).tolist(), q=put(pt).tolist(), k=kind))
+        legend_node.append(("L", ai))
+        return True
+    for ai, a in enumerate(legend):
+        for j in range(a["sheet"] + 1, len(sheets)):
+            if link_to(a, ai, j, [(("L", bi), b["g"]) for bi, b in enumerate(legend) if b["sheet"] == j and a["keys"] & b["keys"]], "ll"): break
+        for j in range(len(sheets)):
+            if j != a["sheet"]: link_to(a, ai, j, [(n, pt) for k in a["keys"] for n, pt in body.get((j, k), [])], "lb")
     roots = {r: idx for idx, r in enumerate(sorted({find(n) for n in parent}, key=str))}
     for link, node in zip(links, link_node): link["c"] = roots[find(node)]
+    for link, node in zip(legend_links, legend_node): link["c"] = roots[find(node)]
+    legend_links.sort(key=lambda link: link["m"])
+    legend_out = [dict(sheet=r["sheet"], year=r["year"], n=r["n"], name=r["name"], vn=r["vn"], x=round(float(r["g"][0]), 1), y=round(float(r["g"][1]), 1), p=put(r["g"]).tolist(), src=r["src"],
+                       **({"c": roots[find(("L", ai))]} if ("L", ai) in parent else {})) for ai, r in enumerate(legend)]
     links.sort(key=lambda link: link["m"])
-    pathlib.Path(out).write_text(json.dumps(dict(layers=layers, links=links, meters_per_unit=1 / scale, ground_origin_m=lo.tolist(), meters_per_degree=K.tolist(), span=SPAN), separators=(",", ":")))
-    print(f"wrote {len(layers)} independently georeferenced scans and {len(links)} adjacent-sheet name links")
+    pathlib.Path(out).write_text(json.dumps(dict(layers=layers, links=links, legend=legend_out, legend_links=legend_links, meters_per_unit=1 / scale, ground_origin_m=lo.tolist(), meters_per_degree=K.tolist(), span=SPAN), separators=(",", ":")))
+    print(f"wrote {len(layers)} independently georeferenced scans and {len(links)} adjacent-sheet name links, {len(legend_out)} legend points, {len(legend_links)} legend links")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=str(pathlib.Path(__file__).with_name("layers.json")))
     parser.add_argument("--link-max-m", type=float, default=150)
+    parser.add_argument("--legend-link-max-m", type=float, default=300)
     args = parser.parse_args()
-    main(args.out, args.link_max_m)
+    main(args.out, args.link_max_m, args.legend_link_max_m)

@@ -48,6 +48,11 @@ export const MAP_WRITABLE_FIELDS: Record<string, Coerce> = {
   holding_institution: orNull,
   collection: orNull,
   map_type: orNull,
+  map_subjects: (v) =>
+    Array.isArray(v) && v.every((item) => typeof item === 'string') ? v : undefined,
+  depicted_state: asIs,
+  classification_note: orNull,
+  classification_source_url: orNull,
   bbox: orNull,
   status: asIs,
   extra_metadata: asObject,

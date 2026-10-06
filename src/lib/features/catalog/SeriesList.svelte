@@ -1,15 +1,17 @@
 <!--
-  SeriesList.svelte — survey rows: what each one is, what it spans, and the one
-  fraction that matters.
+  SeriesList.svelte — the band at the top of /catalog: every series as one line,
+  its name and the one fraction that matters.
 
-  Deliberately not a coverage bar per row: that is the single-series page's
-  job, and three segments repeated down a list is a chart of charts. Shared by
-  `/catalog/series`, which lists every survey, and the band at the top of
-  `/catalog`, which is the way in to it — so the two cannot say the fraction
-  differently, which is the only thing a reader would carry between them.
+  Deliberately not a coverage bar per row: that is the single-series page's job,
+  and three segments repeated down a list is a chart of charts. The dates are on
+  that page too.
 
-  `dense` is the band: the same row at a padding that lets three of them sit
-  above a live search without pushing it off the screen.
+  A series with an imported index is an `<a>` with its real `href`, and that is
+  the point: this band is the entry a crawler follows to the coverage pages, and
+  cmd-click and middle-click keep working for a reader who wants the page rather
+  than the summary. Only an unmodified left click is taken, to open the drawer.
+  A series with no index has no coverage page — it 404s on purpose —
+  so its row is a button that opens the drawer alone.
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
@@ -18,105 +20,95 @@
   import { hasDenominator } from '$lib/data/maps/seriesSheets';
 
   export let series: SeriesIndexEntry[] = [];
-  export let dense: boolean = false;
-  /**
-   * Open a drawer on click instead of following the row.
-   *
-   * The row stays an `<a>` with its real `href` either way, and that is the
-   * point: /catalog's band is the entry a crawler follows to the coverage
-   * pages, and cmd-click and middle-click keep working for a reader who wants
-   * the page rather than the summary. Only an unmodified left click is taken,
-   * which is the same bargain the catalog's own rows strike.
-   */
-  export let drawer: boolean = false;
 
   const dispatch = createEventDispatcher<{ open: SeriesIndexEntry }>();
 
   function onRowClick(e: MouseEvent, s: SeriesIndexEntry) {
-    if (!drawer) return;
     // A new tab, a new window, a saved link — all of those want the page.
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     dispatch('open', s);
   }
 
-  const span = (a: number | null, b: number | null) =>
-    a && b && a !== b ? `${a}–${b}` : (a ?? b ?? '');
-
   const pct = (held: number, total: number) => (total ? Math.round((held / total) * 100) : 0);
+
+  /** The one fraction that matters. Without an index there is no total to divide by. */
+  const fraction = (s: SeriesIndexEntry) =>
+    s.index.total === 0
+      ? $t('{held} sheets held', { held: s.sheets })
+      : hasDenominator(s.index)
+        ? $t('{held} of {total} sheets — {pct}%', {
+            held: s.index.held,
+            total: s.index.total,
+            pct: pct(s.index.held, s.index.total),
+          })
+        : $t('{held} sheets held', { held: s.index.held });
 </script>
 
-<ul class="rows" class:dense>
+<ul class="rows">
   {#each series as s (s.key)}
-    {@const years = span(s.firstYear, s.lastYear)}
     <li>
-      <a
-        class="section-card is-sm is-link"
-        href="/catalog/series/{encodeURIComponent(s.key)}"
-        on:click={(e) => onRowClick(e, s)}
-      >
-        <span class="name">{s.name}</span>
-        <span class="meta">
-          <!-- Labelled, because it is not the survey's dates: the span is an
-               aggregate over `maps` rows, which for L7014 is 9 sheets against
-               a survey of 627 printed 1963–89. Wording follows the single
-               series page. It still flatters — the 452 mosaic cells are held
-               too and carry no year here — so it says what it counts. -->
-          {#if years}<span>{$t('catalogued {years}', { years })}</span>{/if}
-          <span>
-            {#if hasDenominator(s.index)}
-              {$t('{held} of {total} sheets — {pct}%', {
-                held: s.index.held,
-                total: s.index.total,
-                pct: pct(s.index.held, s.index.total),
-              })}
-            {:else}
-              {$t('{held} sheets held', { held: s.index.held })}
-            {/if}
-          </span>
-        </span>
-      </a>
+      {#if s.index.total > 0}
+        <a
+          class="drow"
+          href="/catalog/series/{encodeURIComponent(s.key)}"
+          on:click={(e) => onRowClick(e, s)}
+        >
+          <span class="name">{s.name}</span>
+          <span class="frac">{fraction(s)}</span>
+        </a>
+      {:else}
+        <button type="button" class="drow" on:click={() => dispatch('open', s)}>
+          <span class="name">{s.name}</span>
+          <span class="frac">{fraction(s)}</span>
+        </button>
+      {/if}
     </li>
   {/each}
 </ul>
 
 <style>
+  /* One bordered list, not a card per series: it sits above a live search and should
+     read as a table of contents, not as the page's content. */
   .rows {
     list-style: none;
     padding: 0;
     margin: 0;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--sb-radius-sm);
+    background: var(--color-white);
+    overflow: hidden;
+  }
+  .drow {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.45rem 0.8rem;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
   }
-  /* `--card-pad` is the knob `.section-card` documents for exactly this: the
-     band is the same card at a third of the padding, not a fifth card. */
-  .rows.dense {
-    gap: 0.5rem;
+  li + li .drow {
+    border-top: 1px dashed var(--color-border);
   }
-  .rows.dense :global(.section-card) {
-    --card-pad: 0.7rem 0.9rem;
+  .drow:hover .name {
+    text-decoration: underline;
   }
   .name {
-    display: block;
     font-family: var(--font-family-display);
     font-weight: var(--font-bold);
-    font-size: 1.05rem;
-  }
-  .rows.dense .name {
     font-size: 0.95rem;
   }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: 0.2rem;
-    font-size: 0.85rem;
+  .frac {
+    font-size: 0.78rem;
     color: var(--color-gray-500);
     font-variant-numeric: tabular-nums;
-  }
-  .rows.dense .meta {
-    margin-top: 0.1rem;
-    font-size: 0.78rem;
+    white-space: nowrap;
   }
 </style>

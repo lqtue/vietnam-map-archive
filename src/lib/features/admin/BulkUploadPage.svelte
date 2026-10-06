@@ -4,6 +4,18 @@
   import { fetchUserRole } from '$lib/data/supabase/role';
   import GeorefSyncPanel from '$lib/features/admin/GeorefSyncPanel.svelte';
   import '$styles/pages/admin-bulk.css';
+  import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
+
+  const columns = [
+    { key: 'path', label: 'Local path' },
+    { key: 'name', label: 'Name' },
+    { key: 'year', label: 'Year' },
+    { key: 'collection', label: 'Collection' },
+    { key: 'map_type', label: 'Map type' },
+    { key: 'location', label: 'Location' },
+    { key: 'status', label: 'Status' },
+    { key: 'remove', label: '', srLabel: 'Remove row' },
+  ] satisfies TableColumn[];
 
   // ── session / role guard ────────────────────────────────────────────────
   const { supabase, session } = getSupabaseContext();
@@ -253,53 +265,37 @@
           parsePaste(t);
         }}></textarea>
 
-      <div class="grid-wrap">
-        <table class="grid data-table">
-          <thead>
-            <tr>
-              <th>Local path</th>
-              <th>Name</th>
-              <th>Year</th>
-              <th>Collection</th>
-              <th>Map type</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each rows as row, i (i)}
-              <tr class:row-ok={row.status === 'created'} class:row-bad={row.status === 'failed'}>
-                <td
-                  ><input
-                    type="text"
-                    bind:value={row.path}
-                    on:blur={() => applyAutoName(i)}
-                    placeholder="/abs/path/to/file.jpg"
-                  /></td
-                >
-                <td><input type="text" bind:value={row.name} /></td>
-                <td><input type="text" bind:value={row.year} /></td>
-                <td><input type="text" bind:value={row.collection} /></td>
-                <td><input type="text" bind:value={row.map_type} /></td>
-                <td><input type="text" bind:value={row.location} /></td>
-                <td class="status-cell">
-                  {#if row.status === 'created'}<span class="ok" title={row.id}>✓</span>
-                  {:else if row.status === 'failed'}<span class="bad" title={row.error}>✗</span>
-                  {:else}—{/if}
-                </td>
-                <td
-                  ><button
-                    class="btn is-xs is-ghost"
-                    on:click={() => removeRow(i)}
-                    aria-label="Remove row">✕</button
-                  ></td
-                >
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
+      <DataTable {columns} klass="grid" wrapClass="grid-wrap">
+        {#each rows as row, i (i)}
+          <tr class:row-ok={row.status === 'created'} class:row-bad={row.status === 'failed'}>
+            <td
+              ><input
+                type="text"
+                bind:value={row.path}
+                on:blur={() => applyAutoName(i)}
+                placeholder="/abs/path/to/file.jpg"
+              /></td
+            >
+            <td><input type="text" bind:value={row.name} /></td>
+            <td><input type="text" bind:value={row.year} /></td>
+            <td><input type="text" bind:value={row.collection} /></td>
+            <td><input type="text" bind:value={row.map_type} /></td>
+            <td><input type="text" bind:value={row.location} /></td>
+            <td class="status-cell">
+              {#if row.status === 'created'}<span class="ok" title={row.id}>✓</span>
+              {:else if row.status === 'failed'}<span class="bad" title={row.error}>✗</span>
+              {:else}—{/if}
+            </td>
+            <td
+              ><button
+                class="btn is-xs is-ghost"
+                on:click={() => removeRow(i)}
+                aria-label="Remove row">✕</button
+              ></td
+            >
+          </tr>
+        {/each}
+      </DataTable>
 
       <div class="row-actions">
         <button class="btn" on:click={addRow}>+ Add row</button>

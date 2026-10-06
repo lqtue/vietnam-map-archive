@@ -5,18 +5,24 @@
  * A facet is a test on one row. Every group's selection lives in one `Selected` record, and the
  * year range is two strings under `year` — `[from, to]`, either of which may be empty.
  */
+import { canonicalMapType } from '$lib/core/mapTaxonomy';
+import { matchesCoverageArea } from '$lib/core/catalogAreas';
+import { matchesGeographicRegion } from '$lib/core/catalogRegions';
+
 export type Row = Record<string, any>;
 export type Selected = Record<string, string[]>;
 
 /** A survey sheet carries a series key; a city plan or a one-off does not. */
 export const isSurvey = (r: Row) => !!r.series_key;
 
-/** Area is `maps.region` — the province, derived from the bbox (mig 109). `location` is the
- *  hand-written place and is filled on the one-off plans only, so it filters nothing on a survey. */
-export const passArea = (r: Row, sel: Selected) =>
-  !sel.area?.length || sel.area.includes(String(r.region ?? ''));
+/** Area is `maps.regions` — every province the sheet covers, derived from the bbox (mig 111;
+ *  `region` is the dominant one). `location` is the hand-written place and is filled on the
+ *  one-off plans only, so it filters nothing on a survey. */
+export const passArea = (r: Row, sel: Selected) => matchesCoverageArea(r, sel.area ?? []);
+export const passRegion = (r: Row, sel: Selected) => matchesGeographicRegion(r, sel.region ?? []);
 export const passType = (r: Row, sel: Selected) =>
-  !sel.type?.length || sel.type.includes(String(r.map_type ?? ''));
+  !sel.type?.length ||
+  sel.type.some((value) => canonicalMapType(value) === canonicalMapType(r.map_type));
 export const passInstitution = (r: Row, sel: Selected) =>
   !sel.institution?.length || sel.institution.includes(String(r.holding_institution ?? ''));
 

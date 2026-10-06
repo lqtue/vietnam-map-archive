@@ -84,6 +84,9 @@
       {#if map.location}
         <span class="map-city">{map.location}</span>
       {/if}
+      <!-- A caller's own line under the title (the catalog puts a sheet's work status here).
+           Display only: the card is one button. -->
+      <slot name="status" />
     </div>
   </svelte:element>
 

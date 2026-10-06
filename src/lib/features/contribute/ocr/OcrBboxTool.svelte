@@ -33,13 +33,12 @@
   import Style from 'ol/style/Style';
   import Fill from 'ol/style/Fill';
   import Stroke from 'ol/style/Stroke';
-  import TextStyle from 'ol/style/Text';
   import RegularShape from 'ol/style/RegularShape';
   import CircleStyle from 'ol/style/Circle';
   import Select from 'ol/interaction/Select';
   import Translate from 'ol/interaction/Translate';
   import Draw, { createBox } from 'ol/interaction/Draw';
-  import { click } from 'ol/events/condition';
+  import { click, shiftKeyOnly } from 'ol/events/condition';
   import { getImageShellStore } from '$lib/map/shell/imageContext';
   import type { OcrExtraction } from '../shared/types';
   import {
@@ -62,16 +61,18 @@
 
   export let extractions: OcrExtraction[] = [];
   export let selectedId: string | null = null;
+  export let selectedIds: string[] = [];
   export let filteredIds = new Set<string>();
   export let isolationMode = false;
   export let drawMode = false;
+  export let saving = false;
   /** Layer visibility, owned by the left rail. Hidden boxes are also
    *  uninteractive: a Select over an invisible layer selects nothing a person
    *  can see. */
   export let visible = true;
 
   const dispatch = createEventDispatcher<{
-    select: { id: string };
+    select: { id: string; additive?: boolean };
     edit: { id: string } & Required<ObbRow>;
     draw: Required<ObbRow>;
   }>();
@@ -102,7 +103,9 @@
   /** As stored — the anchor a drag is resolved against, so never the preview. */
   function storedObb(id: string): Obb | null {
     const ext = rowOf(id);
-    return ext && ext.global_w > 0 && ext.global_h > 0 ? obbFromRow(ext) : null;
+    return ext && !ext.is_text_group && ext.global_w > 0 && ext.global_h > 0
+      ? obbFromRow(ext)
+      : null;
   }
 
   /** What to draw: the live edit if there is one, else the row. */
@@ -138,8 +141,8 @@
   }
 
   function makeStyle(ext: OcrExtraction, selected = false): Style | Style[] {
-    const isFiltered = filteredIds.size === 0 || filteredIds.has(ext.id);
-    const hasSelection = !!selectedId;
+    const isFiltered = filteredIds.has(ext.text_group_id ?? ext.id);
+    const hasSelection = selectedIds.length > 0;
 
     let opacity = selected ? 1 : 0.45;
     if (!isFiltered) {
@@ -149,31 +152,16 @@
     }
     if (opacity === 0) return [];
 
-    const color = CAT_COLORS[reviewedCategory(ext)] ?? INK.grey;
-    const label = ext.text_validated ?? ext.text;
+    const owner = ext.text_group_id ? (rowOf(ext.text_group_id) ?? ext) : ext;
+    const color = CAT_COLORS[owner._editCategory ?? reviewedCategory(owner)] ?? INK.grey;
 
     return new Style({
       stroke: new Stroke({
         color: color + (opacity < 1 ? '66' : ''),
         width: selected ? 3 : 1.5,
-        lineDash: STATUS_DASH[ext.status] ?? [],
+        lineDash: STATUS_DASH[owner._editStatus ?? owner.status] ?? [],
       }),
       fill: new Fill({ color: color + (selected ? '44' : opacity < 0.5 ? '08' : '18') }),
-      text:
-        opacity > 0.5
-          ? new TextStyle({
-              text: label.length > 28 ? label.slice(0, 28) + '…' : label,
-              font: '10px "Be Vietnam Pro", sans-serif',
-              fill: new Fill({ color: INK.paper }),
-              stroke: new Stroke({ color: INK.ink, width: 2.5 }),
-              overflow: true,
-              // OL rotation is clockwise; the stored angle reads counter-clockwise.
-              // Rotating with the view keeps the caption on the lettering when the
-              // whole sheet is turned.
-              rotation: (-obbOf(ext).deg * Math.PI) / 180,
-              rotateWithView: true,
-            })
-          : undefined,
     });
   }
 
@@ -185,11 +173,12 @@
    * with and only the ones whose answer moved are restyled.
    */
   function styleKey(ext: OcrExtraction, selected: boolean): string {
-    const shown = filteredIds.size === 0 || filteredIds.has(ext.id);
+    const owner = rowOf(ext.text_group_id ?? ext.id) ?? ext;
+    const shown = filteredIds.has(ext.text_group_id ?? ext.id);
     return [
-      ext.category_validated ?? ext.category,
-      ext.status,
-      ext.text_validated ?? ext.text,
+      owner._editCategory ?? reviewedCategory(owner),
+      owner._editStatus ?? owner.status,
+      owner._editText ?? owner.text_validated ?? owner.text,
       obbOf(ext).deg,
       selected ? 1 : 0,
       shown ? 1 : 0,
@@ -213,6 +202,7 @@
     const seen = new Set<string>();
 
     for (const ext of extractions) {
+      if (ext.is_text_group) continue;
       if (!(ext.global_w > 0) || !(ext.global_h > 0)) continue;
       seen.add(ext.id);
       let feat = labelSource.getFeatureById(ext.id);
@@ -226,7 +216,7 @@
         (feat.getGeometry() as Polygon).setCoordinates([obbRing(obbOf(ext))]);
         feat.set('extraction', ext);
       }
-      const selected = ext.id === selectedId;
+      const selected = selectedIds.includes(ext.text_group_id ?? ext.id);
       const key = styleKey(ext, selected);
       if (styleKeys.get(ext.id) !== key) {
         styleKeys.set(ext.id, key);
@@ -240,12 +230,22 @@
       labelSource.removeFeature(feat);
       styleKeys.delete(id);
     }
+    // Translate must follow the controller's selection, including keyboard
+    // navigation. A group is selected through its members but never moved as
+    // an enclosing rectangle.
+    const selected = selectInteraction?.getFeatures();
+    const feature =
+      selectedId && selectedIds.length === 1 ? labelSource.getFeatureById(selectedId) : null;
+    if (selected && (selected.getLength() !== (feature ? 1 : 0) || selected.item(0) !== feature)) {
+      selected.clear();
+      if (feature) selected.push(feature);
+    }
   }
 
   function syncHandles() {
     // Not mid-drag: repositioning the handle under the pointer fights the drag.
     if (preview) return;
-    const obb = selectedId ? storedObb(selectedId) : null;
+    const obb = selectedId && selectedIds.length === 1 ? storedObb(selectedId) : null;
     obbEditor?.show(selectedId, obb);
     rotateHandle?.show(obb ? selectedId : null, obb ? rotationHandlePoint(obb) : null);
   }
@@ -253,12 +253,14 @@
   $: {
     void extractions;
     void selectedId;
+    void selectedIds;
     void filteredIds;
     void isolationMode;
     if (labelSource) syncFeatures();
   }
   $: {
     void selectedId;
+    void selectedIds;
     void extractions;
     if (obbEditor) syncHandles();
   }
@@ -269,17 +271,22 @@
   // `drawMode` both decide the same four interactions, so one owner settles it.
   $: if (initialized) {
     void visible;
+    void saving;
+    void selectedIds;
+    void selectedId;
     toggleDrawMode(drawMode);
   }
 
   function toggleDrawMode(active: boolean) {
     if (!selectInteraction || !bodyTranslate || !obbEditor) return;
-    const editable = !active && visible;
+    const editable = !active && visible && !saving;
     selectInteraction.setActive(editable);
-    bodyTranslate.setActive(editable);
-    obbEditor.setActive(editable);
-    rotateHandle?.setActive(editable);
-    if (drawInteraction) drawInteraction.setActive(active && visible);
+    const singleBox =
+      editable && selectedIds.length <= 1 && !rowOf(selectedId ?? '')?.is_text_group;
+    bodyTranslate.setActive(singleBox);
+    obbEditor.setActive(singleBox);
+    rotateHandle?.setActive(singleBox);
+    if (drawInteraction) drawInteraction.setActive(active && visible && !saving);
   }
 
   /**
@@ -322,11 +329,16 @@
       // makes it unclickable.
       hitTolerance: 6,
       layers: (l: any) => l === labelLayer,
-      style: (feat: any) => makeStyle(feat.get('extraction'), true),
+      style: null,
+      toggleCondition: shiftKeyOnly,
     });
     selectInteraction.on('select', (e: any) => {
-      const feat = e.selected[0];
-      if (feat) dispatch('select', { id: feat.get('extractionId') as string });
+      const feat = e.selected[0] ?? e.deselected[0];
+      if (feat)
+        dispatch('select', {
+          id: feat.get('extractionId') as string,
+          additive: e.mapBrowserEvent.originalEvent.shiftKey,
+        });
     });
     olMap.addInteraction(selectInteraction);
 
@@ -394,16 +406,17 @@
 
     // Draw interaction for adding new labels (inactive until drawMode=true).
     // A drawn box is upright, so it starts as its own rectangle at 0 degrees.
-    const drawSource = new VectorSource();
     drawInteraction = new Draw({
-      source: drawSource,
       type: 'Circle',
       geometryFunction: createBox(),
+      // Start on pointer-down and finish on release, matching the toolbar's
+      // drag gesture and preventing the same drag from panning the scan.
+      freehand: true,
     });
     drawInteraction.setActive(false);
     drawInteraction.on('drawend', (e: any) => {
       const rect = fromOlExtent(e.feature.getGeometry().getExtent());
-      drawSource.clear();
+      if (!(rect.w > 0) || !(rect.h > 0)) return;
       dispatch(
         'draw',
         obbToRow({

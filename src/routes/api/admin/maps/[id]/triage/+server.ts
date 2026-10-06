@@ -31,6 +31,7 @@ const WRITABLE = [
   'overlap',
   'tile_overrides',
   'regions',
+  'legend',
 ] as const;
 
 const isBox = (v: unknown): boolean =>
@@ -60,6 +61,12 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
       if (value !== 'human' && value !== 'main_map') {
         throw error(400, "neatline_src must be 'human' or 'main_map'");
       }
+      writes.push([key, value]);
+      continue;
+    }
+    if (key === 'legend') {
+      // null removes the key: "this sheet has no legend" is withdrawn.
+      if (value !== 'none' && value !== null) throw error(400, "legend must be 'none' or null");
       writes.push([key, value]);
       continue;
     }

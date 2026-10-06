@@ -4,6 +4,7 @@
   bindable so the parent's handleSave sees the edits.
 -->
 <script lang="ts">
+  import { MAP_TYPES, MAP_SUBJECTS, DEPICTED_STATES } from '$lib/core/mapTaxonomy';
   import { onMount } from 'svelte';
   import SheetPrintingReview from './SheetPrintingReview.svelte';
   export let name: string;
@@ -14,6 +15,10 @@
   export let dc_publisher: string;
   export let location: string;
   export let map_type: string;
+  export let map_subjects: string[] = [];
+  export let depicted_state = 'unknown';
+  export let classification_note = '';
+  export let classification_source_url = '';
   export let dc_description: string;
   export let physical_description: string;
   export let language: string;
@@ -166,12 +171,34 @@
     <span>Map type</span>
     <select bind:value={map_type} class="form-input">
       <option value="">— unknown —</option>
-      <option value="cadastral">Cadastral</option>
-      <option value="topographic">Topographic</option>
-      <option value="city_plan">City Plan</option>
-      <option value="panorama">Panorama</option>
-      <option value="other">Other</option>
+      {#each MAP_TYPES as type (type.key)}
+        <option value={type.key}>{type.en}</option>
+      {/each}
     </select>
+  </label>
+  <label class="form-label">
+    <span>Subjects <span class="field-hint">optional, multiple</span></span>
+    <select multiple bind:value={map_subjects} class="form-input">
+      {#each MAP_SUBJECTS as subject (subject.key)}
+        <option value={subject.key}>{subject.en}</option>
+      {/each}
+    </select>
+  </label>
+  <label class="form-label">
+    <span>Depicted state</span>
+    <select bind:value={depicted_state} class="form-input">
+      {#each DEPICTED_STATES as state (state)}
+        <option value={state}>{state}</option>
+      {/each}
+    </select>
+  </label>
+  <label class="form-label">
+    <span>Classification evidence</span>
+    <textarea bind:value={classification_note} class="form-input" rows="3"></textarea>
+  </label>
+  <label class="form-label">
+    <span>Classification source URL</span>
+    <input type="url" bind:value={classification_source_url} class="form-input" />
   </label>
   <label class="form-label">
     <span>Sheet number <span class="field-hint">series cell, e.g. 6330-4</span></span>

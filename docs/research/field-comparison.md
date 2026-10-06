@@ -92,7 +92,7 @@ whole claim. It needs precision and two more sheets before it is one.
 | **ICDAR 2025 MapText** | 7 teams, 25+ submissions, 4 tasks, 3 datasets — Rumsey, expanded French Land Registers, **new Taiwanese with Chinese characters** | competition; detection strong, **recognition and linking still hard** |
 | **LIGHT** (Lin, Olson, Wu, Chiang, Weinman 2025) | ICDAR 2024/2025 data | multi-modal text linking, bi-directional reading order |
 | **GPT-4o legend detection** (GeoSearch'25) | 40 DARPA–USGS maps | **in-context learning, no training** — 88% F1, 85% IoU, beats a LayoutLMv3 baseline; best at 15 in-prompt examples |
-| **VMA** | **6 sheets, 958 distinct place names**, 43 human-checked | Gemini Flash, coarse→fine tiling, row-sequence, two-pass vote |
+| **VMA** | **6 sheets, 958 distinct place names**, 43 human-checked (6 sheets and 43 validated match the 2026-09-04 dataset-card snapshot; on 2026-09-19 it was 22 sheets and 96 validated, `paper/figures.md` §0; the 958 is not traced to a run) | Gemini Flash, coarse→fine tiling, row-sequence, two-pass vote |
 
 **On scale we are not in the conversation**, and should never imply otherwise. mapKurator has
 processed four orders of magnitude more maps than we have.
@@ -144,7 +144,7 @@ saying in print, because the GPT-4o legend paper's pipeline has the same exposur
 | **Printed graticule + LLM** (Tyagi & Dubey, NCVPRIPG 2025) | printed lat/long labels in the margin | EasyOCR + two-stage multimodal LLM; **internal RMSE < 5 m, validation < 30 m on 11 of 12 sheets**, < 350 s/sheet |
 | **Toponym matching** (Bahgat & Runfola 2021) | a gazetteer and ≥ ~10 toponyms | usable for data extraction ("nearly half of all cases", quoted from the abstract) — real-world sample: 40% at <5% error, 44% at <1% error; simulated: 12.6% true success at <1% error. **Not** "affine RMSE 16.9–84.2 px" — see the 2026-09-19 correction in §7 |
 | **Content-based** (Luft & Schiewe 2021) | topographic content | — |
-| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 12.7 m** on the 1882 sheet; affine buys 10.6 m. Not a floor for the archive — the 1942 sheet measures **72.3 m** |
+| **VMA** | **a human** | Allmaps helmert, 10 GCPs, **RMSE 12.7 m** on the 1882 sheet; affine buys 10.6 m. Not a floor for the archive — the 1942 sheet measures **72.3 m**. *As of 2026-09-19; both superseded 2026-10-01 — 1882 is now 12.3 m on 8 GCPs and 1942 is 33.6 m on 8 GCPs (`ROADMAP.md` `georef-figures-refresh`).* |
 
 **We do no automatic georeferencing at all.** Our 12.7 m is a human result and belongs in the
 ground-truth column, not the results column.
@@ -322,7 +322,7 @@ answer (Rabehi et al.) uses none of them, just a two-pass U-Net.
 | Segmentation **rigour** | **behind** — no precision, no held-out set, train-set scores, one sheet | one exhaustively traced window; then report PQ or semantic IoU |
 | Segmentation **method** | **plausibly novel for polychrome cadastrals**, unproven | the same traced window, plus two sheets from other decades |
 | SAM2 usage | **behind the paper we forked** — tiles-as-video shape without the self-sorting memory bank | implement it; the paper measures +14.3/+16.1 IoU for exactly this, strongest in low-data |
-| Map text **scale** | **not in the conversation** (6 sheets vs 60,000 maps) | nothing cheap; do not claim scale |
+| Map text **scale** | **not in the conversation** (6 sheets on the 2026-09-04 snapshot, 22 by 2026-09-19, vs 60,000 maps) | nothing cheap; do not claim scale |
 | Map text **method** | **level with the field's direction**, corroborated by the GPT-4o legend result | — |
 | Ground per call | **appears to be ours alone**, and is transferable | write it up; it is 1–2 pages and already measured |
 | Diacritic retention metric | **appears to be ours alone** | ditto, and it needs the 39-sheet OCR pass |

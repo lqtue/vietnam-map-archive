@@ -28,6 +28,7 @@
   } from '$lib/map/stores/layersStore';
   import { fetchPublicStories } from '$lib/data/supabase/stories';
   import { fetchUserRole } from '$lib/data/supabase/role';
+  import { trackMeasurement } from '$lib/data/measurement';
   import { createStoryPlayerStore } from '$lib/features/stories/shared/storyStore';
   import type { Story, StoryPoint } from '$lib/features/stories/shared/types';
 
@@ -323,6 +324,7 @@
     addMapOverlay(map);
     syncMapParam(mapRef(map));
     tallyMapOpen(map.id);
+    trackMeasurement('map_open', { surface: 'explore', map_id: map.id, action: 'open' });
     await zoomToMap(map);
   }
   /** A label hit from the browse pane: stack its map, then land on the spot. */
@@ -333,6 +335,7 @@
     addMapOverlay(map);
     syncMapParam(mapRef(map));
     tallyMapOpen(map.id);
+    trackMeasurement('map_open', { surface: 'explore', map_id: map.id, action: 'open' });
     if (h.lng != null && h.lat != null) {
       mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
       focusPoint = { lng: h.lng, lat: h.lat };
@@ -373,6 +376,7 @@
       layersStore.removeOverlayByMapId(top.ref.mapId);
       syncMapParam(mapRef(next));
       tallyMapOpen(next.id);
+      trackMeasurement('map_open', { surface: 'explore', map_id: next.id, action: 'open' });
       return;
     }
 

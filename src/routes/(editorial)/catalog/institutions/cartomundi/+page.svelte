@@ -52,6 +52,7 @@
   />
 
   <main class="editorial-main">
+    <p><a href="/catalog/institutions">← Institution catalog</a></p>
     <section class="section-card intro" aria-labelledby="index-about">
       <div class="section-card-header">
         <h2 id="index-about" class="section-title-sm">What this index shows</h2>

@@ -9,13 +9,18 @@ Regenerate with:
 grep -rn 'ponytail:' src/ work/ scripts/ tests/ supabase/ eslint.config.js playwright.config.ts
 ```
 
-then drop the one hit under `work/archive/cleanup/` (a prose mention in a scratch TODO,
-not a marker) and write the rows by hand. **The plugin that used to generate
+then drop the hits under `work/archive/cleanup/` (prose mentions in gitignored scratch notes,
+not markers) and write the rows by hand. **The plugin that used to generate
 this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-10-05**: **92 tracked markers** (the grep also hits gitignored output under `work/image-processing/results/` — skip those). Previous scan 2026-09-15 (72).
+Scanned **2026-10-06**: **91 tracked markers** (the grep also hits gitignored output under `work/image-processing/results/` — skip those). Previous scan 2026-09-15 (72).
+The two OCR controller entries were retired 2026-10-06: a shared draft cache now
+keeps failed saves and coalesces rotation edits until explicit Save. The 2026-10-06
+rescan added two rows that the 2026-10-05 ledger had missed: `catalogFilters.ts:76`
+and `work/ocr/scripts/sheet_features.py:120`.
+
 Against the
 2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
 the ledger had gone stale in both directions, so this is a full rewrite rather
@@ -83,6 +88,12 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   on its own and nothing else on the map animates. upgrade: reach for `postrender` only if a second
   animated layer shows up.
 
+## src/lib/features/shared/catalogFilters.ts
+
+- **:76** — `seriesShort()` derives a table-cell survey name from the collection string. ceiling: a
+  new series with an odd name falls back to the head of its name. upgrade: a `series.short_name`
+  column.
+
 ## src/lib/features/shared/FootprintsLayer.svelte
 
 - **:75** — one request per set of ids, re-fetched whenever the set changes, no per-map cache.
@@ -120,14 +131,6 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   not tested. ceiling: that fourth check needs `maps.triage.grid`, which most sheets do not have
   yet. upgrade: add it beside the others when the grid is fitted — `_cell_rect`/`cellBox` already
   turn a reference into a rectangle.
-
-## src/lib/features/contribute/ocr/ocrReviewController.ts
-
-- **:120** — the canvas copy of a status change is optimistic and never reverted. ceiling: a failed
-  write surfaces only in the sidebar's error line. upgrade: revert here if that proves confusing to
-  reviewers.
-- **:172** — one PATCH per keypress when rotating a label. ceiling: no debounce at all. upgrade:
-  debounce if holding a key ever matters.
 
 ## src/lib/server/gallica.ts
 
@@ -345,6 +348,12 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 - **:49** — char accuracy via `difflib.SequenceMatcher.ratio()`, a 2·M/T similarity, not a true
   CharACC/CER. ceiling: tracks regressions fine, but the absolute number is not a CER. upgrade: swap
   for `rapidfuzz.normalized_similarity` if an exact CER is ever needed.
+
+## work/ocr/scripts/sheet_features.py
+
+- **:120** — clipped least squares, not true NNLS; exact when both concentrations are ≥ 0. A copy of
+  the `work/image-processing/scripts/sheet_features.py:120` row. upgrade: _none named_ —
+  `no-trigger`.
 
 ## work/ocr/scripts/local_vision.py
 
@@ -627,8 +636,8 @@ which drops every marker written inside a Python docstring — where this repo
 puts most of its module-level ones — and every SQL `--` comment. A bare
 `grep -rn 'ponytail:'` catches all of them.
 
-**Hand-drop the prose mentions.** The grep scope above returns one non-marker
-hit, `work/archive/cleanup/TODO.md`, which is a scratch note rather than a comment on
-code. Widen the scope beyond it and you also pick up this file's own header,
+**Hand-drop the prose mentions.** The grep scope above returns four non-marker
+hits under `work/archive/cleanup/` (`TODO.md` and two dated audit notes, all gitignored scratch notes rather than comments on
+code). Widen the scope beyond it and you also pick up this file's own header,
 `CLAUDE.md`, `contracts/README.md:22` and `docs/search-plan.md:232` — all
 cross-references to the convention, none of them markers.

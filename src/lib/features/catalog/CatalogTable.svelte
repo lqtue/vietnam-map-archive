@@ -1,14 +1,16 @@
 <!--
   CatalogTable — sortable, groupable table for the unified catalog.
-  Click a column header to sort (toggle direction). Use the "Group by" dropdown
-  to collapse rows by Year / Area / Series / Institution.
+  Click a column header to sort (toggle direction). The Group by choice (Year / Area /
+  Series / Institution) comes from the filter group above, in CatalogUnifiedSearch.
 
   `compact` delegates to `ArchiveMapRows` — this same table with four columns
   dropped, which is what a 380px rail can carry. It was `CatalogTableCompact`,
   a hand-built `<ul>`, until Sept 2026.
 -->
 <script lang="ts">
+  import { mapTypeLabel } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { catalogAreaSummary } from '$lib/core/catalogAreas';
   import { createEventDispatcher } from 'svelte';
   import type { MapListItem } from '$lib/data/maps/types';
   import { layersStore, toggleOverlayFor } from '$lib/map/stores/layersStore';
@@ -16,6 +18,9 @@
   import { atWidth, stepDown } from '$lib/core/iiif/thumbUrl';
   import { sortRows, groupRows, type SortKey, type GroupKey } from './catalogTableModel';
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
+  import SheetStatus from './SheetStatus.svelte';
+  import OpenInMenu from './OpenInMenu.svelte';
+  import type { WorkFactsById } from '$lib/core/sheetWork';
   import { inView } from '$lib/ui/inView';
   import { sliceGroups } from './sliceGroups';
   import { sheetLabel, seriesShort } from '$lib/features/shared/catalogFilters';
@@ -27,13 +32,16 @@
   export let showLayerActions: boolean = false;
   /** Staff also see Type and Status; for a reader Type is one value in 96% of rows and Status is "map". */
   export let staff: boolean = false;
+  /** What has been done to each sheet (staff), loaded by the catalog that also filters on it. */
+  export let work: WorkFactsById = {};
+  /** Chosen in the catalog's filter group, not here. */
+  export let groupBy: GroupKey = 'none';
 
   const dispatch = createEventDispatcher();
 
   $: overlayMapIds = new Set($layersStore.overlays.map((o) => o.ref.mapId));
 
   let sort = { key: 'year' as SortKey, asc: true };
-  let groupBy: GroupKey = 'none';
 
   const sheetOf = sheetLabel;
 
@@ -41,18 +49,20 @@
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
     { key: 'name', label: 'Title' },
     { key: 'year', label: 'Year', klass: 'num' },
-    { key: 'region', label: 'Area' },
+    { key: 'region', label: 'Province / city' },
     { key: 'collection', label: 'Series' },
     ...(staff
       ? [
           { key: 'map_type', label: 'Type' },
           { key: 'status', label: 'Status', klass: 'status-col' },
+          { key: 'open', label: '', srLabel: 'Open in', klass: 'open-col', sortable: false },
         ]
       : []),
   ] satisfies TableColumn[];
 
-  $: sorted = sortRows(items, sort);
-  $: groups = groupRows(sorted, groupBy);
+  $: ctx = staff && !compact ? work : null;
+  $: sorted = sortRows(items, sort, ctx);
+  $: groups = groupRows(sorted, groupBy, ctx);
 
   /* 938 rows is 15,000 DOM nodes and a 1.3 s first render, and nobody has scrolled to most of them.
      Draw a slice; the sentinel under the table asks for the next one. A new result set, sort or
@@ -82,23 +92,6 @@
 {#if compact}
   <ArchiveMapRows rows={sorted} rowAction="open" {activeId} on:open />
 {:else}
-  <div class="ct-toolbar">
-    <label class="group-pick">
-      {$t('Group by')}
-      <select bind:value={groupBy}>
-        <option value="none">{$t('None')}</option>
-        <option value="year">{$t('Year')}</option>
-        <option value="region">{$t('Area')}</option>
-        <option value="collection">{$t('Series')}</option>
-        <option value="holding_institution">{$t('Institution')}</option>
-        {#if staff}
-          <option value="map_type">{$t('Type')}</option>
-          <option value="status">{$t('Status')}</option>
-        {/if}
-      </select>
-    </label>
-  </div>
-
   <!-- The `.ct` wrapper is this component's own element, so its scoped CSS can
        still reach the `<table>`, `<thead>` and `<th>`s that are DataTable's. -->
   <div class="ct">
@@ -115,6 +108,7 @@
         {/if}
         {#if g.label === null || !collapsed.has(g.label)}
           {#each g.rows as item (item.id)}
+            {@const area = catalogAreaSummary(item)}
             {@const isScout = (item as any)._table === 'scout'}
             {@const isOverlay = overlayMapIds.has(item.id)}
             {@const shareHref =
@@ -172,32 +166,26 @@
                     >
                   {/if}
                 </div>
-                {#if sheetOf(item) || item.location}
+                {#if sheetOf(item)}
                   <div class="sub">
                     {#if sheetOf(item)}<span class="sheet">{sheetOf(item)}</span>{/if}
-                    {item.location ?? ''}
                   </div>
                 {/if}
               </td>
               <td class="num">{item.year ?? '—'}</td>
-              <td class="area-col">{item.region || '—'}</td>
+              <td
+                class="area-col"
+                title={`${area.full} · province boundaries before July 2025`}
+                aria-label={area.full || '—'}>{area.label}</td
+              >
               <td title={item.collection || ''} class="collection-col">
                 {seriesShort(item.collection) || '—'}
               </td>
               {#if staff}
-                <td>{item.map_type || '—'}</td>
-                <td class="status-col">
-                  {#if isScout}
-                    <span class="badge-chip is-sm scout">scout</span>
-                  {:else if (item as any).georef_done}
-                    <span class="badge-chip is-sm status-map" title={$t('Available on map')}
-                      >{$t('Map')}</span
-                    >
-                  {:else}
-                    <span class="badge-chip is-sm chip-gray" title={$t('Static image only')}
-                      >{$t('Image')}</span
-                    >
-                  {/if}
+                <td>{item.map_type ? mapTypeLabel(item.map_type) : '—'}</td>
+                <td class="status-col"><SheetStatus item={item as any} state={work[item.id]} /></td>
+                <td class="open-col">
+                  {#if !isScout}<OpenInMenu mapId={item.id} />{/if}
                 </td>
               {/if}
             </tr>
@@ -212,27 +200,6 @@
 {/if}
 
 <style>
-  .ct-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    padding: var(--space-1) 0 var(--space-2);
-    font-family: var(--font-family-base);
-    font-size: 0.85rem;
-  }
-  .group-pick {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: var(--font-semibold);
-  }
-  .group-pick select {
-    font: inherit;
-    padding: 0.2rem 0.4rem;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--sb-radius-sm);
-    background: var(--color-white);
-  }
   /* Shape, header, row rules and the sort indicator come from
      `.data-table.is-card` in components/table.css. */
   .ct :global(tbody tr) {
@@ -249,6 +216,9 @@
     text-decoration: underline;
   }
   .area-col {
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--sb-text-meta);
     font-size: 0.85rem;
@@ -293,18 +263,12 @@
      elements are `DataTable`'s; a column's geometry has to reach both halves of
      it. The `.ct` wrapper is this component's, so it keeps them from leaking. */
   .ct :global(.status-col) {
-    width: 90px;
-    text-align: right;
+    width: 9rem;
     white-space: nowrap;
   }
-  /* Two tones only: both are tints of a token, and the shared `.chip-green` /
-     `.chip-yellow` are a solid fill and a white face — too loud and too blank
-     for a badge repeated down every row. */
-  .scout {
-    background: var(--sb-accent-yellow);
-  }
-  .status-map {
-    background: var(--sb-badge-map);
+  .ct :global(.open-col) {
+    width: 6rem;
+    text-align: right;
   }
   .group-row {
     cursor: pointer;

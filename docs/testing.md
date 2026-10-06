@@ -1,16 +1,52 @@
 # Test inventory
 
+Usage measurement (2026-10-06): `measurement.spec.ts` verifies opt-in gating,
+role exclusion, parameter/route sanitization, page deduplication, revocation and
+best-effort failure handling using an injected adapter. These are privacy and
+reporting boundaries, not evidence that a production GA4 property is configured.
+`studio-measurement.spec.ts` distinguishes hydration/unchanged work, meaningful
+feature edits, failed updates and acknowledged nonempty saves.
+`measurement-save.spec.ts` uses mocked PostgREST responses to pin that a successful
+zero-row update is not a confirmed save; it performs no database writes.
+
+
+Taxonomy (2026-10-06): `map-type-contract.spec.ts` checks the editor vocabulary and
+legacy aliases. `tests/sql/map-taxonomy.sql` checks database constraints, alias
+normalization and invalidation of stale reviews after edits or reviewer deletion.
+Run it in a fresh local `vma_map_taxonomy` database; it supplies stand-in tables,
+applies migration 116 and rolls back. A database-name/loopback guard prevents production use.
+
+Catalog header (2026-10-06): `catalog-series.spec.ts` verifies collection browsing and
+facet controls start collapsed, expand with native disclosures, and keep collection links
+in the server-rendered HTML. Drawer tests explicitly open the collection browser.
+
+Coverage/type fixes (2026-10-06): `map-region.spec.ts` pins positive-area polygon overlap for
+small provinces on wide sheets and excludes boundary-only contact and polygon holes;
+`catalog-areas.spec.ts` checks that geographic regions partition the 63-province reference set
+and do not inherit 2025 mergers. `catalog-series.spec.ts` checks the live Cochinchine HCMC
+coverage and region API/filter parity. `map-type-contract.spec.ts` compares editor choices
+with migration 116's canonical types, catching the previously incompatible type dropdown.
+
+City collection SEO (2026-10-06): `catalog-series.spec.ts` checks English and Vietnamese
+collection HTML, canonical/hreflang pairs, image previews and both sitemap addresses without
+requiring JavaScript. Coverage parity counts distinct map links because a preview and title
+can link to the same record.
+
+L909 additions (2026-10-06): `series-sheets.spec.ts` pins that a partial city index never
+claims the historical survey denominator; `series-rows.spec.ts` pins that the partial index
+is linked while its count is described as indexed cities.
+
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **376** tests:
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **468** tests (`npx playwright test --list`, 2026-10-06):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
-that sheet is unpublished) and the **seven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 381 browser-less pure
+that sheet is unpublished) and the **eleven** in `tests/catalog-series.spec.ts`, which are
+**read-only** (they hit the real Supabase project but never write), plus 445 browser-less pure
 checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
 after a display-label change and omit unlinked maps; two scans group only when they have the same
 printing UUID; unresolved scans remain separate, and an institution is held only through
@@ -45,7 +81,7 @@ alias, and `/admin` never resolves an unknown tab to the write-capable bulk scre
 `tests/stale-after-change.spec.ts` (the rebuild set when a published map's pixels or georeference
 change: a re-georeference re-derives exactly `ocr_labels.geom` and `footprints.geom` from stored
 pixels, so a schema change there is a deliberate edit here; a rescan has no equivalent yet —
-`stale-after-change` in the ROADMAP), `tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes. The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
+`stale-after-change` in the ROADMAP), `tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes; and the work tracks: "no legend on this sheet" (`triage.legend = 'none'`) closes the Legend track and leaves `legendReadiness` and the "Legend found, not read" filter alone, legend entries outrank it, and it no longer blocks "All done". The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
 copy of it: `ocr street-index` reads a sheet's printed street directory and has to place each street
 as it writes, because the box columns are NOT NULL, so `_cell_rect` in `ocr.py` and `cellBox` here
 are checked against one committed fixture — a drift between them does not look like a bug, it looks
@@ -151,6 +187,10 @@ from the dead; it reads the source rather than the page, because that is where t
 `tests/table-sort.spec.ts` (the one sort behind every `.data-table` — blanks last in **both**
 directions, `numeric` collation so `Rue 100` follows `Rue 11`, and that the value function runs once
 per row rather than once per comparison, which is what the decorate-sort-undecorate is for),
+`tests/facets.spec.ts` (the filter/count/group layer under `FacetFilters` — a chip's count must
+ignore its **own** facet, because a reviewer turns `validated` on beside `pending` to see what is
+already done, and a count that went to 0 would hide the chip they turned it on to compare; plus that
+an empty choice is no constraint, a chosen chip survives a zero count, and groups keep row order),
 `tests/ocr-jobs.spec.ts` (the four reading jobs of `?mode=text` — the property is that they
 **partition** the loaded rows, because the tabs carry counts and that is a promise that clearing all
 four clears the sheet; a row matching two jobs is checked twice and one matching none is never seen,
@@ -193,7 +233,7 @@ has no source URL and is still **held**; the three statuses must partition the s
 bar draws them as three segments of one whole and the prose says "N of TOTAL"; a degenerate cell has
 to ask for a zoom a basemap actually has rather than `Infinity`; and a survey that exactly fills a
 page still has to stop), `tests/tile-size-segment.spec.ts` (the IIIF **size segment**, and the 404
-that hid behind it — the largest single spec here, 29 checks over `worker/src/iiifKeys`.
+that hid behind it — the largest single spec here, 31 checks over `worker/src/iiifKeys`.
 `vips dzsave --layout iiif3` writes every derivative with an explicit `w,h`; IIIF's canonical "this
 width, proportional height" is width-only, and width-only is what @allmaps/render and OpenLayers ask
 for, so a width-only request missed R2 for *every* map in the bucket — maps with a `sources/` entry
@@ -245,7 +285,12 @@ into a pass on an empty set.
 that subset through `unsupportedKeywords` rather than passing it silently, so adding an unsupported
 keyword to a contract fails loudly instead of going unchecked.
 
-**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 37 tests)
+One write check pins `/api/context`'s `legend[]`: a public fixture map with a validated `px=` legend
+entry returns one point (inside the radius and the year window, `src: 'manual'`, passing
+`context.schema.json`); the entry's stray `geom` never appears under `labels` (mig 115); and the
+same map as a draft gives no `legend` to an anonymous caller or to staff.
+
+**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 38 tests)
 against a **local** stack, never production: `npm run db:test` runs
 `supabase start -x vector -x logflare` and seeds one staff user + one map via
 `scripts/seed-test-db.mjs`. The suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and
@@ -275,3 +320,41 @@ connects to Supabase or production. Create a fresh loopback PostgreSQL database 
 `npm run test:model-sql`. The runner refuses any other database name or non-loopback host. This
 fixture is a migration regression check, not a full Supabase replay, production rollout or evidence
 that catalog records have been reviewed.
+
+
+Text grouping is also covered by `tests/ocr-review-keys.spec.ts`: ordered Shift-click
+selection, member-to-parent selection, and preventing a multi-selection from
+validating only its last box. `tests/sql/text-groups.sql` applies migrations 112–114 in
+an isolated local PostgreSQL database named `vma_text_groups` and checks reading
+order, grouping across runs with original run IDs preserved, one search result,
+draft visibility, unchanged original geometry and review
+state after ungrouping, rejected nested/cross-map/stale selections, atomic failure,
+service-only RPC grants, and subpixel serialization rounding without accepting
+a moved envelope. Its spatial functions are explicit stand-ins; it does
+not test PostGIS or Allmaps accuracy. Run against a fresh local database with
+`psql "$VMA_TEXT_GROUP_TEST_DATABASE_URL" -f tests/sql/text-groups.sql`.
+
+`tests/text-group-schema.spec.ts` pins the migration-112 compatibility boundary:
+only a missing grouping column enables the legacy reader; permission, network,
+and unrelated schema failures remain errors. The review controller also checks
+that grouping availability follows the server and clears when changing maps.
+The OCR reader and existing write paths remain usable before migration 112;
+grouping reports unavailable until its columns exist.
+
+`tests/ocr-drafts.spec.ts` verifies the shared OCR working copy: zero writes while
+staging, coalesced geometry/text patches, batched verdicts, creation and edits before
+grouping, temporary-ID remapping, cancellation before Save, existing ungroup before
+member edits, partial-save recovery without repeating confirmed writes, cache
+restoration, baseline immutability after Save, and external-change conflicts. The
+browser check used the actual sidebar, box panel, group panel and OpenLayers tool
+with mocked writes: table/panel synchronization, above-neatline label visibility,
+Shift-click grouping, refresh recovery, explicit Save, deferred Ungroup, local
+presets, and no list reload after writes. It does not validate a production rollout.
+
+Area coverage is pinned by `tests/catalog-areas.spec.ts` (secondary provinces,
+empty-list fallback and unknown coverage) and `tests/local-search.spec.ts`
+(province names find sheets whose titles omit them, in both boundary sets).
+The area check in `tests/catalog-series.spec.ts` compares the server-rendered
+map lists with anonymous `/api/search?area=`, checks draft exclusion, sitemap
+links and unknown-area 404s, and verifies that the catalog link initializes
+the province filter with the same count after hydration. These are read-only.

@@ -25,7 +25,7 @@ export const REGION_LABELS: Record<RegionKey, string> = {
   legend: 'Legend',
   names: 'Names',
   title: 'Title',
-  off: 'Off-sheet',
+  off: 'Outside map body',
 };
 
 /** The layout categories each pill answers to. `map` is the fallback, not a list. */

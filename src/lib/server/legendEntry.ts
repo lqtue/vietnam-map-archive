@@ -38,6 +38,22 @@ export function manualLegendPoint(
   return ll && Math.abs(ll[0]) <= 180 && Math.abs(ll[1]) <= 90 ? { lngLat: ll } : null;
 }
 
+/** Most extra points one entry may carry: a number printed on a few plots, not a free-for-all. */
+export const MAX_EXTRA_POINTS = 20;
+
+/**
+ * Further positions of the same entry (`more=x,y|x,y`), for a legend number
+ * printed on more than one plot — a depot of two yards, one purpose. The first
+ * position stays `px`, so a sheet with none of these reads exactly as before.
+ */
+export function extraLegendPoints(notes: string | null): [number, number][] {
+  return (legendNote(notes, 'more') ?? '')
+    .split('|')
+    .map((part) => pair(part))
+    .filter((p): p is [number, number] => !!p && p[0] >= 0 && p[1] >= 0)
+    .slice(0, MAX_EXTRA_POINTS);
+}
+
 export type PixelRect = { x: number; y: number; w: number; h: number };
 
 export function inRects(rects: readonly PixelRect[], x: number, y: number): boolean {
@@ -74,14 +90,24 @@ export function numeralCandidate(
 /** Replace only the fields being edited; keep unrelated OCR/provenance notes. */
 export function editLegendNotes(
   notes: string | null,
-  fields: { vn: string | null; grid: string | null; px: [number, number] | null }
+  fields: {
+    vn: string | null;
+    grid: string | null;
+    px: [number, number] | null;
+    more?: [number, number][];
+  }
 ): string {
   const retained = (notes ?? '')
     .split(';')
     .map((part) => part.trim())
-    .filter((part) => part && !/^(vn|grid|point|px)=/.test(part));
+    .filter((part) => part && !/^(vn|grid|point|px|more)=/.test(part));
   if (fields.vn) retained.push(`vn=${fields.vn}`);
   if (fields.grid) retained.push(`grid=${fields.grid}`);
   if (fields.px) retained.push(`px=${fields.px.map((v) => Math.round(v)).join(',')}`);
+  // Extra points only make sense beside a first one.
+  if (fields.px && fields.more?.length)
+    retained.push(
+      `more=${fields.more.map((p) => p.map((v) => Math.round(v)).join(',')).join('|')}`
+    );
   return retained.join('; ');
 }

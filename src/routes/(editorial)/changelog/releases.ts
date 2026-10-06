@@ -40,11 +40,23 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '7.5',
+    date: '2026-10-06',
+    headline: 'Clearer map classifications',
+    changes: [
+      'Map type, subject and geographic coverage are recorded separately, making river charts and administrative maps easier to distinguish from city plans.',
+      'Proposed designs and reverse-side index scans have their own labels. Original classifications and supporting notes are preserved for review.',
+      'Six uncertain originals remain flagged for closer examination of their legends.',
+      'The accompanying editor changes await deployment: long OCR labels wrap below the scan, and box captions no longer cover the original lettering.',
+    ],
+  },
+  {
     version: '7.4',
     date: '2026-09-15',
     headline: 'Every sheet is addressed by its name',
     current: true,
     changes: [
+      'The catalogue’s Area filter and table include every province listed for a sheet, so maps crossing a provincial boundary can be found from either side.',
       'A sheet’s address used to be a line of 36 random characters. It is the sheet’s own name now — maparchive.vn/catalog/plan-de-la-ville-de-saigon-1799 — so a link you paste into a message says what is on the other end before anyone clicks it.',
       'Every link anyone has ever shared still works. The old addresses forward to the new ones rather than breaking, and they will keep doing so.',
       'Where two sheets share a name, both carry their year — vinh-yen-1906 and vinh-yen-1919 — rather than one of them keeping the plain name and the other being given a number. Which sheet was added first is not something a reader should have to know.',

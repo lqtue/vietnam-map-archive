@@ -5,7 +5,11 @@
   interactive lives one click away in /explore?map=<id>.
 -->
 <script lang="ts">
+  import { trackMeasurement } from '$lib/data/measurement';
+  import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { coverageAreas } from '$lib/core/catalogAreas';
+  import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import PageHero from '$lib/ui/PageHero.svelte';
   import { onMount } from 'svelte';
   import {
@@ -23,6 +27,9 @@
   import SupersededSheet from '$lib/features/catalog/SupersededSheet.svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole, type UserRole } from '$lib/data/supabase/role';
+  import SheetWork from '$lib/features/catalog/SheetWork.svelte';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import type { WorkFactsById } from '$lib/core/sheetWork';
 
   export let data;
   $: map = data.map;
@@ -65,7 +72,7 @@
      so the intro is what belongs there. */
   $: paragraphs = (
     map.dc_description ??
-    `${map.name} — a historical map of ${map.location ?? 'Vietnam'} in the Vietnam Map Archive.`
+    `${map.name} — a historical map in the Vietnam Map Archive. View the scan, date and source institution.`
   )
     .split(/\n\s*\n/)
     .map((t) => t.trim())
@@ -103,7 +110,13 @@
           : undefined,
         identifier: map.shelfmark ?? undefined,
         license: map.rights ?? undefined,
-        contentLocation: map.location ? { '@type': 'Place', name: map.location } : undefined,
+        contentLocation: coverageAreas(map).length
+          ? coverageAreas(map).map((name) => ({
+              '@type': 'Place',
+              name,
+              description: 'Estimated map coverage, using province boundaries before July 2025',
+            }))
+          : undefined,
         isPartOf: {
           '@type': 'Collection',
           name: 'Vietnam Map Archive',
@@ -130,6 +143,15 @@
     role = (await fetchUserRole(supabase, session?.user?.id)) ?? 'user';
   });
   $: canFixGeoref = role === 'admin' || role === 'mod';
+
+  // Staff only: what has run on this sheet, and the tools to open it in.
+  let work: WorkFactsById = {};
+  let workFor = '';
+  async function loadWork(id: string) {
+    workFor = id;
+    work = (await fetchSheetWork(id)) ?? {};
+  }
+  $: if (canFixGeoref && workFor !== map.id) void loadWork(map.id);
   $: editorSource = allmapsEditorSourceUrl(map, map.map_iiif_sources ?? [], data.editorSourceId);
   $: editorUrl = editorSource
     ? `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(editorSource)}`
@@ -153,8 +175,21 @@
       ['Shelfmark', m.shelfmark],
       ['Rights', m.rights],
       ['Collection', m.collection],
-      ['Place', m.location],
-      ['Type', m.map_type],
+      ['Provinces / cities (before July 2025)', coverageAreas(m).join(', ')],
+      [
+        'Geographic regions',
+        geographicRegions(m)
+          .map((key) => CATALOG_REGIONS.find((region) => region.key === key)?.en)
+          .join(', '),
+      ],
+      ['Type', m.map_type ? mapTypeLabel(m.map_type) : null],
+      [
+        'Subjects',
+        m.map_subjects
+          ?.map((key) => MAP_SUBJECTS.find((subject) => subject.key === key)?.en ?? key)
+          .join(', '),
+      ],
+      ['Depicted state', m.depicted_state === 'unknown' ? null : m.depicted_state],
       ['Format', m.physical_description],
     ].filter(([, v]) => v) as [string, string][];
 </script>
@@ -222,13 +257,27 @@
       {/if}
       <a class="btn" href="/catalog">{$t('Browse the archive')}</a>
       {#if map.source_url}
-        <a class="btn" href={map.source_url} target="_blank" rel="noopener noreferrer">
+        <a
+          class="btn"
+          href={map.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          on:click={() =>
+            trackMeasurement('source_open', { surface: 'catalog', map_id: map.id, action: 'open' })}
+        >
           {$t('View the original at {institution}', {
             institution: map.holding_institution ?? sourceHost,
           })}
         </a>
       {/if}
     </div>
+
+    {#if canFixGeoref}
+      <section class="share-trace">
+        <h2>{$t('Contribute to this sheet')}</h2>
+        <SheetWork mapId={map.id} state={work[map.id]} />
+      </section>
+    {/if}
 
     {#if tileUrl}
       <section class="share-trace">

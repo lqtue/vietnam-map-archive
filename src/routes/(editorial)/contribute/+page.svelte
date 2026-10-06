@@ -80,6 +80,20 @@
       </a>
 
       {#if role === 'admin' || role === 'mod'}
+        <a href="/scan?mode=legend" class="section-card card-link">
+          <div class="section-card-header">
+            <div>
+              <h2 class="section-title-sm">{$t('Place the legend')}</h2>
+              <p class="section-desc">
+                {$t(
+                  'Place numbered legend entries on the scan and link them to the features they name.'
+                )}
+              </p>
+            </div>
+          </div>
+          <span class="card-cta">{$t('Open legend tool')}</span>
+        </a>
+
         <a href="/scan?mode=shapes&amp;tab=validate" class="section-card card-link mod-card">
           <div class="section-card-header">
             <div>

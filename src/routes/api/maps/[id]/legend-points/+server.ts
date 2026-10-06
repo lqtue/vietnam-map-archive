@@ -24,7 +24,11 @@
  * Legend-internal numbers (those inside the legend box) are dropped — only
  * numerals out on the map body count.
  *
- * Response: { points: [{ n, name, vn, grid, lng, lat, src, accuracy_m? }], reason? }
+ * Response: { points: [{ n, name, vn, grid, lng, lat, src, accuracy_m? }], more, reason? }
+ *
+ * `points` is one per number — the list and the fly-to rely on that. `more`
+ * is the further positions of a number printed on several plots (same shape,
+ * `src: 'manual'`), for the map's pins only.
  */
 
 import { json } from '@sveltejs/kit';
@@ -32,9 +36,14 @@ import type { RequestHandler } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid } from '$lib/server/http';
 import { getRole } from '$lib/server/auth';
-import { readLegendEntries, readNumeralCandidates } from '$lib/server/legendRead';
+import {
+  readLegendEntries,
+  readNumeralCandidates,
+  warpLegend,
+  type LegendPoint,
+} from '$lib/server/legendRead';
 import { getTransformer } from '$lib/server/transformer';
-import { cellAgreement, cellCentre, cellSize, parseGrid } from '$lib/core/geo/mapGrid';
+import { parseGrid } from '$lib/core/geo/mapGrid';
 import type { SavedTriage } from '$lib/data/maps/triageTypes';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
@@ -59,40 +68,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   const { nameByN, rects, maxN } = await readLegendEntries(supabase, mapId);
   const candidates = await readNumeralCandidates(supabase, mapId, maxN, rects);
 
-  type Point = {
-    n: number;
-    name: string | null;
-    vn: string | null;
-    grid: string | null;
-    lng: number;
-    lat: number;
-    src: 'numeral' | 'grid' | 'manual';
-    accuracy_m?: number;
-  };
-  // A manual point is stored in image pixels; with no georeference only a
-  // legacy lng/lat one can still be placed.
-  const placeManual = (toGeo: ((px: [number, number]) => [number, number]) | null): Point[] =>
-    [...nameByN].flatMap(([n, info]): Point[] => {
-      const p = info.manualPoint;
-      const ll = !p ? null : 'lngLat' in p ? p.lngLat : toGeo ? toGeo(p.px) : null;
-      return ll
-        ? [
-            {
-              n,
-              name: info.name,
-              vn: info.vn,
-              grid: info.grid,
-              lng: ll[0],
-              lat: ll[1],
-              src: 'manual',
-            },
-          ]
-        : [];
-    });
-  function response(points: Point[], reason?: string) {
+  function response(points: LegendPoint[], reason?: string, more: LegendPoint[] = []) {
     return json(
       {
         points,
+        more,
         reason,
         canEdit,
         ...(canEdit
@@ -122,66 +102,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
   // Build the pixel→geo transformer from the stored annotation (mirror override
   // first, else the public Allmaps annotation).
   const resolved = await getTransformer(map.allmaps_id, map.annotation_url);
-  if (!resolved) return response(placeManual(null), 'no annotation');
-  const { transformer } = resolved;
-  const manual = placeManual((px) => transformer.transformToGeo(px) as [number, number]);
-
-  // Parsed before the numerals, because it is what decides whether to believe
-  // them.
   const grid = parseGrid((map.triage as SavedTriage | null)?.grid);
-
-  const byN = new Map<number, Point>(manual.map((point) => [point.n, point]));
-  for (const { n, x: cx, y: cy } of candidates) {
-    if (nameByN.get(n)?.manualPoint) continue;
-    if (cellAgreement(grid, nameByN.get(n)?.grid, cx, cy) === false) continue; // not this reference
-    const [lng, lat] = transformer.transformToGeo([cx, cy]);
-    const info = nameByN.get(n);
-    byN.set(n, {
-      n,
-      name: info?.name ?? null,
-      vn: info?.vn ?? null,
-      grid: info?.grid ?? null,
-      lng,
-      lat,
-      src: 'numeral',
-    });
-  }
-
-  // Fall back to the printed grid for entries no numeral was found for. This is
-  // most of them: spotting small digits scattered over a city sheet is the hard
-  // half, while the index already states a cell for every row it carries.
-  if (grid) {
-    const cell = cellSize(grid);
-    for (const [n, info] of nameByN) {
-      if (byN.has(n) || !info.grid) continue;
-      const centre = cellCentre(grid, info.grid);
-      if (!centre) continue;
-      const [lng, lat] = transformer.transformToGeo(centre);
-      // The error bar, in metres on the ground: half a cell diagonal, measured
-      // through the same georeference rather than assumed from the scale bar.
-      let accuracy_m: number | undefined;
-      if (cell) {
-        const [lng2, lat2] = transformer.transformToGeo([
-          centre[0] + cell.w / 2,
-          centre[1] + cell.h / 2,
-        ]);
-        const dx = (lng2 - lng) * 111320 * Math.cos((lat * Math.PI) / 180);
-        const dy = (lat2 - lat) * 110574;
-        accuracy_m = Math.round(Math.hypot(dx, dy));
-      }
-      byN.set(n, {
-        n,
-        name: info.name,
-        vn: info.vn,
-        grid: info.grid,
-        lng,
-        lat,
-        src: 'grid',
-        ...(accuracy_m ? { accuracy_m } : {}),
-      });
-    }
-  }
-
-  const points = [...byN.values()].sort((a, b) => a.n - b.n);
-  return response(points);
+  const { points, more } = warpLegend(nameByN, candidates, grid, resolved?.transformer ?? null);
+  return response(points, resolved ? undefined : 'no annotation', more);
 };

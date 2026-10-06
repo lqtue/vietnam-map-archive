@@ -195,9 +195,6 @@
     <ArchiveMapRows rows={visibleMatches} on:pick on:remove />
   {/if}
 
-  <div class="head">
-    <strong class="title">{$t('Browse the archive')}</strong>
-  </div>
   <ArchiveBrowser
     sortRows={byYear}
     {search}

@@ -97,7 +97,12 @@
 
     <section class="coverage">
       <p class="lead">
-        {#if known}
+        {#if counts.partial}
+          {$t(
+            'The archive holds {held} of {total} indexed city sheets. The full historical series total is not established.',
+            { held: counts.held, total: counts.total }
+          )}
+        {:else if known}
           {$t('The archive holds {held} of this survey’s {total} sheets — {pct}%.', {
             held: counts.held,
             total: counts.total,
@@ -151,9 +156,11 @@
            The filter is the weakest — it narrows this page to what we already
            hold, which is the question the catalog was answering anyway. -->
       <a class="chip is-primary act" href={mapHref}>{$t('Open in map')}</a>
-      <a class="chip act" href="/catalog/series/{encodeURIComponent(series.key)}"
-        >{$t('All sheets')}</a
-      >
+      {#if series.index.total > 0}
+        <a class="chip act" href="/catalog/series/{encodeURIComponent(series.key)}"
+          >{$t('All sheets')}</a
+        >
+      {/if}
       <button type="button" class="chip act" on:click={() => dispatch('filter', series)}
         >{$t('Filter the catalog')}</button
       >

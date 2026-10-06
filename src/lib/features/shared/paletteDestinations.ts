@@ -56,20 +56,13 @@ export const DESTINATIONS: Destination[] = [
     keywords: 'explore view overlay layers basemap story play',
   },
   {
-    href: '/catalog/series',
-    label: 'Map series',
-    hint: 'Systematic surveys, sheet by sheet',
+    href: '/catalog/institutions',
+    label: 'Institution catalog',
+    hint: 'Holding institutions, source platforms and their map records',
     group: 'Browse',
     role: 'anyone',
-    keywords: 'series survey sheets l7014 indochine coverage index gap',
-  },
-  {
-    href: '/catalog/cartomundi',
-    label: 'CartoMundi index',
-    hint: 'Vietnam-related surveys and scan rights evidence',
-    group: 'Browse',
-    role: 'anyone',
-    keywords: 'cartomundi nakala indochine tonkin annam cochinchine license rights maps',
+    keywords:
+      'institutions libraries archives sources cartomundi nakala bnf gallica pcl ign rights maps',
   },
 
   // Make

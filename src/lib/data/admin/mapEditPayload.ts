@@ -1,3 +1,4 @@
+import { canonicalMapType } from '$lib/core/mapTaxonomy';
 /**
  * The `maps` write payload assembled by MapEditModal's Save button.
  *
@@ -17,6 +18,10 @@ export interface MapEditForm {
   dc_publisher: string;
   location: string;
   map_type: string;
+  map_subjects?: string[];
+  depicted_state?: string;
+  classification_note?: string;
+  classification_source_url?: string;
   dc_description: string;
   physical_description: string;
   language: string;
@@ -59,7 +64,11 @@ export interface MapEditPayload {
   allmaps_id: string;
   annotation_url?: string;
   location?: string;
-  map_type?: string;
+  map_type?: string | null;
+  map_subjects?: string[];
+  depicted_state?: string;
+  classification_note?: string;
+  classification_source_url?: string;
   year: number | null;
   description?: string;
   extra_metadata: Record<string, string>;
@@ -138,7 +147,11 @@ export function toMapEditPayload(form: MapEditForm): MapEditPayload {
     allmaps_id: form.allmaps_id.trim(),
     annotation_url: opt(form.annotation_url),
     location: opt(form.location),
-    map_type: opt(form.map_type),
+    map_type: canonicalMapType(form.map_type.trim()),
+    map_subjects: form.map_subjects,
+    depicted_state: form.depicted_state,
+    classification_note: form.classification_note,
+    classification_source_url: form.classification_source_url,
     year: form.year ? Number(form.year) : null,
     description: opt(form.dc_description),
     extra_metadata,

@@ -49,7 +49,7 @@ there is no local venv for it.
 
 Its polygons and `ocr_labels.global_*` share **one full-image pixel grid** (both scale
 tile-render → source px and offset by the tile origin, off the same `info.json`), which is what
-makes the C1 join possible; tile sizes differ and do not matter.
+makes the OCR ↔ shape join possible; tile sizes differ and do not matter.
 
 (The legacy `scripts/vectorize.py` colour-profile pipeline was removed — MapSAM2 supersedes it, and
 `work/archive/vectorize/` only holds local historical previews; it is not an active pipeline.)

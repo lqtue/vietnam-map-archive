@@ -9,6 +9,7 @@ import { test, expect } from '@playwright/test';
 import {
   decadeBins,
   passKind,
+  passArea,
   passYear,
   yearRange,
   passInstitution,
@@ -84,6 +85,14 @@ test('a series name shortens to its head plus the scale', () => {
   expect(seriesShort('Indochine 1:25,000 — Tonkin & Thanh Hóa')).toBe('Indochine 1:25,000');
   expect(seriesShort('AMS L909 — Việt Nam City Maps 1:12,500')).toBe('AMS L909 1:12,500');
   expect(seriesShort(null)).toBe('');
+});
+
+test('Area matches every listed province, including sheets without a dominant province', () => {
+  const sheet = { region: null, regions: ['Long An', 'Hồ Chí Minh'] };
+  expect(passArea(sheet, { area: ['Hồ Chí Minh'] })).toBe(true);
+  expect(passArea(sheet, { area: ['Hà Nội'] })).toBe(false);
+  expect(passArea(sheet, {})).toBe(true);
+  expect(passArea({ region: 'Long An' }, { area: ['Long An'] })).toBe(true);
 });
 
 test('the Info year shows the survey year and, when it differs, the item date', () => {

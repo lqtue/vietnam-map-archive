@@ -50,7 +50,7 @@ moving a public page's `mentions` and `years`.
 
 ## Supabase types
 
-- `src/lib/data/supabase/types.ts` is current against migration head **110** (`edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified 2026-10-05:
+- `src/lib/data/supabase/types.ts` is current against migration head **116** (verified 2026-10-06: every 116 `maps`/`map_images` column is present; 115 only replaces a function body, so it changes no type. `edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified 2026-10-05:
   106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108 changes
   only a column default, which the types do not carry). Regenerate from the linked project after
   every push; a zero-line diff after a hand edit is the cheapest confirmation it was right.
@@ -134,6 +134,13 @@ direction flips. `tableSort.ts` is in `core` because the four tables are in four
 and a feature may not import another; it sorts decorate-sort-undecorate (the value function runs
 once per row, not once per comparison — `OcrSidebar`'s parses a regex), keeps blanks last in
 **both** directions, and collates `numeric` so `Rue 100` follows `Rue 11`.
+
+The numbered legend is one too: `features/shared/LegendTable.svelte` is `DataTable` with the legend's
+columns (№ · Name · Grid, and State in the staff tool), used by `SheetLegendPanel` on /explore and
+`LegendSidebar` on `/scan?mode=legend`. It sorts itself; the caller filters and searches. Until
+Oct 2026 both were hand-built `<ul>`s, so the two rails of the legend tool looked unrelated. A
+`<table class="data-table">` written by hand (SeriesManage, NeatlineEditor, BulkUploadPage did)
+is the same mistake the four sort headers were: use `DataTable`.
 
 **Styling:** all CSS in `src/styles/`, imported via the `$styles` alias. **One sidebar design
 system.** `src/styles/components/sidebar.css` owns it (`.sb-card`, `.sb-btn`, `.sb-pill`,

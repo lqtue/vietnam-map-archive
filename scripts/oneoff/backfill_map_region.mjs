@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Fill `maps.region` and `maps.region_2025` (mig 109) from each map's bbox (the province under most of it).
+// Fill dominant provinces (mig 109) and province lists (mig 111) from each map's bbox.
 //
 //   node --env-file=.env scripts/oneoff/backfill_map_region.mjs            # dry run: report only
-//   node --env-file=.env scripts/oneoff/backfill_map_region.mjs --apply    # write (after mig 109)
+//   node --env-file=.env scripts/oneoff/backfill_map_region.mjs --apply    # write (after mig 111)
 //   ... --apply --force                                                    # also overwrite filled rows
 //
 // Dry by default. A dry run reads only `id,name,bbox,status`, so it works before the migration.
@@ -15,6 +15,10 @@ import { BOUNDARY_URL, NEIGHBOUR_URLS, makeLocator, regionOf } from '../lib/regi
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
 const force = args.includes('--force');
+const onlyIndex = args.indexOf('--only');
+const only = onlyIndex >= 0 ? args[onlyIndex + 1] : null;
+if (onlyIndex >= 0 && !/^[0-9a-f-]{36}$/i.test(only ?? ''))
+  throw new Error('--only requires a map UUID');
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false },
@@ -34,11 +38,13 @@ const locateAbroad = (x, y) => abroad.some((f) => f(x, y));
 
 const rows = [];
 for (let from = 0; ; from += 1000) {
-  const { data, error } = await db
+  let query = db
     .from('maps')
     .select(apply ? 'id,name,bbox,status,region' : 'id,name,bbox,status')
     .order('id')
     .range(from, from + 999);
+  if (only) query = query.eq('id', only);
+  const { data, error } = await query;
   if (error) throw error;
   rows.push(...data);
   if (data.length < 1000) break;
@@ -62,18 +68,22 @@ const pub = (a) => a.filter((r) => r.status === 'public' || r.status === 'featur
 console.log(`public/featured: ${pub(out.set)} labelled, ${pub(out.none)} null`);
 const nullBbox = out.none.filter((r) => !r.bbox);
 console.log(
-  `\nleft null: ${nullBbox.length} with no bbox, ${out.none.length - nullBbox.length} off Vietnamese land or country-scale:`
+  `\nleft null: ${nullBbox.length} with no bbox, ${out.none.length - nullBbox.length} off Vietnamese land or mostly across a border:`
 );
 for (const r of out.none
   .filter((r) => r.bbox && r.status !== 'draft')
   .slice(0, Number(process.env.SHOW ?? 15)))
   console.log(' ', r.status, r.name, JSON.stringify(r.bbox.map((n) => +n.toFixed(2))));
+const multi = out.set.filter((r) => r.regions.length > 1);
+console.log(`\n${multi.length} maps span 2+ provinces (63-set); widest:`);
+for (const r of [...multi].sort((a, b) => b.regions.length - a.regions.length).slice(0, 10))
+  console.log(' ', r.regions.length, r.name.slice(0, 50), '→', r.regions.join(', '));
 console.log('\nthinnest land share (check by eye):');
 for (const r of [...out.set].sort((a, b) => a.land - b.land).slice(0, 12))
   console.log(' ', r.land.toFixed(2), r.name, '→', r.region);
 
 if (!apply) {
-  console.log('\ndry run — nothing written. Re-run with --apply once migration 109 is pushed.');
+  console.log('\ndry run — nothing written. Re-run with --apply once migration 111 is pushed.');
   process.exit(0);
 }
 let written = 0;
@@ -81,9 +91,28 @@ for (const r of out.set) {
   if (rows.find((x) => x.id === r.id)?.region && !force) continue;
   const { error } = await db
     .from('maps')
-    .update({ region: r.region, region_2025: r.region_2025 })
+    .update({
+      region: r.region,
+      region_2025: r.region_2025,
+      regions: r.regions,
+      regions_2025: r.regions_2025,
+    })
     .eq('id', r.id);
   if (error) throw error;
   written++;
 }
 console.log(`\nwrote ${written} rows`);
+if (only) {
+  const { data, error } = await db
+    .from('maps')
+    .select('id,region,region_2025,regions,regions_2025')
+    .eq('id', only)
+    .single();
+  if (error) throw error;
+  const expected = out.set.find((r) => r.id === only);
+  for (const key of ['region', 'region_2025', 'regions', 'regions_2025']) {
+    if (JSON.stringify(data[key]) !== JSON.stringify(expected?.[key]))
+      throw new Error(`Read-back mismatch: ${key}`);
+  }
+  console.log('Read-back verified:', JSON.stringify(data));
+}

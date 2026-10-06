@@ -294,7 +294,7 @@ from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Data
 supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
 ```
 
-It is current against migration head 108 (`docs/conventions.md` §Supabase types keeps the date). Insert/Update payloads use `?:` optional fields, not
+It is current against migration head 116 (`docs/conventions.md` §Supabase types keeps the date). Insert/Update payloads use `?:` optional fields, not
 `Partial<{...}>` (which resolves as `never`).
 
 ---
@@ -377,9 +377,9 @@ enforced server-side by `requireRole`. `/contribute` shows the review and admin 
 
 | Item | Location | Fix |
 |------|----------|-----|
-| ~30 `as any` casts | mostly Svelte components | pass `<Database>` to `createClient` at each call site |
+| 32 `as any` casts (counted 2026-10-06) | the export route, `map/shell` and the catalog components | pass `<Database>` to `createClient` at each call site |
 | `footprints.ts` mixes two concerns | `data/supabase/footprints.ts` holds both map-selector queries and footprint CRUD | split into `maps/labelMaps.ts` + a contribute-scoped module |
 | Mixed error conventions | throw vs `console` → `[]` vs `console` → `false` across `data/` | pick one |
 | Mobile gaps in contribute | `OcrSidebar` bind/`on:filter` and the Segmentation tab are desktop-only (carried from the Aug 2026 cleanup, not re-verified since) | decide whether these tools are desktop-only by design, then either say so or fix |
 | `/scan?mode=inspect` may be dead weight | `features/contribute/inspect/` duplicates what `/catalog/[id]` does since 7.3, drafts included | check whether the tool map picker is the only thing it still offers, then delete it and drop the mode from `core/scanModes.ts` — roadmap, *Open after 7.3* |
-| Fat page components | `ExplorePage.svelte` (**403** script lines, up from 336) and `DigitalizePage.svelte` (**411**, up from the 263 it was cut to when the layout job left in Sept 2026) are controllers, not wiring. Both grew back past the point the extraction bought, which is the argument for doing it as a controller module rather than as a one-off trim (recounted 2026-09-15). The Sept 2026 route merge moved them out of `src/routes` into `features/`, which fixed where they live, not how big they are | pull into `features/<x>/<x>Controller.ts` when next touching them — the `ocrReviewController.ts` / `layoutJob.ts` pattern |
+| Fat page components | `ExplorePage.svelte` (**431** script lines, up from 336) and `DigitalizePage.svelte` (**434**, up from the 263 it was cut to when the layout job left in Sept 2026) are controllers, not wiring. Both grew back past the point the extraction bought, which is the argument for doing it as a controller module rather than as a one-off trim (recounted 2026-10-06 at HEAD, `<script>` block including its tags). The Sept 2026 route merge moved them out of `src/routes` into `features/`, which fixed where they live, not how big they are | pull into `features/<x>/<x>Controller.ts` when next touching them — the `ocrReviewController.ts` / `layoutJob.ts` pattern |

@@ -14,12 +14,12 @@
 -->
 <script lang="ts">
   import OcrSidebar from '$lib/features/contribute/ocr/OcrSidebar.svelte';
+  import TextReviewedMark from '$lib/features/contribute/ocr/TextReviewedMark.svelte';
   import ToolSidebarShell from '$lib/features/contribute/shared/ToolSidebarShell.svelte';
   import EmptyPanel from '$lib/features/contribute/shared/EmptyPanel.svelte';
   import TriageSidebar from './TriageSidebar.svelte';
-  import Tabs from '$lib/ui/Tabs.svelte';
-  import { JOBS, type JobKey } from '$lib/features/contribute/ocr/jobs';
   import type { TriageState } from './triagePrefs';
+  import type { OcrReviewController } from '../ocr/ocrReviewController';
   import type { SavedTriage } from '$lib/data/maps/triageTypes';
 
   export let mode: 'prepare' | 'text' = 'prepare';
@@ -47,26 +47,15 @@
     runs: Record<string, { n: number; categories: Record<string, number> }>;
   };
   export let selectedId: string | null = null;
+  export let review: OcrReviewController;
   export let compact = false;
   /** Bound by the page so it can call `load()` / `focusRow()` on the table. */
   export let ocrSidebar: OcrSidebar | undefined = undefined;
 
   export let onCollapse: (() => void) | null = null;
-
-  /** Which reading job is open, and how many rows each holds. */
-  let job: JobKey = 'names';
-  let counts: Record<JobKey, number> = { names: 0, index: 0, numbers: 0, other: 0 };
-  $: jobTabs = JOBS.map((j) => ({
-    key: j.key,
-    label: counts[j.key] ? `${j.label} ${counts[j.key]}` : j.label,
-  }));
 </script>
 
-<ToolSidebarShell
-  title={mode === 'text' ? 'Text' : 'Prepare'}
-  {onCollapse}
-  showFooter={mode === 'text' && !!mapId}
->
+<ToolSidebarShell title={mode === 'text' ? 'Text' : 'Prepare'} {onCollapse}>
   {#if !mapId}
     <EmptyPanel
       message={compact ? 'Select a map first.' : 'Pick a map to start.'}
@@ -108,25 +97,15 @@
     <OcrSidebar
       bind:this={ocrSidebar}
       {mapId}
+      {review}
       {selectedId}
-      {job}
       regions={triage.regions}
-      on:counts={(e) => (counts = e.detail)}
       on:loaded
       on:filter
       on:regionFocus
       on:zoomToExtraction
       on:select
     />
+    <TextReviewedMark {mapId} />
   {/if}
-
-  <svelte:fragment slot="footer">
-    <Tabs
-      tone="rail"
-      label="Reading jobs"
-      tabs={jobTabs}
-      active={job}
-      on:change={(e) => (job = e.detail.key as JobKey)}
-    />
-  </svelte:fragment>
 </ToolSidebarShell>

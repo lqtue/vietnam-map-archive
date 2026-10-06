@@ -29,6 +29,40 @@ export interface SeriesNote {
 }
 
 export const SERIES_NOTES: Record<string, SeriesNote> = {
+  'ams-l909-viet-nam-city-maps-1-12-500': {
+    summary: [
+      'L909 is a city-map series, with city names as sheet identifiers rather than a continuous numbered grid. Catalogue records show scales of 1:12,500, 1:15,000 and 1:10,000; the familiar 1:12,500 label does not describe every sheet.',
+      'This partial index combines the L909 cities explicitly listed in the Perry-Castañeda Library Vietnam catalogue with the Sài Gòn L909 scan already served by Vietnam Map Archive. It is an index of known records, not a complete historical inventory of every L909 city or edition.',
+    ],
+    facts: [
+      {
+        label: 'Index source',
+        value:
+          'Perry-Castañeda Library Vietnam Maps catalogue, checked 6 October 2026: https://maps.lib.utexas.edu/maps/vietnam.html',
+      },
+      {
+        label: 'Counting cities',
+        value:
+          'Nha Trang and Qui Nhon versos are separate source items of their city sheet, not additional city cells.',
+      },
+      {
+        label: 'Saigon distinction',
+        value:
+          'The two Saigon sheets in the PCL Vietnam catalogue are L9012, not L909. The served Sài Gòn L909 map supplies its own city entry.',
+      },
+      {
+        label: 'Edition evidence',
+        value:
+          'Catalogue year and edition statements remain source assertions. Existing VMA metadata for Hà Nội and Huế differs from the PCL edition labels; no printing identities are inferred or metadata overwritten.',
+      },
+      {
+        label: 'Geographic extents',
+        value:
+          'City-cell extents have not been established from a survey index. Scan georeferences are not copied into catalogue cells.',
+      },
+    ],
+  },
+
   'indochine-1-100-000-1st-edition-sgi-1900-1947': {
     summary: [
       "The first edition of the Service Géographique de l'Indochine's 1:100,000 survey, issued from 1900 to 1947. It is the earlier part of the mapping programme continued by the second edition.",

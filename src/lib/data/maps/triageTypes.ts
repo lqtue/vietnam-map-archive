@@ -87,6 +87,8 @@ export type SavedTriage = {
   neatline_src?: 'human' | 'main_map';
   regions?: LayoutRegion[];
   regions_at?: string;
+  /** A person says this sheet prints no legend. Legend entries, if any exist, outrank it. */
+  legend?: 'none';
   /**
    * When a person last looked at this proposal and accepted it.
    *

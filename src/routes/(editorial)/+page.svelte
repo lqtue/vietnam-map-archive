@@ -558,10 +558,6 @@
       <div class="action-footer">
         <div class="footer-links-group">
           <a href="/catalog" class="text-link">{$t('Browse the catalog')}</a>
-          <!-- "Inspect a scan" pointed at /scan, which stopped being a public
-               address in Sept 2026: a sheet's own catalogue page carries the
-               tiled scan now, so the catalogue link above is that door. -->
-          <a href="/catalog/series" class="text-link">{$t('Map series')}</a>
         </div>
         <a href="/explore" class="btn is-lg is-primary">{$t('Open the map')}</a>
       </div>

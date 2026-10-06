@@ -1,3 +1,4 @@
+import { isPartialSeriesIndex } from '$lib/core/seriesIndexScope';
 /**
  * seriesSheets.ts — what a survey contains, read for display.
  *
@@ -194,6 +195,7 @@ export async function fetchSeriesSheet(
 }
 
 export interface SeriesTally {
+  partial?: boolean;
   total: number;
   held: number;
   obtainable: number;
@@ -209,10 +211,11 @@ export interface SeriesTally {
  * and from our own rows we cannot know the second, so both say how many are
  * held and stop there.
  */
-export const hasDenominator = (t: SeriesTally): boolean => t.held < t.total;
+export const hasDenominator = (t: SeriesTally): boolean => !t.partial && t.held < t.total;
 
 export function tally(sheets: SeriesSheetView[]): SeriesTally {
   return {
+    ...(sheets.some((sheet) => isPartialSeriesIndex(sheet.series_key)) ? { partial: true } : {}),
     total: sheets.length,
     held: sheets.filter((s) => s.status === 'held').length,
     obtainable: sheets.filter((s) => s.status === 'obtainable').length,

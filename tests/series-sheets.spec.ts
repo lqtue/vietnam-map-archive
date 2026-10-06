@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   sheetStatus,
   tally,
+  hasDenominator,
   cellCamera,
   fetchSeriesSheetIndex,
   type SeriesSheet,
@@ -132,4 +133,17 @@ test('sheets come back in the order a person reads them', () => {
     // sheet-number column needs, and 6329-4 must precede 6330-1.
     expect(sheets.map((s) => s.sheet_number).slice(-4)).toEqual(['8', '9', '10', '11']);
   });
+});
+
+// PCL lists known L909 cities, not the complete historical survey. A plausible
+// 3/20 percentage must never be presented as historical series completeness.
+test('the partial L909 index counts known records without claiming a survey denominator', () => {
+  const sheets = [
+    row({ series_key: 'ams-l909-viet-nam-city-maps-1-12-500', held_by: 'map' }),
+    row({ series_key: 'ams-l909-viet-nam-city-maps-1-12-500', source: 'PCL' }),
+  ].map((r) => ({ ...r, status: sheetStatus(r), heldAs: null }));
+  const counts = tally(sheets);
+  expect(counts).toEqual({ total: 2, held: 1, obtainable: 1, no_scan: 0, partial: true });
+  expect(hasDenominator(counts)).toBe(false);
+  expect(hasDenominator({ total: 2, held: 1, obtainable: 1, no_scan: 0 })).toBe(true);
 });

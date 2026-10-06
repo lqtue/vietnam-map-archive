@@ -35,6 +35,7 @@
   import ReviewSidebar from '$lib/features/contribute/review/ReviewSidebar.svelte';
   import '$styles/layouts/tool-page.css';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { trackMeasurement } from '$lib/data/measurement';
   import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
   import { createTrace } from './traceData';
   import { createReviewQueue, type Verdict } from '$lib/features/contribute/review/reviewQueue';
@@ -126,6 +127,13 @@
   async function selectMap(m: LabelMapInfo) {
     if (currentMap?.id === m.id) return;
     currentMap = m;
+    trackMeasurement('contribution_open', {
+      surface: 'scan',
+      workflow: 'shapes',
+      map_id: m.id,
+      mode: 'shapes',
+      action: 'open',
+    });
     iiifInfoUrl = null;
     trace.reset();
     queue.reset();
@@ -357,17 +365,9 @@
         >
           <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
         </svg>
-        <p>
-          {tab === 'validate'
-            ? $queue.queue.length === 0 && !$queue.queueError
-              ? "Queue's clear — no shapes waiting on review."
-              : 'Pick a sheet from the queue to start checking.'
-            : 'Pick a map to start tracing.'}
-        </p>
         {#if mapsError || $queue.queueError}
           <p class="empty-state error">{mapsError || $queue.queueError}</p>
         {/if}
-        <a href="/catalog" class="catalog-link">Browse the catalog →</a>
       </div>
     {:else}
       <div class="loading-stage">

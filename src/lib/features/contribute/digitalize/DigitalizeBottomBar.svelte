@@ -15,6 +15,7 @@
   export let mode: 'prepare' | 'text' = 'prepare';
   export let drawMode = false;
   export let isolationMode = false;
+  export let selectedText: string | null = null;
   /** Current canvas rotation, signed degrees. 0 hides the reset button. */
   export let rotationDeg = 0;
 
@@ -30,10 +31,10 @@
   {#if mode === 'prepare'}
     <div class="bar-hint">Drag the amber box · click a tile to set its priority</div>
   {:else}
-    <div class="bar-hint">
+    <div class="bar-hint" class:selected-text={selectedText !== null && !drawMode}>
       {drawMode
         ? 'Drag a rectangle to add a bbox · Esc to cancel'
-        : 'Click a bbox to edit · j/k next · v validate'}
+        : (selectedText ?? 'Click to edit · Shift-click to group')}
     </div>
     <div class="bar-divider"></div>
     <button
@@ -131,6 +132,14 @@
 </footer>
 
 <style>
+  .bottom-bar {
+    height: auto;
+    min-height: 46px;
+    max-height: 40vh;
+    overflow-y: auto;
+    padding-block: 0.5rem;
+    flex-wrap: wrap;
+  }
   .icon-only {
     padding-inline: 0.4rem;
   }
@@ -139,12 +148,18 @@
     font-size: 0.72rem;
   }
   .bar-hint {
+    flex: 1 1 20rem;
+    min-width: 0;
     font-size: 0.72rem;
     color: var(--color-text);
     opacity: 0.45;
     padding: 0 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .selected-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 1;
   }
 </style>

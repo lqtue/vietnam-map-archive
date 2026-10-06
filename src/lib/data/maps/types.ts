@@ -32,7 +32,10 @@ export interface MapRecord {
   annotation_url?: string; // Optional override URL to W3C annotation JSON (set by mirror-r2 → Supabase Storage)
 
   // Classification
-  map_type?: string;
+  map_type?: string; // canonical primary genre (migration 116)
+  map_subjects?: string[];
+  depicted_state?: string;
+  classification_status?: string;
   bbox?: [number, number, number, number]; // [west, south, east, north]
 
   // Flexible custom metadata (schema-free JSONB)
@@ -58,8 +61,13 @@ export interface MapListItem {
   annotation_url?: string; // Optional override URL to the annotation JSON
   name: string;
   location?: string; // city / region (renamed from `type`)
+  regions?: string[] | null; // modern provinces covered by the bbox (mig 111)
+  regions_2025?: string[] | null;
   region?: string | null; // modern province from the bbox (mig 109); null for sheets mostly abroad
-  map_type?: string; // cartographic type: cadastral, topographic, city_plan, panorama
+  map_type?: string; // canonical primary genre (migration 116)
+  map_subjects?: string[];
+  depicted_state?: string;
+  classification_status?: string;
   dc_description?: string; // dc:description — read from maps.description (renamed mig 095)
   thumbnail?: string;
   isFeatured?: boolean;

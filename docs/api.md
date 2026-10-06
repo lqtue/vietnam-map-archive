@@ -40,7 +40,7 @@ Pipeline:
   unlike the rest of `/api/admin/maps/*`, which take `requireRole(locals)` and so default to admin
   alone — accepting a crop is review work. POST writes part of `maps.triage`, one key at a time
   through the `set_triage_key` RPC (`neatline`, `neatline_src`, `tile_size`, `overlap`,
-  `tile_overrides`, `regions`), and `{ validate: true }` stamps `validated_at`/`validated_by` — the
+  `tile_overrides`, `regions`, and `legend`: `'none'` or `null`, "this sheet prints no legend"), and `{ validate: true }` stamps `validated_at`/`validated_by` — the
   acceptance `enqueue_ocr_all.mjs` gates OCR spending on. Replaces PATCHing `maps` with a whole
   `triage` object, which dropped every key the page did not model (`grid`, `grid_at`, `regions_at`,
   `neatline_src`).
@@ -50,10 +50,15 @@ Pipeline:
   enqueues an `ocr` job (202 `{ job_id, run_id, status }`, or 409 when one is already in flight).
 - `/api/admin/maps/[id]/ocr/apply/` — POST: turn `ocr_labels` above a confidence threshold into
   `label_pins` (bbox centre in source-image px). Body `{ run_id?, min_confidence? }`.
-- `/api/admin/maps/[id]/ocr-review/` — GET extractions + runs; POST manual bbox; PATCH update
+- `/api/admin/maps/[id]/ocr-review/` — GET extractions + runs (`all=true` returns the whole sheet with
+  paged database reads and derives counts from those rows); POST manual bbox; PATCH update
   text/category/status/coords/`rotation_deg`/`label_w`/`label_h` (the label rectangle and the box
   around it arrive together, so only a coord change re-warps); PUT batch status (`?window=` reverts
   the last N minutes).
+- `/api/admin/maps/[id]/ocr-review/groups/` — POST ordered original IDs and combined text/Type;
+  DELETE the combined label to restore its originals. The Text editor stages both locally;
+  these endpoints are called only on explicit Save drafts. Save uses existing write endpoints,
+  acknowledges each completed operation, and retains the unsaved remainder on failure.
 - `/api/admin/maps/[id]/ocr-review/revert-recent/` — GET count, POST undo the current reviewer's
   recent validations (thin wrapper over `$lib/server/ocrReview.ts`).
 - `/api/admin/maps/[id]/pipeline/` — GET the composed stage + timestamps; PATCH records a **human**
@@ -116,9 +121,13 @@ Public / other:
   Rendered by `src/lib/features/shared/LegendPointsLayer.svelte`. Reviewed manual positions
   override numeral/grid positions. Staff with MFA also receive `canEdit` and `entries`,
   including entries without a position. Responses are private and not cached.
+- `/api/admin/maps/legend-stats` — **admin or mod with MFA** GET: `{ [mapId]: { total, placed } }`,
+  entries read off each sheet's legend and how many have a pixel position (`px=` only). One paged
+  read over every sheet; feeds the progress badges and status chips in the `/scan?mode=legend`
+  map picker.
 - `/api/admin/maps/[id]/legend-points/` — **admin or mod with MFA** GET: the legend in **image
   pixels**, for `/scan?mode=legend`. `{ entries: [{ id, n, name, vn, grid, x, y, src: 'manual'|null,
-  validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.
+  more: [[x, y]…], validated }], candidates: [{ n, x, y, inCell: boolean|null, labelId }], grid, legendRects }`.
   No georeference is read, so drafts work; `inCell` is whether a body numeral agrees with its
   entry's grid reference (`null`: nothing to check). A legacy ground `point=` has no pixel and reads
   as unplaced. Shares its reads with the public GET (`$lib/server/legendRead.ts`). Same route,
@@ -132,6 +141,23 @@ Public / other:
   Pre-2026-10-05 rows carried `point=longitude,latitude` and are still read
   (`scripts/oneoff/legend_points_to_pixels.mjs` converts them). Null coordinates restore automatic
   positioning. Review stamps go through `set_extraction_status`. No new schema required.
+  `more` is the entry's further pixel positions — a number printed on several plots (1878's №21, a
+  depot of two yards). The first stays `px=`; the rest are `more=x,y|x,y` in the notes, at most 20,
+  dropped when the entry has no first point. The public GET keeps `points` one per number and adds a
+  separate `more: Point[]` that only the map's pins read.
+- `/api/admin/maps/work-state` — **admin or mod** GET, `?map=<uuid>` narrows to one: `{ [mapId]: WorkFacts }`
+  (`$lib/core/sheetWork.ts`), what has been done to each sheet — triage state, which regions the
+  layout found (title, legend, index), which kinds OCR read, OCR/segmentation ran, text/shapes
+  reviewed, and the person's "no legend" mark. Derived on every call from `maps.triage`,
+  `ocr_labels.category` and `map_pipeline_status`, never stored; a sheet nobody has touched has no
+  key. `Cache-Control: private, no-store`. Feeds the catalog table, grid and drawer (`SheetStatus`,
+  `WorkPips`), `SheetWork` on `/catalog/[id]` and the `/scan?mode=legend` picker. The index pass is not in it.
+- `/api/admin/series/` — admin GET: every `series` row (`id,key,name,code,scale_denominator`), for the
+  map editor's series picker.
+- `/api/admin/sheet-printings/` — admin GET `?series_id=&sheet_number=` the cell's `sheet_printings`
+  and its source items; POST creates one on that cell. `.../[id]/` — PATCH its fields
+  (`$lib/server/sheetPrintingFields.ts` decides which). `/api/admin/cell-printings/[id]/` — PATCH
+  links or unlinks one institution source item to a printing (`{ printing_id }`, `null` clears).
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
   small failed-job list). Admin or mod.
@@ -139,6 +165,14 @@ Public / other:
   archive knows about a spot — covering maps, nearby OCR labels and reviewed footprints, story
   points — via the `context_at` RPC (mig 066). Every item carries `distance_m` and `geom_rmse`;
   ungeoreferenced maps are absent by construction. Design in `docs/platform-design.md` §0.
+  The route adds `legend: [{ map_id, year, n, name, vn, lng, lat, src, distance_m }]` — numbered
+  legend references from the public maps the RPC returned, warped per request through the same
+  `warpLegend` as `/api/maps/[id]/legend-points` (so `src` is `manual | numeral | grid`; a `grid`
+  point is a cell centre, not a position), kept within `radius`, sorted by distance and capped at
+  `limit`. `year` is the map's, and the RPC's `year_from`/`year_to` already decided which maps count.
+  Draft maps contribute none, even to staff. Labels are the five gazetteer categories only
+  (street, hydrology, place, building, institution) as of mig 115 (in production 2026-10-06); before it a legend entry or a
+  title could come back as a label.
 - `/api/press/` — **public** GET `?q=&year=&window=&limit=&provider=&variants=`: newspaper hits ±N
   years for a label, from Gallica and the National Library of Vietnam. No auth, no database,
   edge-cached a day; always 200 so a provider outage thins the /explore panel instead of erroring.
@@ -149,7 +183,17 @@ Public / other:
   image proxy — see `docs/pipelines.md`.
 - `/api/search/` — unified GET over `maps` + (admin/mod) `scout_candidates`. Postgres tsvector via
   `.textSearch('search_vector', q, { config: 'simple' })`. Query:
-  `q, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels, limit, offset`.
+  `q, area, region, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels, limit, offset`.
+  `area` accepts comma-separated pre-July-2025 province names and matches any entry in
+  `maps.regions`, falling back to `region` for older rows. It constrains map results only;
+  `facets.area` ignores its own selection while respecting the other map facets. Slim area
+  queries filter before pagination. Catalog text search also matches both province arrays,
+  with accents folded in the browser; the API's `q` still uses its existing text index.
+  `region` accepts comma-separated geographic region keys from `catalogRegions.ts`
+  (for example `mekong-delta`, `southeast`, `red-river-delta`). Membership derives from
+  the pre-merger province list; a map can belong to multiple regions. It combines
+  with `area` using AND; `facets.region` excludes its own selection. Slim queries
+  apply both coverage filters before pagination.
   Returns `{ maps, scout, labels, total, facets, periods, role }` — map rows carry `slug` (mig 088)
   in both the full and slim column sets, because the catalog drawer and the command palette link
   onward and a row without it falls back to a uuid link; facet tallies are declarative via
@@ -172,3 +216,15 @@ Public / other:
 
 `/api/admin/upload-image` and `/api/admin/labels/*` were deleted (Aug 2026) — do not reintroduce
 references.
+
+`/catalog/area/[slug]` is a server-rendered coverage destination. The pilot
+registry is `src/lib/core/catalogAreas.ts`: Hồ Chí Minh, Hà Nội and Thừa Thiên Huế,
+using the pre-July-2025 province labels already stored in `maps.regions`.
+Pages list published maps chronologically and distinguish estimated coverage
+from an attested historical place name. An empty area returns 404 and is omitted
+from the catalog band and sitemap. `/catalog?area=<province>` initializes the
+existing Area facet; arbitrary filter combinations do not get sitemap entries.
+The catalog also offers six geographic-region browse links and a Region filter,
+initialized by `/catalog?region=<key>`. Legacy `maps.location` labels such as
+`Saigon-HCMC` no longer stand in for calculated coverage in the table, drawer or
+individual map record. Province coverage labels explicitly identify the boundary period.

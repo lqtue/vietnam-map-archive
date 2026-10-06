@@ -143,7 +143,7 @@ must pass beside it — 40 cases, no database. A checker that only ever runs
 against a healthy archive reports the same thing whether it works or not, which
 is how `check_series_index` once reported clean over 79 sheets it could not see.
 
-**Reading today's run (15 Sept 2026).** 274 maps, 131 published, **0 fail, 53
+**Reading today's run (15 Sept 2026).** 274 `maps` rows (every status, drafts included), 131 published, **0 fail, 53
 warn**: 24 published maps the Allmaps Editor cannot be opened on, 13 with no
 `holding_institution` and 3 with no `source_url`, 6 layout jobs out of retries, 5
 `year`/`date_label` disagreements, one holder spelled two ways (Perry-Castañeda,
@@ -950,9 +950,15 @@ table.
 | sheet | printed names | `name_recall` | `agreement` |
 |---|---|---|---|
 | 1959 Đô thành Sài Gòn | 375 | 0.7947 (298) | 0.9434 |
-| 1968 Sài Gòn | 367 | **0.0245 (9)** | 1.0000 (9/9) |
+| 1968 Sài Gòn, before any body pass (14 stored body labels) | 367 | **0.0245 (9)** | 1.0000 (9/9) |
+| 1968 Sài Gòn, after the first body pass (`body-1968-20260910a`, single pass, tile 1120) | 367 | **0.3270 (120)** | 0.9603 (145/151) |
 
-The 1968 row is what the metric is for. That sheet holds **14** body labels
+Only the 0.0245 row is in `index-baselines.json` (`--save`, 2026-09-10, `run_id` null). The 0.3270 row
+is the same day's candidate run, scored from its run directory and never upserted or saved, so it
+exists only in `work/ocr/EVAL-BASELINE.md`, which also holds the later passes (0.3978 for three
+runs, 0.5450 for the four-way union `_union-0910-4way`). None of those is in the database.
+
+The 1968 row before the body pass is what the metric is for. That sheet holds **14** body labels
 against 367 printed street names, so it has effectively never been read — which
 was previously a hunch and is now a number, on a sheet already published and
 georeferenced. Its 9/9 agreement is a small sample, but it says the grid and the

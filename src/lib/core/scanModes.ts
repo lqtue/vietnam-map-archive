@@ -41,3 +41,18 @@ export function resolveScanMode(raw: string | null | undefined): ScanMode | null
   if ((SCAN_MODES as readonly string[]).includes(raw)) return raw as ScanMode;
   return MODE_ALIASES[raw] ?? null;
 }
+
+/**
+ * The contribution tools a sheet can be opened in, for the catalog table and the
+ * record page. Every one takes `?map=<uuid>` and selects that sheet on arrival.
+ */
+export const CONTRIBUTE_TOOLS = [
+  { mode: 'prepare', label: 'Prepare' },
+  { mode: 'text', label: 'Check text' },
+  { mode: 'shapes', label: 'Shapes' },
+  { mode: 'legend', label: 'Legend' },
+] as const satisfies readonly { mode: ScanMode; label: string }[];
+
+export function toolHref(mode: ScanMode, mapId: string): string {
+  return `/scan?mode=${mode}&map=${encodeURIComponent(mapId)}`;
+}

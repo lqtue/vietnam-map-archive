@@ -11,7 +11,7 @@
     <div class="footer-links">
       <a href="/">{$t('Home')}</a>
       <a href="/catalog">{$t('Catalog')}</a>
-      <a href="/catalog/cartomundi">CartoMundi index</a>
+      <a href="/catalog/institutions">{$t('Institution catalog')}</a>
       <a href="/explore">{$t('Map viewer')}</a>
       <a href="/contribute">{$t('Contribute')}</a>
       <a href="/about">{$t('About')}</a>

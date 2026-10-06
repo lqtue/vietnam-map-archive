@@ -379,6 +379,12 @@ function dotTexture() {
   return new THREE.CanvasTexture(c);
 }
 const anchorTexture = dotTexture();
+// Legend pins are squares, so setHot's colour swaps cannot erase the distinction from text anchors.
+const pinTexture = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 32;
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(5, 5, 22, 22);
+  return new THREE.CanvasTexture(c);
+})();
 function yearBadge(year, height) {
   const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 96;
   const ctx = canvas.getContext('2d');
@@ -400,7 +406,7 @@ textureLoader.crossOrigin = 'anonymous';
 async function load() {
   const response = await fetch('layers.json');
   if (!response.ok) throw Error(`Layer data: HTTP ${response.status}`);
-  const { layers, links, meters_per_unit: metersPerUnit, ground_origin_m: groundOrigin,
+  const { layers, links, legend = [], legend_links: legendLinks = [], meters_per_unit: metersPerUnit, ground_origin_m: groundOrigin,
     meters_per_degree: metersPerDegree, span } = await response.json();
   // Oldest sheet sits on top of the stack, facing the camera first; newer
   // sheets stack below it, descending in world Y. Spacing is by sheet index,
@@ -635,11 +641,12 @@ async function load() {
   // not just one adjacent pair — and keeps two same-named but differently
   // located threads (e.g. a long street matched at different ends on
   // different gaps) as separate buttons instead of merging them.
-  const groups = new Map();
+  const groups = new Map(), pins = [];
   const pickables = [];
-  for (const link of links) {
+  // Legend links (k: 'll' legend-legend, 'lb' legend-body; a is the legend end) share chain ids with the name links.
+  for (const link of [...links, ...legendLinks]) {
     const key = link.c;
-    if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], anchors: new Map(), years: new Set(), doling: null });
+    if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], anchors: new Map(), years: new Set(), doling: null, members: [] });
     const group = groups.get(key);
     if (!group.doling && link.d) group.doling = link.d;
     const a = toWorld(link.p, layerY(layers[link.a].year)), b = toWorld(link.q, layerY(layers[link.b].year));
@@ -648,13 +655,20 @@ async function load() {
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
     const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: .16, depthTest: false }));
     scene.add(line); group.elements.push(line);
-    for (const [point, year] of [[a, layers[link.a].year], [b, layers[link.b].year]]) {
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: anchorTexture, color: lineColor, transparent: true, opacity: .2, depthTest: false }));
+    for (const [i, [point, year]] of [[a, layers[link.a].year], [b, layers[link.b].year]].entries()) {
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: link.k && (i === 0 || link.k === 'll') ? pinTexture : anchorTexture, color: lineColor, transparent: true, opacity: .2, depthTest: false }));
       sprite.position.set(...point); sprite.scale.set(8, 8, 1);
       sprite.userData.pixelSize = 10; screenSpaceSprites.add(sprite);
       scene.add(sprite); group.elements.push(sprite); group.years.add(year);
       pickables.push({ sprite, key });
     }
+  }
+  for (const r of legend) {
+    if (groups.has(r.c)) { groups.get(r.c).members.push(r); continue; }
+    if (r.src === 'numeral') continue; // a position guessed from a body numeral is drawn only once a name match confirms it
+    const pin = new THREE.Sprite(new THREE.SpriteMaterial({ map: pinTexture, color: warmColor, transparent: true, opacity: .35, depthTest: false }));
+    pin.position.set(...toWorld(r.p, layerY(r.year))); pin.userData.pixelSize = 7;
+    screenSpaceSprites.add(pin); scene.add(pin); pins.push(pin);
   }
   function setHot(elements, hot) {
     for (const el of elements) {
@@ -675,6 +689,7 @@ async function load() {
         `<p>Per Tim Doling, <em>Historic Vietnam</em>: “${d.post_title}” (${d.post_date}). ` +
         `<a href="${d.post_url}" target="_blank" rel="noopener">Read →</a></p></div>`;
     }
+    for (const r of group.members) html += `<p>${r.year} · ${layers[r.sheet].label} · no. ${r.n}: ${r.name}${r.vn ? ` / ${r.vn}` : ''}</p>`;
     return html;
   }
   function showPopup(x, y, group) {
@@ -812,6 +827,7 @@ async function load() {
     lineColor.set(s.getPropertyValue('--line').trim());
     warmColor.set(s.getPropertyValue('--warm').trim());
     fabrics.forEach(f => f.material.color.copy(warmColor));
+    pins.forEach(p => p.material.color.copy(warmColor));
     for (const [key, g] of groups) setHot(g.elements, key === selected);
     placeContext.refresh();
   };

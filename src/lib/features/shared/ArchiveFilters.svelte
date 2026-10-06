@@ -18,9 +18,12 @@
   way, and its summary carries how many are set.
 -->
 <script lang="ts">
-  import { t } from '$lib/core/i18n';
+  import { mapTypeLabel } from '$lib/core/mapTaxonomy';
+  import { t, locale } from '$lib/core/i18n';
+  import { CATALOG_REGIONS } from '$lib/core/catalogRegions';
   import Tabs from '$lib/ui/Tabs.svelte';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
+  import FilterBar from './FilterBar.svelte';
 
   /** The search engine this bar drives. Created by the caller, because the
    *  point of the component is that several lists can share one. */
@@ -39,10 +42,13 @@
 
   /** Staff get the Type select; for a reader it is one value in 96% of rows, so it filters nothing. */
   export let staff = false;
+  /** Filters the caller adds inside the same disclosure (default slot), counted on its summary. */
+  export let extraActive = 0;
 
   const {
     query,
     areaChoices,
+    regionChoices,
     typeChoices,
     institutionChoices,
     seriesChoices: corpusSeries,
@@ -75,7 +81,10 @@
 
   /** How many facets are set — the number on the summary. */
   $: activeFacets =
+    ($selected.kind?.length ? 1 : 0) +
+    ($selected.series_key?.length ? 1 : 0) +
     ($selected.area?.length ? 1 : 0) +
+    ($selected.region?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
     ($selected.institution?.length ? 1 : 0) +
     ($selected.year?.length ? 1 : 0);
@@ -88,112 +97,100 @@
   }
 </script>
 
-<div class="filters">
-  {#if showSearch}
-    <label class="sb-search">
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <input
-        class="sb-search-input"
-        type="search"
-        placeholder={$t('Search maps…')}
-        bind:value={$query}
-      />
-      {#if $query}
-        <button
-          type="button"
-          class="sb-search-clear"
-          on:click={() => query.set('')}
-          aria-label={$t('Clear')}>×</button
-        >
-      {/if}
-    </label>
-  {/if}
-  {#if hasKinds}
-    <div class="kinds">
-      <Tabs
-        tabs={KINDS}
-        active={kind}
-        label={$t('Kind of map')}
-        on:change={(e) => setKind(e.detail.key)}
-      />
-    </div>
-  {/if}
-  {#if seriesOpts.length > 1}
-    <!-- Out of the disclosure: the survey is the archive's real structure, and the first thing a
-         reader narrows by. -->
-    <div class="dropdowns">
-      <select
-        value={$selected.series_key?.[0] ?? ''}
-        on:change={(e) =>
-          search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-        aria-label="Filter by series"
-      >
-        <option value="">{$t('All series')}</option>
-        {#each seriesOpts as s (s.value)}
-          <option value={s.value}>{s.label}</option>
-        {/each}
-      </select>
-    </div>
-  {/if}
-  <details class="sb-more">
-    <summary
-      >Filters{#if activeFacets}
-        · {activeFacets}{/if}</summary
-    >
-    <div class="dropdowns">
-      {#if $areaChoices.length}
+<FilterBar
+  bind:query={$query}
+  placeholder={$t('Search maps…')}
+  active={activeFacets + extraActive}
+  {showSearch}
+  resettable={hasFilters}
+  on:reset={resetFilters}
+>
+  <!-- All facets live in the Filters disclosure. -->
+  <div class="primary">
+    {#if hasKinds}
+      <div class="kinds">
+        <Tabs
+          tone="rail"
+          tabs={KINDS}
+          active={kind}
+          label={$t('Kind of map')}
+          on:change={(e) => setKind(e.detail.key)}
+        />
+      </div>
+    {/if}
+    {#if seriesOpts.length > 1}
+      <!-- Series is a filter here; the catalog's collection browser links to its full index. -->
+      <div class="dropdowns">
         <select
-          value={$selected.area?.[0] ?? ''}
-          on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by province"
-          title={$t(
-            'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
-          )}
-        >
-          <option value="">{$t('All provinces')}</option>
-          {#each $areaChoices as a (a)}
-            <option value={a}>{a}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if staff && $typeChoices.length}
-        <select
-          value={$selected.type?.[0] ?? ''}
-          on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by map type"
-        >
-          <option value="">{$t('All types')}</option>
-          {#each $typeChoices as t (t)}
-            <option value={t}>{t}</option>
-          {/each}
-        </select>
-      {/if}
-      {#if $institutionChoices.length > 1}
-        <select
-          value={$selected.institution?.[0] ?? ''}
+          value={$selected.series_key?.[0] ?? ''}
           on:change={(e) =>
-            search.setSingle('institution', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by institution"
+            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
+          aria-label="Filter by series"
         >
-          <option value="">{$t('All institutions')}</option>
-          {#each $institutionChoices as i (i)}
-            <option value={i}>{i}</option>
+          <option value="">{$t('All series')}</option>
+          {#each seriesOpts as s (s.value)}
+            <option value={s.value}>{s.label}</option>
           {/each}
         </select>
-      {/if}
-    </div>
+      </div>
+    {/if}
+  </div>
+  {#if $areaChoices.length}
+    <select
+      value={$selected.area?.[0] ?? ''}
+      on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by province"
+      title={$t(
+        'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
+      )}
+    >
+      <option value=""
+        >{$t('All provinces')} · {$locale === 'vi' ? 'trước 7/2025' : 'before July 2025'}</option
+      >
+      {#each $areaChoices as a (a)}
+        <option value={a}>{a}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if $regionChoices.length}
+    <select
+      value={$selected.region?.[0] ?? ''}
+      on:change={(e) => search.setSingle('region', e.currentTarget.value)}
+      aria-label="Filter by geographic region"
+    >
+      <option value="">{$locale === 'vi' ? 'Tất cả vùng địa lý' : 'All geographic regions'}</option>
+      {#each CATALOG_REGIONS.filter( (region) => $regionChoices.includes(region.key) ) as region (region.key)}
+        <option value={region.key}>{region[$locale]}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if staff && $typeChoices.length}
+    <select
+      value={$selected.type?.[0] ?? ''}
+      on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by map type"
+    >
+      <option value="">{$t('All types')}</option>
+      {#each $typeChoices as t (t)}
+        <option value={t}>{mapTypeLabel(t, $locale)}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if $institutionChoices.length > 1}
+    <select
+      value={$selected.institution?.[0] ?? ''}
+      on:change={(e) =>
+        search.setSingle('institution', (e.currentTarget as HTMLSelectElement).value)}
+      aria-label="Filter by institution"
+    >
+      <option value="">{$t('All institutions')}</option>
+      {#each $institutionChoices as i (i)}
+        <option value={i}>{i}</option>
+      {/each}
+    </select>
+  {/if}
+  <slot />
+  <svelte:fragment slot="more">
     {#if $yearBins.length}
       <!-- A decade bar is a shortcut for the two boxes under it: click one for that decade, or
            type any span. The bars are counted against every other filter, so they say what is
@@ -237,22 +234,10 @@
         </div>
       </div>
     {/if}
-  </details>
-</div>
-
-{#if hasFilters}
-  <div class="reset-row">
-    <button type="button" class="reset" on:click={resetFilters}>{$t('Reset filters')}</button>
-  </div>
-{/if}
+  </svelte:fragment>
+</FilterBar>
 
 <style>
-  /* No `gap`: `.sb-more` brings its own vertical margin, and doubling the two
-     is what separates the search box from the disclosure under it. */
-  .filters {
-    display: flex;
-    flex-direction: column;
-  }
   .dropdowns {
     display: flex;
     gap: 0.4rem;
@@ -276,8 +261,25 @@
     cursor: pointer;
   }
 
-  .kinds {
-    padding-top: 0.2rem;
+  .primary {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .primary .dropdowns {
+    padding-top: 0;
+  }
+  .primary .dropdowns select {
+    flex: 0 1 14rem;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.78rem;
+  }
+  /* The pill row shrinks inside a flex line and clips its longest label. */
+  .kinds :global(.sb-pill) {
+    flex: none;
+    white-space: nowrap;
   }
   .years {
     padding-top: 0.5rem;
@@ -317,23 +319,5 @@
     background: var(--sb-card-bg);
     border: var(--border-thin);
     border-radius: var(--sb-radius-sm);
-  }
-
-  /* Its own row, so the link sits under the bar it resets whether or not the
-     list beside it has a count to show. */
-  .reset-row {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .reset {
-    background: transparent;
-    border: none;
-    padding: 0;
-    font: inherit;
-    font-size: 0.76rem;
-    font-weight: var(--font-bold);
-    color: var(--sb-accent);
-    text-decoration: underline;
-    cursor: pointer;
   }
 </style>

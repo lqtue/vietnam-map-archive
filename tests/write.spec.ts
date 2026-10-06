@@ -1415,6 +1415,122 @@ test('the place-time index warps on write, gates drafts, and rewarps on demand',
   await asWorker.dispose();
 });
 
+test('/api/context returns legend points for a public map, hides a draft, and keeps entries out of labels', async () => {
+  // A 1000 px square pinned to 106.70..106.71 E, 10.79..10.80 N; px=500,500 is its centre.
+  const HERE = { lng: 106.705, lat: 10.795 };
+  const { data: map } = await admin
+    .from('maps')
+    .insert({ name: 'legend-ctx smoke', status: 'draft', year: 1968 })
+    .select('id')
+    .single();
+  const id = map!.id;
+  created.mapIds.push(id);
+  const corners = [
+    [0, 0, 106.7, 10.8],
+    [1000, 0, 106.71, 10.8],
+    [1000, 1000, 106.71, 10.79],
+    [0, 1000, 106.7, 10.79],
+  ];
+  const annotation = {
+    type: 'AnnotationPage',
+    '@context': 'http://www.w3.org/ns/anno.jsonld',
+    items: [
+      {
+        type: 'Annotation',
+        motivation: 'georeferencing',
+        target: {
+          type: 'SpecificResource',
+          source: {
+            id: 'https://iiif.maparchive.vn/iiif/write-smoke',
+            type: 'ImageService3',
+            width: 1000,
+            height: 1000,
+          },
+          selector: {
+            type: 'SvgSelector',
+            value:
+              '<svg width="1000" height="1000"><polygon points="0,0 1000,0 1000,1000 0,1000" /></svg>',
+          },
+        },
+        body: {
+          type: 'FeatureCollection',
+          transformation: { type: 'polynomial', options: { order: 1 } },
+          features: corners.map(([x, y, lng, lat]) => ({
+            type: 'Feature',
+            properties: { resourceCoords: [x, y] },
+            geometry: { type: 'Point', coordinates: [lng, lat] },
+          })),
+        },
+      },
+    ],
+  };
+  const { error: uploadError } = await admin.storage
+    .from('annotations')
+    .upload(`${id}.json`, JSON.stringify(annotation), {
+      contentType: 'application/json',
+      upsert: true,
+    });
+  expect(uploadError).toBeNull();
+  created.annotationPaths.push(`${id}.json`);
+
+  const runId = `write-smoke-legend-${Date.now()}`;
+  created.runIds.push(runId);
+  const { error: entryError } = await admin.from('ocr_labels').insert({
+    map_id: id,
+    run_id: runId,
+    tile_x: 0,
+    tile_y: 0,
+    tile_w: 100,
+    tile_h: 100,
+    global_x: 0,
+    global_y: 0,
+    global_w: 100,
+    global_h: 20,
+    text: '7. Marche central',
+    category: 'legend_entry',
+    notes: 'n=7;vn=Cho trung tam;px=500,500',
+    review_status: 'validated',
+    confidence: 0.9,
+    // Production legend rows carry a geom; it must not surface as a label (mig 115).
+    geom: `SRID=4326;POINT(${HERE.lng} ${HERE.lat})`,
+    geom_src: 'smoke-src',
+  });
+  expect(entryError).toBeNull();
+  await admin
+    .from('maps')
+    .update({
+      annotation_url: `https://maparchive.vn/api/maps/${id}/annotation`,
+      bbox: [106.7, 10.79, 106.71, 10.8],
+      status: 'public',
+    })
+    .eq('id', id);
+
+  const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
+  const query = `/api/context?lng=${HERE.lng}&lat=${HERE.lat}&radius=300`;
+  const ctx = await (await anon.get(query)).json();
+  expect(validate(loadSchema('context.schema.json'), ctx)).toEqual([]);
+  const mine = ctx.legend.filter((p: { map_id: string }) => p.map_id === id);
+  expect(mine).toHaveLength(1);
+  expect(mine[0]).toMatchObject({ n: 7, name: 'Marche central', vn: 'Cho trung tam', year: 1968 });
+  expect(mine[0].src).toBe('manual');
+  expect(mine[0].distance_m).toBeLessThan(5);
+  expect(ctx.labels.some((l: { map_id: string }) => l.map_id === id)).toBe(false);
+
+  // Outside the radius it is gone, and a year window that excludes the map drops it.
+  const far = await anon.get(`/api/context?lng=${HERE.lng + 0.01}&lat=${HERE.lat}&radius=100`);
+  expect((await far.json()).legend).toEqual([]);
+  const early = await anon.get(`${query}&year_to=1900`);
+  expect((await early.json()).legend).toEqual([]);
+
+  // Back to draft: anonymous sees nothing, and staff see the map but not its legend.
+  await admin.from('maps').update({ status: 'draft' }).eq('id', id);
+  expect((await (await anon.get(query)).json()).legend).toEqual([]);
+  const staff = await (await staffRequest.get(query)).json();
+  expect(staff.maps.some((m: { id: string }) => m.id === id)).toBe(true);
+  expect(staff.legend.some((p: { map_id: string }) => p.map_id === id)).toBe(false);
+  await anon.dispose();
+});
+
 test('the published contracts match what the API actually returns', async () => {
   // contracts/ is the written definition consumers outside this repo rely on
   // (docs/platform-design.md §3). This is the executable half: if a field

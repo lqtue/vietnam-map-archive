@@ -4,11 +4,18 @@
   Open by setting `item`; close fires `close` event (parent should null out the binding).
 -->
 <script lang="ts">
+  import { trackMeasurement } from '$lib/data/measurement';
+  import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import { mapHref, exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchMapLongFields, type MapLongFields } from '$lib/data/maps/service';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
+  import type { WorkFacts } from '$lib/core/sheetWork';
+  import WorkPips from './WorkPips.svelte';
+  import OpenInMenu from './OpenInMenu.svelte';
 
   export let item: any | null = null;
   /** Staff get an Edit action that opens the admin map editor. */
@@ -31,6 +38,16 @@
     if (item?.id === it.id) more = got;
   }
   $: shown = item ? { ...item, ...more } : null;
+
+  // Staff: what has been done to this sheet, read when the drawer opens.
+  let work: WorkFacts | undefined;
+  $: loadWork(item);
+  async function loadWork(it: any | null) {
+    work = undefined;
+    if (!it?.id || it._table === 'scout' || !(role === 'admin' || role === 'mod')) return;
+    const got = await fetchSheetWork(it.id);
+    if (item?.id === it.id) work = got?.[it.id];
+  }
 
   function close() {
     dispatch('close');
@@ -60,8 +77,24 @@
         ['Creator', shown.creator],
         ['Publisher', shown.dc_publisher],
         ['Year', shown.year_label || shown.year],
-        ['Area', shown.location],
-        ['Type', shown.map_type],
+        [
+          'Geographic regions',
+          geographicRegions(shown)
+            .map((key) => CATALOG_REGIONS.find((region) => region.key === key)?.en)
+            .join(', '),
+        ],
+        [
+          'Provinces / cities (before July 2025)',
+          (shown.regions?.length ? shown.regions : [shown.region]).filter(Boolean).join(', '),
+        ],
+        ['Type', shown.map_type ? mapTypeLabel(shown.map_type) : null],
+        [
+          'Subjects',
+          shown.map_subjects
+            ?.map((key: string) => MAP_SUBJECTS.find((subject) => subject.key === key)?.en ?? key)
+            .join(', '),
+        ],
+        ['Depicted state', shown.depicted_state === 'unknown' ? null : shown.depicted_state],
         ['Collection', shown.collection],
         ['Holding institution', shown.holding_institution],
         ['Shelfmark', shown.shelfmark],
@@ -90,6 +123,14 @@
 
     <div class="badge-chip status-pill">{statusLabel()}</div>
 
+    {#if canEdit}
+      <!-- Staff: what has been done to the sheet, and where to open it. Grey = not yet. -->
+      <div class="work">
+        <WorkPips state={work} />
+        <OpenInMenu mapId={item.id} />
+      </div>
+    {/if}
+
     {#if shown?.dc_description}
       <p class="description">{shown.dc_description}</p>
     {/if}
@@ -100,7 +141,17 @@
           <dt>{k}</dt>
           <dd>
             {#if k === 'Source URL'}
-              <a href={v} target="_blank" rel="noopener">{v}</a>
+              <a
+                href={v}
+                target="_blank"
+                rel="noopener"
+                on:click={() =>
+                  trackMeasurement('source_open', {
+                    surface: 'catalog',
+                    map_id: item.id,
+                    action: 'open',
+                  })}>{v}</a
+              >
             {:else}
               {v}
             {/if}
@@ -142,6 +193,13 @@
 {/if}
 
 <style>
+  .work {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.6rem 0;
+  }
   .drawer-backdrop {
     position: fixed;
     inset: 0;

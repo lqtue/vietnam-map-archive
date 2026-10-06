@@ -9,8 +9,10 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
+  import { catalogAreaSummary } from '$lib/core/catalogAreas';
   import ArchiveFilters from '$lib/features/shared/ArchiveFilters.svelte';
   import CatalogTable from '$lib/features/catalog/CatalogTable.svelte';
+  import type { GroupKey } from '$lib/features/catalog/catalogTableModel';
   import MapCard from '$lib/ui/MapCard.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
@@ -18,10 +20,19 @@
   import CatalogDetailDrawer from '$lib/features/catalog/CatalogDetailDrawer.svelte';
   import LabelHits from '$lib/features/shared/LabelHits.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { get } from 'svelte/store';
+  import { trackMeasurement } from '$lib/data/measurement';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
   import { inView } from '$lib/ui/inView';
+  import SheetStatus from '$lib/features/catalog/SheetStatus.svelte';
+  import { WORK_FILTERS, matchesWork, type WorkFactsById } from '$lib/core/sheetWork';
+  import { fetchSheetWork } from '$lib/data/admin/sheetWork';
 
   export let searchQuery: string = '';
+  /** Initial province from a coverage-page link. Other surfaces leave this empty. */
+  export let initialArea: string = '';
+  export let initialRegion: string = '';
+  let groupBy: GroupKey = 'none';
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** When true, row clicks dispatch `pick` instead of opening the detail drawer. */
   export let pickMode: boolean = false;
@@ -52,12 +63,27 @@
 
   $: staff = role === 'admin' || role === 'mod';
 
+  // Staff: what has been done to each sheet, read once, to show and to filter by.
+  let work: WorkFactsById = {};
+  let workLoaded = false;
+  let workFilter = '';
+  async function loadWork() {
+    workLoaded = true;
+    work = (await fetchSheetWork()) ?? {};
+  }
+  $: if (staff && !compact && !workLoaded) void loadWork();
+  // A scout candidate has no work state, so a work filter leaves it out.
+  $: listed = workFilter
+    ? $results.filter((r) => (r as any)._table !== 'scout' && matchesWork(workFilter, work[r.id]))
+    : $results;
+
   const dispatch = createEventDispatcher<{ pick: any; edit: any }>();
 
   const search = createCatalogSearch({ requireGeoref });
   const {
     query,
     loading,
+    mapsReady,
     results,
     facets,
     total,
@@ -68,23 +94,89 @@
     setSingle,
   } = search;
 
+  if (initialArea) setSingle('area', initialArea);
+  if (initialRegion) setSingle('region', initialRegion);
+
   // Mirror the parent's search box into the engine's query store.
   $: query.set(searchQuery);
+
+  let measurementTimer: ReturnType<typeof setTimeout> | null = null;
+  let lastMeasuredSearch = '';
+  function scheduleSearchMeasurement() {
+    if (compact) return;
+    if (measurementTimer) clearTimeout(measurementTimer);
+    const currentQuery = get(query).trim();
+    const currentFilters = get(selected);
+    const hasFilters = Object.values(currentFilters).some((value) => value?.length);
+    if (!currentQuery && !hasFilters) {
+      lastMeasuredSearch = '';
+      return;
+    }
+    measurementTimer = setTimeout(() => {
+      const signature = JSON.stringify([currentQuery, currentFilters]);
+      const latestSignature = JSON.stringify([get(query).trim(), get(selected)]);
+      if (
+        signature !== latestSignature ||
+        signature === lastMeasuredSearch ||
+        get(loading) ||
+        !get(mapsReady)
+      )
+        return;
+      lastMeasuredSearch = signature;
+      trackMeasurement('search_completed', {
+        surface: 'catalog',
+        workflow: 'search',
+        result_count: get(results).length,
+        action: 'complete',
+      });
+    }, 500);
+  }
 
   $: atRest = !$query.trim() && !Object.values($selected).some((v) => v?.length);
 
   onMount(() => {
     search.start();
+    const stops = [
+      query.subscribe(scheduleSearchMeasurement),
+      selected.subscribe(scheduleSearchMeasurement),
+      results.subscribe(scheduleSearchMeasurement),
+      mapsReady.subscribe((ready) => {
+        if (ready) scheduleSearchMeasurement();
+      }),
+      loading.subscribe((isLoading) => {
+        if (!isLoading) scheduleSearchMeasurement();
+      }),
+    ];
     // ...and back, because the store is no longer a sink: `ArchiveFilters`'
     // Reset clears it, and without this the page's own field would keep showing
     // a query the results had already stopped answering to. The guard is what
     // stops the pair above and below from ringing.
-    return query.subscribe((v) => {
+    const stopQueryMirror = query.subscribe((v) => {
       if (v !== searchQuery) searchQuery = v;
     });
+    return () => {
+      stops.forEach((stop) => stop());
+      stopQueryMirror();
+      if (measurementTimer) clearTimeout(measurementTimer);
+    };
   });
 
   let openedItem: any | null = null;
+  function openResult(item: any) {
+    const hasSearch =
+      !!get(query).trim() || Object.values(get(selected)).some((value) => value?.length);
+    if (!compact && hasSearch) {
+      trackMeasurement('search_result_open', {
+        surface: 'catalog',
+        workflow: 'search',
+        result_kind: 'map',
+        map_id: item?.id,
+        action: 'open',
+      });
+    }
+    if (pickMode) dispatch('pick', item);
+    else openedItem = item;
+  }
 
   /* List or grid. Two words of state, but the reader who wants pictures wants
      them every visit, so it is remembered. */
@@ -127,7 +219,33 @@
        rail of chips put its filters in a column nobody scrolled back up to,
        and the rail cost the results a third of the page's width. /catalog
        gets a fourth control there, series; nothing else passes choices. -->
-  <ArchiveFilters {search} showSearch={false} {seriesChoices} {staff} />
+  <ArchiveFilters
+    {search}
+    showSearch={false}
+    {seriesChoices}
+    {staff}
+    extraActive={(groupBy === 'none' || compact || view === 'grid' ? 0 : 1) + (workFilter ? 1 : 0)}
+  >
+    <!-- Grouping is a way of looking at the filtered list, so it sits in the same
+         disclosure as the filters and is counted on its summary. The grid has no
+         groups, and the compact rail never did. -->
+    {#if staff && !compact}
+      <select bind:value={workFilter} aria-label="Filter by work">
+        {#each WORK_FILTERS as w (w.key)}
+          <option value={w.key}>{$t(w.label)}</option>
+        {/each}
+      </select>
+    {/if}
+    {#if !compact && view !== 'grid'}
+      <select bind:value={groupBy} aria-label={$t('Group by')}>
+        <option value="none">{$t('Group by')}: {$t('None')}</option>
+        <option value="year">{$t('Group by')}: {$t('Year')}</option>
+        <option value="region">{$t('Group by')}: {$t('Area')}</option>
+        <option value="collection">{$t('Group by')}: {$t('Series')}</option>
+        <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
+      </select>
+    {/if}
+  </ArchiveFilters>
 
   {#if !compact}
     <div class="v2-toolbar">
@@ -151,6 +269,7 @@
           >
         {/if}
         <Tabs
+          tone="rail"
           tabs={VIEWS}
           active={view}
           label={$t('Catalog view')}
@@ -174,27 +293,37 @@
       <!-- A card opens the same drawer a row does, so it carries no `href`:
            the grid is the list in another shape, not a different destination. -->
       <div class="cus-grid">
-        {#each $results.slice(0, shown) as item (item.id)}
+        {#each listed.slice(0, shown) as item (item.id)}
           <MapCard
-            map={item as any}
+            map={{
+              ...item,
+              location:
+                catalogAreaSummary(item).label === '—' ? undefined : catalogAreaSummary(item).label,
+            } as any}
             href={null}
             thumbnail={atWidth(item.thumbnail, 400)}
             showSourceBadge
-            on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
-          />
+            on:open={(e) => openResult(e.detail)}
+          >
+            <svelte:fragment slot="status">
+              {#if staff}<SheetStatus {item} state={work[item.id]} />{/if}
+            </svelte:fragment>
+          </MapCard>
         {/each}
       </div>
-      {#if shown < $results.length}
+      {#if shown < listed.length}
         <div use:inView={() => (shown += SLICE)}></div>
       {/if}
     {:else}
       <CatalogTable
-        items={$results as any}
+        items={listed as any}
+        {work}
         {compact}
         {activeId}
         {showLayerActions}
         {staff}
-        on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
+        {groupBy}
+        on:open={(e) => openResult(e.detail)}
       />
     {/if}
   {/if}
@@ -232,17 +361,15 @@
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
-    padding: 0.5rem 0.75rem;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--sb-radius-sm);
+    padding: 0.25rem 0;
     font-family: var(--font-family-base);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    color: var(--sb-text-meta);
   }
   .v2-tools {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.75rem;
   }
   .v2-loading {
     margin-left: 0.4rem;
@@ -256,7 +383,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-weight: var(--font-bold);
     cursor: pointer;
   }
 

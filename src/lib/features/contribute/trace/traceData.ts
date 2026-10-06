@@ -21,6 +21,7 @@ import {
   deleteFootprint,
 } from '$lib/data/supabase/footprints';
 import type { FootprintSubmission, PixelCoord, FeatureType } from '$lib/data/maps/footprintTypes';
+import { trackMeasurement } from '$lib/data/measurement';
 
 export type TraceState = {
   footprints: FootprintSubmission[];
@@ -39,8 +40,10 @@ export type TraceHooks = {
 export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
   const store = writable<TraceState>({ footprints: [], newId: null, error: '' });
   const { subscribe, update, set } = store;
+  let draftPending = false;
 
   function reset() {
+    draftPending = false;
     set({ footprints: [], newId: null, error: '' });
   }
 
@@ -67,6 +70,16 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
   async function draw(pixelPolygon: PixelCoord[], geometry: 'Polygon' | 'LineString') {
     const mapId = getMapId();
     if (!mapId || !userId) return;
+    if (pixelPolygon.length < (geometry === 'Polygon' ? 3 : 2)) return;
+    if (!draftPending) {
+      draftPending = true;
+      trackMeasurement('draft_started', {
+        surface: 'scan',
+        workflow: 'shapes',
+        map_id: mapId,
+        action: 'submit',
+      });
+    }
     const name = nextName(get(store).footprints);
     const featureType: FeatureType = geometry === 'LineString' ? 'road' : 'building';
     const id = await createFootprint(supabase, {
@@ -78,6 +91,13 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
       featureType,
     });
     if (!id) return;
+    draftPending = false;
+    trackMeasurement('save_success', {
+      surface: 'scan',
+      workflow: 'shapes',
+      map_id: mapId,
+      action: 'submit',
+    });
     const row: FootprintSubmission = {
       id,
       mapId,

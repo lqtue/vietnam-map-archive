@@ -1,3 +1,4 @@
+import { canonicalMapType } from '$lib/core/mapTaxonomy';
 // Unified search across `maps` and (admin-only) `scout_candidates`.
 // Powers the upgraded /catalog search bar + facet rail.
 //
@@ -26,6 +27,8 @@ import { readAll, readAllParallel } from '$lib/data/supabase/paged';
 import { MAP_BASE_COLUMNS } from '$lib/data/maps/columns';
 import { getTransformer } from '$lib/server/transformer';
 import { placeKey, placeCoreKey } from '$lib/core/utils/placeKey';
+import { matchesCoverageArea, coverageAreas } from '$lib/core/catalogAreas';
+import { matchesGeographicRegion, geographicRegions } from '$lib/core/catalogRegions';
 
 /**
  * Distinct maps whose annotation we will fetch to warp label hits that have no
@@ -84,7 +87,7 @@ export interface LabelHit {
  * response's own field names (`mapsOut` below) — only the column read from
  * renamed (mig 095).
  */
-const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,language`;
+const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},year_label:date_label,georef_done:is_georeferenced,creator,sheet_number,sheet_half,original_title,dc_publisher:publisher,shelfmark,language`;
 
 /**
  * `fields=slim`: a title and a year, plus the five columns the facet filters
@@ -92,7 +95,7 @@ const FULL_MAP_COLUMNS = `${MAP_BASE_COLUMNS},region,year_label:date_label,geore
  * source fields are most of a map row and no slim caller renders one of them.
  */
 const SLIM_MAP_COLUMNS =
-  'id,slug,name,year,year_label:date_label,status,map_type,source_type,holding_institution,allmaps_id,series_key';
+  'id,slug,name,year,year_label:date_label,status,map_type,source_type,holding_institution,allmaps_id,series_key,region,regions,regions_2025';
 
 // No pagination UI on the catalog/sidebar yet, so the page slice must be able
 // to hold the whole archive. Raw queries keep their own 2000-row safety ceiling.
@@ -185,7 +188,9 @@ async function answer(
 
   const q = (url.searchParams.get('q') || '').trim();
   const institution = csvParam(url.searchParams.get('institution'));
-  const type = csvParam(url.searchParams.get('type'));
+  const type = csvParam(url.searchParams.get('type')).map((value) => canonicalMapType(value) ?? '');
+  const area = csvParam(url.searchParams.get('area')); // pre-July-2025 province names
+  const region = csvParam(url.searchParams.get('region')); // geographic region keys
   const period = csvParam(url.searchParams.get('period'));
   const source = csvParam(url.searchParams.get('source')); // source_type (ia, bnf, …)
   const scoutSource = csvParam(url.searchParams.get('scoutSource')); // scout.source (humazur, gallica, …)
@@ -240,9 +245,10 @@ async function answer(
     // filters in JS, because a facet count needs the unfiltered set.
     // `.limit(2000)` was silently cut to PostgREST's 1,000 with no order, so once the archive passed
     // 1,000 rows every facet and filter ran over an arbitrary subset (L7014 showed 172 of 510).
-    const { data, error: err } = slim
-      ? await build().limit(Math.min(limit + offset, MAX_LIMIT))
-      : await readAllParallel((from, to) => build().order('id').range(from, to));
+    const { data, error: err } =
+      slim && !area.length && !region.length
+        ? await build().limit(Math.min(limit + offset, MAX_LIMIT))
+        : await readAllParallel((from, to) => build().order('id').range(from, to));
     if (err) dbError(err, 'Map search failed');
     return (data as unknown as Record<string, unknown>[]) || [];
   };
@@ -406,6 +412,12 @@ async function answer(
     loadLabels(),
   ]);
 
+  // Area constrains map results; OCR labels, places and scout have their own scope.
+  const areaRows = mapsRows.filter(
+    (row) => matchesCoverageArea(row, area) && matchesGeographicRegion(row, region)
+  );
+  const areaCounts: Record<string, number> = {};
+
   // ---------- FACETS (pre-filter) ----------
   // Each facet group tallies against everything-except-the-current-dimension so that
   // toggling a chip shows realistic post-toggle counts.
@@ -424,19 +436,19 @@ async function answer(
     !georef || (georef === 'yes' ? !!r.allmaps_id : !r.allmaps_id);
 
   // For maps, build the "all but X" subsets.
-  const mapsForInstitutionFacet = mapsRows.filter(
+  const mapsForInstitutionFacet = areaRows.filter(
     (r) => passType(r) && passPeriod(r) && passSource(r) && passGeoref(r)
   );
-  const mapsForTypeFacet = mapsRows.filter(
+  const mapsForTypeFacet = areaRows.filter(
     (r) => passInstitution(r) && passPeriod(r) && passSource(r) && passGeoref(r)
   );
-  const mapsForPeriodFacet = mapsRows.filter(
+  const mapsForPeriodFacet = areaRows.filter(
     (r) => passInstitution(r) && passType(r) && passSource(r) && passGeoref(r)
   );
-  const mapsForSourceFacet = mapsRows.filter(
+  const mapsForSourceFacet = areaRows.filter(
     (r) => passInstitution(r) && passType(r) && passPeriod(r) && passGeoref(r)
   );
-  const mapsForGeorefFacet = mapsRows.filter(
+  const mapsForGeorefFacet = areaRows.filter(
     (r) => passInstitution(r) && passType(r) && passPeriod(r) && passSource(r)
   );
 
@@ -472,7 +484,30 @@ async function answer(
     (r) => passScoutSource(r) && passScoutInstitution(r) && passScoutPeriod(r)
   );
 
+  for (const row of mapsRows.filter(
+    (r) => passInstitution(r) && passType(r) && passPeriod(r) && passSource(r) && passGeoref(r)
+  )) {
+    if (matchesGeographicRegion(row, region))
+      for (const name of new Set(coverageAreas(row)))
+        areaCounts[name] = (areaCounts[name] ?? 0) + 1;
+  }
+
+  const regionCounts: Record<string, number> = {};
+  for (const row of mapsRows.filter(
+    (r) =>
+      matchesCoverageArea(r, area) &&
+      passInstitution(r) &&
+      passType(r) &&
+      passPeriod(r) &&
+      passSource(r) &&
+      passGeoref(r)
+  )) {
+    for (const key of geographicRegions(row)) regionCounts[key] = (regionCounts[key] ?? 0) + 1;
+  }
+
   const facets = {
+    area: areaCounts,
+    region: regionCounts,
     institution: tally(mapsForInstitutionFacet, 'holding_institution'),
     map_type: tally(mapsForTypeFacet, 'map_type'),
     source_type: tally(mapsForSourceFacet, 'source_type'),
@@ -483,7 +518,7 @@ async function answer(
   };
 
   // ---------- APPLY FILTERS + PAGINATE ----------
-  const filteredMaps = mapsRows.filter(
+  const filteredMaps = areaRows.filter(
     (r) => passInstitution(r) && passType(r) && passPeriod(r) && passSource(r) && passGeoref(r)
   );
   const filteredScout = scoutRows.filter(
@@ -507,7 +542,12 @@ async function answer(
     name: r.name,
     location: r.location,
     region: r.region,
+    regions: r.regions,
+    regions_2025: r.regions_2025,
     map_type: r.map_type,
+    map_subjects: r.map_subjects,
+    depicted_state: r.depicted_state,
+    classification_status: r.classification_status,
     thumbnail: r.thumbnail,
     isFeatured: r.status === 'featured',
     year: r.year,

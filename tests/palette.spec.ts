@@ -79,14 +79,10 @@ test('a label prefix beats a keyword match', () => {
 });
 
 test('two labels starting with the same word tie by list order, not by spelling', () => {
-  // "Map viewer" and "Map series" both start with it. The list is hand-ordered
-  // from most central outwards, and an alphabetical tie-break answered `map`
-  // with the series index on the strength of an s preceding a v.
+  // Two labels that start with the same word: the list is hand-ordered from most central
+  // outwards, and an alphabetical tie-break once answered `map` with the wrong page.
   const all = destinationsFor('admin', true);
   expect(matchDestinations(all, 'map')[0].href).toBe('/explore');
-  // And the series index is still reachable by what someone would type for it.
-  expect(matchDestinations(all, 'series')[0].href).toBe('/catalog/series');
-  expect(matchDestinations(all, 'survey')[0].href).toBe('/catalog/series');
 });
 
 test('the words people actually type reach the right tool', () => {

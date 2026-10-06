@@ -15,6 +15,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
+import { textGroupsAvailable } from '$lib/server/textGroups';
 import { assertUuid, dbError } from '$lib/server/http';
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
@@ -36,6 +37,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
     .gte('confidence', minConfidence)
     .neq('category', 'other'); // skip bare parcel numbers
 
+  if (await textGroupsAvailable(supabase)) query = query.is('text_group_id', null);
   if (runId) query = query.eq('run_id', runId);
 
   const { data: extractions, error: fetchError } = await query;

@@ -15,7 +15,8 @@ const config = {
       mode: 'auto',
       directives: {
         'default-src': ['self'],
-        'script-src': ['self', 'unsafe-eval'],
+        // The optional GA tag is loaded only after explicit analytics opt-in.
+        'script-src': ['self', 'unsafe-eval', 'https://www.googletagmanager.com'],
         'style-src': ['self', 'unsafe-inline'],
         'img-src': ['self', 'data:', 'blob:', 'https:'],
         'connect-src': ['self', 'https:'],

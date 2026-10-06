@@ -584,8 +584,8 @@ links), which is where it belongs — beside the sheet list, which also does not
 - **Prepare**: `TriageTool.svelte` (neatline rect + tile priority grid; click cycles normal → low-res amber → skip gray), `RegionsTool.svelte` (the layout regions — one labelled rect per part of the sheet, click to select, drag to correct; a dashed edge is the model's proposal and a solid one a person's) and `TriageSidebar.svelte`, whose five steps are **Layout · Neatline · Tiles · Save triage · Run OCR** — now a *check* rather than a build: the `layout` job adopts its own `main_map` region as `triage.neatline` (stamping `neatline_src`), tile priorities come from `--auto-priority` at run time, and **Save triage is the acceptance** (`triage.validated_at`), which is the only thing `enqueue_ocr_all.mjs` will queue on. `triageState()` in `src/lib/data/maps/triageTypes.ts` is the one predicate — `ready | proposed | needs_crop | needs_layout` — and the fleet script carries a hand copy because it is `.mjs`; `tests/triage-state.spec.ts` is the contract. The gate used to be `triage.neatline`, which **no sheet in the corpus had**, so the script's default mode queued nothing and reported success. **Detect** on step 1 enqueues a `layout` job: one low-resolution look at the whole sheet asking the model where the main map, title block, legend, name list, inset and furniture are. It is a job and not a route because the Gemini key lives on the worker and deliberately not in the web app. The answer lands in `maps.triage.regions` and the page polls for it. **Save triage** writes the neatline, tile grid and per-tile priorities to `maps.triage` (mig 069) — localStorage stays the working draft, but only a saved triage is visible to `scripts/enqueue_ocr_all.mjs`, which by default queues **only** triaged sheets (`--untriaged` includes the rest in auto mode) and crops to the `main_map` region when the layout pass found one, falling back to the neatline. "Run OCR" **enqueues a `pipeline_jobs` row** and returns 202; nothing runs until a worker claims it. Same behaviour in dev and on Cloudflare — the old `child_process` spawn and its `{ cli_only, cli_command }` fallback are gone. `CliCommandBlock` now only serves the segmentation panel.
 - **Text**: `OcrBboxTool.svelte` renders + edits `ocr_labels` bboxes and supports `drawMode`
   for manual bboxes (POSTs with `model: 'manual'`). `OcrSidebar.svelte` is a filterable table with
-  inline text/category edit and auto-save on blur, split into `OcrFilterBar.svelte` +
-  `OcrRunBar.svelte` + `OcrRow.svelte` (the row, 145 lines of the sidebar's old 928), with state in
+  inline text/category edit and auto-save on blur, split into `OcrRunBar.svelte` +
+  `OcrRow.svelte` (the row, 145 lines of the sidebar's old 928), with state in
   `ocrReviewController.ts`. `BboxPanel.svelte` is the floating selected-bbox editor.
 
   **The axis is the job, not the OCR category** (`ocr/jobs.ts`, the panel's footer tabs): **Names**
@@ -598,7 +598,18 @@ links), which is where it belongs — beside the sheet list, which also does not
   clearing all four clears the sheet; `tests/ocr-jobs.spec.ts` holds exactly that. Picking a job
   reframes the canvas on the part it reads, starts the table in that job's order, and resets the
   category chips to the job's set — the chips are a refinement *inside* a job. The region pills this
-  replaced are gone from `OcrFilterBar`; `regionFilter.ts` stays as what `jobs.ts` is built on.
+  replaced are gone; `regionFilter.ts` stays as what `jobs.ts` is built on.
+
+  **Search, filter and group are one system, not a per-table one** (Oct 2026). The panel's search,
+  status, category, confidence, run and group-by are `features/shared/FacetFilters.svelte` — the
+  same `FilterBar` /catalog and the legend rail wear — driven by `core/utils/facets.ts`, which
+  holds the rules: an empty choice is no constraint (so **Pending + Validated together** is two chips
+  on, and a reviewer can see what is already done instead of re-reading it); a facet's counts ignore
+  its own choice; reset goes to the caller's `defaults` (the open job's categories), not to empty.
+  A table declares `facets` and a group list and applies `filterRows` / `groupRows`; the shapes
+  tables and the map lists are the next callers, and `GroupRow` (`lib/ui`) is the group heading.
+  Status and run are also server queries (`?status=pending,validated`, a 2000-row cap), so
+  those two facets reload; their chip counts are the sheet-wide totals the server returns.
 
 The layout job — enqueue, poll, adopt the regions once it closes — lives in
 `digitalize/layoutJob.ts` (`createLayoutJob`), beside `ocrRunApi.ts` and `triagePrefs.ts`, so the

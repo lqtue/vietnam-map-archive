@@ -1,4 +1,124 @@
 import { test, expect } from '@playwright/test';
+import { matchesGeographicRegion } from '../src/lib/core/catalogRegions';
+
+test('catalog begins with compact disclosures while collection links remain in the HTML', async ({
+  page,
+}) => {
+  const response = await page.goto('/catalog');
+  const html = await response!.text();
+  expect(html).toContain('/catalog/area/ho-chi-minh');
+  expect(html).toContain('/catalog?region=mekong-delta');
+  await expect(page.locator('.collection-browser')).not.toHaveAttribute('open');
+  await expect(page.locator('.series-band')).not.toBeVisible();
+  await expect(page.getByLabel('Filter by series')).not.toBeVisible();
+  await page.locator('.collection-browser > summary').click();
+  await expect(page.locator('.series-band')).toBeVisible();
+  await page.locator('.collection-browser > summary').click();
+  await page.locator('.filters .sb-more > summary').click();
+  await expect(page.getByLabel('Filter by series')).toBeVisible();
+  await expect(page.getByLabel('Filter by geographic region')).toBeVisible();
+});
+
+test('geographic region filter agrees with the API and Cochinchine includes HCMC', async ({
+  request,
+  page,
+}) => {
+  const all = await (await request.get('/api/search?include=maps&limit=5000')).json();
+  const cochinchine = all.maps.find(
+    (map: { slug: string }) => map.slug === 'cochinchine-francaise'
+  );
+  expect(cochinchine.regions).toContain('Hồ Chí Minh');
+  for (const region of ['mekong-delta', 'red-river-delta']) {
+    const expected = all.maps.filter((map: Record<string, unknown>) =>
+      matchesGeographicRegion(map, [region])
+    );
+    const filtered = await (
+      await request.get(`/api/search?include=maps&limit=5000&region=${region}`)
+    ).json();
+    expect(filtered.maps.map((map: { id: string }) => map.id).sort()).toEqual(
+      expected.map((map: { id: string }) => map.id).sort()
+    );
+    await page.goto(`/catalog?region=${region}`);
+    await expect(page.getByLabel('Filter by geographic region')).toHaveValue(region);
+    await expect(page.locator('.v2-count')).toHaveText(`${expected.length} in archive`);
+  }
+});
+
+test('area destinations are crawlable and their lists agree with public area search', async ({
+  request,
+  page,
+}) => {
+  const catalog = await request.get('/catalog');
+  expect(catalog.status()).toBe(200);
+  const html = await catalog.text();
+  const areas = [
+    ...new Set([...html.matchAll(/href="(\/catalog\/area\/[^"]+)"/g)].map((m) => m[1])),
+  ];
+  expect(areas.length).toBeGreaterThan(0);
+  for (const href of areas) {
+    const response = await request.get(href);
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    const filter = body.match(/href="(\/catalog\?area=[^"]+)"/)?.[1];
+    expect(filter).toBeTruthy();
+    const name = new URL(filter!, 'https://maparchive.vn').searchParams.get('area')!;
+    const search = await request.get(
+      `/api/search?include=maps&area=${encodeURIComponent(name)}&limit=5000`
+    );
+    expect(search.status()).toBe(200);
+    const result = await search.json();
+    expect(result.maps.length).toBeGreaterThan(0);
+    for (const map of result.maps) {
+      expect(map.status === 'public' || map.status === 'featured').toBe(true);
+      expect(map.regions?.includes(name) || map.region === name).toBe(true);
+      expect(body).toContain(`/catalog/${map.slug}`);
+    }
+    const list = body.match(/<ul\b[^>]*id="area-maps"[^>]*>([\s\S]*?)<\/ul>/)?.[1];
+    expect(list).toBeDefined();
+    const links = new Set(
+      [...list!.matchAll(/href="\/catalog\/([^/?"]+)"/g)].map((match) => match[1])
+    );
+    expect(links.size).toBe(result.total.maps);
+    if (href === '/catalog/area/ho-chi-minh') {
+      await page.goto(filter!);
+      await expect(page.getByLabel('Filter by province')).toHaveValue(name);
+      await expect(page.locator('.v2-count')).toHaveText(`${result.total.maps} in archive`);
+    }
+  }
+  expect((await request.get('/catalog/area/unknown-area')).status()).toBe(404);
+  const sitemap = await request.get('/sitemap.xml');
+  const xml = await sitemap.text();
+  for (const href of areas) expect(xml).toContain(`https://maparchive.vn${href}`);
+});
+
+test('city collections expose translated content, previews and language-specific canonicals in HTML', async ({
+  request,
+}) => {
+  const cases = [
+    ['ho-chi-minh', 'Historical maps of Saigon (Ho Chi Minh City)', 'Bản đồ Sài Gòn xưa'],
+    ['ha-noi', 'Historical maps of Hanoi', 'Bản đồ Hà Nội xưa'],
+    ['thua-thien-hue', 'Historical maps of Huế', 'Bản đồ Huế xưa'],
+  ];
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  for (const [slug, english, vietnamese] of cases) {
+    const path = `/catalog/area/${slug}`;
+    for (const [prefix, title] of [
+      ['', english],
+      ['/vi', vietnamese],
+    ]) {
+      const response = await request.get(prefix + path);
+      expect(response.status()).toBe(200);
+      const html = await response.text();
+      expect(html).toContain(`<title>${title}`);
+      expect(html).toContain(`rel="canonical" href="https://maparchive.vn${prefix}${path}"`);
+      expect(html).toContain(`hreflang="en" href="https://maparchive.vn${path}"`);
+      expect(html).toContain(`hreflang="vi" href="https://maparchive.vn/vi${path}"`);
+      expect(html).toMatch(/<img[^>]+alt="[^"]+"/);
+      expect(html).toContain('id="area-maps"');
+      expect(sitemap).toContain(`<loc>https://maparchive.vn${prefix}${path}</loc>`);
+    }
+  }
+});
 
 /**
  * The series band on /catalog, and the drawer it opens.
@@ -7,7 +127,7 @@ import { test, expect } from '@playwright/test';
  * the outside, which is why each gets a check rather than a glance:
  *
  *  - the band is server-rendered, so a crawler and a reader with no JavaScript
- *    both reach the coverage pages. `/catalog/series` existed for a day with
+ *    both reach the coverage pages. the coverage pages once had
  *    exactly one way in — a control inside an `ssr = false` tool.
  *  - the row keeps its `href` while opening a drawer. A button here would have
  *    silently removed the only crawlable path to the coverage pages, and
@@ -27,7 +147,6 @@ test('the band is in the HTML, with a link to every coverage page', async ({ pag
   expect(html).toContain('series-band');
   const hrefs = [...html.matchAll(/href="(\/catalog\/series\/[^"]+)"/g)].map((m) => m[1]);
   expect(hrefs.length).toBeGreaterThan(0);
-  expect(html).toContain('href="/catalog/series"');
 
   // Every row's href resolves — a 404 here is a survey with no imported index
   // that the band should have filtered out.
@@ -55,13 +174,14 @@ test('the band is in the HTML, with a link to every coverage page', async ({ pag
  */
 async function ready(page: import('@playwright/test').Page) {
   await expect(page.locator('.v2-count')).not.toHaveText(/^\s*0\s+in archive/);
-  await expect(page.locator('.series-band a.section-card').first()).toBeVisible();
+  await page.locator('.collection-browser > summary').click();
+  await expect(page.locator('.series-band a.drow').first()).toBeVisible();
 }
 
 test('a row opens the drawer and still carries its link', async ({ page }) => {
   await page.goto('/catalog');
   await ready(page);
-  const row = page.locator('.series-band a.section-card').first();
+  const row = page.locator('.series-band a.drow').first();
   const href = await row.getAttribute('href');
   expect(href).toMatch(/^\/catalog\/series\//);
 
@@ -108,7 +228,7 @@ test('the drawer is over the nav, not under it', async ({ page }) => {
    */
   await page.goto('/catalog');
   await ready(page);
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   await expect(page.getByRole('dialog', { name: /series details/i })).toBeVisible();
   await expect(page.locator('.drawer-head')).toBeVisible();
 
@@ -141,7 +261,7 @@ test('"Filter the catalog" narrows the list to that survey, and the band steps a
   const count = page.locator('.v2-count');
   const all = Number((await count.textContent())!.match(/(\d+)/)![1]);
 
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   await page.getByRole('button', { name: 'Filter the catalog' }).click();
 
   // The drawer closes, the band goes away, and the list is smaller than the
@@ -155,14 +275,14 @@ test('"Filter the catalog" narrows the list to that survey, and the band steps a
 
   // Reset puts all three back.
   await page.getByRole('button', { name: 'Reset filters' }).click();
-  await expect(page.locator('.series-band')).toBeVisible();
+  await expect(page.locator('.collection-browser')).toBeVisible();
   await expect(count).toContainText(`${all} in archive`);
 });
 
 test('"Open in map" actually puts the survey on the map', async ({ page }) => {
   await page.goto('/catalog');
   await ready(page);
-  await page.locator('.series-band a.section-card').first().click();
+  await page.locator('.series-band a.drow').first().click();
   const name = (await page.getByRole('dialog').getByRole('heading').textContent())!.trim();
   await page.getByRole('link', { name: 'Open in map' }).click();
 
@@ -181,7 +301,7 @@ test('"Open in map" actually puts the survey on the map', async ({ page }) => {
 test('a series page opens its survey alone, clearing a previously selected survey', async ({
   page,
 }) => {
-  await page.goto('/catalog/series');
+  await page.goto('/catalog');
   const hrefs = await page
     .locator('a[href^="/catalog/series/"]')
     .evaluateAll((links) => [

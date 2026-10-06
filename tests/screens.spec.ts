@@ -159,7 +159,7 @@ test('no stylesheet uses a custom property nothing declares', () => {
   // caller may set it. Both count as declared.
   //
   // Two declaration sites, not one. A property set from the template —
-  // `style:--cat-color={…}` on an element, which is how OcrFilterBar tints a
+  // `style:--cat-color={…}` on an element, which is how FacetControl tints a
   // chip per category and how PressPanel sizes a sparkline bar — never appears
   // as `--name:` anywhere. A checker that only knew the CSS form reported both
   // of those as undeclared, which is the failure mode this whole test exists

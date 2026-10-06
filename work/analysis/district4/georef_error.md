@@ -4,6 +4,12 @@
 sheet's own Allmaps annotation. All six sheets, one code path, so the figures are comparable to each
 other — which is why 1882 was redone rather than carried over.
 
+> **Superseded in part, 2026-10-05.** This table is the 2026-09-19 state (1942 amended 2026-09-21). Re-measured
+> 2026-10-01 after the re-georeferencing (similarity RMSE, GCP count): 1882 12.3 m on 8, 1895 26.7 m on 10,
+> 1923 15.4 m on 10, 1942 33.6 m on 8, 1959 14.0 m on 10, 1968 9.0 m on 15 (`docs/ROADMAP.md`
+> `georef-figures-refresh`). The 1942 figures are different point sets, not one series: 72.3 m on 12 GCPs, 15.9 m on 8
+> (2026-09-21, four dropped) and 33.6 m on 8 (2026-10-01); the last two cannot be the same 8 points.
+
 ```bash
 python3 work/analysis/district4/georef_error.py --self-check   # no network
 python3 work/analysis/district4/georef_error.py                # the table below

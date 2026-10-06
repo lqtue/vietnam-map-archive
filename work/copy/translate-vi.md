@@ -40,8 +40,6 @@ that is the point of keying the whole line rather than the two halves.
 | Year | Năm |
 | Title | Tiêu đề |
 | Description | Mô tả |
-| Status | Trạng thái |
-| Type | Loại |
 | Collection | Bộ sưu tập |
 | Map | Bản đồ |
 | Image | Hình ảnh |
@@ -51,9 +49,8 @@ that is the point of keying the whole line rather than the two halves.
 | Continue with Google | Tiếp tục với Google |
 | Nothing matches. | Không có kết quả phù hợp. |
 | Nothing here yet. | Chưa có dữ liệu. |
-| All areas | Tất cả khu vực |
 | All types | Tất cả loại |
-| All periods | Tất cả thời kỳ |
+| Filters | Bộ lọc |
 | Reset filters | Đặt lại bộ lọc |
 | Move up | Di chuyển lên |
 | Move down | Di chuyển xuống |
@@ -158,7 +155,6 @@ keyed on its own rather than as part of a sentence.
 | Heart any map and it lands here, on every device you sign in from. | Thả tim bất kỳ bản đồ nào để lưu vào đây trên mọi thiết bị đăng nhập của bạn. |
 | No maps match this view — try another tab or the catalog. | Không có bản đồ nào phù hợp với góc nhìn này — hãy thử tab khác hoặc danh mục. |
 | Browse the catalog | Duyệt danh mục |
-| Map series | Bộ bản đồ |
 | Build something on top of the archive — a scrollytelling story across historical layers, or your own points, lines and shapes on a sheet. | Xây dựng nội dung dựa trên kho dữ liệu — câu chuyện lịch sử theo lớp không gian, hoặc thêm điểm, đường và hình khối trên bản đồ. |
 | Walk readers through a place, one layer at a time | Dẫn dắt người đọc qua từng lớp thời gian của một địa điểm |
 | Draw on any map and save it as a set | Vẽ trên bất kỳ bản đồ nào và lưu lại thành tập dữ liệu |
@@ -274,6 +270,10 @@ The number lives in its own `<dt>`, so these captions are keyed without it.
 | Grid | Lưới |
 | Try another keyword, or clear a filter and start over. | Thử từ khóa khác hoặc xóa bộ lọc để bắt đầu lại. |
 | Group by | Nhóm theo |
+| Open in | Mở trong |
+| Legend found, not read | Đã thấy chú giải, chưa đọc |
+| No legend located | Chưa xác định chú giải |
+| Contribute to this sheet | Đóng góp cho tờ bản đồ này |
 | No maps match those filters. | Không có bản đồ phù hợp với bộ lọc. |
 | Available on map | Có sẵn trên bản đồ |
 | Static image only | Chỉ có hình ảnh tĩnh |
@@ -288,8 +288,6 @@ the catalogue.
 |---|---|
 | Browse by series | Duyệt theo bộ bản đồ |
 | All series | Tất cả bộ bản đồ |
-| A survey is one map printed as many sheets. Each page lists every sheet the survey contains, held or not. | Một bộ đo đạc là một tấm bản đồ được in thành nhiều mảnh. Mỗi trang liệt kê toàn bộ số mảnh của bộ đó, dù kho có hay không. |
-| catalogued {years} | biên mục {years} |
 | {held} of {total} sheets — {pct}% | {held} trên {total} mảnh — {pct}% |
 
 | English | Tiếng Việt |
@@ -501,15 +499,36 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | English | Tiếng Việt |
 |---|---|
 | {N} of {M} placed | Đã đặt {N}/{M} |
-| Unplaced only | Chỉ mục chưa đặt |
+| Search number, name or grid | Tìm số, tên hoặc ô lưới |
+| Search the legend | Tìm trong chú giải |
+| Show | Hiển thị |
+| State | Trạng thái |
+| Remove | Xóa |
+| Add another point | Thêm điểm khác |
+| Click the scan… | Nhấp vào bản quét… |
+| Or hold Shift and click the scan | Hoặc giữ Shift và nhấp vào bản quét |
+| Point {N} | Điểm {N} |
+| Suggested | Gợi ý |
+| suggested | gợi ý |
+| Accept detected numeral | Nhận số đã phát hiện |
+| Accept {N} matching numerals | Nhận {N} số khớp |
+| All | Tất cả |
+| Unplaced | Chưa đặt |
+| Placed | Đã đặt |
+| Edited, unsaved | Đã sửa, chưa lưu |
+| No entries match. | Không có mục phù hợp. |
+| Sheet status | Trạng thái tờ bản đồ |
+| To do | Cần làm |
+| In progress | Đang làm |
+| Done | Xong |
 | Save {N} | Lưu {N} |
 | Saved {N}. | Đã lưu {N}. |
 | placed | đã đặt |
 | unplaced | chưa đặt |
 | Vietnamese name | Tên tiếng Việt |
 | Grid reference | Ô lưới tham chiếu |
-| Reset point | Đặt lại vị trí |
-| N next unplaced · Enter accept numeral · Esc cancel · Delete reset | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete đặt lại |
+| Remove point | Xóa điểm |
+| N next unplaced · Enter accept numeral · Esc cancel · Delete removes · drag a pin to move it · Shift+click adds a point | N mục chưa đặt kế tiếp · Enter nhận số · Esc hủy · Delete xóa điểm · kéo điểm để dời · Shift+nhấp để thêm điểm |
 | Placed points | Điểm đã đặt |
 | Numeral candidates | Số ứng viên |
 | Index grid | Lưới chỉ mục |
@@ -523,7 +542,51 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Saving… | Đang lưu… |
 | Name | Tên |
 
+## Institution catalog
+
+| English | Tiếng Việt |
+|---|---|
+| Institution catalog | Danh mục cơ quan lưu trữ |
+| Search institutions and sources | Tìm cơ quan và nguồn |
+| Holding institutions | Cơ quan lưu giữ |
+| Source platforms | Nền tảng nguồn |
+| Published maps | Bản đồ đã công bố |
+| published maps | bản đồ đã công bố |
+| external source items | mục nguồn bên ngoài |
+| External source records | Hồ sơ nguồn bên ngoài |
+| CartoMundi series | bộ bản đồ CartoMundi |
+| No institutions match this search. | Không có cơ quan nào phù hợp với tìm kiếm. |
+| indexed series | bộ bản đồ đã lập chỉ mục |
+| sheet records | hồ sơ tờ bản đồ |
+| checked scan items | mục bản quét đã kiểm tra |
+| Browse the survey index and linked scan evidence. | Xem chỉ mục khảo sát và bằng chứng bản quét liên kết. |
+| View item-level rights evidence | Xem bằng chứng quyền sử dụng từng mục |
+| Published maps and external source records are counted separately. Open an institution to browse its records. | Bản đồ đã công bố và hồ sơ nguồn bên ngoài được đếm riêng. Mở một cơ quan để xem hồ sơ. |
+| Platforms provide catalogue access or scans; the holding institution is credited separately. | Nền tảng cung cấp danh mục hoặc bản quét; cơ quan lưu giữ được ghi công riêng. |
+| Place numbered legend entries on the scan and link them to the features they name. | Đặt các mục chú giải đánh số lên bản quét và liên kết với các đối tượng được ghi tên. |
+| Libraries, archives and source platforms represented in our records. | Thư viện, kho lưu trữ và nền tảng nguồn có trong hồ sơ của chúng tôi. |
+
+| All provinces | Tất cả tỉnh thành |
+| Modern province, as it stood until mid-2025 — a locator, not the name the map used | Tỉnh theo ranh giới đến giữa năm 2025 — chỉ để định vị, không phải tên gọi trên bản đồ |
+| All institutions | Tất cả cơ quan lưu trữ |
+| All maps | Tất cả bản đồ |
+| Surveys | Bản đồ địa hình |
+| Series | Bộ bản đồ |
+| Institution | Cơ quan lưu trữ |
+| Area | Khu vực |
+| Plans & other | Bình đồ và khác |
+| Kind of map | Loại bản đồ |
+| Maps per decade | Số bản đồ theo thập niên |
+| From | Từ |
+| To | Đến |
+
+| The archive holds {held} of {total} indexed city sheets. The full historical series total is not established. | Kho lưu trữ có {held} trong {total} tờ bản đồ thành phố đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử. |
+
 # PENDING — translated, not yet wired
+
+| All areas | Tất cả khu vực |
+| All periods | Tất cả thời kỳ |
+
 
 These strings are translated but the app still renders them in English, because
 the English sits inside markup a single lookup cannot span: a sentence wrapped

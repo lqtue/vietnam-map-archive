@@ -1,7 +1,6 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { cartomundiSeries, cartomundiSummary } from '$lib/data/maps/cartomundi';
 
-export const load: PageServerLoad = async () => ({
-  series: cartomundiSeries(),
-  summary: cartomundiSummary(),
-});
+export const load: PageServerLoad = ({ url }) => {
+  throw redirect(301, `/catalog/institutions/cartomundi${url.search}`);
+};
