@@ -174,7 +174,7 @@ Evidence counts are rows on the 1882 sheet. "French" rules assume the French typ
    name + number; the reviewer typed `No.` 21 times. Ask the street pass to return one box and one string per printed
    line (`Rue Bourdais No. 32`), or to return the number as its own typed item so it can be attached
    deterministically. The number is the colonial **road number** (the road's administrative number), not a house
-   number. *Applies to:* French-era sheets only — 1882, 1895/1898, 1923, 1942. Under the RVN roads carry Vietnamese
+   number. *Applies to:* French-era sheets that print road numbers — check each sheet first. 1882 prints them; 1898 does not (`261006-1898-ocr-prep.md`); 1923 and 1942 are unchecked. Under the RVN roads carry Vietnamese
    names and the number drops away, so 1959 and 1968 should not get this rule (correction from the user, 2026-10-06).
 2. **Normalise the numeral token in post-processing, not in the prompt.** n = 29 `No.` against ≥ 6 `N°` in
    validated text; the reviewer fixed `N°` → `No.` in 3 diffs and left it in 6. Fold `N°`, `N.°`, `No`, `No.` to
