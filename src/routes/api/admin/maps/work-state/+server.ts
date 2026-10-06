@@ -96,7 +96,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     if (triage === 'needs_layout' && !regions.length && m.legend !== 'none') continue;
     const f = facts(m.id);
     f.triage = triage;
-    if (m.legend === 'none') f.noLegend = true;
+    // A person's "no legend", or a layout a person accepted in which the scout found none.
+    if (
+      m.legend === 'none' ||
+      (triage === 'ready' && !regions.some((r) => r.category === 'legend'))
+    )
+      f.noLegend = true;
     for (const r of regions) {
       if (r.category === 'title') f.found.title = true;
       // The model's legend guess is not trusted (see WorkFacts); only a person's region counts.

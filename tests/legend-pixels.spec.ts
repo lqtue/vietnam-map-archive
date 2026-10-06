@@ -148,8 +148,10 @@ test('a sheet has independent work tracks: done, in between, or not yet', () => 
 test('"no legend on this sheet" closes the legend track; entries outrank it', () => {
   const none: WorkFacts = { ...NO_WORK, noLegend: true };
   const legend = (f: WorkFacts) => sheetTracks(f).find((x) => x.key === 'legend')!;
-  expect(legend(none)).toMatchObject({ state: 'done', hint: 'No legend printed' });
+  expect(legend(none)).toMatchObject({ state: 'na', hint: 'No legend printed' });
   expect(legendReadiness(none)).toBe('none');
+  // Greyed out, not progress: a sheet with only this fact is still untouched.
+  expect(overallState(none)).toBe('todo');
   expect(readSummary(none)).toBe('no legend printed');
   // Even with a person's legend region on file, the sheet needs no legend work.
   const found: WorkFacts = { ...none, found: { ...none.found, legend: true } };

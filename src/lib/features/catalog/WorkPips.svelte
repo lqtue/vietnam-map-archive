@@ -3,7 +3,7 @@
   small dots (a table row has no room for words; the name is on hover and for
   screen readers), the default is labelled chips (the record page does).
 
-  Green = done, yellow = in between, hollow = not yet.
+  Green = done, yellow = in between, hollow = not yet, faded = does not apply (no legend printed).
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
@@ -16,6 +16,7 @@
     done: 'chip-green',
     doing: 'chip-yellow',
     todo: 'chip-gray',
+    na: 'chip-gray',
   };
 
   $: tracks = sheetTracks(state);
@@ -34,6 +35,7 @@
       <span
         class="badge-chip is-sm {CHIP[tr.state]}"
         class:wp-todo={tr.state === 'todo'}
+        class:wp-na={tr.state === 'na'}
         title={$t(tr.hint)}>{$t(tr.label)}</span
       >
     {/if}
@@ -53,6 +55,10 @@
   .wp-todo {
     opacity: 0.55;
   }
+  .wp-na {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
   .pip {
     width: 0.7rem;
     height: 0.7rem;
@@ -65,5 +71,9 @@
   }
   .pip.is-doing {
     background: var(--color-yellow);
+  }
+  .pip.is-na {
+    opacity: 0.3;
+    border-style: dashed;
   }
 </style>

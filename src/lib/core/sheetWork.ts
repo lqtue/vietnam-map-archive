@@ -19,7 +19,10 @@ export type WorkFacts = {
   /** Categories with at least one non-rejected label. */
   read: { title: boolean; legend: boolean; body: boolean };
   triage: TriageState;
-  /** A person marked the sheet "prints no legend" (`triage.legend`). Legend entries outrank it. */
+  /**
+   * The sheet prints no legend: a person said so (`triage.legend`), or a person accepted a layout
+   * in which the scout found no legend region at all. Legend entries outrank it.
+   */
   noLegend?: boolean;
   /** `map_pipeline_status`: an OCR job finished / a person marked the text reviewed. */
   ocrRan: boolean;
@@ -30,7 +33,8 @@ export type WorkFacts = {
 };
 export type WorkFactsById = Record<string, WorkFacts>;
 
-export type TrackState = 'done' | 'doing' | 'todo';
+/** `na`: the track does not apply to this sheet (no legend printed) — greyed out, never blocks. */
+export type TrackState = 'done' | 'doing' | 'todo' | 'na';
 export type Track = { key: string; label: string; state: TrackState; hint: string };
 
 /** The sheet with nothing done — what a map with no row is. */
@@ -66,7 +70,7 @@ export function sheetTracks(f: WorkFacts | undefined): Track[] {
     {
       key: 'legend',
       label: 'Legend',
-      state: w.read.legend || w.noLegend ? 'done' : pick(false, w.found.legend),
+      state: w.read.legend ? 'done' : w.noLegend ? 'na' : pick(false, w.found.legend),
       hint:
         w.noLegend && !w.read.legend
           ? 'No legend printed'
@@ -97,14 +101,15 @@ export const STATE_LABEL: Record<TrackState, string> = {
   done: 'Done',
   doing: 'In progress',
   todo: 'Not yet',
+  na: 'Not applicable',
 };
 
 /** One word for the whole sheet: every track done, any started, or none. */
 export function overallState(f: WorkFacts | undefined): TrackState {
   const states = sheetTracks(f).map((t) => t.state);
-  return states.every((s) => s === 'done')
+  return states.every((s) => s === 'done' || s === 'na')
     ? 'done'
-    : states.some((s) => s !== 'todo')
+    : states.some((s) => s === 'done' || s === 'doing')
       ? 'doing'
       : 'todo';
 }
