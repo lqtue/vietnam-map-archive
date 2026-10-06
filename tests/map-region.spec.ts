@@ -140,3 +140,14 @@ test('country-scale and missing bboxes get no region', () => {
   expect(regionOf(null, vn, kh)).toBeNull();
   expect(regionOf([1, 2, 3], vn, kh)).toBeNull();
 });
+
+test('wide sheets include small provinces through positive polygon overlap', () => {
+  const locate = makeLocator({
+    features: [square('Long An', 0, 0, 3, 3), square('Hồ Chí Minh', 3.001, 0, 3.02, 0.02)],
+  });
+  expect(regionOf([0, 0, 4, 4], locate)?.regions).toContain('Hồ Chí Minh');
+  expect(locate.intersecting([0, 0, 3.001, 4])).not.toContain('Hồ Chí Minh');
+  const hole = square('Long An', 0, 0, 5, 5);
+  hole.geometry.coordinates.push(square('hole', 1, 1, 4, 4).geometry.coordinates[0]);
+  expect(makeLocator({ features: [hole] }).intersecting([1.5, 1.5, 3.5, 3.5])).toEqual([]);
+});

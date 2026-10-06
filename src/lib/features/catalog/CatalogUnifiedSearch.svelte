@@ -9,6 +9,7 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
+  import { catalogAreaSummary } from '$lib/core/catalogAreas';
   import ArchiveFilters from '$lib/features/shared/ArchiveFilters.svelte';
   import CatalogTable from '$lib/features/catalog/CatalogTable.svelte';
   import type { GroupKey } from '$lib/features/catalog/catalogTableModel';
@@ -19,6 +20,8 @@
   import CatalogDetailDrawer from '$lib/features/catalog/CatalogDetailDrawer.svelte';
   import LabelHits from '$lib/features/shared/LabelHits.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { get } from 'svelte/store';
+  import { trackMeasurement } from '$lib/data/measurement';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
   import { inView } from '$lib/ui/inView';
   import SheetStatus from '$lib/features/catalog/SheetStatus.svelte';
@@ -26,6 +29,9 @@
   import { fetchSheetWork } from '$lib/data/admin/sheetWork';
 
   export let searchQuery: string = '';
+  /** Initial province from a coverage-page link. Other surfaces leave this empty. */
+  export let initialArea: string = '';
+  export let initialRegion: string = '';
   let groupBy: GroupKey = 'none';
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** When true, row clicks dispatch `pick` instead of opening the detail drawer. */
@@ -77,6 +83,7 @@
   const {
     query,
     loading,
+    mapsReady,
     results,
     facets,
     total,
@@ -87,23 +94,89 @@
     setSingle,
   } = search;
 
+  if (initialArea) setSingle('area', initialArea);
+  if (initialRegion) setSingle('region', initialRegion);
+
   // Mirror the parent's search box into the engine's query store.
   $: query.set(searchQuery);
+
+  let measurementTimer: ReturnType<typeof setTimeout> | null = null;
+  let lastMeasuredSearch = '';
+  function scheduleSearchMeasurement() {
+    if (compact) return;
+    if (measurementTimer) clearTimeout(measurementTimer);
+    const currentQuery = get(query).trim();
+    const currentFilters = get(selected);
+    const hasFilters = Object.values(currentFilters).some((value) => value?.length);
+    if (!currentQuery && !hasFilters) {
+      lastMeasuredSearch = '';
+      return;
+    }
+    measurementTimer = setTimeout(() => {
+      const signature = JSON.stringify([currentQuery, currentFilters]);
+      const latestSignature = JSON.stringify([get(query).trim(), get(selected)]);
+      if (
+        signature !== latestSignature ||
+        signature === lastMeasuredSearch ||
+        get(loading) ||
+        !get(mapsReady)
+      )
+        return;
+      lastMeasuredSearch = signature;
+      trackMeasurement('search_completed', {
+        surface: 'catalog',
+        workflow: 'search',
+        result_count: get(results).length,
+        action: 'complete',
+      });
+    }, 500);
+  }
 
   $: atRest = !$query.trim() && !Object.values($selected).some((v) => v?.length);
 
   onMount(() => {
     search.start();
+    const stops = [
+      query.subscribe(scheduleSearchMeasurement),
+      selected.subscribe(scheduleSearchMeasurement),
+      results.subscribe(scheduleSearchMeasurement),
+      mapsReady.subscribe((ready) => {
+        if (ready) scheduleSearchMeasurement();
+      }),
+      loading.subscribe((isLoading) => {
+        if (!isLoading) scheduleSearchMeasurement();
+      }),
+    ];
     // ...and back, because the store is no longer a sink: `ArchiveFilters`'
     // Reset clears it, and without this the page's own field would keep showing
     // a query the results had already stopped answering to. The guard is what
     // stops the pair above and below from ringing.
-    return query.subscribe((v) => {
+    const stopQueryMirror = query.subscribe((v) => {
       if (v !== searchQuery) searchQuery = v;
     });
+    return () => {
+      stops.forEach((stop) => stop());
+      stopQueryMirror();
+      if (measurementTimer) clearTimeout(measurementTimer);
+    };
   });
 
   let openedItem: any | null = null;
+  function openResult(item: any) {
+    const hasSearch =
+      !!get(query).trim() || Object.values(get(selected)).some((value) => value?.length);
+    if (!compact && hasSearch) {
+      trackMeasurement('search_result_open', {
+        surface: 'catalog',
+        workflow: 'search',
+        result_kind: 'map',
+        map_id: item?.id,
+        action: 'open',
+      });
+    }
+    if (pickMode) dispatch('pick', item);
+    else openedItem = item;
+  }
 
   /* List or grid. Two words of state, but the reader who wants pictures wants
      them every visit, so it is remembered. */
@@ -222,11 +295,15 @@
       <div class="cus-grid">
         {#each listed.slice(0, shown) as item (item.id)}
           <MapCard
-            map={item as any}
+            map={{
+              ...item,
+              location:
+                catalogAreaSummary(item).label === '—' ? undefined : catalogAreaSummary(item).label,
+            } as any}
             href={null}
             thumbnail={atWidth(item.thumbnail, 400)}
             showSourceBadge
-            on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
+            on:open={(e) => openResult(e.detail)}
           >
             <svelte:fragment slot="status">
               {#if staff}<SheetStatus {item} state={work[item.id]} />{/if}
@@ -246,7 +323,7 @@
         {showLayerActions}
         {staff}
         {groupBy}
-        on:open={(e) => (pickMode ? dispatch('pick', e.detail) : (openedItem = e.detail))}
+        on:open={(e) => openResult(e.detail)}
       />
     {/if}
   {/if}

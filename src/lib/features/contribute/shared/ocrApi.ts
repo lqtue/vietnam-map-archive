@@ -19,6 +19,8 @@ export function reviewedCategory(
 
 export type OcrReviewPage = {
   extractions: OcrExtraction[];
+  parts?: OcrExtraction[];
+  groupingAvailable?: boolean;
   total: number;
   statusCounts: Record<string, number>;
   runIds: string[];
@@ -77,16 +79,25 @@ const base = (mapId: string) => `/api/admin/maps/${mapId}/ocr-review`;
 
 export async function fetchExtractions(
   mapId: string,
-  params: { status?: string | string[]; runId?: string; limit?: number; offset?: number } = {}
+  params: {
+    status?: string | string[];
+    runId?: string;
+    limit?: number;
+    offset?: number;
+    all?: boolean;
+  } = {}
 ): Promise<OcrReviewPage> {
   const qs = new URLSearchParams({ limit: String(params.limit ?? 200) });
   const status = [params.status ?? []].flat().join(',');
   if (status) qs.set('status', status);
   if (params.runId?.trim()) qs.set('run_id', params.runId.trim());
   if (params.offset) qs.set('offset', String(params.offset));
+  if (params.all) qs.set('all', 'true');
   const page = await request<OcrReviewPage>(`${base(mapId)}?${qs}`);
   return {
     extractions: page.extractions ?? [],
+    parts: page.parts ?? [],
+    groupingAvailable: page.groupingAvailable ?? false,
     total: page.total ?? 0,
     statusCounts: page.statusCounts ?? {},
     runIds: page.runIds ?? [],
@@ -304,4 +315,26 @@ export function promoteSaved(state: RowSaveState, saved: Set<string>): RowSaveSt
     };
   });
   return { rows, statusCounts };
+}
+
+/** Ordered original boxes remain attached to a separate combined label. */
+export async function groupTextBoxes(
+  mapId: string,
+  ids: string[],
+  text: string,
+  category: string
+): Promise<string> {
+  const data = await request<{ id: string }>(`${base(mapId)}/groups`, {
+    method: 'POST',
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ ids, text, category }),
+  });
+  return data.id;
+}
+export async function ungroupTextBoxes(mapId: string, id: string): Promise<void> {
+  await request(`${base(mapId)}/groups`, {
+    method: 'DELETE',
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ id }),
+  });
 }

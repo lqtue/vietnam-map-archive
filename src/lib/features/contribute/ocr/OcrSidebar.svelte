@@ -3,12 +3,12 @@
 
   Rows come from `ocrApi`; each is editable inline. An edit or a verdict is a
   draft — marked on the row, counted on Save — and one Save writes them all, as
-  the legend tool does with its staged entries. Moving or resizing a box on the
-  canvas still writes at once (`ocrReviewController`).
+  the legend tool does with its staged entries. The controller owns the shared
+  working copy: geometry, new boxes and groups are cached drafts too.
   Search, status, category, confidence, run and group-by are one
   `FacetFilters` (the same bar /catalog wears, described by `core/utils/facets`)
   and the batch verdict buttons are OcrRunBar — this file declares the facets,
-  owns the data and the filter/sort/group pipeline, the table itself, and the
+  loads the data and owns the filter/sort/group pipeline, the table itself, and the
   Save/reload pair on the filter bar's own line.
 -->
 <script lang="ts">
@@ -22,25 +22,18 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import OcrRunBar from './OcrRunBar.svelte';
   import type { EditableOcrExtraction } from '../shared/types';
-  import {
-    fetchExtractions,
-    batchSetStatus,
-    withEditState,
-    isRowDirty,
-    saveDrafts,
-    promoteSaved,
-    reviewedCategory,
-    type OcrStatus,
-  } from '../shared/ocrApi';
-  import { toggleSort as nextSort, applySort } from '$lib/core/utils/tableSort';
+  import { fetchExtractions, type OcrStatus } from '../shared/ocrApi';
+  import { applySort } from '$lib/core/utils/tableSort';
   import { filterRows, groupRows, type Facet, type Selection } from '$lib/core/utils/facets';
   import { legendEntries, suspectRefs, entryForRow, indexGaps, printedLine } from './legendIndex';
-  import { JOBS, jobOf, jobCounts, jobBox, isPrintedJob, type JobKey } from './jobs';
+  import { JOBS, jobBox, isPrintedJob, type JobKey } from './jobs';
+  import { regionOf, REGION_LABELS } from './regionFilter';
+  import type { OcrReviewController } from './ocrReviewController';
   import type { LayoutRegion } from '$lib/data/maps/triageTypes';
 
   const dispatch = createEventDispatcher<{
     zoomToExtraction: { globalX: number; globalY: number; globalW: number; globalH: number };
-    loaded: { extractions: EditableOcrExtraction[] };
+    loaded: { extractions: EditableOcrExtraction[]; groupingAvailable?: boolean };
     filter: { extractions: EditableOcrExtraction[] };
     select: { id: string };
     /** A job was chosen — fit the canvas to the part of the sheet it reads. */
@@ -50,18 +43,17 @@
   }>();
 
   export let mapId: string;
+  export let review: OcrReviewController;
   export let selectedId: string | null = null;
   /** The sheet's layout, so rows can be reviewed one job at a time. */
   export let regions: LayoutRegion[] = [];
   /** Which of the four jobs is open. Owned by the panel that draws the tabs. */
-  export let job: JobKey = 'names';
+  let job: JobKey | 'all' | 'custom' = 'all';
 
-  let extractions: EditableOcrExtraction[] = [];
+  $: extractions = $review.extractions.filter((r) => !r.text_group_id) as EditableOcrExtraction[];
   let loading = false;
   let error = '';
   let notice = '';
-  let statusCounts: Record<string, number> = {};
-  let availableRuns: string[] = [];
 
   const STATUSES: OcrStatus[] = ['pending', 'validated', 'rejected'];
   const titled = (v: string) => v.charAt(0).toUpperCase() + v.slice(1);
@@ -73,8 +65,7 @@
    * against, so the same label is not read twice.
    */
   const freshSelection = (): Selection => ({
-    status: ['pending'],
-    category: [...(JOBS.find((j) => j.key === job)?.cats ?? [])],
+    status: ['pending', 'validated'],
   });
   let selected: Selection = freshSelection();
   /** The settled search box. */
@@ -82,9 +73,8 @@
   let groupBy = '';
 
   $: filterRunId = selected.run?.[0] ?? '';
-  $: floorPct = Math.round(Number(selected.conf?.[0] ?? 0) * 100);
   /** What the chips go back to on reset — the open job's categories. */
-  $: defaults = { status: ['pending'], category: JOBS.find((j) => j.key === job)?.cats ?? [] };
+  const defaults = { status: ['pending', 'validated'] };
 
   $: facets = [
     {
@@ -107,10 +97,17 @@
     },
     {
       key: 'category',
-      label: 'Category',
+      label: 'Type',
       kind: 'many',
       color: (v) => CAT_COLORS[v],
-      value: reviewedCategory,
+      value: (r) => r._editCategory,
+    },
+    {
+      key: 'region',
+      label: 'Region',
+      kind: 'many',
+      value: (e) => regionOf(e, regions),
+      valueLabel: (v) => REGION_LABELS[v as keyof typeof REGION_LABELS] ?? v,
     },
     { key: 'run', label: 'Run', kind: 'one', values: availableRuns, value: (e) => e.run_id ?? '' },
     {
@@ -126,7 +123,7 @@
   ] satisfies Facet<EditableOcrExtraction>[];
 
   $: GROUPS = [
-    { key: 'category', label: 'Category', of: reviewedCategory },
+    { key: 'category', label: 'Type', of: (r: EditableOcrExtraction) => r._editCategory },
     // One status is one group; offer the grouping only when it can say something.
     ...((selected.status?.length ?? 0) === 1
       ? []
@@ -144,18 +141,13 @@
   ];
   $: grouper = GROUPS.find((g) => g.key === groupBy);
 
-  /** The server answers for status and run (it caps a page at 2000 rows); the rest is here. */
-  let loadedKey = '';
-  const fetchKey = () => `${selected.status?.join()}|${selected.run?.join()}`;
-  function onFacetChange(e: CustomEvent<{ key: string }>) {
-    if (e.detail.key === 'status' || e.detail.key === 'run') load();
-  }
-  function onReset() {
-    if (fetchKey() !== loadedKey) load();
-  }
-  /** The totals the server holds for the whole sheet — the loaded rows are only what is chosen. */
+  // All status/run filtering is local after one paged load of the sheet.
   $: totals = { status: statusCounts };
-
+  $: statusCounts = extractions.reduce<Record<string, number>>((counts, r) => {
+    counts[r.status] = (counts[r.status] ?? 0) + 1;
+    return counts;
+  }, {});
+  $: availableRuns = [...new Set(extractions.map((r) => r.run_id ?? '').filter(Boolean))].sort();
   /**
    * The sheet's own printed legend, used twice: to name the numeral in a row
    * (a bare `37` is unreviewable — 37 and 87 look identical in the table), and
@@ -167,12 +159,6 @@
 
   type SortKey = 'text' | 'category' | 'confidence' | 'cell' | 'n';
   let sort: { key: SortKey; asc: boolean } = { key: 'confidence', asc: false };
-
-  const onSort = (e: CustomEvent<{ key: string }>) => toggleSort(e.detail.key);
-
-  function toggleSort(key: string) {
-    sort = nextSort(sort, key as SortKey, (k) => k !== 'confidence');
-  }
 
   function sortValue(e: EditableOcrExtraction, key: SortKey): string | number | null {
     // Ordered the way the paper orders them: the legend prints by number, so a
@@ -186,37 +172,32 @@
     return e.confidence;
   }
 
-  /**
-   * Changing job reframes the canvas on the part of the sheet the job reads,
-   * starts the table in that job's own order, and puts the category chips back
-   * to the job's own set — they are a refinement inside a job, not the axis.
-   * Status, run and the confidence floor are the reviewer's, and stay.
-   *
-   * `openedJob` rather than a plain `$:` on `job`: the reviewer is free to sort
-   * and to uncheck a chip afterwards, and a reactive block that re-ran on any
-   * dependency would undo their choice under them.
-   *
-   * Keep this above `jobRows` and `sorted`. `applyJob` assigns `selected` and
-   * `sort` from inside a function, which `$:` ordering cannot see, so a
-   * statement placed after them runs them on the previous job's categories and
-   * nothing runs them again.
-   */
-  let openedJob: JobKey | '' = '';
-  $: if (job !== openedJob && extractions.length) applyJob();
-
-  function applyJob() {
-    openedJob = job;
-    const def = JOBS.find((j) => j.key === job);
-    if (!def) return;
-    sort = { ...def.sort };
-    selected = { ...selected, category: [...def.cats], suspect: [] };
-    dispatch('regionFocus', { bbox: jobBox(job, regions), printed: isPrintedJob(job) });
+  function choosePreset() {
+    if (job === 'custom') return;
+    query = '';
+    groupBy = '';
+    const recipes: Record<JobKey | 'all', { category: string[]; region: string[] }> = {
+      all: { category: [], region: [] },
+      names: {
+        category: ['street', 'place', 'hydrology', 'institution', 'building'],
+        region: ['map', 'off'],
+      },
+      index: { category: [], region: ['legend', 'names'] },
+      numbers: { category: ['legend_ref'], region: ['map', 'off'] },
+      other: { category: ['title', 'legend', 'legend_entry', 'other'], region: [] },
+    };
+    selected = { ...selected, ...recipes[job], suspect: [] };
+    sort =
+      job === 'all' ? { key: 'text', asc: true } : { ...JOBS.find((j) => j.key === job)!.sort };
+    dispatch('regionFocus', {
+      bbox: job === 'all' || job === 'names' ? null : jobBox(job, regions),
+      printed: job !== 'all' && isPrintedJob(job),
+    });
   }
-
   const searchText = (e: EditableOcrExtraction) => `${e._editText} ${e._editCategory}`;
 
   /** The open job's rows: the partition comes first, and the facets count inside it. */
-  $: jobRows = extractions.filter((e) => jobOf(e, regions) === job);
+  $: jobRows = extractions;
   $: sorted = applySort(
     filterRows(jobRows, facets, selected, { query, text: searchText }),
     sort,
@@ -253,11 +234,7 @@
       }))
     : [{ key: '', rows: shownRows, count: visible.length }];
 
-  $: jobHint = JOBS.find((j) => j.key === job)?.hint ?? '';
-  $: jobTally = jobCounts(extractions, regions);
-  $: dispatch('counts', jobTally);
-  /** The job's own row count, before the confidence floor and the chips. */
-  $: jobTotal = jobTally[job] ?? 0;
+  $: jobTotal = extractions.length;
 
   /**
    * The Index job is a table, so it is shown as one: the category dropdown and
@@ -265,7 +242,7 @@
    * paper prints beside it. It is also ordered the way it is printed, which is
    * how a reader would find a line in it.
    */
-  $: printedView = isPrintedJob(job);
+  $: printedView = job === 'index';
   /* The middle columns are the job's: the Index job reads a printed list, so it
      answers "which cell, which line"; every other job keeps only its category. */
   $: COLUMNS = [
@@ -276,7 +253,7 @@
           { key: 'cell', label: 'Cell', klass: 'col-cat' },
           { key: 'n', label: 'N', klass: 'col-conf num' },
         ]
-      : [{ key: 'category', label: 'Cat', klass: 'col-cat' }]),
+      : [{ key: 'category', label: 'Type', klass: 'col-cat' }]),
     { key: 'actions', label: '', klass: 'col-actions', srLabel: 'Verdict', sortable: false },
   ] satisfies TableColumn[];
 
@@ -296,145 +273,74 @@
   async function batchVerdict(status: 'validated' | 'rejected') {
     // A model pass is the unit that can be trusted or rolled back. Never let
     // the default "All runs" view silently make a batch decision across runs.
-    if (!filterRunId) return;
-    const ids = visible.filter((e) => e.status === 'pending').map((e) => e.id);
+    if (!filterRunId || saving) return;
+    const ids = visible.filter((e) => e._editStatus === 'pending').map((e) => e.id);
     if (!ids.length) return;
-    const verb = status === 'validated' ? 'Validate' : 'Reject';
-    if (
-      !confirm(
-        `${verb} ${ids.length} label${ids.length === 1 ? '' : 's'} from ${filterRunId} (confidence ≥ ${floorPct}%)?`
-      )
-    )
-      return;
-    loading = true;
-    error = '';
-    try {
-      const count = await batchSetStatus(mapId, ids, status);
-      lastBatch = { ids, status, count };
-      notice = `${status === 'validated' ? 'Validated' : 'Rejected'} ${count} label${count === 1 ? '' : 's'}.`;
-      await load();
-    } catch (e: any) {
-      error = e.message;
-    } finally {
-      loading = false;
-    }
+    for (const id of ids) stage(id, status);
+    lastBatch = { ids, status, count: ids.length };
+    notice = `Drafted ${ids.length} verdicts.`;
   }
-
-  /** The last batch verdict is an operation-level undo, never a broad time sweep. */
   let lastBatch: { ids: string[]; status: OcrStatus; count: number } | null = null;
-
-  async function undoBatch() {
+  function undoBatch() {
     if (!lastBatch) return;
-    loading = true;
-    error = '';
-    try {
-      const count = await batchSetStatus(mapId, lastBatch.ids, 'pending');
-      lastBatch = null;
-      notice = `Put ${count} label${count === 1 ? '' : 's'} back to pending.`;
-      setTimeout(() => (notice = ''), 4000);
-      await load();
-    } catch (e: any) {
-      error = e.message;
-    } finally {
-      loading = false;
-    }
+    for (const id of lastBatch.ids) stage(id, 'pending');
+    lastBatch = null;
   }
 
+  let loadGeneration = 0;
   export async function load() {
-    if (!mapId) return;
+    if (!mapId || $review.saving) return;
+    const requestedMap = mapId;
+    const generation = ++loadGeneration;
     loading = true;
     error = '';
     try {
-      // Pending is the default review queue. A reviewer can open history, or
-      // several statuses at once, or a single run, from the filters above.
-      loadedKey = fetchKey();
-      const page = await fetchExtractions(mapId, {
-        limit: 2000,
-        status: selected.status,
-        // `selected`, not `filterRunId`: that one is derived and has not caught up
-        // when a facet's change event calls this in the same tick.
-        runId: selected.run?.[0] ?? '',
-      });
-      statusCounts = page.statusCounts;
-      // eslint-disable-next-line svelte/infinite-reactive-loop
-      if (page.runIds.length) availableRuns = page.runIds;
-      // Drafts outlive a reload: a facet that re-queries must not eat unsaved
-      // work. A draft row the new page did not return stays, hidden by the same
-      // facets that hid it, and still counts toward Save.
-      const drafts = new Map(extractions.filter(isRowDirty).map((r) => [r.id, r]));
-      const fresh = withEditState(page.extractions).map((r) => drafts.get(r.id) ?? r);
-      // eslint-disable-next-line svelte/infinite-reactive-loop
-      extractions = [...fresh, ...[...drafts.values()].filter((r) => !fresh.includes(r))];
-      // Row element maps are keyed by extraction id — drop the stale keys.
+      const page = await fetchExtractions(requestedMap, { all: true });
+      if (generation !== loadGeneration || mapId !== requestedMap) return;
       inputEls = {};
       rowEls = {};
-      dispatch('loaded', { extractions });
+      review.loaded(
+        new CustomEvent('loaded', {
+          detail: {
+            extractions: [...page.extractions, ...(page.parts ?? [])],
+            groupingAvailable: page.groupingAvailable,
+          },
+        })
+      );
     } catch (e: any) {
-      error = e.message;
+      if (generation === loadGeneration) error = e.message;
     } finally {
-      loading = false;
+      if (generation === loadGeneration) loading = false;
     }
   }
-
-  // Reset run selection and reload when map changes.
-  //
-  // `load()` assigns `availableRuns`, but this statement only *reads* `mapId`,
-  // so `availableRuns` is not one of its dependencies and there is no loop.
   $: if (mapId) {
     selected = freshSelection();
-    availableRuns = [];
-    extractions = [];
-    // eslint-disable-next-line svelte/infinite-reactive-loop
+    job = 'all';
+    lastBatch = null;
     load();
   }
-
-  /**
-   * A verdict is a draft, like a text edit: it changes what the row shows and
-   * waits for Save. The row keeps its place in the list — `status` is still what
-   * the server holds, and the status facet reads that — so a pending row marked
-   * validated stays where it was, in green, instead of vanishing under the
-   * reviewer mid-pass.
-   */
   function stage(id: string, status: OcrStatus) {
-    extractions = extractions.map((r) => (r.id === id ? { ...r, _editStatus: status } : r));
+    review.stage(id, { _editStatus: status });
   }
-
-  $: dirtyCount = extractions.filter(isRowDirty).length;
-
-  let saving = false;
-  /** Every draft, in one go. A failure leaves the unsaved rows as drafts to try again. */
-  async function saveAll() {
-    if (saving || !dirtyCount) return;
-    saving = true;
-    error = '';
+  $: dirtyCount = $review.dirtyCount;
+  $: saving = $review.saving;
+  function saveAll() {
     notice = '';
-    const { saved, error: failed } = await saveDrafts(mapId, extractions);
-    ({ rows: extractions, statusCounts } = promoteSaved(
-      { rows: extractions, statusCounts },
-      saved
-    ));
-    if (failed) error = `${saved.size ? `Saved ${saved.size}, then: ` : ''}${failed}`;
-    else notice = `Saved ${saved.size} change${saved.size === 1 ? '' : 's'}.`;
-    saving = false;
+    lastBatch = null;
+    return review.saveAll();
   }
-
-  /** Throw the drafts away and read the rows as the server has them. */
   function discard() {
-    if (!confirm(`Discard ${dirtyCount} unsaved change${dirtyCount === 1 ? '' : 's'}?`)) return;
-    extractions = [];
-    return load();
+    if (confirm(`Discard ${dirtyCount} unsaved changes?`)) review.discard();
   }
 
   let inputEls: Record<string, HTMLInputElement> = {};
   let rowEls: Record<string, HTMLTableRowElement> = {};
 
   /** The full shortcut list is read once and then known — fold it away by default. */
-  let hintExpanded = false;
 
   /** Open one OCR pass — what "load run" on the Run step asks for. */
   export function showRun(runId: string) {
     selected = { ...selected, run: [runId] };
-    return load();
   }
 
   export function getRunId(): string {
@@ -472,15 +378,21 @@
   }
 </script>
 
-<!-- A reload or a close would otherwise take the drafts with it. -->
-<svelte:window
-  on:beforeunload={(e) => {
-    if (dirtyCount > 0) e.preventDefault();
-  }}
-/>
-
 <div class="sidebar-content">
   <div class="ocr-filters">
+    <select
+      class="text-preset"
+      aria-label="Text task preset"
+      bind:value={job}
+      on:change={choosePreset}
+    >
+      <option value="all">All text</option>
+      {#if job === 'custom'}<option value="custom">Custom filters</option>{/if}
+      <option value="names">Map labels</option>
+      <option value="index">Printed lists</option>
+      <option value="numbers">Numbers</option>
+      <option value="other">Sheet notes</option>
+    </select>
     <FacetFilters
       {facets}
       rows={jobRows}
@@ -492,8 +404,10 @@
       groups={GROUPS}
       bind:groupBy
       {totals}
-      on:change={onFacetChange}
-      on:reset={onReset}
+      on:change={(e) => {
+        if (e.detail.key === 'category' || e.detail.key === 'region') job = 'custom';
+      }}
+      on:reset={() => (job = 'all')}
     >
       <svelte:fragment slot="primary">
         <span class="shapes-count"
@@ -504,9 +418,9 @@
           class="sb-btn is-primary is-sm"
           on:click={saveAll}
           disabled={loading || saving || dirtyCount === 0}
-          title="Save every drafted edit and verdict at once"
+          title="Save all locally cached text, verdict, box and group drafts to the database"
         >
-          {saving ? 'Saving…' : `Save${dirtyCount > 0 ? ` (${dirtyCount})` : ''}`}
+          {saving ? 'Saving…' : `Save drafts${dirtyCount > 0 ? ` (${dirtyCount})` : ''}`}
         </button>
         {#if dirtyCount > 0}
           <button type="button" class="sb-btn is-ghost is-sm" on:click={discard} disabled={saving}>
@@ -517,8 +431,8 @@
           type="button"
           class="sb-btn is-icon"
           on:click={load}
-          disabled={loading}
-          title="Reload"
+          disabled={loading || saving}
+          title="Reload saved labels; keep local drafts"
         >
           <svg
             width="13"
@@ -535,7 +449,6 @@
         </button>
       </svelte:fragment>
       <svelte:fragment slot="more">
-        {#if jobHint}<p class="job-hint">{jobHint}</p>{/if}
         <OcrRunBar
           {pendingShown}
           {loading}
@@ -564,17 +477,17 @@
     </div>
   {/if}
 
-  {#if notice}
+  {#if $review.notice || notice}
     <div class="ocr-notice">
-      {notice}
+      {$review.notice || notice}
       {#if lastBatch}
         <button type="button" class="notice-undo" on:click={undoBatch}>Undo</button>
       {/if}
     </div>
   {/if}
 
-  {#if error}
-    <div class="ocr-error">{error}</div>
+  {#if error || $review.error}
+    <div class="ocr-error">{error || $review.error}</div>
   {/if}
 
   <!-- Table -->
@@ -596,12 +509,14 @@
             {reasons}
             {line}
             {printedView}
+            {saving}
             selected={ext.id === selectedId}
             bind:rowEl={rowEls[ext.id]}
             bind:inputEl={inputEls[ext.id]}
             on:select
             on:zoomToExtraction
-            on:edit={() => (extractions = extractions)}
+            on:edit={() =>
+              review.stage(ext.id, { _editText: ext._editText, _editCategory: ext._editCategory })}
             on:verdict={(e) => stage(ext.id, e.detail.status)}
           />
         {/each}
@@ -628,25 +543,13 @@
     </DataTable>
   {/if}
 
-  <div class="hint-bar">
-    <kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>v</kbd> validate · <kbd>x</kbd> reject
-    <button
-      type="button"
-      class="sb-btn is-icon is-ghost hint-toggle"
-      on:click={() => (hintExpanded = !hintExpanded)}
-      aria-expanded={hintExpanded}
-      aria-label={hintExpanded ? 'Hide more shortcuts' : 'Show more shortcuts'}
-      title="More shortcuts"
-    >
-      ?
-    </button>
-  </div>
-  {#if hintExpanded}
+  <details class="text-help">
+    <summary>Keyboard &amp; selection</summary>
     <div class="hint-bar">
-      Click row to select · double-click to zoom · <kbd>e</kbd> edit text ·
-      <kbd>,</kbd>/<kbd>.</kbd> turn label · <kbd>r</kbd> turn sheet
+      Click to select · Shift-click to group · j/k next/previous · e edit · v validate · x reject ·
+      ,/. turn box · r turn sheet. All edits are drafts until Save.
     </div>
-  {/if}
+  </details>
 </div>
 
 <style>
@@ -683,11 +586,24 @@
     border-bottom: var(--border-thin);
     flex-shrink: 0;
   }
-  .job-hint {
-    margin: 0 0 0.4rem;
+  .text-preset {
+    width: 100%;
+    font: inherit;
+    font-size: 0.75rem;
+    padding: 0.35rem;
+    margin-bottom: 0.5rem;
+    border: var(--sb-border);
+    border-radius: var(--sb-radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .text-help {
     font-size: 0.7rem;
-    line-height: 1.35;
+    padding: 0.45rem 0.75rem;
     color: var(--sb-text-meta);
+  }
+  .text-help summary {
+    cursor: pointer;
   }
   /* The printed index numbers itself 1..N with no gaps, so this one line is the
      whole quality report for a block — which reading 235 rows never gives you.
@@ -732,10 +648,6 @@
     cursor: pointer;
   }
   /* Sits inline with the compact hint line rather than on its own row. */
-  .hint-toggle {
-    margin-left: 0.35rem;
-    vertical-align: middle;
-  }
   .table-empty code {
     display: block;
     margin-top: 0.5rem;

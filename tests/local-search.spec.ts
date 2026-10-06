@@ -51,3 +51,16 @@ test('an empty or punctuation-only query keeps every row', () => {
   expect(matchesQuery(hue, '  ')).toBe(true);
   expect(matchesQuery(hue, '--')).toBe(true);
 });
+
+test('coverage names find a numbered sheet even when its title omits the province', () => {
+  const map = {
+    name: 'Sheet 5929-3',
+    year: 1965,
+    regions: ['Hồ Chí Minh', 'Long An'],
+    regions_2025: ['Hồ Chí Minh', 'Tây Ninh'],
+  };
+  expect(matchesQuery(map, 'ho chi minh 196')).toBe(true);
+  expect(matchesQuery(map, 'long an')).toBe(true);
+  expect(matchesQuery(map, 'tay ninh')).toBe(true);
+  expect(matchesQuery(map, 'ha noi')).toBe(false);
+});

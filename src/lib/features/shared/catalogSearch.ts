@@ -17,11 +17,14 @@ import { writable, derived, get, type Readable, type Writable } from 'svelte/sto
 import { browser } from '$app/environment';
 import { debounce } from '$lib/core/utils/debounce';
 import { matchesQuery } from './localSearch';
+import { coverageAreas } from '$lib/core/catalogAreas';
+import { geographicRegions } from '$lib/core/catalogRegions';
 import { matchesSeriesFacet } from '$lib/data/maps/seriesFacet';
 import {
   decadeBins,
   isSurvey,
   passArea,
+  passRegion,
   passInstitution,
   passKind,
   passType,
@@ -57,6 +60,8 @@ export interface CatalogSearchController {
   selected: Writable<Selected>;
   includeScout: Writable<boolean>;
   loading: Readable<boolean>;
+  /** True only after the latest archive-map read succeeded. */
+  mapsReady: Readable<boolean>;
   rawMaps: Readable<Row[]>;
   rawScout: Readable<Row[]>;
   filteredMaps: Readable<Row[]>;
@@ -73,6 +78,7 @@ export interface CatalogSearchController {
   total: Readable<{ maps: number; drafts: number; scout: number }>;
   /** Distinct areas/types present in the corpus, frequency-sorted (for dropdowns). */
   areaChoices: Readable<string[]>;
+  regionChoices: Readable<string[]>;
   typeChoices: Readable<string[]>;
   institutionChoices: Readable<string[]>;
   /** The surveys in the corpus, for a caller with no `map_series` read of its own. */
@@ -154,6 +160,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const selected = writable<Selected>({});
   const includeScout = writable(false);
   const loading = writable(false);
+  const mapsReady = writable(false);
   const rawMaps = writable<Row[]>([]);
   const rawScout = writable<Row[]>([]);
   const labels = writable<LabelHit[]>([]);
@@ -176,14 +183,17 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   function loadMaps(): Promise<void> {
     if (mapsLoaded) return mapsLoaded;
     mapsPending = true;
+    mapsReady.set(false);
     syncLoading();
     mapsLoaded = (async () => {
       try {
         const res = await fetch(`/api/search?include=maps&limit=${FETCH_LIMIT}`);
         if (!res.ok) throw new Error(await res.text());
         rawMaps.set((await res.json()).maps ?? []);
+        mapsReady.set(true);
       } catch (e) {
         mapsLoaded = null; // so the next keystroke tries again
+        mapsReady.set(false);
         console.error('catalog search failed:', e);
       } finally {
         mapsPending = false;
@@ -266,6 +276,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   // Every dimension, so a tally can skip its own: `passExcept(sel, 'area')` is "everything but area".
   const mapTests: Record<string, (r: Row, sel: Selected) => boolean> = {
     area: passArea,
+    region: passRegion,
     type: passType,
     series_key: passSeries,
     year: passYear,
@@ -282,7 +293,12 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
 
   const filteredScout = derived([rawScout, selected], ([$scout, $sel]) =>
     $scout.filter(
-      (r) => passArea(r, $sel) && passYear(r, $sel) && passScoutCat(r, $sel) && passStatus(r, $sel)
+      (r) =>
+        passArea(r, $sel) &&
+        passRegion(r, $sel) &&
+        passYear(r, $sel) &&
+        passScoutCat(r, $sel) &&
+        passStatus(r, $sel)
     )
   );
 
@@ -306,6 +322,10 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
 
       return {
         area: tally(but('area'), 'regions'),
+        region: tally(
+          but('region').map((r) => ({ ...r, geographic_regions: geographicRegions(r) })),
+          'geographic_regions'
+        ),
         map_type: tally(but('type'), 'map_type'),
         series_key: tally(but('series_key'), 'series_key'),
         institution: tally(but('institution'), 'holding_institution'),
@@ -326,7 +346,20 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     scout: $s.length,
   }));
 
-  const areaChoices = derived(searchedMaps, ($m) => distinct($m, 'regions', requireGeoref));
+  const areaChoices = derived(searchedMaps, ($m) =>
+    distinct(
+      $m.map((r) => ({ ...r, provinces: coverageAreas(r) })),
+      'provinces',
+      requireGeoref
+    )
+  );
+  const regionChoices = derived(searchedMaps, ($m) =>
+    distinct(
+      $m.map((r) => ({ ...r, geographic_regions: geographicRegions(r) })),
+      'geographic_regions',
+      requireGeoref
+    )
+  );
   const typeChoices = derived(searchedMaps, ($m) => distinct($m, 'map_type', requireGeoref));
   const institutionChoices = derived(searchedMaps, ($m) =>
     distinct($m, 'holding_institution', requireGeoref)
@@ -360,6 +393,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     selected,
     includeScout,
     loading,
+    mapsReady,
     rawMaps,
     rawScout,
     labels,
@@ -369,6 +403,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     facets,
     total,
     areaChoices,
+    regionChoices,
     typeChoices,
     institutionChoices,
     seriesChoices,

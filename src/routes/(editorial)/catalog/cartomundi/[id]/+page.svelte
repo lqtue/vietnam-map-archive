@@ -59,7 +59,7 @@
   />
 
   <main class="editorial-main">
-    <a class="back-link" href="/catalog/cartomundi">All CartoMundi series</a>
+    <a class="back-link" href="/catalog/institutions/cartomundi">All CartoMundi series</a>
 
     <section class="section-card" aria-labelledby="series-about">
       <div class="section-card-header">

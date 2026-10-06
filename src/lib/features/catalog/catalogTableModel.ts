@@ -9,6 +9,7 @@
  * `numeric` collation, which is now what every table gets.
  */
 import { statusOf } from '$lib/features/shared/catalogSearch';
+import { catalogAreaSummary } from '$lib/core/catalogAreas';
 import { applySort, type SortState } from '$lib/core/utils/tableSort';
 import { STATE_LABEL, overallState, type WorkFactsById } from '$lib/core/sheetWork';
 
@@ -46,7 +47,7 @@ export function keyOf(
   if (k === 'name') return item.name;
   if (k === 'year') return item.year;
   if (k === 'location') return item.location;
-  if (k === 'region') return item.regions?.join(', ') || item.region;
+  if (k === 'region') return catalogAreaSummary(item).primary;
   if (k === 'map_type') return item.map_type;
   if (k === 'collection') return item.collection;
   if (k === 'holding_institution') return item.holding_institution;

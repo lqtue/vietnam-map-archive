@@ -18,7 +18,9 @@
   way, and its summary carries how many are set.
 -->
 <script lang="ts">
-  import { t } from '$lib/core/i18n';
+  import { mapTypeLabel } from '$lib/core/mapTaxonomy';
+  import { t, locale } from '$lib/core/i18n';
+  import { CATALOG_REGIONS } from '$lib/core/catalogRegions';
   import Tabs from '$lib/ui/Tabs.svelte';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import FilterBar from './FilterBar.svelte';
@@ -46,6 +48,7 @@
   const {
     query,
     areaChoices,
+    regionChoices,
     typeChoices,
     institutionChoices,
     seriesChoices: corpusSeries,
@@ -78,7 +81,10 @@
 
   /** How many facets are set — the number on the summary. */
   $: activeFacets =
+    ($selected.kind?.length ? 1 : 0) +
+    ($selected.series_key?.length ? 1 : 0) +
     ($selected.area?.length ? 1 : 0) +
+    ($selected.region?.length ? 1 : 0) +
     ($selected.type?.length ? 1 : 0) +
     ($selected.institution?.length ? 1 : 0) +
     ($selected.year?.length ? 1 : 0);
@@ -99,39 +105,36 @@
   resettable={hasFilters}
   on:reset={resetFilters}
 >
-  <svelte:fragment slot="before">
-    <!-- One line: the kind switch and the survey select. -->
-    <div class="primary">
-      {#if hasKinds}
-        <div class="kinds">
-          <Tabs
-            tone="rail"
-            tabs={KINDS}
-            active={kind}
-            label={$t('Kind of map')}
-            on:change={(e) => setKind(e.detail.key)}
-          />
-        </div>
-      {/if}
-      {#if seriesOpts.length > 1}
-        <!-- Out of the disclosure: the survey is the archive's real structure, and the first thing a
-           reader narrows by. -->
-        <div class="dropdowns">
-          <select
-            value={$selected.series_key?.[0] ?? ''}
-            on:change={(e) =>
-              search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-            aria-label="Filter by series"
-          >
-            <option value="">{$t('All series')}</option>
-            {#each seriesOpts as s (s.value)}
-              <option value={s.value}>{s.label}</option>
-            {/each}
-          </select>
-        </div>
-      {/if}
-    </div>
-  </svelte:fragment>
+  <!-- All facets live in the Filters disclosure. -->
+  <div class="primary">
+    {#if hasKinds}
+      <div class="kinds">
+        <Tabs
+          tone="rail"
+          tabs={KINDS}
+          active={kind}
+          label={$t('Kind of map')}
+          on:change={(e) => setKind(e.detail.key)}
+        />
+      </div>
+    {/if}
+    {#if seriesOpts.length > 1}
+      <!-- Series is a filter here; the catalog's collection browser links to its full index. -->
+      <div class="dropdowns">
+        <select
+          value={$selected.series_key?.[0] ?? ''}
+          on:change={(e) =>
+            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
+          aria-label="Filter by series"
+        >
+          <option value="">{$t('All series')}</option>
+          {#each seriesOpts as s (s.value)}
+            <option value={s.value}>{s.label}</option>
+          {/each}
+        </select>
+      </div>
+    {/if}
+  </div>
   {#if $areaChoices.length}
     <select
       value={$selected.area?.[0] ?? ''}
@@ -141,9 +144,23 @@
         'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
       )}
     >
-      <option value="">{$t('All provinces')}</option>
+      <option value=""
+        >{$t('All provinces')} · {$locale === 'vi' ? 'trước 7/2025' : 'before July 2025'}</option
+      >
       {#each $areaChoices as a (a)}
         <option value={a}>{a}</option>
+      {/each}
+    </select>
+  {/if}
+  {#if $regionChoices.length}
+    <select
+      value={$selected.region?.[0] ?? ''}
+      on:change={(e) => search.setSingle('region', e.currentTarget.value)}
+      aria-label="Filter by geographic region"
+    >
+      <option value="">{$locale === 'vi' ? 'Tất cả vùng địa lý' : 'All geographic regions'}</option>
+      {#each CATALOG_REGIONS.filter( (region) => $regionChoices.includes(region.key) ) as region (region.key)}
+        <option value={region.key}>{region[$locale]}</option>
       {/each}
     </select>
   {/if}
@@ -155,7 +172,7 @@
     >
       <option value="">{$t('All types')}</option>
       {#each $typeChoices as t (t)}
-        <option value={t}>{t}</option>
+        <option value={t}>{mapTypeLabel(t, $locale)}</option>
       {/each}
     </select>
   {/if}
@@ -247,6 +264,7 @@
   .primary {
     display: flex;
     flex-wrap: wrap;
+    flex-basis: 100%;
     align-items: center;
     gap: 0.5rem;
   }

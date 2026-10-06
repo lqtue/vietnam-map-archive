@@ -97,7 +97,12 @@
 
     <section class="coverage">
       <p class="lead">
-        {#if known}
+        {#if counts.partial}
+          {$t(
+            'The archive holds {held} of {total} indexed city sheets. The full historical series total is not established.',
+            { held: counts.held, total: counts.total }
+          )}
+        {:else if known}
           {$t('The archive holds {held} of this survey’s {total} sheets — {pct}%.', {
             held: counts.held,
             total: counts.total,

@@ -1,3 +1,4 @@
+import { isPartialSeriesIndex } from '$lib/core/seriesIndexScope';
 import type { SeriesRef } from '$lib/map/stores/layersStore';
 import type { MapSeries } from '$lib/data/maps/types';
 
@@ -20,9 +21,8 @@ export interface SeriesRow {
    *
    * Undefined unless the survey's index has actually been imported. A
    * `map_series` row exists for every survey with georeferenced sheets, but
-   * `series_sheets` is seeded per survey by hand: AMS L909 has three sheets and
-   * no index, so its page is a 404, and offering a link to it from a row that
-   * works is worse than offering none. `surveySheets` is exactly that signal —
+   * `series_cells` is seeded per survey by hand; an unindexed survey has no
+   * coverage page. `surveySheets` is exactly that signal —
    * null means "not counted", which is the same thing as "no page".
    */
   seriesKey?: string;
@@ -79,7 +79,10 @@ export function buildSeriesRows(db: MapSeries[], canSeeDrafts: boolean): SeriesR
       parts: [{ kind: 'sheets', seriesKey: s.key, collection: s.collection }],
       bounds: s.bounds,
     },
-    label: count(s.sheets, s.surveySheets),
+    label:
+      isPartialSeriesIndex(s.key) && s.surveySheets
+        ? `${s.sheets} sheets · ${s.surveySheets} indexed cities`
+        : count(s.sheets, s.surveySheets),
     note: seriesNote(s, canSeeDrafts),
     seriesKey: s.surveySheets ? s.key : undefined,
   }));

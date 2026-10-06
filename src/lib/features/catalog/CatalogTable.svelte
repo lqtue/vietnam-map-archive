@@ -8,7 +8,9 @@
   a hand-built `<ul>`, until Sept 2026.
 -->
 <script lang="ts">
+  import { mapTypeLabel } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { catalogAreaSummary } from '$lib/core/catalogAreas';
   import { createEventDispatcher } from 'svelte';
   import type { MapListItem } from '$lib/data/maps/types';
   import { layersStore, toggleOverlayFor } from '$lib/map/stores/layersStore';
@@ -47,7 +49,7 @@
     { key: 'thumb', label: '', klass: 'thumb-col', srLabel: 'Thumbnail', sortable: false },
     { key: 'name', label: 'Title' },
     { key: 'year', label: 'Year', klass: 'num' },
-    { key: 'region', label: 'Area' },
+    { key: 'region', label: 'Province / city' },
     { key: 'collection', label: 'Series' },
     ...(staff
       ? [
@@ -106,6 +108,7 @@
         {/if}
         {#if g.label === null || !collapsed.has(g.label)}
           {#each g.rows as item (item.id)}
+            {@const area = catalogAreaSummary(item)}
             {@const isScout = (item as any)._table === 'scout'}
             {@const isOverlay = overlayMapIds.has(item.id)}
             {@const shareHref =
@@ -163,20 +166,23 @@
                     >
                   {/if}
                 </div>
-                {#if sheetOf(item) || item.location}
+                {#if sheetOf(item)}
                   <div class="sub">
                     {#if sheetOf(item)}<span class="sheet">{sheetOf(item)}</span>{/if}
-                    {item.location ?? ''}
                   </div>
                 {/if}
               </td>
               <td class="num">{item.year ?? '—'}</td>
-              <td class="area-col">{item.regions?.join(', ') || item.region || '—'}</td>
+              <td
+                class="area-col"
+                title={`${area.full} · province boundaries before July 2025`}
+                aria-label={area.full || '—'}>{area.label}</td
+              >
               <td title={item.collection || ''} class="collection-col">
                 {seriesShort(item.collection) || '—'}
               </td>
               {#if staff}
-                <td>{item.map_type || '—'}</td>
+                <td>{item.map_type ? mapTypeLabel(item.map_type) : '—'}</td>
                 <td class="status-col"><SheetStatus item={item as any} state={work[item.id]} /></td>
                 <td class="open-col">
                   {#if !isScout}<OpenInMenu mapId={item.id} />{/if}
@@ -210,6 +216,9 @@
     text-decoration: underline;
   }
   .area-col {
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--sb-text-meta);
     font-size: 0.85rem;

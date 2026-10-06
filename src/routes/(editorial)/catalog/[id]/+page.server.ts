@@ -40,7 +40,7 @@ import { verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 // (`map_images`, aliased back to `map_iiif_sources` below), and nothing
 // replaces the subject field.
 const MAP_COLUMNS =
-  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, location, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, duplicate_of_map_id, archive_reason, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type)';
+  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, map_subjects, depicted_state, classification_status, classification_note, classification_source_url, location, region, regions, regions_2025, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, duplicate_of_map_id, archive_reason, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type, content_role)';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const ref = decodeURIComponent(params.id);

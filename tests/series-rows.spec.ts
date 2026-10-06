@@ -70,3 +70,19 @@ test('every survey gets its own row', () => {
   expect(rows.map((r) => r.key)).toEqual(['series-l7014-vietnam-1-50-000', 'tonkin-25k']);
   expect(rows[1].label).toBe('53 of 76 sheets');
 });
+
+test('L909 links its partial index without promising full historical coverage', () => {
+  const [row] = buildSeriesRows(
+    [
+      series({
+        key: 'ams-l909-viet-nam-city-maps-1-12-500',
+        sheets: 3,
+        publishedSheets: 3,
+        surveySheets: 20,
+      }),
+    ],
+    false
+  );
+  expect(row.seriesKey).toBe('ams-l909-viet-nam-city-maps-1-12-500');
+  expect(row.label).toBe('3 sheets · 20 indexed cities');
+});

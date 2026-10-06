@@ -25,6 +25,7 @@
   import { debounce } from '$lib/core/utils/debounce';
   import { destinationsFor, matchDestinations, type Destination } from './paletteDestinations';
   import { placeHref } from '$lib/core/utils/placeKey';
+  import { trackMeasurement } from '$lib/data/measurement';
 
   /** Role of the signed-in visitor, or null. Gates which pages are offered. */
   export let role: string | null = null;
@@ -50,7 +51,7 @@
 
   type Row =
     | { kind: 'page'; href: string; title: string; sub: string }
-    | { kind: 'map'; href: string; title: string; sub: string }
+    | { kind: 'map'; href: string; title: string; sub: string; mapId: string }
     | { kind: 'place'; href: string; title: string; sub: string }
     | { kind: 'label'; href: string; title: string; sub: string; lettering: string };
 
@@ -86,6 +87,7 @@
     ...maps.map((m): Row => ({
       kind: 'map',
       href: exploreHref(m),
+      mapId: m.id,
       title: m.name,
       sub: m.year_label ?? (m.year ? String(m.year) : 'Undated'),
     })),
@@ -137,6 +139,16 @@
     searchError = '';
   }
 
+  function recordSearchCompleted(a: Answer, q: string) {
+    if (!q.trim() || query.trim() !== q.trim()) return;
+    trackMeasurement('search_completed', {
+      surface: 'palette',
+      workflow: 'search',
+      result_count: a.maps.length + a.places.length + a.labels.length + pages.length,
+      action: 'complete',
+    });
+  }
+
   const search = debounce(async (q: string) => {
     if (!q.trim()) {
       searchCtrl?.abort();
@@ -159,6 +171,7 @@
     if (hit) {
       searchCtrl = null;
       apply(hit);
+      recordSearchCompleted(hit, q);
       loading = false;
       return;
     }
@@ -179,6 +192,7 @@
       if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value as string);
       cache.set(q.trim(), answer);
       apply(answer);
+      if (searchCtrl === ctrl) recordSearchCompleted(answer, q);
     } catch (e: unknown) {
       // An abort is not a failure: a newer query took over and owns the UI.
       if ((e as { name?: string })?.name === 'AbortError') return;
@@ -227,6 +241,15 @@
 
   function choose(row: Row | undefined) {
     if (!row) return;
+    if (row.kind === 'map' || row.kind === 'place') {
+      trackMeasurement('search_result_open', {
+        surface: 'palette',
+        workflow: 'search',
+        result_kind: row.kind,
+        ...(row.kind === 'map' ? { map_id: row.mapId } : {}),
+        action: 'open',
+      });
+    }
     // Navigating away is its own focus change, so don't restore the opener here.
     closePalette();
     opener = null;

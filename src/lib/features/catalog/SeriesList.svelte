@@ -10,7 +10,7 @@
   the point: this band is the entry a crawler follows to the coverage pages, and
   cmd-click and middle-click keep working for a reader who wants the page rather
   than the summary. Only an unmodified left click is taken, to open the drawer.
-  A series with no index (AMS L909) has no coverage page — it 404s on purpose —
+  A series with no index has no coverage page — it 404s on purpose —
   so its row is a button that opens the drawer alone.
 -->
 <script lang="ts">

@@ -40,6 +40,17 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '7.5',
+    date: '2026-10-06',
+    headline: 'Clearer map classifications',
+    changes: [
+      'Map type, subject and geographic coverage are recorded separately, making river charts and administrative maps easier to distinguish from city plans.',
+      'Proposed designs and reverse-side index scans have their own labels. Original classifications and supporting notes are preserved for review.',
+      'Six uncertain originals remain flagged for closer examination of their legends.',
+      'The accompanying editor changes await deployment: long OCR labels wrap below the scan, and box captions no longer cover the original lettering.',
+    ],
+  },
+  {
     version: '7.4',
     date: '2026-09-15',
     headline: 'Every sheet is addressed by its name',

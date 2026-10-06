@@ -27,6 +27,7 @@
 
   export let ext: EditableOcrExtraction;
   export let selected = false;
+  export let saving = false;
   /** Index job: show the printed cell and number instead of category + confidence. */
   export let printedView = false;
   /** What the sheet's own legend says this numeral names, if it names one. */
@@ -77,9 +78,9 @@
     {:else}
       <span
         class="dot"
-        class:dot--dirty={isRowDirty(ext)}
+        class:dot--dirty={isRowDirty(ext) || ext._draft}
         style="background:{STATUS_COLORS[ext._editStatus]}"
-        title={isRowDirty(ext) ? `${ext._editStatus} · unsaved` : ext.status}
+        title={isRowDirty(ext) || ext._draft ? `${ext._editStatus} · unsaved` : ext.status}
       ></span>
     {/if}
   </td>
@@ -90,6 +91,8 @@
       bind:value={ext._editText}
       bind:this={inputEl}
       placeholder="Text…"
+      disabled={saving}
+      on:input={() => dispatch('edit')}
       title={ext._editText}
       on:blur={() => dispatch('edit')}
       on:keydown={(e) => {
@@ -122,7 +125,8 @@
           class="cell-select"
           bind:value={ext._editCategory}
           on:change={() => dispatch('edit')}
-          aria-label="Category"
+          aria-label="Label type"
+          disabled={saving}
         >
           {#each OCR_CATEGORIES as cat (cat)}
             <option value={cat}>{cat}</option>
@@ -157,6 +161,7 @@
     {:else}
       <button
         type="button"
+        disabled={saving}
         class="row-action validate-action"
         on:click={() =>
           dispatch('verdict', {
@@ -178,6 +183,7 @@
       </button>
       <button
         type="button"
+        disabled={saving}
         class="row-action reject-action"
         on:click={() =>
           dispatch('verdict', { status: ext._editStatus === 'rejected' ? 'pending' : 'rejected' })}

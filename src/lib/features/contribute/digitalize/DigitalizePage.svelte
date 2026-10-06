@@ -28,6 +28,7 @@
   import ImageShell from '$lib/map/shell/ImageShell.svelte';
   import OcrSidebar from '$lib/features/contribute/ocr/OcrSidebar.svelte';
   import OcrBboxTool from '$lib/features/contribute/ocr/OcrBboxTool.svelte';
+  import TextGroupPanel from '$lib/features/contribute/ocr/TextGroupPanel.svelte';
   import BboxPanel from '$lib/features/contribute/ocr/BboxPanel.svelte';
   import TriageTool from '$lib/features/contribute/digitalize/TriageTool.svelte';
   import RegionsTool from '$lib/features/contribute/digitalize/RegionsTool.svelte';
@@ -135,6 +136,7 @@
   let bboxPanel: BboxPanel | undefined;
   const review = createOcrReview({
     getMapId: () => currentMap?.id ?? null,
+    getUserId: () => $page.data.user?.id ?? null,
     getRunId: () => ocrSidebar?.getRunId?.() ?? 'manual',
     reload: () => ocrSidebar?.load?.(),
     focusRow: (id, focusInput) => ocrSidebar?.focusRow?.(id, focusInput),
@@ -142,7 +144,12 @@
     panTo,
     setRowStatus: (id, status) => ocrSidebar?.setRowStatus?.(id, status),
   });
+  onDestroy(review.destroy);
   $: selectedExtraction = $review.extractions.find((e) => e.id === $review.selectedId) ?? null;
+
+  $: selectedExtractions = $review.selectedIds
+    .map((id) => $review.extractions.find((r) => r.id === id))
+    .filter((r): r is NonNullable<typeof r> => !!r);
 
   function fitTo(x: number, y: number, w: number, h: number) {
     map?.getView().fit(toOlExtent(x, y, w, h), { padding: [100, 100, 100, 100], duration: 400 });
@@ -305,7 +312,7 @@
   }
 
   async function selectMap(m: LabelMapInfo) {
-    if (currentMap?.id === m.id) return;
+    if (currentMap?.id === m.id || $review.saving) return;
     currentMap = m;
     iiifInfoUrl = null;
     imgWidth = 0;
@@ -454,7 +461,13 @@
   }
 </script>
 
-<svelte:window on:keydown={onKeydown} />
+<svelte:window
+  on:keydown={onKeydown}
+  on:beforeunload={(e) => {
+    review.persist();
+    if ($review.dirtyCount > 0) e.preventDefault();
+  }}
+/>
 <svelte:head>
   <title>{currentMap ? `${currentMap.name} — ${modeTitle}` : modeTitle} — Vietnam Map Archive</title
   >
@@ -494,6 +507,7 @@
         bind:triage
         {run}
         bind:ocrSidebar
+        {review}
         selectedId={$review.selectedId}
         onCollapse={() => (rightSidebarCollapsed = true)}
         {savedTriage}
@@ -548,9 +562,11 @@
           <OcrBboxTool
             extractions={$review.extractions}
             selectedId={$review.selectedId}
+            selectedIds={$review.selectedIds}
             filteredIds={$review.visibleIds}
             isolationMode={$review.isolationMode}
             drawMode={$review.drawMode}
+            saving={$review.saving}
             visible={showBoxes}
             on:select={review.select}
             on:edit={review.edit}
@@ -559,18 +575,31 @@
         {/if}
       </ImageShell>
 
-      {#if mode === 'text' && $review.error}
+      {#if mode === 'text' && $review.error && rightSidebarCollapsed}
         <div class="ocr-error-toast">{$review.error}</div>
       {/if}
 
-      {#if mode === 'text' && selectedExtraction}
+      {#if mode === 'text' && selectedExtractions.length > 1}
+        {#key $review.selectedIds.join('|')}
+          <TextGroupPanel
+            extractions={selectedExtractions}
+            available={$review.groupingAvailable}
+            saving={$review.saving}
+            on:group={review.group}
+            on:close={review.deselect}
+          />
+        {/key}
+      {:else if mode === 'text' && selectedExtraction}
         <BboxPanel
           bind:this={bboxPanel}
           extraction={selectedExtraction}
           saving={$review.saving}
+          on:draft={review.save}
           on:save={review.save}
           on:rotate={(e) => review.turnSelected(e.detail.deg)}
           on:close={review.deselect}
+          on:ungroup={review.ungroup}
+          on:duplicate={review.duplicate}
         />
       {/if}
     {:else if !currentMap}
@@ -604,6 +633,15 @@
       {mode}
       drawMode={$review.drawMode}
       isolationMode={$review.isolationMode}
+      selectedText={selectedExtractions.length > 1
+        ? selectedExtractions
+            .map((row) => row._editText ?? row.text_validated ?? row.text)
+            .join(' ')
+        : selectedExtraction
+          ? (selectedExtraction._editText ??
+            selectedExtraction.text_validated ??
+            selectedExtraction.text)
+          : null}
       {rotationDeg}
       on:toggleDraw={toggleDraw}
       on:toggleIsolation={review.toggleIsolation}

@@ -3,41 +3,9 @@ import type { RequestHandler } from './$types';
 import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { assertUuid, dbError } from '$lib/server/http';
-import { bboxCentre, pointEwkt, resolveMapWarp, type MapWarp } from '$lib/server/warp';
-
-/**
- * The bbox centre warped into the place-time index (migration 066). Shared by
- * the manual-box POST and the coordinate-editing PATCH, because a box that is
- * dragged somewhere else is somewhere else on the ground too.
- */
-async function warpFields(
-  supabase: ReturnType<typeof adminClient>,
-  mapId: string,
-  coords: {
-    global_x?: number | null;
-    global_y?: number | null;
-    global_w?: number | null;
-    global_h?: number | null;
-  }
-): Promise<{ geom: string | null; geom_src: string | null; geom_rmse: number | null }> {
-  const centre = bboxCentre(coords);
-  if (!centre) return { geom: null, geom_src: null, geom_rmse: null };
-  const { data: map } = await supabase
-    .from('maps')
-    .select('allmaps_id, annotation_url')
-    .eq('id', mapId)
-    .single();
-  const warp: MapWarp | null = map
-    ? await resolveMapWarp(map.allmaps_id, map.annotation_url)
-    : null;
-  const geom = warp ? pointEwkt(warp, centre) : null;
-  return {
-    geom,
-    geom_src: geom ? warp!.src : null,
-    geom_rmse: geom ? warp!.rmse : null,
-  };
-}
-import { bulkSetStatus, isOcrReviewStatus } from '$lib/server/ocrReview';
+import { bulkSetStatus, isOcrReviewStatus, warpFields } from '$lib/server/ocrReview';
+import { textGroupsAvailable } from '$lib/server/textGroups';
+import type { OcrExtraction } from '$lib/features/contribute/shared/types';
 import type { Database } from '$lib/data/supabase/types';
 
 /**
@@ -76,10 +44,14 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
   await requireRole(locals);
   const mapId = assertUuid(params.id, 'map id');
   const supabase = adminClient();
-  const runId = url.searchParams.get('run_id');
-  const statuses = (url.searchParams.get('status') ?? '').split(',').filter(isOcrReviewStatus);
+  const groupingAvailable = await textGroupsAvailable(supabase);
+  const all = url.searchParams.get('all') === 'true';
+  const runId = all ? null : url.searchParams.get('run_id');
+  const statuses = all
+    ? []
+    : (url.searchParams.get('status') ?? '').split(',').filter(isOcrReviewStatus);
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '200'), 2000);
-  const offset = parseInt(url.searchParams.get('offset') ?? '0');
+  const offset = all ? 0 : parseInt(url.searchParams.get('offset') ?? '0');
 
   const rows = await pageAll(
     (from, to) => {
@@ -89,7 +61,8 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
           // Client-side field names stay `text_validated`/`category_validated`/
           // `status`/`validated_at` (the OCR review UI's own vocabulary) — only
           // the columns they read from renamed (mig 095).
-          'id, run_id, tile_x, tile_y, tile_w, tile_h, global_x, global_y, global_w, global_h, category, text, text_validated:text_corrected, category_validated:category_corrected, confidence, rotation_deg, label_w, label_h, notes, status:review_status, validated_at:reviewed_at, model, prompt'
+          'id, run_id, tile_x, tile_y, tile_w, tile_h, global_x, global_y, global_w, global_h, category, text, text_validated:text_corrected, category_validated:category_corrected, confidence, rotation_deg, label_w, label_h, notes, status:review_status, validated_at:reviewed_at, model, prompt' +
+            (groupingAvailable ? ',is_text_group,text_group_id,text_group_order' : '')
         )
         .eq('map_id', mapId)
         .order('category', { ascending: true })
@@ -99,33 +72,67 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
         // pages would drop rows and repeat others. id is the stable tiebreak.
         .order('id', { ascending: true })
         .range(offset + from, offset + to);
+      if (groupingAvailable) q = q.is('text_group_id', null);
       if (runId) q = q.eq('run_id', runId);
       if (statuses.length) q = q.in('review_status', statuses);
-      return q;
+      return q.returns<OcrExtraction[]>();
     },
-    limit,
+    all ? Infinity : limit,
     'Could not read OCR extractions'
   );
 
   // Counts and run ids describe the whole sheet, so they need every row, not the
   // page above. Two small columns, paged the same way.
-  const meta = await pageAll(
-    (from, to) =>
-      supabase
-        .from('ocr_labels')
-        .select('status:review_status, run_id')
-        .eq('map_id', mapId)
-        .range(from, to),
-    Infinity,
-    'Could not count OCR extractions'
-  );
+  const meta = all
+    ? rows
+    : await pageAll(
+        (from, to) => {
+          let q = supabase
+            .from('ocr_labels')
+            .select('status:review_status, run_id')
+            .eq('map_id', mapId);
+          if (groupingAvailable) q = q.is('text_group_id', null);
+          return q.range(from, to);
+        },
+        Infinity,
+        'Could not count OCR extractions'
+      );
 
   const statusCounts: Record<string, number> = {};
   for (const row of meta) statusCounts[row.status] = (statusCounts[row.status] ?? 0) + 1;
 
   const runIds = [...new Set(meta.map((r) => r.run_id))].sort();
 
-  return json({ extractions: rows, total: meta.length, statusCounts, runIds });
+  const groupIds = rows.filter((r) => r.is_text_group).map((r) => r.id);
+  // Keep each PostgREST URL below typical proxy limits even on a sheet with
+  // hundreds of groups. Members still page independently of the root query.
+  const partPages = await Promise.all(
+    Array.from({ length: Math.ceil(groupIds.length / 100) }, (_, i) =>
+      pageAll(
+        (from, to) =>
+          supabase
+            .from('ocr_labels')
+            .select(
+              'id, run_id, tile_x, tile_y, tile_w, tile_h, global_x, global_y, global_w, global_h, category, text, text_validated:text_corrected, category_validated:category_corrected, confidence, rotation_deg, label_w, label_h, is_text_group, text_group_id, text_group_order, status:review_status'
+            )
+            .eq('map_id', mapId)
+            .in('text_group_id', groupIds.slice(i * 100, (i + 1) * 100))
+            .order('id')
+            .range(from, to),
+        Infinity,
+        'Could not read grouped boxes'
+      )
+    )
+  );
+  const parts = partPages.flat();
+  return json({
+    extractions: rows,
+    parts,
+    total: meta.length,
+    statusCounts,
+    runIds,
+    groupingAvailable,
+  });
 };
 
 /** POST /api/admin/maps/[id]/ocr-review
@@ -218,6 +225,27 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     throw error(400, 'status must be validated, rejected, or pending');
   }
 
+  const groupingAvailable = await textGroupsAvailable(adminClient());
+  if (groupingAvailable) {
+    const { data: target, error: targetError } = await adminClient()
+      .from('ocr_labels')
+      .select('text_group_id, is_text_group')
+      .eq('id', extractionId)
+      .eq('map_id', mapId)
+      .single();
+    if (targetError || !target) throw error(404, 'Label not found');
+    if (target.text_group_id)
+      throw error(409, 'Ungroup this label before editing its original boxes');
+    if (
+      target.is_text_group &&
+      [global_x, global_y, global_w, global_h, rotation_deg, label_w, label_h].some(
+        (v) => v !== undefined
+      )
+    ) {
+      throw error(409, 'A group keeps the geometry of its original boxes');
+    }
+  }
+
   // Corrections are plain column writes; the status transition is not, because
   // it carries the reviewed_at/reviewed_by stamp — that lives in the RPC.
   const update: Database['public']['Tables']['ocr_labels']['Update'] = {};
@@ -257,12 +285,15 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
   }
 
   if (Object.keys(update).length) {
-    const { error: err } = await supabase
+    let query = supabase
       .from('ocr_labels')
       .update(update)
       .eq('id', extractionId)
       .eq('map_id', mapId);
+    if (groupingAvailable) query = query.is('text_group_id', null);
+    const { data: changed, error: err } = await query.select('id').maybeSingle();
     if (err) dbError(err, 'Could not update extraction');
+    if (!changed) throw error(409, 'Label changed or was grouped; reload and try again');
   }
 
   if (status !== undefined) {

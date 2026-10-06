@@ -1,3 +1,4 @@
+import { isPartialSeriesIndex } from '$lib/core/seriesIndexScope';
 /**
  * seriesIndex.ts — the surveys the archive holds part of, and how much of each.
  *
@@ -54,7 +55,7 @@ export async function fetchSeriesIndex(
   supabase: SupabaseClient<Database>
 ): Promise<SeriesIndexEntry[]> {
   const all = await fetchMapSeries(supabase);
-  /* Every series with a published sheet. One whose index was never imported (AMS L909) has no
+  /* Every series with a published sheet. One whose index was never imported (a newly added survey) has no
      coverage page — that route 404s on purpose — so `hasDenominator` is false for it and the band
      opens its drawer instead of linking. It gets a coverage page the moment someone imports its
      index. */
@@ -121,7 +122,7 @@ export async function fetchSeriesIndex(
       itemLinkedPrintings: availabilityByKey.get(s.key)?.itemLinked ?? 0,
       knownPrintings: availabilityByKey.get(s.key)?.known ?? 0,
       bounds: s.bounds,
-      index,
+      index: isPartialSeriesIndex(s.key) ? { ...index, partial: true } : index,
     };
   });
 }

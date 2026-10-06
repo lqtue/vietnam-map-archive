@@ -35,6 +35,7 @@
   import ReviewSidebar from '$lib/features/contribute/review/ReviewSidebar.svelte';
   import '$styles/layouts/tool-page.css';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { trackMeasurement } from '$lib/data/measurement';
   import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
   import { createTrace } from './traceData';
   import { createReviewQueue, type Verdict } from '$lib/features/contribute/review/reviewQueue';
@@ -126,6 +127,13 @@
   async function selectMap(m: LabelMapInfo) {
     if (currentMap?.id === m.id) return;
     currentMap = m;
+    trackMeasurement('contribution_open', {
+      surface: 'scan',
+      workflow: 'shapes',
+      map_id: m.id,
+      mode: 'shapes',
+      action: 'open',
+    });
     iiifInfoUrl = null;
     trace.reset();
     queue.reset();

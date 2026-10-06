@@ -1,5 +1,8 @@
 export type OcrExtraction = {
   id: string;
+  is_text_group?: boolean;
+  text_group_id?: string | null;
+  text_group_order?: number | null;
   tile_x: number;
   tile_y: number;
   tile_w: number;
@@ -29,6 +32,8 @@ export type OcrExtraction = {
   /** A verdict not yet saved — `status` stays what the server holds until it is. */
   _editStatus?: 'pending' | 'validated' | 'rejected';
   _saving?: boolean;
+  /** Any local change, including geometry or group membership. */
+  _draft?: boolean;
 };
 
 /** An extraction whose client-side edit buffer has been seeded (see `withEditState`). */

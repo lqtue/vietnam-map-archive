@@ -1,5 +1,6 @@
 import { derived, get, writable } from 'svelte/store';
 import { vi } from './vi';
+import { CATALOG_AREAS } from '../catalogAreas';
 
 export type Locale = 'en' | 'vi';
 
@@ -110,6 +111,14 @@ export const LOCALIZED_PATHS = [
   '/contribute/georef',
   '/directory',
 ];
+
+/** Translated collections are enumerated separately: only populated areas enter the sitemap. */
+export function isLocalizedPath(path: string): boolean {
+  return (
+    LOCALIZED_PATHS.includes(path) ||
+    CATALOG_AREAS.some((area) => path === `/catalog/area/${area.slug}`)
+  );
+}
 
 /** `/vi/about` → `/about`, `/vi` → `/`. Any other path is returned unchanged. */
 export function stripLocale(pathname: string): string {

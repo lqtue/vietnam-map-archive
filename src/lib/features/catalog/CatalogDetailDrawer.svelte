@@ -4,7 +4,10 @@
   Open by setting `item`; close fires `close` event (parent should null out the binding).
 -->
 <script lang="ts">
+  import { trackMeasurement } from '$lib/data/measurement';
+  import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import { mapHref, exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
@@ -74,8 +77,24 @@
         ['Creator', shown.creator],
         ['Publisher', shown.dc_publisher],
         ['Year', shown.year_label || shown.year],
-        ['Area', shown.location],
-        ['Type', shown.map_type],
+        [
+          'Geographic regions',
+          geographicRegions(shown)
+            .map((key) => CATALOG_REGIONS.find((region) => region.key === key)?.en)
+            .join(', '),
+        ],
+        [
+          'Provinces / cities (before July 2025)',
+          (shown.regions?.length ? shown.regions : [shown.region]).filter(Boolean).join(', '),
+        ],
+        ['Type', shown.map_type ? mapTypeLabel(shown.map_type) : null],
+        [
+          'Subjects',
+          shown.map_subjects
+            ?.map((key: string) => MAP_SUBJECTS.find((subject) => subject.key === key)?.en ?? key)
+            .join(', '),
+        ],
+        ['Depicted state', shown.depicted_state === 'unknown' ? null : shown.depicted_state],
         ['Collection', shown.collection],
         ['Holding institution', shown.holding_institution],
         ['Shelfmark', shown.shelfmark],
@@ -122,7 +141,17 @@
           <dt>{k}</dt>
           <dd>
             {#if k === 'Source URL'}
-              <a href={v} target="_blank" rel="noopener">{v}</a>
+              <a
+                href={v}
+                target="_blank"
+                rel="noopener"
+                on:click={() =>
+                  trackMeasurement('source_open', {
+                    surface: 'catalog',
+                    map_id: item.id,
+                    action: 'open',
+                  })}>{v}</a
+              >
             {:else}
               {v}
             {/if}

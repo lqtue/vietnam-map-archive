@@ -126,7 +126,8 @@
 
     <NavDropdown label="Tools" active={activeTools}>
       <a href="/explore" class="dropdown-item" on:click={closeDrawer}>{$t('Map viewer')}</a>
-      <a href="/catalog/cartomundi" class="dropdown-item" on:click={closeDrawer}>CartoMundi index</a
+      <a href="/catalog/institutions" class="dropdown-item" on:click={closeDrawer}
+        >{$t('Institution catalog')}</a
       >
       <a href="/explore?mode=story" class="dropdown-item" on:click={closeDrawer}
         >{$t('Story Builder')}</a
@@ -149,13 +150,16 @@
       >
 
       {#if isStaff}
+        <a href="/scan?mode=legend" class="dropdown-item" on:click={closeDrawer}
+          >{$t('Place the legend')}</a
+        >
+      {/if}
+
+      {#if isStaff}
         <span class="dropdown-rule" role="separator"></span>
         <a href="/scan?mode=shapes&amp;tab=validate" class="dropdown-item" on:click={closeDrawer}>
           {$t('Review queue')}
         </a>
-        <a href="/scan?mode=legend" class="dropdown-item" on:click={closeDrawer}
-          >{$t('Place the legend')}</a
-        >
         <a href="/admin?tab=status" class="dropdown-item" on:click={closeDrawer}
           >{$t('Admin console')}</a
         >
@@ -296,7 +300,9 @@
 
     <nav class="drawer-nav">
       <a href="/catalog" class="drawer-link" on:click={closeDrawer}>{$t('Catalog')}</a>
-      <a href="/catalog/cartomundi" class="drawer-link" on:click={closeDrawer}>CartoMundi index</a>
+      <a href="/catalog/institutions" class="drawer-link" on:click={closeDrawer}
+        >{$t('Institution catalog')}</a
+      >
       <a href="/about" class="drawer-link" on:click={closeDrawer}>{$t('About')}</a>
       <a href="/blog" class="drawer-link" on:click={closeDrawer}>{$t('Blog')}</a>
 
@@ -320,13 +326,16 @@
       <a href="/scan?mode=shapes" class="drawer-link" on:click={closeDrawer}>{$t('Draw shapes')}</a>
 
       {#if isStaff}
+        <a href="/scan?mode=legend" class="drawer-link" on:click={closeDrawer}
+          >{$t('Place the legend')}</a
+        >
+      {/if}
+
+      {#if isStaff}
         <p class="drawer-section-label">{$t('Staff')}</p>
         <a href="/scan?mode=shapes&amp;tab=validate" class="drawer-link" on:click={closeDrawer}>
           {$t('Review queue')}
         </a>
-        <a href="/scan?mode=legend" class="drawer-link" on:click={closeDrawer}
-          >{$t('Place the legend')}</a
-        >
         <a href="/admin?tab=status" class="drawer-link" on:click={closeDrawer}
           >{$t('Admin console')}</a
         >

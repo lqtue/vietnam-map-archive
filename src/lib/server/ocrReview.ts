@@ -7,7 +7,9 @@
  * client write cannot skip it. What is left here is argument shaping.
  */
 
+import { textGroupsAvailable } from './textGroups';
 import { adminClient } from './supabaseAdmin';
+import { bboxCentre, pointEwkt, resolveMapWarp, type MapWarp } from './warp';
 
 export const OCR_REVIEW_STATUSES = ['validated', 'rejected', 'pending'] as const;
 export type OcrReviewStatus = (typeof OCR_REVIEW_STATUSES)[number];
@@ -42,14 +44,18 @@ export async function bulkSetStatus(opts: {
 }
 
 /** Rows this user validated on this map inside the window. */
-function recentQuery(mapId: string, userId: string, threshold: string) {
-  return adminClient()
+async function recentQuery(mapId: string, userId: string, threshold: string) {
+  const db = adminClient();
+  const available = await textGroupsAvailable(db);
+  let q = db
     .from('ocr_labels')
     .select('id', { count: 'exact' })
     .eq('map_id', mapId)
     .eq('review_status', 'validated')
     .eq('reviewed_by', userId)
     .gt('reviewed_at', threshold);
+  if (available) q = q.is('text_group_id', null);
+  return await q;
 }
 
 /** How many of this user's validations on this map fall inside the window. */
@@ -68,4 +74,37 @@ export async function revertRecentValidations(mapId: string, userId: string, win
   });
 
   return { error, count: data ?? 0, threshold: revertThreshold(windowMins) };
+}
+
+/**
+ * The bbox centre warped into the place-time index (migration 066). Shared by
+ * the manual-box POST and the coordinate-editing PATCH, because a box that is
+ * dragged somewhere else is somewhere else on the ground too.
+ */
+export async function warpFields(
+  supabase: ReturnType<typeof adminClient>,
+  mapId: string,
+  coords: {
+    global_x?: number | null;
+    global_y?: number | null;
+    global_w?: number | null;
+    global_h?: number | null;
+  }
+): Promise<{ geom: string | null; geom_src: string | null; geom_rmse: number | null }> {
+  const centre = bboxCentre(coords);
+  if (!centre) return { geom: null, geom_src: null, geom_rmse: null };
+  const { data: map } = await supabase
+    .from('maps')
+    .select('allmaps_id, annotation_url')
+    .eq('id', mapId)
+    .single();
+  const warp: MapWarp | null = map
+    ? await resolveMapWarp(map.allmaps_id, map.annotation_url)
+    : null;
+  const geom = warp ? pointEwkt(warp, centre) : null;
+  return {
+    geom,
+    geom_src: geom ? warp!.src : null,
+    geom_rmse: geom ? warp!.rmse : null,
+  };
 }

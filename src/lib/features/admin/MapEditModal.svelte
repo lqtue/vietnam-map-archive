@@ -34,6 +34,10 @@
   let dc_publisher = map.publisher || '';
   let location = map.location || '';
   let map_type = map.map_type || '';
+  let map_subjects = map.map_subjects ?? [];
+  let depicted_state = map.depicted_state ?? 'unknown';
+  let classification_note = map.classification_note ?? '';
+  let classification_source_url = map.classification_source_url ?? '';
   let dc_description = map.description || '';
   let physical_description = map.physical_description || '';
   let language = map.language || '';
@@ -144,6 +148,10 @@
         dc_publisher,
         location,
         map_type,
+        map_subjects,
+        depicted_state,
+        classification_note,
+        classification_source_url,
         dc_description,
         physical_description,
         language,
@@ -266,6 +274,10 @@
           bind:dc_publisher
           bind:location
           bind:map_type
+          bind:map_subjects
+          bind:depicted_state
+          bind:classification_note
+          bind:classification_source_url
           bind:dc_description
           bind:physical_description
           bind:language

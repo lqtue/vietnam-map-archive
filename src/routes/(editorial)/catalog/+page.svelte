@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t, splitHighlight } from '$lib/core/i18n';
+  import { t, locale, splitHighlight } from '$lib/core/i18n';
   import { onMount } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole } from '$lib/data/supabase/role';
@@ -126,25 +126,60 @@
       {/if}
     </label>
 
-    <!-- Above the results, and only at rest. A survey is a coarser thing than a
-         sheet and belongs in front of the list rather than inside it; but once
-         a reader has typed or filtered, it is three cards between them and
-         what they asked for. -->
-    {#if atRest && series.length}
-      <section class="series-band" aria-labelledby="series-band-title">
-        <h2 id="series-band-title" class="band-title">{$t('Browse by series')}</h2>
-        <SeriesList {series} on:open={(e) => (openedSeries = e.detail)} />
-      </section>
+    {#if atRest && (series.length || data.areas.length || data.regions.length)}
+      <details class="collection-browser">
+        <summary>{$locale === 'vi' ? 'Khám phá bộ sưu tập' : 'Browse collections'}</summary>
+        <div class="collection-content">
+          {#if series.length}
+            <section class="series-band" aria-labelledby="series-band-title">
+              <h2 id="series-band-title" class="band-title">{$t('Browse by series')}</h2>
+              <SeriesList {series} on:open={(e) => (openedSeries = e.detail)} />
+            </section>
+          {/if}
+
+          {#if data.areas.length}
+            <section class="coverage-band" aria-labelledby="area-band-title">
+              <h2 id="area-band-title" class="band-title">Browse by area</h2>
+              <div class="area-links">
+                {#each data.areas as area (area.slug)}
+                  <a href={`${$locale === 'vi' ? '/vi' : ''}/catalog/area/${area.slug}`}
+                    >{area[$locale].label} ({area.count})</a
+                  >
+                {/each}
+              </div>
+            </section>
+          {/if}
+
+          {#if data.regions.length}
+            <section class="coverage-band" aria-labelledby="region-band-title">
+              <h2 id="region-band-title" class="band-title">
+                {$locale === 'vi' ? 'Khám phá theo vùng địa lý' : 'Browse by geographic region'}
+              </h2>
+              <div class="area-links">
+                {#each data.regions as region (region.key)}
+                  <a href={`${$locale === 'vi' ? '/vi' : ''}/catalog?region=${region.key}`}
+                    >{region[$locale]} ({region.count})</a
+                  >
+                {/each}
+              </div>
+            </section>
+          {/if}
+        </div>
+      </details>
     {/if}
 
-    <CatalogUnifiedSearch
-      bind:this={searchRef}
-      bind:searchQuery
-      bind:atRest
-      {seriesChoices}
-      {role}
-      on:edit={(e) => openEditor(e.detail)}
-    />
+    {#key `${data.initialArea}|${data.initialRegion}`}
+      <CatalogUnifiedSearch
+        bind:this={searchRef}
+        bind:searchQuery
+        bind:atRest
+        {seriesChoices}
+        {role}
+        initialArea={data.initialArea}
+        initialRegion={data.initialRegion}
+        on:edit={(e) => openEditor(e.detail)}
+      />
+    {/key}
     <SeriesDetailDrawer
       series={openedSeries}
       on:close={() => (openedSeries = null)}
@@ -179,7 +214,21 @@
   /* No card around it: the rows are cards already, and a card of cards is the
      nesting `.section-card` exists to stop. The rule under it is what separates
      the band from the search results, at the width the page already uses. */
-  .series-band {
+  .collection-browser {
+    border-bottom: var(--border-thin);
+    padding-bottom: var(--space-3);
+  }
+  .collection-browser summary {
+    cursor: pointer;
+    font-weight: var(--font-bold);
+  }
+  .collection-content {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+  }
+  .series-band,
+  .coverage-band {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -191,5 +240,10 @@
     font-family: var(--font-family-display);
     font-weight: var(--font-extrabold);
     font-size: 1.1rem;
+  }
+  .area-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
   }
 </style>

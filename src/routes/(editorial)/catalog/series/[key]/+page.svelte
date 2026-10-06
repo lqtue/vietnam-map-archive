@@ -32,6 +32,7 @@
   };
   $: sheets = data.sheets as SeriesSheetView[];
   $: counts = data.counts as {
+    partial?: boolean;
     total: number;
     held: number;
     obtainable: number;
@@ -80,6 +81,7 @@
     : '';
 
   $: known = hasDenominator(counts);
+  $: description = `${series.name}: ${counts.held} published maps${counts.partial ? ` across ${counts.total} indexed cities; partial source index` : known ? ` of ${counts.total} indexed sheets` : ''}${span ? `; recorded dates ${span}` : ''}. Browse sheet records, scans and source institutions.`;
   $: pct = counts.total ? Math.round((counts.held / counts.total) * 100) : 0;
 
   const STATUS_LABEL: Record<string, string> = {
@@ -248,12 +250,9 @@
 
 <svelte:head>
   <title>{series.name} — Vietnam Map Archive</title>
-  <meta
-    name="description"
-    content="{series.name}: {counts.held} of {counts.total} sheets held{span
-      ? `; the sheets date ${span}`
-      : ''}."
-  />
+  <meta name="description" content={description} />
+  <meta property="og:title" content={series.name} />
+  <meta property="og:description" content={description} />
 </svelte:head>
 
 <PageHero
@@ -294,7 +293,13 @@
 
   <section class="section-card coverage">
     <h2>Coverage</h2>
-    {#if known}
+    {#if counts.partial}
+      <p class="lead">
+        The archive holds <strong>{counts.held}</strong> of the <strong>{counts.total}</strong> city sheets
+        currently indexed. This is a partial catalogue-backed list; the full historical series total is
+        not established.
+      </p>
+    {:else if known}
       <p class="lead">
         The archive holds <strong>{counts.held}</strong> of this survey's
         <strong>{counts.total}</strong> sheets — {pct}%.
@@ -307,14 +312,16 @@
     {/if}
     <!-- Where the cells sit, tinted like the bar below. A held-only index still
          draws: it is the footprint of what the archive has. -->
-    <div class="cov-map">
-      <SeriesCoverageMap
-        cells={coverage}
-        seriesKey={series.key}
-        label="{series.name}: where the sheets are"
-      />
-    </div>
-    <p class="cov-credit">Basemap © OpenStreetMap contributors, Protomaps</p>
+    {#if coverage.some((cell) => cell.bbox)}
+      <div class="cov-map">
+        <SeriesCoverageMap
+          cells={coverage}
+          seriesKey={series.key}
+          label="{series.name}: where the sheets are"
+        />
+      </div>
+      <p class="cov-credit">Basemap © OpenStreetMap contributors, Protomaps</p>
+    {/if}
     <!-- A bar rather than three numbers: the point of this page is the shape of
          what is missing, and three integers do not have a shape. -->
     {#if known}

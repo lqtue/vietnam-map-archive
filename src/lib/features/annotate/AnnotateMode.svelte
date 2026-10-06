@@ -27,6 +27,8 @@
   import { createAnnotationStateStore } from '$lib/map/annotations/annotationState';
   import { setAnnotationContext } from '$lib/map/annotations/annotationContext';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { trackMeasurement } from '$lib/data/measurement';
+  import { createStudioMeasurementController, STUDIO_SAVE_FAILURE } from './studioMeasurement';
   import { createMapPickHandlers } from '$lib/features/stories/shared/mapPickHandlers';
   import { createAnnotationProjectStore } from './annotationProjectStore';
   import { createTimelineStore } from './animation/timelineStore';
@@ -102,6 +104,8 @@
   let currentProject: AnnotationSet | null = null;
   let isSaving = false;
   let saveSuccess = false;
+  let restoringProjectFeatures = false;
+  const studioMeasurement = createStudioMeasurementController(trackMeasurement);
 
   // Overpass import — the flow lives in AnnotateOverpassController; these three
   // are shared with the two map layers it drives.
@@ -154,7 +158,11 @@
     notice = { text: 'All annotations cleared.', tone: 'info' };
   }
   function handleAnnotationExport() {
-    drawToolRef?.exportAnnotationsAsGeoJSON();
+    if (!drawToolRef) return;
+    const features = drawToolRef.exportAnnotationsAsGeoJsonObject();
+    if (!features.features.length) return;
+    drawToolRef.exportAnnotationsAsGeoJSON();
+    studioMeasurement.exportCompleted();
     notice = { text: 'GeoJSON downloaded.', tone: 'success' };
   }
   async function handleAnnotationImport(event: CustomEvent<{ file: File }>) {
@@ -181,7 +189,15 @@
     // isSheetLayer excludes series rows — their synthetic `series:<key>` id
     // wouldn't resolve back to a catalog map on reload.
     const mapIds = $layersStore.overlays.filter(isSheetLayer).map((o) => o.ref.mapId);
-    await projectStore.saveFeatures(currentProject.id, features, mapIds);
+    studioMeasurement.observeDraft(features);
+    const persisted = await projectStore.saveFeatures(currentProject.id, features, mapIds);
+    if (!persisted) {
+      isSaving = false;
+      saveSuccess = false;
+      notice = STUDIO_SAVE_FAILURE;
+      return;
+    }
+    studioMeasurement.saved(features, Boolean(persisted && supabase && userId));
     currentProject = { ...currentProject, mapIds };
     isSaving = false;
     saveSuccess = true;
@@ -195,13 +211,6 @@
     const title = event.detail.title;
     projectStore.updateProject(currentProject.id, { title });
     currentProject = { ...currentProject, title };
-  }
-
-  function handleUndo() {
-    drawToolRef?.undoLastAction();
-  }
-  function handleRedo() {
-    drawToolRef?.redoLastAction();
   }
 
   // ── Timeline / animation playback ────────────────────────────
@@ -251,10 +260,14 @@
   function handleSelectProject(project: AnnotationSet) {
     restoredStackFor = null;
     currentProject = project;
+    studioMeasurement.enterProject(project.features);
     if (project.features?.features?.length) {
       setTimeout(() => {
         const text = JSON.stringify(project.features);
-        drawToolRef?.importGeoJsonText(text);
+        if (drawToolRef) {
+          restoringProjectFeatures = true;
+          drawToolRef.importGeoJsonText(text).finally(() => (restoringProjectFeatures = false));
+        }
       }, 500);
     }
     if (project.mapId) {
@@ -271,6 +284,7 @@
       const newProject = $projectStore.projects.find((p) => p.id === id);
       if (newProject) {
         currentProject = newProject;
+        studioMeasurement.enterProject(newProject.features);
         activeView = 'editor';
       }
     }, 50);
@@ -294,6 +308,13 @@
   }
 
   onMount(() => {
+    const stopHistoryMeasurement = studioMeasurement.watchHistory(
+      annotationHistory,
+      () => drawToolRef?.exportAnnotationsAsGeoJsonObject?.() ?? null,
+      () => activeView === 'editor',
+      () => restoringProjectFeatures
+    );
+
     // annotate mode doesn't support side-by-side — snap back if state is stale from /view.
     if ($layerStore.viewMode === 'dual') layerStore.setViewMode('overlay');
 
@@ -311,15 +332,17 @@
       const key = event.key.toLowerCase();
       if (key === 'z' && !event.shiftKey && canUndo) {
         event.preventDefault();
-        handleUndo();
+        drawToolRef?.undoLastAction();
       } else if ((key === 'z' && event.shiftKey) || key === 'y') {
         if (canRedo) {
           event.preventDefault();
-          handleRedo();
+          drawToolRef?.redoLastAction();
         }
       }
     };
     window.addEventListener('keydown', keydownHandler);
+
+    return stopHistoryMeasurement;
   });
 
   onDestroy(() => {
