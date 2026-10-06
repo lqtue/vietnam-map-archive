@@ -171,7 +171,7 @@ Public / other:
   point is a cell centre, not a position), kept within `radius`, sorted by distance and capped at
   `limit`. `year` is the map's, and the RPC's `year_from`/`year_to` already decided which maps count.
   Draft maps contribute none, even to staff. Labels are the five gazetteer categories only
-  (street, hydrology, place, building, institution) as of mig 115 (not yet pushed to production); before it a legend entry or a
+  (street, hydrology, place, building, institution) as of mig 115 (in production 2026-10-06); before it a legend entry or a
   title could come back as a label.
 - `/api/press/` — **public** GET `?q=&year=&window=&limit=&provider=&variants=`: newspaper hits ±N
   years for a label, from Gallica and the National Library of Vietnam. No auth, no database,

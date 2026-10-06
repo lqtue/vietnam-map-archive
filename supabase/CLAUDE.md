@@ -31,12 +31,12 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 **The head is 116**, pushed 2026-10-06: seven canonical map genres, independent
 subjects and depicted state, image content roles, legacy classification and review
 evidence. Migration 116 alone was pushed from an isolated migration directory;
-**115 remains pending** and a later push must include that out-of-order migration.
+115 was pushed after 116 on 2026-10-06 with `--include-all`; local and remote history now match.
 The source-backed audit changed three charts to hydrographic and one administrative
 map to thematic; six ambiguous originals remain needs_review. No publication or
 identity fields changed. Linked maps/map_images types were regenerated and reconciled.
 `tests/sql/map-taxonomy.sql` checks constraints, old plan/regional inputs and review
-invalidation in disposable local PostgreSQL. Migration 115, NOT yet in production: `context_at` returned `legend_entry`,
+invalidation in disposable local PostgreSQL. Migration 115, in production 2026-10-06: `context_at` returned `legend_entry`,
 `legend_ref` and `title` rows as "labels" (no category filter); it now takes only the five
 gazetteer categories, by effective category. Before it, **114**, pushed 2026-10-06: boxes from different OCR runs on the same
 map can be grouped. Each original keeps its run; the combined label uses the first

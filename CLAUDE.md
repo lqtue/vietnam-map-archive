@@ -80,7 +80,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 116**, in production (pushed alone 2026-10-06: seven map genres, independent subjects and depicted state). **115 is NOT in production** — it was skipped, so the next push must include it (`/api/context` labels limited to the five gazetteer categories, so legend entries and titles stop leaking in); 095–114 are in production (114, 113 and 112 pushed 2026-10-06 for grouping across OCR runs, coordinate rounding tolerance and text-box grouping; 111, 110 and 109 pushed 2026-10-05; local/remote history checked before 112 via
+- **Migration head is 116**; 095–116 are all in production (116 pushed 2026-10-06 for seven map genres, independent subjects and depicted state; 115 pushed after it the same day with `--include-all`, limiting `/api/context` labels to the five gazetteer categories so legend entries and titles stop leaking in; 114, 113 and 112 pushed 2026-10-06 for grouping across OCR runs, coordinate rounding tolerance and text-box grouping; 111, 110 and 109 pushed 2026-10-05; local/remote history checked before 112 via
   `supabase migration list`) — see `supabase/CLAUDE.md` for what each one does. Adding one, and
   regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
