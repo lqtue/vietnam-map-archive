@@ -1,0 +1,923 @@
+{
+  "checkedAt": "2026-10-06",
+  "items": [
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "PREY VENG, CAMBODIA",
+      "scale": "1:250,000",
+      "date": "2000",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4803_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19362",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "AN LOC, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4804_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19363",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "KAMPOT, CAMBODIA",
+      "scale": "1:250,000",
+      "date": "2000",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/1501ANC4805_005_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19364",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "LONG XUYEN, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4806_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19365",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "SAI GON (THAN PHO HO CHI MINH), VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4807_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19366",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "PHAN-THIET, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4808_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19367",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "CA MAU, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4810_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19368",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "SOC TRANG, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4811_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19369",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "NAM CAN, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4815_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19370",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "DA LAT, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANC4901_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19371",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "CHAVAN, LAOS",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4804_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19494",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "ATTAPU, LAOS",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4808_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19495",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "VIRACHEY, CAMBODIA",
+      "scale": "1:250,000",
+      "date": "2003",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4812_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19498",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "DA NANG (TOURANE), VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4901_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19502",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "KON TUM, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4905_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19503",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "QUI NHON, VIETNAM",
+      "scale": "1:250,000",
+      "date": "2000",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4909_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19504",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "NHA TRANG, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501AND4913_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19505",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "CUA RAO, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4802_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19554",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "THANH-HOA, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1974",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4803_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19555",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "VINH, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1974",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4807_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19556",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "RON, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1988",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4811_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19557",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "DONG HOI, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1974",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4812_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19558",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "HUE, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANE4816_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19559",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "CAO BANG, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4807_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19616",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "DIEN BIEN PHU, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1969",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4809_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19617",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "YEN BAY, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/1501ANF4810_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19618",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "HANOI, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4811_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19619",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "MON CAY, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4812_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19620",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "MUANG NGOY, LAOS",
+      "scale": "1:250,000",
+      "date": "1988",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4813_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19621",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "SAM NEUA, LAOS",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4814_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19622",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "HAI DOUNG, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4815_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19623",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "HAI PHONG, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1994",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANF4816_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19624",
+      "georeferenced": true
+    },
+    {
+      "series": "Joint Operations Graphic, Series 1501 (1:250,000)",
+      "title": "LAI CHAU, VIETNAM",
+      "scale": "1:250,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/1501ANf4805_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/19614",
+      "georeferenced": true
+    },
+    {
+      "series": "Other sheets",
+      "title": "PHILIPPINES: EAST ASIA, SHT 4",
+      "scale": "1:2,500,000",
+      "date": "2000",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/pdf/34177.pdf",
+      "productUrl": "https://store.usgs.gov/product/34177",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "THON VU BON, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1984",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61379.pdf",
+      "productUrl": "https://store.usgs.gov/product/61379",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PHAN RI, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1983",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61380.pdf",
+      "productUrl": "https://store.usgs.gov/product/61380",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "HAI NINH, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1984",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61381.pdf",
+      "productUrl": "https://store.usgs.gov/product/61381",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "THON MA TY, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61382.pdf",
+      "productUrl": "https://store.usgs.gov/product/61382",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PHAN RANG, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61383.pdf",
+      "productUrl": "https://store.usgs.gov/product/61383",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "MA NOI, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61384.pdf",
+      "productUrl": "https://store.usgs.gov/product/61384",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "DON DUONG, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1989",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61385.pdf",
+      "productUrl": "https://store.usgs.gov/product/61385",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "BUON THACH TRAI, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/PDF/61386.pdf",
+      "productUrl": "https://store.usgs.gov/product/61386",
+      "georeferenced": false
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "MUANG HAT HIN, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701554532_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32803",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "LI MOU CHANG, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701554533_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32804",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "TAO PHYA, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701554534_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32805",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN THIN TOC, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701555511_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32829",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN NAM LUANG, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701555512_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32830",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "NA LAM, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701555522_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32833",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "PHOU TA TE SON, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701555523_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32834",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "NAM MAT, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701556504_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32854",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN XAOSI, LAOS",
+      "scale": "1:50,000",
+      "date": "1969",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701557503_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32872",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN MUANGCHOUAN, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701558461.pdf",
+      "productUrl": "https://store.usgs.gov/product/32875",
+      "georeferenced": false
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN MUANG-NGAT, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701558473_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32879",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "MUONG HET, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701558504_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32888",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN SANG, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701559462_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32896",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "PHU DEN DIN, LAOS",
+      "scale": "1:50,000",
+      "date": "1972",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701559464_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32898",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "SOP PHUA, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701559492_001_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32900",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "MUANG SOI, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701559494_001_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32902",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "PHOU KOUNKANIN, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701560452_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32917",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "NAPE, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701560454_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32919",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN XE NUA, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701561431_004_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32937",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN BUK, LAOS",
+      "scale": "1:50,000",
+      "date": "1969",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701561444_003_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32942",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN NATHON, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701562421_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32959",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN VANG-ALA, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701562433_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32963",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "HA SHIN PE NU, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701563414_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32980",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "DAK PALOUAT, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701564381.pdf",
+      "productUrl": "https://store.usgs.gov/product/32981",
+      "georeferenced": false
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN MANGHA NOY, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701564391_003_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32985",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN VANGTAT, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701564392_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32986",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN TANGYOUN, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701564403_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/32989",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7015 (1:50,000)",
+      "title": "BAN KO, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701564413.pdf",
+      "productUrl": "https://store.usgs.gov/product/32991",
+      "georeferenced": false
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "KRONG KEB, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1993",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701658291_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33062",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "TAKEO, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1988",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701659301_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33093",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "PHUM POU, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1971",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701659302_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33094",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "PH KAMPONG TRACH, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1997",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701661311_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33147",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "SVAY RIENG, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1971",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701661312_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33148",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "CHOAM KRAVIEN, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1969",
+      "url": "https://store.usgs.gov/assets/mod/storefiles/NGA/L701662321_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33172",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "MEAK SAY, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1967",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701663333_001_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33196",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "O TEA, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701664341_001_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33215",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "MEREUCH, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701664352_001_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33220",
+      "georeferenced": true
+    },
+    {
+      "series": "Series L7016 (1:50,000)",
+      "title": "PHUM KHAM DORANG, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/L701664371_002_geo.pdf",
+      "productUrl": "https://store.usgs.gov/product/33227",
+      "georeferenced": true
+    },
+    {
+      "series": "Other sheets",
+      "title": "HAI DONG, VIETNAM",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/assets/MOD/StoreFiles/NGA/VM_Hai_Dong.pdf",
+      "productUrl": "https://store.usgs.gov/product/61432",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "THICKNESS MAP OF THE PETROLIFEROUS",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177671",
+      "productUrl": "https://store.usgs.gov/product/177671",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PALINSPASTIC THICKNESS MAP OF THE",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177673",
+      "productUrl": "https://store.usgs.gov/product/177673",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PALINSPASTIC PALEOGRAPHIC MAP OF THE",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177675",
+      "productUrl": "https://store.usgs.gov/product/177675",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PALINSPASTIC THICKNESS MAP OF THE",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177677",
+      "productUrl": "https://store.usgs.gov/product/177677",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PALINSPASTIC PALEOGEOGRAPHIC MAP OF",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177679",
+      "productUrl": "https://store.usgs.gov/product/177679",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "LOCATION MAP OF MAJOR TERTIARY",
+      "scale": "NO SCALE",
+      "date": "1987",
+      "url": "https://store.usgs.gov/product/177681",
+      "productUrl": "https://store.usgs.gov/product/177681",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "POU B, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/product/32835",
+      "productUrl": "https://store.usgs.gov/product/32835",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "NONG HET, LAOS",
+      "scale": "1:50,000",
+      "date": "1971",
+      "url": "https://store.usgs.gov/product/32859",
+      "productUrl": "https://store.usgs.gov/product/32859",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "BAN NAMKHAOHOU, LAOS",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/product/32860",
+      "productUrl": "https://store.usgs.gov/product/32860",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "XIENG LOUANG, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/product/32882",
+      "productUrl": "https://store.usgs.gov/product/32882",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "SOP LONG, LAOS",
+      "scale": "1:50,000",
+      "date": "1965",
+      "url": "https://store.usgs.gov/product/32886",
+      "productUrl": "https://store.usgs.gov/product/32886",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "SA MOI, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/product/32977",
+      "productUrl": "https://store.usgs.gov/product/32977",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "BAN PHIADOUANG, LAOS",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/product/32982",
+      "productUrl": "https://store.usgs.gov/product/32982",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "BAN ALOT, LAOS",
+      "scale": "1:50,000",
+      "date": "1968",
+      "url": "https://store.usgs.gov/product/32990",
+      "productUrl": "https://store.usgs.gov/product/32990",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "TUK MEAS, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1971",
+      "url": "https://store.usgs.gov/product/33095",
+      "productUrl": "https://store.usgs.gov/product/33095",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PREY NHAY, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1971",
+      "url": "https://store.usgs.gov/product/33149",
+      "productUrl": "https://store.usgs.gov/product/33149",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "CHONG CHEACH, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/product/33151",
+      "productUrl": "https://store.usgs.gov/product/33151",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "DAK DAM, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/product/33213",
+      "productUrl": "https://store.usgs.gov/product/33213",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "ORANG, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1970",
+      "url": "https://store.usgs.gov/product/33214",
+      "productUrl": "https://store.usgs.gov/product/33214",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "PH THONG, CAMBODIA",
+      "scale": "1:50,000",
+      "date": "1966",
+      "url": "https://store.usgs.gov/product/33223",
+      "productUrl": "https://store.usgs.gov/product/33223",
+      "georeferenced": false
+    },
+    {
+      "series": "Other sheets",
+      "title": "SOUTHEAST ASIA BRIEFING MAP",
+      "scale": "1:2,000,000",
+      "date": "1981",
+      "url": "https://store.usgs.gov/product/33932",
+      "productUrl": "https://store.usgs.gov/product/33932",
+      "georeferenced": false
+    }
+  ]
+}

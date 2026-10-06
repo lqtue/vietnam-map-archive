@@ -64,6 +64,21 @@
     searchRef?.refresh();
   }
 
+  /* Published maps first; an institution with none still says what it holds — catalogue
+     sources, or failing those the series it is known for. */
+  function institutionCount(
+    i: { count: number; sources: number; series: number },
+    lang: string
+  ): string {
+    const vi = lang === 'vi';
+    const sources = i.sources
+      ? `${i.sources} ${vi ? 'nguồn' : i.sources === 1 ? 'source' : 'sources'}`
+      : null;
+    const series =
+      !i.count && !i.sources && i.series ? `${i.series} ${vi ? 'bộ bản đồ' : 'series'}` : null;
+    return [i.count || null, sources, series].filter(Boolean).join(' · ') || '0';
+  }
+
   const CONTRIBUTE_EMAIL = 'vietnammaproject@gmail.com';
   const contributeHref = `mailto:${CONTRIBUTE_EMAIL}?subject=${encodeURIComponent('VMA — map submission')}&body=${encodeURIComponent("Hi VMA,\n\nI'd like to submit a map to the archive.\n\n• Title:\n• Year / period:\n• Location (city / region):\n• Source (URL, institution, or attachment):\n• Anything else we should know:\n\nThanks!")}`;
 
@@ -126,7 +141,7 @@
       {/if}
     </label>
 
-    {#if atRest && (series.length || data.areas.length || data.regions.length)}
+    {#if atRest && (series.length || data.areas.length || data.regions.length || data.institutions.length)}
       <details class="collection-browser">
         <summary>{$locale === 'vi' ? 'Khám phá bộ sưu tập' : 'Browse collections'}</summary>
         <div class="collection-content">
@@ -161,6 +176,22 @@
                     >{region[$locale]} ({region.count})</a
                   >
                 {/each}
+              </div>
+            </section>
+          {/if}
+
+          {#if data.institutions.length}
+            <section class="coverage-band" aria-labelledby="institution-band-title">
+              <h2 id="institution-band-title" class="band-title">
+                {$locale === 'vi' ? 'Khám phá theo cơ quan lưu trữ' : 'Browse by institution'}
+              </h2>
+              <div class="area-links">
+                {#each data.institutions as institution (institution.slug)}
+                  <a href={`/catalog/institutions/${institution.slug}`}
+                    >{institution.label} ({institutionCount(institution, $locale)})</a
+                  >
+                {/each}
+                <a href="/catalog/institutions">{$t('All institutions')}</a>
               </div>
             </section>
           {/if}

@@ -1,10 +1,8 @@
 <!--
-  SeriesList.svelte — the band at the top of /catalog: every series as one line,
-  its name and the one fraction that matters.
-
-  Deliberately not a coverage bar per row: that is the single-series page's job,
-  and three segments repeated down a list is a chart of charts. The dates are on
-  that page too.
+  SeriesList.svelte — the series band at the top of /catalog: every series as
+  "Name (sheets held)", styled like the area and region bands beside it. The
+  fraction against the series' own index is the link's title; the coverage bar
+  and dates are the single-series page's job.
 
   A series with an imported index is an `<a>` with its real `href`, and that is
   the point: this band is the entry a crawler follows to the coverage pages, and
@@ -52,63 +50,38 @@
         <a
           class="drow"
           href="/catalog/series/{encodeURIComponent(s.key)}"
-          on:click={(e) => onRowClick(e, s)}
+          title={fraction(s)}
+          on:click={(e) => onRowClick(e, s)}>{s.name} ({s.sheets})</a
         >
-          <span class="name">{s.name}</span>
-          <span class="frac">{fraction(s)}</span>
-        </a>
       {:else}
-        <button type="button" class="drow" on:click={() => dispatch('open', s)}>
-          <span class="name">{s.name}</span>
-          <span class="frac">{fraction(s)}</span>
-        </button>
+        <button type="button" class="drow" title={fraction(s)} on:click={() => dispatch('open', s)}
+          >{s.name} ({s.sheets})</button
+        >
       {/if}
     </li>
   {/each}
 </ul>
 
 <style>
-  /* One bordered list, not a card per series: it sits above a live search and should
-     read as a table of contents, not as the page's content. */
+  /* The same wrapping row of "Name (count)" links as the area, region and institution bands
+     beside it on /catalog; the fraction moved into the title. */
   .rows {
     list-style: none;
     padding: 0;
     margin: 0;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--sb-radius-sm);
-    background: var(--color-white);
-    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
   }
   .drow {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    width: 100%;
-    padding: 0.45rem 0.8rem;
+    padding: 0;
     border: 0;
     background: none;
     font: inherit;
-    text-align: left;
     color: inherit;
-    text-decoration: none;
     cursor: pointer;
   }
-  li + li .drow {
-    border-top: 1px dashed var(--color-border);
-  }
-  .drow:hover .name {
+  .drow:hover {
     text-decoration: underline;
-  }
-  .name {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-bold);
-    font-size: 0.95rem;
-  }
-  .frac {
-    font-size: 0.78rem;
-    color: var(--color-gray-500);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
 </style>
