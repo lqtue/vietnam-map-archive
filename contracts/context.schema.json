@@ -73,6 +73,25 @@
         }
       }
     },
+    "legend": {
+      "type": "array",
+      "description": "Numbered-legend references standing near the point, nearest first, from public maps that cover it (GET /api/context only; the context_at RPC does not return it). Warped per request from image pixels; src says how the position was found.",
+      "items": {
+        "type": "object",
+        "required": ["map_id", "n", "lng", "lat", "src", "distance_m"],
+        "properties": {
+          "map_id": { "type": "string" },
+          "year": { "type": ["integer", "null"], "description": "The map's year." },
+          "n": { "type": "integer", "description": "The legend number." },
+          "name": { "type": ["string", "null"] },
+          "vn": { "type": ["string", "null"] },
+          "lng": { "type": "number" },
+          "lat": { "type": "number" },
+          "src": { "type": "string", "enum": ["manual", "numeral", "grid"] },
+          "distance_m": { "type": "number" }
+        }
+      }
+    },
     "stories": {
       "type": "array",
       "items": {

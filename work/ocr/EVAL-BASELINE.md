@@ -2407,3 +2407,48 @@ Do not re-attempt as stated.
 - **`--split-rg` is one measured point, not a swept plateau.** 0.020 / 0.050 /
   0.070 was started and abandoned; a higher threshold is *slower*, because it
   fragments the redder core into more components.
+
+## Re-gate against the larger validated truth (2026-10-06)
+
+The gate above scored against **43** validated `v1b` rows. The reviewer has since validated most of the
+1882 sheet's OCR, body text included, so the same harness now has a much larger truth. **Do not compare
+these numbers with the rows above**: the denominator, and what is in it, changed.
+
+**Ground truth, map `0e02b9d9`, `review_status='validated'`: 212 rows** (192 label rows + 20 text-group rows).
+By run: `v1b` 104, `post0910` 105, `2026-09-04T0527` 3. Of the 192 label rows, **16 are `manual`** boxes the human
+drew because OCR missed them, and 20 group rows are union boxes with human-typed text; a model cannot match
+either by construction. The 176 remaining rows are model-read. Other statuses: 318 rejected, 11 pending.
+Effective text is `coalesce(text_corrected, text)`; 234 rows carry a `text_corrected`, which counts corrections, not verdicts.
+
+**Scored with `--pred-run-dir`, not `--run-id`.** `eval.py ocr --run-id v1b` would score `v1b` against truth that contains
+`v1b`'s own validated rows, and the no-argument form scores rejected duplicates. Run directories are the like-for-like
+comparison, and they are what the 2026-09-08 rows used:
+
+```
+eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --pred-run-dir outputs/<map>/runs/<run>
+```
+
+| run | GT | predictions | recall @0.5 | precision | char_acc | mean_iou | text_recall@0.3 | category_acc |
+|-----|----|-------------|-------------|-----------|----------|----------|-----------------|--------------|
+| `baseline` | 212 (all) | 145 | 0.3774 | 0.5517 | 0.9702 | 0.7305 | 0.3585 | 0.85 |
+| `baseline` | 176 (model-read only) | 145 | 0.4432 | 0.5379 | 0.9695 | 0.7346 | 0.4148 | 0.859 |
+| `postfix-v8` | 212 | 204 | 0.4104 | 0.4265 | 0.9409 | 0.716 | 0.3585 | 0.8851 |
+| `postfix-v8` | 176 | 204 | 0.4886 | 0.4216 | 0.9402 | 0.7155 | 0.4261 | 0.8953 |
+| `post0910` | 212 | 287 | 0.5896 | 0.4355 | 0.9644 | 0.804 | 0.6038 | 0.904 |
+| `post0910` | 176 | 287 | 0.6818 | 0.4181 | 0.9665 | 0.8048 | 0.7045 | 0.9083 |
+
+How to read it:
+
+- **Recall fell against the old gate for `baseline` (0.7674 -> 0.38 / 0.44) without the run changing.** The old 43 were
+  the easy ones. The new truth adds every sparse diagonal street name, whose human-drawn box is the whole printed line
+  and which the model emits as several small fragments (docs/journals/261006-1882-ocr-review-patterns.md). `text_recall@0.3`
+  tells the same story: the text is mostly found, the box is not.
+- **`char_acc` still holds up where a box matches** (0.97 for `baseline` and `post0910`, 0.94 for `postfix-v8`), so the
+  2026-09-08 verdict on `postfix-v8` stands on the larger set, and `postfix-v8` still loses on `char_acc`.
+- **`post0910` is the best run on this truth** (recall 0.59 / 0.68, `mean_iou` 0.80, diacritic recall 1.0), which the
+  43-row gate could not have shown: it did not exist then.
+- **Precision is still not trustworthy.** 0.42-0.55 counts every correct reading of a legend, margin or house number the
+  truth does not contain, and every rejected duplicate, as a false positive. 133 of the 313 rejected model rows are a
+  validated label's twin from another run.
+- The old gate in this file (recall >= 0.77, char_acc >= 0.98, mean_iou >= 0.72) cannot be applied to these rows. Re-derive
+  a gate from this table if a run needs one: for `char_acc` the bar to beat is 0.97, for `mean_iou` 0.80.

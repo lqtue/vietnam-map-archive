@@ -5,6 +5,8 @@ use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../REA
 
 | Record | Subject |
 |---|---|
+| [261006](261006-1882-ocr-review-patterns.md) | 1882 OCR review: what 212 validated rows say about the other District 4 sheets |
+| [261006](261006-legend-fabric.md) | Legend points across District 4 sheets in the fabric proto: chains, drift, gaps |
 | [261004](261004-l7014-metadata.md) | Series 500 recovery; L7014 names and dates reviewed against scans |
 | [261003](261003-l7014-audit.md) | L7014: live inventory, stopped margin readers, placement gaps and proposed closing gates |
 | [261002](261002-colour-eda-1882-1898.md) | Colour, line and OSM-warp EDA on 1882/1898; current delivery narrowed to 1882 |

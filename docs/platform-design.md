@@ -76,7 +76,8 @@ Closing that is the engine.
    ```
    context_at(lng, lat, radius_m default 150, year_from default null, year_to default null,
               public_only default true) → jsonb
-     { maps: [...], labels: [...], footprints: [...], legend_points: [...], stories: [...] }
+     { maps: [...], labels: [...], footprints: [...], stories: [...] }
+     (GET /api/context adds `legend: [...]` — legend points are warped per request, not stored)
    ```
 
    Each item carries `map_id`, `year`, `distance_m`, and the warp's own `geom_rmse`, so a caller can
