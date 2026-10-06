@@ -34,6 +34,22 @@ receiving production credentials. Privileged server actions are unavailable ther
 `npm run deploy` therefore passes the directory explicitly:
 `wrangler pages deploy .svelte-kit/cloudflare --project-name vmabeta`.
 
+**Only `main` reaches production.** Wrangler names the deployment after the current git
+branch, so `npm run deploy` from a feature branch publishes a **Preview** at
+`<branch>.vmabeta.pages.dev` and leaves `maparchive.vn` untouched — it still prints
+"Deployment complete!". A production deploy prints a bare `<hash>.vmabeta.pages.dev` with no
+"alias URL" line. On 2026-10-06 7.5 went to Preview this way first; merge, then deploy from
+`main`.
+
+**A changed `PUBLIC_*` variable takes up to four hours to reach readers.** The public
+variables are read at runtime through `$env/dynamic/public` and served in `/_app/env.js`, which
+the edge caches with `max-age=14400`. A new deployment does not refresh that copy: after
+`PUBLIC_GA_MEASUREMENT_ID` was added on 2026-10-06 the deployment's own host served it while
+`maparchive.vn/_app/env.js` returned the old cached file (`cf-cache-status: HIT`). Check with a
+cache-busting `curl -s "https://maparchive.vn/_app/env.js?v=$RANDOM"`; to apply it at once,
+Custom Purge `https://maparchive.vn/_app/env.js` under the zone's Caching → Configuration.
+Browsers that already hold the file keep it for up to the same four hours.
+
 Secrets are read through `$env/static/private`, which resolves them at **build** time.
 `$env/dynamic/private` was tried and does not work here — the three secrets came back
 undefined in Pages Functions (`Error: supabaseKey is required.` on every route using
