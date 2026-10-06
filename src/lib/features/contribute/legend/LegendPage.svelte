@@ -41,7 +41,7 @@
   import { invalidateLegend } from '$lib/data/maps/legendRevision';
   import type { MapGrid } from '$lib/core/geo/mapGrid';
   import type { MapListItem } from '$lib/data/maps/types';
-  import { legendReadiness, readSummary, type WorkFactsById } from '$lib/core/sheetWork';
+  import { NO_WORK, legendReadiness, readSummary, type WorkFactsById } from '$lib/core/sheetWork';
   import { fetchSheetWork } from '$lib/data/admin/sheetWork';
   import type { LabelMapInfo } from '$lib/data/supabase/footprints';
 
@@ -317,6 +317,29 @@
     }
   }
 
+  $: noLegend = !!(currentMap && work[currentMap.id]?.noLegend);
+
+  /** "This sheet prints no legend" — one merged key in `maps.triage`, so regions are untouched. */
+  async function setNoLegend(on: boolean) {
+    if (!currentMap || saving) return;
+    const id = currentMap.id;
+    saving = true;
+    message = '';
+    try {
+      const res = await fetch(`/api/admin/maps/${id}/triage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ legend: on ? 'none' : null }),
+      });
+      if (!res.ok) throw new Error('save');
+      work = { ...work, [id]: { ...(work[id] ?? NO_WORK), noLegend: on } };
+    } catch {
+      message = $t('Could not save the legend.');
+    } finally {
+      saving = false;
+    }
+  }
+
   async function loadStats() {
     try {
       const res = await fetch('/api/admin/maps/legend-stats');
@@ -386,6 +409,18 @@
           <EmptyPanel message={loadError} />
         {:else if !rows.length}
           <EmptyPanel message={$t('This sheet has no numbered legend.')} />
+          <div class="no-legend">
+            <label>
+              <input
+                type="checkbox"
+                checked={noLegend}
+                disabled={saving}
+                on:change={(e) => setNoLegend(e.currentTarget.checked)}
+              />
+              {$t('No legend on this sheet')}
+            </label>
+            {#if message}<p role="alert">{message}</p>{/if}
+          </div>
         {:else}
           <LegendSidebar
             rows={view}
@@ -448,3 +483,14 @@
     {/if}
   </ToolLayout>
 </div>
+
+<style>
+  .no-legend {
+    padding: 0 0.75rem;
+    font-size: 0.8rem;
+  }
+  .no-legend p {
+    margin: 0.3rem 0 0;
+    color: var(--sb-text-meta);
+  }
+</style>

@@ -447,6 +447,7 @@ export const vi: Record<string, string> = {
   'The legend tool is for staff.': 'Công cụ chú giải chỉ dành cho quản trị viên.',
   'Could not load this sheet’s legend.': 'Không thể tải chú giải của tờ này.',
   'Could not save the legend.': 'Không thể lưu chú giải.',
+  'No legend on this sheet': 'Tờ bản đồ này không có chú giải',
   'Pick a map to place its legend.': 'Chọn một bản đồ để đặt chú giải.',
   'Place the legend': 'Đặt chú giải',
   'Open legend tool': 'Mở công cụ chú giải',

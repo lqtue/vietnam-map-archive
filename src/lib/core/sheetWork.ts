@@ -19,6 +19,8 @@ export type WorkFacts = {
   /** Categories with at least one non-rejected label. */
   read: { title: boolean; legend: boolean; body: boolean };
   triage: TriageState;
+  /** A person marked the sheet "prints no legend" (`triage.legend`). Legend entries outrank it. */
+  noLegend?: boolean;
   /** `map_pipeline_status`: an OCR job finished / a person marked the text reviewed. */
   ocrRan: boolean;
   textReviewed: boolean;
@@ -64,8 +66,11 @@ export function sheetTracks(f: WorkFacts | undefined): Track[] {
     {
       key: 'legend',
       label: 'Legend',
-      state: pick(w.read.legend, w.found.legend),
-      hint: 'Legend read (yellow: a person marked the region, not read yet)',
+      state: w.read.legend || w.noLegend ? 'done' : pick(false, w.found.legend),
+      hint:
+        w.noLegend && !w.read.legend
+          ? 'No legend printed'
+          : 'Legend read (yellow: a person marked the region, not read yet)',
     },
     {
       key: 'body',
@@ -129,16 +134,18 @@ export const matchesWork = (key: string, f: WorkFacts | undefined): boolean =>
   (WORK_FILTERS.find((w) => w.key === key) ?? WORK_FILTERS[0]).test(f);
 
 /** Where a sheet stands for legend work. `ready` = legend region found, not yet read. */
-export type LegendReadiness = 'read' | 'ready' | 'unlocated';
+export type LegendReadiness = 'read' | 'none' | 'ready' | 'unlocated';
 
 export function legendReadiness(s: WorkFacts | undefined): LegendReadiness {
   if (s?.read.legend) return 'read';
+  if (s?.noLegend) return 'none';
   return s?.found.legend ? 'ready' : 'unlocated';
 }
 
 /** The legend picker's chip text for a sheet whose legend has no entries yet. */
 export function readSummary(s: WorkFacts | undefined): string | undefined {
   if (!s) return undefined;
+  if (s.noLegend) return 'no legend printed';
   const parts = [
     s.found.legend && 'legend found',
     s.read.title && 'title read',

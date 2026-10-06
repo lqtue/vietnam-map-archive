@@ -14,6 +14,7 @@
 -->
 <script lang="ts">
   import OcrSidebar from '$lib/features/contribute/ocr/OcrSidebar.svelte';
+  import TextReviewedMark from '$lib/features/contribute/ocr/TextReviewedMark.svelte';
   import ToolSidebarShell from '$lib/features/contribute/shared/ToolSidebarShell.svelte';
   import EmptyPanel from '$lib/features/contribute/shared/EmptyPanel.svelte';
   import TriageSidebar from './TriageSidebar.svelte';
@@ -118,6 +119,7 @@
       on:zoomToExtraction
       on:select
     />
+    <TextReviewedMark {mapId} />
   {/if}
 
   <svelte:fragment slot="footer">

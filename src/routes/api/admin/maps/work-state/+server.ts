@@ -31,13 +31,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         ? db
             .from('maps')
             .select(
-              'id,regions:triage->regions,neatline:triage->neatline,validated:triage->validated_at,triage_reviewed_at'
+              'id,regions:triage->regions,neatline:triage->neatline,validated:triage->validated_at,legend:triage->legend,triage_reviewed_at'
             )
             .eq('id', only)
         : db
             .from('maps')
             .select(
-              'id,regions:triage->regions,neatline:triage->neatline,validated:triage->validated_at,triage_reviewed_at'
+              'id,regions:triage->regions,neatline:triage->neatline,validated:triage->validated_at,legend:triage->legend,triage_reviewed_at'
             )
       )
         .order('id')
@@ -83,6 +83,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     regions: { category?: string; source?: string }[] | null;
     neatline: number[] | null;
     validated: string | null;
+    legend: string | null;
     triage_reviewed_at: string | null;
   }[]) {
     const regions = Array.isArray(m.regions) ? m.regions : [];
@@ -92,9 +93,10 @@ export const GET: RequestHandler = async ({ locals, url }) => {
       validated_at: m.validated ?? m.triage_reviewed_at,
     } as unknown as SavedTriage);
     // A sheet nobody has touched keeps no row: absent means "nothing done".
-    if (triage === 'needs_layout' && !regions.length) continue;
+    if (triage === 'needs_layout' && !regions.length && m.legend !== 'none') continue;
     const f = facts(m.id);
     f.triage = triage;
+    if (m.legend === 'none') f.noLegend = true;
     for (const r of regions) {
       if (r.category === 'title') f.found.title = true;
       // The model's legend guess is not trusted (see WorkFacts); only a person's region counts.

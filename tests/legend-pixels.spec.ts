@@ -19,6 +19,8 @@ import {
   legendReadiness,
   readSummary,
   sheetTracks,
+  matchesWork,
+  overallState,
   type WorkFacts,
 } from '../src/lib/core/sheetWork';
 
@@ -141,6 +143,38 @@ test('a sheet has independent work tracks: done, in between, or not yet', () => 
   });
   // A region the model guessed is not a fact: the track stays grey until a person confirms it.
   expect(states({ ...NO_WORK, found: { ...NO_WORK.found, legend: false } }).legend).toBe('todo');
+});
+
+test('"no legend on this sheet" closes the legend track; entries outrank it', () => {
+  const none: WorkFacts = { ...NO_WORK, noLegend: true };
+  const legend = (f: WorkFacts) => sheetTracks(f).find((x) => x.key === 'legend')!;
+  expect(legend(none)).toMatchObject({ state: 'done', hint: 'No legend printed' });
+  expect(legendReadiness(none)).toBe('none');
+  expect(readSummary(none)).toBe('no legend printed');
+  // Even with a person's legend region on file, the sheet needs no legend work.
+  const found: WorkFacts = { ...none, found: { ...none.found, legend: true } };
+  expect(legendReadiness(found)).toBe('none');
+  expect(matchesWork('legend', found)).toBe(false);
+  expect(matchesWork('legend', { ...NO_WORK, found: { ...NO_WORK.found, legend: true } })).toBe(
+    true
+  );
+  // Entries win: read, with the ordinary hint, and no conflict shown.
+  const both: WorkFacts = { ...none, read: { ...none.read, legend: true } };
+  expect(legendReadiness(both)).toBe('read');
+  expect(legend(both)).toMatchObject({ state: 'done' });
+  expect(legend(both).hint).not.toBe('No legend printed');
+  // The track no longer blocks "All done".
+  const rest: WorkFacts = {
+    ...none,
+    triage: 'ready',
+    found: { ...none.found, title: true },
+    read: { ...none.read, title: true, body: true },
+    textReviewed: true,
+    shapesReviewed: true,
+  };
+  expect(overallState(rest)).toBe('done');
+  expect(matchesWork('done', rest)).toBe(true);
+  expect(matchesWork('done', { ...rest, noLegend: false })).toBe(false);
 });
 
 test('the legend list filters, searches without accents, and keeps the open row', () => {
