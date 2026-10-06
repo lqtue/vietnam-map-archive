@@ -262,7 +262,8 @@
           href={map.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          on:click={() => trackMeasurement('source_open', { surface: 'catalog', map_id: map.id, action: 'open' })}
+          on:click={() =>
+            trackMeasurement('source_open', { surface: 'catalog', map_id: map.id, action: 'open' })}
         >
           {$t('View the original at {institution}', {
             institution: map.holding_institution ?? sourceHost,
