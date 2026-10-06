@@ -81,7 +81,7 @@ const inPolygon = (x, y, poly) =>
 /**
  * Build a locator from boundary GeoJSON: `(lng, lat) → name or null`.
  * @param {{ features: any[] }} geojson
- * @returns {(lng: number, lat: number) => string | null}
+ * @returns {((lng: number, lat: number) => string | null) & { intersecting: (bbox: number[]) => string[] }}
  */
 export function makeLocator(geojson) {
   const feats = geojson.features.map((f) => {
@@ -98,7 +98,7 @@ export function makeLocator(geojson) {
       ],
     };
   });
-  return (lng, lat) =>
+  const locate = (lng, lat) =>
     feats.find(
       (f) =>
         lng >= f.box[0] &&
@@ -107,12 +107,69 @@ export function makeLocator(geojson) {
         lat <= f.box[3] &&
         f.polys.some((p) => inPolygon(lng, lat, p))
     )?.name ?? null;
+  // Wide sheets need every positive-area overlap, including small cities that a
+  // grid or percentage cutoff can miss. Clip outer rings and subtract holes.
+  locate.intersecting = (bbox) => [
+    ...new Set(
+      feats
+        .map((f) => ({
+          name: f.name,
+          area: f.polys.reduce(
+            (sum, p) =>
+              sum +
+              Math.max(
+                0,
+                clippedArea(p[0], bbox) -
+                  p.slice(1).reduce((holes, ring) => holes + clippedArea(ring, bbox), 0)
+              ),
+            0
+          ),
+        }))
+        .filter((f) => f.area > 1e-12)
+        .sort((a, b) => b.area - a.area)
+        .map((f) => f.name)
+    ),
+  ];
+  return locate;
+}
+
+/** Sutherland–Hodgman clipping against the sheet's geographic rectangle. */
+function clippedArea(ring, [w, s, e, n]) {
+  let points = ring.slice();
+  for (const [axis, bound, direction] of [
+    [0, w, 1],
+    [0, e, -1],
+    [1, s, 1],
+    [1, n, -1],
+  ]) {
+    const clipped = [];
+    for (let i = 0; i < points.length; i++) {
+      const a = points[(i + points.length - 1) % points.length],
+        b = points[i];
+      const aIn = direction * (a[axis] - bound) >= 0,
+        bIn = direction * (b[axis] - bound) >= 0;
+      if (aIn !== bIn) {
+        const t = (bound - a[axis]) / (b[axis] - a[axis]);
+        clipped.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]);
+      }
+      if (bIn) clipped.push(b);
+    }
+    points = clipped;
+  }
+  return (
+    Math.abs(
+      points.reduce((sum, p, i) => {
+        const q = points[(i + 1) % points.length];
+        return sum + p[0] * q[1] - q[0] * p[1];
+      }, 0)
+    ) / 2
+  );
 }
 
 /** Grid points per side sampled across a bbox. */
 const GRID = 7;
-/** A wide sheet is sampled finer and lists a province at a lower share: at 7×7 over 5° each province
- *  gets about one sample, so the 10% cutoff would keep one or two of the dozen it spans. */
+/** Wide sheets sample land finer. Province membership uses polygon overlap when
+ * available; the lower sample share is only a fallback for custom locators. */
 const WIDE_GRID = 40;
 const WIDE_SHARE = 0.02;
 /** Samples on Vietnamese land needed to label a sheet at all (3 of 49): open water is not "in" a province. */
@@ -132,9 +189,10 @@ export const MIN_SHARE = 0.1;
  * @param {(lng: number, lat: number) => unknown} [locateAbroad] truthy over a neighbouring country
  */
 export function regionOf(bbox, locate, locateAbroad = () => null) {
-  if (!Array.isArray(bbox) || bbox.length !== 4 || bbox.some((n) => typeof n !== 'number'))
+  if (!Array.isArray(bbox) || bbox.length !== 4 || bbox.some((n) => !Number.isFinite(n)))
     return null;
   const [w, s, e, n] = bbox;
+  if (w >= e || s >= n) return null;
   const wide = e - w > MAX_WIDTH_DEG || n - s > MAX_WIDTH_DEG;
   const G = wide ? WIDE_GRID : GRID;
   const counts = new Map();
@@ -153,9 +211,10 @@ export function regionOf(bbox, locate, locateAbroad = () => null) {
   if (land / G ** 2 < MIN_LAND || (!wide && abroad >= land)) return null;
   const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]);
   const region = ranked[0][0];
-  const regions = ranked
-    .filter(([, c]) => c / land >= (wide ? WIDE_SHARE : MIN_SHARE))
-    .map(([n]) => n);
+  const regions =
+    wide && locate.intersecting
+      ? locate.intersecting(bbox)
+      : ranked.filter(([, c]) => c / land >= (wide ? WIDE_SHARE : MIN_SHARE)).map(([n]) => n);
   return {
     region: wide ? null : region,
     region_2025: wide ? null : provinceNow(region),

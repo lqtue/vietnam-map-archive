@@ -1,0 +1,112 @@
+{
+  "source": "https://maps.lib.utexas.edu/maps/vietnam.html",
+  "checkedAt": "2026-10-06",
+  "scope": "Partial catalogue-backed index; not a complete historical series inventory. Versos remain separate source items of the same city cell.",
+  "items": [
+    {
+      "title": "Bien Hoa",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-bien_hoa-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 2-TPC, Series L909, National Imagery and Mapping Agency, 1968 (11MB)"
+    },
+    {
+      "title": "Can Tho",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-can_tho-1970.jpg",
+      "catalogueDescription": "1:12,500, Edition 1-TPC (29 ETB), Series L909, National Imagery and Mapping Agency, 1970 (15MB)"
+    },
+    {
+      "title": "Chu Lai and Vicinity",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-chu_lai-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 2-TPC, Series L909, National Imagery and Mapping Agency, 1968 (18MB)"
+    },
+    {
+      "title": "Da Lat [Dalat]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-da_lat-1963.jpg",
+      "catalogueDescription": "1:12,500, Edition 1-AMS, Series L909, U.S. Army Map Service, 1963 (12MB)"
+    },
+    {
+      "title": "Da Nang [Tourane]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-da_nang-1969.jpg",
+      "catalogueDescription": "1:12,500, Edition 3-TPC (29 ETB), Series L909, National Imagery and Mapping Agency, 1969 (12MB)"
+    },
+    {
+      "title": "Dong Hoi",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-dong_hoi-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 1, Series L909, National Imagery and Mapping Agency, 1968 (5.6MB)"
+    },
+    {
+      "title": "Ha Noi [Hanoi]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-oclc-232337961-hanoi-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 3, Series L909, National Imagery and Mapping Agency, 1968 (16MB)"
+    },
+    {
+      "title": "Hai Phong",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-haiphong-1968.jpg",
+      "catalogueDescription": "1:15,000, Edition 1, Series L909, National Imagery and Mapping Agency, 1968 (15MB)"
+    },
+    {
+      "title": "Hon Gay",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-hon_gay-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 1, Series L909, National Imagery and Mapping Agency, 1968 (6.8MB)"
+    },
+    {
+      "title": "Hue",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-oclc-21740104-hue-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 3-AMS (29 ETB), Series L909, National Imagery and Mapping Agency, 1968 (12MB)"
+    },
+    {
+      "title": "Lac Giao [Ban Me Thuot]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-lac_giao-196_.jpg",
+      "catalogueDescription": "1:12,500, Edition 2-TPC, Series L909, National Imagery and Mapping Agency, 196- (12MB)"
+    },
+    {
+      "title": "My Tho",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-my_tho-1971.jpg",
+      "catalogueDescription": "1:12,500, Edition 2-DMATC, Series L909, Defense Mapping Agency, 1971 (11MB)"
+    },
+    {
+      "title": "Nha Trang",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-nha_trang-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 3, Series L909, National Imagery and Mapping Agency, 1968 (6.4MB)"
+    },
+    {
+      "title": "Nha Trang [verso]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-nha_trang-1968-a.jpg",
+      "catalogueDescription": "Edition 3, Series L909, National Imagery and Mapping Agency, 1968 (2.7MB)"
+    },
+    {
+      "title": "Phu Lang Thuong",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-phu_lang-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 1, Series L909, National Imagery and Mapping Agency, 1968 (3.9MB)"
+    },
+    {
+      "title": "Quang Ngai",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-quang_ngai-1966.jpg",
+      "catalogueDescription": "1:12,500, Edition 1-TPC, Series L909, National Imagery and Mapping Agency, 1966 (6.3MB)"
+    },
+    {
+      "title": "Qui Nhon",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-qui_nhon-196_.jpg",
+      "catalogueDescription": "1:10,000, Edition 5 (USARV), Series L909, 569th Eng Co (Topo) Corps, 196- (6.2MB)"
+    },
+    {
+      "title": "Qui Nhon [verso]",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-qui_nhon-196_-a.jpg",
+      "catalogueDescription": "Edition 5 (USARV), Series L909, 569th Eng Co (Topo) Corps, 196- (2.4MB)"
+    },
+    {
+      "title": "Tuy Hoa",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-tuy_hoa-1968.jpg",
+      "catalogueDescription": "1:12,500, Edition 1-TPC, Series L909, National Imagery and Mapping Agency, 1968 (10MB)"
+    },
+    {
+      "title": "Vinh and Ben Thuy",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-vinh-1970.jpg",
+      "catalogueDescription": "1:12,500, Edition 3-TPC, Series L909, National Imagery and Mapping Agency, 1970 (5MB)"
+    },
+    {
+      "title": "Vinh Long",
+      "url": "https://maps.lib.utexas.edu/maps/world_cities/txu-pclmaps-vinh_long-1966.jpg",
+      "catalogueDescription": "1:10,000, Edition 1-TPC, Series L909, National Imagery and Mapping Agency, 1966 (9.8MB)"
+    }
+  ]
+}

@@ -15,6 +15,10 @@ import { BOUNDARY_URL, NEIGHBOUR_URLS, makeLocator, regionOf } from '../lib/regi
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
 const force = args.includes('--force');
+const onlyIndex = args.indexOf('--only');
+const only = onlyIndex >= 0 ? args[onlyIndex + 1] : null;
+if (onlyIndex >= 0 && !/^[0-9a-f-]{36}$/i.test(only ?? ''))
+  throw new Error('--only requires a map UUID');
 
 const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false },
@@ -34,11 +38,13 @@ const locateAbroad = (x, y) => abroad.some((f) => f(x, y));
 
 const rows = [];
 for (let from = 0; ; from += 1000) {
-  const { data, error } = await db
+  let query = db
     .from('maps')
     .select(apply ? 'id,name,bbox,status,region' : 'id,name,bbox,status')
     .order('id')
     .range(from, from + 999);
+  if (only) query = query.eq('id', only);
+  const { data, error } = await query;
   if (error) throw error;
   rows.push(...data);
   if (data.length < 1000) break;
@@ -96,3 +102,17 @@ for (const r of out.set) {
   written++;
 }
 console.log(`\nwrote ${written} rows`);
+if (only) {
+  const { data, error } = await db
+    .from('maps')
+    .select('id,region,region_2025,regions,regions_2025')
+    .eq('id', only)
+    .single();
+  if (error) throw error;
+  const expected = out.set.find((r) => r.id === only);
+  for (const key of ['region', 'region_2025', 'regions', 'regions_2025']) {
+    if (JSON.stringify(data[key]) !== JSON.stringify(expected?.[key]))
+      throw new Error(`Read-back mismatch: ${key}`);
+  }
+  console.log('Read-back verified:', JSON.stringify(data));
+}
