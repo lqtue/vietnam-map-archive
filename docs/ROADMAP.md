@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-05)
+# Roadmap — open work (updated 2026-10-06)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -118,20 +118,6 @@ measurement, metadata that maintains itself, and corpus size.
       over 2px against a version-28 snapshot. 46 holds remain: 24 catalogue-span, 4 axis-scale-only,
       12 mixed, 3 shape/aspect, 3 persistent exclusions. Resume from
       `docs/journals/260929-series561-handoff.md`.
-- [ ] **`indochine-100k-licence`** — **premise moved (2026-10-01):** the ingest is done, and all
-      581 rows already carry `CC BY 4.0 — IGN, deposited in Nakala`, not the NC-SA string below.
-      Still open: whether CC BY is right for the 100,000 series. The exit is now "the minted rows
-      carry a verified licence", not "settle before minting". Original text: settle it before the
-      ingest run mints 578 rows.
-      Probed 2026-09-21 with the same
-      per-item method that settled the 25,000 series, `10.34847/nkl.3490q3l6` (serie 561) also
-      returns `"CC-BY-4.0"`, not NC-SA — and both series' CartoMundi records name the *same* Nakala
-      collection DOI (`10.34847/nkl.d2a82952`). So the per-item field does not discriminate between
-      them, and whatever established NC-SA for the 100,000 series was not re-verifiable: the Nakala
-      collection page now demands SSO. `scripts/oneoff/ingest_indochine_100k_nakala.mjs` writes
-      CC-BY-NC-SA-4.0 into every row it mints. Settle this **before** the ingest run mints 578
-      more of them — over-claiming a restriction is cheaper than under-claiming one, but a
-      collection of 578 rows carrying the wrong licence string is expensive to correct.
 - [ ] **`shape-precision`** — measure shapes before tuning them. There is a recall-ish number and
       **no
       precision number at all**, so every segmentation change to date is unfalsifiable. Trace one
@@ -188,9 +174,10 @@ Do them when the surrounding work opens the file.
       obtainable L7014 sheets, or publishes a draft, the index still says *gap* and the coverage
       page still draws it missing: right about the survey, wrong about us, with no symptom but a
       plausible-looking number. Real fix: derive `held_by`/`map_id` in a view, or a trigger on
-      `maps`. Pending migrations 105–106 add role-gated `series_cell_coverage` and
-      `series_printing_availability` views. These derive distinct public cells and printings, but
-      production readers still consume legacy snapshots until rollout. Exit: publishing a draft
+      `maps`. Migrations 105–106 (in production) add role-gated `series_cell_coverage` and
+      `series_printing_availability` views. These derive distinct public cells and printings, and
+      the coverage page and series index now read them (`seriesSheets.ts`, `seriesIndex.ts`); the
+      `held_by`/`map_id` snapshot columns remain. Exit: publishing a draft
       moves its cell to *held* with nobody running anything, and service-role readers preserve the
       same public gate.
       **Until then there is a detector, which is not the same thing** —
@@ -260,6 +247,14 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       corpus will drift. Keep its own pass only for what the view drops — `legend_entry` rows,
       `--min-confidence`, per-sighting provenance. Exit: the script's ground-name count equals the
       view's, and `--self-check` still passes.
+- [ ] **`text-box-groups`** — deploy the matching app changes; migrations 112–114 applied
+      2026-10-06 and the OCR reader verified with grouping available. Local implementation keeps original oriented boxes linked in click order under
+      one combined label, with Shift-click selection and Ungroup. All Text edits now share
+      a per-user/map browser draft cache and explicit Save drafts; the single list has local
+      Type/Region filters and task presets. Controller, browser
+      interaction (mocked writes) and isolated SQL checks pass. Exit: deploy, then verify
+      one real group and ungroup in Text without changing its
+      original readings; search returns the combined label once.
 - [ ] **`dictionary-review`** — after the drain. The first artefact a human can check against the
       sheets: errors invisible one bbox at a time (`ARSENAL DE L`, `HOTEL DU GNRAL`, a bare `Rue`
       seen 14 times) are obvious in an alphabetical list. Exit: the 20 most-sighted names are each
@@ -325,18 +320,18 @@ system — what a result must retain, and the two kinds of check — is in the r
       `attested-variants` build on its `claim_evidence` rather than beside it. Exit: a public
       claim opens its exact source region; the packet survives an OCR or georeference correction;
       draft evidence stays private. Plan: `docs/evidence-chain-plan.md`.
-- [ ] **`georef-versions`** — the georeference is not a database object. GCPs, transformation,
-      mask and RMSE exist only inside `annotations/<id>.json`; only `geom_src` and a copied
-      `geom_rmse` reach the DB. One table, one row per stored version, appended by every writer
+- [ ] **`georef-versions`** — finish recording a database row for every georeference writer.
+      Migration 103 supplies the version table and `map_georef_current`; GCP coordinates and
+      masks remain in the versioned annotation. One row per stored version, appended by every writer
       (`mirrorAnnotation`, the neatline PATCH, the sync script, the pipeline georef scripts). Exit:
       one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
-      stale labels. Plan: `docs/knowledge-system-plan.md` §5. **Built 2026-10-01, not pushed:**
+      stale labels. Plan: `docs/knowledge-system-plan.md` §5. **Built 2026-10-01, pushed:**
       migration 103, the three TS/JS writers, `scripts/backfill_georef_versions.mjs`, one write
-      test. Left: `db push` **before** the app deploy, regenerate types, run the backfill with
-      `--apply` (it prints the exit query; the 2026-10-01 dry run counted 592 maps, 21 history
-      files, 584 live files needing a history copy, 0 unparseable, one history name that is not a
-      stamp and five root files not keyed by uuid), then the four writers named in plan §5 record
-      their own rows.
+      test. Read-only check 2026-10-05: 604 version rows on 591 maps, including two history rows
+      for 1882; both have origin `unrecorded`, consistent with the catch-up backfill. This is an
+      inventory, not proof that every Storage file is covered. Left: the four writers named in
+      plan §5 must record their own rows, then verify coverage against Storage and the stale-label
+      join. Keep the item open for that writer coverage.
 - [ ] **`rewarp-on-sync`** — a synced georeference leaves its labels on the old one. Measured
       2026-10-01: 1882, 1895, 1898, 1923 and 1942 carried stale `geom_src`. The one-off repair
       **ran 2026-10-01**: `scripts/oneoff/fix_saigon_1942_1968.mjs` queued 5 `warp` jobs, and all
@@ -346,12 +341,12 @@ system — what a result must retain, and the two kinds of check — is in the r
       on that map carries an old `geom_src`.
 - [ ] **`georef-flag-one-meaning`** — the code has three different tests for "is this map
       georeferenced", and they disagree:
-      - `api/search/+server.ts:368,395` (the facet) tests `allmaps_id` alone, so the 480 Indochine
+      - `api/search/+server.ts:436,463–464` (the facet) tests `allmaps_id` alone, so the 480 Indochine
         halves made by our pipeline count as not georeferenced;
       - `data/supabase/footprints.ts:62` (the label-map picker) also requires `allmaps_id`, which
         excludes the same halves;
-      - `fetchGeoreferencedMaps` (`data/maps/service.ts:119`) accepts `allmaps_id` with no status
-        filter, so signed-in users get 267 drafts whose `allmaps_id` has nothing behind it on
+      - `fetchGeoreferencedMaps` (`data/maps/service.ts:149`) accepts `allmaps_id` or `annotation_url`
+        and filters only `archived`, so signed-in users get 267 drafts whose `allmaps_id` has nothing behind it on
         Allmaps.
 
       `is_georeferenced` already exists. Exit: every "georeferenced" test in `src/` reads that one
@@ -384,10 +379,13 @@ system — what a result must retain, and the two kinds of check — is in the r
       | 1959 | 10 | 14.0 m | 22.9 m | |
       | 1968 | 15 | 9.0 m | 20.1 m | |
 
-      Still citing the old numbers: `work/analysis/district4/georef_error.md`,
-      `docs/journals/260921-sheet-overlap.md:82`, `docs/paper/related-work.md:628` and the 1882
-      hash pinned in `evidence-chain-plan.md` step 1 (now `93c4487e621f83c9`). Exit: each cites
-      a figure together with the GCP set it was measured on.
+      Updated 2026-10-05: the District 4 record and `docs/paper/related-work.md` now distinguish
+      dated point sets; live 1882/1942 fits reproduced in `research/framework-audit-followup.md`.
+      The 1942 declared affine fit is 26.5 m; 33.6 m above is the comparison similarity fit.
+      Left: rerun the 1882/1898 overlap in `docs/journals/260921-sheet-overlap.md` on the new
+      fit. The example hash in `evidence-chain-plan.md` is now tied to the live mirror read
+      2026-10-05 (`93c4487e621f83c9`); comparing that mirror with upstream remains in the pilot.
+      Exit: each cites a figure together with the GCP set and named measure it was measured on.
 - [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
       neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
       writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
@@ -405,7 +403,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       deployed readers use stable identity. Plan: `docs/knowledge-system-plan.md` §1.
 
 - [ ] **`multi-printing-cells`** — preserve `series_cells` as one index row per cell; do not widen
-      its primary key and count printings as cells. Pending branch migration 106 adds independent
+      its primary key and count printings as cells. Migration 106 (in production since 2026-10-04) adds independent
       `sheet_printings` rows linked by cell UUID, with optional reviewed links from source items and
       map scans. It does not guess printing identity from years/edition labels or backfill old rows.
       Still open: review margin/catalog evidence, exercise the approved pilot cells, roll out readers
@@ -416,11 +414,16 @@ system — what a result must retain, and the two kinds of check — is in the r
       and the Mekong delta, top of the scout queue at `/admin?tab=scout`. Pattern is
       `scripts/oneoff/import_indochine_series_sheets.mjs`; union every edition of the survey, not
       one.
-- [ ] **`l909-index`** — no coverage page, no /explore link. Narrower than it looks: the DB-filing
-      half is already done in production — `fix_l909_series_index.mjs --apply` has run, all three
-      sheets carry one `collection` string (`AMS L909 — Việt Nam City Maps 1:12,500`) and
-      consistent `extra_metadata.series`/`edition`. What's missing is a `series_cells` row set —
-      someone still has to decide what the survey contains beyond the three held sheets.
+- [ ] **`l909-index`** — the partial catalogue-backed index is in production (2026-10-06):
+      20 known city cells, 3 served maps and 17 externally obtainable; 21 PCL source items include
+      Nha Trang and Quy Nhơn versos without counting them as extra cities. Import/read-back:
+      `scripts/oneoff/import_l909_series_cells.mjs`; evidence: `work/l909/pcl-city-maps.json`.
+      The coverage page, catalog link and partial-index wording are implemented locally.
+      The 19 missing indexed scans (17 city rectos + 2 versos) are now mirrored and ingested as drafts;
+      native pixels, thumbnails, overviews, source links and representative tiles were verified.
+      Record manifest: `work/l909/ingested-scans.json`; preparation/georeferencing remain pending.
+      Still open: establish the full historical city/edition inventory and catalogue cell extents.
+      No survey-completeness percentage is justified by this partial list.
 - [ ] **`titles-from-sheet`** — not from the catalogue. CartoMundi's spellings are
       French colonial transcriptions — `Yên-Dinh` is half-accented for Yên Định and reads as an
       error. Deliberately not applied; it sits behind `--names` in
@@ -447,7 +450,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       drafts
       included, which was inspect's last stated job. Check the two things the record page does not
       obviously carry over — the tool map picker, and the plain level0 look — before deleting
-      `features/contribute/inspect/`. Exit: either the directory is gone and `SCAN_MODES` has three
+      `features/contribute/inspect/`. Exit: either the directory is gone and `SCAN_MODES` has four
       entries, or `scanModes.ts` says which job keeps it alive.
 - [ ] **`slug-alias-proof`** — `map_slug_aliases` is empty on production, so the retired-name 301 is
       exercised only by
@@ -657,13 +660,22 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
       reader just tapped (pre-existing, found 2026-09-13).
 - [ ] API response shapes → `{ ok, data }`.
 - [ ] `tokens.css` grey ramp → fold the `color-mix` hacks.
-- [ ] 69 eslint warnings, mostly unkeyed `{#each}`.
-- [ ] Files > 400 lines: MapEditHostingTab 584, CreateMode 583, OcrSidebar 562 (→ OcrTable, needs
-      OCR test data), MapEditPipelineTab 467, TripPlayback 462, CatalogTable 450,
-      StudioAnimationPanel 412, explore/+page 407, TriageSidebar 407, trip/[id]/+page 405,
-      StudioMode 405.
+- [ ] Files > 400 lines (Svelte, `wc -l`, 2026-10-06, working tree): screens/+page 907,
+      catalog/series/[key]/+page 758, (editorial)/+page 705, DigitalizePage 668, OcrSidebar 658
+      (→ OcrTable, needs OCR test data), ExplorePage 651, NavBar 625, CommandPalette 619,
+      MapEditHostingTab 605, CreateMode 588, ReviewSidebar 541, LegendPage 496, FeaturedSheet 488,
+      AnnotateMode 477, catalog/[id]/+page 466, OcrBboxTool 454, MapEditPipelineTab 452, ShapesPage
+      450, TripPlayback 431, AnnotateAnimationPanel 412, CatalogUnifiedSearch 405.
 
 ## Infrastructure
+
+- [ ] **`usage-measurement`** — purposeful measurement for a bounded user study,
+      grant evidence and eventual donation invitations. Plan: [usage measurement](usage-measurement-plan.md).
+      Use opt-in GA4 journeys, existing DB-confirmed outcomes and voluntary reuse
+      evidence; defer the custom collector/dashboard. Implement role exclusion,
+      canonical navigation and meaningful search/contribution hooks; configure and
+      verify production separately. Exit: 6–8 weeks of documented observation,
+      one evidence sheet and one justified product/study/support recommendation.
 
 - [ ] **`preview-env-vars`** — the Preview environment has none. Production holds all five, Preview
       holds none, so

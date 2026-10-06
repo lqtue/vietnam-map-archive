@@ -45,13 +45,13 @@ else under another feature is private. Routes may import anything under `feature
 
 ```
 src/lib/
-├─ core/      pure — no OL, no Supabase        geo/ iiif/ utils/ (+ utils/persistence/)
+├─ core/      pure — no OL, no Supabase        geo/ georef/ i18n/ iiif/ utils/ (+ utils/persistence/)
 ├─ data/      DB/HTTP access + canonical types  supabase/ maps/ admin/
 ├─ server/    $lib/server — SvelteKit blocks client import
 │             auth.ts supabaseAdmin.ts http.ts storage.ts ia.ts mapFields.ts
 │             facets.ts transformer.ts allmaps.ts ocrReview.ts
 ├─ map/       the OpenLayers runtime, one home  shell/ stores/ annotations/ types.ts constants.ts
-├─ features/  one dir per product surface       explore/ catalog/ stories/ annotate/ contribute/ admin/
+├─ features/  one dir per product surface       explore/ catalog/ stories/ annotate/ contribute/ admin/ account/ shared/
 └─ ui/        generic primitives only           NavBar EditorialFooter PageHero MapCard Tabs SortHeader LocationSearch …
 ```
 
@@ -97,7 +97,7 @@ carries.
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
-- `src/lib/data/supabase/types.ts` is generated and current against migration head **110** (`edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified
+- `src/lib/data/supabase/types.ts` is generated and current against migration head **116** (115 only replaces the `context_at` body, so it changes no type; the 116 `maps`/`map_images` columns and 112–114's text-group columns are present, verified 2026-10-06. `edition` and `region` / `region_2025` were added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified
   2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
   changes only a default). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift

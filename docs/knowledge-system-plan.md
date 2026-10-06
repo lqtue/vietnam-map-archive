@@ -26,6 +26,19 @@ additive implementation branch for stable series/cell/printing identities and ar
 they are not recorded as deployed or populated data. The production counts below remain the baseline
 until rollout and reviewed evidence are complete.
 
+*Update 2026-10-05:* `supabase migration list` shows 103 to 111 applied to production, so "pending" below
+is the state on 2026-10-01. Row counts of `maps` here are all rows, drafts included (859, of which 528
+published); the anon-visible published set on 2026-10-05 is 1,038 (`catalog-plan.md`). The figure of 274
+in `paper/` and `pipelines.md` is the same all-rows count on 2026-09-15 to 20, before the Indochine
+1:100,000 (created 2026-09-21 to 23) and L7014 (2026-10-01 to 02) ingests, by `created_at`.
+
+*Service-role follow-up, 2026-10-05 15:43 UTC:* 1,499 maps across all statuses (1,033 public,
+5 featured, 460 draft, 1 archived); 15,133 OCR rows on 24 maps (499 validated, 3,147 rejected,
+11,487 pending), 8 with a polygon link; 1,067 scout candidates; 604 georeference versions on
+591 maps. These storage-row populations include legend entries and rejected OCR, and supersede
+neither the dated October 1 snapshot nor a reviewed map-text benchmark. Method and limits:
+`research/framework-audit-followup.md`.
+
 ## 1. The question that started it: series and collection overlap
 
 **Yes, they overlapped in the production schema.** `maps.collection` was meant as a display string,
@@ -77,14 +90,14 @@ identified and how it is classified. An empty cell in these tables is a finding,
 | **Survey** (series) | `maps.collection` text; the `map_series` view summarises it | `series_key(collection)`. There is no table. | 5 named; 4 appear in the view |
 | **Cell** | `series_cells` | `(series_key, sheet_number)` | 1,046 |
 | **Printing** | `cell_printings` | row id. It deliberately has no foreign key, so a printing we do not hold still has a home. | 1,131 |
-| **Map** (a held sheet, or an E/W half) | `maps` | `id`; `slug` is its address | 859 (528 published) |
+| **Map** (a held sheet, or an E/W half) | `maps` | `id`; `slug` is its address | 859 rows, every status (528 published; production, 2026-10-01) |
 | **Image** (a scan or IIIF service) | `map_images`, plus R2 tiles | row id | 481 published maps have **no image row at all**: the Indochine halves, plus one L7014 sheet |
 | **Georeference version** | Storage: `annotations/<id>.json` for the live version, `annotations/<id>/<stamp>.json` for history | `geom_src` (a hash of the GCP set), but only as a copy on derived rows. The georeference is **not a database object**. | 592 live |
 | **GCP set** | Inside the annotation JSON, `body.features` | none | readable only by parsing the JSON |
 | **Transformation** | Inside the annotation JSON, `body.transformation` | none | polynomial 566, helmert 20, thin-plate spline 5 |
 | **Mask** | Three different things; see §2c | none | — |
 | **Fit quality** (RMSE) | `geom_rmse`, copied onto each label and polygon row | none | no figure stored per map or per version |
-| **Text label** | `ocr_labels` | `id`; `run_id` groups the output of one OCR run | 14,506 labels on 22 maps |
+| **Text label** | `ocr_labels` | `id`; `run_id` groups the output of one OCR run | 14,506 labels on 22 maps (every `review_status`; production, 2026-10-01) |
 | **Polygon** | `footprints` | `id` | 1,519 polygons on 2 maps |
 | **Pin** | `label_pins` | `id`, located by pixel x/y | 368 |
 | **User layer** | `user_layers` (`annotation_sets` is only its compatibility view) | `id` | 15 |
@@ -178,15 +191,16 @@ changed. All five were re-warped the same day. The 1882 hash pinned in `evidence
 step 1, `245d98f7f8d61572`, is the old one; the current hash is `93c4487e621f83c9`.
 
 The staleness check works as designed: the hashes differ, so the drift is visible. But nothing
-re-warps on its own when an annotation is synced (`rewarp-on-sync`), and the georeference has no
-database row that a query could compare the hashes against (`georef-versions`).
+re-warps on its own when an annotation is synced (`rewarp-on-sync`). Migration 103 now supplies
+database versions for comparing hashes; four writers still need to record their own rows
+(`georef-versions`).
 
 ## 5. Gaps, ranked
 
 Each gap is named for its subject. "Owner" points at the plan that already holds it, if any.
 
 1. **`georef-versions`: make the georeference a database object.** This is the one genuinely new
-   table. **Built (migration 103, not yet pushed):** `georef_versions(map_id, stamp, geom_src,
+   table. **Built (migration 103, applied to production 2026-10-01):** `georef_versions(map_id, stamp, geom_src,
    transformation, gcp_count, rmse_m, rmse_method, source_id, source_width, source_height, origin,
    allmaps_id, user_id)`, one row per history file, plus the `map_georef_current` view (newest
    stamp per map). It differs from the first draft of this plan in four ways:
@@ -286,7 +300,11 @@ under Evidence and legibility, and `series-identity` under Survey layer and cata
   sync on 2026-10-01 put it back. This is the first regression caused by having no review step
   before syncing. `scripts/oneoff/fix_saigon_1942_1968.mjs` dropped the point again the same day:
   33.6 m RMSE on 8 GCPs. The point still has to be deleted in the Allmaps Editor
-  (`allmaps-drift`).
+  (`allmaps-drift`). **Earlier figures for this sheet, all superseded:** 72.3 m on 12 GCPs
+  (2026-09-19), then 15.9 m on 8 GCPs after four points were dropped (2026-09-21), both from
+  `work/analysis/district4/georef_error.md`. Different point sets, not one series; 112 m is the
+  9-GCP state after the 2026-10-01 sync restored the bad point. The current figure is 33.6 m
+  (2026-10-01, our copy only, similarity RMSE, `ROADMAP.md` `georef-figures-refresh`).
 - **1968 Sài Gòn.** `allmaps_id` is keyed to an Internet Archive scan that has no `map_images` row,
   so no editor link can be built. The same script adds the row.
 - **1959 Đô thành Sài Gòn** is consistent: its stored copy matches upstream, the fit is 14 m, and
@@ -306,22 +324,22 @@ any one period of work, fix the lowest broken layer first.
 
 | Layer | What it holds | Open items |
 |---|---|---|
-| **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `indochine-100k-licence` · `hue-rescans` · `gallica-text-harvest` |
+| **0. Sources and surveys** | providers, surveys, cells, printings, holders, rights, period texts | `series-identity` · `multi-printing-cells` · `held-by-derived` · `series-sheets-bbox-datum` · `cochinchine-index` · `l909-index` · `hue-rescans` · `gallica-text-harvest` |
 | **1. Holdings** | the map row, its scans and tiles, its address | `map-json-to-columns` · `triage-scan-identity` · `slug-alias-proof` · `slug-in-payloads` · `unify-mirror-step` · `titles-from-sheet` |
 | **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-iiif` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
-| **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `legend-numeral-misses` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
+| **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `text-box-groups` · `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `legend-numeral-misses` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
 | **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
 | **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` |
 | **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
-| **Outside the model** | operations, CI, the language of the UI | `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 7 unnamed lines under ROADMAP's Debt heading |
+| **Outside the model** | operations, CI, the language of the UI | `usage-measurement` · `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 6 unnamed lines under ROADMAP's Debt heading |
 
 The current scope of `river-reconstruction` is approved 1882 water; its 1898 work is
 deferred by the [1882 feature-layer plan](image-processing-1882-plan.md). The item stays in layer 3.
 
-That is 82 named items, plus the 7 unnamed debt lines, as of 2026-10-05.
+The index gained `usage-measurement` on 2026-10-06. Use ROADMAP for current scope and completion checks.
 
-**Reading the table.** Layer 3 holds the most items (20), but the layers are not equally healthy
-underneath. Placement (layer 2) has 11 open items and three of them were stale or wrong this week,
+**Reading the table.** Layer 3 holds the most items (22), but the layers are not equally healthy
+underneath. Placement (layer 2) has 12 open items and three of them were stale or wrong this week,
 while layer 3's corpus is 22 OCR'd maps, of which 118 labels have been reviewed. So until
 `georef-versions` and `rewarp-on-sync` land, every new batch of readings rests on placement that
 nothing re-checks automatically.

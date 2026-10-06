@@ -4,6 +4,7 @@ Start here to find a guide, understand the system, or locate the evidence behind
 For scripts, datasets and local experiments, use the [work directory guide](../work/README.md).
 
 The [directory layout](model-layout.md) follows the same layers as the knowledge system.
+The [map-type audit](catalog-map-type-audit.md) records the original-map review and pending classification questions.
 The [workspace mapping](workspace-model.json) declares each area's primary responsibility;
 [research records](research/README.md) now have a dedicated folder.
 
@@ -48,6 +49,7 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Theory](theory.md)                          | Intellectual framework                               |
 | [Knowledge system](knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
 | [Search](search-plan.md)                     | Finding labels, shapes and period sources            |
+| [Usage measurement](usage-measurement-plan.md) | Study, grant and support evidence; opt-in journeys and confirmed outcomes |
 | [Catalog](catalog-plan.md)                   | The public list: columns, facets, speed, search       |
 | [Walk](walk-plan.md)                         | Proposed district walks; forks the separate HACW app |
 | [Evidence chain](evidence-chain-plan.md)     | Source-backed claims, review and reuse               |

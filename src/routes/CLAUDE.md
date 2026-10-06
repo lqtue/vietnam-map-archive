@@ -34,9 +34,11 @@ and `paletteDestinations.ts`.
 | `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
 | `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |
 | `/catalog/place/[name]` | The gazetteer: one page per attested place name | `src/routes/(editorial)/catalog/place/[name]/` |
+| `/catalog/area/[slug]` | Curated modern-province coverage pages, published maps only; links from catalog and sitemap | `src/routes/(editorial)/catalog/area/[slug]/` |
 | `/catalog/series/[key]` | One survey: its coverage and every sheet it contains, held or not | `src/routes/(editorial)/catalog/series/[key]/` |
 | `/catalog/series/[key]/[number]` | One sheet of a survey — including the ones the archive does not hold | `src/routes/(editorial)/catalog/series/[key]/[number]/` |
-| `/catalog/cartomundi` | CartoMundi's Vietnam-related series and item-level Nakala rights evidence | `src/routes/(editorial)/catalog/cartomundi/` |
+| `/catalog/institutions` | Holding institutions and source platforms, with published maps and external source records | `src/routes/(editorial)/catalog/institutions/` |
+| `/catalog/institutions/cartomundi` | CartoMundi's Vietnam-related series and item-level Nakala rights evidence; `/catalog/cartomundi` redirects here | `src/routes/(editorial)/catalog/institutions/cartomundi/` |
 | `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
 | `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
 
@@ -85,7 +87,7 @@ client-side search against `/api/search`, but `fetchSeriesIndex` (`$lib/data/map
 crawler gets. There is no `/catalog/series` index page any more; it 301s to `/catalog`. It feeds three things:
 
 - the **band** above the results — `SeriesList`, every series with a published sheet, one line each (one with no imported
-  index, AMS L909, is a button, since it has no coverage page), shown only
+  index is a button, since it has no coverage page), shown only
   while `atRest` (no query, no facet) is bound back out of `CatalogUnifiedSearch`;
 - the **drawer** a row opens (`SeriesDetailDrawer`) — the row keeps its real `href`, so cmd-click
   and crawlers still reach the coverage page and only an unmodified left click is taken;
@@ -101,3 +103,9 @@ Map CRUD is inline in `/catalog`, gated by `role === 'admin' | 'mod'`:
 `src/routes/(editorial)/catalog/+page.svelte` renders `MapEditModal`. Plus the dedicated pages
 `/admin?tab=bulk` and `/admin?tab=scout`. There is no general `/admin` route. Full reference in
 `docs/admin-tooling.md`.
+
+**Per-sheet work state** (staff only) is derived, never stored: `GET /api/admin/maps/work-state`
+(`requireRole` admin/mod) reads `maps.triage`, `ocr_labels.category` and `map_pipeline_status` into
+a `WorkFacts` per sheet (`$lib/core/sheetWork.ts` holds the vocabulary; `$lib/data/admin/sheetWork.ts`
+the fetch). It feeds `SheetStatus` / `WorkPips` / `OpenInMenu` in the catalog table, grid and
+drawer, `SheetWork` on `/catalog/[id]`, and the `/scan?mode=legend` picker.

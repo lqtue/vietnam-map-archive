@@ -83,6 +83,14 @@ bounds anything compared against the modern city.
 constant, not a per-point residual, and cannot be used to weigh an individual
 label.
 
+> **Superseded 2026-10-05.** Every figure on this page is for the ten-point annotation of 2026-09-19.
+> The sheet now has 8 GCPs: similarity RMSE **12.3 m**, worst 19.9 m (`ROADMAP.md`
+> `georef-figures-refresh`, re-measured 2026-10-01). The 499 labels were re-warped the same day and
+> now carry `geom_rmse` 15.1354 (`georef_versions.rmse_method` = `gcp-roundtrip-rms`, a third
+> measure; read 2026-10-05, not recomputed), not 16.50. 12.7 m, 10.6 m and 16.50 are three measures
+> of one old point set, not three estimates of the current fit; 11.3 m was the spherical-earth
+> version of 12.7 m (note above).
+
 **And do not generalise this sheet's figure to the archive.** The same method run
 over all six District 4 sheets puts 1968 at 9.0 m and 1959 at 12.8 m, but **1942
 at 72.3 m RMSE with a worst point of 193.7 m** — on the sheet carrying 31.7% of

@@ -65,21 +65,18 @@ about shapes rather than words.
 Pick a sheet from the left rail. It badges each map **Triaged** and **OCR'd**, which is how you find
 your place across a long session.
 
-### The four reading jobs
+### One text list, with optional filters
 
-`?mode=text` is four tabs at the foot of the panel, each badged with how many rows it holds. They
-divide the sheet's rows between them with nothing left over, so clearing all four clears the sheet.
+Text starts on **All text**, showing pending and validated labels from every run.
+Rejected labels are available through Status. **Type** describes the label's meaning
+(street, place, institution, building, hydrology, title, legend, etc.); **Region**
+describes its location on the sheet. A name outside the neatline remains accessible
+in All text and the Map labels preset.
 
-| Job | What you are checking |
-|-----|----------------------|
-| **Names** | The names printed on the terrain: streets, places, water, institutions. |
-| **Index** | The sheet's own printed tables — the numbered legend and the name list. The canvas frames the table; the rows beside it *are* the table, in the order the paper prints them. |
-| **Numbers** | The numerals on the map, against the index that explains them. The **suspect** chip is what the index contradicts. |
-| **Other** | Title block, scale bar, stamp, anything that fell off the sheet. |
-
-This replaced a row of category chips. A category cuts across all four jobs: the 1942 sheet's
-printed index alone contributed 719 `street` rows and 630 `institution` rows, none of them marks on
-the map, all of them sitting in the same chip as the street names you were trying to check.
+The preset menu applies ordinary Type/Region filters: **Map labels**, **Printed
+lists**, **Numbers**, and **Sheet notes**. These are shortcuts for reviewing a part
+of the sheet, not additional categories stored in the database. Filters, search and
+presets operate on the loaded sheet without another database query.
 
 ---
 
@@ -181,6 +178,30 @@ scans. Aim for roughly **1.4 km per call**.
 Rendering is *not* the lever. A tile rendered at 1:1 and the same tile upsampled 2× gave
 byte-identical output; the scan is the ceiling.
 
+**Estimating how much text a tile holds before paying for it.** "Skip the blank margins" needs a
+number per tile, and colour turned out to be a weak way to get one. What has been tried, all
+read-only and none costing an API call:
+
+| Method | Result |
+|--------|--------|
+| **Local variance** — share of 8×8 windows with grey std-dev above 25 (`compute_tile_densities`, `iiif_tiles.py`) | **The one in use** (`--auto-priority`, `--skip-sparse`). Correlates 0.30–0.67 (Spearman) with OCR'd characters per 250 px cell across five sheets. |
+| **Hue/saturation wash demotion** (`compute_tile_colours`) — water and vegetation read as busy but hold few names | Opt-in only. It looks at hue 60–260°, and every saturated pixel on the 1882 cadastral sits at 0–60° (aged paper, pink tints), so it scored 0.000 on every tile. Does nothing on a grey scan. |
+| **Dark neutral ink** — black-hat against the local paper level, saturation below 0.45 | 0.27–0.59. Ties or loses to local variance on four of five sheets. Linework (hachures, parcel borders, contours) is as dark as the lettering, so colour cannot separate them. |
+| **Ink minus straight lines** — open with 25 px line kernels at 12 angles and subtract | Frees text that touches a line. +0.04 on the 1882 sheet, otherwise noise. |
+| **Orientation coherence gate** — keep ink only where the structure tensor is isotropic (lettering) rather than aligned (lines) | 0.66 on the 1882 sheet, but 0.47 on 1878 and 0.22 on 1799. The 0.66 was tuned on the data it was scored on — do not quote it. |
+| **Local layout detection** (`detect-layout`, scipy) | Found 0 of 17 legend and index boxes on nine sheets. The model's scout is about $0.009 a sheet, so use that. |
+
+What this means in practice: on a dense city plan a density pass finds almost no empty tiles. The
+saving is excluding the legend and index tiles, which is what the layout step already does. Skipping
+pays on older regional sheets (a 1791 river plan came out 20% empty). Treat any text-amount figure as
+a rough ranking of tiles, not a count of names.
+
+**These figures are provisional.** The only ground truth is OCR output, not yet fully validated, and they should be re-measured once the sheets have been edited (`work/ocr/scripts/ink_lines.py`).
+
+**The measurement is noisy.** The only ground truth is OCR output. The "validated" rows on most sheets
+are whole-legend entries rather than map labels, so a per-tile score is against unvalidated Gemini
+reads. Only the 1882 and 1799 sheets have real validated map labels.
+
 ### 4. Save triage — the step that counts
 
 Everything above autosaves to your browser as a draft. **Nothing on a server can see that.**
@@ -206,16 +227,24 @@ Queues the job and returns. Watch the worker's terminal, or come back later.
 
 ## Text, the second mode
 
-Pick a job from the tabs at the foot of the panel; the table lists that job's rows — text, category,
-confidence, or for the Index job the printed cell and number. Click a row and its box highlights on
-the scan; click a box and the row focuses. Edit text or category inline; it saves when you click
-away. Draw a box the model missed with draw mode (`Escape` cancels a draw in progress). Validate or
-reject in bulk from the run bar.
+Start with All text or choose a task preset. Click a row to select its box; double-click
+it to zoom. Edit text or Type in the table or floating box editor. Draw a missing box
+with **Add bbox** (`Escape` cancels a draw). The box actions menu holds **Duplicate
+box**, **Reset box angle**, and **Ungroup**.
 
-Choosing a job also frames the canvas on the part of the sheet that job reads, and over a printed
-block it takes the boxes down — there the boxes are the crop each call covered, not the lines it
-read (235 rows of the 1942 index share six rectangles), so they hide the table you are there to
-read. The left rail turns them back on.
+Every text, Type, verdict, geometry, new-box and group change is a **draft**. The
+canvas and table share one working copy, cached in this browser per user and map.
+Refreshes and switching sheets retain drafts; other devices cannot see them. Only
+**Save drafts** writes to the database. Repeated edits to a box become one patch;
+verdict-only changes are batched by status. Successful writes update the working
+copy without reloading the whole list. If a save fails, confirmed writes stay saved
+and the remaining drafts can be retried. A fresh read that finds a saved label
+changed since the draft blocks overwriting it. **Discard** returns to the saved
+values. A cache-storage failure is shown explicitly.
+
+The Printed lists preset frames the printed region and hides boxes, because some
+index runs attach every line to its call's whole crop. Turn Text boxes back on in
+the left rail to inspect those rectangles.
 
 You will need this mode. Two things to expect:
 
@@ -380,3 +409,18 @@ dropping data*:
 
 None of these were found by reading the code. All were found by **measuring something that already
 appeared to work.** When a sheet looks finished, check a number.
+
+
+### Grouping separate words (migration 112 applied; app deployment pending)
+
+In Text, click the first word box, then Shift-click the remaining boxes in reading
+order. The floating panel offers the combined transcription and category; correct
+them and press **Group draft**. Boxes may come from different OCR runs on the same map.
+Existing edits can be included in the draft group. Shift-click a selected box to remove it from the selection.
+
+After Save drafts, a group is one searchable label. Its original boxes remain linked in order, with
+their text, rotation and review state intact; the canvas highlights those boxes
+rather than drawing a new enclosing rectangle. Review the combined transcription
+in the regular label panel. **Ungroup** stages removal of the combined label and restores the
+original readings; Save drafts commits that change. Ungroup before changing a member box's geometry or making a
+different group. The group's enclosing rectangle is only a navigation envelope.

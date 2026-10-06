@@ -22,13 +22,13 @@ un-paged version caps at 1,000 rows and reports the truncation as nothing, which
 
 | | **2026-09-19 (live)** | 2026-09-04, as the dataset card still says | note |
 |---|---|---|---|
-| `maps` rows | **274** | 101 | 2.7× |
+| `maps` rows (every status, drafts included) | **274** | 101 | 2.7× |
 | published (`public` + `featured`) | **252** | 38 | |
 | `georef_done` | **253** | 39 | the Tonkin ingest |
 | carrying `annotation_url` | **253** | 38 | |
 | carrying a ground `bbox` | **274 of 274** | 40 of 101 | |
-| `ocr_extractions` | **13,525** | 1,544 | |
-| …across | **22 sheets**, 42 runs | 6 of 39 | |
+| `ocr_extractions` rows (every review status; renamed `ocr_labels`, mig 095) | **13,525** | 1,544 | |
+| …across | **22 sheets**, 42 runs | 6 of 39 sheets (the "6 sheets" in `field-comparison.md`) | |
 | `status = validated` (the human gate) | **96** | 43 | |
 | `place_names` (gazetteer view) | **4,524** | 394 | |
 | `footprint_submissions` | **1,519** | 46 | see §0.2 |

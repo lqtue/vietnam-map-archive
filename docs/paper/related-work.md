@@ -625,23 +625,26 @@ Stated carefully, because the comparison is easy to make dishonestly:
 | Automatic, content-based — Luft & Schiewe (2021) | **101 m** median |
 | Automatic, toponym-based — Milleville et al. (2022) | **316 m** / **287 m** mean |
 | LMM on locality descriptions — Wijegunarathna et al. (2025) | **~1.03 km** |
-| **Our human-placed GCPs** | **9.0 m to 1,415.9 m** RMSE across the 274-sheet archive; the 1882 sheet at **12.7 m**, and **65% of all extractions sit on a sheet with a bad stated limit or none** |
+| **Our human-placed GCPs** | Historical 2026-09-19 inventory: **9.0 m to 1,415.9 m**, with **65.0%** of extraction rows on bad or unmeasurable fits; these are recorded historical results, not current archive totals. Rechecked 2026-10-05: **1882 12.3 m similarity RMSE on 8 GCPs**; **1942 26.5 m affine RMSE on 8 GCPs** (its declared model), or **33.6 m** under the comparison similarity fit. These are fitted-control-point residuals, not independent positional accuracy. |
 | **The L7014 datum fault we shipped** | **~470 m** |
 
-> **note 2026-09-19 — this row read "**2.3–19.0 m** rms; the 1882 sheet at **11.3 m** RMSE".**
-> Both figures were wrong. 11.3 m is the superseded spherical-earth conversion, now 12.7 m geodetic
-> (`docs/worked-example-1882.md:44`). The 2.3–19.0 m range is worse than superseded — it understated
-> the archive's ceiling by nearly 4×. Measuring all six District 4 sheets through one code path
+> **Historical correction, 2026-09-19 — this row read "**2.3–19.0 m** rms; the 1882 sheet at **11.3 m** RMSE".**
+> Both figures were wrong. 11.3 m used a superseded spherical-earth conversion; the replacement
+> 12.7 m geodetic figure also predates the later change from 10 to 8 GCPs
+> (`docs/research/worked-example-1882.md`). The 2.3–19.0 m range is worse than superseded — it understated
+> the six-sheet ceiling by nearly 4×. Measuring all six District 4 sheets through one code path
 > (`work/analysis/district4/georef_error.md`) puts **1942 at 72.3 m RMSE, worst point 193.7 m**, on
 > the sheet carrying 31.7% of all extractions. Two of the six cannot be measured from their own GCPs
 > at all.
 >
-> **The archive-wide pass has since run** — all 274 sheets, one code path
+> **The historical archive-wide pass ran on 2026-09-19** — all 274 maps then in the table, one code path
 > (`work/analysis/georef_coverage.md`). It is worse than District 4 suggested. Eight sheets are worse
 > than 1942; the worst is 1,415.9 m. **1922 (Carte routière des environs de Saïgon) is at 456.9 m and
 > is the archive's third most-extracted sheet** (1,420 rows). 35 of 274 sheets cannot be measured
 > from their own control points at all. Counted by extraction row rather than by sheet, **65.0%
-> (8,796 of 13,525) sit on a sheet whose stated limit is bad or absent.**
+> (8,796 of 13,525) sat on a sheet whose stated limit was bad or absent.** The saved coverage
+> table sums to that numerator (6,111 bad + 2,685 unmeasurable), but the original per-sheet pass
+> was not re-run here. Later re-fits and OCR edits prevent treating it as a current percentage.
 
 **The only honest comparison in this table is the last two rows against the middle ones**, and it is
 worth one sentence in §1:

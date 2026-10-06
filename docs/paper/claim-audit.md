@@ -18,6 +18,9 @@ archive incident from becoming an unwarranted priority or generalisation claim.
 | claim or number | status | current evidence | consequence for draft |
 |---|---|---|---|
 | catalog: 274 maps, 252 published, 174 IIIF sources, 160 jobs, 21 queued | A | `node --env-file=.env scripts/catalog_audit.mjs --quiet`, 2026-09-20 | Reproduced live totals; do not substitute them for the older OCR/gazetteer/footprint counts. |
+| catalogue size: 274 · 859 · 1,038 maps | A for 1,038 · B for 274 and 859 | 1,038 = rows of `maps` visible to the anon key (1,033 `public` + 5 `featured`, all with an `annotation_url`), paged PostgREST read, 2026-10-05. 274 (2026-09-15 to 20) and 859 (2026-10-01) are every-status counts with drafts, taken with the service key; drafts are invisible to anon, so neither reproduces from the public key. | Not a conflict: three populations on three dates. State the population wherever one is quoted; `paper/related-work.md`'s "274-sheet archive" is the all-rows count of 2026-09-19. The draft quotes none of them. |
+| OCR rows: 13,525 · 14,506 · 10,574 (and "6 sheets", "22 maps") | A for 10,574 · B for the rest | 10,574 `ocr_labels` rows on 22 maps, anon-visible, 2026-10-05: 8,955 pending, 1,127 rejected, 492 validated, 44 runs. 13,525 (22 sheets, 42 runs, 2026-09-19, `ocr_extractions`) and 14,506 (22 maps, 2026-10-01) were counted with the service key; "6 sheets" is the 2026-09-04 snapshot. The 1942 Plan de Saigon-Cho Lon (4,287 rows on 2026-09-19, `260919-seg-audit.md`) is not visible to anon. | The drop from 14,506 to 10,574 is not settled from the public key (the 1942 sheet alone is about 4,300 rows); do not quote a current total or validated count until it is counted with the service key. |
+| 1882 error 12.7 / 10.6 / 16.50 m; 1942 72.3 / 112 / 33.6 m (`related-work.md:628`, `:635`) | R | All are superseded point sets. Current (2026-10-01, `ROADMAP.md` `georef-figures-refresh`): 1882 12.3 m on 8 GCPs, 1942 33.6 m on 8 GCPs, similarity RMSE. Live `geom_rmse` on the 1882 labels is 15.1354 (`gcp-roundtrip-rms`), read 2026-10-05. | `related-work.md` still carries the 2026-09-19 figures; replace each with a figure plus its GCP set and date before any use. The draft states none of them. |
 | L7014 461 held/627; Indochine 75/79; 0 adrift/dangling/unindexed over 706 cells | A | `node --env-file=.env scripts/check_series_index.mjs`, 2026-09-20 | Reproducible live coverage. |
 | 274 maps and 253 usable GCP sets | A | `node --env-file=.env scripts/geo_audit.mjs --quiet`, 2026-09-20 | Reproduces a current inventory only. |
 | L7014 A/B: 437 denominator, fault population, displacement, seam census | A — **resolved 2026-09-20 (ARS round 1)** | re-run 2026-09-20, `work/l7014/regen/REGEN.md`; controlled A/B on one flag (`l7014_mosaic.py warp --no-datum-shift`) | Reproduced, but several numbers move: fault population **276** (`fit`) / **269** (CRS displacement), not 285; displacement **395–528 m, median 455**, not "~470"; seams **717**, median **9.2 m**, **97** over 300 m, not 750 / 19 m / 56. Draft now states the full 510→62→448→11→437 denominator chain (F1) and the matched-pair 189→0 result (F4). |
@@ -85,7 +88,17 @@ Scholar, Unpaywall and Scite all resolve the same date, and a reader following t
 an article stamped 30 December 2020. The draft already reads 2020 in all six places — the four
 in-text mentions, the Table 1 row and the reference entry — so nothing changed.
 
-## Submission requirement
+## Framework follow-up, 2026-10-05
+
+| claim or number | status | evidence and consequence |
+|---|---|---|
+| Current inventory: 1,499 maps / 1,038 published; 15,133 OCR rows on 24 maps; 499 validated; 8 polygon-linked; 1,067 scout candidates | A | Paged service-role read at 15:43 UTC, `research/framework-audit-followup.md`. Includes drafts, rejected OCR and legend entries. Historical 274 / 859 / 13,525 / 14,506 totals remain B and cannot be reconstructed from current mutable rows. The earlier public-key totals are a different population. |
+| 1882 fit 12.3 m, 8 GCPs; 1942 26.5 m affine / 33.6 m similarity, 8 GCPs | A | `georef_error.py --maps` against currently served annotations, 2026-10-05; dimensions and command in the follow-up. 1942 declares polynomial/affine: 33.6 m is a comparison similarity fit. `related-work.md` corrected; these are fitted GCP residuals, not independent accuracy. |
+| Historical 65.0% bad/unmeasurable extraction-row share | B | Saved coverage-table arithmetic checked: (6,111 + 2,685) / 13,525 = 65.034%; historical per-sheet classifications not rerun. Do not quote as current prevalence. 9.0 m is also recorded for 1968 in the District 4 analysis. |
+| Migration 103 and migration head 111 | A | Local/remote `supabase migration list` matches through 111. Version table contains 604 rows on 591 maps; this inventory does not prove complete Storage/writer coverage. The concurrent region work committed the initially untracked 111 file in `520209a7` during this pass. |
+| 958 names; historical 1942 nine-point 112 m state | R | No identified reproducible run for 958; 112 m remains prose-backed only. Exclude from established results until the run or exact annotation is recovered. |
+
+## Submission artifacts
 
 Before submission, deposit immutable or regenerable versions of the L7014 lattice, mosaic GeoJSON,
 source-manifest hashes, raw seam table, `fit` and correction dry-run outputs, and exact commit /
