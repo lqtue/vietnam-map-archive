@@ -380,12 +380,11 @@ export type Database = {
       }
       map_images: {
         Row: {
-          source_item_id: string | null
-          width: number | null
-          height: number | null
-          content_sha256: string | null
           asset_version: string | null
+          content_role: string
+          content_sha256: string | null
           created_at: string | null
+          height: number | null
           id: string
           iiif_image: string
           iiif_manifest: string | null
@@ -393,15 +392,16 @@ export type Database = {
           label: string | null
           map_id: string
           sort_order: number
+          source_item_id: string | null
           source_type: string | null
+          width: number | null
         }
         Insert: {
-          source_item_id?: string | null
-          width?: number | null
-          height?: number | null
-          content_sha256?: string | null
           asset_version?: string | null
+          content_role?: string
+          content_sha256?: string | null
           created_at?: string | null
+          height?: number | null
           id?: string
           iiif_image: string
           iiif_manifest?: string | null
@@ -409,15 +409,16 @@ export type Database = {
           label?: string | null
           map_id: string
           sort_order?: number
+          source_item_id?: string | null
           source_type?: string | null
+          width?: number | null
         }
         Update: {
-          source_item_id?: string | null
-          width?: number | null
-          height?: number | null
-          content_sha256?: string | null
           asset_version?: string | null
+          content_role?: string
+          content_sha256?: string | null
           created_at?: string | null
+          height?: number | null
           id?: string
           iiif_image?: string
           iiif_manifest?: string | null
@@ -425,7 +426,9 @@ export type Database = {
           label?: string | null
           map_id?: string
           sort_order?: number
+          source_item_id?: string | null
           source_type?: string | null
+          width?: number | null
         }
         Relationships: [
           {
@@ -440,6 +443,20 @@ export type Database = {
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_images_source_item_id_fkey"
+            columns: ["source_item_id"]
+            isOneToOne: false
+            referencedRelation: "cell_printings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_images_source_item_id_fkey"
+            columns: ["source_item_id"]
+            isOneToOne: false
+            referencedRelation: "sheet_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -551,25 +568,25 @@ export type Database = {
       }
       maps: {
         Row: {
-          series_id: string | null
-          printing_id: string | null
-          region: string | null
-          region_2025: string | null
-          regions: string[] | null
-          regions_2025: string[] | null
-          duplicate_of_map_id: string | null
-          archive_reason: string | null
           allmaps_id: string | null
           annotation_url: string | null
+          archive_reason: string | null
           bbox: number[] | null
+          classification_note: string | null
+          classification_reviewed_at: string | null
+          classification_reviewed_by: string | null
+          classification_source_url: string | null
+          classification_status: string
           collection: string | null
           created_at: string
           created_by: string | null
           creator: string | null
           date_label: string | null
+          depicted_state: string
           description: string | null
-          extra_metadata: Json | null
+          duplicate_of_map_id: string | null
           edition: string | null
+          extra_metadata: Json | null
           holding_institution: string | null
           id: string
           iiif_image: string | null
@@ -577,14 +594,22 @@ export type Database = {
           label_config: Json
           language: string | null
           location: string | null
+          map_subjects: string[]
           map_type: string | null
+          map_type_legacy: string | null
           name: string
           original_title: string | null
           physical_description: string | null
+          printing_id: string | null
           priority: number
           publisher: string | null
+          region: string | null
+          region_2025: string | null
+          regions: string[] | null
+          regions_2025: string[] | null
           rights: string | null
           search_vector: unknown
+          series_id: string | null
           series_key: string | null
           sheet_half: string | null
           sheet_number: string | null
@@ -601,25 +626,25 @@ export type Database = {
           year: number | null
         }
         Insert: {
-          series_id?: string | null
-          printing_id?: string | null
-          region?: string | null
-          region_2025?: string | null
-          regions?: string[] | null
-          regions_2025?: string[] | null
-          duplicate_of_map_id?: string | null
-          archive_reason?: string | null
           allmaps_id?: string | null
           annotation_url?: string | null
+          archive_reason?: string | null
           bbox?: number[] | null
+          classification_note?: string | null
+          classification_reviewed_at?: string | null
+          classification_reviewed_by?: string | null
+          classification_source_url?: string | null
+          classification_status?: string
           collection?: string | null
           created_at?: string
           created_by?: string | null
           creator?: string | null
           date_label?: string | null
+          depicted_state?: string
           description?: string | null
-          extra_metadata?: Json | null
+          duplicate_of_map_id?: string | null
           edition?: string | null
+          extra_metadata?: Json | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null
@@ -627,14 +652,23 @@ export type Database = {
           label_config?: Json
           language?: string | null
           location?: string | null
+          map_subjects?: string[]
           map_type?: string | null
+          map_type_legacy?: string | null
           name: string
           original_title?: string | null
           physical_description?: string | null
+          printing_id?: string | null
           priority?: number
           publisher?: string | null
+          region?: string | null
+          region_2025?: string | null
+          regions?: string[] | null
+          regions_2025?: string[] | null
           rights?: string | null
           search_vector?: unknown
+          series_id?: string | null
+          series_key?: string | null
           sheet_half?: string | null
           sheet_number?: string | null
           shelfmark?: string | null
@@ -650,25 +684,25 @@ export type Database = {
           year?: number | null
         }
         Update: {
-          series_id?: string | null
-          printing_id?: string | null
-          region?: string | null
-          region_2025?: string | null
-          regions?: string[] | null
-          regions_2025?: string[] | null
-          duplicate_of_map_id?: string | null
-          archive_reason?: string | null
           allmaps_id?: string | null
           annotation_url?: string | null
+          archive_reason?: string | null
           bbox?: number[] | null
+          classification_note?: string | null
+          classification_reviewed_at?: string | null
+          classification_reviewed_by?: string | null
+          classification_source_url?: string | null
+          classification_status?: string
           collection?: string | null
           created_at?: string
           created_by?: string | null
           creator?: string | null
           date_label?: string | null
+          depicted_state?: string
           description?: string | null
-          extra_metadata?: Json | null
+          duplicate_of_map_id?: string | null
           edition?: string | null
+          extra_metadata?: Json | null
           holding_institution?: string | null
           id?: string
           iiif_image?: string | null
@@ -676,14 +710,23 @@ export type Database = {
           label_config?: Json
           language?: string | null
           location?: string | null
+          map_subjects?: string[]
           map_type?: string | null
+          map_type_legacy?: string | null
           name?: string
           original_title?: string | null
           physical_description?: string | null
+          printing_id?: string | null
           priority?: number
           publisher?: string | null
+          region?: string | null
+          region_2025?: string | null
+          regions?: string[] | null
+          regions_2025?: string[] | null
           rights?: string | null
           search_vector?: unknown
+          series_id?: string | null
+          series_key?: string | null
           sheet_half?: string | null
           sheet_number?: string | null
           shelfmark?: string | null
@@ -698,7 +741,57 @@ export type Database = {
           updated_at?: string
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "maps_duplicate_of_map_id_fkey"
+            columns: ["duplicate_of_map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "maps_duplicate_of_map_id_fkey"
+            columns: ["duplicate_of_map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maps_printing_id_fkey"
+            columns: ["printing_id"]
+            isOneToOne: false
+            referencedRelation: "sheet_printings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maps_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "series"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maps_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "series_cell_coverage"
+            referencedColumns: ["series_id"]
+          },
+          {
+            foreignKeyName: "maps_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "series_cell_coverage_detail"
+            referencedColumns: ["series_id"]
+          },
+          {
+            foreignKeyName: "maps_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "series_printing_availability"
+            referencedColumns: ["series_id"]
+          },
+        ]
       }
       ocr_labels: {
         Row: {
@@ -717,6 +810,9 @@ export type Database = {
           global_y: number
           global_yi: number | null
           id: string
+          is_text_group: boolean
+          text_group_id: string | null
+          text_group_order: number | null
           label_h: number | null
           label_w: number | null
           map_id: string
@@ -751,6 +847,9 @@ export type Database = {
           global_y: number
           global_yi?: number | null
           id?: string
+          is_text_group?: boolean
+          text_group_id?: string | null
+          text_group_order?: number | null
           label_h?: number | null
           label_w?: number | null
           map_id: string
@@ -785,6 +884,9 @@ export type Database = {
           global_y?: number
           global_yi?: number | null
           id?: string
+          is_text_group?: boolean
+          text_group_id?: string | null
+          text_group_order?: number | null
           label_h?: number | null
           label_w?: number | null
           map_id?: string
@@ -831,6 +933,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "maps"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_labels_text_group_fk"
+            columns: ["map_id", "text_group_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_extractions"
+            referencedColumns: ["map_id", "id"]
+          },
+          {
+            foreignKeyName: "ocr_labels_text_group_fk"
+            columns: ["map_id", "text_group_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_labels"
+            referencedColumns: ["map_id", "id"]
           },
         ]
       }
@@ -1915,6 +2031,16 @@ export type Database = {
       }
     }
     Functions: {
+      // Verified against linked schema 112; nullable geography arguments are
+      // retained because the generator omits SQL function argument nullability.
+      group_text_boxes: {
+        Args: { p_map_id: string; p_ids: string[]; p_text: string; p_category: string; p_bounds: number[]; p_geom: string | null; p_geom_src: string | null; p_geom_rmse: number | null; p_user: string }
+        Returns: string
+      }
+      ungroup_text_boxes: {
+        Args: { p_map_id: string; p_id: string }
+        Returns: undefined
+      }
       canonicalise_category: { Args: { raw: string }; Returns: string }
       claim_job: {
         Args: { p_kinds: string[]; p_worker: string; p_worker_key_id: string }
