@@ -295,9 +295,8 @@
     <h2>Coverage</h2>
     {#if counts.partial}
       <p class="lead">
-        The archive holds <strong>{counts.held}</strong> of the <strong>{counts.total}</strong> city sheets
-        currently indexed. This is a partial catalogue-backed list; the full historical series total is
-        not established.
+        The archive holds <strong>{counts.held}</strong> of the <strong>{counts.total}</strong> sheets
+        currently indexed. This is a partial list; the full historical series total is not established.
       </p>
     {:else if known}
       <p class="lead">

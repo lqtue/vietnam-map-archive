@@ -63,6 +63,40 @@ export const SERIES_NOTES: Record<string, SeriesNote> = {
     ],
   },
 
+  'south-vietnam-provincial-maps-1971': {
+    summary: [
+      'A set of 44 provincial administrative maps of South Vietnam, one sheet per province, each with the province named and numbered in its title block and a table of area and population by district and village beside the map.',
+      'The index lists the 44 sheets this archive holds, numbered 01 to 44 with no gap. Whether the atlas contained other sheets is not established, so it is a list of what is held rather than a count of the whole survey.',
+    ],
+    facts: [
+      {
+        label: 'Printed by',
+        value:
+          'The imprint on sheet 01 reads "Nha Địa-Dư Quốc-Gia Việt-Nam Ấn-Hành, 71" and "Printed by the National Geographic Directorate-Vietnam 71". The other sheets were not read for it.',
+      },
+      {
+        label: 'Scales',
+        value:
+          'Set per province in the sheet title: 1:100,000 on 4 sheets, 1:150,000 on 17, 1:200,000 on 18 and 1:250,000 on 5.',
+      },
+      {
+        label: 'Tables on the sheet',
+        value:
+          'Sheet 01 states that areas are measured on 1:100,000 cadastral maps and referred to the 1970 statistical yearbook, and that population figures run to December 1970 and follow a 1970 HES report.',
+      },
+      {
+        label: 'Georeferencing',
+        value:
+          'Each sheet is placed by this archive from the 10 km UTM grid it prints, zones 48 and 49, with the Indian 1960 datum shifted to WGS 84.',
+      },
+      {
+        label: 'Scans come from',
+        value:
+          'One private copy, scanned for this archive. No institutional catalogue record is known, so no holder or source link is given.',
+      },
+    ],
+  },
+
   'indochine-1-100-000-1st-edition-sgi-1900-1947': {
     summary: [
       "The first edition of the Service Géographique de l'Indochine's 1:100,000 survey, issued from 1900 to 1947. It is the earlier part of the mapping programme continued by the second edition.",

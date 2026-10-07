@@ -99,7 +99,7 @@
       <p class="lead">
         {#if counts.partial}
           {$t(
-            'The archive holds {held} of {total} indexed city sheets. The full historical series total is not established.',
+            'The archive holds {held} of {total} indexed sheets. The full historical series total is not established.',
             { held: counts.held, total: counts.total }
           )}
         {:else if known}
