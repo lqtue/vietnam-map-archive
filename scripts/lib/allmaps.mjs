@@ -38,7 +38,8 @@ export function mapIdFrom(body) {
   } catch {
     j = null;
   }
-  const raw = j?.mapId ?? j?.id ?? (j && Object.values(j).find((v) => typeof v === 'string'));
+  // POST answers [{ imageUri, imageId, mapIds: [id] }]
+  const raw = j?.[0]?.mapIds?.[0] ?? j?.mapId ?? j?.id ?? (j && Object.values(j).find((v) => typeof v === 'string'));
   const id = String(raw ?? '')
     .split('/')
     .pop();
@@ -118,6 +119,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     mapIdFrom('{"id":"https://annotations.allmaps.org/maps/9199d6e708ebe292"}'),
     '9199d6e708ebe292'
   );
+  assert.equal(mapIdFrom('[{"imageId":"1b947ccb651f7af9","mapIds":["6ec9edabe8ab5c78"]}]'), '6ec9edabe8ab5c78');
   assert.throws(() => mapIdFrom('oops'));
   console.log('ok');
 }
