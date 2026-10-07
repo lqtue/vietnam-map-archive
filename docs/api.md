@@ -115,6 +115,10 @@ Public / other:
 - `/api/maps/[id]/annotation/` — **public for published maps** GET; drafts require a signed-in
   session. Streams the stable annotation from the private Storage bucket. A `?version=` history
   request requires staff MFA. Direct Storage object URLs are no longer public.
+- `/api/series/[key]/annotation/` — **public** GET, published and georeferenced sheets only. One
+  Georeference Annotation Page merging every such sheet's stable annotation, so
+  `viewer.allmaps.org/?url=<this>` shows the survey whole. `[key]` is `maps.series_key`; capped at
+  60 sheets (one Storage download each), so a large series such as L7014 needs a pre-merged file.
 - `/api/maps/[id]/legend-points/` — **public** GET. Numbered-legend references placed on the ground:
   each body numeral (`category = 'legend_ref'`) warped to lng/lat via the map's Allmaps
   georeference, joined to its `legend_entry` for a name. Legend-internal numbers are dropped.
