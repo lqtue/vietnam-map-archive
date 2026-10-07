@@ -24,7 +24,7 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 | Version | Date | In one line |
 |---|---|---|
-| [7.5](#75--october-2026) | Oct 2026 | Map genre, subjects, depicted state and scan role are independent; app changes await deployment |
+| [7.5](#75--october-2026) | Oct 2026 | Map genre, subjects, depicted state and scan role are independent |
 | [7.4](#74--september-2026) | Sept 2026 | A sheet is addressed by its name: `/catalog/plan-de-la-ville-de-saigon-1799`, with every uuid link still landing |
 | [7.3](#73--september-2026) | Sept 2026 | One page per sheet: the scan itself moved onto the catalogue record, and `/scan` stopped being a public address |
 | [7.2](#72--september-2026) | Sept 2026 | A survey is one thing: 514 sheets on the map as two layers, and a page for every sheet a survey contains, held or not |
@@ -47,7 +47,7 @@ Raw history: `git log --reverse --format='%ad %s' --date=short`.
 
 ## 7.5 — October 2026
 
-Migration 116 is in production; the app changes are local and await deployment.
+Migration 116 is in production; the app changes went live 2026-10-07.
 Seven primary map genres replace the mixed form/extent vocabulary. Controlled
 subjects, depicted state and image content roles are independent. Previous types
 and source-backed classification notes remain available; ambiguous originals are
