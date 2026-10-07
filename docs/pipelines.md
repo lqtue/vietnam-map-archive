@@ -157,6 +157,47 @@ mosaic and the fifteen backdrop sheets have no annotation to compare against.
 Keeping a cell both ways only buys a standing check once both holdings are
 actually georeferenced.
 
+## Storing a script-made georeference (`scripts/georef_write.mjs`)
+
+Our own `annotations` bucket is where every series pipeline stores its
+annotations. Allmaps can also be written to: `POST live.allmaps.org/maps` takes a
+Georeferenced Map (`@context` must be the single string
+`https://schemas.allmaps.org/map/2/context.json`), and `PATCH live.allmaps.org/maps/<mapId>`
+updates one. Re-POSTing creates a second map on the same image. No key is needed.
+The 1971 pilot used this on 2026-10-06 for four sheets; its code and the 44 prepared
+maps are in `work/vn1971/`. Nothing in `scripts/` pushes to Allmaps yet: what
+comes back from there is *pulled* (`sync-allmaps`, `sync_district4_annotations.mjs`).
+Each pipeline used to store annotations its own way. Now every pipeline follows the
+same three steps:
+
+1. **Place** — series-specific, and stays in the series script: Tonkin and Indochine
+   100k detect frame corners, L7014 reads GeoPDF corners or hand corners, L909
+   fits its neatline, the 1971 provincial maps read their UTM grid.
+2. **Build** — `scripts/lib/georef_annotation.py` `annotation(iiif, w, h, gcps, mask,
+   transformation=None)`. It writes one JSON per sheet to `work/<series>/annotations/<map-uuid>.json`.
+   The mask is the neatline/rim quad. `transformation` is an Allmaps dict
+   (`polynomial(2)`, `{"type": "thinPlateSpline"}`, `{"type": "helmert"}`); the default
+   is a first-order polynomial (the docstring says why).
+3. **Store** — `node --env-file=.env scripts/georef_write.mjs [--apply]
+   [--replace-public] <files>`, or `georef_annotation.store(files, apply=...)` from
+   Python. It is a dry run without `--apply`. For each file it:
+   - refuses an unparsable file, fewer than 3 GCPs, no mask, a source that is not
+     the row's `iiif_image`, or a pixel size that source does not serve;
+   - refuses a non-draft row that already has a georeference (`annotation_url`) unless
+     `--replace-public` is passed; a public row with none is written;
+   - writes the history copy `annotations/<map>/<stamp>.json` plus its
+     `georef_versions` row (`origin` `script`), then the live file, which it reads
+     back and compares;
+   - sets `annotation_url` (the app route), `is_georeferenced` and `bbox`. The
+     `bbox` is the warped mask extent, from `scripts/lib/sheet_extent.mjs`, the
+     same function `backfill_map_bbox.mjs` uses.
+
+   It exits 3 when it refused any file. It never sets `status`: a person publishes,
+   after looking at the sheet in /explore.
+
+Tonkin, Indochine 100k and both L7014 scripts go through this path; the L909
+scripts do not yet. A new series script writes only step 1 and calls the other two.
+
 ## AMS Series L7014 mosaic (`scripts/l7014_mosaic.py`)
 
 The US Army Map Service's 1:50,000 coverage of Vietnam, as **one raster PMTiles

@@ -22,11 +22,13 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import georef_annotation as G  # noqa: E402
+
 WORK = Path("work/l7014")
 CITY = {"6330-4", "6330-1", "6330-2", "6330-3", "6329-1",
         "6329-4", "6541-4", "6641-3", "6350-4"}
 CORNERS = ("NW", "NE", "SE", "SW")
-BUCKET = "annotations"
 
 
 def env():
@@ -68,52 +70,10 @@ def plain(url):
 
 
 def annotation(map_id, iiif, w, h, pin):
-    """One georeference annotation, in the shape the Allmaps renderer reads.
-
-    Two choices worth naming. The transformation is a first-order polynomial,
-    not a projective: four corners fit a projective *exactly*, so a pixel of
-    pinning error would be reproduced faithfully as perspective instead of being
-    averaged away, and the sheets were measured as having no perspective to
-    recover (opposite edges agree to 0.25%). And the mask is the neatline quad,
-    which is what stops the paper margin, the title block and the legend from
-    being painted over the neighbouring sheets.
-    """
-    poly = " ".join(f"{round(pin['pixels'][c][0])},{round(pin['pixels'][c][1])}"
-                    for c in CORNERS)
-    return {
-        "type": "AnnotationPage",
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        "items": [{
-            "id": f"{iiif}/annotation",
-            "type": "Annotation",
-            "@context": [
-                "http://iiif.io/api/extension/georef/1/context.json",
-                "http://iiif.io/api/presentation/3/context.json",
-            ],
-            "motivation": "georeferencing",
-            "target": {
-                "type": "SpecificResource",
-                "source": {"id": iiif, "type": "ImageService3", "width": w, "height": h},
-                "selector": {
-                    "type": "SvgSelector",
-                    "value": f'<svg width="{w}" height="{h}"><polygon points="{poly}" /></svg>',
-                },
-            },
-            "body": {
-                "type": "FeatureCollection",
-                "transformation": {"type": "polynomial", "options": {"order": 1}},
-                "features": [
-                    {"type": "Feature",
-                     "properties": {"resourceCoords": [round(pin["pixels"][c][0]),
-                                                       round(pin["pixels"][c][1])]},
-                     "geometry": {"type": "Point",
-                                  "coordinates": [round(pin["ground"][c][0], 7),
-                                                  round(pin["ground"][c][1], 7)]}}
-                    for c in CORNERS
-                ],
-            },
-        }],
-    }
+    """The four pinned corners, order 1, neatline quad as mask (`scripts/lib/georef_annotation.py`).
+    The pins were measured to carry no perspective: opposite edges agree to 0.25%."""
+    return G.annotation(iiif, w, h, [(pin["pixels"][c], pin["ground"][c]) for c in CORNERS],
+                        [pin["pixels"][c] for c in CORNERS])
 
 
 def main():
@@ -140,7 +100,7 @@ def main():
     if missing:
         print(f"no maps row for: {', '.join(sorted(missing))}")
 
-    done = 0
+    ready = []
     for sheet in sorted(by_sheet):
         m = by_sheet[sheet]
         pin = pins.get(sheet)
@@ -152,25 +112,10 @@ def main():
         out = WORK / "annotations" / f"{m['id']}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(ann, indent=1))
-        note = f"  {sheet}  {info['width']}x{info['height']}  -> {out.name}"
-        if not args.write:
-            print(note + "   (dry run)")
-            continue
-        url = f"{base}/storage/v1/object/{BUCKET}/{m['id']}.json"
-        try:
-            req(url, key, "POST", out.read_bytes(), extra={"x-upsert": "true"})
-        except urllib.error.HTTPError as e:
-            if e.code != 400:
-                raise
-            req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
-        # The app's route, not a storage URL: the bucket is private (mig 097).
-        public = f"https://maparchive.vn/api/maps/{m['id']}/annotation"
-        req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
-            {"annotation_url": public, "is_georeferenced": True})
-        print(note + "   uploaded, row updated")
-        done += 1
-    print(f"\n{done if args.write else len(by_sheet)} sheets "
-          f"{'written' if args.write else 'ready'}")
+        print(f"  {sheet}  {info['width']}x{info['height']}  -> {out.name}")
+        ready.append(out)
+    # These rows are public and this has always rewritten them; the writer keeps a history copy.
+    G.store(ready, apply=args.write, replace_public=True)
 
 
 if __name__ == "__main__":
