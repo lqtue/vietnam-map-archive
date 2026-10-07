@@ -8,7 +8,7 @@ for Vietnam, so the Helmert is spelled out exactly as `l7014_mosaic.py` does it.
 
     python scripts/l909_georef.py detect <image> <sheet>      # grid fit, no writes
     python scripts/l909_georef.py check  <image> <sheet>      # + printed-tick check
-    python scripts/l909_georef.py annotate <image> <sheet>    # + local Allmaps JSON, no DB write
+    python scripts/l909_georef.py annotate <image> <sheet> [--apply] [--replace-public] [--allmaps]  # + JSON, then georef_write.mjs
     python scripts/l909_georef.py compare  <image> <sheet>    # grid fit vs the stored georef; read-only
 
 Per-sheet facts (zone, which km line is which, printed corner ticks) are READ OFF
@@ -21,11 +21,15 @@ of varying terrain heights". A small residual here measures the grid, not the
 ground.
 """
 import sys
+from pathlib import Path
 
 import numpy as np
 from PIL import Image
 from scipy.ndimage import uniform_filter1d
 from scipy.signal import find_peaks
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import georef_annotation as G  # noqa: E402
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -57,10 +61,11 @@ READINGS = {
         "zone": 48,
         # margin: "713000m.E." under the first full vertical line, "2316000m.N." at the
         # bottom-most printed horizontal line (SW crop, read 2026-10-07). The datum line of the
-        # box was cut off in the crop; Indian 1960 assumed from the series.
+        # box was cut off in the first crop; read in full 2026-10-07: "HORIZONTAL DATUM ... INDIAN 1960",
+        # "GRID ... 1,000 METER UTM: ZONE 48", spheroid Everest.
         "e0_km": 713, "n0_km": 2317,
         "sw_tick": (20 + 56 / 60, 107 + 2.5 / 60),
-        "datum_note": "UTM zone 48 read; horizontal datum assumed Indian 1960",
+        "datum_note": "Horizontal datum: Indian 1960; 1,000 meter UTM zone 48 (margin box, read 2026-10-07)",
         # the 2316000 line sits 3 px inside the detected face edge, so it is not traced
         "face": (0.032, 0.048, 0.979, 0.6505),
         # the bay is too faint for the detector: y of the 2316000 line, fraction of height.
@@ -278,35 +283,6 @@ def scan_row(slug):
                 if s["slug"] == slug and s["side"] == "recto")
 
 
-def annotation(iiif, w, h, pts, mask):
-    """Allmaps georeference annotation: polynomial order 1, mask = neatline quad.
-
-    Same shape as `annotation()` in indochine100k_georef.py. Not imported: that one
-    is fixed to four named corners, and this takes any control-point list.
-    """
-    poly = " ".join(f"{round(x)},{round(y)}" for x, y in mask)
-    return {
-        "type": "AnnotationPage",
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        "items": [{
-            "id": f"{iiif}/annotation", "type": "Annotation",
-            "@context": ["http://iiif.io/api/extension/georef/1/context.json",
-                         "http://iiif.io/api/presentation/3/context.json"],
-            "motivation": "georeferencing",
-            "target": {"type": "SpecificResource",
-                       "source": {"id": iiif, "type": "ImageService3", "width": w, "height": h},
-                       "selector": {"type": "SvgSelector",
-                                    "value": f'<svg width="{w}" height="{h}"><polygon points="{poly}" /></svg>'}},
-            "body": {"type": "FeatureCollection",
-                     "transformation": {"type": "polynomial", "options": {"order": 1}},
-                     "features": [{"type": "Feature",
-                                   "properties": {"resourceCoords": [round(x), round(y)]},
-                                   "geometry": {"type": "Point", "coordinates": [round(lo, 7), round(la, 7)]}}
-                                  for (x, y), (lo, la) in pts]},
-        }],
-    }
-
-
 def stored_annotation(mid):
     """The stored (draft or public) annotation, read with the service key. Read-only."""
     import os
@@ -437,7 +413,7 @@ def main(argv):
             (lon, lat), _ = to_wgs84(rd, E, N)
             pts.append(((x * f, y * f), (lon, lat)))
         mask = [(x * f, y * f) for x, y in quad]
-        ann = annotation(row["iiif_image"], row["width"], row["height"], pts, mask)
+        ann = G.annotation(row["iiif_image"], row["width"], row["height"], pts, mask)
         out = Path("work/l909/annotations")
         out.mkdir(parents=True, exist_ok=True)
         (out / f"{row['id']}.json").write_text(json.dumps(ann, indent=1))
@@ -446,44 +422,9 @@ def main(argv):
                 max(l[0] for l in lonlat), max(l[1] for l in lonlat)]
         print(f"wrote work/l909/annotations/{row['id']}.json   bbox "
               f"{bbox[0]:.5f},{bbox[1]:.5f},{bbox[2]:.5f},{bbox[3]:.5f}")
-        if "--apply" in argv:
-            apply(row["id"], out / f"{row['id']}.json", [round(b, 7) for b in bbox])
-        else:
-            print("dry run: no database or storage write (add --apply)")
-
-
-def apply(mid, file, bbox):
-    """Draft rows only, like `annotate` in indochine100k_georef.py.
-
-    Upload the JSON, point `annotation_url` at the app's own route (the raw storage
-    URL 400s -- see that script), set the bbox and the flag. status stays draft, so
-    nothing becomes public; the PATCH filter refuses anything already georeferenced.
-    """
-    import os
-    import requests
-    from dotenv import load_dotenv
-    load_dotenv(".env")
-    url, key = os.environ["PUBLIC_SUPABASE_URL"].rstrip("/"), os.environ["SUPABASE_SERVICE_KEY"]
-    h = {"apikey": key, "Authorization": f"Bearer {key}"}
-    row = requests.get(f"{url}/rest/v1/maps", headers=h, timeout=30, params={
-        "id": f"eq.{mid}", "select": "name,status,is_georeferenced,annotation_url"}).json()
-    if not row or row[0]["status"] != "draft" or row[0]["is_georeferenced"] or row[0]["annotation_url"]:
-        raise SystemExit(f"refusing: row is not an un-georeferenced draft: {row}")
-    body = file.read_bytes()
-    obj = f"{url}/storage/v1/object/annotations/{mid}.json"
-    hdr = {**h, "Content-Type": "application/json", "x-upsert": "true"}
-    r = requests.post(obj, headers=hdr, data=body, timeout=60)
-    if r.status_code == 400:
-        r = requests.put(obj, headers=hdr, data=body, timeout=60)
-    r.raise_for_status()
-    r = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}&status=eq.draft&is_georeferenced=is.false",
-                       headers={**h, "Prefer": "return=representation"}, timeout=30,
-                       json={"annotation_url": f"https://maparchive.vn/api/maps/{mid}/annotation",
-                             "is_georeferenced": True, "bbox": bbox})
-    r.raise_for_status()
-    back = requests.get(f"{url}/storage/v1/object/annotations/{mid}.json", headers=h, timeout=60)
-    print(f"written: {row[0]['name']} -> draft row patched ({len(r.json())} row); "
-          f"storage read-back {'identical' if back.content == body else 'DIFFERS'}")
+        G.store([out / f"{row['id']}.json"], "utm-grid", apply="--apply" in argv,
+                replace_public="--replace-public" in argv, allmaps="--allmaps" in argv,
+                datum="Indian1960 towgs84=198,881,317")
 
 
 if __name__ == "__main__":
