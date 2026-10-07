@@ -35,7 +35,11 @@ export const GET: RequestHandler = async ({ params }) => {
   );
   const items = pages.flatMap((p) => (p ? (p.items ?? [p]) : []));
   return new Response(
-    JSON.stringify({ '@context': 'http://www.w3.org/ns/anno.jsonld', type: 'AnnotationPage', items }),
+    JSON.stringify({
+      '@context': 'http://www.w3.org/ns/anno.jsonld',
+      type: 'AnnotationPage',
+      items,
+    }),
     {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
