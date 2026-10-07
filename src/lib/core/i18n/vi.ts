@@ -225,6 +225,7 @@ export const vi: Record<string, string> = {
   'Try another keyword, or clear a filter and start over.':
     'Thử từ khóa khác hoặc xóa bộ lọc để bắt đầu lại.',
   'Group by': 'Nhóm theo',
+  'Remove {X}': 'Bỏ {X}',
   'Open in': 'Mở trong',
   'Legend found, not read': 'Đã thấy chú giải, chưa đọc',
   'No legend located': 'Chưa xác định chú giải',

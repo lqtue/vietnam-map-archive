@@ -224,25 +224,21 @@
     showSearch={false}
     {seriesChoices}
     {staff}
-    extraActive={(groupBy === 'none' || compact || view === 'grid' ? 0 : 1) + (workFilter ? 1 : 0)}
+    extraActive={workFilter ? 1 : 0}
+    extraChips={workFilter
+      ? [
+          {
+            label: $t(WORK_FILTERS.find((w) => w.key === workFilter)?.label ?? workFilter),
+            clear: () => (workFilter = ''),
+          },
+        ]
+      : []}
   >
-    <!-- Grouping is a way of looking at the filtered list, so it sits in the same
-         disclosure as the filters and is counted on its summary. The grid has no
-         groups, and the compact rail never did. -->
     {#if staff && !compact}
       <select bind:value={workFilter} aria-label="Filter by work">
         {#each WORK_FILTERS as w (w.key)}
           <option value={w.key}>{$t(w.label)}</option>
         {/each}
-      </select>
-    {/if}
-    {#if !compact && view !== 'grid'}
-      <select bind:value={groupBy} aria-label={$t('Group by')}>
-        <option value="none">{$t('Group by')}: {$t('None')}</option>
-        <option value="year">{$t('Group by')}: {$t('Year')}</option>
-        <option value="region">{$t('Group by')}: {$t('Area')}</option>
-        <option value="collection">{$t('Group by')}: {$t('Series')}</option>
-        <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
       </select>
     {/if}
   </ArchiveFilters>
@@ -267,6 +263,15 @@
           <label class="v2-scout-toggle">
             <input type="checkbox" bind:checked={$includeScout} />{$t('Include scout queue')}</label
           >
+        {/if}
+        {#if view !== 'grid'}
+          <select bind:value={groupBy} aria-label={$t('Group by')}>
+            <option value="none">{$t('Group by')}: {$t('None')}</option>
+            <option value="year">{$t('Group by')}: {$t('Year')}</option>
+            <option value="region">{$t('Group by')}: {$t('Area')}</option>
+            <option value="collection">{$t('Group by')}: {$t('Series')}</option>
+            <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
+          </select>
         {/if}
         <Tabs
           tone="rail"

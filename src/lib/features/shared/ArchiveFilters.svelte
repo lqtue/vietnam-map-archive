@@ -24,6 +24,7 @@
   import Tabs from '$lib/ui/Tabs.svelte';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import FilterBar from './FilterBar.svelte';
+  import YearTimeline from './YearTimeline.svelte';
 
   /** The search engine this bar drives. Created by the caller, because the
    *  point of the component is that several lists can share one. */
@@ -44,6 +45,8 @@
   export let staff = false;
   /** Filters the caller adds inside the same disclosure (default slot), counted on its summary. */
   export let extraActive = 0;
+  /** Removable chips for filters the caller owns (the slot's), drawn after the facets' own. */
+  export let extraChips: { label: string; clear: () => void }[] = [];
 
   const {
     query,
@@ -72,12 +75,9 @@
   }
 
   $: [yFrom, yTo] = [$selected.year?.[0] ?? '', $selected.year?.[1] ?? ''];
-  $: maxBin = Math.max(1, ...$yearBins.map((b) => b.count));
   function setYears(from: string, to: string) {
     selected.update((s) => ({ ...s, year: from || to ? [from, to] : [] }));
   }
-  const inRange = (decade: number) =>
-    (!yFrom || decade + 9 >= Number(yFrom)) && (!yTo || decade <= Number(yTo));
 
   /** How many facets are set — the number on the summary. */
   $: activeFacets =
@@ -90,6 +90,41 @@
     ($selected.year?.length ? 1 : 0);
 
   $: hasFilters = !!$query.trim() || activeFacets > 0 || !!kind || !!$selected.series_key?.length;
+
+  /** One removable chip per set facet, labelled as its dropdown labels it. */
+  $: chips = [
+    ...($selected.kind?.[0]
+      ? [{ key: 'kind', label: KINDS.find((k) => k.key === kind)?.label }]
+      : []),
+    ...($selected.series_key?.[0]
+      ? [
+          {
+            key: 'series_key',
+            label: seriesOpts.find((s) => s.value === $selected.series_key[0])?.label,
+          },
+        ]
+      : []),
+    ...($selected.area?.[0] ? [{ key: 'area', label: $selected.area[0] }] : []),
+    ...($selected.region?.[0]
+      ? [
+          {
+            key: 'region',
+            label: CATALOG_REGIONS.find((r) => r.key === $selected.region[0])?.[$locale],
+          },
+        ]
+      : []),
+    ...($selected.type?.[0]
+      ? [{ key: 'type', label: mapTypeLabel($selected.type[0], $locale) }]
+      : []),
+    ...($selected.institution?.[0]
+      ? [{ key: 'institution', label: $selected.institution[0] }]
+      : []),
+    ...($selected.year?.length ? [{ key: 'year', label: `${yFrom || '…'}–${yTo || '…'}` }] : []),
+  ].map((c) => ({
+    label: c.label || $selected[c.key][0],
+    clear: () => (c.key === 'year' ? setYears('', '') : search.setSingle(c.key, '')),
+  }));
+  $: allChips = [...chips, ...extraChips];
 
   function resetFilters() {
     query.set('');
@@ -192,50 +227,31 @@
   <slot />
   <svelte:fragment slot="more">
     {#if $yearBins.length}
-      <!-- A decade bar is a shortcut for the two boxes under it: click one for that decade, or
-           type any span. The bars are counted against every other filter, so they say what is
-           left, and drawn on a square-root scale — ~1,000 sheets are from the 1960s and a handful
-           before, so a straight scale left every other decade a hairline. -->
-      <div class="years">
-        <div class="bars" role="group" aria-label={$t('Maps per decade')}>
-          {#each $yearBins as b (b.decade)}
-            <button
-              type="button"
-              class="bar"
-              class:is-on={inRange(b.decade)}
-              style="height: {b.count ? Math.max(8, Math.sqrt(b.count / maxBin) * 100) : 2}%"
-              title="{b.decade}s · {b.count}"
-              aria-label="{b.decade}s, {b.count}"
-              on:click={() => setYears(String(b.decade), String(b.decade + 9))}
-            ></button>
-          {/each}
-        </div>
-        <div class="span">
-          <label
-            >{$t('From')}
-            <input
-              type="number"
-              inputmode="numeric"
-              placeholder={String($yearBins[0].decade)}
-              value={yFrom}
-              on:change={(e) => setYears(e.currentTarget.value, yTo)}
-            /></label
-          >
-          <label
-            >{$t('To')}
-            <input
-              type="number"
-              inputmode="numeric"
-              placeholder={String($yearBins[$yearBins.length - 1].decade + 9)}
-              value={yTo}
-              on:change={(e) => setYears(yFrom, e.currentTarget.value)}
-            /></label
-          >
-        </div>
-      </div>
+      <YearTimeline
+        bins={$yearBins}
+        from={yFrom}
+        to={yTo}
+        on:change={(e) => setYears(...e.detail)}
+      />
     {/if}
   </svelte:fragment>
 </FilterBar>
+
+{#if allChips.length}
+  <div class="active-chips">
+    {#each allChips as c (c.label)}
+      <span class="chip is-on">
+        {c.label}
+        <button
+          type="button"
+          class="chip-x"
+          aria-label={$t('Remove {X}', { X: c.label })}
+          on:click={c.clear}>×</button
+        >
+      </span>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .dropdowns {
@@ -261,6 +277,18 @@
     cursor: pointer;
   }
 
+  .active-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .chip-x {
+    all: unset;
+    cursor: pointer;
+    margin-left: 0.3rem;
+    padding: 0 0.2rem;
+  }
+
   .primary {
     display: flex;
     flex-wrap: wrap;
@@ -280,44 +308,5 @@
   .kinds :global(.sb-pill) {
     flex: none;
     white-space: nowrap;
-  }
-  .years {
-    padding-top: 0.5rem;
-  }
-  .bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 2.2rem;
-  }
-  .bar {
-    flex: 1 1 0;
-    min-width: 3px;
-    padding: 0;
-    border: none;
-    background: color-mix(in srgb, var(--color-text) 22%, transparent);
-    cursor: pointer;
-  }
-  .bar.is-on {
-    background: var(--sb-accent);
-  }
-  .span {
-    display: flex;
-    gap: 0.5rem;
-    padding-top: 0.3rem;
-    font-size: 0.78rem;
-  }
-  .span label {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  .span input {
-    width: 4.5rem;
-    padding: 0.25rem 0.35rem;
-    font: inherit;
-    background: var(--sb-card-bg);
-    border: var(--border-thin);
-    border-radius: var(--sb-radius-sm);
   }
 </style>
