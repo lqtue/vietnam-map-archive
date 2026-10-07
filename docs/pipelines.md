@@ -165,8 +165,9 @@ Georeferenced Map (`@context` must be the single string
 `https://schemas.allmaps.org/map/2/context.json`), and `PATCH live.allmaps.org/maps/<mapId>`
 updates one. Re-POSTing creates a second map on the same image. No key is needed.
 The 1971 pilot used this on 2026-10-06 for four sheets; its code and the 44 prepared
-maps are in `work/vn1971/`. Nothing in `scripts/` pushes to Allmaps yet: what
-comes back from there is *pulled* (`sync-allmaps`, `sync_district4_annotations.mjs`).
+maps are in `work/vn1971/`. `georef_write.mjs --allmaps` now pushes a stored sheet
+(below). What comes back from Allmaps is only ever *pulled* for sheets edited there
+(`sync-allmaps`, `sync_district4_annotations.mjs`), never for a script-made one.
 Each pipeline used to store annotations its own way. Now every pipeline follows the
 same three steps:
 
@@ -185,17 +186,37 @@ same three steps:
      the row's `iiif_image`, or a pixel size that source does not serve;
    - refuses a non-draft row that already has a georeference (`annotation_url`) unless
      `--replace-public` is passed; a public row with none is written;
+   - requires `--method` (`utm-grid`, `printed-corners`, `catalogue+calibration`,
+     `geopdf`, `hand`, `allmaps-editor`) and records it with `--datum`, `--derived-from`
+     and `method_ref` (the calling script at its git short sha; `store()` fills it from
+     `sys.argv[0]`). Python callers pass `method` as the second argument of `store()`;
    - writes the history copy `annotations/<map>/<stamp>.json` plus its
-     `georef_versions` row (`origin` `script`), then the live file, which it reads
-     back and compares;
+     `georef_versions` row (`origin` `script`, and the provenance columns of migration
+     118), then the live file, which it reads back and compares;
    - sets `annotation_url` (the app route), `is_georeferenced` and `bbox`. The
      `bbox` is the warped mask extent, from `scripts/lib/sheet_extent.mjs`, the
      same function `backfill_map_bbox.mjs` uses.
 
-   It exits 3 when it refused any file. It never sets `status`: a person publishes,
+   - with `--allmaps`, pushes each stored sheet to `live.allmaps.org` — POST the first
+     time, PATCH after, using the newest `georef_versions.allmaps_map_id` for that map —
+     records the map id on the version row, then reads `annotations.allmaps.org/maps/<id>`
+     back and prints any GCP, transformation or mask difference. The push is
+     `scripts/lib/allmaps.mjs`. **Run it only on a map whose GCPs you mean to publish: a
+     POST creates a public map nobody can delete but Allmaps.** The map's own `id` is
+     not kept by Allmaps (the read-back id is Allmaps'), so the link runs one way, from
+     the version row to Allmaps. (Whether Allmaps keeps a field of ours was not tested.)
+
+   `node --env-file=.env scripts/allmaps_drift.mjs [<map-uuid>...]` compares every pushed
+   map's live Allmaps GCPs with ours and exits 3 on a difference. It reads only: Allmaps is a
+   push-only mirror, and the next `--allmaps` PATCH puts our version back.
+
+   It exits 3 when it refused any file, or when an `--allmaps` push failed. It never sets `status`: a person publishes,
    after looking at the sheet in /explore.
 
-Tonkin, Indochine 100k and both L7014 scripts go through this path; the L909
+Methods the existing callers pass: Tonkin `printed-corners`; Indochine 100k
+`catalogue+calibration`; `l7014_annotate.py` `hand`; `l7014_annotate_pdf.py` `geopdf`, `hand`
+for `--hand`, `catalogue+calibration` for `--auto` (detected corners against the lattice
+cell). Tonkin, Indochine 100k and both L7014 scripts go through this path; the L909
 scripts do not yet. A new series script writes only step 1 and calls the other two.
 
 ## AMS Series L7014 mosaic (`scripts/l7014_mosaic.py`)

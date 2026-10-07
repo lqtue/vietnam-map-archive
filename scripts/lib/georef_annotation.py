@@ -54,16 +54,34 @@ def annotation(iiif, w, h, gcps, mask, transformation=None, ndigits=0):
     }
 
 
-def store(files, apply=False, replace_public=False, origin="script"):
+def store(files, method, apply=False, replace_public=False, origin="script", datum=None,
+          derived_from=None, allmaps=False):
     """Hand annotation files (each `<map-uuid>.json`) to georef_write.mjs. Dry unless `apply`.
 
+    `method` is required (what anchored the placement; the writer lists the choices).
+    The recorded `method_ref` is the calling script and the git short sha.
     Returns True when every file passed. A refused file (exit 3) is reported, not
     raised: the others were still stored. Anything else the writer exits with is."""
     import subprocess
+    import sys
+    from pathlib import Path
     if not files:
         return True
-    cmd = ["node", "--env-file=.env", "scripts/georef_write.mjs", "--origin", origin]
+    root = Path(__file__).resolve().parents[2]
+    sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=root, capture_output=True,
+                         text=True, check=True).stdout.strip()
+    try:
+        caller = Path(sys.argv[0]).resolve().relative_to(root)
+    except ValueError:
+        caller = Path(sys.argv[0]).name
+    cmd = ["node", "--env-file=.env", "scripts/georef_write.mjs", "--origin", origin,
+           "--method", method, "--method-ref", f"{caller}@{sha}"]
+    if datum:
+        cmd += ["--datum", datum]
+    if derived_from:
+        cmd += ["--derived-from", derived_from]
     cmd += (["--apply"] if apply else []) + (["--replace-public"] if replace_public else [])
+    cmd += ["--allmaps"] if allmaps else []
     code = subprocess.run(cmd + [str(f) for f in files]).returncode
     if code not in (0, 3):
         raise SystemExit(f"georef_write.mjs failed (exit {code})")

@@ -315,7 +315,8 @@ def main():
     print(f"\n{len(ok)} ready, {len(skipped)} skipped")
     if ready:
         # --force reaches published rows, as it always has; the writer keeps a history copy.
-        G.store(ready, apply=args.write, replace_public=args.force)
+        G.store(ready, "hand" if args.hand else "catalogue+calibration" if args.auto else "geopdf",
+               apply=args.write, replace_public=args.force)
         for mid, meta in (methods if args.write else {}).items():
             req(f"{base}/rest/v1/maps?id=eq.{mid}", key, "PATCH", {"extra_metadata": meta})
     reasons = {}

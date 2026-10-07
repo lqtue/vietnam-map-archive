@@ -924,7 +924,7 @@ def annotate(write=False, only_new=False):
     print(f"\n{len(ready)} built, {skipped} held back")
     # Without --new this re-places published sheets too, as it always has; the writer
     # now keeps a history copy of each, so a re-place is recoverable.
-    G.store(ready, apply=write, replace_public=not only_new)
+    G.store(ready, "printed-corners", apply=write, replace_public=not only_new)
 
 
 def check():

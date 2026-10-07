@@ -115,7 +115,7 @@ def main():
         print(f"  {sheet}  {info['width']}x{info['height']}  -> {out.name}")
         ready.append(out)
     # These rows are public and this has always rewritten them; the writer keeps a history copy.
-    G.store(ready, apply=args.write, replace_public=True)
+    G.store(ready, "hand", apply=args.write, replace_public=True)
 
 
 if __name__ == "__main__":

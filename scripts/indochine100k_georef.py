@@ -2226,7 +2226,7 @@ def annotate(write=False, only_new=True, only_ids=None):
         (outdir / f"{mid}.json").write_text(json.dumps(ann, indent=1))
         ready.append(outdir / f"{mid}.json")
     print(f"{len(ready)} built, {held} held")
-    G.store(ready, apply=write)
+    G.store(ready, "catalogue+calibration", apply=write)
 
 
 def main():

@@ -28,6 +28,13 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
+**118 (`118_georef_provenance.sql`) is written and applied to the local stack only — not pushed.**
+It adds nullable `method`, `method_ref`, `datum`, `derived_from`, `allmaps_map_id`, `review` to
+`georef_versions` and `series.dataset_doi`. `src/lib/data/supabase/types.ts` has these hand-added;
+regenerate after the push (a full local regen rewrites unrelated hand-typed sections). Push it
+before running `georef_write.mjs --apply` against production: the writer sends the new columns,
+and the insert fails without them.
+
 **The head is 116**, pushed 2026-10-06: seven canonical map genres, independent
 subjects and depicted state, image content roles, legacy classification and review
 evidence. Migration 116 alone was pushed from an isolated migration directory;
