@@ -1,71 +1,71 @@
 {
- "09": {
-  "mask": "690,,12760,"
- },
- "10": {
-  "mask": "1750,,,",
-  "poly": "1750,916;15968,916;15968,8024;13672,8024;13672,9375;15968,9375;15968,10172;1750,10172",
-  "note": "Hon Phu Qui inset notched out"
- },
- "15": {
-  "mask": ",,10930,10165",
-  "note": "bottom cut the map face 0.4 cell short of the frame"
- },
- "26": {
-  "mask": "650,,,"
- },
- "29": {
-  "mask": "3087,,,"
- },
- "41": {
-  "edgewin": 1.6
- },
- "18": {
-  "scale": 11.0378,
-  "poly": "145,60;1420,60;1420,1195;685,1195;685,985;540,985;540,612;440,497;145,497",
-  "note": "main map + NW panel; Phu Quoc and the two small insets cut out"
- },
- "35": {
-  "scale": 11.687,
-  "poly": "52,43;1445,43;1445,815;648,815;648,1022;52,1022"
- },
- "37": {
-  "scale": 11.687,
-  "poly": "570,90;1435,90;1435,830;668,830;668,1065;145,1065;145,320;570,320"
- },
- "33": {
-  "poly": "2336,524;13392,524;13392,8360;11056,8360;11056,10668;2336,10668",
-  "note": "Truong Sa inset (lower right corner) cut out"
- },
- "25": {
-  "mask": ",850,,"
- },
- "08": {
-  "mask": ",3231,,16291",
-  "note": "top/bottom were the paper edge and the legend heading"
- },
- "30": {
-  "mask": ",3504,,",
-  "note": "top was the 0.15-cell fallback, inside the neatline"
- },
- "06": {
-  "mask": ",393,,",
-  "note": "top was inside the title box; now the thick frame"
- },
- "07": {
-  "mask": "507,2880,,15880",
-  "note": "west, top and bottom were 0.25-1.2 cell inside the frame, cutting map face"
- },
- "12": {
-  "mask": "2129,,,",
-  "note": "left was 0.2 cell inside the face"
- },
- "22": {
-  "mask": "810,,,",
-  "note": "no printed frame on the west: the map colour starts at x~810"
- },
- "31": {
-  "mask": "644,3350,11842,16825",
-  "note": "all four sides were 0.15-0.35 cell inside the frame"
- }
+  "09": {
+    "mask": "690,,12760,"
+  },
+  "10": {
+    "mask": "1750,,,",
+    "poly": "1750,916;15968,916;15968,8024;13672,8024;13672,9375;15968,9375;15968,10172;1750,10172",
+    "note": "Hon Phu Qui inset notched out"
+  },
+  "15": {
+    "mask": ",,10930,10165",
+    "note": "bottom cut the map face 0.4 cell short of the frame"
+  },
+  "26": {
+    "mask": "650,,,"
+  },
+  "29": {
+    "mask": "3087,,,"
+  },
+  "41": {
+    "edgewin": 1.6
+  },
+  "18": {
+    "scale": 11.0378,
+    "poly": "145,60;1420,60;1420,1195;685,1195;685,985;540,985;540,612;440,497;145,497",
+    "note": "main map + NW panel; Phu Quoc and the two small insets cut out"
+  },
+  "35": {
+    "scale": 11.687,
+    "poly": "52,43;1445,43;1445,815;648,815;648,1022;52,1022"
+  },
+  "37": {
+    "scale": 11.687,
+    "poly": "570,90;1435,90;1435,830;668,830;668,1065;145,1065;145,320;570,320"
+  },
+  "33": {
+    "poly": "2336,524;13392,524;13392,8360;11056,8360;11056,10668;2336,10668",
+    "note": "Truong Sa inset (lower right corner) cut out"
+  },
+  "25": {
+    "mask": ",850,,"
+  },
+  "08": {
+    "mask": ",3231,,16291",
+    "note": "top/bottom were the paper edge and the legend heading"
+  },
+  "30": {
+    "mask": ",3504,,",
+    "note": "top was the 0.15-cell fallback, inside the neatline"
+  },
+  "06": {
+    "mask": ",393,,",
+    "note": "top was inside the title box; now the thick frame"
+  },
+  "07": {
+    "mask": "507,2880,,15880",
+    "note": "west, top and bottom were 0.25-1.2 cell inside the frame, cutting map face"
+  },
+  "12": {
+    "mask": "2129,,,",
+    "note": "left was 0.2 cell inside the face"
+  },
+  "22": {
+    "mask": "810,,,",
+    "note": "no printed frame on the west: the map colour starts at x~810"
+  },
+  "31": {
+    "mask": "644,3350,11842,16825",
+    "note": "all four sides were 0.15-0.35 cell inside the frame"
+  }
 }
