@@ -129,6 +129,8 @@ const COLUMNS =
  */
 const INSTITUTION_NAME: Record<string, string> = {
   PCL: 'Perry-Castañeda',
+  USGS: 'USGS',
+  Princeton: 'Princeton',
   TTU: 'Texas Tech',
   ANU: 'ANU',
   IGN: 'IGN',

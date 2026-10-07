@@ -86,8 +86,9 @@ references.
 client-side search against `/api/search`, but `fetchSeriesIndex` (`$lib/data/maps/seriesIndex.ts`) is the same for every anonymous reader and belongs in the HTML a
 crawler gets. There is no `/catalog/series` index page any more; it 301s to `/catalog`. It feeds three things:
 
-- the **band** above the results — `SeriesList`, every series with a published sheet, one line each (one with no imported
-  index is a button, since it has no coverage page), shown only
+- the **band** above the results — `SeriesList`, every series with a published sheet as "Name (sheets)", styled like
+  the area, region and institution bands beside it (one with no imported index is a button, since it has no
+  coverage page), shown only
   while `atRest` (no query, no facet) is bound back out of `CatalogUnifiedSearch`;
 - the **drawer** a row opens (`SeriesDetailDrawer`) — the row keeps its real `href`, so cmd-click
   and crawlers still reach the coverage page and only an unmodified left click is taken;

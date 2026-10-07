@@ -8,6 +8,7 @@
   import { trackMeasurement } from '$lib/data/measurement';
   import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { institutionHref } from '$lib/data/maps/institutionRegistry';
   import { coverageAreas } from '$lib/core/catalogAreas';
   import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import PageHero from '$lib/ui/PageHero.svelte';
@@ -339,7 +340,11 @@
         {#each facts(map) as [label, value] (label)}
           <div class="share-fact">
             <dt>{label}</dt>
-            <dd>{value}</dd>
+            <dd>
+              {#if label === 'Held by' && institutionHref(value)}
+                <a href={institutionHref(value)}>{value}</a>
+              {:else}{value}{/if}
+            </dd>
           </div>
         {/each}
       </dl>

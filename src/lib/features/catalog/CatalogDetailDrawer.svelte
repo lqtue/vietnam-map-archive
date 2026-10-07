@@ -7,6 +7,7 @@
   import { trackMeasurement } from '$lib/data/measurement';
   import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { institutionHref } from '$lib/data/maps/institutionRegistry';
   import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import { mapHref, exploreHref, mapRef } from '$lib/core/utils/mapSlug';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
@@ -152,6 +153,8 @@
                     action: 'open',
                   })}>{v}</a
               >
+            {:else if k === 'Holding institution' && institutionHref(v)}
+              <a href={institutionHref(v)}>{v}</a>
             {:else}
               {v}
             {/if}
