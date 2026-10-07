@@ -49,7 +49,6 @@ that is the point of keying the whole line rather than the two halves.
 | Continue with Google | Tiếp tục với Google |
 | Nothing matches. | Không có kết quả phù hợp. |
 | Nothing here yet. | Chưa có dữ liệu. |
-| All types | Tất cả loại |
 | Filters | Bộ lọc |
 | Reset filters | Đặt lại bộ lọc |
 | Move up | Di chuyển lên |
@@ -287,7 +286,6 @@ the catalogue.
 | English | Tiếng Việt |
 |---|---|
 | Browse by series | Duyệt theo bộ bản đồ |
-| All series | Tất cả bộ bản đồ |
 | {held} of {total} sheets — {pct}% | {held} trên {total} mảnh — {pct}% |
 
 | English | Tiếng Việt |
@@ -553,6 +551,17 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Published maps | Bản đồ đã công bố |
 | published maps | bản đồ đã công bố |
 | external source items | mục nguồn bên ngoài |
+| series | bộ bản đồ |
+| other holdings | nguồn lưu giữ khác |
+| Website | Trang web |
+| Filter by sheet, title or year | Lọc theo tờ, tên hoặc năm |
+| source items | mục nguồn |
+| sheets with a map in the archive | tờ đã có bản đồ trong kho |
+| scans served from this source | bản quét lấy từ nguồn này |
+| Open | Mở |
+| served | đang phục vụ |
+| Other holdings | Nguồn lưu giữ khác |
+| Sheets in series the archive does not index yet, as the catalogue lists them on | Các tờ thuộc loạt bản đồ mà kho chưa lập chỉ mục, theo danh mục của nơi lưu giữ, kiểm tra ngày |
 | External source records | Hồ sơ nguồn bên ngoài |
 | CartoMundi series | bộ bản đồ CartoMundi |
 | No institutions match this search. | Không có cơ quan nào phù hợp với tìm kiếm. |
@@ -566,7 +575,6 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Place numbered legend entries on the scan and link them to the features they name. | Đặt các mục chú giải đánh số lên bản quét và liên kết với các đối tượng được ghi tên. |
 | Libraries, archives and source platforms represented in our records. | Thư viện, kho lưu trữ và nền tảng nguồn có trong hồ sơ của chúng tôi. |
 
-| All provinces | Tất cả tỉnh thành |
 | Modern province, as it stood until mid-2025 — a locator, not the name the map used | Tỉnh theo ranh giới đến giữa năm 2025 — chỉ để định vị, không phải tên gọi trên bản đồ |
 | All institutions | Tất cả cơ quan lưu trữ |
 | All maps | Tất cả bản đồ |
@@ -574,13 +582,43 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Series | Bộ bản đồ |
 | Institution | Cơ quan lưu trữ |
 | Area | Khu vực |
-| Plans & other | Bình đồ và khác |
 | Kind of map | Loại bản đồ |
 | Maps per decade | Số bản đồ theo thập niên |
 | From | Từ |
 | To | Đến |
 
 | The archive holds {held} of {total} indexed city sheets. The full historical series total is not established. | Kho lưu trữ có {held} trong {total} tờ bản đồ thành phố đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử. |
+
+## 20 · Catalog filters, favorites, home Maps tab (Oct 2026)
+
+| English | Tiếng Việt |
+|---|---|
+| Saigon | Sài Gòn |
+| Across Vietnam | Toàn Việt Nam |
+| See all {N} in the catalog | Xem cả {N} bản đồ trong danh mục |
+| Remove {X} | Bỏ {X} |
+| {N} of {M} | {N} trên {M} |
+| Saved | Đã lưu |
+| Sign in to save | Đăng nhập để lưu |
+| Other sheets of this plan | Các tờ khác của bản đồ này |
+| Add | Thêm |
+| print | bản in |
+| No legend on this sheet | Tờ bản đồ này không có chú giải |
+| Institutions | Cơ quan lưu trữ |
+| Anywhere | Mọi nơi |
+| Filter | Bộ lọc |
+| Series or type | Bộ hoặc loại bản đồ |
+| Held by | Lưu giữ tại |
+| Work | Công việc |
+| Clear all | Bỏ tất cả |
+| Any series or type | Mọi bộ hoặc loại bản đồ |
+| Regions | Vùng địa lý |
+| Provinces | Tỉnh thành |
+| Type | Loại bản đồ |
+| Plans | Bình đồ |
+| maps | bản đồ |
+| Drag across the timeline to pick a range | Kéo trên dòng thời gian để chọn khoảng năm |
+
 
 # PENDING — translated, not yet wired
 

@@ -125,6 +125,107 @@ export async function fetchPublishedMapCount(supabase: SupabaseClient<Database>)
   return count ?? 0;
 }
 
+/**
+ * What a front-page place collection is: the province as `maps.regions` spells
+ * it (the strings `catalogAreas.ts` names), or — with no `area` — the survey
+ * sheets, which are every map carrying a `series_key`.
+ */
+export interface PlaceSpec {
+  /** Province, as in `CATALOG_AREAS[].name`. Absent for the survey set. */
+  area?: string;
+  /** A sheet named for the place wins its decade. */
+  namePattern?: RegExp;
+  /** Sheets we processed ourselves: they win their decade and survive the thinning. */
+  prefer?: string[];
+  /** Sheets that match the area but are not the place (a Long An sheet that clips the city's edge). */
+  exclude?: string[];
+}
+
+export const SAIGON_PLACE: PlaceSpec = {
+  area: 'Hồ Chí Minh',
+  namePattern: /sa[iï]gon|sài gòn|cholon|hồ chí minh/i,
+  prefer: [
+    '1bce28f0-aa82-48eb-8e33-8f0b07182c2f', // Saigon – Cholon, 1923
+    '3a446d85-25a8-4e81-9cfc-8de357c3a5df', // AMS L909 Sài Gòn, 1968
+  ],
+  exclude: ['8716b8cc-1ee3-4e4a-9026-e2995d466a49'], // Cần Giuộc, L7014 1970 — a Long An sheet
+};
+
+/**
+ * A spread of one place's sheets for the front page: public, georeferenced,
+ * with a picture, one per decade (a sheet named for the place wins its decade,
+ * then a featured one), oldest first, thinned evenly to `limit`. `total` is the
+ * number of sheets that qualified. The survey set also prefers a series not yet
+ * shown, so the strip is not twelve cells of one mosaic.
+ */
+export async function fetchPlaceSpread(
+  supabase: SupabaseClient<Database>,
+  place: PlaceSpec,
+  limit = 12
+): Promise<{ maps: MapListItem[]; total: number }> {
+  let query = supabase
+    .from('maps')
+    .select(LIST_COLUMNS, { count: 'exact' })
+    .in('status', ['public', 'featured'])
+    .eq('is_georeferenced', true)
+    .not('thumbnail', 'is', null)
+    .not('year', 'is', null);
+  query = place.area
+    ? query.contains('regions', [place.area])
+    : query.not('series_key', 'is', null);
+  const { data, error, count } = await query.order('year', { ascending: true }).order('name');
+
+  if (error) {
+    console.error('fetchPlaceSpread:', error);
+    return { maps: [], total: 0 };
+  }
+  const rows = (data as unknown as DbRow[])
+    .map(toMapListItem)
+    .filter((m) => !place.exclude?.includes(m.id));
+  const preferred = (m: MapListItem) => !!place.prefer?.includes(m.id);
+  const rank = (m: MapListItem) =>
+    (preferred(m) ? -4 : 0) + (place.namePattern?.test(m.name) ? 0 : 2) + (m.isFeatured ? 0 : 1);
+  const byDecade = new Map<number, MapListItem>();
+  const seen = new Set<string>();
+  if (place.area) {
+    for (const m of rows) {
+      const decade = Math.floor((m.year as number) / 10);
+      const held = byDecade.get(decade);
+      if (!held || rank(m) < rank(held)) byDecade.set(decade, m);
+    }
+  } else {
+    // Oldest decade first, so each decade's pick sees which series are taken.
+    const decades = new Map<number, MapListItem[]>();
+    for (const m of rows) {
+      const decade = Math.floor((m.year as number) / 10);
+      decades.set(decade, [...(decades.get(decade) ?? []), m]);
+    }
+    for (const [decade, group] of decades) {
+      const fresh = (m: MapListItem) => (m.series_key && seen.has(m.series_key) ? 4 : 0);
+      const best = group.reduce((a, b) => (rank(b) + fresh(b) < rank(a) + fresh(a) ? b : a));
+      byDecade.set(decade, best);
+      if (best.series_key) seen.add(best.series_key);
+    }
+  }
+  const picks = [...byDecade.values()];
+  let maps = picks;
+  if (picks.length > limit) {
+    // Thin evenly, but never drop a preferred sheet: thin the others to fill what is left.
+    const kept = picks.filter(preferred);
+    const rest = picks.filter((m) => !preferred(m));
+    const room = Math.max(0, limit - kept.length);
+    const thinned = Array.from(
+      { length: Math.min(room, rest.length) },
+      (_, i) => rest[Math.round((i * (rest.length - 1)) / Math.max(1, room - 1))]
+    );
+    maps = [...new Set([...kept, ...thinned])].sort(
+      (a, b) => (a.year as number) - (b.year as number)
+    );
+  }
+  // `count` is exact; `rows` stops at the API's 1000-row page.
+  return { maps, total: count ?? rows.length };
+}
+
 /** The named maps, in one query. For a list of ids you already hold — favorites. */
 export async function fetchMapsByIds(
   supabase: SupabaseClient<Database>,

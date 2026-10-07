@@ -49,14 +49,18 @@
           )}
         </p>
       </div>
-      {#each institutions as institution (institution.name)}
+      {#each institutions as institution (institution.slug)}
         <details>
           <summary
-            ><strong>{institution.name}</strong><span
+            ><strong
+              ><a href={`/catalog/institutions/${institution.slug}`}>{institution.name}</a></strong
+            ><span
               >{institution.maps.length}
               {$t('published maps')} · {institution.sourceItems}
-              {$t('external source items')} · {institution.cartomundiSeries.length}
-              {$t('CartoMundi series')}</span
+              {$t('external source items')} · {institution.series.length +
+                institution.cartomundiSeries.length +
+                institution.otherSeries}
+              {$t('series')}</span
             ></summary
           >
           {#if institution.maps.length}

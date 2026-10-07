@@ -20,6 +20,7 @@
   import DataTable, { type TableColumn } from '$lib/ui/DataTable.svelte';
   import SheetStatus from './SheetStatus.svelte';
   import OpenInMenu from './OpenInMenu.svelte';
+  import FavoriteButton from '$lib/features/shared/FavoriteButton.svelte';
   import type { WorkFactsById } from '$lib/core/sheetWork';
   import { inView } from '$lib/ui/inView';
   import { sliceGroups } from './sliceGroups';
@@ -153,6 +154,9 @@
                     >
                   {:else}
                     <span class="title-link">{item.name || '—'}</span>
+                  {/if}
+                  {#if !isScout && !showLayerActions}
+                    <FavoriteButton mapId={item.id} icon />
                   {/if}
                   {#if showLayerActions && !isScout && (item as any).georef_done}
                     <button

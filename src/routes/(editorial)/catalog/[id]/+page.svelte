@@ -8,6 +8,7 @@
   import { trackMeasurement } from '$lib/data/measurement';
   import { mapTypeLabel, MAP_SUBJECTS } from '$lib/core/mapTaxonomy';
   import { t } from '$lib/core/i18n';
+  import { institutionHref } from '$lib/data/maps/institutionRegistry';
   import { coverageAreas } from '$lib/core/catalogAreas';
   import { CATALOG_REGIONS, geographicRegions } from '$lib/core/catalogRegions';
   import PageHero from '$lib/ui/PageHero.svelte';
@@ -25,6 +26,7 @@
 
   import SheetZoom from '$lib/features/catalog/SheetZoom.svelte';
   import SupersededSheet from '$lib/features/catalog/SupersededSheet.svelte';
+  import FavoriteButton from '$lib/features/shared/FavoriteButton.svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import { fetchUserRole, type UserRole } from '$lib/data/supabase/role';
   import SheetWork from '$lib/features/catalog/SheetWork.svelte';
@@ -256,6 +258,7 @@
         <a class="btn" href={exploreHref(map)}>{$t('Open on the map')}</a>
       {/if}
       <a class="btn" href="/catalog">{$t('Browse the archive')}</a>
+      {#if published}<FavoriteButton mapId={map.id} signInLink />{/if}
       {#if map.source_url}
         <a
           class="btn"
@@ -339,7 +342,11 @@
         {#each facts(map) as [label, value] (label)}
           <div class="share-fact">
             <dt>{label}</dt>
-            <dd>{value}</dd>
+            <dd>
+              {#if label === 'Held by' && institutionHref(value)}
+                <a href={institutionHref(value)}>{value}</a>
+              {:else}{value}{/if}
+            </dd>
           </div>
         {/each}
       </dl>

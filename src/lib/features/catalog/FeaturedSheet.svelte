@@ -23,6 +23,8 @@
   export let thumbnails: Map<string, string> = new Map();
   export let favoriteIds: string[] = [];
   export let showFavorite = false;
+  /** A decade label under each dated tile, joined by a line, so the strip reads as a timeline. */
+  export let axis = false;
 
   const dispatch = createEventDispatcher<{ toggleFavorite: string }>();
 
@@ -235,6 +237,9 @@
               {favoriteIds.includes(tile.id) ? '\u2665' : '\u2661'}
             </button>
           {/if}
+          {#if axis && tile.map?.year}
+            <span class="fs-tick" aria-hidden="true">{Math.floor(tile.map.year / 10) * 10}s</span>
+          {/if}
         </div>
       {/each}
     </div>
@@ -372,6 +377,31 @@
     scroll-snap-align: start;
   }
 
+  /* The timeline: a rule that runs on through the gap to the next tile, with
+     the decade hung under it. It scrolls with the strip, so it cannot drift. */
+  .fs-tick {
+    position: relative;
+    display: block;
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-gray-500);
+  }
+
+  .fs-tick::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% + var(--space-4));
+    border-top: 2px solid var(--color-border);
+  }
+
+  .fs-tile-wrap:last-child .fs-tick::before {
+    width: 100%;
+  }
+
   .fs-tile {
     display: flex;
     flex-direction: column;
@@ -452,6 +482,8 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    /* Always two lines tall, so the timeline rule under the tiles sits at one height. */
+    min-height: calc(2 * 1.35em);
   }
 
   .fs-tile.active .fs-tile-name {
@@ -478,6 +510,18 @@
 
   .fs-fav.on {
     color: var(--color-primary);
+  }
+
+  /* Twelve hearts on a strip is twelve buttons: with a pointer they appear on the tile you are
+     over, or once a map is saved. Touch has no hover, so it keeps them. */
+  @media (hover: hover) {
+    .fs-fav:not(.on) {
+      opacity: 0;
+    }
+    .fs-tile-wrap:hover .fs-fav,
+    .fs-fav:focus-visible {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 800px) {

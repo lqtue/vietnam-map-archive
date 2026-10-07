@@ -11,11 +11,10 @@
   The bar owns no state: everything it reads and writes lives on the
   `CatalogSearchController` the caller passes in.
 
-  The facets sit inside one native `<details class="sb-more">` rather than
-  abreast: at a 300px rail's width three selects each got a third of a line and
-  read as three abbreviations. They stay separate controls — area AND type AND
-  series AND year still combine — the disclosure just folds them out of the
-  way, and its summary carries how many are set.
+  Only what is set shows: the kind pills, one native `<details>` "+ Filter" menu
+  holding the selects for facets not yet chosen, a chip per chosen facet, and
+  the year timeline in the open. They stay separate controls — area AND type
+  AND series AND year still combine.
 -->
 <script lang="ts">
   import { mapTypeLabel } from '$lib/core/mapTaxonomy';
@@ -24,6 +23,7 @@
   import Tabs from '$lib/ui/Tabs.svelte';
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import FilterBar from './FilterBar.svelte';
+  import YearTimeline from './YearTimeline.svelte';
 
   /** The search engine this bar drives. Created by the caller, because the
    *  point of the component is that several lists can share one. */
@@ -44,6 +44,8 @@
   export let staff = false;
   /** Filters the caller adds inside the same disclosure (default slot), counted on its summary. */
   export let extraActive = 0;
+  /** Removable chips for filters the caller owns (the slot's), drawn after the facets' own. */
+  export let extraChips: { label: string; clear: () => void }[] = [];
 
   const {
     query,
@@ -63,21 +65,18 @@
   $: hasKinds = seriesChoices.length > 0;
   $: kind = $selected.kind?.[0] ?? '';
   $: KINDS = [
-    { key: '', label: $t('All maps') },
+    { key: '', label: $t('All') },
     { key: 'surveys', label: $t('Surveys') },
-    { key: 'plans', label: $t('Plans & other') },
+    { key: 'plans', label: $t('Plans') },
   ];
   function setKind(k: string) {
     search.setSingle('kind', k);
   }
 
   $: [yFrom, yTo] = [$selected.year?.[0] ?? '', $selected.year?.[1] ?? ''];
-  $: maxBin = Math.max(1, ...$yearBins.map((b) => b.count));
   function setYears(from: string, to: string) {
     selected.update((s) => ({ ...s, year: from || to ? [from, to] : [] }));
   }
-  const inRange = (decade: number) =>
-    (!yFrom || decade + 9 >= Number(yFrom)) && (!yTo || decade <= Number(yTo));
 
   /** How many facets are set — the number on the summary. */
   $: activeFacets =
@@ -91,21 +90,89 @@
 
   $: hasFilters = !!$query.trim() || activeFacets > 0 || !!kind || !!$selected.series_key?.length;
 
+  /** One removable chip per set facet, prefixed with the facet's name. */
+  $: chips = [
+    ...($selected.kind?.[0]
+      ? [{ key: 'kind', label: KINDS.find((k) => k.key === kind)?.label }]
+      : []),
+    ...($selected.series_key?.[0]
+      ? [
+          {
+            key: 'series_key',
+            facet: 'Series',
+            label: seriesOpts.find((s) => s.value === $selected.series_key[0])?.label,
+          },
+        ]
+      : []),
+    ...($selected.area?.[0] ? [{ key: 'area', facet: 'Place', label: $selected.area[0] }] : []),
+    ...($selected.region?.[0]
+      ? [
+          {
+            key: 'region',
+            facet: 'Region',
+            label: CATALOG_REGIONS.find((r) => r.key === $selected.region[0])?.[$locale],
+          },
+        ]
+      : []),
+    ...($selected.type?.[0]
+      ? [{ key: 'type', facet: 'Type', label: mapTypeLabel($selected.type[0], $locale) }]
+      : []),
+    ...($selected.institution?.[0]
+      ? [{ key: 'institution', facet: 'Held by', label: $selected.institution[0] }]
+      : []),
+    ...($selected.year?.length
+      ? [{ key: 'year', facet: 'Year', label: `${yFrom || '…'}–${yTo || '…'}` }]
+      : []),
+  ].map((c) => {
+    const label = c.label || $selected[c.key][0];
+    return {
+      label: 'facet' in c ? `${$t(c.facet as string)}: ${label}` : label,
+      clear: () => (c.key === 'year' ? setYears('', '') : search.setSingle(c.key, '')),
+    };
+  });
+  $: allChips = [...chips, ...extraChips];
+
+  /** A "what" value is `series:<key>` or `type:<t>`; set that key, clear the other. */
+  function setWhat(v: string) {
+    const [group, ...rest] = v.split(':');
+    const value = rest.join(':');
+    search.setSingle('series_key', group === 'series' ? value : '');
+    search.setSingle('type', group === 'type' ? value : '');
+  }
+  /** A "where" value is `region:<key>` or `area:<province>`; same shape. */
+  function setWhere(v: string) {
+    const [group, ...rest] = v.split(':');
+    const value = rest.join(':');
+    search.setSingle('region', group === 'region' ? value : '');
+    search.setSingle('area', group === 'area' ? value : '');
+  }
+
+  /** The "+ Filter" menu: a native <details>, closed after a pick or a click outside it. */
+  let menuOpen = false;
+  let menu: HTMLDetailsElement;
+  /** Facets with nothing chosen yet are the only ones the menu offers. */
+  $: showWhat = !$selected.series_key?.length && !$selected.type?.length;
+  $: showWhere = !$selected.region?.length && !$selected.area?.length;
+  $: showInstitution = !$selected.institution?.length;
+  $: showMenu =
+    (showWhat && (seriesOpts.length > 1 || (staff && $typeChoices.length > 0))) ||
+    (showWhere && ($areaChoices.length > 0 || $regionChoices.length > 0)) ||
+    (showInstitution && $institutionChoices.length > 1) ||
+    (!!$$slots.default && !extraActive);
+
   function resetFilters() {
     query.set('');
     selected.set({});
   }
 </script>
 
-<FilterBar
-  bind:query={$query}
-  placeholder={$t('Search maps…')}
-  active={activeFacets + extraActive}
-  {showSearch}
-  resettable={hasFilters}
-  on:reset={resetFilters}
->
-  <!-- All facets live in the Filters disclosure. -->
+<svelte:window
+  on:click={(e) => {
+    if (menuOpen && menu && !menu.contains(e.target as Node)) menuOpen = false;
+  }}
+/>
+
+<FilterBar bind:query={$query} placeholder={$t('Search maps…')} {showSearch} flat>
   <div class="primary">
     {#if hasKinds}
       <div class="kinds">
@@ -118,140 +185,148 @@
         />
       </div>
     {/if}
-    {#if seriesOpts.length > 1}
-      <!-- Series is a filter here; the catalog's collection browser links to its full index. -->
-      <div class="dropdowns">
-        <select
-          value={$selected.series_key?.[0] ?? ''}
-          on:change={(e) =>
-            search.setSingle('series_key', (e.currentTarget as HTMLSelectElement).value)}
-          aria-label="Filter by series"
-        >
-          <option value="">{$t('All series')}</option>
-          {#each seriesOpts as s (s.value)}
-            <option value={s.value}>{s.label}</option>
-          {/each}
-        </select>
-      </div>
+    {#if showMenu}
+      <details class="add-filter" bind:open={menuOpen} bind:this={menu}>
+        <summary class="chip">+ {$t('Filter')}</summary>
+        <!-- A pick fires `change` on its select; it bubbles here and folds the menu. -->
+        <div class="menu" on:change={() => (menuOpen = false)}>
+          {#if showWhat && (seriesOpts.length > 1 || (staff && $typeChoices.length))}
+            <!-- Series and type are both "what kind of map": one select, two groups. -->
+            <label
+              >{$t('Series or type')}
+              <select value="" on:change={(e) => setWhat(e.currentTarget.value)}>
+                <option value="">{$t('Any series or type')}</option>
+                {#if seriesOpts.length > 1}
+                  <optgroup label={$t('Series')}>
+                    {#each seriesOpts as s (s.value)}
+                      <option value={`series:${s.value}`}>{s.label}</option>
+                    {/each}
+                  </optgroup>
+                {/if}
+                {#if staff && $typeChoices.length}
+                  <optgroup label={$t('Type')}>
+                    {#each $typeChoices as t (t)}
+                      <option value={`type:${t}`}>{mapTypeLabel(t, $locale)}</option>
+                    {/each}
+                  </optgroup>
+                {/if}
+              </select>
+            </label>
+          {/if}
+          {#if showWhere && ($areaChoices.length || $regionChoices.length)}
+            <!-- Region and province are both "where": one select, two groups. -->
+            <label
+              >{$t('Place')}
+              <select
+                value=""
+                on:change={(e) => setWhere(e.currentTarget.value)}
+                title={$t(
+                  'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
+                )}
+              >
+                <option value="">{$t('Anywhere')}</option>
+                {#if $regionChoices.length}
+                  <optgroup label={$t('Regions')}>
+                    {#each CATALOG_REGIONS.filter( (region) => $regionChoices.includes(region.key) ) as region (region.key)}
+                      <option value={`region:${region.key}`}>{region[$locale]}</option>
+                    {/each}
+                  </optgroup>
+                {/if}
+                {#if $areaChoices.length}
+                  <optgroup
+                    label={`${$t('Provinces')} · ${$locale === 'vi' ? 'trước 7/2025' : 'before July 2025'}`}
+                  >
+                    {#each $areaChoices as a (a)}
+                      <option value={`area:${a}`}>{a}</option>
+                    {/each}
+                  </optgroup>
+                {/if}
+              </select>
+            </label>
+          {/if}
+          {#if showInstitution && $institutionChoices.length > 1}
+            <label
+              >{$t('Held by')}
+              <select
+                value=""
+                on:change={(e) => search.setSingle('institution', e.currentTarget.value)}
+              >
+                <option value="">{$t('All institutions')}</option>
+                {#each $institutionChoices as i (i)}
+                  <option value={i}>{i}</option>
+                {/each}
+              </select>
+            </label>
+          {/if}
+          {#if $$slots.default && !extraActive}
+            <label>{$t('Work')} <slot /></label>
+          {/if}
+        </div>
+      </details>
     {/if}
   </div>
-  {#if $areaChoices.length}
-    <select
-      value={$selected.area?.[0] ?? ''}
-      on:change={(e) => search.setSingle('area', (e.currentTarget as HTMLSelectElement).value)}
-      aria-label="Filter by province"
-      title={$t(
-        'Modern province, as it stood until mid-2025 — a locator, not the name the map used'
-      )}
-    >
-      <option value=""
-        >{$t('All provinces')} · {$locale === 'vi' ? 'trước 7/2025' : 'before July 2025'}</option
-      >
-      {#each $areaChoices as a (a)}
-        <option value={a}>{a}</option>
-      {/each}
-    </select>
-  {/if}
-  {#if $regionChoices.length}
-    <select
-      value={$selected.region?.[0] ?? ''}
-      on:change={(e) => search.setSingle('region', e.currentTarget.value)}
-      aria-label="Filter by geographic region"
-    >
-      <option value="">{$locale === 'vi' ? 'Tất cả vùng địa lý' : 'All geographic regions'}</option>
-      {#each CATALOG_REGIONS.filter( (region) => $regionChoices.includes(region.key) ) as region (region.key)}
-        <option value={region.key}>{region[$locale]}</option>
-      {/each}
-    </select>
-  {/if}
-  {#if staff && $typeChoices.length}
-    <select
-      value={$selected.type?.[0] ?? ''}
-      on:change={(e) => search.setSingle('type', (e.currentTarget as HTMLSelectElement).value)}
-      aria-label="Filter by map type"
-    >
-      <option value="">{$t('All types')}</option>
-      {#each $typeChoices as t (t)}
-        <option value={t}>{mapTypeLabel(t, $locale)}</option>
-      {/each}
-    </select>
-  {/if}
-  {#if $institutionChoices.length > 1}
-    <select
-      value={$selected.institution?.[0] ?? ''}
-      on:change={(e) =>
-        search.setSingle('institution', (e.currentTarget as HTMLSelectElement).value)}
-      aria-label="Filter by institution"
-    >
-      <option value="">{$t('All institutions')}</option>
-      {#each $institutionChoices as i (i)}
-        <option value={i}>{i}</option>
-      {/each}
-    </select>
-  {/if}
-  <slot />
   <svelte:fragment slot="more">
     {#if $yearBins.length}
-      <!-- A decade bar is a shortcut for the two boxes under it: click one for that decade, or
-           type any span. The bars are counted against every other filter, so they say what is
-           left, and drawn on a square-root scale — ~1,000 sheets are from the 1960s and a handful
-           before, so a straight scale left every other decade a hairline. -->
-      <div class="years">
-        <div class="bars" role="group" aria-label={$t('Maps per decade')}>
-          {#each $yearBins as b (b.decade)}
-            <button
-              type="button"
-              class="bar"
-              class:is-on={inRange(b.decade)}
-              style="height: {b.count ? Math.max(8, Math.sqrt(b.count / maxBin) * 100) : 2}%"
-              title="{b.decade}s · {b.count}"
-              aria-label="{b.decade}s, {b.count}"
-              on:click={() => setYears(String(b.decade), String(b.decade + 9))}
-            ></button>
-          {/each}
-        </div>
-        <div class="span">
-          <label
-            >{$t('From')}
-            <input
-              type="number"
-              inputmode="numeric"
-              placeholder={String($yearBins[0].decade)}
-              value={yFrom}
-              on:change={(e) => setYears(e.currentTarget.value, yTo)}
-            /></label
-          >
-          <label
-            >{$t('To')}
-            <input
-              type="number"
-              inputmode="numeric"
-              placeholder={String($yearBins[$yearBins.length - 1].decade + 9)}
-              value={yTo}
-              on:change={(e) => setYears(yFrom, e.currentTarget.value)}
-            /></label
-          >
-        </div>
-      </div>
+      <YearTimeline
+        bins={$yearBins}
+        from={yFrom}
+        to={yTo}
+        on:change={(e) => setYears(...e.detail)}
+      />
     {/if}
   </svelte:fragment>
 </FilterBar>
 
+{#if allChips.length || hasFilters}
+  <div class="active-chips">
+    {#each allChips as c (c.label)}
+      <span class="chip is-on">
+        {c.label}
+        <button
+          type="button"
+          class="chip-x"
+          aria-label={$t('Remove {X}', { X: c.label })}
+          on:click={c.clear}>×</button
+        >
+      </span>
+    {/each}
+    {#if hasFilters}
+      <button type="button" class="reset" on:click={resetFilters}>{$t('Clear all')}</button>
+    {/if}
+  </div>
+{/if}
+
 <style>
-  .dropdowns {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    padding-top: 0.3rem;
+  .add-filter {
+    flex-basis: 100%;
   }
-  /* `max-width` because the same controls sit on a 1280px page as well as in a
-     300px rail: without it each one grew to 400px of chrome around two words.
-     The 110px basis is still what makes them wrap in the rail — and what lets
-     the fourth one wrap rather than squeeze the three beside it. */
-  .dropdowns select {
-    flex: 1 1 110px;
-    max-width: 240px;
-    padding: 0.35rem 0.45rem;
+  .add-filter summary {
+    display: inline-block;
+    cursor: pointer;
+    list-style: none;
+  }
+  .add-filter summary::-webkit-details-marker {
+    display: none;
+  }
+  /* In flow, not floating: a 300px rail clips an absolute panel. */
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-top: 0.35rem;
+  }
+  .menu label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1 1 8rem;
+    min-width: 0;
+    font-size: 0.72rem;
+    font-weight: var(--font-bold);
+  }
+  .menu :global(select) {
+    max-width: 100%;
+    padding: 0.3rem 0.45rem;
     font-family: inherit;
     font-size: 0.82rem;
     background: var(--sb-card-bg);
@@ -261,6 +336,30 @@
     cursor: pointer;
   }
 
+  .active-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .reset {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: var(--font-bold);
+    color: var(--sb-accent);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .chip-x {
+    all: unset;
+    cursor: pointer;
+    margin-left: 0.3rem;
+    padding: 0 0.2rem;
+  }
+
   .primary {
     display: flex;
     flex-wrap: wrap;
@@ -268,56 +367,9 @@
     align-items: center;
     gap: 0.5rem;
   }
-  .primary .dropdowns {
-    padding-top: 0;
-  }
-  .primary .dropdowns select {
-    flex: 0 1 14rem;
-    padding: 0.25rem 0.4rem;
-    font-size: 0.78rem;
-  }
   /* The pill row shrinks inside a flex line and clips its longest label. */
   .kinds :global(.sb-pill) {
     flex: none;
     white-space: nowrap;
-  }
-  .years {
-    padding-top: 0.5rem;
-  }
-  .bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 2.2rem;
-  }
-  .bar {
-    flex: 1 1 0;
-    min-width: 3px;
-    padding: 0;
-    border: none;
-    background: color-mix(in srgb, var(--color-text) 22%, transparent);
-    cursor: pointer;
-  }
-  .bar.is-on {
-    background: var(--sb-accent);
-  }
-  .span {
-    display: flex;
-    gap: 0.5rem;
-    padding-top: 0.3rem;
-    font-size: 0.78rem;
-  }
-  .span label {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  .span input {
-    width: 4.5rem;
-    padding: 0.25rem 0.35rem;
-    font: inherit;
-    background: var(--sb-card-bg);
-    border: var(--border-thin);
-    border-radius: var(--sb-radius-sm);
   }
 </style>
