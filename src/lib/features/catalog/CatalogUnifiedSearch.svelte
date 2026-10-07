@@ -12,7 +12,8 @@
   import { catalogAreaSummary } from '$lib/core/catalogAreas';
   import ArchiveFilters from '$lib/features/shared/ArchiveFilters.svelte';
   import CatalogTable from '$lib/features/catalog/CatalogTable.svelte';
-  import type { GroupKey } from '$lib/features/catalog/catalogTableModel';
+  import { sortRows, groupRows, type GroupKey } from '$lib/features/catalog/catalogTableModel';
+  import { sliceGroups } from '$lib/features/catalog/sliceGroups';
   import MapCard from '$lib/ui/MapCard.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
@@ -20,6 +21,12 @@
   import CatalogDetailDrawer from '$lib/features/catalog/CatalogDetailDrawer.svelte';
   import LabelHits from '$lib/features/shared/LabelHits.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { getSupabaseContext } from '$lib/data/supabase/context';
+  import {
+    favoriteIds,
+    loadFavoriteIds,
+    toggleFavorite,
+  } from '$lib/features/shared/favoritesStore';
   import { get } from 'svelte/store';
   import { trackMeasurement } from '$lib/data/measurement';
   import { createCatalogSearch } from '$lib/features/shared/catalogSearch';
@@ -134,7 +141,11 @@
 
   $: atRest = !$query.trim() && !Object.values($selected).some((v) => v?.length);
 
+  const { supabase, session } = getSupabaseContext();
+  const userId = session?.user?.id;
+
   onMount(() => {
+    if (userId) loadFavoriteIds(supabase, userId);
     search.start();
     const stops = [
       query.subscribe(scheduleSearchMeasurement),
@@ -196,6 +207,24 @@
     shown = SLICE;
   }
 
+  /* The grid groups as the table does: sort by the grouping key so the sections come out in order,
+     then slice after grouping so a heading never loses its first cards. */
+  $: gridGroups = sliceGroups(
+    groupRows(
+      groupBy === 'none' ? listed : sortRows(listed as any[], { key: groupBy, asc: true }, null),
+      groupBy
+    ),
+    shown
+  );
+  let collapsedGroups = new Set<string>();
+  function toggleGroup(label: string | null) {
+    if (label == null) return;
+    if (collapsedGroups.has(label)) collapsedGroups.delete(label);
+    else collapsedGroups.add(label);
+    collapsedGroups = new Set(collapsedGroups);
+  }
+  $: shownCount = gridGroups.reduce((n, g) => n + g.rows.length, 0);
+
   // ── Admin edit: the page owns MapEditModal (catalog UI must not import admin) ──
   /** Re-run the current query (call after an admin edit lands). */
   export function refresh() {
@@ -228,7 +257,7 @@
     extraChips={workFilter
       ? [
           {
-            label: $t(WORK_FILTERS.find((w) => w.key === workFilter)?.label ?? workFilter),
+            label: `${$t('Work')}: ${$t(WORK_FILTERS.find((w) => w.key === workFilter)?.label ?? workFilter)}`,
             clear: () => (workFilter = ''),
           },
         ]
@@ -264,15 +293,13 @@
             <input type="checkbox" bind:checked={$includeScout} />{$t('Include scout queue')}</label
           >
         {/if}
-        {#if view !== 'grid'}
-          <select bind:value={groupBy} aria-label={$t('Group by')}>
-            <option value="none">{$t('Group by')}: {$t('None')}</option>
-            <option value="year">{$t('Group by')}: {$t('Year')}</option>
-            <option value="region">{$t('Group by')}: {$t('Area')}</option>
-            <option value="collection">{$t('Group by')}: {$t('Series')}</option>
-            <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
-          </select>
-        {/if}
+        <select bind:value={groupBy} aria-label={$t('Group by')}>
+          <option value="none">{$t('Group by')}: {$t('None')}</option>
+          <option value="year">{$t('Group by')}: {$t('Year')}</option>
+          <option value="region">{$t('Group by')}: {$t('Area')}</option>
+          <option value="collection">{$t('Group by')}: {$t('Series')}</option>
+          <option value="holding_institution">{$t('Group by')}: {$t('Institution')}</option>
+        </select>
         <Tabs
           tone="rail"
           tabs={VIEWS}
@@ -297,26 +324,47 @@
     {#if view === 'grid' && !compact}
       <!-- A card opens the same drawer a row does, so it carries no `href`:
            the grid is the list in another shape, not a different destination. -->
-      <div class="cus-grid">
-        {#each listed.slice(0, shown) as item (item.id)}
-          <MapCard
-            map={{
-              ...item,
-              location:
-                catalogAreaSummary(item).label === '—' ? undefined : catalogAreaSummary(item).label,
-            } as any}
-            href={null}
-            thumbnail={atWidth(item.thumbnail, 400)}
-            showSourceBadge
-            on:open={(e) => openResult(e.detail)}
+      {#each gridGroups as g (g.label)}
+        {#if g.label !== null}
+          <button
+            type="button"
+            class="cus-group"
+            aria-expanded={!collapsedGroups.has(g.label)}
+            on:click={() => toggleGroup(g.label)}
           >
-            <svelte:fragment slot="status">
-              {#if staff}<SheetStatus {item} state={work[item.id]} />{/if}
-            </svelte:fragment>
-          </MapCard>
-        {/each}
-      </div>
-      {#if shown < listed.length}
+            <span class="cus-caret">{collapsedGroups.has(g.label) ? '▸' : '▾'}</span>
+            <strong>{g.label}</strong>
+            <span class="cus-group-n">{g.count}</span>
+          </button>
+        {/if}
+        {#if g.label === null || !collapsedGroups.has(g.label)}
+          <div class="cus-grid">
+            {#each g.rows as item (item.id)}
+              <MapCard
+                map={{
+                  ...item,
+                  location:
+                    catalogAreaSummary(item).label === '—'
+                      ? undefined
+                      : catalogAreaSummary(item).label,
+                } as any}
+                href={null}
+                thumbnail={atWidth(item.thumbnail, 400)}
+                showSourceBadge
+                showFavorite={!!userId && (item as any)._table !== 'scout'}
+                isFavorited={$favoriteIds.has(item.id)}
+                on:toggleFavorite={(e) => userId && toggleFavorite(supabase, userId, e.detail)}
+                on:open={(e) => openResult(e.detail)}
+              >
+                <svelte:fragment slot="status">
+                  {#if staff}<SheetStatus {item} state={work[item.id]} />{/if}
+                </svelte:fragment>
+              </MapCard>
+            {/each}
+          </div>
+        {/if}
+      {/each}
+      {#if shownCount < listed.length}
         <div use:inView={() => (shown += SLICE)}></div>
       {/if}
     {:else}
@@ -393,6 +441,37 @@
 
   /* `MapCard` carries its own 3px border and 4px drop, so the track is sized
      for the card rather than the card padded to fill a track. */
+  .cus-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    margin: 1.25rem 0 0.6rem;
+    padding: var(--space-2) var(--space-3);
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    background: var(--sb-group-bg);
+    border: none;
+    border-top: 1.5px solid var(--color-border);
+    border-bottom: 1.5px solid var(--color-border);
+  }
+  .cus-group:hover {
+    background: var(--sb-group-bg-hover);
+  }
+  .cus-caret {
+    display: inline-block;
+    width: 1em;
+  }
+  .cus-group-n {
+    padding: 0.05rem 0.45rem;
+    background: var(--color-text);
+    color: var(--color-white);
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
+    font-weight: var(--font-extrabold);
+  }
   .cus-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

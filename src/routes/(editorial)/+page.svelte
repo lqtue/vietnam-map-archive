@@ -27,7 +27,21 @@
   let thumbnails: Map<string, string> = new Map();
   /** Only the Favorites tab ever waits: the surveys are already in the HTML. */
   let loadingFavorites = false;
-  let filterCollection: 'featured' | 'favorites' = 'featured';
+  let filterCollection: 'maps' | 'featured' | 'favorites' = 'maps';
+  /** Which place the Maps tab shows. All four sets are in the HTML already. */
+  let placeKey = 'saigon';
+  $: place = data.places.find((p) => p.key === placeKey) ?? data.places[0];
+  /** Display names; the keys come from `+page.server.ts`. */
+  const placeLabel = (key: string) =>
+    key === 'saigon'
+      ? $t('Saigon')
+      : key === 'hanoi'
+        ? 'Hà Nội'
+        : key === 'hue'
+          ? 'Huế'
+          : $t('Across Vietnam');
+  /** /catalog filters on `?area=<province>`; the survey set has no URL filter, so it opens the catalog. */
+  $: seeAllHref = place?.area ? `/catalog?area=${encodeURIComponent(place.area)}` : '/catalog';
 
   /**
    * The sheet the "how this works" section plays, and how to hold it.
@@ -329,12 +343,14 @@
       return;
     }
 
-    // Keep the Favorites tab in step without a round trip. Anything favorited
-    // from this page is on it, so the record is already here.
+    // Keep the Favorites tab in step without a round trip. The record is on
+    // the page already: from the Favorites tab itself or the Maps tab.
     if (wasFavorited) {
       favoriteMaps = favoriteMaps.filter((m) => m.id !== mapId);
       return;
     }
+    const added = data.places.flatMap((p) => p.maps).find((m) => m.id === mapId);
+    if (added) favoriteMaps = [...favoriteMaps, added];
   }
 
   onMount(loadReaderData);
@@ -517,17 +533,16 @@
         <!-- Only a signed-in reader has favorites, and the tab used to be there
              for everyone else too — a second tab whose whole content was a note
              saying to sign in. -->
-        {#if session}
-          <Tabs
-            label={$t('Which sheets')}
-            tabs={[
-              { key: 'featured', label: 'Surveys' },
-              { key: 'favorites', label: 'Favorites' },
-            ]}
-            active={filterCollection}
-            on:change={(e) => (filterCollection = e.detail.key as typeof filterCollection)}
-          />
-        {/if}
+        <Tabs
+          label={$t('Which sheets')}
+          tabs={[
+            { key: 'maps', label: 'Maps' },
+            { key: 'featured', label: 'Surveys' },
+            ...(session ? [{ key: 'favorites', label: 'Favorites' }] : []),
+          ]}
+          active={filterCollection}
+          on:change={(e) => (filterCollection = e.detail.key as typeof filterCollection)}
+        />
       </div>
 
       <!-- No loading state for the surveys: they are in the HTML. Favorites
@@ -539,9 +554,29 @@
           <h3>{$t('No favorites yet.')}</h3>
           <p>{$t('Heart any map and it lands here, on every device you sign in from.')}</p>
         </div>
-      {:else if filterCollection === 'featured' ? data.series.length > 0 : displayedMaps.length > 0}
+      {:else if filterCollection === 'featured' ? data.series.length > 0 : filterCollection === 'maps' ? place.maps.length > 0 || data.places.some((p) => p.maps.length) : displayedMaps.length > 0}
+        {#if filterCollection === 'maps'}
+          <div class="place-chips" role="group" aria-label={$t('Place')}>
+            {#each data.places as p (p.key)}
+              <button
+                type="button"
+                class="chip"
+                class:is-on={p.key === placeKey}
+                aria-pressed={p.key === placeKey}
+                on:click={() => (placeKey = p.key)}
+              >
+                {placeLabel(p.key)}{p.total ? ` (${p.total})` : ''}
+              </button>
+            {/each}
+          </div>
+        {/if}
         <FeaturedSheet
-          maps={filterCollection === 'featured' ? [] : displayedMaps}
+          maps={filterCollection === 'featured'
+            ? []
+            : filterCollection === 'maps'
+              ? place.maps
+              : displayedMaps}
+          axis={filterCollection === 'maps'}
           series={filterCollection === 'featured' ? data.series : []}
           {thumbnails}
           {favoriteIds}
@@ -553,6 +588,14 @@
           <h3>{$t('Nothing here yet.')}</h3>
           <p>{$t('No maps match this view — try another tab or the catalog.')}</p>
         </div>
+      {/if}
+
+      {#if filterCollection === 'maps' && place?.total}
+        <p class="see-all">
+          <a href={seeAllHref} class="text-link"
+            >{$t('See all {N} in the catalog', { N: place.total })}</a
+          >
+        </p>
       {/if}
 
       <div class="action-footer">

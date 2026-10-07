@@ -120,15 +120,17 @@
 
   <!-- Desktop links: what you read stays in the bar -->
   <div class="nav-links">
-    <a href="/catalog" class="nav-link" class:active={activeCatalog}>{$t('Catalog')}</a>
+    <NavDropdown label={$t('Catalog')} active={activeCatalog}>
+      <a href="/catalog" class="dropdown-item" on:click={closeDrawer}>{$t('All maps')}</a>
+      <a href="/catalog/institutions" class="dropdown-item" on:click={closeDrawer}
+        >{$t('Institutions')}</a
+      >
+    </NavDropdown>
     <a href="/about" class="nav-link" class:active={activeAbout}>{$t('About')}</a>
     <a href="/blog" class="nav-link" class:active={activeBlog}>{$t('Blog')}</a>
 
     <NavDropdown label="Tools" active={activeTools}>
       <a href="/explore" class="dropdown-item" on:click={closeDrawer}>{$t('Map viewer')}</a>
-      <a href="/catalog/institutions" class="dropdown-item" on:click={closeDrawer}
-        >{$t('Institution catalog')}</a
-      >
       <a href="/explore?mode=story" class="dropdown-item" on:click={closeDrawer}
         >{$t('Story Builder')}</a
       >
@@ -300,8 +302,8 @@
 
     <nav class="drawer-nav">
       <a href="/catalog" class="drawer-link" on:click={closeDrawer}>{$t('Catalog')}</a>
-      <a href="/catalog/institutions" class="drawer-link" on:click={closeDrawer}
-        >{$t('Institution catalog')}</a
+      <a href="/catalog/institutions" class="drawer-link drawer-sublink" on:click={closeDrawer}
+        >{$t('Institutions')}</a
       >
       <a href="/about" class="drawer-link" on:click={closeDrawer}>{$t('About')}</a>
       <a href="/blog" class="drawer-link" on:click={closeDrawer}>{$t('Blog')}</a>
@@ -604,6 +606,10 @@
     transition:
       background 0.12s,
       border-color 0.12s;
+  }
+  .drawer-sublink {
+    margin-left: 1rem;
+    font-size: 0.9rem;
   }
   .drawer-link:hover {
     background: var(--color-yellow);

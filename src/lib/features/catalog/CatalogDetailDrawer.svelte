@@ -17,6 +17,7 @@
   import type { WorkFacts } from '$lib/core/sheetWork';
   import WorkPips from './WorkPips.svelte';
   import OpenInMenu from './OpenInMenu.svelte';
+  import FavoriteButton from '$lib/features/shared/FavoriteButton.svelte';
 
   export let item: any | null = null;
   /** Staff get an Edit action that opens the admin map editor. */
@@ -164,6 +165,7 @@
     </dl>
 
     <div class="actions">
+      {#if !isScout}<FavoriteButton mapId={item.id} />{/if}
       {#if canEdit}
         <button type="button" class="chip act" on:click={() => dispatch('edit', item)}
           >✎ Edit</button

@@ -141,7 +141,28 @@
   $: query = search ? search.query : writable('');
   $: typing = !!$query.trim();
 
-  $: visibleSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts) : [];
+  // The series list answers the same query and facets as the rows below it: a
+  // series with no matching sheet steps aside and the rest show "N of M". Only
+  // with the rail's shared engine — the mobile drawer's browser owns its own,
+  // out of reach here, so there the list keeps its full counts.
+  $: results = search ? search.results : writable<Record<string, any>[]>([]);
+  $: selected = search ? search.selected : writable<Record<string, string[]>>({});
+  $: mapsReady = search ? search.mapsReady : writable(false);
+  $: filtering =
+    !!search && $mapsReady && (typing || Object.values($selected).some((v) => v?.length));
+  $: matchCount = filtering ? countBySeries($results) : new Map<string, number>();
+
+  function countBySeries(rows: Record<string, any>[]) {
+    const out = new Map<string, number>();
+    for (const r of rows) if (r.series_key) out.set(r.series_key, (out.get(r.series_key) ?? 0) + 1);
+    return out;
+  }
+
+  // The rail is 300px: one line per series there, the dates and drafts on hover.
+  $: compact = search !== null;
+
+  $: allSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts) : [];
+  $: visibleSeries = filtering ? allSeries.filter((r) => matchCount.has(r.key)) : allSeries;
   $: seriesOn = new Set(
     $layersStore.overlays.filter((o) => o.ref.kind === 'series').map((o) => o.ref.mapId)
   );
@@ -156,14 +177,25 @@
           type="button"
           class="series-row"
           class:is-on={on}
+          class:compact
           aria-pressed={on}
+          title={compact ? `${s.name} — ${s.label}${s.note ? ` · ${s.note}` : ''}` : undefined}
           on:click={() => toggleRow(s)}
         >
           <span class="series-mark" aria-hidden="true">{on ? '✓' : '+'}</span>
           <span class="series-text">
             <span class="series-name">{s.name}</span>
-            <span class="series-note">{s.label} · {s.note}</span>
+            <span class="series-note"
+              >{compact ? s.note || s.label : `${s.label}${s.note ? ` · ${s.note}` : ''}`}</span
+            >
           </span>
+          {#if compact}
+            <span class="series-count"
+              >{filtering
+                ? $t('{N} of {M}', { N: matchCount.get(s.key) ?? 0, M: s.sheetCount })
+                : s.sheetCount}</span
+            >
+          {/if}
         </button>
         <!-- Beside the toggle, never inside it: the row is a button that puts
              the survey on the map, and a nested anchor would be invalid markup
@@ -269,6 +301,29 @@
   .series-note {
     font-size: 0.7rem;
     color: var(--sb-text-muted);
+  }
+  .series-text {
+    flex: 1 1 auto;
+  }
+  .compact .series-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .series-count {
+    flex: none;
+    font-size: 0.75rem;
+    color: var(--sb-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  /* The second line costs a row's height, so it opens only for the row being read. */
+  .compact .series-note {
+    display: none;
+  }
+  .compact:hover .series-note,
+  .compact:focus-visible .series-note,
+  .compact.is-on .series-note {
+    display: block;
   }
   .series-info {
     flex: none;

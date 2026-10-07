@@ -130,12 +130,22 @@
   >
     <div class="bands">
       {#each bands as e (e.name)}
-        <span
+        {@const on = from === String(Math.max(e.a, start)) && to === String(Math.min(e.b, end - 1))}
+        <button
+          type="button"
           class="band"
+          class:is-on={on}
+          aria-pressed={on}
+          on:pointerdown|stopPropagation
+          on:pointerup|stopPropagation
+          on:click={() =>
+            on
+              ? dispatch('change', ['', ''])
+              : commit(Math.max(e.a, start), Math.min(e.b, end - 1))}
           style:left="{e.left * 100}%"
           style:width="{e.width * 100}%"
           style:--tint="{10 + (e.i % 2) * 14}%"
-          title="{$t(e.name)} · {e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}">{$t(e.name)}</span
+          title="{$t(e.name)} · {e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}">{$t(e.name)}</button
         >
       {/each}
     </div>
@@ -159,21 +169,6 @@
   </div>
 
   <div class="controls">
-    <div class="eras">
-      {#each bands as e (e.name)}
-        {@const on = from === String(Math.max(e.a, start)) && to === String(Math.min(e.b, end - 1))}
-        <button
-          type="button"
-          class="chip"
-          class:is-on={on}
-          aria-pressed={on}
-          on:click={() =>
-            on
-              ? dispatch('change', ['', ''])
-              : commit(Math.max(e.a, start), Math.min(e.b, end - 1))}>{$t(e.name)}</button
-        >
-      {/each}
-    </div>
     <div class="span">
       <label
         >{$t('From')}
@@ -248,7 +243,16 @@
     font-size: 0.66rem;
     line-height: 1.2rem;
     background: color-mix(in srgb, var(--sb-accent) var(--tint), transparent);
+    border: none;
     border-left: 1px solid var(--color-bg, transparent);
+    color: inherit;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .band:hover,
+  .band.is-on {
+    background: color-mix(in srgb, var(--sb-accent) 45%, transparent);
   }
   .bars {
     display: flex;
@@ -297,19 +301,9 @@
   .controls {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 0.4rem 0.75rem;
     padding-top: 0.2rem;
-  }
-  .eras {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-  .chip {
-    --btn-pad: 0.15rem 0.55rem;
-    --btn-text: 0.72rem;
-    --btn-border: var(--border-thin);
   }
   .span {
     display: flex;

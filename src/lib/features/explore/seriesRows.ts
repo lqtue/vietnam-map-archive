@@ -14,6 +14,8 @@ export interface SeriesRow {
   /** The one layer this row puts on the map. */
   ref: SeriesRef;
   label: string;
+  /** Sheets held, for the one-line rail count. */
+  sheetCount: number;
   note: string;
   /**
    * The survey's `map_series.key`, which is also its `series_sheets.series_key`
@@ -83,6 +85,7 @@ export function buildSeriesRows(db: MapSeries[], canSeeDrafts: boolean): SeriesR
       isPartialSeriesIndex(s.key) && s.surveySheets
         ? `${s.sheets} sheets · ${s.surveySheets} indexed cities`
         : count(s.sheets, s.surveySheets),
+    sheetCount: s.sheets,
     note: seriesNote(s, canSeeDrafts),
     seriesKey: s.surveySheets ? s.key : undefined,
   }));

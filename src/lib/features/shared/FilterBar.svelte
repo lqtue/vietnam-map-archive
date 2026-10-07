@@ -21,6 +21,8 @@
   export let showSearch = true;
   /** Show the reset link. */
   export let resettable = false;
+  /** No "Filters" disclosure: the default slot and `more` sit in the open. The caller folds its own controls. */
+  export let flat = false;
 
   const dispatch = createEventDispatcher<{ reset: void }>();
 </script>
@@ -60,15 +62,20 @@
   {/if}
   <!-- Controls that stay visible when the disclosure is folded (a caller's primary facet). -->
   <slot name="before" />
-  <details class="sb-more">
-    <summary
-      >{$t('Filters')}{#if active}
-        · {active}{/if}</summary
-    >
-    <div class="dropdowns"><slot /></div>
-    <!-- Anything that is not a select, under them: the year bars. -->
+  {#if flat}
+    <slot />
     <slot name="more" />
-  </details>
+  {:else}
+    <details class="sb-more">
+      <summary
+        >{$t('Filters')}{#if active}
+          · {active}{/if}</summary
+      >
+      <div class="dropdowns"><slot /></div>
+      <!-- Anything that is not a select, under them: the year bars. -->
+      <slot name="more" />
+    </details>
+  {/if}
 </div>
 
 {#if resettable}

@@ -107,6 +107,9 @@ export const vi: Record<string, string> = {
   'No maps match this view — try another tab or the catalog.':
     'Không có bản đồ nào phù hợp với góc nhìn này — hãy thử tab khác hoặc danh mục.',
   'Browse the catalog': 'Duyệt danh mục',
+  Saigon: 'Sài Gòn',
+  'Across Vietnam': 'Toàn Việt Nam',
+  'See all {N} in the catalog': 'Xem cả {N} bản đồ trong danh mục',
   'Build something on top of the archive — a scrollytelling story across historical layers, or your own points, lines and shapes on a sheet.':
     'Xây dựng nội dung dựa trên kho dữ liệu — câu chuyện lịch sử theo lớp không gian, hoặc thêm điểm, đường và hình khối trên bản đồ.',
   'Walk readers through a place, one layer at a time':
@@ -236,6 +239,7 @@ export const vi: Record<string, string> = {
   'Browse by series': 'Duyệt theo bộ bản đồ',
   'All series': 'Tất cả bộ bản đồ',
   '{held} of {total} sheets — {pct}%': '{held} trên {total} mảnh — {pct}%',
+  '{N} of {M}': '{N} trên {M}',
   'Series details': 'Thông tin bộ bản đồ',
   'Distinct public cells': 'Số ô bản đồ công khai riêng biệt',
   'Printings linked to source items': 'Lần in được liên kết với nguồn lưu trữ',
@@ -274,6 +278,8 @@ export const vi: Record<string, string> = {
   'Close the viewer': 'Đóng trình xem',
   'IIIF image service': 'Dịch vụ ảnh IIIF',
   'Sheet page': 'Trang bản đồ',
+  Saved: 'Đã lưu',
+  'Sign in to save': 'Đăng nhập để lưu',
   'This sheet is a draft: it is not published, and this page is visible only because you are signed in.':
     'Bản đồ này là bản nháp: chưa được xuất bản, và trang này chỉ hiển thị vì bạn đã đăng nhập.',
   'View the original at {institution}': 'Xem bản gốc tại {institution}',
@@ -445,6 +451,7 @@ export const vi: Record<string, string> = {
   'Saving…': 'Đang lưu…',
   Name: 'Tên',
   'Institution catalog': 'Danh mục cơ quan lưu trữ',
+  Institutions: 'Cơ quan lưu trữ',
   'Search institutions and sources': 'Tìm cơ quan và nguồn',
   'Holding institutions': 'Cơ quan lưu giữ',
   'Source platforms': 'Nền tảng nguồn',
@@ -481,10 +488,23 @@ export const vi: Record<string, string> = {
   'Libraries, archives and source platforms represented in our records.':
     'Thư viện, kho lưu trữ và nền tảng nguồn có trong hồ sơ của chúng tôi.',
   'All provinces': 'Tất cả tỉnh thành',
+  Anywhere: 'Mọi nơi',
+  Filter: 'Bộ lọc',
+  'Series or type': 'Bộ hoặc loại bản đồ',
+  'Held by': 'Lưu giữ tại',
+  Work: 'Công việc',
+  Region: 'Vùng',
+  'Clear all': 'Bỏ tất cả',
+  'Any series or type': 'Mọi bộ hoặc loại bản đồ',
+  Regions: 'Vùng địa lý',
+  Provinces: 'Tỉnh thành',
+  Type: 'Loại bản đồ',
   'Modern province, as it stood until mid-2025 — a locator, not the name the map used':
     'Tỉnh theo ranh giới đến giữa năm 2025 — chỉ để định vị, không phải tên gọi trên bản đồ',
   'All institutions': 'Tất cả cơ quan lưu trữ',
   'All maps': 'Tất cả bản đồ',
+  Plans: 'Bình đồ',
+  Maps: 'Bản đồ',
   Surveys: 'Bản đồ địa hình',
   Series: 'Bộ bản đồ',
   Institution: 'Cơ quan lưu trữ',

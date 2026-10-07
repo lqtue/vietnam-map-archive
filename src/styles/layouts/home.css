@@ -431,6 +431,38 @@
   margin: 0;
 }
 
+.home-page .place-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+/* Places read as a quiet text row, not as a second set of pill buttons beside the tabs. */
+.home-page .place-chips .chip {
+  --btn-bg: transparent;
+  --btn-pad: 0.1rem 0;
+  --btn-border: 0;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  opacity: 0.65;
+}
+
+.home-page .place-chips .chip:hover,
+.home-page .place-chips .chip.is-on {
+  background: transparent;
+  color: var(--color-text);
+  opacity: 1;
+}
+
+.home-page .place-chips .chip.is-on {
+  border-bottom-color: var(--color-text);
+}
+
+.home-page .see-all {
+  margin: var(--space-3) 0 0;
+}
+
 .home-page .action-footer {
   display: flex;
   justify-content: space-between;

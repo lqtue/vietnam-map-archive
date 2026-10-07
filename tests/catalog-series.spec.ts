@@ -10,13 +10,13 @@ test('catalog begins with compact disclosures while collection links remain in t
   expect(html).toContain('/catalog?region=mekong-delta');
   await expect(page.locator('.collection-browser')).not.toHaveAttribute('open');
   await expect(page.locator('.series-band')).not.toBeVisible();
-  await expect(page.getByLabel('Filter by series')).not.toBeVisible();
+  await expect(page.locator('.filters .add-filter select')).not.toBeVisible();
   await page.locator('.collection-browser > summary').click();
   await expect(page.locator('.series-band')).toBeVisible();
   await page.locator('.collection-browser > summary').click();
-  await page.locator('.filters .sb-more > summary').click();
-  await expect(page.getByLabel('Filter by series')).toBeVisible();
-  await expect(page.getByLabel('Filter by geographic region')).toBeVisible();
+  await page.locator('.filters .add-filter > summary').click();
+  await expect(page.getByLabel('Series or type')).toBeVisible();
+  await expect(page.getByLabel('Place')).toBeVisible();
 });
 
 test('geographic region filter agrees with the API and Cochinchine includes HCMC', async ({
@@ -39,7 +39,7 @@ test('geographic region filter agrees with the API and Cochinchine includes HCMC
       expected.map((map: { id: string }) => map.id).sort()
     );
     await page.goto(`/catalog?region=${region}`);
-    await expect(page.getByLabel('Filter by geographic region')).toHaveValue(region);
+    await expect(page.locator('.active-chips')).toContainText('Region:');
     await expect(page.locator('.v2-count')).toHaveText(`${expected.length} in archive`);
   }
 });
@@ -81,7 +81,7 @@ test('area destinations are crawlable and their lists agree with public area sea
     expect(links.size).toBe(result.total.maps);
     if (href === '/catalog/area/ho-chi-minh') {
       await page.goto(filter!);
-      await expect(page.getByLabel('Filter by province')).toHaveValue(name);
+      await expect(page.locator('.active-chips')).toContainText(`Place: ${name}`);
       await expect(page.locator('.v2-count')).toHaveText(`${result.total.maps} in archive`);
     }
   }
@@ -274,7 +274,7 @@ test('"Filter the catalog" narrows the list to that survey, and the band steps a
   expect(narrowed).toBeLessThan(all);
 
   // Reset puts all three back.
-  await page.getByRole('button', { name: 'Reset filters' }).click();
+  await page.getByRole('button', { name: 'Clear all' }).click();
   await expect(page.locator('.collection-browser')).toBeVisible();
   await expect(count).toContainText(`${all} in archive`);
 });

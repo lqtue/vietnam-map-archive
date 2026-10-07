@@ -34,8 +34,10 @@ test('home renders and links into the catalog', async ({ page }) => {
   await expect(page.locator('nav.top-nav a[href="/about"]')).toBeVisible();
   // The bar carries the reading pages directly; the tools sit behind Tools ▾,
   // whose contents are gated behind {#if open} — click to render them.
-  await expect(page.locator('nav.top-nav a[href="/catalog"]')).toBeVisible();
   await hydrated(page);
+  await page.locator('nav.top-nav button', { hasText: 'Catalog' }).click();
+  await expect(page.locator('nav.top-nav a[href="/catalog"]')).toBeVisible();
+  await expect(page.locator('nav.top-nav a[href="/catalog/institutions"]')).toBeVisible();
   await page.locator('nav.top-nav button', { hasText: 'Tools' }).click();
   await expect(page.locator('nav a[href="/explore"]').first()).toBeVisible();
   await expect(page.locator('nav a[href="/directory"]').first()).toBeVisible();
