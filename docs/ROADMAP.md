@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-06)
+# Roadmap — open work (updated 2026-10-07)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -607,6 +607,50 @@ Plan: `docs/walk-plan.md`.
       one
       class. VMA's IIIF image plus its accepted georeference can be exposed as a warped XYZ URL via
       the Allmaps Tile Server and loaded as custom imagery.
+
+## Later — historical engagements and terrain (planned 2026-10-07)
+
+Deferred educational use of L7014; does not change **Do next**, the 1882
+`evidence-chain` pilot, or the current manuscript. Reuse the knowledge model and
+existing map runtime. Open work is tracked here; the entries below are the plan.
+
+- [ ] **`l7014-engagement-pilot`** — help readers learn the Vietnam War by comparing
+      the ground, intended battle plans and reported actions on relevant L7014
+      printings. After the 1882 `evidence-chain` pilot and placement/printing checks
+      for the selected sheets, prepare one curated engagement dossier. Cầu Chữ Y,
+      May 1968 is a candidate, not a confirmed choice: verify sheet coverage and
+      find a citable plan before promising plan-versus-action teaching. Assess NARA
+      SITRA records and US and Vietnamese accounts; use Wikipedia for discovery
+      and trace its references rather than count derivative text as independent
+      agreement. Reuse subjects, claims and supporting/conflicting evidence;
+      extend document page/record anchors only where needed. Keep historical
+      places separate from dated actions, and intended movements separate from
+      reported occurrence. Record source locators, date precision, review state,
+      location uncertainty and whether geometry is transcribed or inferred.
+      Battlefield extents require evidence; sheet coverage is never their boundary.
+      Display an optional event overlay and guided dated phases in the existing
+      viewer, with objectives, positions and routes opening their evidence and
+      alternative accounts. Link relevant printings with their survey/revision and
+      publication dates. Event identities are independent of map series: later
+      expansion to the First Indochina War and other conflicts reuses the model,
+      but corpus-wide ingestion is outside this pilot. Exit: one reviewed event
+      page and frozen research packet make map depiction, intention, reported
+      action and VMA interpretation distinguishable. Assess learning benefits in a
+      later study before claiming them; this may inform KG/text-analysis and
+      Saigon spatial-history research, without expanding the current methods paper.
+- [ ] **`terrain-context`** — deferred terrain support for the engagement pilot,
+      reusable across series. Choose a DEM only after checking pilot-area coverage,
+      resolution, acquisition date, horizontal/vertical references and reuse terms;
+      preserve source identity and processing provenance. First scope: optional
+      hillshade, elevation inspection and a profile along a selected line in the
+      existing map runtime. Keep modern elevation separate from dated historical
+      waterways, roads, vegetation and built areas; do not present it as reconstructed
+      wartime ground. Add slope only for a demonstrated case; defer viewsheds,
+      movement modelling and 3D terrain until questions and historical inputs justify
+      their assumptions. Exit: terrain and an L7014 sheet align in the pilot area,
+      attribution and limitations are inspectable, and terrain can be toggled while
+      reading the map and event evidence. The engagement dossier can proceed before
+      terrain delivery.
 
 ## OCR setup — open improvements from the 1959 re-run (2026-09-10)
 

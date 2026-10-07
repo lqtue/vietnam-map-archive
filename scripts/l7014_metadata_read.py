@@ -160,7 +160,7 @@ def read_one(row, source, model, reader, rotation):
             data=(ROOT / crop['path']).read_bytes(), mime_type='image/jpeg')]
     started = time.time()
     response = client.models.generate_content(model=model, contents=content,
-        config=genai_types.GenerateContentConfig(temperature=0,
+        config=genai_types.GenerateContentConfig(
             response_mime_type='application/json', max_output_tokens=2200))
     reading = json.loads(response.text)
     if not isinstance(reading.get('dates'), list):
