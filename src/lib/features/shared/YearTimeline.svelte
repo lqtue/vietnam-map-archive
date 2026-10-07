@@ -1,7 +1,7 @@
 <!--
   YearTimeline.svelte — the catalog's year filter: a decade histogram you drag across.
 
-  Era bands sit on top of the bars, each labelled with the year it starts, and a click on a band
+  Era bands sit on top of the bars, each labelled with the year it starts when it is wide enough to hold one, and a click on a band
   takes its whole span. Drag selects any run of years, a click on a bar takes
   that decade, and From/To stay for typing an exact year — they are also the keyboard path, as the
   chart itself is pointer-only. Bars are the caller's counts, already narrowed by every other facet.
@@ -52,7 +52,10 @@
         width: Math.max(0, Math.min(sel[1] + 1, end) - Math.max(sel[0], start)) / span,
       }
     : null;
-  $: ticks = bins.filter((b, i) => i === 0 || b.decade % 20 === 0);
+  // Every 40 years, plus the first bar when a tick is not already within 20 years of it.
+  $: ticks = bins.filter((b, i) =>
+    i === 0 ? (40 - (start % 40)) % 40 === 0 || (40 - (start % 40)) % 40 >= 20 : b.decade % 40 === 0
+  );
 
   const yearAt = (x: number) => {
     const r = chart.getBoundingClientRect();
@@ -133,7 +136,9 @@
           style:left="{e.left * 100}%"
           style:width="{e.width * 100}%"
           style:--tint="{10 + (e.i % 2) * 14}%"
-          title="{e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}">{Math.max(e.a, start)}</button
+          title="{e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}"
+          aria-label="{e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}"
+          >{e.width > 0.12 ? Math.max(e.a, start) : ''}</button
         >
       {/each}
     </div>
