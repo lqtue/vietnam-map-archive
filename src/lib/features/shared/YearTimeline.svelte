@@ -1,8 +1,8 @@
 <!--
   YearTimeline.svelte — the catalog's year filter: a decade histogram you drag across.
 
-  Era bands sit on top of the bars so the dates carry their history (French colonial, the two wars),
-  and a click on a band takes its whole span. Drag selects any run of years, a click on a bar takes
+  Era bands sit on top of the bars, each labelled with the year it starts, and a click on a band
+  takes its whole span. Drag selects any run of years, a click on a bar takes
   that decade, and From/To stay for typing an exact year — they are also the keyboard path, as the
   chart itself is pointer-only. Bars are the caller's counts, already narrowed by every other facet.
 -->
@@ -16,13 +16,13 @@
 
   const dispatch = createEventDispatcher<{ change: [string, string] }>();
 
-  // ponytail: hand-listed eras for the Saigon archive; lift to core/ if another page needs them.
-  const ERAS: [string, number, number][] = [
-    ['Before French rule', 0, 1858],
-    ['French colonial', 1859, 1945],
-    ['Indochina War', 1946, 1954],
-    ['Vietnam War', 1955, 1975],
-    ['Since 1975', 1976, 9999],
+  // ponytail: hand-listed spans for the Saigon archive; lift to core/ if another page needs them.
+  const ERAS: [number, number][] = [
+    [0, 1858],
+    [1859, 1945],
+    [1946, 1954],
+    [1955, 1975],
+    [1976, 9999],
   ];
 
   let chart: HTMLElement;
@@ -35,8 +35,7 @@
   $: end = bins[bins.length - 1].decade + 10;
   $: span = end - start;
   $: maxCount = Math.max(1, ...bins.map((b) => b.count));
-  $: bands = ERAS.map(([name, a, b], i) => ({
-    name,
+  $: bands = ERAS.map(([a, b], i) => ({
     a,
     b,
     i,
@@ -55,7 +54,6 @@
     : null;
   $: ticks = bins.filter((b, i) => i === 0 || b.decade % 20 === 0);
 
-  const eraOf = (y: number) => ERAS.find(([, a, b]) => y >= a && y <= b)?.[0] ?? '';
   const yearAt = (x: number) => {
     const r = chart.getBoundingClientRect();
     const f = Math.min(1, Math.max(0, (x - r.left) / r.width));
@@ -88,14 +86,6 @@
 
   $: hoverBin =
     hover == null ? null : bins.find((b) => hover! >= b.decade && hover! < b.decade + 10);
-  $: eraNow = (() => {
-    if (!sel) return '';
-    const names = [eraOf(sel[0]), eraOf(Math.min(sel[1], end - 1))];
-    return [...new Set(names)]
-      .filter(Boolean)
-      .map((n) => $t(n))
-      .join(' → ');
-  })();
 </script>
 
 <div class="timeline">
@@ -104,10 +94,8 @@
       <b>{hoverBin.decade}s</b>
       {hoverBin.count.toLocaleString()}
       {$t('maps')}
-      <span class="era">{$t(eraOf(hoverBin.decade + 5))}</span>
     {:else if sel}
       <b>{sel[0] === sel[1] ? sel[0] : `${sel[0]}–${sel[1]}`}</b>
-      <span class="era">{eraNow}</span>
       {#if !draft}<button type="button" class="link" on:click={() => dispatch('change', ['', ''])}
           >{$t('Clear')}</button
         >{/if}
@@ -129,7 +117,7 @@
     on:pointerleave={() => (hover = null)}
   >
     <div class="bands">
-      {#each bands as e (e.name)}
+      {#each bands as e (e.i)}
         {@const on = from === String(Math.max(e.a, start)) && to === String(Math.min(e.b, end - 1))}
         <button
           type="button"
@@ -145,7 +133,7 @@
           style:left="{e.left * 100}%"
           style:width="{e.width * 100}%"
           style:--tint="{10 + (e.i % 2) * 14}%"
-          title="{$t(e.name)} · {e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}">{$t(e.name)}</button
+          title="{e.a > 0 ? e.a : ''}–{e.b < 9999 ? e.b : ''}">{Math.max(e.a, start)}</button
         >
       {/each}
     </div>
@@ -206,8 +194,7 @@
     gap: 0.5rem;
     align-items: baseline;
   }
-  .hint,
-  .era {
+  .hint {
     opacity: 0.7;
   }
   .link {
