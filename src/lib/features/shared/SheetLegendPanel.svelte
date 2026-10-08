@@ -10,7 +10,18 @@
   import { get } from 'svelte/store';
   import { legendRevision, invalidateLegend } from '$lib/data/maps/legendRevision';
   import LegendTable from './LegendTable.svelte';
-  import LegendEntryEditor, { type LegendDraft } from './LegendEntryEditor.svelte';
+  import LegendEntryEditor from './LegendEntryEditor.svelte';
+  import {
+    accuracyBbox,
+    applyDraft,
+    forgetStoredDrafts,
+    readStoredDrafts,
+    saveDrafts,
+    writeStoredDrafts,
+    type Bbox,
+    type LegendDraft,
+    type LegendPoint,
+  } from './legendDrafts';
 
   /** Same zoom a label hit lands at — `LABEL_ZOOM` in explore/exploreUrl.ts,
    *  which this shared panel can't import (feature isolation). */
@@ -18,47 +29,26 @@
 
   const dispatch = createEventDispatcher<{
     toggleLegendPoints: void;
-    pickLocation: { lat: number; lng: number; label: string; zoom?: number };
+    pickLocation: { lat: number; lng: number; label: string; zoom?: number; bbox?: Bbox };
     clearFocus: void;
   }>();
 
   export let mapId: string | null = null;
   export let showLegendPoints = false;
   export let mapActions = true;
-  /** The row the reader last flew to — bound by the caller so Escape can clear it. */
+  /** The row the reader last selected — bound by the caller so Escape can clear it.
+   *  For an editor it is also the open row. */
   export let selectedN: number | null = null;
-
-  type LegendPoint = {
-    src?: 'manual' | 'grid' | 'numeral' | null;
-    id?: string;
-    n: number;
-    name: string | null;
-    vn: string | null;
-    grid: string | null;
-    lng: number | null;
-    lat: number | null;
-    accuracy_m?: number;
-  };
 
   let drafts: Record<string, LegendDraft> = {};
   let savingDrafts = false;
   let saveMessage = '';
   let saveErrors: { id: string; message: string }[] = [];
   let legend: LegendPoint[] = [];
-  function applyDraft(point: LegendPoint, draft: LegendDraft): LegendPoint {
-    return {
-      ...point,
-      name: draft.name,
-      vn: draft.vn,
-      grid: draft.grid,
-      lng: draft.coordinateOverride ? draft.lng : point.src === 'manual' ? null : draft.lng,
-      lat: draft.coordinateOverride ? draft.lat : point.src === 'manual' ? null : draft.lat,
-      src: draft.coordinateOverride ? 'manual' : point.src === 'manual' ? null : point.src,
-    };
-  }
   function keepDraft(draft: LegendDraft) {
     drafts = { ...drafts, [draft.id]: draft };
-    editingId = null;
+    // The open editor is always this sheet's, so `legendFor` is the key's owner.
+    if (mapId && mapId === legendFor) writeStoredDrafts(mapId, drafts);
     saveMessage = '';
     saveErrors = saveErrors.filter((error) => error.id !== draft.id);
   }
@@ -70,25 +60,10 @@
     saveMessage = '';
     saveErrors = [];
     try {
-      const response = await fetch(`/api/admin/maps/${id}/legend-points`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          entries: submitted.map((draft) => ({
-            id: draft.id,
-            name: draft.name,
-            vn: draft.vn,
-            grid: draft.grid,
-            lng: draft.coordinateOverride ? draft.lng : null,
-            lat: draft.coordinateOverride ? draft.lat : null,
-          })),
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.message ?? result.error ?? 'Could not save the legend drafts.');
+      const { saved, failed, warning } = await saveDrafts(id, submitted);
+      // Whatever became of the panel meanwhile, those entries are no longer drafts.
+      forgetStoredDrafts(id, saved);
       if (destroyed) return;
-      const saved = new Set<string>(result.saved ?? submitted.map((draft) => draft.id));
       const submittedById = new Map(submitted.map((draft) => [draft.id, draft]));
       if (mapId === id) {
         legend = legend.map((point) =>
@@ -96,9 +71,9 @@
             ? applyDraft(point, submittedById.get(point.id)!)
             : point
         );
-        saveErrors = result.failed ?? [];
+        saveErrors = failed;
         saveMessage = saved.size
-          ? `Saved ${saved.size} ${saved.size === 1 ? 'entry' : 'entries'}.`
+          ? `Saved ${saved.size} ${saved.size === 1 ? 'entry' : 'entries'}.${warning ? ` ${warning}` : ''}`
           : '';
       }
       drafts = Object.fromEntries(
@@ -117,7 +92,6 @@
   }
 
   let canEdit = false;
-  let editingId: string | null = null;
   let loadVersion = 0;
   let loadedRevision = -1;
   let destroyed = false;
@@ -132,9 +106,10 @@
   async function loadLegend(id: string, revision: number) {
     const version = ++loadVersion;
     selectedN = null;
-    editingId = null;
     saveMessage = '';
     saveErrors = [];
+    // Drafts belong to one sheet: never carry them over to the next.
+    if (legendFor !== id) drafts = {};
     legendFor = id;
     loadedRevision = revision;
     legendLoading = true;
@@ -146,6 +121,16 @@
       if (destroyed || version !== loadVersion || mapId !== id) return;
       canEdit = data?.canEdit === true;
       legend = (canEdit ? (data.entries ?? []) : (data?.points ?? [])) as LegendPoint[];
+      // A reload or a closed tab leaves drafts in storage; an editor gets them back
+      // (and they win over the server's row until saved). A reader never does.
+      if (canEdit)
+        drafts = {
+          ...readStoredDrafts(
+            id,
+            legend.flatMap((point) => (point.id ? [point.id] : []))
+          ),
+          ...drafts,
+        };
     } catch {
       if (!destroyed && version === loadVersion && mapId === id) {
         legend = [];
@@ -174,23 +159,31 @@
         )
       : [];
 
-  function flyToLegend(p: LegendPoint) {
-    if (p.lng == null || p.lat == null) return;
+  $: editing = canEdit && !savingDrafts ? legendRows.find((p) => p.n === selectedN && p.id) : null;
+  const placed = (p: LegendPoint) => p.lng != null && p.lat != null;
+
+  function selectRow(p: LegendPoint) {
     // Tap the lit row again to put it out — the same gesture that lit it.
     if (selectedN === p.n) {
       selectedN = null;
       dispatch('clearFocus');
       return;
     }
+    if (!canEdit && !placed(p)) return;
     selectedN = p.n;
-    // A legend number is a point on the sheet, so it lands at a label hit's
+    if (p.lng == null || p.lat == null) return;
+    const label = p.name ?? `№${p.n}`;
+    // A point read off the grid reference is the middle of a cell, so frame the
+    // cell; a precise one is a point on the sheet and lands at a label hit's
     // zoom rather than a Nominatim place's wider 15.
-    dispatch('pickLocation', {
-      lat: p.lat,
-      lng: p.lng,
-      label: p.name ?? `№${p.n}`,
-      zoom: LABEL_ZOOM,
-    });
+    if (p.accuracy_m)
+      dispatch('pickLocation', {
+        lat: p.lat,
+        lng: p.lng,
+        label,
+        bbox: accuracyBbox(p.lng, p.lat, p.accuracy_m),
+      });
+    else dispatch('pickLocation', { lat: p.lat, lng: p.lng, label, zoom: LABEL_ZOOM });
   }
 </script>
 
@@ -209,16 +202,9 @@
   <p class="sb-empty">{$t('This sheet has no numbered legend.')}</p>
 {:else}
   {#if canEdit && pendingDrafts.length}
-    <button
-      type="button"
-      class="sb-btn is-sm is-block"
-      disabled={savingDrafts || !!editingId}
-      on:click={saveAll}
+    <button type="button" class="sb-btn is-sm is-block" disabled={savingDrafts} on:click={saveAll}
       >{savingDrafts ? 'Saving drafts…' : `Save all (${pendingDrafts.length})`}</button
     >
-    {#if editingId}<p class="sb-empty">
-        Keep or cancel the open edit before saving all drafts.
-      </p>{/if}
   {/if}
   {#if saveMessage}<p class="sb-empty" role="status">{saveMessage}</p>{/if}
   {#each saveErrors as failure (failure.id)}<p class="sb-empty" role="alert">
@@ -243,46 +229,40 @@
   <LegendTable
     rows={legendRows}
     {selectedN}
-    actionable={(p) => mapActions && p.lng != null && p.lat != null}
+    actionable={(p) => canEdit || (mapActions && placed(p))}
     rowTitle={(p) =>
-      mapActions && p.lng != null && p.lat != null
-        ? selectedN === p.n
-          ? 'Clear this highlight'
-          : p.accuracy_m
-            ? `Within about ${p.accuracy_m} m`
-            : 'Fly to this place'
-        : undefined}
+      selectedN === p.n
+        ? canEdit
+          ? 'Close this entry'
+          : 'Clear this highlight'
+        : canEdit
+          ? 'Edit this entry'
+          : mapActions && placed(p)
+            ? p.accuracy_m
+              ? `Within about ${p.accuracy_m} m`
+              : 'Fly to this place'
+            : undefined}
     on:select={(e) => {
       const point = legendRows.find((p) => p.n === e.detail.n);
-      if (point) flyToLegend(point);
+      if (point) selectRow(point);
     }}
   >
     <svelte:fragment slot="extra" let:row={p}>
-      {#if canEdit && p.id && mapId}
-        <button
-          type="button"
-          class="sb-btn is-sm"
-          disabled={savingDrafts}
-          on:click={() => (editingId = editingId === p.id ? null : (p.id ?? null))}
-          >Edit text / point{drafts[p.id] ? ' · draft' : ''}</button
-        >
-        {#if drafts[p.id]}
-          <span class="lg-draft-point"
-            >{drafts[p.id].coordinateOverride
-              ? `Draft manual point · ${drafts[p.id].lng}, ${drafts[p.id].lat}`
-              : 'Draft automatic point'}</span
-          >
-        {/if}
-        {#if editingId === p.id}
-          {#key `${mapId}:${p.id}`}
-            <LegendEntryEditor
-              entry={{ ...p, id: p.id }}
-              draft={drafts[p.id] ?? null}
-              on:draft={(event) => keepDraft(event.detail)}
-              on:close={() => (editingId = null)}
-            />
-          {/key}
-        {/if}
+      {#if editing && editing.n === p.n && editing.id}
+        {#key `${mapId}:${editing.id}`}
+          <LegendEntryEditor
+            entry={{ ...editing, id: editing.id }}
+            draft={drafts[editing.id] ?? null}
+            on:draft={(event) => keepDraft(event.detail)}
+            on:locate={(event) =>
+              dispatch('pickLocation', {
+                ...event.detail,
+                ...(!event.detail.bbox && { zoom: LABEL_ZOOM }),
+              })}
+          />
+        {/key}
+      {:else if p.id && drafts[p.id]}
+        <span class="lg-draft-point">Unsaved draft</span>
       {/if}
     </svelte:fragment>
   </LegendTable>

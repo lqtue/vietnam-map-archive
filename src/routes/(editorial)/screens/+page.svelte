@@ -51,6 +51,8 @@
   let renameValue = 'Untitled story';
   let dialogOpen = false;
   let locQuery = '';
+  let locSearch: LocationSearch;
+  let locActive: string | null = null;
 
   // ── the system, as data ───────────────────────────────────────────────────
   /*
@@ -770,9 +772,11 @@
                 placeholder="Ben Thanh · 48Q XD 850 418 · 10.7769, 106.7009"
                 aria-label="Location search demo"
                 bind:value={locQuery}
+                aria-activedescendant={locActive}
+                on:keydown={(e) => locSearch?.keydown(e)}
               />
             </label>
-            <LocationSearch bind:query={locQuery} />
+            <LocationSearch bind:this={locSearch} bind:activeId={locActive} bind:query={locQuery} />
           </div>
         </div>
 

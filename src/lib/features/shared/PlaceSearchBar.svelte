@@ -27,6 +27,8 @@
   $: label = placeholder || $t('Search a place or coordinates…');
 
   let query = '';
+  let places: LocationSearch;
+  let activeResult: string | null = null;
 
   function onPick(e: CustomEvent<Pick>) {
     query = '';
@@ -56,6 +58,8 @@
       placeholder={label}
       aria-label={label}
       bind:value={query}
+      aria-activedescendant={activeResult}
+      on:keydown={(e) => places?.keydown(e)}
     />
     {#if query}
       <button
@@ -66,9 +70,13 @@
       >
     {/if}
   </label>
-  {#if query}
-    <LocationSearch {query} on:pickLocation={onPick} />
-  {/if}
+  <LocationSearch
+    bind:this={places}
+    bind:activeId={activeResult}
+    {query}
+    hidden={!query}
+    on:pickLocation={onPick}
+  />
 </div>
 
 <style>

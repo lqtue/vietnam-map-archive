@@ -1,31 +1,33 @@
-<script context="module" lang="ts">
-  export interface LegendDraft {
-    id: string;
-    name: string;
-    vn: string | null;
-    grid: string | null;
-    lng: number | null;
-    lat: number | null;
-    coordinateOverride: boolean;
-  }
-</script>
+<!--
+  LegendEntryEditor.svelte — the open row's fields in the Legend tab. Every
+  change is the draft at once, and while it is open a click on the map places
+  the entry's point; closing it is selecting another row (or Escape). Saving is
+  the panel's "Save all".
 
+  "Find" starts empty — a place's name changed over the years, so the reader
+  searches by whichever name they know. Picking a result only moves the map
+  there; the point is the reader's click on the printed number.
+-->
 <script lang="ts">
-  import { createEventDispatcher, onMount, onDestroy, tick } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { getShellContext } from '$lib/map/shell/context';
   import { createLegendPointPicker } from '$lib/map/shell/legendPointPicker';
-  export let entry: {
-    src?: 'manual' | 'grid' | 'numeral' | null;
-    id: string;
-    n: number;
-    name: string | null;
-    vn: string | null;
-    grid: string | null;
-    lng: number | null;
-    lat: number | null;
-  };
+  import { toLonLat } from 'ol/proj';
+  import LocationSearch from '$lib/ui/LocationSearch.svelte';
+  import {
+    toDraft,
+    type Bbox,
+    type LegendDraft,
+    type LegendFind,
+    type LegendPoint,
+  } from './legendDrafts';
+
+  export let entry: LegendPoint & { id: string };
   export let draft: LegendDraft | null = null;
-  const dispatch = createEventDispatcher<{ close: void; draft: LegendDraft }>();
+  const dispatch = createEventDispatcher<{
+    draft: LegendDraft;
+    locate: { lng: number; lat: number; label: string; bbox?: Bbox };
+  }>();
   const { map: mapWritable } = getShellContext();
   let name = draft?.name ?? entry.name ?? '';
   let vn = draft?.vn ?? entry.vn ?? '';
@@ -33,156 +35,148 @@
   let lng = (draft ? draft.lng : entry.lng) ?? undefined;
   let lat = (draft ? draft.lat : entry.lat) ?? undefined;
   let coordinateOverride = draft?.coordinateOverride ?? entry.src === 'manual';
-  let picking = false;
   let error = '';
-  let destroyed = false;
-  let mapReady = false;
+  let find = '';
+  /** The last Find pick, waiting for the click that places the point. */
+  let lastFind: LegendFind | null = null;
+  /** The search behind the point as it stands; saved with it (mig 119). */
+  let pointFind: LegendFind | null = draft?.find ?? null;
+  let viewbox: string | null = null;
+  let places: LocationSearch;
+  let activeResult: string | null = null;
+  function locate(
+    e: CustomEvent<{
+      lng: number;
+      lat: number;
+      label: string;
+      bbox?: Bbox;
+      osm?: { type: 'node' | 'way' | 'relation'; id: number };
+    }>
+  ) {
+    const { lng, lat, label, bbox, osm } = e.detail;
+    if (find.trim())
+      lastFind = {
+        query: find.trim().slice(0, 500),
+        osmType: osm?.type ?? null,
+        osmId: osm?.id ?? null,
+        osmName: label.slice(0, 1000) || null,
+        lng,
+        lat,
+      };
+    find = '';
+    dispatch('locate', { lng, lat, label, bbox });
+  }
   const picker = createLegendPointPicker(
     (longitude, latitude) => {
       coordinateOverride = true;
       lng = longitude;
       lat = latitude;
-      showPoint();
+      pointFind = lastFind ?? pointFind;
+      commit();
     },
-    (active) => (picking = active)
+    () => {}
   );
-  async function editCoordinates() {
-    coordinateOverride = true;
-    await tick();
-    if (!destroyed) showPoint();
-  }
-  function showPoint() {
+  function commit() {
     picker.show(lng, lat);
+    const next = toDraft(entry.id, {
+      name,
+      vn,
+      grid,
+      lng,
+      lat,
+      coordinateOverride,
+      find: pointFind,
+    });
+    error = typeof next === 'string' ? next : '';
+    if (typeof next !== 'string') dispatch('draft', next);
   }
-  function stopPicking() {
-    picker.stop();
-  }
-  function startPicking() {
-    picker.start();
+  function editCoordinates() {
+    coordinateOverride = true;
+    commit();
   }
   function resetPoint() {
     coordinateOverride = false;
-    stopPicking();
     lng = undefined;
     lat = undefined;
-    showPoint();
+    pointFind = null;
+    commit();
   }
-  function keepDraft() {
-    stopPicking();
-    error = '';
-    if ([name, vn, grid].some((text) => /[;\r\n]/.test(text))) {
-      error = 'Use plain text without semicolons or line breaks.';
-      return;
-    }
-    if (!name.trim()) {
-      error = 'Enter the legend name.';
-      return;
-    }
-    if (
-      (lng == null) !== (lat == null) ||
-      (lng != null && (!Number.isFinite(lng) || Math.abs(lng) > 180)) ||
-      (lat != null && (!Number.isFinite(lat) || Math.abs(lat) > 90))
-    ) {
-      error = 'Enter both longitude and latitude, or reset the point.';
-      return;
-    }
-    dispatch('draft', {
-      id: entry.id,
-      name: name.trim(),
-      vn: vn.trim() || null,
-      grid: grid.trim() || null,
-      lng: lng ?? null,
-      lat: lat ?? null,
-      coordinateOverride: coordinateOverride && lng != null && lat != null,
-    });
-  }
-  onMount(() => {
-    const unsubscribe = mapWritable.subscribe((map) => {
+  let armedOn: unknown = null;
+  onMount(() =>
+    mapWritable.subscribe((map) => {
       picker.attach(map);
-      mapReady = !!map;
-      showPoint();
-    });
-    return unsubscribe;
-  });
-  onDestroy(() => {
-    destroyed = true;
-    picker.destroy();
-  });
-  function escape(event: KeyboardEvent) {
-    if (event.key === 'Escape' && picking) {
-      event.preventDefault();
-      stopPicking();
-    }
-  }
+      // Rank results inside what the reader is looking at, i.e. this sheet's city.
+      const extent = map?.getView().calculateExtent(map.getSize());
+      if (extent)
+        viewbox = [...toLonLat(extent.slice(0, 2)), ...toLonLat(extent.slice(2))].join(',');
+      picker.show(lng, lat);
+      // `start` toggles, and a store re-set with the same map must not disarm it.
+      if (map && map !== armedOn) picker.start(true);
+      armedOn = map;
+    })
+  );
+  onDestroy(() => picker.destroy());
 </script>
 
-<svelte:window on:keydown={escape} />
-<form class="legend-editor" on:submit|preventDefault={keepDraft}>
-  <fieldset>
-    <legend>Edit legend №{entry.n}</legend>
-    <label>Name <input bind:value={name} required maxlength="1000" /></label>
-    <label>Vietnamese name <input bind:value={vn} maxlength="1000" /></label>
-    <p>{coordinateOverride ? 'Manual point' : 'Automatic point from the sheet reference'}</p>
-    <details>
-      <summary>Grid and coordinates</summary>
-      <label>Grid reference <input bind:value={grid} maxlength="1000" /></label>
-      <div class="coordinates">
-        <label
-          >Longitude <input
-            type="number"
-            min="-180"
-            max="180"
-            step="any"
-            bind:value={lng}
-            on:input={editCoordinates}
-          /></label
-        >
-        <label
-          >Latitude <input
-            type="number"
-            min="-90"
-            max="90"
-            step="any"
-            bind:value={lat}
-            on:input={editCoordinates}
-          /></label
-        >
-      </div>
-    </details>
-    <div class="actions">
-      <button
-        type="button"
-        class="sb-btn is-sm"
-        class:is-on={picking}
-        disabled={!mapReady}
-        on:click={startPicking}>{picking ? 'Cancel point selection' : 'Set point on map'}</button
-      ><button type="button" class="sb-btn is-sm" on:click={resetPoint}
-        >Reset point to automatic</button
+<div class="legend-editor">
+  <label>Name <input bind:value={name} required maxlength="1000" on:input={commit} /></label>
+  <label>Vietnamese name <input bind:value={vn} maxlength="1000" on:input={commit} /></label>
+  <label
+    >Find on the map <input
+      bind:value={find}
+      type="search"
+      placeholder="A place name, old or new"
+      aria-activedescendant={activeResult}
+      on:keydown={(e) => places?.keydown(e)}
+    /></label
+  >
+  <LocationSearch
+    bind:this={places}
+    bind:activeId={activeResult}
+    query={find}
+    coordinates={false}
+    {viewbox}
+    on:pickLocation={locate}
+  />
+  <p>
+    {coordinateOverride ? 'Manual point' : 'Automatic point from the sheet reference'} · click the map
+    to place it
+    {#if coordinateOverride}<button type="button" class="link" on:click={resetPoint}>reset</button
+      >{/if}
+  </p>
+  <details>
+    <summary>Grid and coordinates</summary>
+    <label>Grid reference <input bind:value={grid} maxlength="1000" on:input={commit} /></label>
+    <div class="coordinates">
+      <label
+        >Longitude <input
+          type="number"
+          min="-180"
+          max="180"
+          step="any"
+          bind:value={lng}
+          on:input={editCoordinates}
+        /></label
+      >
+      <label
+        >Latitude <input
+          type="number"
+          min="-90"
+          max="90"
+          step="any"
+          bind:value={lat}
+          on:input={editCoordinates}
+        /></label
       >
     </div>
-    {#if picking}<p role="status">
-        Click the map to set this entry’s point. Escape cancels selection.
-      </p>{/if}
-    {#if error}<p role="alert">{error}</p>{/if}
-    <div class="actions">
-      <button type="submit" class="sb-btn is-sm">Keep draft</button><button
-        type="button"
-        class="sb-btn is-sm"
-        on:click={() => dispatch('close')}>Cancel</button
-      >
-    </div>
-  </fieldset>
-</form>
+  </details>
+  {#if error}<p role="alert">{error}</p>{/if}
+</div>
 
 <style>
   .legend-editor {
     margin: 0.4rem 0;
   }
-  fieldset {
-    border: var(--sb-border);
-    padding: 0.5rem;
-  }
-  legend,
   label,
   p {
     font-size: 0.75rem;
@@ -192,9 +186,6 @@
     flex-direction: column;
     gap: 0.15rem;
     margin-bottom: 0.4rem;
-  }
-  details {
-    margin-bottom: 0.5rem;
   }
   summary {
     cursor: pointer;
@@ -206,13 +197,20 @@
     min-width: 0;
     box-sizing: border-box;
   }
-  .coordinates,
-  .actions {
+  .coordinates {
     display: flex;
-    flex-wrap: wrap;
     gap: 0.4rem;
   }
   .coordinates label {
     flex: 1;
+  }
+  .link {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--color-blue);
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

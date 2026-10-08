@@ -523,6 +523,16 @@ system — what a result must retain, and the two kinds of check — is in the r
       truth — the n=89 contamination in `work/ocr/EVAL-BASELINE.md` is the same error already paid
       for once. Matching needs no new code (`f_unaccent` + `word_similarity`, mig 065). Exit: the
       eval baseline is unchanged after a suggestion run, and an accepted fix carries its citation.
+- [ ] **`gazetteer-guided-ocr`** — read a sheet knowing what it should say. `ocr-suggestions`
+      corrects a reading after the fact; this uses a dated gazetteer *before* — the names in force
+      on the sheet's date (streets, buildings, legend entries) as the vocabulary, and, once the
+      sheet is georeferenced, where each should sit. Two uses: snap a reading to the nearest
+      attested name of that period (choosing from a closed list beats spelling diacritics from
+      scratch on a worn scan), and re-read only the crop where an expected name is missing. Falls
+      to the same rule as `ocr-suggestions`: output goes to the suggestion side-table, never
+      `text_validated`, or the eval scores the dictionary against itself. Waits on
+      `attested-variants` and `gazetteer-depth` for a vocabulary with dates. Exit: on a held-out
+      sheet, name-level accuracy against `eval.py ocr` with and without the vocabulary, same crops.
 - [ ] **`source-agreement`** — a reading attested on a sheet *and* in a dated period source is two
       sources agreeing. Feeds `ocr-merge-evidence`. Exit: a reviewer sees which sources agree, not
       a blended score.

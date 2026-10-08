@@ -39,7 +39,13 @@
     toggleCollapse: void;
     backToLibrary: void;
     changeViewMode: { mode: ViewMode };
-    pickLocation: { lat: number; lng: number; label: string; zoom?: number };
+    pickLocation: {
+      lat: number;
+      lng: number;
+      label: string;
+      zoom?: number;
+      bbox?: [number, number, number, number];
+    };
     toggleLegendPoints: void;
     clearFocus: void;
     toggleVectors: { mapId: string };

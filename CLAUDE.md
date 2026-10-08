@@ -44,7 +44,7 @@ npm run build        # Production build (wipes .svelte-kit/output first)
 npm run check        # Type-check (primary verification) — currently 0 errors / 0 warnings
 npm run lint         # prettier --check . && eslint .
 npm run format       # prettier --write .
-npm run test         # Playwright smoke suite, read-only (468 tests)
+npm run test         # Playwright smoke suite, read-only (474 tests)
 npm run db:test      # Start the local Supabase stack + seed the write-test fixtures
 npm run db:test:reset  # Replay every migration from scratch, then reseed
 npm run test:write   # Write-path smokes against that local stack (38 tests)
@@ -55,7 +55,7 @@ npx wrangler pages dev .svelte-kit/cloudflare  # Local CF preview
 `npm run test` starts a dev server on 5173, or reuses one already running. It runs twenty-three
 read-only
 browser checks — twelve in `tests/smoke.spec.ts`, eleven in `tests/catalog-series.spec.ts` (they hit
-the real Supabase project but never write) — plus 445 browser-less pure checks riding the same
+the real Supabase project but never write) — plus 451 browser-less pure checks riding the same
 runner. **What each one pins, and why it exists, is `docs/testing.md`** — read it before changing a
 check or adding one, because most of them exist to
 catch a failure that looks like data rather than like a bug. Write paths are covered separately —
@@ -80,7 +80,7 @@ the propagation lag below, which no build-time check can see.
 - **A blank page right after a deploy is edge propagation, not a bug** — chunks 404 for a minute or
   two, and with `ssr = false` one missing chunk is a blank document. Wait and hard-reload first;
   the `curl` check is in `docs/deploy.md`.
-- **Migration head is 116**; 095–116 are all in production (116 pushed 2026-10-06 for seven map genres, independent subjects and depicted state; 115 pushed after it the same day with `--include-all`, limiting `/api/context` labels to the five gazetteer categories so legend entries and titles stop leaking in; 114, 113 and 112 pushed 2026-10-06 for grouping across OCR runs, coordinate rounding tolerance and text-box grouping; 111, 110 and 109 pushed 2026-10-05; local/remote history checked before 112 via
+- **Migration head is 119**; 095–119 are all in production (119 pushed 2026-10-08 for `legend_finds`, the place search behind a map-placed legend point; 117 and 118 were already in production by then, per `supabase migration list`; 116 pushed 2026-10-06 for seven map genres, independent subjects and depicted state; 115 pushed after it the same day with `--include-all`, limiting `/api/context` labels to the five gazetteer categories so legend entries and titles stop leaking in; 114, 113 and 112 pushed 2026-10-06 for grouping across OCR runs, coordinate rounding tolerance and text-box grouping; 111, 110 and 109 pushed 2026-10-05; local/remote history checked before 112 via
   `supabase migration list`) — see `supabase/CLAUDE.md` for what each one does. Adding one, and
   regenerating types afterwards: `supabase/CLAUDE.md`.
 - **A sheet's address is its name, not its uuid** — `maps.slug` (mig 088). `/catalog/<slug>` is
@@ -120,7 +120,7 @@ Each file's opening paragraph says what it covers. Read before acting:
 
 - **Before code:** `architecture.md` (map runtime) · `conventions.md` · `design-system.md` ·
   `system-guidelines.md` (layering, §11 live debt table) · `api.md` · `testing.md` (what each of the
-  468 tests pins)
+  474 tests pins)
 - **Before a migration or DB write:** `db-guidelines.md` · `lessons.md` (rules this project paid for
   more than once — also before any unattended run or any pass that produces a number)
 - **Before deploying:** `deploy.md`

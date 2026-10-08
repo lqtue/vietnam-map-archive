@@ -144,7 +144,11 @@ Public / other:
   annotation first (409 if it has none) — so it follows any re-georeference; the GET warps it.
   Pre-2026-10-05 rows carried `point=longitude,latitude` and are still read
   (`scripts/oneoff/legend_points_to_pixels.mjs` converts them). Null coordinates restore automatic
-  positioning. Review stamps go through `set_extraction_status`. No new schema required.
+  positioning. Review stamps go through `set_extraction_status`. A ground-click entry may carry
+  `find: { query, osmType, osmId, osmName, lng, lat }` — the place search that led the editor there;
+  each saved one is appended to `legend_finds` (mig 119) as today's ground truth for the entry. A
+  malformed `find` is a 400; a failed `legend_finds` insert leaves the entries saved and adds
+  `warning` to the batch response.
   `more` is the entry's further pixel positions — a number printed on several plots (1878's №21, a
   depot of two yards). The first stays `px=`; the rest are `more=x,y|x,y` in the notes, at most 20,
   dropped when the entry has no first point. The public GET keeps `points` one per number and adds a
