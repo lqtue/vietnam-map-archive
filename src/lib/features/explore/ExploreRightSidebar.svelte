@@ -189,8 +189,8 @@
           />
         {:else}
           {#each legendSheets as sheet (sheet.id)}
-            <section class="pair-sheet">
-              <h3>{sheet.name}</h3>
+            <details class="pair-sheet" open>
+              <summary>{sheet.name}</summary>
               {#if !sheet.onMap}
                 <button
                   type="button"
@@ -207,7 +207,7 @@
                 on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
                 on:clearFocus={() => dispatch('clearFocus')}
               />
-            </section>
+            </details>
           {/each}
         {/if}
       {:else}
@@ -231,9 +231,11 @@
 </aside>
 
 <style>
-  .pair-sheet h3 {
+  .pair-sheet summary {
     margin: 0.6rem 0 0.3rem;
     font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
   }
   .series-summary {
     padding: 0.75rem;

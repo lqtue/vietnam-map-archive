@@ -14,9 +14,10 @@ const PAIRS: string[][] = [
   ],
 ];
 
-/** The sheet and its partners, the sheet first; just the sheet when it has none. */
+/** The sheet and its partners in a fixed order, so the list does not reshuffle when the
+ *  other half is picked; just the sheet when it has none. */
 export function pairedSheets(mapId: string | null): string[] {
   if (!mapId) return [];
   const group = PAIRS.find((ids) => ids.includes(mapId));
-  return group ? [mapId, ...group.filter((id) => id !== mapId)] : [mapId];
+  return group ?? [mapId];
 }
