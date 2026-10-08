@@ -174,16 +174,39 @@ export function forgetStoredDrafts(mapId: string, entryIds: Iterable<string>) {
   writeStoredDrafts(mapId, kept);
 }
 
-/** Saves every draft in one PATCH; throws with the server's message on failure. */
-export async function saveDrafts(
-  mapId: string,
-  drafts: LegendDraft[]
-): Promise<{
+/** The server's cap on one PATCH (`legend-points/+server.ts`). */
+const SAVE_BATCH = 200;
+
+type SaveResult = {
   saved: Set<string>;
   failed: { id: string; message: string }[];
   /** The entries saved but their search not recorded. */
   warning?: string;
-}> {
+};
+
+/** Saves every draft, `SAVE_BATCH` per PATCH. A batch that fails after an
+ *  earlier one saved marks its drafts failed rather than throwing, so the saved
+ *  ones are still forgotten; a first batch that fails throws. */
+export async function saveDrafts(mapId: string, drafts: LegendDraft[]): Promise<SaveResult> {
+  const out: SaveResult = { saved: new Set(), failed: [] };
+  for (let i = 0; i < drafts.length; i += SAVE_BATCH) {
+    const batch = drafts.slice(i, i + SAVE_BATCH);
+    try {
+      const { saved, failed, warning } = await saveBatch(mapId, batch);
+      for (const id of saved) out.saved.add(id);
+      out.failed.push(...failed);
+      if (warning) out.warning = warning;
+    } catch (error) {
+      if (!out.saved.size) throw error;
+      const message = error instanceof Error ? error.message : 'Could not save.';
+      out.failed.push(...drafts.slice(i).map((d) => ({ id: d.id, message })));
+      break;
+    }
+  }
+  return out;
+}
+
+async function saveBatch(mapId: string, drafts: LegendDraft[]): Promise<SaveResult> {
   const response = await fetch(`/api/admin/maps/${mapId}/legend-points`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
