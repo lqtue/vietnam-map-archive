@@ -209,6 +209,13 @@ Do them when the surrounding work opens the file.
       2026-09-11 as "three near-collinear points in one corner", which understates it. Folded into
       `three-point-residuals`; noted here because it is the corpus's clearest single example of the
       guard working.
+- [ ] **`saigon-1942-pair-view`** — show the 1942 Plan de Saïgon (`6989a04e`) and Plan de Cholon
+      (`8c605819`) as one map, Allmaps-style: both warped layers on one view, each from its own scan
+      and annotation. Decided 2026-10-08 against re-hosting the legend on the archived whole sheet
+      (`eca788e5`), whose georeference sits 60–95 m off Cholon's. The legend stays per image: the 15
+      Cholon "(1)" entries printed on the Saigon half already carry `px=` beyond Cholon's right edge,
+      which its Helmert carries exactly. Exit: one `/explore` address opens both halves, and a Cholon
+      "(1)" pin lands on its numeral on the Saigon half.
 - [ ] **`hue-rescans`** — two Huế sheets (800×628, 754×877) are under the scout's 1024 px floor.
       They need larger
       scans, which is sourcing, not code.
