@@ -420,6 +420,7 @@ export const vi: Record<string, string> = {
   'Saved {N}.': 'Đã lưu {N}.',
   placed: 'đã đặt',
   unplaced: 'chưa đặt',
+  draft: 'bản nháp',
   'Vietnamese name': 'Tên tiếng Việt',
   'Grid reference': 'Ô lưới tham chiếu',
   'Remove point': 'Xóa điểm',
