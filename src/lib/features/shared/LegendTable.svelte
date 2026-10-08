@@ -23,6 +23,8 @@
     placed?: boolean;
     /** Not placed, but a detected numeral could be taken for it. */
     suggested?: boolean;
+    /** An unsaved draft: the State column says so ahead of placed/unplaced. */
+    draft?: boolean;
     /** Appended to the state: `*` for an unsaved edit. */
     mark?: string;
   };
@@ -53,7 +55,13 @@
   ] satisfies TableColumn[];
 
   $: sorted = applySort(rows, sort, (row, key) =>
-    key === 'n' ? row.n : key === 'name' ? row.name : key === 'grid' ? row.grid : row.placed ? 1 : 0
+    key === 'n'
+      ? row.n
+      : key === 'name'
+        ? row.name
+        : key === 'grid'
+          ? row.grid
+          : (row.draft ? 2 : 0) + (row.placed ? 1 : 0)
   );
 </script>
 
@@ -90,6 +98,7 @@
         <td class="col-grid">{row.grid ?? ''}</td>
         {#if showState}
           <td class="col-state">
+            {#if row.draft}<span class="badge-chip is-sm chip-blue">{$t('draft')}</span>{/if}
             {#if row.placed}<span class="badge-chip is-sm chip-green">{$t('placed')}</span
               >{:else if row.suggested}<span class="badge-chip is-sm chip-yellow"
                 >{$t('suggested')}</span

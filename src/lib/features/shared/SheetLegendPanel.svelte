@@ -227,7 +227,10 @@
     </button>
   {/if}
   <LegendTable
-    rows={legendRows}
+    rows={canEdit
+      ? legendRows.map((p) => ({ ...p, placed: placed(p), draft: !!(p.id && drafts[p.id]) }))
+      : legendRows}
+    showState={canEdit}
     {selectedN}
     actionable={(p) => canEdit || (mapActions && placed(p))}
     rowTitle={(p) =>
@@ -261,17 +264,7 @@
               })}
           />
         {/key}
-      {:else if p.id && drafts[p.id]}
-        <span class="lg-draft-point">Unsaved draft</span>
       {/if}
     </svelte:fragment>
   </LegendTable>
 {/if}
-
-<style>
-  .lg-draft-point {
-    display: block;
-    font-size: 0.68rem;
-    color: var(--sb-text-meta);
-  }
-</style>
