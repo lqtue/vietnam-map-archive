@@ -293,8 +293,8 @@
           })),
         }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message ?? 'save');
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.message ?? `HTTP ${res.status}`);
       if (currentMap?.id !== id) return;
       const saved = new Set<string>(result.saved ?? []);
       const sentById = new Map(sent.map((row) => [row.id, row]));
@@ -310,8 +310,9 @@
       );
       message = $t('Saved {N}.', { N: saved.size });
       if (saved.size) invalidateLegend(id);
-    } catch {
-      message = $t('Could not save the legend.');
+    } catch (err) {
+      // The server's reason, so a failed save says why (MFA, a bad entry, a 500).
+      message = `${$t('Could not save the legend.')} ${err instanceof Error ? err.message : ''}`;
     } finally {
       saving = false;
     }
