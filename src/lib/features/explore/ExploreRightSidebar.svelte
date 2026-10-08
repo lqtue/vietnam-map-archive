@@ -41,7 +41,13 @@
   const dispatch = createEventDispatcher<{
     toggleCollapse: void;
     changeViewMode: { mode: ViewMode };
-    pickLocation: { lat: number; lng: number; label: string; zoom?: number };
+    pickLocation: {
+      lat: number;
+      lng: number;
+      label: string;
+      zoom?: number;
+      bbox?: [number, number, number, number];
+    };
     toggleGps: void;
     toggleLegendPoints: void;
     clearFocus: void;

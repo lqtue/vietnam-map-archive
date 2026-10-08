@@ -22,6 +22,7 @@ export function createLegendPointPicker(
 ) {
   let map: Map | null = null;
   let picking = false;
+  let sticky = false;
   let previousCursor = '';
   let session: LegendPickingSession | null = null;
   let previousPicking: unknown;
@@ -54,7 +55,7 @@ export function createLegendPointPicker(
   function pick(event: MapBrowserEvent) {
     const [lng, lat] = toLonLat(event.coordinate);
     onPick(Number(lng.toFixed(7)), Number(lat.toFixed(7)));
-    stop();
+    if (!sticky) stop();
     return false;
   }
   return {
@@ -77,7 +78,9 @@ export function createLegendPointPicker(
       )
         source.addFeature(new Feature(new Point(fromLonLat([lng, lat]))));
     },
-    start() {
+    /** `keep`: stay armed after a pick and don't collapse the mobile drawer —
+     *  for an editor that is open for as long as clicks should place. */
+    start(keep = false) {
       if (!map) return;
       if (picking) {
         stop();
@@ -100,8 +103,11 @@ export function createLegendPointPicker(
         .map((interaction) => ({ interaction, active: interaction.getActive() }));
       for (const { interaction } of suspended) interaction.setActive(false);
       picking = true;
-      session = { active: true, cancel: stop };
-      legendPicking.set(session);
+      sticky = keep;
+      if (!keep) {
+        session = { active: true, cancel: stop };
+        legendPicking.set(session);
+      }
       onPicking(true);
       map.set('legendPointPicking', true);
       map.getTargetElement().style.cursor = 'crosshair';

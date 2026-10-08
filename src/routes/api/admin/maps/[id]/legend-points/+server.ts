@@ -25,7 +25,51 @@ type LegendEdit = {
   /** Further image-pixel positions of this entry; undefined keeps the stored ones
    *  (the map-mode editor does not know about them and never sends the field). */
   more?: [number, number][];
+  /** The place search that led to a map-placed point, kept in `legend_finds` (mig 119). */
+  find: LegendFind | null;
 };
+
+type LegendFind = {
+  query: string;
+  osmType: 'node' | 'way' | 'relation' | null;
+  osmId: number | null;
+  osmName: string | null;
+  lng: number;
+  lat: number;
+};
+
+/** A search is ground truth for the gazetteer, so a malformed one is refused, not trimmed. */
+function parseFind(value: unknown): LegendFind | null {
+  if (value == null) return null;
+  const f = value as Record<string, unknown>;
+  const osmType = f.osmType ?? null;
+  const osmId = f.osmId ?? null;
+  const osmName = f.osmName ?? null;
+  if (
+    typeof f !== 'object' ||
+    Array.isArray(f) ||
+    typeof f.query !== 'string' ||
+    !f.query.trim() ||
+    f.query.length > 500 ||
+    (osmType !== null && !['node', 'way', 'relation'].includes(osmType as string)) ||
+    (osmId !== null && (!Number.isSafeInteger(osmId) || (osmId as number) <= 0)) ||
+    (osmType === null) !== (osmId === null) ||
+    (osmName !== null && (typeof osmName !== 'string' || osmName.length > 1000)) ||
+    typeof f.lng !== 'number' ||
+    typeof f.lat !== 'number' ||
+    !(Math.abs(f.lng) <= 180) ||
+    !(Math.abs(f.lat) <= 90)
+  )
+    throw error(400, 'Invalid place search');
+  return {
+    query: f.query.trim(),
+    osmType: osmType as LegendFind['osmType'],
+    osmId: osmId as number | null,
+    osmName: osmName as string | null,
+    lng: f.lng,
+    lat: f.lat,
+  };
+}
 
 function noteText(value: unknown, label: string): string | null {
   if (value === null || value === '') return null;
@@ -87,6 +131,8 @@ function parseEdit(body: unknown): LegendEdit {
     grid: noteText(value.grid, 'Grid reference'),
     point,
     more,
+    // Only a point placed on the map can have been found by a search.
+    find: point && 'lngLat' in point ? parseFind(value.find) : null,
   };
 }
 
@@ -242,7 +288,32 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     }
   }
 
+  // The searches behind the saved points. The entries are already saved, so a
+  // failure here is a warning, not a failed save.
+  let warning: string | undefined;
+  const savedIds = new Set(saved);
+  const finds = edits
+    .filter((edit) => edit.find && savedIds.has(edit.id))
+    .map(({ id, find }) => ({
+      label_id: id,
+      map_id: mapId,
+      query: find!.query,
+      osm_type: find!.osmType,
+      osm_id: find!.osmId,
+      osm_name: find!.osmName,
+      osm_lng: find!.lng,
+      osm_lat: find!.lat,
+      created_by: user.id,
+    }));
+  if (finds.length) {
+    const { error: findError } = await db.from('legend_finds').insert(finds);
+    if (findError) {
+      console.error('legend_finds insert', findError.message);
+      warning = 'The place searches were not recorded.';
+    }
+  }
+
   if (!batch && failed.length) throw error(500, failed[0].message);
   if (!batch) return json({ id: saved[0] });
-  return json({ saved, failed });
+  return json({ saved, failed, ...(warning ? { warning } : {}) });
 };

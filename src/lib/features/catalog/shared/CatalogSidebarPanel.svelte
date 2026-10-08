@@ -29,6 +29,8 @@
     };
   }>();
   let searchQuery = '';
+  let places: LocationSearch;
+  let activeResult: string | null = null;
 </script>
 
 <div class="csp">
@@ -53,6 +55,8 @@
         type="text"
         placeholder={$t('Search maps…')}
         bind:value={searchQuery}
+        aria-activedescendant={activeResult}
+        on:keydown={(e) => places?.keydown(e)}
       />
       {#if searchQuery}
         <button
@@ -67,6 +71,8 @@
 
   {#if showLocation}
     <LocationSearch
+      bind:this={places}
+      bind:activeId={activeResult}
       query={searchQuery}
       on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
     />

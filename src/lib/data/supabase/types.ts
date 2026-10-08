@@ -396,6 +396,77 @@ export type Database = {
           },
         ]
       }
+      legend_finds: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          label_id: string
+          map_id: string
+          osm_id: number | null
+          osm_lat: number | null
+          osm_lng: number | null
+          osm_name: string | null
+          osm_type: string | null
+          query: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label_id: string
+          map_id: string
+          osm_id?: number | null
+          osm_lat?: number | null
+          osm_lng?: number | null
+          osm_name?: string | null
+          osm_type?: string | null
+          query: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label_id?: string
+          map_id?: string
+          osm_id?: number | null
+          osm_lat?: number | null
+          osm_lng?: number | null
+          osm_name?: string | null
+          osm_type?: string | null
+          query?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legend_finds_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_extractions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legend_finds_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_labels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legend_finds_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map_pipeline_status"
+            referencedColumns: ["map_id"]
+          },
+          {
+            foreignKeyName: "legend_finds_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       map_images: {
         Row: {
           asset_version: string | null

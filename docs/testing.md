@@ -39,14 +39,14 @@ is linked while its count is described as indexed cities.
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **468** tests (`npx playwright test --list`, 2026-10-06):
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **474** tests (`npx playwright test --list`, 2026-10-08):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **eleven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 445 browser-less pure
+**read-only** (they hit the real Supabase project but never write), plus 451 browser-less pure
 checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
 after a display-label change and omit unlinked maps; two scans group only when they have the same
 printing UUID; unresolved scans remain separate, and an institution is held only through
@@ -81,7 +81,7 @@ alias, and `/admin` never resolves an unknown tab to the write-capable bulk scre
 `tests/stale-after-change.spec.ts` (the rebuild set when a published map's pixels or georeference
 change: a re-georeference re-derives exactly `ocr_labels.geom` and `footprints.geom` from stored
 pixels, so a schema change there is a deliberate edit here; a rescan has no equivalent yet —
-`stale-after-change` in the ROADMAP), `tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes; and the work tracks: "no legend on this sheet" (`triage.legend = 'none'`) closes the Legend track and leaves `legendReadiness` and the "Legend found, not read" filter alone, legend entries outrank it, and it no longer blocks "All done". The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
+`stale-after-change` in the ROADMAP), `tests/legend-drafts.spec.ts` (the Legend tab's drafts: an editor's fields trim and blank to null, refuse what the notes field cannot hold, a reset manual point is dropped rather than kept, a place search rides with the map-placed point it led to and is dropped when the point is reset, an approximate point is framed by its `accuracy_m` box (wider in longitude away from the equator), and the drafts kept in localStorage round-trip per sheet, restore only entries still on it, drop malformed rows and survive blocked storage), `tests/legend-entry.spec.ts` (a staff-placed legend position is saved in image pixels, never frozen as lng/lat, and the legacy `point=` form is still read until every row is converted), `tests/legend-pixels.spec.ts` (the pixel side of the legend tool: which body numerals can name an entry, whether one agrees with its index cell, which entry `n` walks to and which numeral Enter takes; and the work tracks: "no legend on this sheet" (`triage.legend = 'none'`) closes the Legend track and leaves `legendReadiness` and the "Legend found, not read" filter alone, legend entries outrank it, and it no longer blocks "All done". The first two are shared by the public ground-space GET and the staff pixel GET, so the two readings cannot drift), `tests/street-index-grid.spec.ts` (that same cell-to-rectangle arithmetic, pinned against the Python
 copy of it: `ocr street-index` reads a sheet's printed street directory and has to place each street
 as it writes, because the box columns are NOT NULL, so `_cell_rect` in `ocr.py` and `cellBox` here
 are checked against one committed fixture — a drift between them does not look like a bug, it looks

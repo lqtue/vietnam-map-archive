@@ -33,6 +33,8 @@
   let preset: OverpassPreset = 'buildings';
   let customQuery = 'way["historic"];';
   let locationQuery = '';
+  let places: LocationSearch;
+  let activeResult: string | null = null;
 
   function onPickLocation(
     e: CustomEvent<{
@@ -182,8 +184,15 @@
           bind:value={locationQuery}
           placeholder="e.g. District 1, Hue, Cholon…"
           disabled={isFetching}
+          aria-activedescendant={activeResult}
+          on:keydown={(e) => places?.keydown(e)}
         />
-        <LocationSearch query={locationQuery} on:pickLocation={onPickLocation} />
+        <LocationSearch
+          bind:this={places}
+          bind:activeId={activeResult}
+          query={locationQuery}
+          on:pickLocation={onPickLocation}
+        />
       </div>
 
       {#if error}
