@@ -20,12 +20,14 @@ DOLING_CSV = ROOT / "work/research/doling/street-name-pairs.csv"
 K = np.array([111320.0 * math.cos(math.radians(10.775)), 110540.0])
 SPAN, PREC, KEEP = 1000.0, 1, 500
 SKIP = {"title", "legend", "other"}
+SITE_MAX_M = 60.0
 
 SHEETS = [
     dict(year=1882, label="Plan Cadastral", map_id="0e02b9d9-9d40-4cca-8e41-8c8373d54d3b", ocr=f"{OUT}/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/runs/post0910/all_extractions.json"),
     dict(year=1898, label="Bertaux", map_id="20ec4f9a-16bd-4895-a593-40c6ed9c9555", ocr=f"{OUT}/20ec4f9a-16bd-4895-a593-40c6ed9c9555/runs/2026-09-13T1036-20ec4f9a/all_extractions.json"),
     dict(year=1923, label="Saigon – Cholon", map_id="1bce28f0-aa82-48eb-8e33-8f0b07182c2f", ocr=f"{OUT}/1bce28f0-aa82-48eb-8e33-8f0b07182c2f/runs/2026-09-12T1324-1bce28f0/all_extractions.json"),
-    dict(year=1942, label="Plan de Saigon – Cho Lon", map_id="eca788e5-6780-4dca-bf23-7651a1c48aba-20260911", annotation_id="eca788e5-6780-4dca-bf23-7651a1c48aba", ocr=f"{OUT}/eca788e5-6780-4dca-bf23-7651a1c48aba/runs/2026-09-11T1628-eca788e5/all_extractions.json"),
+    dict(year=1942, label="Plan de Saïgon", map_id="6989a04e-0f51-439e-9390-a6678aff374c"),
+    dict(year=1942, label="Plan de Cholon", map_id="8c605819-a8c3-4b2f-aa4a-6fad12893eab"),
     dict(year=1959, label="Đô thành Sài Gòn", map_id="34d4edb2-f7df-4c47-a65a-f6b471400396", ocr=f"{OUT}/34d4edb2-f7df-4c47-a65a-f6b471400396/runs/2026-09-10T0930-34d4edb2/all_extractions.json"),
     dict(year=1968, label="Sài Gòn – Việt Nam City Maps", map_id="3a446d85-25a8-4e81-9cfc-8de357c3a5df", ocr=f"{OUT}/3a446d85-25a8-4e81-9cfc-8de357c3a5df/runs/body-1968-20260910g-t800/all_extractions.json"),
 ]
@@ -233,6 +235,7 @@ def main(out, link_max_m, legend_link_max_m):
         if ra != rb: parent[rb] = ra
     links, link_node = [], []
     for i, left in enumerate(sheets[:-1]):
+        if sheets[i + 1]["sheet"]["year"] == left["sheet"]["year"]: continue  # the 1942 pair share a layer
         right = sheets[i + 1]["labels"]
         for name, occ_left in left["labels"].items():
             occ_right = right.get(name)
@@ -269,9 +272,28 @@ def main(out, link_max_m, legend_link_max_m):
         return True
     for ai, a in enumerate(legend):
         for j in range(a["sheet"] + 1, len(sheets)):
+            if sheets[j]["sheet"]["year"] == a["year"]: continue
             if link_to(a, ai, j, [(("L", bi), b["g"]) for bi, b in enumerate(legend) if b["sheet"] == j and a["keys"] & b["keys"]], "ll"): break
         for j in range(len(sheets)):
-            if j != a["sheet"]: link_to(a, ai, j, [(n, pt) for k in a["keys"] for n, pt in body.get((j, k), [])], "lb")
+            if sheets[j]["sheet"]["year"] != a["year"]: link_to(a, ai, j, [(n, pt) for k in a["keys"] for n, pt in body.get((j, k), [])], "lb")
+    # Same-site pass: names do not survive a language change (1942 French -> 1959 Vietnamese),
+    # so entries not yet name-linked to the next legend year pair by place: mutual nearest
+    # within SITE_MAX_M. Kind "ls" -- a building on the same ground, not necessarily the same use.
+    years = sorted({r["year"] for r in legend})
+    for y0, y1 in zip(years, years[1:]):
+        A = [i for i, r in enumerate(legend) if r["year"] == y0]
+        B = [i for i, r in enumerate(legend) if r["year"] == y1]
+        if not A or not B: continue
+        nearest = lambda i, pool: min(pool, key=lambda k: np.linalg.norm(legend[k]["g"] - legend[i]["g"]))
+        for ai in A:
+            a = legend[ai]
+            if any(l["a"] == a["sheet"] and l["t"] == a["name"] and l["k"] == "ll" and sheets[l["b"]]["sheet"]["year"] == y1 for l in legend_links): continue
+            bi = nearest(ai, B)
+            if nearest(bi, A) != ai or np.linalg.norm(legend[bi]["g"] - a["g"]) > SITE_MAX_M: continue
+            b = legend[bi]
+            parent.setdefault(("L", ai), ("L", ai)); parent.setdefault(("L", bi), ("L", bi)); union(("L", ai), ("L", bi))
+            legend_links.append(dict(a=a["sheet"], b=b["sheet"], t=a["name"], m=round(float(np.linalg.norm(b["g"] - a["g"])), 1), p=put(a["g"]).tolist(), q=put(b["g"]).tolist(), k="ls"))
+            legend_node.append(("L", ai))
     roots = {r: idx for idx, r in enumerate(sorted({find(n) for n in parent}, key=str))}
     for link, node in zip(links, link_node): link["c"] = roots[find(node)]
     for link, node in zip(legend_links, legend_node): link["c"] = roots[find(node)]
