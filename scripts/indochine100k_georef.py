@@ -32,6 +32,8 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "work/ocr/scripts"))
 import iiif_tiles as T  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import georef_annotation as G  # noqa: E402
 
 WORK = Path("work/indochine-100k")
 SOURCE = WORK / "sources/serie-561.json"
@@ -50,7 +52,6 @@ ACROSS, MAXIN, MINGAP, LIM, TRIM = (190, 300), 250, 10, 34, 3.0
 # rim appear to have an anomalous offset (Gia Ray, Kratié, Hà Giang).
 NEAR, RESIDUAL = 12, 15.0
 GRADE, PARIS = 0.9, 2.337229166666667
-BUCKET = "annotations"
 CORNERS = ("NW", "NE", "SE", "SW")
 # Tri Binh (W) ("1f025a9f-...") was held here after its 2026-09-23 two-tick
 # Gemini read came out 741.5m off the accepted latitude fit -- removed
@@ -717,51 +718,10 @@ def ground(lon0, lat0, lon1, lat1):
 
 
 def annotation(iiif, w, h, got):
-    """One georeference annotation, in the shape the Allmaps renderer reads.
-
-    Same shape `scripts/l7014_annotate.py` writes, and for the same two reasons.
-    The transformation is a first-order polynomial, not a projective: four corners
-    fit a projective *exactly*, so a pixel of detection error would be reproduced
-    faithfully as perspective instead of averaged away, and these sheets were
-    measured as having no perspective to recover -- the rigid-rotation fit makes
-    opposite edges agree by construction. And the mask is the rim quad, which is
-    what stops the paper margin, the title block and the legend being painted over
-    the neighbouring sheets.
-    """
-    px = {c: [round(got["corners"][c][0]), round(got["corners"][c][1])] for c in CORNERS}
-    poly = " ".join(f"{px[c][0]},{px[c][1]}" for c in CORNERS)
-    return {
-        "type": "AnnotationPage",
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        "items": [{
-            "id": f"{iiif}/annotation",
-            "type": "Annotation",
-            "@context": [
-                "http://iiif.io/api/extension/georef/1/context.json",
-                "http://iiif.io/api/presentation/3/context.json",
-            ],
-            "motivation": "georeferencing",
-            "target": {
-                "type": "SpecificResource",
-                "source": {"id": iiif, "type": "ImageService3", "width": w, "height": h},
-                "selector": {"type": "SvgSelector",
-                             "value": f'<svg width="{w}" height="{h}">'
-                                      f'<polygon points="{poly}" /></svg>'},
-            },
-            "body": {
-                "type": "FeatureCollection",
-                "transformation": {"type": "polynomial", "options": {"order": 1}},
-                "features": [
-                    {"type": "Feature",
-                     "properties": {"resourceCoords": px[c]},
-                     "geometry": {"type": "Point",
-                                  "coordinates": [round(got["wgs84"][c][0], 7),
-                                                  round(got["wgs84"][c][1], 7)]}}
-                    for c in CORNERS
-                ],
-            },
-        }],
-    }
+    """One georeference annotation: the four detected corners, order 1, rim quad as mask.
+    Shape and rationale: `scripts/lib/georef_annotation.py`."""
+    return G.annotation(iiif, w, h, [(got["corners"][c], got["wgs84"][c]) for c in CORNERS],
+                        [got["corners"][c] for c in CORNERS])
 
 
 
@@ -2240,19 +2200,15 @@ def regress(tolerance=2.0):
 
 
 def annotate(write=False, only_new=True, only_ids=None):
-    """Prepare Allmaps annotations; --apply writes draft rows only."""
-    import requests
+    """Build annotations for sheets that cleared every gate; --apply stores them (draft rows only)."""
     if not OFFSET_FILE.exists() or not calibration_ready(json.loads(OFFSET_FILE.read_text())):
         raise SystemExit("calibration has not cleared the residual and latitude gates")
     if not check():
         raise SystemExit("lattice check failed; no annotations prepared")
-    load_dotenv(Path(".env"))
-    url, key = os.environ["PUBLIC_SUPABASE_URL"].rstrip("/"), os.environ["SUPABASE_SERVICE_KEY"]
-    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
     dbrows = {r["id"]: r for r in rows()}
     outdir = WORK / "annotations"
     outdir.mkdir(parents=True, exist_ok=True)
-    done = held = 0
+    ready, held = [], 0
     for file in sorted(WORK.glob("*.json")):
         if not re.fullmatch(r"[0-9a-f-]{36}", file.stem):
             continue
@@ -2268,33 +2224,9 @@ def annotate(write=False, only_new=True, only_ids=None):
         info = T.get_image_info(iiif)
         ann = annotation(iiif, info["width"], info["height"], got)
         (outdir / f"{mid}.json").write_text(json.dumps(ann, indent=1))
-        w = got["wgs84"]
-        bbox = [w["SW"][0], w["SW"][1], w["NE"][0], w["NE"][1]]
-        if not write:
-            print(f"{got['name']}: ready {bbox}")
-            done += 1
-            continue
-        body = (outdir / f"{mid}.json").read_bytes()
-        obj = f"{url}/storage/v1/object/{BUCKET}/{mid}.json"
-        response = requests.post(obj, headers={**headers, "Content-Type": "application/json",
-                                               "x-upsert": "true"}, data=body, timeout=60)
-        if response.status_code == 400:
-            response = requests.put(obj, headers={**headers, "Content-Type": "application/json",
-                                                  "x-upsert": "true"}, data=body, timeout=60)
-        response.raise_for_status()
-        # Not a raw storage URL: the "annotations" bucket has no working public
-        # path (confirmed 2026-09-30 -- it 400s "Bucket not found" for every
-        # sheet written this way). Every sheet published before this one uses
-        # the app's own route, which serves the same bucket through the
-        # service-role client regardless of the bucket's own public flag.
-        public = f"https://maparchive.vn/api/maps/{mid}/annotation"
-        response = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}&status=eq.draft&is_georeferenced=is.false",
-                                  headers=headers, timeout=30,
-                                  json={"annotation_url": public, "is_georeferenced": True, "bbox": bbox})
-        response.raise_for_status()
-        print(f"{got['name']}: written")
-        done += 1
-    print(f"{done} {'written' if write else 'ready'}, {held} held")
+        ready.append(outdir / f"{mid}.json")
+    print(f"{len(ready)} built, {held} held")
+    G.store(ready, "catalogue+calibration", apply=write)
 
 
 def main():

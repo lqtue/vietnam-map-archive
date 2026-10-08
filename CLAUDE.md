@@ -150,7 +150,7 @@ Special rules:
   (`handoff.md` when no stream is given). Read the one for your stream first when resuming; it
   lists which dirty files are another session's.
 - `contracts/` — JSON Schemas for shapes shared with other apps, checked by `tests/schemaCheck.ts`.
-- `CHANGELOG.md` — 1.0 (Apr 2025) to **7.5** (its app changes await deployment, so `releases.ts` still marks 7.4 `current`); the number moves on a structural change,
+- `CHANGELOG.md` — 1.0 (Apr 2025) to **7.5** (live 2026-10-07; `releases.ts` marks it `current`); the number moves on a structural change,
   not a build. Its public twin is `/changelog` (`src/routes/(editorial)/changelog/releases.ts`) —
   plain language, shorter, a different audience. Nothing generates one from the other: add a
   release to both.

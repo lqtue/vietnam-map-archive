@@ -329,14 +329,16 @@ any one period of work, fix the lowest broken layer first.
 | **2. Placement** | georeference versions, GCPs, transformation, masks, fit | `l7014-iiif` · `three-point-residuals` · `saigon-cholon-1912` · `indochine-100k-georef` · `tonkin-review` · `georef-versions` · `rewarp-on-sync` · `mask-names` · `georef-flag-one-meaning` · `size-check-fails-open` · `allmaps-drift` · `district4-mirror-sync` |
 | **3. Readings** | OCR labels, polygons, legend, triage regions; each with its run or reviewer | `text-box-groups` · `hand-triage` · `queue-the-pass` · `drain-the-queue` · `colab-seg-run` · `clahe-measurement` · `ocr-merge-evidence` · `review-ordering` · `ocr-suggestions` · `ocr-reads-regions` · `legend-flag-fails-loud` · `index-region-reader` · `grid-from-ticks` · `integer-gate` · `merge-keeps-box` · `legend-numeral-misses` · `shape-precision` · `seg-eval-set` · `colour-blocks` · `colour-hue-window` · `shapes-deferred` · `river-reconstruction` |
 | **4. Entities and vocabularies** | place-name groups, attested spellings, street-name pairs, classification terms | `dictionary-on-place-names` · `dictionary-review` · `attested-variants` · `gazetteer-depth` · `doling-review` · `street-name-pairs` · `press-from-gazetteer` · `building-attributes` |
-| **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` |
-| **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` |
+| **5. Assertions and studies** | claims, evidence, the figures a study cites | `evidence-chain` · `source-agreement` · `district4-table` · `district4-figures` · `georef-figures-refresh` · `l7014-engagement-pilot` |
+| **Surfaces** | pages and apps that read the layers above: search, Walk, stories, staff views | `search-acceptance` · `next-action-view` · `inspect-mode-fate` · `walk-the-route` · `field-photo-pilot` · `sheet-pmtiles` · `year-slider` · `story-contract` · `hacw-fork` · `names-layer` · `stops-and-quizzes` · `district4-change-story` · `ohm-vector-pilot` · `terrain-context` |
 | **Outside the model** | operations, CI, the language of the UI | `usage-measurement` · `drop-compat-views` · `gemini-second-key` · `auto-priority` · `queue-age-in-status` · `scripts-apply-flag` · `cells-test-ci` · `preview-env-vars` · `vi-survey-string` · `coverage-page-weight` · the 6 unnamed lines under ROADMAP's Debt heading |
 
 The current scope of `river-reconstruction` is approved 1882 water; its 1898 work is
 deferred by the [1882 feature-layer plan](image-processing-1882-plan.md). The item stays in layer 3.
 
-The index gained `usage-measurement` on 2026-10-06. Use ROADMAP for current scope and completion checks.
+The index gained `usage-measurement` on 2026-10-06 and the deferred
+`l7014-engagement-pilot` and `terrain-context` on 2026-10-07. Use ROADMAP for current
+scope and completion checks.
 
 **Reading the table.** Layer 3 holds the most items (22), but the layers are not equally healthy
 underneath. Placement (layer 2) has 12 open items and three of them were stale or wrong this week,

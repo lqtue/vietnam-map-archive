@@ -14,16 +14,29 @@ import { describeAnnotation } from '../../src/lib/core/georef/version.ts';
  * @param {string} stamp the history file's key
  * @param {unknown} annotation
  * @param {'allmaps'|'mirror'|'neatline'|'script'|'pipeline'|'unrecorded'} origin
- * @param {{ allmapsId?: string | null }} [opts]
+ * @param {{ allmapsId?: string | null, method?: string | null, methodRef?: string | null,
+ *          datum?: string | null, derivedFrom?: string | null }} [opts] provenance (mig 118)
  */
 export async function recordGeorefVersion(db, mapId, stamp, annotation, origin, opts = {}) {
   const facts = await describeAnnotation(annotation);
-  const { error } = await db
-    .from('georef_versions')
-    .upsert(
-      { map_id: mapId, stamp, origin, allmaps_id: opts.allmapsId ?? null, ...facts },
-      { onConflict: 'map_id,stamp', ignoreDuplicates: true }
-    );
+  const { error } = await db.from('georef_versions').upsert(
+    {
+      map_id: mapId,
+      stamp,
+      origin,
+      allmaps_id: opts.allmapsId ?? null,
+      // Only when given: the other callers must keep working against a database that has
+      // not had migration 118 pushed yet.
+      ...(opts.method && {
+        method: opts.method,
+        method_ref: opts.methodRef ?? null,
+        datum: opts.datum ?? null,
+        derived_from: opts.derivedFrom ?? null,
+      }),
+      ...facts,
+    },
+    { onConflict: 'map_id,stamp', ignoreDuplicates: true }
+  );
   if (error)
     throw new Error(`georef_versions insert failed for ${mapId}/${stamp}: ${error.message}`);
   return facts;

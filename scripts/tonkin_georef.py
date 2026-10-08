@@ -37,6 +37,8 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "work/ocr/scripts"))
 import iiif_tiles as T  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import georef_annotation as G  # noqa: E402
 
 WORK = Path("work/tonkin")
 OV = 1800            # overview width for the rough pass
@@ -860,55 +862,13 @@ def run_all(which="inner", shard=None):
 
 
 CORNERS = ("NW", "NE", "SE", "SW")
-BUCKET = "annotations"
 
 
 def annotation(iiif, w, h, got):
-    """One georeference annotation, in the shape the Allmaps renderer reads.
-
-    Same shape `scripts/l7014_annotate.py` writes, and for the same two reasons.
-    The transformation is a first-order polynomial, not a projective: four corners
-    fit a projective *exactly*, so a pixel of detection error would be reproduced
-    faithfully as perspective instead of averaged away, and these sheets were
-    measured as having no perspective to recover -- the rigid-rotation fit makes
-    opposite edges agree by construction. And the mask is the rim quad, which is
-    what stops the paper margin, the title block and the legend being painted over
-    the neighbouring sheets.
-    """
-    px = {c: [round(got["corners"][c][0]), round(got["corners"][c][1])] for c in CORNERS}
-    poly = " ".join(f"{px[c][0]},{px[c][1]}" for c in CORNERS)
-    return {
-        "type": "AnnotationPage",
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        "items": [{
-            "id": f"{iiif}/annotation",
-            "type": "Annotation",
-            "@context": [
-                "http://iiif.io/api/extension/georef/1/context.json",
-                "http://iiif.io/api/presentation/3/context.json",
-            ],
-            "motivation": "georeferencing",
-            "target": {
-                "type": "SpecificResource",
-                "source": {"id": iiif, "type": "ImageService3", "width": w, "height": h},
-                "selector": {"type": "SvgSelector",
-                             "value": f'<svg width="{w}" height="{h}">'
-                                      f'<polygon points="{poly}" /></svg>'},
-            },
-            "body": {
-                "type": "FeatureCollection",
-                "transformation": {"type": "polynomial", "options": {"order": 1}},
-                "features": [
-                    {"type": "Feature",
-                     "properties": {"resourceCoords": px[c]},
-                     "geometry": {"type": "Point",
-                                  "coordinates": [round(got["wgs84"][c][0], 7),
-                                                  round(got["wgs84"][c][1], 7)]}}
-                    for c in CORNERS
-                ],
-            },
-        }],
-    }
+    """One georeference annotation: the four detected corners, order 1, rim quad as mask.
+    Shape and rationale: `scripts/lib/georef_annotation.py`."""
+    return G.annotation(iiif, w, h, [(got["corners"][c], got["wgs84"][c]) for c in CORNERS],
+                        [got["corners"][c] for c in CORNERS])
 
 
 def annotate(write=False, only_new=False):
@@ -941,7 +901,7 @@ def annotate(write=False, only_new=False):
     # shape-audit.json, which is an array and has no .get at all. The 36-char
     # stem is the same test `calibrate` and `cell_footprints` use.
     files = sorted(f for f in WORK.glob("*.json") if len(f.stem) == 36)
-    done = skipped = 0
+    ready, skipped = [], 0
     if only_new:
         r = requests.get(f"{url}/rest/v1/maps", headers=H, timeout=60,
                          params={"select": "id", "is_georeferenced": "is.true",
@@ -960,29 +920,11 @@ def annotate(write=False, only_new=False):
         info = T.get_image_info(iiif)
         ann = annotation(iiif, info["width"], info["height"], got)
         (outdir / f"{mid}.json").write_text(json.dumps(ann, indent=1))
-        w = got["wgs84"]
-        bbox = [w["SW"][0], w["SW"][1], w["NE"][0], w["NE"][1]]
-        if not write:
-            print(f"  {got['name']:22.22s} ready   bbox {bbox}")
-            done += 1
-            continue
-        body = (outdir / f"{mid}.json").read_bytes()
-        obj = f"{url}/storage/v1/object/{BUCKET}/{mid}.json"
-        r = requests.post(obj, headers={**H, "Content-Type": "application/json",
-                                        "x-upsert": "true"}, data=body, timeout=60)
-        if r.status_code == 400:
-            r = requests.put(obj, headers={**H, "Content-Type": "application/json",
-                                           "x-upsert": "true"}, data=body, timeout=60)
-        r.raise_for_status()
-        # The app's route, not a storage URL: the bucket is private (mig 097).
-        public = f"https://maparchive.vn/api/maps/{mid}/annotation"
-        r = requests.patch(f"{url}/rest/v1/maps?id=eq.{mid}", headers=H, timeout=30,
-                           json={"annotation_url": public, "is_georeferenced": True,
-                                 "bbox": bbox})
-        r.raise_for_status()
-        print(f"  {got['name']:22.22s} written")
-        done += 1
-    print(f"\n{done} {'written' if write else 'ready'}, {skipped} held back")
+        ready.append(outdir / f"{mid}.json")
+    print(f"\n{len(ready)} built, {skipped} held back")
+    # Without --new this re-places published sheets too, as it always has; the writer
+    # now keeps a history copy of each, so a re-place is recoverable.
+    G.store(ready, "printed-corners", apply=write, replace_public=not only_new)
 
 
 def check():

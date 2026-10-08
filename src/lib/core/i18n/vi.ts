@@ -485,8 +485,8 @@ export const vi: Record<string, string> = {
   'Maps per decade': 'Số bản đồ theo thập niên',
   From: 'Từ',
   To: 'Đến',
-  'The archive holds {held} of {total} indexed city sheets. The full historical series total is not established.':
-    'Kho lưu trữ có {held} trong {total} tờ bản đồ thành phố đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử.',
+  'The archive holds {held} of {total} indexed sheets. The full historical series total is not established.':
+    'Kho lưu trữ có {held} trong {total} tờ đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử.',
   Saigon: 'Sài Gòn',
   'Across Vietnam': 'Toàn Việt Nam',
   'See all {N} in the catalog': 'Xem cả {N} bản đồ trong danh mục',

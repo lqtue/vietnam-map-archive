@@ -117,3 +117,8 @@ work/archive/vectorize/
 # Modern-layer derived geometry and figures remain local pending licence review.
 work/image-processing/experiments/osm-warp/*
 !work/image-processing/experiments/osm-warp/README.md
+
+# 1971 atlas: scans (1.9 GB) and the allmaps preview/mask images
+work/vn1971/up/
+work/vn1971/allmaps/*.png
+work/vn1971/allmaps/p*.jpg

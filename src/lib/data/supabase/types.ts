@@ -40,9 +40,9 @@ export type Database = {
   public: {
     Tables: {
       series: {
-        Row: { id: string; key: string; name: string; code: string | null; scale_denominator: number | null; created_at: string; updated_at: string }
-        Insert: { id?: string; key: string; name: string; code?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; key?: string; name?: string; code?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
+        Row: { id: string; key: string; name: string; code: string | null; dataset_doi: string | null; scale_denominator: number | null; created_at: string; updated_at: string }
+        Insert: { id?: string; key: string; name: string; code?: string | null; dataset_doi?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; key?: string; name?: string; code?: string | null; dataset_doi?: string | null; scale_denominator?: number | null; created_at?: string; updated_at?: string }
         Relationships: []
       }
       sheet_printings: {
@@ -264,12 +264,18 @@ export type Database = {
       georef_versions: {
         Row: {
           allmaps_id: string | null
+          allmaps_map_id: string | null
           created_at: string
+          datum: string | null
+          derived_from: string | null
           gcp_count: number
           geom_src: string
           id: string
           map_id: string
+          method: string | null
+          method_ref: string | null
           origin: string
+          review: string | null
           rmse_m: number | null
           rmse_method: string
           source_height: number | null
@@ -281,12 +287,18 @@ export type Database = {
         }
         Insert: {
           allmaps_id?: string | null
+          allmaps_map_id?: string | null
           created_at?: string
+          datum?: string | null
+          derived_from?: string | null
           gcp_count: number
           geom_src: string
           id?: string
           map_id: string
+          method?: string | null
+          method_ref?: string | null
           origin: string
+          review?: string | null
           rmse_m?: number | null
           rmse_method: string
           source_height?: number | null
@@ -298,12 +310,18 @@ export type Database = {
         }
         Update: {
           allmaps_id?: string | null
+          allmaps_map_id?: string | null
           created_at?: string
+          datum?: string | null
+          derived_from?: string | null
           gcp_count?: number
           geom_src?: string
           id?: string
           map_id?: string
+          method?: string | null
+          method_ref?: string | null
           origin?: string
+          review?: string | null
           rmse_m?: number | null
           rmse_method?: string
           source_height?: number | null

@@ -212,7 +212,6 @@ async function gemini(key, parts, { json = false } = {}) {
     body: JSON.stringify({
       contents: [{ parts }],
       generationConfig: {
-        temperature: 0.2, // transcription and citation, not invention
         ...(json ? { responseMimeType: 'application/json' } : {}),
       },
     }),

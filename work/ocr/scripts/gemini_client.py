@@ -690,7 +690,6 @@ def extract_grid(image: Image.Image, model: str = DEFAULT_MODEL,
 
     client, _ = _load_client()
     config = genai_types.GenerateContentConfig(
-        temperature=0,
         response_mime_type="application/json",
         response_schema=_GRID_SCHEMA,
     )
@@ -798,7 +797,6 @@ def extract_legend(image: Image.Image, model: str = DEFAULT_MODEL,
 
     client, _ = _load_client()
     config = genai_types.GenerateContentConfig(
-        temperature=0,
         response_mime_type="application/json",
         response_schema=_LEGEND_SCHEMA,
         max_output_tokens=65536,  # a 244-row bilingual legend is long — avoid truncation

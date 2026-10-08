@@ -35,7 +35,8 @@ from osgeo import gdal, ogr, osr
 
 sys.path.insert(0, str(Path(__file__).parent))
 import l7014_mosaic as M  # noqa: E402
-from l7014_annotate import BUCKET, env, plain, req  # noqa: E402
+from l7014_annotate import env, plain, req  # noqa: E402
+from lib import georef_annotation as G  # noqa: E402
 
 gdal.UseExceptions()
 OUT = Path("work/l7014/annotations")
@@ -222,34 +223,7 @@ def outline_gap(mask_ground, sheet, manifest):
 
 
 def annotation(iiif, w, h, px, ground, mask, order=ORDER):
-    poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in mask)
-    return {
-        "type": "AnnotationPage",
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        "items": [{
-            "id": f"{iiif}/annotation",
-            "type": "Annotation",
-            "@context": ["http://iiif.io/api/extension/georef/1/context.json",
-                         "http://iiif.io/api/presentation/3/context.json"],
-            "motivation": "georeferencing",
-            "target": {
-                "type": "SpecificResource",
-                "source": {"id": iiif, "type": "ImageService3", "width": w, "height": h},
-                "selector": {"type": "SvgSelector",
-                             "value": f'<svg width="{w}" height="{h}"><polygon points="{poly}" /></svg>'},
-            },
-            "body": {
-                "type": "FeatureCollection",
-                "transformation": {"type": "polynomial", "options": {"order": order}},
-                "features": [
-                    {"type": "Feature",
-                     "properties": {"resourceCoords": [round(float(p[0]), 1), round(float(p[1]), 1)]},
-                     "geometry": {"type": "Point", "coordinates": [round(float(g[0]), 7), round(float(g[1]), 7)]}}
-                    for p, g in zip(px, ground)
-                ],
-            },
-        }],
-    }
+    return G.annotation(iiif, w, h, list(zip(px, ground)), mask, G.polynomial(order), ndigits=1)
 
 
 def main():
@@ -278,7 +252,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
 
     src = corner_sources() if args.hand else None
-    ok, skipped = [], []
+    ok, skipped, ready, methods = [], [], [], {}
     for m in sorted(rows, key=lambda r: r["sheet_number"]):
         sheet = m["sheet_number"]
         if args.sheet and sheet not in args.sheet:
@@ -331,23 +305,20 @@ def main():
         if args.write and args.bbox_only:
             req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH", {"bbox": bbox})
             note += f"  bbox {bbox}"
-        elif args.write:
-            url = f"{base}/storage/v1/object/{BUCKET}/{m['id']}.json"
-            try:
-                req(url, key, "POST", out.read_bytes(), extra={"x-upsert": "true"})
-            except urllib.error.HTTPError as e:
-                if e.code != 400:
-                    raise
-                req(url, key, "PUT", out.read_bytes(), extra={"x-upsert": "true"})
-            req(f"{base}/rest/v1/maps?id=eq.{m['id']}", key, "PATCH",
-                {"annotation_url": f"https://maparchive.vn/api/maps/{m['id']}/annotation",
-                 "is_georeferenced": True, "bbox": bbox,
-                 **({"extra_metadata": {**m["extra_metadata"], "georef_method": note_how}} if note_how else {})})
-            note += "  uploaded"
+        elif not args.bbox_only:
+            ready.append(out)
+            if note_how:
+                methods[m["id"]] = {**m["extra_metadata"], "georef_method": note_how}
         ok.append(note)
         print(note)
 
-    print(f"\n{len(ok)} {'written' if args.write else 'ready'}, {len(skipped)} skipped")
+    print(f"\n{len(ok)} ready, {len(skipped)} skipped")
+    if ready:
+        # --force reaches published rows, as it always has; the writer keeps a history copy.
+        G.store(ready, "hand" if args.hand else "catalogue+calibration" if args.auto else "geopdf",
+               apply=args.write, replace_public=args.force)
+        for mid, meta in (methods if args.write else {}).items():
+            req(f"{base}/rest/v1/maps?id=eq.{mid}", key, "PATCH", {"extra_metadata": meta})
     reasons = {}
     for s, why in skipped:
         reasons.setdefault(why.split(":")[0].split(" ")[0], []).append(s)
