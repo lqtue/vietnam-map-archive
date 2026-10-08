@@ -37,6 +37,7 @@
   import GpsTracker from '$lib/map/shell/GpsTracker.svelte';
   import StoryMarkers from '$lib/features/stories/shared/StoryMarkers.svelte';
   import LegendPointsLayer from '$lib/features/shared/LegendPointsLayer.svelte';
+  import { pairedSheets } from '$lib/core/sheetPairs';
   import FocusPulse from '$lib/features/explore/FocusPulse.svelte';
   import GpsDot from '$lib/features/explore/GpsDot.svelte';
   import FootprintsLayer from '$lib/features/shared/FootprintsLayer.svelte';
@@ -158,6 +159,16 @@
   $: inspectionMapId = $inspection.mapId ?? ($inspection.series ? null : activeOverlayMapId);
   $: inspectionMap =
     [...$inspection.maps, ...mapList].find((item) => item.id === inspectionMapId) ?? null;
+  // A sheet printed in two halves reads as one legend: both lists, both sets of pins.
+  $: legendSheets = pairedSheets(inspectionMapId).map((id) => ({
+    id,
+    name: mapList.find((m) => m.id === id)?.name ?? id,
+    onMap: $layersStore.overlays.some((o) => isSheetLayer(o) && o.ref.mapId === id),
+  }));
+  function handleAddSheet(event: CustomEvent<{ mapId: string }>) {
+    const map = mapList.find((m) => m.id === event.detail.mapId);
+    if (map) addMapOverlay(map);
+  }
   const handleInspectMap = (event: CustomEvent<{ mapId: string; tab: 'info' | 'legend' }>) =>
     void inspection.inspectMap(event.detail);
   const handleInspectSeries = (event: CustomEvent<{ ref: SeriesRef; tab: 'info' | 'legend' }>) =>
@@ -502,6 +513,8 @@
         {gpsActive}
         mapId={inspectionMapId}
         map={inspectionMap}
+        {legendSheets}
+        on:addSheet={handleAddSheet}
         {showLegendPoints}
         bind:selectedN={legendN}
         bind:tab={inspectorTab}
@@ -548,6 +561,8 @@
           {gpsActive}
           mapId={inspectionMapId}
           map={inspectionMap}
+          {legendSheets}
+          on:addSheet={handleAddSheet}
           bind:tab={inspectorTab}
           bind:selectedN={legendN}
           series={$inspection.series}
@@ -586,7 +601,9 @@
         on:position={handleGpsPosition}
         on:error={handleGpsError}
       />
-      <LegendPointsLayer mapId={inspectionMapId} enabled={showLegendPoints} />
+      {#each legendSheets as sheet (sheet.id)}
+        <LegendPointsLayer mapId={sheet.id} enabled={showLegendPoints} />
+      {/each}
       <GpsDot position={userPosition} />
       <FocusPulse point={focusPoint} />
       <FootprintsLayer mapIds={vectorMapIds} />

@@ -40,6 +40,7 @@
 
   const dispatch = createEventDispatcher<{
     toggleCollapse: void;
+    addSheet: { mapId: string };
     changeViewMode: { mode: ViewMode };
     pickLocation: {
       lat: number;
@@ -61,6 +62,8 @@
   export let mapId: string | null = null;
   /** Same map, resolved against the loaded list, for the Info tab. */
   export let map: MapListItem | null = null;
+  /** The sheet's legend and its partners' (two halves of one plan), each with whether it is drawn. */
+  export let legendSheets: { id: string; name: string; onMap: boolean }[] = [];
   export let showLegendPoints = false;
   /** Whether the top sheet's traced fabric is drawn — owned by the page. */
   export let vectorsOn = false;
@@ -175,14 +178,38 @@
           on:toggleVectors={(e) => dispatch('toggleVectors', e.detail)}
         />
       {:else if tab === 'legend'}
-        <SheetLegendPanel
-          {mapId}
-          {showLegendPoints}
-          bind:selectedN
-          on:toggleLegendPoints={() => dispatch('toggleLegendPoints')}
-          on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
-          on:clearFocus={() => dispatch('clearFocus')}
-        />
+        {#if legendSheets.length < 2}
+          <SheetLegendPanel
+            {mapId}
+            {showLegendPoints}
+            bind:selectedN
+            on:toggleLegendPoints={() => dispatch('toggleLegendPoints')}
+            on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
+            on:clearFocus={() => dispatch('clearFocus')}
+          />
+        {:else}
+          {#each legendSheets as sheet (sheet.id)}
+            <details class="pair-sheet" open>
+              <summary>{sheet.name}</summary>
+              {#if !sheet.onMap}
+                <button
+                  type="button"
+                  class="sb-btn is-sm is-block"
+                  on:click={() => dispatch('addSheet', { mapId: sheet.id })}
+                  >Show this sheet on the map</button
+                >
+              {/if}
+              <SheetLegendPanel
+                mapId={sheet.id}
+                {showLegendPoints}
+                bind:selectedN
+                on:toggleLegendPoints={() => dispatch('toggleLegendPoints')}
+                on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
+                on:clearFocus={() => dispatch('clearFocus')}
+              />
+            </details>
+          {/each}
+        {/if}
       {:else}
         <!-- `showSearch={false}` / `showGps={false}`: the rail carries both at
              its crown.
@@ -204,6 +231,12 @@
 </aside>
 
 <style>
+  .pair-sheet summary {
+    margin: 0.6rem 0 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
   .series-summary {
     padding: 0.75rem;
     border-bottom: var(--sb-border);
