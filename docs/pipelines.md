@@ -565,6 +565,13 @@ Run it as a job (`kind = 'layout'`, the worker's default set) rather than by han
 **Detect** button enqueues one and polls. `--save-triage` merges rather than replaces, so a re-run
 cannot discard somebody's neatline.
 
+**Ingest queues its own.** `POST /api/admin/scout` inserts a `layout` job (payload `then: 'ocr'`)
+for every sheet it creates that has an Image API endpoint. When that job finishes,
+`/api/pipeline/results` calls `queueOcrAfterLayout` (`$lib/server/pipelineQueue.ts`), which queues
+`ocr` with the saved `main_map` crop and the `legend` / `name_list` blocks as `exclude` — or queues
+nothing, if the pass found no `main_map` (a person draws one). The Detect button's jobs carry no
+`then`, so they still stop for a human. Georeferencing is never chained.
+
 The payoff is `main_map`. `enqueue_ocr_all.mjs` crops to it in preference to the neatline, because
 the neatline is the *printed border* — a legend or a street index printed inside the border is
 inside the neatline too, and gets tiled at full resolution for nothing.

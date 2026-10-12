@@ -5,6 +5,7 @@ import { requireRole } from '$lib/server/auth';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { dbError } from '$lib/server/http';
 import { tally } from '$lib/server/facets';
+import { enqueueLayout } from '$lib/server/pipelineQueue';
 
 export const GET: RequestHandler = async ({ locals, url }) => {
   await requireRole(locals, ['admin', 'mod']);
@@ -69,7 +70,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     .eq('review_status', 'approved');
   if (fetchErr) dbError(fetchErr, 'Could not load scout candidates');
 
-  const results: { id: string; map_id?: string; error?: string }[] = [];
+  const results: { id: string; map_id?: string; layout_queued?: boolean; error?: string }[] = [];
   for (const c of cands ?? []) {
     try {
       // Mig 062 only constrains published maps, so a candidate with no image
@@ -142,7 +143,21 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         })
         .eq('id', c.id);
 
-      results.push({ id: c.id, map_id: mapId });
+      // Layout (then OCR, chained in /api/pipeline/results) starts by itself; the
+      // georeference stays a human step. A sheet with no Image API endpoint has
+      // nothing for the worker to read yet, so it queues nothing. A failed enqueue
+      // must not undo an ingest that already succeeded.
+      let layoutQueued = false;
+      if (imageUrl) {
+        try {
+          await enqueueLayout(supabase, mapId);
+          layoutQueued = true;
+        } catch (e) {
+          console.error('could not enqueue the layout job:', (e as Error).message);
+        }
+      }
+
+      results.push({ id: c.id, map_id: mapId, layout_queued: layoutQueued });
     } catch (e) {
       results.push({ id: c.id, error: (e as Error).message.slice(0, 200) });
     }

@@ -334,6 +334,8 @@ open https://<host>/admin?tab=scout
   operates on `status=approved`; sets `status=ingested` + `map_id` on success). Maps
   holding-institution string to `source_type`: "David Rumsey" → `rumsey`; "Bibliothèque nationale" →
   `bnf`; else `other`. Stamps `extra_metadata.scout_candidate_id` for traceability.
+  Also queues a `layout` job for each new sheet that has an image endpoint (`layout_queued` in the
+  reply); its completion queues `ocr` — see `docs/pipelines.md` §The layout pass.
 
 ## Holding institution model
 

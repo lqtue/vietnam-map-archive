@@ -29,6 +29,7 @@ import { assertUuid, dbError } from '$lib/server/http';
 import { bboxCentre, pointEwkt, resolveMapWarp, type MapWarp } from '$lib/server/warp';
 import { parseRegion, type SavedTriage } from '$lib/data/maps/triageTypes';
 import { parseGrid } from '$lib/core/geo/mapGrid';
+import { queueOcrAfterLayout } from '$lib/server/pipelineQueue';
 
 const MAX_ROWS = 500;
 
@@ -286,6 +287,15 @@ export const POST: RequestHandler = async ({ request }) => {
     if (err) dbError(err, 'Could not update the job');
     if (!data || !(data as { id: string | null }).id) throw error(409, 'Job claim expired');
     applied.job = (data as { status: string }).status;
+
+    // A layout job queued by ingest hands on to ocr, with the regions it just saved.
+    if (job.kind === 'layout' && applied.job === 'done') {
+      const chained = await queueOcrAfterLayout(supabase, {
+        map_id: job.map_id,
+        payload: job.payload,
+      });
+      if (chained) applied.chain = chained;
+    }
   }
 
   return json({ ok: true, applied });

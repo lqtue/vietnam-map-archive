@@ -690,6 +690,106 @@ test('a worker key claims a job and reports back through /api/pipeline', async (
   await asWorker.dispose();
 });
 
+test('ingest queues its own layout job, and a finished layout queues ocr', async () => {
+  const external = `write-smoke-${Date.now()}`;
+  const { data: cands, error: candErr } = await admin
+    .from('scout_candidates')
+    .insert(
+      ['with', 'without'].map((kind) => ({
+        source: 'write-smoke',
+        external_id: `${external}-${kind}`,
+        title: `Auto-queue ${kind} image`,
+        review_status: 'approved',
+        manifest_url: `https://example.test/${external}-${kind}/manifest.json`,
+        raw: kind === 'with' ? { iiif_image: `https://example.test/iiif/${external}` } : {},
+      }))
+    )
+    .select('id, external_id');
+  expect(candErr, candErr?.message).toBeNull();
+  const byKind = (k: string) => cands!.find((c) => c.external_id.endsWith(k))!.id;
+
+  const post = await staffRequest.post('/api/admin/scout', {
+    data: { ids: [byKind('with'), byKind('without')] },
+  });
+  expect(post.status(), await post.text()).toBe(200);
+  const { results } = await post.json();
+  const withImage = results.find((r: { id: string }) => r.id === byKind('with'));
+  const noImage = results.find((r: { id: string }) => r.id === byKind('without'));
+  created.mapIds.push(withImage.map_id, noImage.map_id);
+
+  // Draft rows, and a layout job only where there is an image for the worker to read.
+  const { data: maps } = await admin
+    .from('maps')
+    .select('id, status')
+    .in('id', [withImage.map_id, noImage.map_id]);
+  expect(maps!.map((m) => m.status)).toEqual(['draft', 'draft']);
+  expect(withImage.layout_queued).toBe(true);
+  expect(noImage.layout_queued).toBe(false);
+  const { data: jobs } = await admin
+    .from('pipeline_jobs')
+    .select('id, kind, status, payload')
+    .in('map_id', [withImage.map_id, noImage.map_id]);
+  expect(jobs).toHaveLength(1);
+  expect(jobs![0]).toMatchObject({ kind: 'layout', status: 'queued' });
+  expect(jobs![0].payload).toMatchObject({ render_size: 2048, then: 'ocr' });
+
+  // The worker finishes the layout pass: regions + status in one round trip.
+  const asWorker = await playwrightRequest.newContext({
+    baseURL: 'http://localhost:5199',
+    extraHTTPHeaders: { Authorization: `Bearer ${TEST_WORKER_TOKEN}` },
+  });
+  const claim = await asWorker.post('/api/pipeline/claim', {
+    data: { kinds: ['layout'], worker: 'write-smoke-box' },
+  });
+  expect((await claim.json()).job.id).toBe(jobs![0].id);
+  const mainMap = [100, 200, 3000, 2000];
+  const legend = [3200, 200, 400, 900];
+  const done = await asWorker.post('/api/pipeline/results', {
+    data: {
+      job_id: jobs![0].id,
+      map_id: withImage.map_id,
+      status: 'done',
+      triage_regions: [
+        { category: 'main_map', bbox: mainMap, confidence: 0.9 },
+        { category: 'legend', bbox: legend, confidence: 0.8 },
+      ],
+      triage_neatline: mainMap,
+    },
+  });
+  expect(done.ok(), await done.text()).toBe(true);
+  expect((await done.json()).applied.chain).toBe('ocr queued');
+
+  const { data: ocr } = await admin
+    .from('pipeline_jobs')
+    .select('payload')
+    .eq('map_id', withImage.map_id)
+    .eq('kind', 'ocr');
+  expect(ocr).toHaveLength(1);
+  expect(ocr![0].payload).toMatchObject({ neatline: mainMap, exclude: [legend], auto: true });
+
+  // A layout job nobody chained (the Detect button) leaves ocr to a person.
+  await admin.from('pipeline_jobs').delete().eq('map_id', withImage.map_id);
+  const { data: plain } = await admin
+    .from('pipeline_jobs')
+    .insert({ kind: 'layout', map_id: withImage.map_id, payload: { run_id: `${external}-p` } })
+    .select('id')
+    .single();
+  await asWorker.post('/api/pipeline/claim', { data: { kinds: ['layout'], worker: 'w' } });
+  const plainDone = await asWorker.post('/api/pipeline/results', {
+    data: { job_id: plain!.id, status: 'done' },
+  });
+  expect((await plainDone.json()).applied.chain).toBeUndefined();
+  const { data: none } = await admin
+    .from('pipeline_jobs')
+    .select('id')
+    .eq('map_id', withImage.map_id)
+    .eq('kind', 'ocr');
+  expect(none).toHaveLength(0);
+
+  await asWorker.dispose();
+  await admin.from('scout_candidates').delete().like('external_id', `${external}%`);
+});
+
 test('only the human stages can be set by hand', async () => {
   const derived = await staffRequest.patch(`/api/admin/maps/${mapId}/pipeline`, {
     data: { stage: 'ocr_done' },
