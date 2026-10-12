@@ -4,7 +4,7 @@
 ponytail: needs `markdown` + `weasyprint`, neither in the repo's deps because nothing
 else here makes a PDF. Run it from a venv that has them:
     python3 -m venv .venv-pdf && .venv-pdf/bin/pip install markdown weasyprint
-    .venv-pdf/bin/python scripts/md2pdf.py docs/allmaps-series-note.md
+    .venv-pdf/bin/python scripts/md2pdf.py docs/research/allmaps-series-note.md
 
 Usage: md2pdf.py <in.md> [out.pdf]
 """

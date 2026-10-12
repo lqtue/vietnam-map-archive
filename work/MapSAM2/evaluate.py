@@ -211,7 +211,7 @@ def main():
     print("=== Benchmarks (SODUCO Chen 2024) ===")
     m50 = polygon_f1(pred_coords, gt_coords, 0.5)
     print(f"  VMA F1 @ 0.5:    {m50.f1:.3f}")
-    print(f"  SODUCO best COCO PQ: 51.1%  (Chen et al. 2024; this repo reports mean IoU, not PQ -- not comparable, see docs/field-comparison.md \u00a70)")
+    print(f"  SODUCO best COCO PQ: 51.1%  (Chen et al. 2024; this repo reports mean IoU, not PQ -- not comparable, see docs/research/field-comparison.md \u00a70)")
     print(f"  Morlighem floor:  0.639  (degraded)")
     print(f"  Morlighem ceil:   0.929  (clean)")
 
