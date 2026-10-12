@@ -273,7 +273,16 @@ a `no image` flag instead, which is the fact that actually decides whether inges
 - **Gallica SRU**:
   `https://gallica.bnf.fr/SRU?operation=searchRetrieve&version=1.2&query=(dc.type adj "carte") and (dc.title all "{keyword}")&maximumRecords=50&startRecord=1`
   — federated. Rate-limit ~3s/req, returns 429 if hammered. Use `--use-system-ca` or
-  `NODE_TLS_REJECT_UNAUTHORIZED=0`.
+  `NODE_TLS_REJECT_UNAUTHORIZED=0`. Rows carry a manifest and a thumbnail but no image endpoint, so
+  `deriveGallicaImage` in `scoutDerive.mjs` reads the ark off `source_url` / `manifest_url` /
+  `thumbnail` and parks `https://gallica.bnf.fr/iiif/ark:/12148/<ark>/f1` in `raw.iiif_image`
+  (`deriveImageUrl` calls it after the LoC case). That is the image **base**, no `/info.json` — the
+  form the 1942 maps hold and the worker (`get_image_info`) and SheetZoom append to themselves.
+  Without it ingest makes a map the layout/OCR worker refuses ("Map has no iiif_image"). New loads
+  get it from `load_scout_to_db.mjs`; rows already in the table:
+  `scripts/oneoff/backfill_gallica_iiif_image.mjs` (dry by default; `--probe` GETs each `info.json`
+  once, 3 s apart). R2 tiling still follows on publish (mig 058). Gallica sits behind Cloudflare and
+  answers 403 to a client it has stopped trusting; a worker that meets that now fails the job.
 - **David Rumsey Luna**:
   `https://www.davidrumsey.com/luna/servlet/as/search?q={kw}&dh=50&os=json&so={offset}` — JSON, ~994
   raw "Vietnam" hits. Filter on `fieldValues.Country/City/Region` to drop atlas pages.
