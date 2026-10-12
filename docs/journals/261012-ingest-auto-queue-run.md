@@ -30,7 +30,8 @@ there are no per-map timings to report and none are invented here.
 
 Candidates the owner has approved and not yet ingested (`review_status = 'approved'`, `map_id` null;
 the earlier HTTP 400 was `status` not being a column — it is `review_status` since mig 095): **5**.
-Of 1,000 rows: 993 pending, 5 approved, 2 ingested (the two 1942 Saigon / Cholon plates).
+The status tally read the first 1,000 rows only (PostgREST cap): 993 pending, 5 approved, 2 ingested
+(the two 1942 Saigon / Cholon plates). The approved list itself was queried directly and is complete.
 
 | Candidate | Source | Year | Manifest | `raw.iiif_image` | Note |
 |---|---|---|---|---|---|
