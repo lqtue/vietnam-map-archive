@@ -13,6 +13,28 @@ a layered data stack, a HITL pipeline, and a Public Policy interpretive lens tha
 
 ---
 
+## A Check Must Be Able to Fail
+
+_Added 12 October 2026; this is the method commitment the rest of the framework rests on._
+
+Every layer below is only as good as the checks behind it, and a check proves something only when
+it could have caught the mistake. Three kinds of check look like confirmation and often are not:
+
+- **A machine check that shares the error.** The paper *Blind by construction*
+  (`docs/paper/draft.md`) documents a graticule test that passed 269 sheets a median 455 m out of
+  place, because the test and the fault used the same datum.
+- **A person who agrees with the machine.** A reviewer shown a suggestion may confirm it without
+  looking. VMA's review pages hide the suggestion on one item in five, so agreement and accuracy
+  can be told apart.
+- **A source that copies another.** Two maps agree because the later one was redrawn from the
+  earlier; an AI summary repeats the catalogue it was written from. Agreement counts only between
+  sources that do not share an origin.
+
+So VMA records, for each fact, who or what checked it, what exactly they judged, and whether that
+check was independent of what it checked. The plan for this is `docs/digest-pipeline-plan.md`.
+
+---
+
 ## The 6-Layer World-as-Data-Stack
 
 The city understood as ascending layers of spatial abstraction:

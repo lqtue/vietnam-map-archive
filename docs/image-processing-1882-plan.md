@@ -1,5 +1,9 @@
 # Image-processing consolidation and the 1882 feature layer — plan
 
+> **Priority (`docs/NOW.md`, 2026-10-12): this plan is bet 1b, after place links (1a) and the
+> measured gates (2).** Work already running may finish one bounded step (the prepared Colab
+> comparison); owner reference tracing and full-sheet runs wait.
+
 **Written 2026-10-03. Phase 0 is done: the reorganisation merged in PR #33, the branch integration in PR #34, the OCR/image-processing script split in PR #35. Phase 1 has not started.** The plan to stop researching feature extraction and ship one approved
 1882 layer (water, plots, buildings, roads), after first cleaning up the image-processing WIP. Scope is the 1882 sheet only:
 1898 and District 4 are out of scope until this ships. The owner approved the direction and asked for this file

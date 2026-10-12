@@ -1,1 +1,0 @@
-research/field-comparison.md
