@@ -66,3 +66,78 @@ The two previously ingested plates went through that route and were then hosted 
   automation reach them.
 - No worker was run, no Gemini spend, no timings, no label counts, no title/cartouche agreement
   check. The comparison against the manual baseline therefore has no automated-side data yet.
+
+## Follow-up (same day): giving the four Gallica sheets an image
+
+The owner chose Gallica's own IIIF Image server over tiling to R2 first (R2 tiling still happens on
+publish, mig 058). Nothing was applied: no `--apply`, no production write, no job queued.
+
+### The smoke failure is not this branch's
+
+`tests/catalog-series.spec.ts:4` ("catalog begins with compact disclosures…") **also fails on
+`main`** (detached worktree at `1f224d5c`, own dev server on port 5199 so no other session's server
+on 5173 could be reused; the worktree was removed afterwards):
+
+```
+Error: expect(locator).toBeVisible() failed
+Locator: getByLabel('Place')   Expected: visible   Received: hidden
+> 19 |   await expect(page.getByLabel('Place')).toBeVisible();
+```
+
+The element resolves to the `<select title="Modern province, …">` and stays hidden after the
+add-filter disclosure is opened. A catalog UI regression that predates this branch.
+
+### The derivation
+
+`deriveGallicaImage(rec)` in `scripts/scoutDerive.mjs`: ark from `source_url`, then `manifest_url`,
+then `thumbnail`, only on `gallica.bnf.fr`, never for the Omeka-backed hosts (humazur, Bordeaux 3 —
+`deriveManifestUrl` owns those) →
+`https://gallica.bnf.fr/iiif/ark:/12148/<ark>/f1`. `deriveImageUrl` now returns the LoC form or this,
+so `load_scout_to_db.mjs` and `fix_scout_iiif.mjs` pick it up unchanged.
+
+One deliberate departure from the brief: the stored value is the **base** (`…/f1`), not
+`…/f1/info.json`. `get_image_info` and `SheetZoom` append `/info.json` themselves, and every Gallica
+`map_images` row in production (the 1942 pair included) holds the base. An `info.json` URL in
+`maps.iiif_image` would make the worker request `…/info.json/info.json`. (The LoC case in
+`deriveImageUrl` does store `info.json`; no ingested map has one, so it has not bitten. Worth
+fixing before the first LoC ingest.)
+
+`scripts/oneoff/backfill_gallica_iiif_image.mjs` (`willApply()`; dry by default) — dry-run output:
+
+| Candidate | `raw.iiif_image` it would get |
+|---|---|
+| `1c9bfdc1` Mytho 1902 | `https://gallica.bnf.fr/iiif/ark:/12148/btv1b8458472s/f1` |
+| `9a068e07` Mytho 1890 | `https://gallica.bnf.fr/iiif/ark:/12148/btv1b530577107/f1` |
+| `966aa45e` Chaudoc 1890 | `https://gallica.bnf.fr/iiif/ark:/12148/btv1b530586464/f1` |
+| `f2405e6a` Soc Trang 1888 | `https://gallica.bnf.fr/iiif/ark:/12148/btv1b531670480/f1` |
+
+### Probe: could not be answered from here
+
+One GET of each `…/f1/info.json`, 3 s apart:
+
+| Candidate | HTTP | Size |
+|---|---|---|
+| `1c9bfdc1` | 403 | none |
+| `9a068e07` | 403 | none |
+| `966aa45e` | 403 | none |
+| `f2405e6a` | 403 | none |
+
+The 403 is not about these arks. From this machine **every** `gallica.bnf.fr` URL answers 403 with a
+Cloudflare HTML challenge — the manifest, the ark page, the thumbnail, and `info.json` of the 1942
+sheet that is already in production (`btv1b53197000p`), with curl and with python-requests. So the
+derived URLs are unverified, not wrong; sizes are unknown. No attempt was made to get past the
+challenge. The probe is `--probe` on the backfill script and should be re-run from a network Gallica
+accepts (the machine that will run the worker is the one that matters).
+
+### Failures are failures
+
+`cmd_scout` (layout) already raised: `get_image_info` re-raises after its retries and `fetch_crop`
+raises `RuntimeError` when a non-IA source refuses the region and the level-0 fallback. Pinned by
+`work/ocr/scripts/test_fetch_failure.py` for 403, 429 and 500.
+
+The OCR tile loop did **not**: a failed tile was printed and appended to `errors`, then the run went
+on — dedup of what survived, a master file, `ocr_labels` upserted, `ocr_done` stamped, exit 0. A
+Gallica that refused every tile would have ended as "0 extractions, done". `ocr.py` now calls
+`_fail_on_tile_errors(errors, total)` straight after listing the failures: non-zero exit before
+anything is written, the worker records the job as failed, and a re-run resumes from the tiles
+already on disk. This also stops a quota-hit run from stamping `ocr_done` on a partial result.
