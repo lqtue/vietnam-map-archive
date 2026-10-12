@@ -1,0 +1,27 @@
+# MapSAM2 inference and training on a GPU machine (Colab): work/MapSAM2,
+# worker kind `seg` (work/worker/vma_worker.py --kinds seg).
+#
+# Colab already has torch, torchvision, numpy, pillow and requests with a CUDA
+# build that matches the runtime. Do NOT pip-install torch there: it replaces the
+# CUDA build. The notebooks install only what is below (work/MapSAM2/
+# vma_seg_worker.ipynb, vma_mapsam2_training.ipynb):
+#
+#   !git clone --depth 1 https://github.com/lqtue/vietnam-map-archive.git /content/vma
+#   !git clone --depth 1 https://github.com/Xue-Xia/MapSAM2.git /content/MapSAM2
+#   !pip install -q -r /content/vma/work/seg-requirements-gpu.txt
+#
+# Needs from this repo: work/core (vma_core), work/ocr/scripts shims
+# (iiif_tiles), work/MapSAM2, work/worker. Not the OCR packages (no Gemini).
+#
+# Imports read off work/MapSAM2/*.py (checked 2026-10-12): torch, sam2, hydra,
+# sam_lora_image_encoder (from the MapSAM2 clone, not pip), cv2, shapely, numpy,
+# PIL, requests, python-dotenv (vma_core.paths/db load .env if present).
+
+# Preinstalled on Colab; listed so a local GPU box knows it needs them:
+#   torch torchvision numpy pillow requests
+
+shapely
+python-dotenv
+opencv-python-headless
+# SAM2 from source; also brings hydra-core and iopath.
+git+https://github.com/facebookresearch/segment-anything-2.git
