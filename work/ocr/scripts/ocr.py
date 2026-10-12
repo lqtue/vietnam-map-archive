@@ -219,6 +219,23 @@ def _tile_cache_path(tile_cache_dir: Path, tile_key: str, render: int) -> Path:
     return tile_cache_dir / f"{tile_key}@{render}_tile.png"
 
 
+def _fail_on_tile_errors(errors: list, total: int) -> None:
+    """A run that lost tiles is a failed run, not a short label list.
+
+    Tile failures were printed and then the run carried on: dedup of whatever
+    survived, a master file, `ocr_labels` upserted, and `ocr_done` stamped. A
+    source that refuses every request (Gallica answers 403/429 from behind
+    Cloudflare) therefore ended as "0 extractions, done" - indistinguishable
+    from a sheet with nothing on it. Exit non-zero before anything is written; the
+    tiles that did land are on disk, so a re-run resumes from them.
+    """
+    if errors:
+        raise SystemExit(
+            f"{len(errors)} of {total} tile(s) failed; nothing written to ocr_labels "
+            "and the map is not marked ocr_done. Re-run to resume from the tiles already done."
+        )
+
+
 def _cached_tile(tile_cache_dir: Path, tile_key: str, render: int) -> Image.Image | None:
     """The cached PNG for this tile *at this render size*, or None to fetch it.
 
@@ -1093,6 +1110,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
         print(f"\n{len(errors)} tile(s) failed:")
         for k, e in errors:
             print(f"  {k}: {e}")
+    _fail_on_tile_errors(errors, total)
 
     # Collect all tile results and dedup into a master output
     print("\nCollecting and deduplicating all extractions ...")
