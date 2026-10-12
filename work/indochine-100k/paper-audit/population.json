@@ -1,0 +1,3051 @@
+{
+ "frozen_at": "2026-10-13T00:17:06+0700",
+ "collection": "Indochine 1:100,000 — 2nd édition SGI (1947–1959)",
+ "paper_public_count": 314,
+ "db_public": 337,
+ "n": 337,
+ "public_without_clear_placement": [],
+ "sha1": "c3227ce3b7275f5e704e8aa233fd7d55433aa42d",
+ "calibration_in_population": [
+  "Phnom Tabeng (E)",
+  "Thanh Hoa (W)",
+  "Son Tây (E)",
+  "Ream (W)",
+  "Ha Tinh (W)"
+ ],
+ "sheets": [
+  {
+   "id": "00270fcf-9db6-47a3-ab4b-a012a811cbc0",
+   "name": "Phnom Tabeng (E)",
+   "hash": "b2466e6c52569ff471b9c0c58905a48b25b2774a",
+   "detector_version": 3,
+   "calibration": true,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/00270fcf-9db6-47a3-ab4b-a012a811cbc0"
+  },
+  {
+   "id": "00be6ac3-8fd5-4ac7-be8f-18313ba2dd2a",
+   "name": "Mu Gia (E)",
+   "hash": "2237f30a4b9044b5abe4d248847af81371f08ee1",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/00be6ac3-8fd5-4ac7-be8f-18313ba2dd2a"
+  },
+  {
+   "id": "00fecb6f-b40f-4d54-b94b-27fcc0d5921c",
+   "name": "Phnom Penh (W)",
+   "hash": "c25d5e1d3d2d565ec170f7ac0a9f7e1c57b9d5b2",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/00fecb6f-b40f-4d54-b94b-27fcc0d5921c"
+  },
+  {
+   "id": "01809df2-d722-42d6-aa62-5c9095b33679",
+   "name": "Poste du Lac (W)",
+   "hash": "1b8222607e4d36fd52e2b3feb8dfe4237a7b7826",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/01809df2-d722-42d6-aa62-5c9095b33679"
+  },
+  {
+   "id": "01d5110b-9f84-4e80-9d29-d92ec940db38",
+   "name": "Russey Chrum (E)",
+   "hash": "0e2554dab01bc7d40323d4fb8474508945440c01",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/01d5110b-9f84-4e80-9d29-d92ec940db38"
+  },
+  {
+   "id": "0215f697-358e-4649-959a-5e1da59921a0",
+   "name": "Kampot (E)",
+   "hash": "b92372b3a178174ac4619e990e551775a1c64900",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0215f697-358e-4649-959a-5e1da59921a0"
+  },
+  {
+   "id": "02e923e5-efbb-4c55-bd67-962f7fae8e33",
+   "name": "Dak Sut (W)",
+   "hash": "049460eb2fc46e5d4888eb8524ec86d422c22607",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/02e923e5-efbb-4c55-bd67-962f7fae8e33"
+  },
+  {
+   "id": "03973ced-e945-4fa1-923b-b66a526eabf8",
+   "name": "Pak Seng (E)",
+   "hash": "7d1a3f7026e09fed2a261c878ffaf4ccc8d1c40b",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/03973ced-e945-4fa1-923b-b66a526eabf8"
+  },
+  {
+   "id": "03d7e00d-4057-4585-a0da-dedccbb0a5cc",
+   "name": "Attopeu (W)",
+   "hash": "36b6f50c9b49b49941be97eeceb1e4cd73a19f4d",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/03d7e00d-4057-4585-a0da-dedccbb0a5cc"
+  },
+  {
+   "id": "03e339a6-e196-41df-a7bc-5f77491634f1",
+   "name": "Kompong Chhnang (W)",
+   "hash": "582bff180f2356f2e7aba3b4a42860691ab4e26e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/03e339a6-e196-41df-a7bc-5f77491634f1"
+  },
+  {
+   "id": "0423bba3-e5ee-4e4b-b4a2-7a10079698a1",
+   "name": "Pailin (E)",
+   "hash": "825f4d5a374021a6a9007c9f4fc61b8d79ce2f54",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0423bba3-e5ee-4e4b-b4a2-7a10079698a1"
+  },
+  {
+   "id": "04f35f4f-b19a-4992-bfc7-d1da75a9ddba",
+   "name": "Phan Thiet (W)",
+   "hash": "1370dfcf64fa6a6bab576b5e50f655094ef207d3",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/04f35f4f-b19a-4992-bfc7-d1da75a9ddba"
+  },
+  {
+   "id": "04fb7b4c-13ed-456f-b4cc-63b5f36db22e",
+   "name": "Hon Quan (E)",
+   "hash": "06abb01da9cfacd4dc898f63c0d201ea6d16804b",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/04fb7b4c-13ed-456f-b4cc-63b5f36db22e"
+  },
+  {
+   "id": "0549534c-7354-412e-a940-0932e765932f",
+   "name": "An Khê (W)",
+   "hash": "feb8f6a4d248b3ac97c7e88b3e20b9f339e4b72d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0549534c-7354-412e-a940-0932e765932f"
+  },
+  {
+   "id": "0576d9eb-38d0-4ca0-bae6-fa4a4bfb2fea",
+   "name": "Muong May (W)",
+   "hash": "b26562ba36c2516f0f5ea242189ebcd22ab2b018",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0576d9eb-38d0-4ca0-bae6-fa4a4bfb2fea"
+  },
+  {
+   "id": "07d62603-5fe6-4c34-82eb-c7d5161eae4b",
+   "name": "Ban Phone (W)",
+   "hash": "5d10a107785696809b52784071d68ce73057c660",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/07d62603-5fe6-4c34-82eb-c7d5161eae4b"
+  },
+  {
+   "id": "09a93bb7-56f4-4e0a-99df-8bcc69a9a64a",
+   "name": "Muong Phalane (E)",
+   "hash": "40b62bb3d8a3c284ee18b6b1271c1d82d5cba35d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/09a93bb7-56f4-4e0a-99df-8bcc69a9a64a"
+  },
+  {
+   "id": "0c592559-86c5-4c4e-994a-6c255a614f60",
+   "name": "Takeo (E)",
+   "hash": "9e203cd8bb25ba0537b739cb1129c64924b4eccb",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0c592559-86c5-4c4e-994a-6c255a614f60"
+  },
+  {
+   "id": "0c79071c-f21a-42cd-aeb6-f316bbae0779",
+   "name": "An Diêm (W)",
+   "hash": "bc195ad9abfed1b6c0d3900c9930f5dc3afff886",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0c79071c-f21a-42cd-aeb6-f316bbae0779"
+  },
+  {
+   "id": "0d026129-f521-48eb-8cd9-b86a1a256fa3",
+   "name": "Muong Hun Xieng Hung (E)",
+   "hash": "36a50dab2b696bc2deffef55f0fa5c7bac325c2f",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0d026129-f521-48eb-8cd9-b86a1a256fa3"
+  },
+  {
+   "id": "0d2bc33e-f09b-4a3f-8263-075611bd265b",
+   "name": "Tam Ky (W)",
+   "hash": "021c6b5c18dfe8655eec2e30141a213be9f19807",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0d2bc33e-f09b-4a3f-8263-075611bd265b"
+  },
+  {
+   "id": "0e8e7be8-6d77-43f7-96a4-a53fc1c65368",
+   "name": "Qui Chäu (W)",
+   "hash": "a2e395706187578a0eb7c1144f6771da2fe505e7",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/0e8e7be8-6d77-43f7-96a4-a53fc1c65368"
+  },
+  {
+   "id": "108624bd-4043-44ef-8177-174ae53e06b1",
+   "name": "Nong-Het (W)",
+   "hash": "4ffef481957f1e06178a1db1dabd5e0dcbe023b1",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/108624bd-4043-44ef-8177-174ae53e06b1"
+  },
+  {
+   "id": "10c5ebee-97b0-4dd8-a7f1-482442a60b9f",
+   "name": "Ban Sot (E)",
+   "hash": "d9a24589ab1ae4a17ba89eea75998be5530170b4",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/10c5ebee-97b0-4dd8-a7f1-482442a60b9f"
+  },
+  {
+   "id": "10e6a00f-2aea-42d1-8c41-370fc0993099",
+   "name": "Muong-Tè (W)",
+   "hash": "c995d02662bfbe13ac0e87c9785b6e15a1387657",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/10e6a00f-2aea-42d1-8c41-370fc0993099"
+  },
+  {
+   "id": "1369db8c-1c56-420f-8e8b-ba8b43b166f3",
+   "name": "Moung (W)",
+   "hash": "366214f9d4418cfe1323d8b1083d135948bf8693",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1369db8c-1c56-420f-8e8b-ba8b43b166f3"
+  },
+  {
+   "id": "1422e188-1841-4c32-9061-7a43b835ccb5",
+   "name": "Phu Nho Quan (W)",
+   "hash": "696b848e5e871466b06b11e9a0ac9d5131e40ad3",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1422e188-1841-4c32-9061-7a43b835ccb5"
+  },
+  {
+   "id": "14279ec8-c75b-449c-ab35-913754fdf5d0",
+   "name": "Ko Mayol (W)",
+   "hash": "3b9e667b3967191881d3343cb7e1f0e2e634cb82",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/14279ec8-c75b-449c-ab35-913754fdf5d0"
+  },
+  {
+   "id": "15645cbe-4ab5-49bd-b349-0e4914828941",
+   "name": "Trapeang Kraleng (W)",
+   "hash": "23518bad6bf7f332843237c0a0ff9d54b37a4b95",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/15645cbe-4ab5-49bd-b349-0e4914828941"
+  },
+  {
+   "id": "16ab1934-7b4f-4d4a-8ba3-98b07e679ee9",
+   "name": "Kompong-Cham (W)",
+   "hash": "2d487fd52cf628b88b14d591fb260daeff998ed2",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/16ab1934-7b4f-4d4a-8ba3-98b07e679ee9"
+  },
+  {
+   "id": "16e9af6c-2c30-450e-8aaf-3dac8be15f62",
+   "name": "Qui Chäu (E)",
+   "hash": "fab8b911743b5c43bacec25a6c1daf011e99e19c",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/16e9af6c-2c30-450e-8aaf-3dac8be15f62"
+  },
+  {
+   "id": "18cf8ecc-5dc4-410f-8507-14c2dd08151e",
+   "name": "Huong Khé (W)",
+   "hash": "8f23492924c2f6fd476f1ea9cae3a5723b47cf5f",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/18cf8ecc-5dc4-410f-8507-14c2dd08151e"
+  },
+  {
+   "id": "190264be-7e68-4c88-97be-e6287e832a3f",
+   "name": "Haut-Donnaï (E)",
+   "hash": "90b2d4f5705d19173085ac86a2fedc2be8fed337",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/190264be-7e68-4c88-97be-e6287e832a3f"
+  },
+  {
+   "id": "1a47d0a9-0b84-4dbc-a9b0-4822d70a4ad9",
+   "name": "Tchépone (W)",
+   "hash": "49e402d0a6c49e9887fc5587f5f7d374f2376d72",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1a47d0a9-0b84-4dbc-a9b0-4822d70a4ad9"
+  },
+  {
+   "id": "1ce2d961-4147-44eb-964c-9a7f64ea48d4",
+   "name": "Muong-Tè (E)",
+   "hash": "7040e61d16aeafae0253b885813f47ed7248a59d",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1ce2d961-4147-44eb-964c-9a7f64ea48d4"
+  },
+  {
+   "id": "1eda9df3-4ee3-4555-92a8-47c50b447fc3",
+   "name": "Phnom Leach",
+   "hash": "8ab79ecb2b5a204326b3731548d7407c9983a010",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1eda9df3-4ee3-4555-92a8-47c50b447fc3"
+  },
+  {
+   "id": "1f025a9f-ea9e-4816-ad35-edfba60bf518",
+   "name": "Tri Binh (W)",
+   "hash": "2a1b58df8d31f0681f0554c1e0ada091e09a1e2b",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1f025a9f-ea9e-4816-ad35-edfba60bf518"
+  },
+  {
+   "id": "1f8b34e6-bdc8-4c29-b7fb-bf411f3d0d7f",
+   "name": "Van Trinh",
+   "hash": "f6acc31140fe7a2d3f54b9119c03305a309401dc",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/1f8b34e6-bdc8-4c29-b7fb-bf411f3d0d7f"
+  },
+  {
+   "id": "2199b9d8-0d32-4852-913a-9872372d94e7",
+   "name": "Sré Khtum (E)",
+   "hash": "eeca391549679f91fc2e2900e9a94cad7a491619",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2199b9d8-0d32-4852-913a-9872372d94e7"
+  },
+  {
+   "id": "22209777-98cc-4da9-9f40-68760cdf9870",
+   "name": "Mélouprey (E)",
+   "hash": "e05d03c91d96cfc51bec978a31b4bc9cf7aefc9e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/22209777-98cc-4da9-9f40-68760cdf9870"
+  },
+  {
+   "id": "2293e554-3ee6-456f-a841-fde1d2a9580d",
+   "name": "Son Ha (W)",
+   "hash": "8b25989b9a8be2da900a05e5f71a8e84bd4973ae",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2293e554-3ee6-456f-a841-fde1d2a9580d"
+  },
+  {
+   "id": "22def28f-cd1b-4f6a-9019-63e703ab22d9",
+   "name": "Takeo (W)",
+   "hash": "f28ed8581bb2cbae1e179b4712ed5695c37ca008",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/22def28f-cd1b-4f6a-9019-63e703ab22d9"
+  },
+  {
+   "id": "261c851c-4c2c-4243-8155-9a2dc201dd25",
+   "name": "Anlong Veng (E)",
+   "hash": "baaa10396b0018a86602ffe4269d5d26849ad276",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/261c851c-4c2c-4243-8155-9a2dc201dd25"
+  },
+  {
+   "id": "269eb049-dbfa-4679-b1af-a2fe58bdffa0",
+   "name": "Thmar Puok",
+   "hash": "c8b1617c4466436d310bf1b96cf67e4bea0355d5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/269eb049-dbfa-4679-b1af-a2fe58bdffa0"
+  },
+  {
+   "id": "2705faf5-537d-4786-90a6-c278779d03ac",
+   "name": "Ban Song Kon (W)",
+   "hash": "bd4c9da52553596f3fde59d7c3e72b1573bed30e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2705faf5-537d-4786-90a6-c278779d03ac"
+  },
+  {
+   "id": "27325a7c-b4b1-46aa-9361-249a7a383ce4",
+   "name": "Bô Kheo (W)",
+   "hash": "fe6050aec47a8e1305880e02036b549edc1c42fd",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/27325a7c-b4b1-46aa-9361-249a7a383ce4"
+  },
+  {
+   "id": "283ae0d8-dca7-4a2d-a86e-1e56dc08527e",
+   "name": "Thanh Hoa (E)",
+   "hash": "cfe5228463ea91763923fbf383d4f8db68306a02",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/283ae0d8-dca7-4a2d-a86e-1e56dc08527e"
+  },
+  {
+   "id": "287d7a08-d14e-4186-a0e3-e31c1456a4e2",
+   "name": "Bac-Kan (W)",
+   "hash": "abc5774bd34dd171b6e20be0c882904a6d37c31e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/287d7a08-d14e-4186-a0e3-e31c1456a4e2"
+  },
+  {
+   "id": "2af5a166-10ab-4aad-88c2-6a173e358be9",
+   "name": "Tuyên-Quang (W)",
+   "hash": "cc38aca6aa1aa104d08860335dd6b1e248b88fb8",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2af5a166-10ab-4aad-88c2-6a173e358be9"
+  },
+  {
+   "id": "2b289c7e-b8fb-4f91-8718-7baa688f6db4",
+   "name": "Luang Prabang (E)",
+   "hash": "dee9a781ef507a195c9fd1f3eacb5f16f2bd6f1e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2b289c7e-b8fb-4f91-8718-7baa688f6db4"
+  },
+  {
+   "id": "2b6b8fad-f328-4f42-8fe2-21a8bc09d947",
+   "name": "Phnom Penh (W)",
+   "hash": "288ba0fcbcf4e1de38f29045888eda3adc822b8e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2b6b8fad-f328-4f42-8fe2-21a8bc09d947"
+  },
+  {
+   "id": "2d35666c-53d0-43a2-b34c-3e4135e71587",
+   "name": "Bô Kham (W)",
+   "hash": "6bde38610951f4c3fbdc73cc2902574b40f397c5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/2d35666c-53d0-43a2-b34c-3e4135e71587"
+  },
+  {
+   "id": "302ad01e-78c3-4fd4-98e4-552b85e0b570",
+   "name": "Phnom Deck (W)",
+   "hash": "08945dadc1a33007e74380ca99a1970d1d449a10",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/302ad01e-78c3-4fd4-98e4-552b85e0b570"
+  },
+  {
+   "id": "329da7e0-8e4e-4b24-8928-ccac16a1e345",
+   "name": "Phu Diên Châu (W)",
+   "hash": "623923c7e6c1d3b76ae9eeaa4865d446f6f2f614",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/329da7e0-8e4e-4b24-8928-ccac16a1e345"
+  },
+  {
+   "id": "334fd258-a37e-4a9f-af6b-3b949ca91f7a",
+   "name": "Tam Ky (E)",
+   "hash": "d8326ef49d761459dbc4f6314d340573859c2aac",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/334fd258-a37e-4a9f-af6b-3b949ca91f7a"
+  },
+  {
+   "id": "338188ee-186e-49c7-9857-338c7bd2c9fa",
+   "name": "Nong Het (E)",
+   "hash": "841a4535c48cf677e193259933f22874d05528f0",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/338188ee-186e-49c7-9857-338c7bd2c9fa"
+  },
+  {
+   "id": "34d187dc-8046-4d01-998c-1276f54697bc",
+   "name": "Kas Moul",
+   "hash": "e87644b3882ad8aa3a747cb787a3a6dba505fa92",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/34d187dc-8046-4d01-998c-1276f54697bc"
+  },
+  {
+   "id": "3658780c-ef1b-401a-8447-6dd4b9e8aab1",
+   "name": "Hon Quan (W)",
+   "hash": "b4e748b50e87cfe39a633551f051c5ff961555c5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3658780c-ef1b-401a-8447-6dd4b9e8aab1"
+  },
+  {
+   "id": "38305a6d-b86f-41af-8f5d-b4b8f7f6d9df",
+   "name": "Cheom Ksan (W)",
+   "hash": "ebba4c922b4acc4c176d8fd50e6b6eee485f176f",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/38305a6d-b86f-41af-8f5d-b4b8f7f6d9df"
+  },
+  {
+   "id": "38518ffe-3e88-4469-a162-abd10c4a4b32",
+   "name": "Napé (W)",
+   "hash": "ea3536adf69d40d526350378993c267930a94b97",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/38518ffe-3e88-4469-a162-abd10c4a4b32"
+  },
+  {
+   "id": "38d8877f-64e9-42cf-bb98-8ac90c5d3c8f",
+   "name": "Khang Khai (W)",
+   "hash": "4a16aaf5d73a3db643fdb0d328a52b297d8a2282",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/38d8877f-64e9-42cf-bb98-8ac90c5d3c8f"
+  },
+  {
+   "id": "39c8bc64-df4e-4231-b2d0-343f818b5442",
+   "name": "Mélouprey (W)",
+   "hash": "365b6df987e214ee4ec1fb916d252f3549f49702",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/39c8bc64-df4e-4231-b2d0-343f818b5442"
+  },
+  {
+   "id": "3a5be1b2-b181-47f7-85f2-179b72954f78",
+   "name": "Cheom Ksan (E)",
+   "hash": "682ff5927f2b84d55b3480ed266be06332dda778",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3a5be1b2-b181-47f7-85f2-179b72954f78"
+  },
+  {
+   "id": "3a6fb0d4-3f91-4977-acd7-7f9889c840fe",
+   "name": "Gia Ray (W)",
+   "hash": "8f58039c19a16e1fc81743e4cdc711c1389d3c16",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3a6fb0d4-3f91-4977-acd7-7f9889c840fe"
+  },
+  {
+   "id": "3a931ab3-d936-4d8b-9b57-67c80c332141",
+   "name": "Pursat (W)",
+   "hash": "1cf5ec1f192f0ba0f6d8d69f4115805a2904ab80",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3a931ab3-d936-4d8b-9b57-67c80c332141"
+  },
+  {
+   "id": "3b18064c-ed8d-4a6c-9a23-b32d720a3361",
+   "name": "Lao-Kay (E)",
+   "hash": "82438e83dd76fb86b4464c2aed9e40cb396cdc5d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3b18064c-ed8d-4a6c-9a23-b32d720a3361"
+  },
+  {
+   "id": "3b2b62bb-5557-477e-888f-bed1fa477fe2",
+   "name": "Than-Poun (W)",
+   "hash": "f371c3098585d587b45eabc44f3bbde0380b8c28",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3b2b62bb-5557-477e-888f-bed1fa477fe2"
+  },
+  {
+   "id": "3b61a7ea-09dc-41cf-9a0c-a29402dfadeb",
+   "name": "Luân Châu (W)",
+   "hash": "1084d51ab449e46cd7fa60c6c6eb8f8dc2c854a4",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3b61a7ea-09dc-41cf-9a0c-a29402dfadeb"
+  },
+  {
+   "id": "3c0fb979-fbf6-4451-8352-abfd657a0059",
+   "name": "Muong Het (W)",
+   "hash": "99e46aa01ed3b354482927e88a8fceed26dc4922",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3c0fb979-fbf6-4451-8352-abfd657a0059"
+  },
+  {
+   "id": "3d0a6cca-5ca3-4ceb-9334-5374d4d2afb4",
+   "name": "Phan Rang (W)",
+   "hash": "deac468851351015eaaedd54f18bb68be680d2f4",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3d0a6cca-5ca3-4ceb-9334-5374d4d2afb4"
+  },
+  {
+   "id": "3d8d139e-7609-4d57-94dc-733e35032ae6",
+   "name": "Battambang (W)",
+   "hash": "af933ddeafb84b00c8a1b76cef034d73e71dde0a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3d8d139e-7609-4d57-94dc-733e35032ae6"
+  },
+  {
+   "id": "3f10ed47-25e7-47e0-b831-58f284ec6c1f",
+   "name": "Sré Khtum (W)",
+   "hash": "1fada672e0714fdafb4a55e428f73e8bf50c2c7c",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3f10ed47-25e7-47e0-b831-58f284ec6c1f"
+  },
+  {
+   "id": "3f1b49b5-cf33-4e79-9c75-737c5ddf0e59",
+   "name": "Chhuk (W)",
+   "hash": "7f2146fb8548cdd54c33d9f6c2c5172abe10b354",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3f1b49b5-cf33-4e79-9c75-737c5ddf0e59"
+  },
+  {
+   "id": "3f740ce8-2041-4f54-a556-4edebc2a1f45",
+   "name": "Ninh Binh (W)",
+   "hash": "dcc09839f2904e1507cc05fbef58777aba350c51",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3f740ce8-2041-4f54-a556-4edebc2a1f45"
+  },
+  {
+   "id": "3fd3527b-a79b-4556-aba3-6aba93d0cc0d",
+   "name": "Tchépone (E)",
+   "hash": "fa20c896a27df0a14082e124443c7f9348c8601a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/3fd3527b-a79b-4556-aba3-6aba93d0cc0d"
+  },
+  {
+   "id": "4020fa6b-0087-4512-8cae-862d95070785",
+   "name": "Ko Mayol (E)",
+   "hash": "dc9c5927bffbed91507aa7ea441f4b7a83f341f2",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4020fa6b-0087-4512-8cae-862d95070785"
+  },
+  {
+   "id": "40648c8e-4104-499b-ab19-1d03882a316a",
+   "name": "Lao-Kay (W)",
+   "hash": "32179bb8f14c15337bd8e3b7c44251caa7b07329",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/40648c8e-4104-499b-ab19-1d03882a316a"
+  },
+  {
+   "id": "40901d43-3ba9-40c5-92e9-e571fae47016",
+   "name": "Tourane (E)",
+   "hash": "dfbb6acefb780e52c6ca1bf1b4b89cd24dbe4cd9",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/40901d43-3ba9-40c5-92e9-e571fae47016"
+  },
+  {
+   "id": "42ac774a-ec13-4f0a-a9dc-0f6f72783d31",
+   "name": "Hôi Xuân (W)",
+   "hash": "66da8fdf5c924c133ce4832e734ce85f5f40443b",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/42ac774a-ec13-4f0a-a9dc-0f6f72783d31"
+  },
+  {
+   "id": "435063e2-5b8d-4a42-a8cd-d2b1e176592c",
+   "name": "Bi-Nhi (W)",
+   "hash": "42994edfae6a7c521a0b93d1512fc9c36a074714",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/435063e2-5b8d-4a42-a8cd-d2b1e176592c"
+  },
+  {
+   "id": "435e35c6-d44e-446e-8999-a165ed0cbfcb",
+   "name": "Xieng Khouang (E)",
+   "hash": "a1e2ca626d4438c77207ef730c6bddc366ad7317",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/435e35c6-d44e-446e-8999-a165ed0cbfcb"
+  },
+  {
+   "id": "43cc3dd1-6e1a-4419-9602-8271d589b47a",
+   "name": "Chong Kal (E)",
+   "hash": "006745201bd4af2944bceb0c54dbbea077644ae7",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/43cc3dd1-6e1a-4419-9602-8271d589b47a"
+  },
+  {
+   "id": "44176367-f159-472d-a9bd-6bd334a5737a",
+   "name": "Ban Nam Bac (W)",
+   "hash": "aa866b74dec3a63d775c506ac6fbee9c5aac9f95",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/44176367-f159-472d-a9bd-6bd334a5737a"
+  },
+  {
+   "id": "44aae444-8403-49a7-b5b6-e9657f90f7ad",
+   "name": "Cam Pha (E)",
+   "hash": "5e04224c0ee12a0840970f905faea6661cda95b1",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/44aae444-8403-49a7-b5b6-e9657f90f7ad"
+  },
+  {
+   "id": "452e84c2-e679-4075-b281-bbe4aea41154",
+   "name": "Dak To (E)",
+   "hash": "fe25db839ce2c870c193d0bce2908b1beda3635f",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/452e84c2-e679-4075-b281-bbe4aea41154"
+  },
+  {
+   "id": "45e9e857-f40a-494e-904a-3b2ef0bc0d7d",
+   "name": "Pa-Kha (E)",
+   "hash": "053bafdd8d030129dd183536688f859154b1394e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/45e9e857-f40a-494e-904a-3b2ef0bc0d7d"
+  },
+  {
+   "id": "461cd1aa-41a7-4731-a51d-97bdd11cd2ae",
+   "name": "Phsar Oudong (W)",
+   "hash": "bbdd061ae5cb97679a46c8782ae97452d1d94f03",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/461cd1aa-41a7-4731-a51d-97bdd11cd2ae"
+  },
+  {
+   "id": "46d9171d-1447-4465-a315-89d8671a1462",
+   "name": "Siem Réap (W)",
+   "hash": "ccb91a84ef78d89bc0c131510dd5e992bc2e9dfb",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/46d9171d-1447-4465-a315-89d8671a1462"
+  },
+  {
+   "id": "48584dae-d4e3-4821-82a1-bab588ec3dd2",
+   "name": "Quang Ngai",
+   "hash": "1eb7b0fc38c94e04ab34c64e2eacaba0982b56f8",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/48584dae-d4e3-4821-82a1-bab588ec3dd2"
+  },
+  {
+   "id": "488d9453-88ba-4c6d-ade4-b221e95d735e",
+   "name": "Luc-An-Chau (E)",
+   "hash": "60efaa87336d8f86cf4a7af0ac3188f391ce7297",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/488d9453-88ba-4c6d-ade4-b221e95d735e"
+  },
+  {
+   "id": "49004e34-a1fe-4d74-bf82-d14c6ee8311b",
+   "name": "Chhuk (E)",
+   "hash": "b0e52ab71201e78615490158e0174768e81a9124",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/49004e34-a1fe-4d74-bf82-d14c6ee8311b"
+  },
+  {
+   "id": "4981483e-68b0-485a-a7d5-d319b15b3147",
+   "name": "Gia Ray (E)",
+   "hash": "910d68982d45a7807a1ad88a45a27da1e2c63983",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4981483e-68b0-485a-a7d5-d319b15b3147"
+  },
+  {
+   "id": "4d75074e-7c2e-4bd6-8014-4c3ee5a2f463",
+   "name": "Pailin (W)",
+   "hash": "df711b9c1b371f755ce07afddf5491b4fac24786",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4d75074e-7c2e-4bd6-8014-4c3ee5a2f463"
+  },
+  {
+   "id": "4d762955-14f8-4209-9e6e-7bd2e4cdcc1b",
+   "name": "Kralanh (E)",
+   "hash": "c8321dc2ceaed99f8cac91ab564c683d2ce58784",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4d762955-14f8-4209-9e6e-7bd2e4cdcc1b"
+  },
+  {
+   "id": "4da1d33d-6b29-4fd7-a846-7e8473a449e4",
+   "name": "Pha Bo (E)",
+   "hash": "7de5d89496f6bf731804372465649636ea3b715e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4da1d33d-6b29-4fd7-a846-7e8473a449e4"
+  },
+  {
+   "id": "4e70153f-d765-4966-a794-e5d86c8fa6d8",
+   "name": "Muong Soui (W)",
+   "hash": "061fa73d4eb40d6d9b66610345b431cf05096805",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4e70153f-d765-4966-a794-e5d86c8fa6d8"
+  },
+  {
+   "id": "4e7b87fc-2f55-4e43-b5a5-9794b664dca3",
+   "name": "Vinh (W)",
+   "hash": "3050e5463e1a96f798d840b25d5ee7e823fd6783",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4e7b87fc-2f55-4e43-b5a5-9794b664dca3"
+  },
+  {
+   "id": "4f3addb2-6a27-48f6-a30e-bc848eb4b7ec",
+   "name": "Bao-Lac (E)",
+   "hash": "fe7ba9a0a104ef0cdddf892f2b8c9a880a1700f2",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4f3addb2-6a27-48f6-a30e-bc848eb4b7ec"
+  },
+  {
+   "id": "4f54f188-d50c-4c11-8f4f-11fbe4529ac0",
+   "name": "Saravane (W)",
+   "hash": "72765701f25e34c01ece49e4991efdeee5a2c361",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/4f54f188-d50c-4c11-8f4f-11fbe4529ac0"
+  },
+  {
+   "id": "50689317-5dbf-46db-ba84-0fa4c0a67213",
+   "name": "Dong-Hoi (W)",
+   "hash": "706b5ccd9d287b5f18b2b065e67e012e351ca2fa",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/50689317-5dbf-46db-ba84-0fa4c0a67213"
+  },
+  {
+   "id": "511cc2da-8cf7-40de-8fb9-abca8adb8388",
+   "name": "Cam Ranh (W)",
+   "hash": "5ccab3b90c4b21343827d8505f914b834fb4a422",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/511cc2da-8cf7-40de-8fb9-abca8adb8388"
+  },
+  {
+   "id": "51288411-20dc-4e5c-b0a0-db91ed754018",
+   "name": "Napé (E)",
+   "hash": "0d1b7fc3e9efc490ba8dbb13ba2f5b1aa3deb5cf",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/51288411-20dc-4e5c-b0a0-db91ed754018"
+  },
+  {
+   "id": "5185e960-ddb1-4f98-9cba-f9198e91840e",
+   "name": "Poste Deshayes (W)",
+   "hash": "bc0c18d29f799f2f0a322dac4013442838e54297",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5185e960-ddb1-4f98-9cba-f9198e91840e"
+  },
+  {
+   "id": "52c814cf-0256-4369-8be6-30e3ba225468",
+   "name": "Dong-Van (E)",
+   "hash": "1c8303b0ff02e6521f96d5e968f25e293b33d9b8",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/52c814cf-0256-4369-8be6-30e3ba225468"
+  },
+  {
+   "id": "5300b1fc-7b90-4c8d-a800-5f369bea96ca",
+   "name": "Lang Son (E)",
+   "hash": "fea3625d48ea83d51c1f86d7ba2102b011991a2e",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5300b1fc-7b90-4c8d-a800-5f369bea96ca"
+  },
+  {
+   "id": "543d4a4b-49f2-4648-80a8-1464284136cb",
+   "name": "Ban Keng Say (E)",
+   "hash": "2dc673664c7b0938e76058e5a1b14347638689d6",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/543d4a4b-49f2-4648-80a8-1464284136cb"
+  },
+  {
+   "id": "54f97629-6c09-4168-ae68-9f60b8644948",
+   "name": "Bên Giang (W)",
+   "hash": "90a88a01cd35dbabcca44507d010612c8b405825",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/54f97629-6c09-4168-ae68-9f60b8644948"
+  },
+  {
+   "id": "55394603-825c-4d62-b8ff-15a2d6bb0291",
+   "name": "Viêt Trì (E)",
+   "hash": "b4fafa326e0cbd66e1c93ca097e991a737541c01",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/55394603-825c-4d62-b8ff-15a2d6bb0291"
+  },
+  {
+   "id": "557c1b72-ecbf-4113-8c29-4efb16cea25e",
+   "name": "Bô Kham (E)",
+   "hash": "ee3cdac3f16abcc65c6258a5623ae16834ba71fb",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/557c1b72-ecbf-4113-8c29-4efb16cea25e"
+  },
+  {
+   "id": "559ba082-a861-45a8-bbff-e0285f727bd9",
+   "name": "Mon-Cay (E)",
+   "hash": "2c5df93f1be217078628a6ce521f799573127ec3",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/559ba082-a861-45a8-bbff-e0285f727bd9"
+  },
+  {
+   "id": "55a96be2-22a2-47e7-88b3-5013cfdb1498",
+   "name": "Svay-Rieng (W)",
+   "hash": "8cbbc2b1c5b3738dd9480bd3ac1278e25468d001",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/55a96be2-22a2-47e7-88b3-5013cfdb1498"
+  },
+  {
+   "id": "5621306f-dcbe-4580-a51f-54c9cbcb30f3",
+   "name": "Kompong Sralao (E)",
+   "hash": "2005c07b5733234e2d87317f419387d5dd77a694",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5621306f-dcbe-4580-a51f-54c9cbcb30f3"
+  },
+  {
+   "id": "562fd87b-b04a-4d17-a06b-6f5f6b9e68d2",
+   "name": "Vang Vieng (E)",
+   "hash": "233660f4fc9b49f9cae635598c2921e4e11439e3",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/562fd87b-b04a-4d17-a06b-6f5f6b9e68d2"
+  },
+  {
+   "id": "5769c604-08a4-4fe6-8a36-983af5053e5a",
+   "name": "Trapéang Chong (W)",
+   "hash": "024fcec53348dcd80e43682bb3cbc3425abd03d3",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5769c604-08a4-4fe6-8a36-983af5053e5a"
+  },
+  {
+   "id": "57f24746-d879-45ae-9ce0-0b69b5e087a4",
+   "name": "Pha Bo (W)",
+   "hash": "5da009f824a09b74fb06668dfa100a6113f7400c",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/57f24746-d879-45ae-9ce0-0b69b5e087a4"
+  },
+  {
+   "id": "583fa8fd-e5d5-4ca8-aa46-43ef3781fca7",
+   "name": "Banteai Srei (W)",
+   "hash": "3c3f7ddf9c403756ace801583299f3c0feaffcd8",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/583fa8fd-e5d5-4ca8-aa46-43ef3781fca7"
+  },
+  {
+   "id": "5923ac6c-4ca8-4256-8f7a-72405403b80b",
+   "name": "Khong (W)",
+   "hash": "ff53c160c00785e1a214a833a60ec4a98c5567f0",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5923ac6c-4ca8-4256-8f7a-72405403b80b"
+  },
+  {
+   "id": "59b5f224-ca82-426e-b0f0-14eb09e9d91f",
+   "name": "Stung Treng (W)",
+   "hash": "70d00c6b138f1ff28d3b17a0ea5d4ad4b18e08a8",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/59b5f224-ca82-426e-b0f0-14eb09e9d91f"
+  },
+  {
+   "id": "59b7ab12-6586-4aec-9e3a-55b5fb6624de",
+   "name": "Hai Phong (E)",
+   "hash": "4e445c07489c5d478f4014862f7a05d59a020c73",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/59b7ab12-6586-4aec-9e3a-55b5fb6624de"
+  },
+  {
+   "id": "59ccd22b-c179-467c-8e60-619554a72c13",
+   "name": "Ban Song Kon (E)",
+   "hash": "a4b14f933caf0d0d2cf68ee47e42918307ef6252",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/59ccd22b-c179-467c-8e60-619554a72c13"
+  },
+  {
+   "id": "5a859801-db39-4998-969a-d86e3ea5c63e",
+   "name": "Thanh Hoa (W)",
+   "hash": "4ca91849eedca9681aedd3b53bb4de81fb92bc7e",
+   "detector_version": null,
+   "calibration": true,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5a859801-db39-4998-969a-d86e3ea5c63e"
+  },
+  {
+   "id": "5c06d0d8-65c8-453b-8313-c3dc88e0a2d4",
+   "name": "Kralanh (W)",
+   "hash": "61995a7eeb80309b264559c3122e5554b369d3f8",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5c06d0d8-65c8-453b-8313-c3dc88e0a2d4"
+  },
+  {
+   "id": "5c36fcb3-3161-40b7-b3e5-d9762d5a485a",
+   "name": "Poste Maître (W)",
+   "hash": "385c6fbe2e7403b1d6791fc8de0c23c9efd83834",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5c36fcb3-3161-40b7-b3e5-d9762d5a485a"
+  },
+  {
+   "id": "5d96a9d6-db2c-4ce7-a759-acc458718712",
+   "name": "Ban Taphane (E)",
+   "hash": "5c69f464a929947949f2224fab265146eac1dd64",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5d96a9d6-db2c-4ce7-a759-acc458718712"
+  },
+  {
+   "id": "5dfc24fb-b2c5-43fe-b74a-6d5abb564f62",
+   "name": "Muong Son (W)",
+   "hash": "cf58acad466fe868c5d987e0057b3b7dcea624ae",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5dfc24fb-b2c5-43fe-b74a-6d5abb564f62"
+  },
+  {
+   "id": "5e1ca3a9-4e94-4ec4-976a-86c13ad12b27",
+   "name": "Kratié (E)",
+   "hash": "0f77bd5e32ec0a8699cce1578398ee9d8e48a84e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5e1ca3a9-4e94-4ec4-976a-86c13ad12b27"
+  },
+  {
+   "id": "5e57bfba-6492-454e-ba58-54cb26dbd3e7",
+   "name": "Söng Cau (W)",
+   "hash": "cafe65674d1ad88cd43b1620b35c3360807c66df",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5e57bfba-6492-454e-ba58-54cb26dbd3e7"
+  },
+  {
+   "id": "5f5e9dde-4267-4b10-bd05-b8a55ab4c470",
+   "name": "Hà Giang (W)",
+   "hash": "4c761850ce0004ea9262e1ff2a165ce7b6f99a88",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5f5e9dde-4267-4b10-bd05-b8a55ab4c470"
+  },
+  {
+   "id": "5f804e82-2ad6-4924-bf00-fee91291cc60",
+   "name": "Dong-Hoi (E)",
+   "hash": "48c7870b95e7660647991e01a9237e782c3fef42",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/5f804e82-2ad6-4924-bf00-fee91291cc60"
+  },
+  {
+   "id": "60a3de16-8bb6-4827-9b1b-d51a50320689",
+   "name": "Lôc Ninh (E)",
+   "hash": "240d5574dc926b91d247fb2d0372ee69a4f0066c",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/60a3de16-8bb6-4827-9b1b-d51a50320689"
+  },
+  {
+   "id": "60b8180d-71de-4402-b994-d44b6e4a2c85",
+   "name": "Poste du Lac",
+   "hash": "5faa540f666f3711099af4eee7667b1db285663a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/60b8180d-71de-4402-b994-d44b6e4a2c85"
+  },
+  {
+   "id": "611af307-111a-4198-b954-ed364ea4df57",
+   "name": "Tri Binh (E)",
+   "hash": "1fcd88f2d4094192883f3ead11e4220a7a56426a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/611af307-111a-4198-b954-ed364ea4df57"
+  },
+  {
+   "id": "61272041-c511-4384-91af-f4694954f79c",
+   "name": "Ron (E)",
+   "hash": "5bc8bf952e6421bae3627fe1edaa5012e05eb59c",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/61272041-c511-4384-91af-f4694954f79c"
+  },
+  {
+   "id": "62fac952-29ea-4514-8a70-c75053234429",
+   "name": "An Diêm (E)",
+   "hash": "7e433e7bc2ca3f8f1608a678c41b151e074ca135",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/62fac952-29ea-4514-8a70-c75053234429"
+  },
+  {
+   "id": "634d132b-6b8e-47b2-87e2-37a3e3495c63",
+   "name": "Ban Sot (W)",
+   "hash": "573cd52f8a79ddf94a1f601f8adce94e862cfee5",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/634d132b-6b8e-47b2-87e2-37a3e3495c63"
+  },
+  {
+   "id": "639ea798-7042-4b9a-8594-a8f9a6887b15",
+   "name": "Bô Kheo (E)",
+   "hash": "2bb687983e0ed1bcf36037ecdec466c76bbd118e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/639ea798-7042-4b9a-8594-a8f9a6887b15"
+  },
+  {
+   "id": "65366fa5-092a-4225-a576-69e83bf4c647",
+   "name": "Phu Diên Châu (E)",
+   "hash": "e0d2b02b871e42a294c85f1bcd1a380574635c50",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/65366fa5-092a-4225-a576-69e83bf4c647"
+  },
+  {
+   "id": "65559440-3d12-4cfe-9d52-9e872564f3bd",
+   "name": "Muong Ou Tay (W)",
+   "hash": "53fc067388ccfd898542a3745fc5e6917d55d9b9",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/65559440-3d12-4cfe-9d52-9e872564f3bd"
+  },
+  {
+   "id": "661ad123-b536-4d20-bd9d-ed80508a6670",
+   "name": "Phu Gia",
+   "hash": "dc365aaeadd4e062a684d6968105b8e506a541c8",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/661ad123-b536-4d20-bd9d-ed80508a6670"
+  },
+  {
+   "id": "6783fbf2-9ea1-45a1-9d5d-70316c9249ff",
+   "name": "Són La (W)",
+   "hash": "70233ba8c93ecd2a93fb6b4dd2ad8e6368bb610c",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6783fbf2-9ea1-45a1-9d5d-70316c9249ff"
+  },
+  {
+   "id": "69914af7-ac7d-41d4-b1ed-517f3a33fee9",
+   "name": "Ban Mé Thuot (E)",
+   "hash": "90486259d62c0e633fbf68cecd29ce0a79eee024",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/69914af7-ac7d-41d4-b1ed-517f3a33fee9"
+  },
+  {
+   "id": "69c78109-7163-4434-bd24-1662e7b15a49",
+   "name": "Tây Ninh (E)",
+   "hash": "310cbc58efaec91c6ffc50084927dd68e3d7a813",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/69c78109-7163-4434-bd24-1662e7b15a49"
+  },
+  {
+   "id": "6a4b42da-c26d-4370-9d62-45e766777ca9",
+   "name": "Mahaxay (W)",
+   "hash": "48a42c186b09a58573b8adc84c422ffd2599b245",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6a4b42da-c26d-4370-9d62-45e766777ca9"
+  },
+  {
+   "id": "6b089c23-934a-46c1-b78e-c327543fa11d",
+   "name": "Kompong-Cham (E)",
+   "hash": "fe23a8a0d1928221cf4c9e36e20b52872842a1ae",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6b089c23-934a-46c1-b78e-c327543fa11d"
+  },
+  {
+   "id": "6b40af90-88e3-444c-b8c8-1757809bbdc7",
+   "name": "Khê Kiên (E)",
+   "hash": "675c428abc80d430cd76a59cac440dd6c16d6840",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6b40af90-88e3-444c-b8c8-1757809bbdc7"
+  },
+  {
+   "id": "6bd7a6dd-5863-44d0-9cf1-21940df72f24",
+   "name": "Bên Giang (E)",
+   "hash": "361228a1d47c7d646020d29ca072d902d6b06c00",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6bd7a6dd-5863-44d0-9cf1-21940df72f24"
+  },
+  {
+   "id": "6bdd9ab8-22dd-460d-b511-0a29d5dd843f",
+   "name": "Bun-Tai (E)",
+   "hash": "1325c0bc2b9322a8510bb12e3cfeb67501820072",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6bdd9ab8-22dd-460d-b511-0a29d5dd843f"
+  },
+  {
+   "id": "6c42c7e0-bfb6-45ea-a4a7-dbf507f2e229",
+   "name": "Lao-Bao (W)",
+   "hash": "1ee1a628473b9945c51896ee5f48aa5a38b6687a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6c42c7e0-bfb6-45ea-a4a7-dbf507f2e229"
+  },
+  {
+   "id": "6c598535-81ad-4fe9-8da6-61aa0ba7fe70",
+   "name": "Ban Don (W)",
+   "hash": "bff2259d581abb928d1979d64229cd5a7c377b0b",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6c598535-81ad-4fe9-8da6-61aa0ba7fe70"
+  },
+  {
+   "id": "6d7a282f-d568-4466-b6e2-e00b5b7d531b",
+   "name": "Kompong Thom (E)",
+   "hash": "48a708562cfcd84cb43d3cd955c936929cf8b0b2",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6d7a282f-d568-4466-b6e2-e00b5b7d531b"
+  },
+  {
+   "id": "6daf5d5b-f23f-4b55-8e35-5296a07cf9a9",
+   "name": "Ban Phone (E)",
+   "hash": "fd49f50148980e97f4b5a6cd3f339898ee05726d",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6daf5d5b-f23f-4b55-8e35-5296a07cf9a9"
+  },
+  {
+   "id": "6e6c2e02-8b2c-49f2-beaa-e3aa09a67dcf",
+   "name": "Cua Rao W (W)",
+   "hash": "e7166428aec21aed927b5966b695cf61688d6111",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6e6c2e02-8b2c-49f2-beaa-e3aa09a67dcf"
+  },
+  {
+   "id": "6eca3a2a-3c32-4a95-8fc6-21934716ac48",
+   "name": "M?ong Sai (E)",
+   "hash": "3477b534e3c16c317aa04c6f8279f823eb746d69",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6eca3a2a-3c32-4a95-8fc6-21934716ac48"
+  },
+  {
+   "id": "6ef896bf-d4cf-4202-b402-7693d70154bc",
+   "name": "Beng Lovéa (W)",
+   "hash": "82a25bf0fe3e087b6cac46bab71dbc60eaef4b56",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/6ef896bf-d4cf-4202-b402-7693d70154bc"
+  },
+  {
+   "id": "70951e24-876e-4b5f-8a7b-1a440ec2fd37",
+   "name": "Sop Cop (E)",
+   "hash": "b60eaf66836900a3eb5870a762a88b16d8bdaaf5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/70951e24-876e-4b5f-8a7b-1a440ec2fd37"
+  },
+  {
+   "id": "730b9c0f-734f-471c-93d3-319768a89930",
+   "name": "Sam Neua (W)",
+   "hash": "c398342065ae76c99b34ac37284221e2806c8183",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/730b9c0f-734f-471c-93d3-319768a89930"
+  },
+  {
+   "id": "7525950b-3475-4a08-a33e-db09654e4e25",
+   "name": "Prek Preas (E)",
+   "hash": "e8d01b5f1c39ecfecfaa56f66471c85c9805b612",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7525950b-3475-4a08-a33e-db09654e4e25"
+  },
+  {
+   "id": "7530d40e-cbb0-4521-b12a-c99acffec27d",
+   "name": "Nam Dinh (W)",
+   "hash": "8f4389339cb49900d198f57dcd4dac9d64f4f218",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7530d40e-cbb0-4521-b12a-c99acffec27d"
+  },
+  {
+   "id": "753b93ac-e569-4a49-8018-e089354e2be2",
+   "name": "Phong-Saly (W)",
+   "hash": "22faf10610a39c0ba71b253cdec577a594653e52",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/753b93ac-e569-4a49-8018-e089354e2be2"
+  },
+  {
+   "id": "756df82a-ee3b-40c9-9e33-7973830c8f85",
+   "name": "Srépok (W)",
+   "hash": "ba01e0967657344a79c6b167c2ca88fb967bb49a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/756df82a-ee3b-40c9-9e33-7973830c8f85"
+  },
+  {
+   "id": "7597af1f-8154-4e68-bb65-6ca187412857",
+   "name": "Phu Nho Quan (E)",
+   "hash": "5aca21dffb04ddff222d47cf8493b836627a266c",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7597af1f-8154-4e68-bb65-6ca187412857"
+  },
+  {
+   "id": "79ee184d-f9cc-435f-a5c9-23896d14930d",
+   "name": "Banteai Srei (E)",
+   "hash": "f09607d9b15ac95bb08bfe3b20020085bbfa9444",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/79ee184d-f9cc-435f-a5c9-23896d14930d"
+  },
+  {
+   "id": "7a51e6e8-8e6e-40a8-9c0a-9b3294d9dbe1",
+   "name": "Poste du Lac (E)",
+   "hash": "1e3de04bca7d963ec7f9a484a8074aa004414b0e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7a51e6e8-8e6e-40a8-9c0a-9b3294d9dbe1"
+  },
+  {
+   "id": "7a5fc271-21ee-4053-9438-40a66873e691",
+   "name": "Phong-Saly (E)",
+   "hash": "eee5336b5ecb57491af953d468a2cef340629a84",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7a5fc271-21ee-4053-9438-40a66873e691"
+  },
+  {
+   "id": "7b61f45a-fca6-4244-b4f2-5a9cf79e556c",
+   "name": "Stung Treng (E)",
+   "hash": "8d67147d191394bc5f4c75e6996f5c5861aa8f47",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7b61f45a-fca6-4244-b4f2-5a9cf79e556c"
+  },
+  {
+   "id": "7bf1330c-2cf2-4974-9daa-dded9ed72d00",
+   "name": "Söng Cau (E)",
+   "hash": "c052bc0dd17c0be4d4153a0229449c2cdb80fb78",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7bf1330c-2cf2-4974-9daa-dded9ed72d00"
+  },
+  {
+   "id": "7c7b90fa-a2ef-4978-8765-75127fc5b0a3",
+   "name": "Battambang (E)",
+   "hash": "100120eb244ba326d2a601f7f1470dfd1f6a4b31",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7c7b90fa-a2ef-4978-8765-75127fc5b0a3"
+  },
+  {
+   "id": "7dd84a36-b79a-4d9f-a5c4-c1aa2ffb7a6d",
+   "name": "Ban Mé Thuot (W)",
+   "hash": "95b8aade139d59ae3c9cd4fbdeb3dfbd2edae057",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7dd84a36-b79a-4d9f-a5c4-c1aa2ffb7a6d"
+  },
+  {
+   "id": "7e292f27-1cd0-404a-ae59-5258900d5d54",
+   "name": "Thanh-Ba (E)",
+   "hash": "033cfe61438059e9bab91bca8e92d28fc8963e26",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7e292f27-1cd0-404a-ae59-5258900d5d54"
+  },
+  {
+   "id": "7ec6dcc4-ba07-4fb3-87ff-78ae548fcf17",
+   "name": "Sop Cop (W)",
+   "hash": "5cbce7fbec4b5b3b041d1d9bd96a93684543ec5b",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/7ec6dcc4-ba07-4fb3-87ff-78ae548fcf17"
+  },
+  {
+   "id": "826a2182-bc32-4fa7-babe-59c784ec1440",
+   "name": "Muong-Phine (E)",
+   "hash": "05e611da105b2c3de9e45ccfd64ac499093872b9",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/826a2182-bc32-4fa7-babe-59c784ec1440"
+  },
+  {
+   "id": "827cfedf-312e-43de-9448-607462f4de31",
+   "name": "Kon Plong (E)",
+   "hash": "a64aec3f59f436fdfa045b61279dcf7119c0f116",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/827cfedf-312e-43de-9448-607462f4de31"
+  },
+  {
+   "id": "8289d9a6-6780-4f1e-8ead-7f9f137d6ada",
+   "name": "Ha-Lang (W)",
+   "hash": "f5c17f74ae788ca657fadeb55c58a4bf1309b6ca",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8289d9a6-6780-4f1e-8ead-7f9f137d6ada"
+  },
+  {
+   "id": "83501380-a456-4687-a6b7-76f798925a7e",
+   "name": "Muong-Vène (W)",
+   "hash": "2677b817ebece34c9cc7062034ade9e1e478f79a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/83501380-a456-4687-a6b7-76f798925a7e"
+  },
+  {
+   "id": "83de267b-a570-4534-b7ae-407998aea3e3",
+   "name": "Phiafay (W)",
+   "hash": "cc5577b33d5ead119580dfcd5388090559ac7ce5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/83de267b-a570-4534-b7ae-407998aea3e3"
+  },
+  {
+   "id": "84fd3f51-4dda-4e87-8b5f-925b47c7c4a3",
+   "name": "Kompong Chhnang (E)",
+   "hash": "fcfe2a9f88b769a5a726b698667488fc293626b4",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/84fd3f51-4dda-4e87-8b5f-925b47c7c4a3"
+  },
+  {
+   "id": "8714ef04-fd0b-44be-a324-1fefd2db9976",
+   "name": "Trang Bang (W)",
+   "hash": "6c7f130c30755a5d2f94f39c8c6114dee1a45325",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8714ef04-fd0b-44be-a324-1fefd2db9976"
+  },
+  {
+   "id": "8777bf20-9e4e-4afb-8813-54a400c0c6c3",
+   "name": "Tuyên-Quang (E)",
+   "hash": "e03333f19ef9869efab0b882f42c0b629c2889c6",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8777bf20-9e4e-4afb-8813-54a400c0c6c3"
+  },
+  {
+   "id": "87ea4c9f-fb7a-4d9f-9540-1a62f103624e",
+   "name": "Dak To (W)",
+   "hash": "94e1411678f14c5a683f046b0a72356c13d83264",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/87ea4c9f-fb7a-4d9f-9540-1a62f103624e"
+  },
+  {
+   "id": "8a518936-b23a-4f7d-983e-a12288fd2ffa",
+   "name": "Muong Hùn Xiêng Hung (W)",
+   "hash": "441104a0f1c8dfc39fa2e3350b9387ac9f27f6c1",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8a518936-b23a-4f7d-983e-a12288fd2ffa"
+  },
+  {
+   "id": "8a876d4c-7193-461b-b60d-851df9542a1f",
+   "name": "Diên Biên Phu (E)",
+   "hash": "f39baaf4c85d4fd6123628bfc71078803a853522",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8a876d4c-7193-461b-b60d-851df9542a1f"
+  },
+  {
+   "id": "8aecc8d9-3d3e-4fdf-9804-3f7de42ad360",
+   "name": "Sambor (E)",
+   "hash": "6b5880822f35bf1354b43b1c3d4d5accaf38190d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8aecc8d9-3d3e-4fdf-9804-3f7de42ad360"
+  },
+  {
+   "id": "8b5306bd-a96a-4fd3-8f2e-f84dea6362d7",
+   "name": "Phnom Tabeng (W)",
+   "hash": "2540bfd29ec3e47639a16e76fc2f933e55c1e549",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8b5306bd-a96a-4fd3-8f2e-f84dea6362d7"
+  },
+  {
+   "id": "8be2ff16-7f75-4f7c-aa18-56da5f04f88b",
+   "name": "Bai-Thuong (E)",
+   "hash": "6e2ac26777efac3b2d25f6a16f4a93c87feeeaca",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8be2ff16-7f75-4f7c-aa18-56da5f04f88b"
+  },
+  {
+   "id": "8be86779-1fe3-4aa6-a942-49ec733795e9",
+   "name": "Van Gia (E)",
+   "hash": "20aa11a7792978bc79216cf3b6556d95704aec8b",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8be86779-1fe3-4aa6-a942-49ec733795e9"
+  },
+  {
+   "id": "8c05c8f8-eb60-471e-a1ff-9e1ed694d6d9",
+   "name": "Sambor (W)",
+   "hash": "1abcc4939f9f512080f4481312569ef4aeffde81",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8c05c8f8-eb60-471e-a1ff-9e1ed694d6d9"
+  },
+  {
+   "id": "8cee7a7c-9dac-44b6-8d56-0ac9999f3ec7",
+   "name": "Tang Phloch (W)",
+   "hash": "50f255f68a935427b1d575e1ff5baa387e059a75",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8cee7a7c-9dac-44b6-8d56-0ac9999f3ec7"
+  },
+  {
+   "id": "8de9e954-dc8d-468f-8dca-bae49e0ef081",
+   "name": "Cam Ranh (E)",
+   "hash": "ba239eaadfab3e65db690777639587169ebf4f40",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8de9e954-dc8d-468f-8dca-bae49e0ef081"
+  },
+  {
+   "id": "8e1cc8c5-76bd-4801-8a21-b3e8e61fe802",
+   "name": "Kratié (W)",
+   "hash": "89cfb2d31acf359915ffc175cb5e99a27efd9ff8",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8e1cc8c5-76bd-4801-8a21-b3e8e61fe802"
+  },
+  {
+   "id": "8e4520ca-5fd9-457b-9647-8a1f374d68ea",
+   "name": "Sam Teu (W)",
+   "hash": "2def053f54cb78c86597fb5f82f7a8f0be5b249e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8e4520ca-5fd9-457b-9647-8a1f374d68ea"
+  },
+  {
+   "id": "8f06c5b2-807b-4501-9f5c-c2bedcde85c1",
+   "name": "Bai-Thuong (W)",
+   "hash": "3d64a6437744359e85ca22320fefb86ffa1bd77e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8f06c5b2-807b-4501-9f5c-c2bedcde85c1"
+  },
+  {
+   "id": "8fa327fe-fb39-4258-835f-5a2e8ecd635b",
+   "name": "Son Ha (E)",
+   "hash": "f81dc7b54e74ec3424f0aa1cf2dbf84ac9520a7f",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8fa327fe-fb39-4258-835f-5a2e8ecd635b"
+  },
+  {
+   "id": "8fcd3ac5-7661-4284-9e43-d9dbcd5213fc",
+   "name": "Bac-Ninh (W)",
+   "hash": "fb66ae75153e210221e369186ef10145672afdaa",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/8fcd3ac5-7661-4284-9e43-d9dbcd5213fc"
+  },
+  {
+   "id": "9038fcc1-e05b-4217-92a5-1942e2b0da80",
+   "name": "Lovéa (E)",
+   "hash": "366560dc379f684ccbc2704db51f3d9b31405240",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9038fcc1-e05b-4217-92a5-1942e2b0da80"
+  },
+  {
+   "id": "90b6dcd2-269e-4829-9d22-32e92c5d68ee",
+   "name": "Pak-Seng (W)",
+   "hash": "9e698fb399dc7d93e9a0ba0aa772ee3479c721be",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/90b6dcd2-269e-4829-9d22-32e92c5d68ee"
+  },
+  {
+   "id": "964a6bcc-c839-4bc4-a6e7-b2e8e4f7dd05",
+   "name": "Kompong Som (E)",
+   "hash": "4a0d13289db0b5f9671e18dd04aa4a2b5e276dab",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/964a6bcc-c839-4bc4-a6e7-b2e8e4f7dd05"
+  },
+  {
+   "id": "96773ca7-1f10-4969-93d0-ee8b35a33522",
+   "name": "Saravane (E)",
+   "hash": "13e0f9f16a2dd363c8d031b68e677ef8e2cc2cf4",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/96773ca7-1f10-4969-93d0-ee8b35a33522"
+  },
+  {
+   "id": "968508c9-868f-4610-bb24-0ad49e9913a9",
+   "name": "Tây Ninh (W)",
+   "hash": "fda2d49dfa4a1f472ba58d309cd1508859e9de17",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/968508c9-868f-4610-bb24-0ad49e9913a9"
+  },
+  {
+   "id": "96bb8a0d-67c0-4762-9eb6-85c9be8df23c",
+   "name": "Muong-Song-Khone (E)",
+   "hash": "9b37585eac5f157c8909254eac3b52452e3776ac",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/96bb8a0d-67c0-4762-9eb6-85c9be8df23c"
+  },
+  {
+   "id": "97d155e5-ebb5-4402-8c4d-4fdb5fe8ccd6",
+   "name": "Ban Nam Bac (E)",
+   "hash": "e5cadd3963772b5e89af8e0a5d38cb77c675ec79",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/97d155e5-ebb5-4402-8c4d-4fdb5fe8ccd6"
+  },
+  {
+   "id": "9839a452-f7f8-4a10-a865-4e900eaa0788",
+   "name": "Saigon (W)",
+   "hash": "ec805e4feacd639e4fb461e1b5c1533932f52741",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9839a452-f7f8-4a10-a865-4e900eaa0788"
+  },
+  {
+   "id": "9931b535-4baa-4cfe-b9e1-eb45ce77d6e5",
+   "name": "Poste Maître (E)",
+   "hash": "335af23f0ec090df09883fcaf7b8db1a36b23f76",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9931b535-4baa-4cfe-b9e1-eb45ce77d6e5"
+  },
+  {
+   "id": "99aa654e-9c50-48b9-86d1-d246ac8520c4",
+   "name": "Nha Trang (W)",
+   "hash": "e68c885315dad649fc1954db40099faa6930d270",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/99aa654e-9c50-48b9-86d1-d246ac8520c4"
+  },
+  {
+   "id": "99adde4f-9d56-4a66-b186-6c8e81b63d39",
+   "name": "Vinh (E)",
+   "hash": "31a4e36c3364a9994178cda80264e5b0a0ec9a79",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/99adde4f-9d56-4a66-b186-6c8e81b63d39"
+  },
+  {
+   "id": "99bfdd1e-a6c2-48f7-bee4-6af18dfc860d",
+   "name": "Kompong Trabeck (E)",
+   "hash": "da1effe9d950770c24982c4a783c05db62c55b58",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/99bfdd1e-a6c2-48f7-bee4-6af18dfc860d"
+  },
+  {
+   "id": "9a1808b9-be9c-4323-9574-9d56bec7b5ca",
+   "name": "Prey Veng (E)",
+   "hash": "a65d27f31d8e0fdd2c25eb25d340a57e6983cfe5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9a1808b9-be9c-4323-9574-9d56bec7b5ca"
+  },
+  {
+   "id": "9ac129b4-5037-407d-9f21-293766435fd4",
+   "name": "Plei Ku (W)",
+   "hash": "89e4f9a9c2e4140708c400a34c359078576c12b9",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9ac129b4-5037-407d-9f21-293766435fd4"
+  },
+  {
+   "id": "9b6715c9-6c2d-4446-a0ba-f402ce1fa370",
+   "name": "Dalat (E)",
+   "hash": "d6c4eebfd0ff716dcc803ac787301f76be6c2106",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9b6715c9-6c2d-4446-a0ba-f402ce1fa370"
+  },
+  {
+   "id": "9b67946f-3053-440b-9f05-ac07a1fb236b",
+   "name": "Hôi Xuân (E)",
+   "hash": "a3391d1cb07af03242a1b9e1f24402400f6c2970",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9b67946f-3053-440b-9f05-ac07a1fb236b"
+  },
+  {
+   "id": "9c3b2401-66f9-4d0c-a86f-8101faa0fc40",
+   "name": "Thât Khê (W)",
+   "hash": "460709d3764e02789aa4c7ce6d8e2d737622a9ae",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9c3b2401-66f9-4d0c-a86f-8101faa0fc40"
+  },
+  {
+   "id": "9d1d3a7d-0d52-4120-9e37-e375ade1581f",
+   "name": "Dinh-Lâp (E)",
+   "hash": "2121200ffcc82c0260a8de75f7306b8d53be4648",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9d1d3a7d-0d52-4120-9e37-e375ade1581f"
+  },
+  {
+   "id": "9e32a541-d9e6-4515-ab83-2976881acd06",
+   "name": "Trang Bang (E)",
+   "hash": "53543acfa79289670f6d5124f3401bb2ad9c30de",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9e32a541-d9e6-4515-ab83-2976881acd06"
+  },
+  {
+   "id": "9f0506bd-e3b6-4f1e-83c8-93015b6db101",
+   "name": "Haut-Donnaï (W)",
+   "hash": "b39256aecf23cfdc63377450170986851819427d",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9f0506bd-e3b6-4f1e-83c8-93015b6db101"
+  },
+  {
+   "id": "9f4f3b60-0538-4605-a126-ec9dfe94a5b6",
+   "name": "Bassac (W)",
+   "hash": "7827faf40d2b0dfd7a73ecd43d216d4b27addecb",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9f4f3b60-0538-4605-a126-ec9dfe94a5b6"
+  },
+  {
+   "id": "9fc52532-7c6f-4367-bb74-b520e08f45bd",
+   "name": "Srépok (E)",
+   "hash": "101db00fbab8b3c6f5bdcd1e2b8881a8bf57023b",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/9fc52532-7c6f-4367-bb74-b520e08f45bd"
+  },
+  {
+   "id": "a14c47f9-37a0-4118-955a-b5adea93cb4e",
+   "name": "Pak Hin Boun (W)",
+   "hash": "0218c18ef71cab90287b479bfc243673e93be485",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a14c47f9-37a0-4118-955a-b5adea93cb4e"
+  },
+  {
+   "id": "a2115438-ffb3-4251-9bf7-5e71ff8a14bd",
+   "name": "Ron (W)",
+   "hash": "0ebfb950751eaabbf8c394364f5650b1f3f13af9",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a2115438-ffb3-4251-9bf7-5e71ff8a14bd"
+  },
+  {
+   "id": "a387ff3f-05c4-4d46-8470-079323555c40",
+   "name": "Lai Châu (E)",
+   "hash": "30600549a2fa729c8e669a00763ec8984b5c0816",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a387ff3f-05c4-4d46-8470-079323555c40"
+  },
+  {
+   "id": "a38bfb69-ab45-455b-abe8-9368598edf0e",
+   "name": "Lôc Ninh (W)",
+   "hash": "e1c6311116031c2ce6b0c8ba8ba6fb7ba0c53210",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a38bfb69-ab45-455b-abe8-9368598edf0e"
+  },
+  {
+   "id": "a4851907-0882-4ab2-9e72-6009ac35f1be",
+   "name": "Dalat (W)",
+   "hash": "fe488e362a302bcab7a7f3dfed548ea0e7f5af0e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a4851907-0882-4ab2-9e72-6009ac35f1be"
+  },
+  {
+   "id": "a6664e2e-d9ae-4061-b290-a2685a1dea45",
+   "name": "Tang Phloch (E)",
+   "hash": "f9b22b2b777be4bd9aca2b93d4664a7788ad9df7",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a6664e2e-d9ae-4061-b290-a2685a1dea45"
+  },
+  {
+   "id": "a7902329-39c0-4ce2-939b-fda7dd57f9b8",
+   "name": "Ban Don (E)",
+   "hash": "675bd8661de3ea687d6d32b136c143d566388007",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a7902329-39c0-4ce2-939b-fda7dd57f9b8"
+  },
+  {
+   "id": "a7f065d8-3c46-447c-a7fd-23e9455db6b4",
+   "name": "Pho Bình Gia (E)",
+   "hash": "a4f6934d1871d92b89322e8fa973a444066ca5a3",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a7f065d8-3c46-447c-a7fd-23e9455db6b4"
+  },
+  {
+   "id": "a8039626-c205-4a4d-a136-87acb33c2fc8",
+   "name": "Than-Poun (E)",
+   "hash": "491da38748a952f342da11d54c55310611d2a5da",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/a8039626-c205-4a4d-a136-87acb33c2fc8"
+  },
+  {
+   "id": "aa3c4bcb-9070-40dc-8ce0-9bd098429f28",
+   "name": "Beng Lovéa (E)",
+   "hash": "2947e15148ea52d505c096f18c7fd729b2abf03f",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/aa3c4bcb-9070-40dc-8ce0-9bd098429f28"
+  },
+  {
+   "id": "ab1d3f59-f24f-4462-a398-24f53e7a0e66",
+   "name": "Muong Vène (E)",
+   "hash": "f2ee8797eb21e1f54f1005e32a1618a1ed71c486",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ab1d3f59-f24f-4462-a398-24f53e7a0e66"
+  },
+  {
+   "id": "ab592683-7ea2-43e7-bf78-bbcbc8dc1045",
+   "name": "Luc-An-Chau (W)",
+   "hash": "1abd5196fcc802729edf391460fd5baf05eaf72e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ab592683-7ea2-43e7-bf78-bbcbc8dc1045"
+  },
+  {
+   "id": "ab99db79-58e1-4535-928e-49fe6c7723e8",
+   "name": "Lai Châu (W)",
+   "hash": "ebb6003fd8692aa24ad71f63d9974376a7cf43a3",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ab99db79-58e1-4535-928e-49fe6c7723e8"
+  },
+  {
+   "id": "ad354af4-724c-4ddf-86a0-3357c4c6a635",
+   "name": "Dinh-Lâp (W)",
+   "hash": "e6eea9116025e7ece7120fca7ad55b3db0bd5f4e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ad354af4-724c-4ddf-86a0-3357c4c6a635"
+  },
+  {
+   "id": "ae3c2983-9710-416b-82e6-7448c1414c78",
+   "name": "Diên Biên Phu (W)",
+   "hash": "53f88d9e5330371658231f0f57451438f992984e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ae3c2983-9710-416b-82e6-7448c1414c78"
+  },
+  {
+   "id": "ae657f84-69bf-497a-8fac-0ecb0e95cea5",
+   "name": "Blao (E)",
+   "hash": "48772ec2d8306ae6703a028eef703cb0b4b9d5db",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ae657f84-69bf-497a-8fac-0ecb0e95cea5"
+  },
+  {
+   "id": "af1c3c1f-23e3-42ed-b1e7-817294de015e",
+   "name": "Ha Tinh (E)",
+   "hash": "93e0a1bca6a51e32ced52c86b92b2e17cb82ffbe",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/af1c3c1f-23e3-42ed-b1e7-817294de015e"
+  },
+  {
+   "id": "b0cc3cba-df54-42d8-80f0-5d9be95560ef",
+   "name": "Ban Ko Kieng (E)",
+   "hash": "9c171f96a959a79dd49319ccaaa083345518f936",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b0cc3cba-df54-42d8-80f0-5d9be95560ef"
+  },
+  {
+   "id": "b12f0296-9d70-4ec2-83fd-90fb57fba38a",
+   "name": "Krau Chmar (E)",
+   "hash": "9690fa4533ae683fbdb6038b68fb84909abc0b66",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b12f0296-9d70-4ec2-83fd-90fb57fba38a"
+  },
+  {
+   "id": "b2ced5b1-57e4-4406-93ff-9f2d44d25f9f",
+   "name": "Mimot (W)",
+   "hash": "71e439a7555b78a1ae0e9a5d6427c22d17a683d6",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b2ced5b1-57e4-4406-93ff-9f2d44d25f9f"
+  },
+  {
+   "id": "b32de2dc-e2ec-4ca4-8769-24c111fb8b9c",
+   "name": "Phnom Leach (E)",
+   "hash": "d45bdd17627b183242498dfd23b5f9625e6bc1e5",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b32de2dc-e2ec-4ca4-8769-24c111fb8b9c"
+  },
+  {
+   "id": "b3b427b3-26d3-4646-9159-f6d09f6a54b1",
+   "name": "Mu Gia (W)",
+   "hash": "fa327f3c7602eaaf510cdeb59f338335cea2b530",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b3b427b3-26d3-4646-9159-f6d09f6a54b1"
+  },
+  {
+   "id": "b3d24e3f-eeb0-47dc-9d81-3456c27794ba",
+   "name": "Cua Rao E (E)",
+   "hash": "6664c05cf93377b6d4128f903e444c0f13e7f96a",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b3d24e3f-eeb0-47dc-9d81-3456c27794ba"
+  },
+  {
+   "id": "b4943ce2-14f7-40f4-a375-f9f0f5b4da5a",
+   "name": "Dong-Van (W)",
+   "hash": "431d84c7886707d759307a40cfbcb466d3f9706a",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b4943ce2-14f7-40f4-a375-f9f0f5b4da5a"
+  },
+  {
+   "id": "b4c0df32-632c-48d6-ba19-42e4f49aa409",
+   "name": "Pho Bình Gia (W)",
+   "hash": "bf9ac2b837c68465236e63c48488d41e194658e6",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b4c0df32-632c-48d6-ba19-42e4f49aa409"
+  },
+  {
+   "id": "b5bdbead-dd62-4a7c-b935-9e237211fcc6",
+   "name": "Hué (E)",
+   "hash": "b7f79e437ef7c4108828e3731080785a6cddd0cf",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b5bdbead-dd62-4a7c-b935-9e237211fcc6"
+  },
+  {
+   "id": "b6db55fe-1f0d-444e-b06f-ebb883e56286",
+   "name": "Hà Giang (E)",
+   "hash": "a40a3c541f5a63e7925563afd5e55cfa102aec42",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b6db55fe-1f0d-444e-b06f-ebb883e56286"
+  },
+  {
+   "id": "b7195d8d-37e0-43ed-bbf0-bbae860080d5",
+   "name": "Prek Preas (W)",
+   "hash": "0d9d6d8997cb24f3bc4f83098a6fa05ffa4fe193",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b7195d8d-37e0-43ed-bbf0-bbae860080d5"
+  },
+  {
+   "id": "b88f996a-4c14-4a61-b753-71a8b1a341b6",
+   "name": "Muong Het (E)",
+   "hash": "f9f753c48add01ddb6aba11c66e9c67c5e0c5127",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b88f996a-4c14-4a61-b753-71a8b1a341b6"
+  },
+  {
+   "id": "b90ff4e3-f256-43f0-9316-52163827f955",
+   "name": "Luân Châu (E)",
+   "hash": "bad8e502f1c7df4ebb698f4f688dabc9427e345e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b90ff4e3-f256-43f0-9316-52163827f955"
+  },
+  {
+   "id": "b99455b8-0b70-4dee-9457-071f7cf6e73d",
+   "name": "Lao-Bao (E)",
+   "hash": "a932b37abfa9aab39851c022f6086d925093fa92",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/b99455b8-0b70-4dee-9457-071f7cf6e73d"
+  },
+  {
+   "id": "ba3f38a6-78ed-49d6-a656-8390961cab3b",
+   "name": "Qui Nhon (E)",
+   "hash": "cd30d9f5ad68e230fc091af6030f275e041e48fb",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ba3f38a6-78ed-49d6-a656-8390961cab3b"
+  },
+  {
+   "id": "ba67ffe5-1eb4-45fa-b7df-bea82197d78a",
+   "name": "Hanoi (W)",
+   "hash": "fe6794f72c156e8fb519d7bd6faac11a61179299",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ba67ffe5-1eb4-45fa-b7df-bea82197d78a"
+  },
+  {
+   "id": "bb385758-17f8-41bf-b5a9-1ca706a1966b",
+   "name": "Ban-Poung (E)",
+   "hash": "5b95687ac58afeb6d57541067f6edb963e09bdd4",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bb385758-17f8-41bf-b5a9-1ca706a1966b"
+  },
+  {
+   "id": "bcb3c495-d935-4ba7-b505-7ba8fbdd2fd4",
+   "name": "Poste Deshayes (E)",
+   "hash": "e22f4d7f327d081754021961d1f3c3cf266b4fc2",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bcb3c495-d935-4ba7-b505-7ba8fbdd2fd4"
+  },
+  {
+   "id": "bccf5524-8214-4088-8453-2395a08927a4",
+   "name": "Thât Khê (E)",
+   "hash": "278dececfb5784605ccf5cb7692ceef577d8f3fa",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bccf5524-8214-4088-8453-2395a08927a4"
+  },
+  {
+   "id": "bce71023-a522-4b30-91ea-d01602e1c50d",
+   "name": "Dak Sut (E)",
+   "hash": "c2197016e55277436de16aa45ef5b7c8ea773b58",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bce71023-a522-4b30-91ea-d01602e1c50d"
+  },
+  {
+   "id": "bcf2da50-f093-41aa-b1bf-a3c9e53d8b4e",
+   "name": "Muong Khoua (W)",
+   "hash": "452b07bbafc15163c3b6cbb1bcd2c6db824d9227",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bcf2da50-f093-41aa-b1bf-a3c9e53d8b4e"
+  },
+  {
+   "id": "bd52c73f-56ac-4115-a562-cbe7ec3544be",
+   "name": "Muong Son (E)",
+   "hash": "53115f5fb1c47bf85d89b9deb67eaf5ff71aed14",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bd52c73f-56ac-4115-a562-cbe7ec3544be"
+  },
+  {
+   "id": "be1b968e-262c-412b-93c7-098c4f8d0555",
+   "name": "Hué (W)",
+   "hash": "4066bd2778b45d067cfe7e35be692b930920ae3b",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/be1b968e-262c-412b-93c7-098c4f8d0555"
+  },
+  {
+   "id": "bee1af1a-b48f-4db1-9243-59772c86f86e",
+   "name": "Moung (E)",
+   "hash": "e5523e97ccd7fbbebae6d369827bbd846842662c",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bee1af1a-b48f-4db1-9243-59772c86f86e"
+  },
+  {
+   "id": "bf9b52c4-b626-4171-87c0-c1e538fdccbe",
+   "name": "Sisophon (E)",
+   "hash": "e23c757d6ff8689a2a10ea4c24e253dca955956a",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/bf9b52c4-b626-4171-87c0-c1e538fdccbe"
+  },
+  {
+   "id": "c18b8494-09c5-43e6-bd9b-18f40696b32e",
+   "name": "Muong Soui (E)",
+   "hash": "a81876838fa878ab44c1d9686ddb0abea91719ac",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c18b8494-09c5-43e6-bd9b-18f40696b32e"
+  },
+  {
+   "id": "c19c68a6-5ce8-4b74-86ec-9272f0c98a21",
+   "name": "Phan Rang (E)",
+   "hash": "7b42480a00f54fcbda8ebbfacbde6f6d798dec1e",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c19c68a6-5ce8-4b74-86ec-9272f0c98a21"
+  },
+  {
+   "id": "c2e4834c-c81d-4666-a264-42587589851a",
+   "name": "Paksane (E)",
+   "hash": "b358343881dd32d170c2fbf32791b9f56e32b663",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c2e4834c-c81d-4666-a264-42587589851a"
+  },
+  {
+   "id": "c2e76617-25b2-46c9-ad2c-6944de3bfee9",
+   "name": "Djiring (W)",
+   "hash": "c1efcef5e7211c8bb25cff8af7a0a9b31951c0ee",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c2e76617-25b2-46c9-ad2c-6944de3bfee9"
+  },
+  {
+   "id": "c46c6f64-8a24-4d88-a68c-ca8cb3ec2009",
+   "name": "Haute Sé Kong (E)",
+   "hash": "32d228c7e6fb3d41001613971f2dfbb7d81584d6",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c46c6f64-8a24-4d88-a68c-ca8cb3ec2009"
+  },
+  {
+   "id": "c4963daf-5b8a-4448-a1d2-8fbebfafcbed",
+   "name": "Luân Châu",
+   "hash": "4a04d612ef363150dc54d41959ff55ec920959b5",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c4963daf-5b8a-4448-a1d2-8fbebfafcbed"
+  },
+  {
+   "id": "c4a278c5-dc5d-4375-879b-2a7bc95f68ad",
+   "name": "Phnom Penh (E)",
+   "hash": "bf0b7545c22772aa422687da9473183ab4eac0c9",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c4a278c5-dc5d-4375-879b-2a7bc95f68ad"
+  },
+  {
+   "id": "c4a6bf0a-278d-4125-9e2e-6e7a155b7e9e",
+   "name": "Cam Pha (W)",
+   "hash": "1ddb1ebc900594973287747e75d13c012d8f1b56",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c4a6bf0a-278d-4125-9e2e-6e7a155b7e9e"
+  },
+  {
+   "id": "c6e8df0d-5d66-4675-a9a0-c89c00ea87b2",
+   "name": "Thanh-Ba (W)",
+   "hash": "843234696e3d1e6dc6108f55e13aa8c3778f7aa4",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c6e8df0d-5d66-4675-a9a0-c89c00ea87b2"
+  },
+  {
+   "id": "c7b7949d-de54-4341-8616-a256dddd5771",
+   "name": "Khang Khai (E)",
+   "hash": "dd7fb17b5ba469c2d4e26e6cb8f73d7388430edd",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c7b7949d-de54-4341-8616-a256dddd5771"
+  },
+  {
+   "id": "c8846603-1059-4d7f-be78-75708191e447",
+   "name": "Tô Bông",
+   "hash": "3c0393003fd2c10a8e6b0745f9f407cd4e78f38d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/c8846603-1059-4d7f-be78-75708191e447"
+  },
+  {
+   "id": "cba8286c-239d-44cb-85f7-a2cbc24abb61",
+   "name": "Muong Phalane (W)",
+   "hash": "cde026f8ae15a89cea1250092c1d8bafa4a17416",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/cba8286c-239d-44cb-85f7-a2cbc24abb61"
+  },
+  {
+   "id": "cbc3475a-6518-49a6-a930-867fdacc6ca0",
+   "name": "Bong Son (E)",
+   "hash": "b271f18f88b4fbdd59a66dd9b25033b8bbf530ae",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/cbc3475a-6518-49a6-a930-867fdacc6ca0"
+  },
+  {
+   "id": "cd6025f9-4e9b-46ab-8554-94053bcb6e97",
+   "name": "Haute-Sé Kong (W)",
+   "hash": "4d35493e8703004581765b4b961221593f506c6d",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/cd6025f9-4e9b-46ab-8554-94053bcb6e97"
+  },
+  {
+   "id": "cdd7b58e-a6b5-421e-be3e-f8e3a2ad4916",
+   "name": "Trapeang Kraleng (E)",
+   "hash": "df4d40776a7289940a2bdeded54ef82e8174d5ae",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/cdd7b58e-a6b5-421e-be3e-f8e3a2ad4916"
+  },
+  {
+   "id": "cf74a1ab-79c2-4c98-9007-20225ffa35f9",
+   "name": "Pak Hin Boun (E)",
+   "hash": "da305aab862361f9a31ac5ee0f5709e80392064b",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/cf74a1ab-79c2-4c98-9007-20225ffa35f9"
+  },
+  {
+   "id": "d09fc5ba-d87e-4504-bb1d-e16c133cf4f7",
+   "name": "Bac-Ninh (E)",
+   "hash": "dbf8375d8aff9aee9bf68a315e01fe93cc5ba600",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d09fc5ba-d87e-4504-bb1d-e16c133cf4f7"
+  },
+  {
+   "id": "d1db5882-a158-43d8-8ae8-420b57f13919",
+   "name": "Blao (W)",
+   "hash": "2011525f8a61670342a2312bb5641644bd22f9b3",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d1db5882-a158-43d8-8ae8-420b57f13919"
+  },
+  {
+   "id": "d381f1c3-5d92-4b25-8e36-0106480d525e",
+   "name": "Tourane (W)",
+   "hash": "fae353a44e93b57c7ee6618c0aacccdcf016e779",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d381f1c3-5d92-4b25-8e36-0106480d525e"
+  },
+  {
+   "id": "d4d4bb88-f2ac-42c8-856a-c048c781b1b6",
+   "name": "Phnom Leach (W)",
+   "hash": "e6d33c0380f93033a0c6bd98d7511d7d83929dc2",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d4d4bb88-f2ac-42c8-856a-c048c781b1b6"
+  },
+  {
+   "id": "d5139795-2c78-4159-a376-0ef11f1c0f46",
+   "name": "Trapéang Chong (E)",
+   "hash": "d1228e2c472bf9c3c6fbe36cec25d0f2d2cefa52",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d5139795-2c78-4159-a376-0ef11f1c0f46"
+  },
+  {
+   "id": "d53fd730-3d18-413d-b711-c1a21bb74e32",
+   "name": "Chamnop (E)",
+   "hash": "b035721260e41d2f5c9e48678624ac30a851f6ed",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d53fd730-3d18-413d-b711-c1a21bb74e32"
+  },
+  {
+   "id": "d5482d05-911f-46dd-b02d-c0f85dae5abd",
+   "name": "Ban Tur (W)",
+   "hash": "d3e0786ea120830aa0a318b8124a88b92b23f38e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d5482d05-911f-46dd-b02d-c0f85dae5abd"
+  },
+  {
+   "id": "d6a87608-2a5a-4fe5-a6b2-f67ecfc66bf9",
+   "name": "Russey Chrum (W)",
+   "hash": "fed7b49d6d3ed5ed8708181977270deaef1c12e1",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d6a87608-2a5a-4fe5-a6b2-f67ecfc66bf9"
+  },
+  {
+   "id": "d7561735-d521-4aa7-ba74-de5b3e992789",
+   "name": "Bac-Kan (E)",
+   "hash": "233617b7293b990669b12edfb38b70b9a237e027",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d7561735-d521-4aa7-ba74-de5b3e992789"
+  },
+  {
+   "id": "d7a35019-ec33-4418-8733-334ee1e4d313",
+   "name": "Ninh Binh (E)",
+   "hash": "8fd82e5a643d76641c02256bf0ea175a9b3c5e67",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d7a35019-ec33-4418-8733-334ee1e4d313"
+  },
+  {
+   "id": "d8d61cd1-216a-4d0c-a3d2-7461eca8741e",
+   "name": "Nam Dinh (E)",
+   "hash": "f308a7bb796e00e38dcaba81fa873bf7decc43d0",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d8d61cd1-216a-4d0c-a3d2-7461eca8741e"
+  },
+  {
+   "id": "d968da88-9c90-46bb-8376-b410f1bfc9fd",
+   "name": "Cheo Reo (W)",
+   "hash": "baf6a61ba9468f9963accdcc4858609a8508d1ae",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/d968da88-9c90-46bb-8376-b410f1bfc9fd"
+  },
+  {
+   "id": "da274467-2985-43b4-a0ae-dc6f2b64ef4a",
+   "name": "Qui Nhon (W)",
+   "hash": "5fd53041b9b87468ad55f7e4e6be2ffa0bef440d",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/da274467-2985-43b4-a0ae-dc6f2b64ef4a"
+  },
+  {
+   "id": "db0171f6-564e-4d7c-94a6-cde0f8b4198f",
+   "name": "Ban-Calan (E)",
+   "hash": "a3576339ea83e2690a57bc1798a3291c56119538",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/db0171f6-564e-4d7c-94a6-cde0f8b4198f"
+  },
+  {
+   "id": "dcc604ec-7a19-4b8f-b850-88e2dd360c6b",
+   "name": "Borikhane (W)",
+   "hash": "e8f81e8fd495ec3ea63f252b1585b3e9e87c16a2",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dcc604ec-7a19-4b8f-b850-88e2dd360c6b"
+  },
+  {
+   "id": "dcfb2452-b976-4092-bddb-8c9e04300db3",
+   "name": "Tu Lê (E)",
+   "hash": "6f32b52aa0cbf8a422360a8294cc3cccdac957d1",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dcfb2452-b976-4092-bddb-8c9e04300db3"
+  },
+  {
+   "id": "dd3e54c5-a7af-46fe-8e51-9bd79be31b98",
+   "name": "Phsar Oudong (E)",
+   "hash": "f407e1815d019e88e02928f1bea83d7d4c07ec56",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dd3e54c5-a7af-46fe-8e51-9bd79be31b98"
+  },
+  {
+   "id": "dd424aed-fd34-4882-a2b7-6953ec6d82d9",
+   "name": "Ban-Calan (W)",
+   "hash": "5a256a75f654dab2c60d431db7dcf16e7cfc89ac",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dd424aed-fd34-4882-a2b7-6953ec6d82d9"
+  },
+  {
+   "id": "dd513b9b-d4de-439e-9a49-694827a647f6",
+   "name": "Bao-Lac (W)",
+   "hash": "dcf2b20d0d2d6cac036da2871deb086f5519cd9e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dd513b9b-d4de-439e-9a49-694827a647f6"
+  },
+  {
+   "id": "df533792-d419-4d30-bb4a-3db7f2778992",
+   "name": "Kon Plong (W)",
+   "hash": "00166f331ea929802e517fbba8e3c07c304440cc",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/df533792-d419-4d30-bb4a-3db7f2778992"
+  },
+  {
+   "id": "dfe53d27-d8d1-4410-b107-941e5fa19061",
+   "name": "Hai Phong (W)",
+   "hash": "0b803b6ac18fb5f2e910ecab523794a42918bd32",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/dfe53d27-d8d1-4410-b107-941e5fa19061"
+  },
+  {
+   "id": "e0555f42-2f14-4075-b0d5-b0e68ce81a1e",
+   "name": "Saigon (E)",
+   "hash": "c87d51a299271015ba0b61e6fbd4c8ff48a32f6c",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e0555f42-2f14-4075-b0d5-b0e68ce81a1e"
+  },
+  {
+   "id": "e0aee830-25aa-4530-bf11-a8b8528f9b02",
+   "name": "Kompong Trabeck (W)",
+   "hash": "b7ec1a8c950c1371fe90dc46c95c12e191b708ba",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e0aee830-25aa-4530-bf11-a8b8528f9b02"
+  },
+  {
+   "id": "e13bcdfc-b852-4349-8119-f988ff6e44ec",
+   "name": "Phnom Deck (E)",
+   "hash": "6f4a5bb55d1aeffa03ae0ee09b6b2307dd0a0208",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e13bcdfc-b852-4349-8119-f988ff6e44ec"
+  },
+  {
+   "id": "e19c409d-e2bb-469e-8c6c-ed7c8d3fcf3f",
+   "name": "Dô-Son (W)",
+   "hash": "6a11edb5125ddfafa88523ef826fd97c11f3a7eb",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e19c409d-e2bb-469e-8c6c-ed7c8d3fcf3f"
+  },
+  {
+   "id": "e19e7743-f209-4947-a2d1-d40c3a11948d",
+   "name": "Muong Song Khone (W)",
+   "hash": "f286a3656413c3eb2f54e2fb4c442a226e3c14eb",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e19e7743-f209-4947-a2d1-d40c3a11948d"
+  },
+  {
+   "id": "e43f0089-a1bf-4fc1-a8db-1defaeb24e9a",
+   "name": "Mimot (E)",
+   "hash": "74b128b494b5c596e0fd176d2d57e945e570cf88",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e43f0089-a1bf-4fc1-a8db-1defaeb24e9a"
+  },
+  {
+   "id": "e4bde047-eb08-4db5-a7b2-c91464f63073",
+   "name": "Attopeu (E)",
+   "hash": "48a23d69f074586d80941b0a3c83f3adee472b76",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e4bde047-eb08-4db5-a7b2-c91464f63073"
+  },
+  {
+   "id": "e6ee3683-83a9-4497-b95e-7b38a0dc5c12",
+   "name": "Muong Phine (W)",
+   "hash": "eea437ae448e5e49d6823b3959253313d9d0afac",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e6ee3683-83a9-4497-b95e-7b38a0dc5c12"
+  },
+  {
+   "id": "e7c9b604-d451-484b-af6d-10cbc3a95f9c",
+   "name": "Viêt Trì (W)",
+   "hash": "1d29b8a8ba2b89b95b6be37c081d42cd18bcfbbf",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e7c9b604-d451-484b-af6d-10cbc3a95f9c"
+  },
+  {
+   "id": "e7cc411f-63a5-46c8-81da-719ec613014b",
+   "name": "Muong Ou Tay (E)",
+   "hash": "60c9b61bf28a3c3e8fe39365a377a72c2c10d267",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e7cc411f-63a5-46c8-81da-719ec613014b"
+  },
+  {
+   "id": "e89efc64-76cd-4eff-84c3-d92b12819c60",
+   "name": "Muong May (E)",
+   "hash": "5e3c4b364ace502a205b736b7c1751c5fd152329",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e89efc64-76cd-4eff-84c3-d92b12819c60"
+  },
+  {
+   "id": "e8b02c15-5e15-4bc5-bf99-b5d4e2c008e2",
+   "name": "Nha Trang (E)",
+   "hash": "b6d3ce789687547c82e8965cac45f1799572b82e",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/e8b02c15-5e15-4bc5-bf99-b5d4e2c008e2"
+  },
+  {
+   "id": "ea1c8a7d-775c-49bc-9896-5040f07ac4c6",
+   "name": "Paksane (W)",
+   "hash": "c5ab8059195efb82f0ba1258d889e4fb4da33c2e",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ea1c8a7d-775c-49bc-9896-5040f07ac4c6"
+  },
+  {
+   "id": "ec38e660-4e32-4a88-abc8-aaf4d591b34f",
+   "name": "Khê Kiên (W)",
+   "hash": "6da7d1bba4f2c5b56b01d49a599b7144db3bc9ef",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ec38e660-4e32-4a88-abc8-aaf4d591b34f"
+  },
+  {
+   "id": "edb34855-cc39-4b9b-83cd-113f5aafb505",
+   "name": "Vientiane Ban Keun (E)",
+   "hash": "3a89f773784481ec86b5384b95589dac7382b422",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/edb34855-cc39-4b9b-83cd-113f5aafb505"
+  },
+  {
+   "id": "edd8be90-fa2d-422f-aa46-cbc1f6c657ac",
+   "name": "Phan Thiet (E)",
+   "hash": "9333495c802fa99e4b55677ea51912752c7fb9e8",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/edd8be90-fa2d-422f-aa46-cbc1f6c657ac"
+  },
+  {
+   "id": "ef0c22d1-720b-4f0e-9f42-814b700131c3",
+   "name": "Mahaxay (E)",
+   "hash": "592c75165b7568e4858c0093fa73721c7a6862b3",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ef0c22d1-720b-4f0e-9f42-814b700131c3"
+  },
+  {
+   "id": "ef26c8fc-32b2-49ab-b1ed-ddbf8e7378dc",
+   "name": "Phong Thô (E)",
+   "hash": "8c3809deac17388f36e94ffb1a69243ab09db670",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ef26c8fc-32b2-49ab-b1ed-ddbf8e7378dc"
+  },
+  {
+   "id": "efee6216-8b35-4068-9d60-3a822ce1c649",
+   "name": "Ya Li (E)",
+   "hash": "61260801e8f860b2aa4ce41205b4d3ef42105d33",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/efee6216-8b35-4068-9d60-3a822ce1c649"
+  },
+  {
+   "id": "f0c155b7-7fb0-46c9-8224-70260a45e494",
+   "name": "Son Tây (E)",
+   "hash": "1519b34f622333878fefee6a5ee0c3cd2129d72a",
+   "detector_version": null,
+   "calibration": true,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f0c155b7-7fb0-46c9-8224-70260a45e494"
+  },
+  {
+   "id": "f1730eb8-f52f-483d-a00c-dc1d9e29e648",
+   "name": "Bong Son (W)",
+   "hash": "85f68d17fef809ecec2270a4a4cda1bf3f63ebdf",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f1730eb8-f52f-483d-a00c-dc1d9e29e648"
+  },
+  {
+   "id": "f19d7c4c-c0f5-4974-999a-78a1769ab739",
+   "name": "Ream (W)",
+   "hash": "d6351b263f43b090a1863e12e2ccd859e532b904",
+   "detector_version": 3,
+   "calibration": true,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f19d7c4c-c0f5-4974-999a-78a1769ab739"
+  },
+  {
+   "id": "f3406ea3-521d-4bb9-a252-d2b2d18b2315",
+   "name": "Van Gia (W)",
+   "hash": "110797c278d619af18a65650117c74564532d152",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f3406ea3-521d-4bb9-a252-d2b2d18b2315"
+  },
+  {
+   "id": "f352f638-c8e5-4480-ba1b-2bf81043b1d5",
+   "name": "Ha Tinh (W)",
+   "hash": "48225f3661bff1577008fad95974d18cbe6c8824",
+   "detector_version": null,
+   "calibration": true,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f352f638-c8e5-4480-ba1b-2bf81043b1d5"
+  },
+  {
+   "id": "f4201ba5-30de-46e8-8ae6-b109b9dc6f41",
+   "name": "Kompong Thom (W)",
+   "hash": "e999881cd4bedcaff8c808e3627ffa7dfd6194cc",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f4201ba5-30de-46e8-8ae6-b109b9dc6f41"
+  },
+  {
+   "id": "f5f8e3ca-c814-4385-a0db-56fec17db2b0",
+   "name": "Cheo Reo (E)",
+   "hash": "57273f8f8ae7c1c02fd07ba6625d6d6987d4f9fd",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f5f8e3ca-c814-4385-a0db-56fec17db2b0"
+  },
+  {
+   "id": "f615ed7e-c125-4768-9820-9ec44dccddec",
+   "name": "Ban Tur (E)",
+   "hash": "8ef62c364f40680b30f543a987a11b2ae532b388",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f615ed7e-c125-4768-9820-9ec44dccddec"
+  },
+  {
+   "id": "f69076ab-fb15-4497-a411-d60d6cbb6b05",
+   "name": "Són-La (E)",
+   "hash": "8a2b0738ed07b9a63ae6be6f229d6b705a1280d3",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f69076ab-fb15-4497-a411-d60d6cbb6b05"
+  },
+  {
+   "id": "f7aeeae2-162a-4f1f-96f7-ba6a62b82d44",
+   "name": "Son Tây (W)",
+   "hash": "b661123a01a9e14ce3312bea8ef9f3878e5f201a",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f7aeeae2-162a-4f1f-96f7-ba6a62b82d44"
+  },
+  {
+   "id": "f819c248-7cf7-4fb8-9c70-eecce06b1e2e",
+   "name": "Hanoi (E)",
+   "hash": "cf7d2c2ae0c596ba08f04759201b7b65ea15b845",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f819c248-7cf7-4fb8-9c70-eecce06b1e2e"
+  },
+  {
+   "id": "f889bb60-3c3c-4b0e-b14b-69754e1afa15",
+   "name": "An Khê (E)",
+   "hash": "e119606b5746af85a201e605282f28e4aaecbd96",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f889bb60-3c3c-4b0e-b14b-69754e1afa15"
+  },
+  {
+   "id": "f8c55f03-0aa0-47ef-8c68-badf98156649",
+   "name": "Chong Kal (W)",
+   "hash": "a46ef2e67cfd9d794a0680394f436c65cd34b365",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f8c55f03-0aa0-47ef-8c68-badf98156649"
+  },
+  {
+   "id": "f96d1436-5762-4120-8c52-c41234dc3ddc",
+   "name": "Chamnop (W)",
+   "hash": "595b47c464e402db1bab2d23a4254ce2eebdbe06",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f96d1436-5762-4120-8c52-c41234dc3ddc"
+  },
+  {
+   "id": "f9dd1cd4-018d-4b59-acfa-7d5536ceb55c",
+   "name": "Ban Ko Kieng (W)",
+   "hash": "d4ebdf09714e0b02221c9a5c490c0ddae6265224",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f9dd1cd4-018d-4b59-acfa-7d5536ceb55c"
+  },
+  {
+   "id": "f9fc556b-8311-4e0a-8f72-fd5801b13ef1",
+   "name": "Quan-Ba (E)",
+   "hash": "629c524a7e01e39a6d44314381f72e67558f8b15",
+   "detector_version": 39,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/f9fc556b-8311-4e0a-8f72-fd5801b13ef1"
+  },
+  {
+   "id": "fa43ed0f-d887-4564-a23e-9550cd87d25b",
+   "name": "Phong Thô (W)",
+   "hash": "d771f570eaee272fcf5c2cb28d8d5973906f83a7",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": true,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fa43ed0f-d887-4564-a23e-9550cd87d25b"
+  },
+  {
+   "id": "facf1520-9fbd-481c-914a-a7f55428972c",
+   "name": "Borikhane (E)",
+   "hash": "cae7ec263c7a15310bc9c768c24e88486803e154",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/facf1520-9fbd-481c-914a-a7f55428972c"
+  },
+  {
+   "id": "fadb82f8-32f1-4c82-93d2-2cffac7a3168",
+   "name": "Mon-Cay (W)",
+   "hash": "64de0043c0e643a2818301f10be4acb3f3789e80",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fadb82f8-32f1-4c82-93d2-2cffac7a3168"
+  },
+  {
+   "id": "fbb1f2cc-31e8-4d10-926a-d5de49d105ad",
+   "name": "Quang Tri (E)",
+   "hash": "976fb19d37c42327eb4fa350dab0e3a9a72a3fd7",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fbb1f2cc-31e8-4d10-926a-d5de49d105ad"
+  },
+  {
+   "id": "fbe9e63d-1b00-44b4-b88f-50f67a3c5871",
+   "name": "Pa-Kha (W)",
+   "hash": "46eeecde2aa66d02bd8f14a5ae5b416c87fab050",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fbe9e63d-1b00-44b4-b88f-50f67a3c5871"
+  },
+  {
+   "id": "fcc45374-c84d-4901-89c8-bd7cc938791d",
+   "name": "Djiring (E)",
+   "hash": "59b5168e5f46f27002e664d24f5d6725ed84ada8",
+   "detector_version": 31,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fcc45374-c84d-4901-89c8-bd7cc938791d"
+  },
+  {
+   "id": "fdbf4d00-3080-47b9-ad55-e7ab7f8cadc9",
+   "name": "Siem Réap (E)",
+   "hash": "a607ddfb90f312905d2f7be6fb319fa1e9cedc3e",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/fdbf4d00-3080-47b9-ad55-e7ab7f8cadc9"
+  },
+  {
+   "id": "ff489df1-78c9-40cd-a0b9-bbb5ac956310",
+   "name": "Lang Son (W)",
+   "hash": "51ea6a17c13e6eb94f13ef2b3d4f1e9eac08e08a",
+   "detector_version": 3,
+   "calibration": false,
+   "printed_quad": false,
+   "iiif_base": "https://iiif.maparchive.vn/iiif/ff489df1-78c9-40cd-a0b9-bbb5ac956310"
+  }
+ ]
+}
