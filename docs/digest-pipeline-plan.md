@@ -71,6 +71,9 @@ count, is the accuracy number.
 
 Phase 4 starts only if the Phase 2 numbers justify it.
 
+**Priority (`docs/NOW.md`, 2026-10-12):** the Phase 2 sittings and the Phase 3 audit come first,
+because they produce the measured results. G1 and Phase 4 are product work and wait for them.
+
 ## The ingest decision
 
 The approved Gallica maps arrive with only a small preview picture, so the automatic layout and OCR

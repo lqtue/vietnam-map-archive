@@ -18,6 +18,10 @@ comment. The map from the old codes to these names is at the bottom of this file
 
 ## Do next
 
+**Priority is set in `docs/NOW.md` (2026-10-12), not here.** Its bets 1a (`place-links`) and 2
+(`paper-audit-100k`, `review-events`) come first; this list is bet 3, the corpus to link against,
+and waits on them.
+
 The foundations pass, opened 2026-09-21 and superseding the OCR-corpus list that ran before it.
 Why foundations rather than another method: every elaborate pass in the record ended by finding a
 basic thing broken — no OCR run could read an R2-hosted map at all, a 31.8% white-hole overview the
@@ -768,7 +772,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 
 ## Order
 
-**Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
+After the `docs/NOW.md` bets, **Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
 there is human time — `three-point-residuals` and `tonkin-review` are its two halves.
 `walk-the-route` comes before anything else in Walk is worth starting; `story-contract` is
 independent and can run alongside Search. `evidence-chain` needs only the 1882 sheet, whose
