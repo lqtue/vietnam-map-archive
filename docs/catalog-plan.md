@@ -1,6 +1,6 @@
 # Catalog — plan (2026-10-05)
 
-**Status:** decided, not started · **Baseline:** VMA `main` @ fb2f7358 · **Measured:** production,
+**Status:** four of five shipped by 2026-10-12; `map-json-to-columns` is still open · **Baseline:** VMA `main` @ fb2f7358 · **Measured:** production,
 2026-10-05, public (anon) reader, 1,038 maps
 
 Design detail for the five catalog items in `docs/ROADMAP.md` (the single tracker):
