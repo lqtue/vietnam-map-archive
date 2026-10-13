@@ -1,7 +1,7 @@
 # Paper figures — every number the paper quotes, with where it came from
 
 **Frozen 2026-09-19.** One file, so a draft cites this and not fifteen scattered originals.
-Convention inherited from `docs/image-processing-record.md`: *where this file and a source file
+Convention inherited from `docs/research/image-processing-record.md`: *where this file and a source file
 disagree, the source file wins* — and then this file is corrected, not the other way round.
 
 Three kinds of row:

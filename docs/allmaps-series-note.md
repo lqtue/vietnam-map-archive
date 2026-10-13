@@ -1,1 +1,0 @@
-research/allmaps-series-note.md

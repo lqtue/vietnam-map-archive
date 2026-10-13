@@ -1,1 +1,0 @@
-research/image-processing-record.md
