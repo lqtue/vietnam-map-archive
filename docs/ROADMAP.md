@@ -754,6 +754,12 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
       MapEditHostingTab 605, CreateMode 588, ReviewSidebar 541, LegendPage 496, FeaturedSheet 488,
       AnnotateMode 477, catalog/[id]/+page 466, OcrBboxTool 454, MapEditPipelineTab 452, ShapesPage
       450, TripPlayback 431, AnnotateAnimationPanel 412, CatalogUnifiedSearch 405.
+- [ ] **`audit-gates`** — `scripts/geo_audit.mjs` exits 1 with 221 FAIL (public maps with no
+      annotation), and `scripts/check_series_index.mjs` shows 129 of 1,151 sheets adrift (65
+      L7014, 20 L909, 44 in 1971; measured 2026-10-13). Both are meant to gate a deploy and cannot
+      while they are red. Tue decides whether public-but-unplaced is intended; if it is, teach both
+      scripts to treat those sheets as known. Also watch: client JS grew 15% gzip from 13 Sep to
+      13 Oct (/catalog +23%), all first-party. Exit: both scripts exit 0 on production data.
 
 ## Infrastructure
 
