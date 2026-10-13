@@ -13,7 +13,7 @@ export default ts.config(
   {
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: {
-      // ponytail: repo has ~100 `as any` today; tracked as debt, not a lint failure
+      // ponytail: repo has 36 `as any` today (2026-10-13); tracked as debt, not a lint failure
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
