@@ -165,7 +165,7 @@ class Session:
             return {"id": None, "done": len(done), "total": len(self.items)}
         it = self.items[todo[0]]
         shown = self.arms[it["id"]] == "shown"
-        return {"id": it["id"], "done": len(done), "total": len(self.items), "category": it["category"], "text": it["text"],
+        return {"id": it["id"], "done": len(done), "total": len(self.items), "category": it["category"], "text": it["text"], "lon": it["lon"], "lat": it["lat"],
                 "names": it["names"], "cands": [{"k": k + 1, "name": c["name"], "source": c["source"], "dist_m": c["dist_m"],
                                                  "wikidata": c["wikidata"], "osm": c["osm"]}
                                                 for k, c in enumerate(it["cands"])] if shown else []}
@@ -241,13 +241,13 @@ PAGE = """<!doctype html><meta charset=utf-8><title>Place links</title>
 #res div{padding:3px 8px;cursor:pointer}#res div:hover{background:#444}#q,#note{width:340px;background:#111;color:#eee;border:1px solid #666;padding:4px}
 #msg{color:#ffb347;min-height:1.3em}.dim{color:#999}</style>
 <p id=s></p><div id=row><img id=a width=800 height=800><div style="max-width:920px"><img id=b width=900 height=900></div>
-<div style="max-width:420px"><h3 id=t></h3><div id=cands></div><p><input id=q placeholder="/  search a place within 300 m"><div id=res></div></p>
+<div style="max-width:420px"><h3 id=t></h3><p>What is this 1882 place today? 1) pick a match, 2) say how it relates.</p><p id=lk></p><div id=cands></div><p><input id=q placeholder="/  search a place within 300 m"><div id=res></div></p>
 <p>picked: <b id=pk>nothing</b></p><p><input id=note placeholder="t  note (optional)"></p><p id=msg></p>
 <p class=dim><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> pick &nbsp; <kbd>/</kbd> search<br>
 <kbd>s</kbd> same building &nbsp; <kbd>n</kbd> same site, new building &nbsp; <kbd>m</kbd> moved<br>
 <kbd>g</kbd> gone &nbsp; <kbd>x</kbd> none &nbsp; <kbd>?</kbd> unsure &nbsp; <kbd>u</kbd> undo</p></div></div>
 <script>
-const COL=['#e61e1e','#145ae6','#14a03c'];
+const MAP='0e02b9d9-9d40-4cca-8e41-8c8373d54d3b';const COL=['#e61e1e','#145ae6','#14a03c'];
 let cur=null,item=null,pick=null,sid=null,sname='',shownAt=0,loaded=0;
 const $=id=>document.getElementById(id);
 function loadedOne(){if(++loaded===2)shownAt=Date.now()/1000}
@@ -257,7 +257,9 @@ async function next(){item=await (await fetch('/next')).json();cur=item.id;pick=
  $('msg').textContent='';$('note').value='';$('q').value='';$('res').innerHTML='';render();
  if(cur){loaded=0;a.src=`/img/${cur}/close.png`;b.src=`/img/${cur}/context.png`}else{a.removeAttribute('src');b.removeAttribute('src')}}
 function render(){ $('t').textContent=cur?`${item.text}`:'';
- $('cands').innerHTML=(item.cands||[]).map(c=>`<div class=c data-k=${c.k} style="border-color:${COL[c.k-1]}" onclick="doPick(${c.k})">
+ $('lk').innerHTML=cur?`See today: <a target=_blank href="https://maparchive.vn/explore?map=${MAP}&at=${item.lon},${item.lat}">1882 over today (o)</a> &middot; <a target=_blank href="https://www.google.com/maps/@${item.lat},${item.lon},19z/data=!3m1!1e3">satellite (v)</a> &middot; <a target=_blank href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${item.lat},${item.lon}">street view (w)</a>`:'';
+ $('cands').innerHTML=(item.cands||[]).length?'':'<p class=dim>No suggestions here. Press / and type a name you know, or g gone, x none, ? unsure.</p>';
+ $('cands').innerHTML+=(item.cands||[]).map(c=>`<div class=c data-k=${c.k} style="border-color:${COL[c.k-1]}" onclick="doPick(${c.k})">
  <b>${c.k}</b> ${c.name}<br><span class=dim>${c.source} &middot; ${c.dist_m} m${c.wikidata?' &middot; '+c.wikidata:''}</span></div>`).join('');
  $('pk').textContent=sid?sname+' (search)':pick?item.cands[pick-1].name:'nothing';
  document.querySelectorAll('.c').forEach(e=>e.classList.toggle('sel',+e.dataset.k===pick))}
@@ -280,6 +282,7 @@ document.onkeydown=async e=>{
  if(k==='/'){e.preventDefault();$('q').focus();doSearch();return}
  if(k==='t'){e.preventDefault();$('note').focus();return}
  if(k==='u'){await fetch('/undo',{method:'POST'});return next()}
+ const lk={o:0,v:1,w:2}[k];if(lk!==undefined){const l=$('lk').querySelectorAll('a')[lk];if(l)window.open(l.href,'_blank');return}
  if(k.length===1&&'123'.includes(k))return doPick(+k);
  const rel={s:'s',n:'n',m:'m',g:'g',x:'x','?':'?'}[k];if(rel)send(rel)};
 next();
