@@ -458,7 +458,7 @@ def main() -> None:
                 print(f"  - {d}")
         else:
             print("1882 reproduces the recorded figures "
-                  "(docs/worked-example-1882.md:40).")
+                  "(docs/research/worked-example-1882.md:40).")
 
 
 if __name__ == "__main__":

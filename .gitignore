@@ -122,3 +122,6 @@ work/image-processing/experiments/osm-warp/*
 work/vn1971/up/
 work/vn1971/allmaps/*.png
 work/vn1971/allmaps/p*.jpg
+
+# ProjectAtlas local index (Codex code map)
+.projectatlas/
