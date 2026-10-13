@@ -1,1 +1,0 @@
-research/worked-example-1882.md

@@ -1,7 +1,8 @@
 # 260921 — sourcing the two calibration panoramas
 
 **Date:** 2026-09-21 · **Severity:** —  · **Component:** L2 mass model / District 4 4D plan ·
-**Status:** both found, neither visually confirmed; "1901" label was wrong (it's 1898)
+**Status:** both found; the "1898" pair is now catalogued by the David Rumsey Map Collection with
+**1902** printed on the sheet — see the 2026-10-12 addendum at the end
 
 `docs/archive/pipeline-3d.md` and `docs/private/priority-2026q4.md:152` name two painting-map pairs
 as the height-calibration source for the LoD1 mass model (no LiDAR for colonial Saigon): an 1881
@@ -60,8 +61,42 @@ Both calibration sources are now traceable to specific, dated, sourced prints:
 | Pair | Source | Date | Confirmed |
 |---|---|---|---|
 | "1882" | *Saïgon d'après nature*, Favre/Lepère, Gallica `btv1b53062212t` | 1881 | via search snippets, not a direct read |
-| "1898" | Bird's-eye view, Pusch/Claude et Cie., Geographicus `saigonview-claude-1898` | **1898** (doc said 1901) | via search snippets, not a direct read |
+| "1898" | *Ville de Saigon. 1902.*, Pusch/Claude et Cie., David Rumsey List No. 16413.000 (Geographicus `saigonview-claude-1898` first) | **1902** printed on the sheet (Geographicus said 1898, doc said 1901) | catalogue record, image not yet viewed — addendum 2026-10-12 |
 
 Both listings 403 WebFetch, so nothing here has been visually confirmed against the actual image —
 someone should open both URLs directly before wiring either into the pipeline. The "1901" label in
 the archived plan and the private note should be corrected to 1898 once this is confirmed.
+
+## Addendum 2026-10-12 — the "1898" pair, cited to David Rumsey
+
+Cite the Pusch view to the **David Rumsey Map Collection**, which is a catalogued institutional record
+rather than a dealer snippet:
+
+> Pusch, Gaston. *Ville de Saigon. 1902.* Saigon: Claude et Cie Éditeurs, 1902. Colour lithograph,
+> bird's-eye view, 78 × 113 cm. David Rumsey Map Collection, List No. 16413.000.
+> <https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~370886~90138468:Ville-de-Saigon--1902->
+
+What the record says that changes the entry above (read from the record's text as the owner
+pasted it, 2026-10-12; the image has not been viewed in this session). **The Rumsey page mixes
+two kinds of text.** The "Summary"/"Overview" block is an AI summary (LUNA record + computer vision
++ LLM, flagged by the site's own disclaimer as not authoritative); the field list below it
+(Date, Full Title, Obj Height/Width, Pub Note) is the librarian-curated catalogue record. Only the
+latter is cited here.
+
+- **The catalogue dates it 1902:** Date `1902`, Full Title `Ville de Saigon. 1902.` A transcribed
+  title carrying the year suggests the year is printed on the sheet. The AI overview says the lower
+  margin reads "VILLE DE SAIGON 1902", but that is machine-read and must be checked on the image.
+  Either way the catalogue beats the Geographicus "1898", which came from search snippets of an
+  *untitled* listing. So the 2026-09-21 correction from "1901" to 1898 was likely wrong in the
+  other direction.
+- **The size differs:** Rumsey gives 78 × 113 cm, while Geographicus gave 33.5 × 47.5 in
+  (85 × 121 cm). That could be a second edition, a measurement with or without the margin, or a
+  different sheet. It stays open until both images are compared side by side.
+- **The record's own provenance note** (Alexander Johnson / Dasa Pahor, 2025) traces only one other
+  example, sold in 2019, and no institutional copy. If that holds, Rumsey is now the only
+  institutional copy.
+
+**Consequence for the pairing:** the view is four years after the 1898 cadastral, not the same year.
+Before it is used to calibrate heights, any building it draws must be checked against what existed
+in 1898; buildings finished 1898–1902 (e.g. parts of the city hall, begun 1898) may appear in the
+view but not on the plan.

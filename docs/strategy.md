@@ -1,7 +1,7 @@
 # Vietnam Map Archive — Strategy
 
 _Funder-facing: what VMA is, what exists, where it goes, how it pays for itself._
-_Last updated: August 2026. Supersedes `strategy-roadmap.md` and `startup-strategy.md`._
+_Last updated: 12 October 2026 (current focus); the rest dates from August 2026. Supersedes `strategy-roadmap.md` and `startup-strategy.md`._
 
 ---
 
@@ -21,6 +21,14 @@ military repositories, university libraries, and private collections — unlinke
 modern geography, inaccessible to Vietnamese researchers, rich in physical data but stripped of
 social and political context, and exposed to link rot. The gap is not the maps. It is the
 infrastructure to connect them.
+
+**The current focus (October 2026).** The time-layered city stays the long view. The work now is
+the step under it: **linking** maps to each other, to their sources and to today, with a machine
+that proposes and a person who decides, and **measuring** how often each link is right and what it
+costs to check. A check counts only if it could have caught the mistake: a machine test that shares
+the error, a reviewer who only agrees with the machine, or a second map copied from the first all
+look like confirmation and are not. This matters more now that AI writes plausible history for
+free. The repo-side order of work is [`docs/NOW.md`](./NOW.md).
 
 **The frame.** The city as a six-layer data stack, built bottom-up, with political and economic
 context cutting across every layer. Full argument in [`docs/theory.md`](./theory.md) — not repeated

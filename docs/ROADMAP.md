@@ -18,6 +18,10 @@ comment. The map from the old codes to these names is at the bottom of this file
 
 ## Do next
 
+**Priority is set in `docs/NOW.md` (2026-10-12), not here.** Its bets 1a (`place-links`) and 2
+(`paper-audit-100k`, `review-events`) come first; this list is bet 3, the corpus to link against,
+and waits on them.
+
 The foundations pass, opened 2026-09-21 and superseding the OCR-corpus list that ran before it.
 Why foundations rather than another method: every elaborate pass in the record ended by finding a
 basic thing broken — no OCR run could read an R2-hosted map at all, a 31.8% white-hole overview the
@@ -398,6 +402,29 @@ system — what a result must retain, and the two kinds of check — is in the r
       writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
       uses a bare "mask" for more than one.
 
+## Measured pipeline (planned 2026-10-12)
+
+Machines propose, a person decides at a named gate, and every verdict records its time and the
+exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the starting numbers:
+`docs/journals/261012-manual-baseline.md`.
+
+- [ ] **`place-links`** — what stands today where a sheet names a place. 1882 first: suggestions
+      from `name_today.py` (position, name, kind) confirmed on a local page that times each item
+      and hides suggestions on one in five. Scored on `landmarks_1882.csv`, not on the 27 editor
+      picks it was tuned on. Exit: owner-confirmed links for the 1882 place labels with a measured
+      accuracy and seconds per item; `/explore` shows them only if those numbers justify the app work.
+- [ ] **`then-now-blocks`** — 1882 street blocks and junctions against 2023 wide-street blocks: a
+      displacement field (where the sheet's georeference is off, scored on held-out tiles) and
+      block change classes that a person gates with two verdicts. Exit: a gated class table and a
+      field residual compared with its written prediction.
+- [ ] **`paper-audit-100k`** — the audit §9 (B0152) says has not been run: a pre-registered random
+      sample of cleared Indochine 1:100,000 sheets, two verdicts each, bound to the corners judged.
+      Exit: the paper's first rate with an interval, and a cost of verification in seconds per sheet.
+- [ ] **`review-events`** — human time in the app's own review tools (OCR review, footprint
+      validate, legend), one row per sitting, and the stamp gaps the baseline found: a reject
+      clears `reviewed_at`, footprint `reviewed_at` is never set. Exit: the baseline's
+      "unmeasured" cells for those stages have numbers.
+
 ## Survey layer and catalog
 
 - [ ] **`series-identity`** — migration 105 (in production, verified 2026-10-04) adds stable
@@ -745,7 +772,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 
 ## Order
 
-**Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
+After the `docs/NOW.md` bets, **Do next**, top to bottom, supersedes everything below it. `corpus-growth` still runs whenever
 there is human time — `three-point-residuals` and `tonkin-review` are its two halves.
 `walk-the-route` comes before anything else in Walk is worth starting; `story-contract` is
 independent and can run alongside Search. `evidence-chain` needs only the 1882 sheet, whose

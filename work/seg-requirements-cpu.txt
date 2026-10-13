@@ -1,0 +1,29 @@
+# Segmentation and analysis scripts that run on a laptop CPU:
+# work/image-processing/scripts, work/image-processing/experiments,
+# work/analysis, work/review-kit. Not MapSAM2 inference (that is GPU: see
+# seg-requirements-gpu.txt).
+#
+#   python3 -m venv work/.venv-seg
+#   source work/.venv-seg/bin/activate
+#   pip install -r work/seg-requirements-cpu.txt
+#
+# Built from the import statements in those folders (checked 2026-10-12). The
+# base set (numpy, pillow, requests, scipy, shapely, python-dotenv, pyogrio) comes
+# from the OCR file, because these scripts import work/core, which needs the same.
+-r ocr/requirements.txt
+
+# The geo stack. Versions are the ones the Homebrew python3 (/opt/homebrew/bin)
+# holds today, where then_now_blocks, landmarks_1882, name_today,
+# export_1882_qgis, modern-overlays and analysis/district4/metrics run.
+geopandas==1.1.2          # modern-overlays/*, export_1882_qgis, landmarks_1882, name_today, then_now_blocks
+rasterio==1.5.0           # export_1882_qgis, analysis/district4
+pyproj==3.7.2             # analysis/district4/metrics, landmarks_1882
+matplotlib==3.10.8        # then_now_blocks
+pyarrow==24.0.0           # landmarks_1882 (GeoParquet)
+
+# cv2: boundary_refine, mask_to_footprints (and MapSAM2 masks_to_polygons,
+# evaluate). Installed nowhere on this Mac today, so there is no verified version
+# to pin: pin it after the first install. The headless wheel is enough (no GUI
+# calls). Check that a wheel exists for your Python first; iiif_tiles.py's CLAHE
+# is pure numpy because there was none for 3.14.
+opencv-python-headless
