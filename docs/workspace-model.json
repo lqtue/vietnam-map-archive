@@ -243,6 +243,11 @@
           "path": "docs/walk-plan.md",
           "purpose": "Walk plan",
           "availability": "repository"
+        },
+        {
+          "path": "docs/city-reconstruction-plan.md",
+          "purpose": "Proposed historical city viewer, dated building states and landmark detail",
+          "availability": "repository"
         }
       ]
     },

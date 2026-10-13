@@ -53,6 +53,7 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Catalog](catalog-plan.md)                   | The public list: columns, facets, speed, search       |
 | [Walk](walk-plan.md)                         | Proposed district walks; forks the separate HACW app |
 | [Evidence chain](evidence-chain-plan.md)     | Source-backed claims, review and reuse               |
+| [City reconstruction](city-reconstruction-plan.md) | Small 1882 viewer test, engine choice, dated city states and landmarks |
 | [Platform design](platform-design.md)        | Proposed shared platform architecture                |
 
 ## Research records
