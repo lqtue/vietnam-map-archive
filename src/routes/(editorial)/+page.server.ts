@@ -13,6 +13,7 @@
 
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
+import { cached } from '$lib/server/edgeCache';
 import { fetchPublishedMapCount, fetchPlaceSpread, SAIGON_PLACE } from '$lib/data/maps/service';
 import { fetchSeriesIndex } from '$lib/data/maps/seriesIndex';
 import type { FeaturedSeries } from '$lib/features/catalog/homeCatalog';
@@ -64,17 +65,27 @@ const PLACES = [
   { key: 'vietnam', area: '', spec: {} },
 ];
 
-export const load: PageServerLoad = async () => {
-  // The service key, so no row-level policy applies — every query here filters
-  // by status itself, and a draft must never reach the front page.
-  const supabase = adminClient();
+export const load: PageServerLoad = async ({ platform }) => {
+  // Public data, the same for every reader (the session lives in +layout.server.ts),
+  // so the whole object is cached at the edge. `ok` refuses a result the data layer
+  // degraded to zeros and empty lists after a failed query.
+  return cached(
+    platform,
+    'home-v1',
+    async () => {
+      // The service key, so no row-level policy applies — every query here filters
+      // by status itself, and a draft must never reach the front page.
+      const supabase = adminClient();
 
-  const [mapCount, series, ...spreads] = await Promise.all([
-    fetchPublishedMapCount(supabase),
-    loadFeaturedSeries(supabase),
-    ...PLACES.map((p) => fetchPlaceSpread(supabase, p.spec)),
-  ]);
-  const places = PLACES.map(({ key, area }, i) => ({ key, area, ...spreads[i] }));
+      const [mapCount, series, ...spreads] = await Promise.all([
+        fetchPublishedMapCount(supabase),
+        loadFeaturedSeries(supabase),
+        ...PLACES.map((p) => fetchPlaceSpread(supabase, p.spec)),
+      ]);
+      const places = PLACES.map(({ key, area }, i) => ({ key, area, ...spreads[i] }));
 
-  return { mapCount, series, places };
+      return { mapCount, series, places };
+    },
+    { ok: (d) => d.mapCount > 0 && d.series.length > 0 && d.places.every((p) => p.total > 0) }
+  );
 };

@@ -23,8 +23,38 @@
 import type { PageServerLoad } from './$types';
 import { adminClient } from '$lib/server/supabaseAdmin';
 import { readAll } from '$lib/data/supabase/paged';
+import { cached } from '$lib/server/edgeCache';
 
-export const load: PageServerLoad = async ({ setHeaders }) => {
+export const load: PageServerLoad = async ({ setHeaders, platform }) => {
+  // The counts are identical for every reader, so they are cached at the edge; the
+  // header below is per response and stays outside. `ok` refuses a result in which a
+  // failed query read as zero.
+  const stats = await cached(platform, 'about-v1', loadStats, {
+    ok: (s) =>
+      s.published > 0 &&
+      s.labels > 0 &&
+      s.shapes > 0 &&
+      s.surveys > 0 &&
+      s.surveySheets > 0 &&
+      s.surveySheetsHeld > 0,
+  });
+  // One minute, not one hour. The data behind this page changes slowly and an
+  // hour was right about that — but the header caches the *HTML*, and a
+  // SvelteKit page's HTML names its JS chunks by content hash. A deploy writes
+  // new hashes and deletes the old files, so for the rest of its TTL this page
+  // served a cached document pointing at eight chunks that no longer existed:
+  // 404s, no hydration, and nothing in the page itself to say so. Measured on
+  // the 2026-09-13 deploy at `age: 3193` — 53 minutes of a page that renders
+  // and does not work.
+  //
+  // /about is the only editorial page setting a max-age at all; the rest are
+  // dynamic and were unaffected. A minute keeps the six queries off a crawl
+  // burst and shrinks the post-deploy window to something a hard reload fixes.
+  setHeaders({ 'cache-control': 'public, max-age=60' });
+  return { stats };
+};
+
+async function loadStats() {
   const db = adminClient();
   const head = { count: 'exact' as const, head: true };
 
@@ -69,35 +99,19 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
     if (r.location) cities.set(r.location, (cities.get(r.location) ?? 0) + 1);
   }
 
-  // One minute, not one hour. The data behind this page changes slowly and an
-  // hour was right about that — but the header caches the *HTML*, and a
-  // SvelteKit page's HTML names its JS chunks by content hash. A deploy writes
-  // new hashes and deletes the old files, so for the rest of its TTL this page
-  // served a cached document pointing at eight chunks that no longer existed:
-  // 404s, no hydration, and nothing in the page itself to say so. Measured on
-  // the 2026-09-13 deploy at `age: 3193` — 53 minutes of a page that renders
-  // and does not work.
-  //
-  // /about is the only editorial page setting a max-age at all; the rest are
-  // dynamic and were unaffected. A minute keeps the six queries off a crawl
-  // burst and shrinks the post-deploy window to something a hard reload fixes.
-  setHeaders({ 'cache-control': 'public, max-age=60' });
-
   return {
-    stats: {
-      published: rows.length,
-      drafts: drafts.count ?? 0,
-      labels: labels.count ?? 0,
-      labelsChecked: labelsChecked.count ?? 0,
-      shapes: shapes.count ?? 0,
-      shapesApproved: shapesApproved.count ?? 0,
-      yearFrom: years.length ? Math.min(...years) : null,
-      yearTo: years.length ? Math.max(...years) : null,
-      // Biggest first — "Saigon 22, Huế 10, Hanoi 7".
-      cities: [...cities.entries()].sort((a, b) => b[1] - a[1]),
-      surveys: surveys.count ?? 0,
-      surveySheets: surveySheets.count ?? 0,
-      surveySheetsHeld: surveySheetsHeld.count ?? 0,
-    },
+    published: rows.length,
+    drafts: drafts.count ?? 0,
+    labels: labels.count ?? 0,
+    labelsChecked: labelsChecked.count ?? 0,
+    shapes: shapes.count ?? 0,
+    shapesApproved: shapesApproved.count ?? 0,
+    yearFrom: years.length ? Math.min(...years) : null,
+    yearTo: years.length ? Math.max(...years) : null,
+    // Biggest first — "Saigon 22, Huế 10, Hanoi 7".
+    cities: [...cities.entries()].sort((a, b) => b[1] - a[1]),
+    surveys: surveys.count ?? 0,
+    surveySheets: surveySheets.count ?? 0,
+    surveySheetsHeld: surveySheetsHeld.count ?? 0,
   };
-};
+}
