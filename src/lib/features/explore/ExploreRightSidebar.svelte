@@ -85,6 +85,16 @@
    * Bound by the page so Escape can clear both at once.
    */
   export let selectedN: number | null = null;
+  /** A pair's halves number their entries from 1 each, so each keeps its own open row;
+   *  one shared number would open both editors, and either's reload would close the other. */
+  let pairSelected: Record<string, number | null> = {};
+  $: if (legendSheets.length > 1)
+    selectedN = Object.values(pairSelected).find((n) => n != null) ?? null;
+  // The page clears `selectedN` on Escape; a function call keeps this out of the cycle above.
+  const dropPairSelection = (n: number | null) => {
+    if (n === null) pairSelected = {};
+  };
+  $: dropPairSelection(selectedN);
 </script>
 
 <aside class="sb-rail is-right" data-tour="controls" class:embedded>
@@ -202,7 +212,7 @@
               <SheetLegendPanel
                 mapId={sheet.id}
                 {showLegendPoints}
-                bind:selectedN
+                bind:selectedN={pairSelected[sheet.id]}
                 on:toggleLegendPoints={() => dispatch('toggleLegendPoints')}
                 on:pickLocation={(e) => dispatch('pickLocation', e.detail)}
                 on:clearFocus={() => dispatch('clearFocus')}
