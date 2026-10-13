@@ -86,7 +86,7 @@ Worker-authenticated (`Authorization: Bearer <worker_keys token>`, **not** a use
   `human` are kept, so a second **Detect** no longer discards every correction), and/or
   `status` (→ `finish_job`). There is no stage field: closing the job advances the stage.
 - `/api/pipeline/execute/` — POST `{ job_id }` for the kinds whose work belongs on the server
-  (`mirror_annotation`, `sync_allmaps`): they need the service key, which a worker deliberately
+  (`mirror_annotation`, `sync_allmaps`, `warp`): they need the service key, which a worker deliberately
   lacks. The handler runs the mirror and closes the job itself. Kinds with real compute (`ocr`,
   `seg`, `tile_to_r2`) are rejected with a 400 — those run on the worker.
 
@@ -197,7 +197,7 @@ Public / other:
   image proxy — see `docs/pipelines.md`.
 - `/api/search/` — unified GET over `maps` + (admin/mod) `scout_candidates`. Postgres tsvector via
   `.textSearch('search_vector', q, { config: 'simple' })`. Query:
-  `q, area, region, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels, limit, offset`.
+  `q, area, region, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels,places, fields=slim, limit, offset`.
   `area` accepts comma-separated pre-July-2025 province names and matches any entry in
   `maps.regions`, falling back to `region` for older rows. It constrains map results only;
   `facets.area` ignores its own selection while respecting the other map facets. Slim area
@@ -208,7 +208,8 @@ Public / other:
   the pre-merger province list; a map can belong to multiple regions. It combines
   with `area` using AND; `facets.region` excludes its own selection. Slim queries
   apply both coverage filters before pagination.
-  Returns `{ maps, scout, labels, total, facets, periods, role }` — map rows carry `slug` (mig 088)
+  Returns `{ maps, scout, labels, places, total, limit, offset, facets, periods, role }`, where `total` is
+  an object of counts per kind (`maps`, `scout`, `labels`, `places`) — map rows carry `slug` (mig 088)
   in both the full and slim column sets, because the catalog drawer and the command palette link
   onward and a row without it falls back to a uuid link; facet tallies are declarative via
   `$lib/server/facets.ts` ("all-but-this-dimension"). Public users get
@@ -219,7 +220,9 @@ Public / other:
   `$lib/server/transformer.ts`. Rendered by `LabelHits.svelte` on /catalog (links to
   `/explore?map=<id>&at=<lng>,<lat>`) and in /explore's browse pane (stacks the map, lands on the
   spot). Only maps that have been OCR'd can hit — `scripts/enqueue_ocr_all.mjs` queues the rest —
-  triaged sheets only, unless `--untriaged`.
+  triaged sheets only, unless `--untriaged`. **`include=places`** searches the gazetteer (mig 067's
+  `place_names` view); a hit resolves to its `/place/<slug>` page (which 301s to `/catalog/place/`)
+  and is what the command palette turns into place rows.
 - `/sitemap.xml` — **public** GET, no auth (`src/routes/sitemap.xml/+server.ts`). Not under `/api/`,
   but a server route with a contract: the crawl entry the server-rendered half of the site never
   had. Emits the editorial pages in `LOCALIZED_PATHS` (twice, once per locale), `public`/`featured`

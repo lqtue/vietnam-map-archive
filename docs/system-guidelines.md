@@ -4,7 +4,7 @@ Canonical reference for code organisation, page structure, and component pattern
 and components follow these rules; deviations need a comment saying why.
 
 Companion docs: `db-guidelines.md` (schema), `design-system.md` (tokens + CSS), `admin-tooling.md`,
-`pipelines.md`, `theory.md` (the intellectual framing), `cleanup-2026-08.md` (what the Aug-2026
+`pipelines.md`, `theory.md` (the intellectual framing), `archive/cleanup-2026-08.md` (what the Aug-2026
 restructure changed).
 
 ---
@@ -40,11 +40,11 @@ A directory may import only from directories to its **left**. This is the single
 ```
 src/lib/
 ├─ core/      pure — no OpenLayers, no Supabase
-│             geo/ (geo, bearing, geolocation, mapBounds, types)
-│             iiif/ (allmapsId, annotationUrl, iiifImageInfo)
-│             utils/ (debounce, id, pwa, persistence/)
+│             geo/ (geo, bearing, geolocation, mapBounds, rectUtils, types)
+│             iiif/ (allmapsId, annotationUrl, level0, sourceSize, thumbUrl)
+│             utils/ (debounce, id, theme, unaccent, persistence/)
 ├─ data/      DB + HTTP access and the canonical domain types
-│             supabase/ maps/ admin/ blog/ about/
+│             supabase/ maps/ admin/
 ├─ server/    $lib/server — SvelteKit makes a client import a build error
 │             auth · supabaseAdmin · http · storage · ia · mapFields
 │             facets · transformer · allmaps · ocrReview
@@ -53,8 +53,8 @@ src/lib/
 │             stores/ (mapStore, layerStore, layersStore, urlStore)
 │             annotations/ · types.ts · constants.ts
 ├─ features/  one directory per product surface
-│             explore/ catalog/ stories/{shared,editor,play} studio/
-│             contribute/{ocr,digitalize,trace,review,shared} admin/
+│             explore/ catalog/ stories/{shared,editor,play} annotate/ account/
+│             contribute/{ocr,digitalize,inspect,legend,trace,review,shared} admin/
 └─ ui/        generic primitives only — no domain imports
               NavBar EditorialFooter PageHero MapCard LocationSearch AuthGate …
 ```
@@ -87,7 +87,7 @@ The group in parentheses is the SvelteKit layout group, not part of the URL. Bot
 | Route | Group | Entry component | Auth |
 |-------|-------|-----------------|------|
 | `/` | (editorial) | `+page.svelte` | none |
-| `/about` | (editorial) | `+page.svelte` + `content.ts` beside it | none |
+| `/about` | (editorial) | `+page.svelte` + `+page.server.ts` | none |
 | `/blog`, `/blog/[slug]` | (editorial) | `+page.svelte` + `posts.ts` beside it | none |
 | `/catalog` | (editorial) | `+page.svelte` → `CatalogUnifiedSearch` (+ `MapEditModal` for admin/mod) | none |
 | `/contribute` | (editorial) | `+page.svelte` | none (mod cards gated) |
@@ -97,7 +97,7 @@ The group in parentheses is the SvelteKit layout group, not part of the URL. Bot
 | `/admin?tab=bulk` | (editorial) | `+page.svelte` | admin |
 | `/admin?tab=scout` | (editorial) | `+page.svelte` + `ScoutCard` | admin/mod |
 | `/explore` | (app) | `+page.svelte` + `MapWorkspace` + `ExploreSidebar` (left rail) + `ExploreRightSidebar` (right rail) | none |
-| `/explore?mode=annotate` | (app) | `StudioMode.svelte` | auth |
+| `/explore?mode=studio` (alias `annotate`) | (app) | `AnnotateMode.svelte` (imported as `StudioMode`) | auth |
 | `/explore?mode=story` | (app) | `CreateMode.svelte` | auth |
 | `/trip/[id]` | (app) | `+page.svelte` + `TripPlayback` | none |
 | `/scan` | (app) | `+page.svelte` + `ImageShell` | none |
@@ -112,13 +112,13 @@ became `?mode=shapes&tab=validate` in Sept.
 with the query string preserved:
 
 - `/view` → `/explore`
-- `/annotate`, `/studio` → `/explore?mode=annotate`
+- `/annotate`, `/studio` → `/explore?mode=studio`
 - `/create` → `/explore?mode=story`
-- `/image` → `/scan`
+- `/image`, `/catalog/series` → `/catalog`
 - `/contribute/label`, `/contribute/digitalize` → `/scan?mode=prepare`
 - `/contribute/trace` → `/scan?mode=shapes`
 - `/contribute/review` → `/scan?mode=shapes&tab=validate`
-- `/admin/bulk|scout|status` → `/admin?tab=…`
+- `/admin/bulk|scout|status` → `/admin?tab=…` (`/admin/status` included)
 
 `LEGACY_PREFIXES` handles the two that carry an id rather than a fixed name:
 `/map/<id>` → `/catalog/<id>` and `/place/<name>` → `/catalog/place/<name>`.
@@ -160,7 +160,7 @@ add a modifier class or extend the sheet. Page-specific CSS goes in `src/styles/
 
 ### Geo-map tool
 
-`/explore`, `/explore?mode=annotate`, `/explore?mode=story`, `/trip/[id]`.
+`/explore`, `/explore?mode=studio`, `/explore?mode=story`, `/trip/[id]`.
 
 `src/lib/map/shell/MapWorkspace.svelte` is the shared base (§5). It composes `ToolLayout` +
 `MapShell` + `LayerRenderer` + `MapModeOverlays`. Never create a second OL map outside `MapShell`.
@@ -215,7 +215,7 @@ let derived = $derived(value.toUpperCase());
 ## 5. MapWorkspace contract
 
 `src/lib/map/shell/MapWorkspace.svelte` is the unified base for geo-map modes. `/explore`,
-`StudioMode` and `CreateMode` all build on it; new geo-map surfaces must use it rather than mounting
+`AnnotateMode` (the Studio) and `CreateMode` all build on it; new geo-map surfaces must use it rather than mounting
 `MapShell` directly.
 
 **Owns:** `ToolLayout` chrome (responsive workspace, sidebar resize, mobile drawer stack) ·
@@ -282,7 +282,7 @@ component. The current route inventory is in `src/routes/CLAUDE.md`.
 component props. `maps.allmaps_id` is used only when calling Allmaps (annotation URLs, warped tile
 layers) and is never a join key. `mapStore.activeMapId` now holds the UUID and is mirrored from
 `layersStore.topOverlay`; the old `&map=` hash writer is gone and the deep-link param is
-`?map=<uuid>`.
+`?map=<slug>` (the readable address since mig 088; a uuid or alias still resolves via `resolveMapRef`).
 
 **Client usage.** Browser: `getSupabaseContext()` → `{ supabase, session }`. Server: `adminClient()`
 from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Database>(...)`. A bare

@@ -1,9 +1,13 @@
 # work/ — the pipelines
 
 Root context: `/CLAUDE.md`. What every folder here is: `work/README.md`; model responsibilities: `docs/model-layout.md`.
-Image commands live in `work/image-processing/scripts/`, experiments in `experiments/` and local
-outputs in `results/`. OCR commands and shared modules remain in `work/ocr/scripts/`, with the
-shared environment at `work/ocr/.venv`. `ocr/outputs` and `ocr/logs` are temporary compatibility
+Image commands live in `work/image-processing/scripts/`, experiments in
+`work/image-processing/experiments/` and local outputs in `work/image-processing/results/`. OCR
+commands remain in `work/ocr/scripts/`, with the shared environment at `work/ocr/.venv`. The code
+OCR, segmentation and the worker share is the `vma_core` package in `work/core/` (PR #67: IIIF tile
+fetching, georef maths, Supabase transport); the old `work/ocr/scripts/{iiif_tiles,scale,supabase_client}.py`
+are re-export shims. Core imports nothing from `ocr`, segmentation or `worker` — see
+`work/core/README.md`. `ocr/outputs` and `ocr/logs` are temporary compatibility
 links pending the reference audit in `docs/image-processing-1882-plan.md`.
 Full command reference and design rationale: `docs/pipelines.md`.
 §*Getting more out of OCR* there is the ranked list of what to do next and what not to re-attempt;
@@ -29,7 +33,7 @@ worker with `--kinds seg`. A worker left running therefore finishes what publish
 
 It needs `VMA_API_URL` + `VMA_WORKER_KEY` and **no database credentials** — claim and results both
 go through `/api/pipeline/*`. The worker exports both into the job's subprocess, so `ocr.py --db`
-writes the same way (`supabase_client.py` switches transport on those two variables; the
+writes the same way (`vma_core/db.py` switches transport on those two variables; the
 analysis-only subcommands still use the service key when run by hand). The `seg` runner's flags
 mirror `segCommand.ts`, and `MAPSAM2_DIR` / `MAPSAM2_CHECKPOINT` come from the machine's environment
 rather than the job.

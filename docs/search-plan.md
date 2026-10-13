@@ -246,7 +246,7 @@ columns. **Not planned.** Revisit only if E3b's extraction proves worth scaling.
 63 place names against 1,544 extractions cleans a handful, not a corpus. The value is that each
 fix is citable and that agreement becomes measurable — not volume. And **none of this is on the
 critical path.** `docs/private/priority-2026q4.md` still runs: the traced window → `seg_eval
---window` → the Zenodo DOI → the letter-writer packet. E3b is good work that must not displace it.
+--window` → the Zenodo DOI. E3b is good work that must not displace it.
 
 ## E4 — Corpus growth
 
