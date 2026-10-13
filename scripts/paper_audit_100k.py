@@ -637,7 +637,7 @@ PAGE = """<!doctype html><meta charset=utf-8><title>Paper audit 100k</title>
 #fr figcaption{font-size:12px;color:#999}
 #tabs span{display:inline-block;padding:3px 12px;margin-right:6px;background:#333;border-radius:3px}#tabs span.on{background:#2f6fd0}
 #pl{display:flex;gap:8px;align-items:flex-start}.pn{position:relative}.pn img{display:block;border:1px solid #555;cursor:crosshair}
-.pn.h img{width:calc((100vw - 56px)/3)}.pn .m{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #f0f;border-radius:50%;pointer-events:none}
+.pn.h img{width:calc((100vw - 56px)/3)}.pn .m{position:absolute;box-sizing:border-box;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #f0f;border-radius:50%;pointer-events:none}
 .pn input{width:120px;background:#111;color:#eee;border:1px solid #666;padding:3px;margin-top:3px}#note{width:300px;background:#111;color:#eee;border:1px solid #666;padding:3px}
 #sum{margin:6px 0}</style>
 <p><span id=st></span> <span id=msg></span></p>
@@ -667,14 +667,14 @@ function buildPlace(){$('sp').style.display='';const first=item.panels.filter(p=
  <img src="/img/${item.id}/place/${p.side}${p.k}.png" ${p.side==='T'?'onload=loadOne()':''} data-w=${p.w} data-h=${p.h}><div class=m style=display:none></div>
  <input placeholder="label, Enter" style=display:none></div>`}).join('');
  document.querySelectorAll('.pn').forEach(el=>{const img=el.querySelector('img'),inp=el.querySelector('input'),k=tkey(el.dataset.s,el.dataset.k);
-  img.onclick=e=>{const r=img.getBoundingClientRect();ticks[k]={cx:(e.clientX-r.left)/r.width*img.dataset.w,cy:(e.clientY-r.top)/r.height*img.dataset.h,typed:(ticks[k]||{}).typed||''};draw();inp.focus();inp.select()};
+  img.onclick=e=>{const r=img.getBoundingClientRect();ticks[k]={cx:(e.clientX-r.left-img.clientLeft)/img.clientWidth*img.dataset.w,cy:(e.clientY-r.top-img.clientTop)/img.clientHeight*img.dataset.h,typed:(ticks[k]||{}).typed||''};draw();inp.focus();inp.select()};
   inp.oninput=()=>{ticks[k].typed=inp.value;sum()};
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();sum()}else if(e.key==='Escape'){e.preventDefault();if(!inp.value)delete ticks[k];inp.blur();draw()}e.stopPropagation()}});
  pick('T')}
 function pick(s){side=s;draw()}
 function draw(){document.querySelectorAll('.pn').forEach(el=>{const s=el.dataset.s,k=tkey(s,el.dataset.k),t=ticks[k],img=el.querySelector('img'),m=el.querySelector('.m'),inp=el.querySelector('input');
   el.style.display=s===side?'':'none';m.style.display=t?'':'none';inp.style.display=t?'':'none';
-  if(t){m.style.left=(t.cx/img.dataset.w*100)+'%';m.style.top=(t.cy/img.dataset.h*100)+'%';if(document.activeElement!==inp)inp.value=t.typed}});
+  if(t){m.style.left=(img.offsetLeft+img.clientLeft+t.cx/img.dataset.w*img.clientWidth)+'px';m.style.top=(img.offsetTop+img.clientTop+t.cy/img.dataset.h*img.clientHeight)+'px';if(document.activeElement!==inp)inp.value=t.typed}});
  $('tabs').innerHTML=SIDES.map((s,i)=>`<span class="${s===side?'on':''}">${i+1} ${NAME[s]}</span>`).join('');sum()}
 function sum(){const c={T:0,B:0,L:0,R:0};for(const k in ticks)if(ticks[k].typed.trim())c[k[0]]++;
  $('sum').textContent='ticks entered - '+SIDES.map(s=>`${NAME[s]} ${c[s]}`).join(' · ')}
