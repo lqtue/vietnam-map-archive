@@ -26,6 +26,11 @@
           "path": "docs/research/allmaps-series-note.md",
           "purpose": "Dated survey georeferencing note",
           "availability": "repository"
+        },
+        {
+          "path": "work/usgs",
+          "purpose": "USGS and NGA Vietnam product list",
+          "availability": "repository"
         }
       ]
     },
@@ -79,6 +84,16 @@
         {
           "path": "docs/journals/260930-series-georef-review-loop.md",
           "purpose": "Placement review procedure",
+          "availability": "repository"
+        },
+        {
+          "path": "work/vn1971",
+          "purpose": "1971 provincial maps: grid georeferences and Allmaps annotations",
+          "availability": "repository"
+        },
+        {
+          "path": "work/l909",
+          "purpose": "L909 city index, ingested scans and annotations",
           "availability": "repository"
         }
       ]
@@ -146,6 +161,11 @@
         {
           "path": "docs/research/river-reconstruction.md",
           "purpose": "Exploratory river reconstruction record",
+          "availability": "repository"
+        },
+        {
+          "path": "work/review-kit",
+          "purpose": "Review page and record writers for reading checks",
           "availability": "repository"
         }
       ]
@@ -335,6 +355,16 @@
           "path": "work/archive/vectorize",
           "purpose": "Retired colour-profile previews retained as evidence",
           "availability": "local"
+        },
+        {
+          "path": "scripts",
+          "purpose": "Commands that act on the live system: ingest, enqueue, audit, georeference writes, layout check",
+          "availability": "repository"
+        },
+        {
+          "path": "work/core",
+          "purpose": "Shared Python package (vma_core) for the OCR, segmentation and worker pipelines",
+          "availability": "repository"
         }
       ]
     }
@@ -350,11 +380,6 @@
     "work/analysis/1882": "work/image-processing/experiments/river-1882",
     "work/analysis/river_pair": "work/image-processing/experiments/river-1882-1898",
     "work/analysis/seg-260919": "work/image-processing/experiments/segmentation-20260919",
-    "work/vectorize": "work/archive/vectorize",
-    "docs/allmaps-series-note.md": "docs/research/allmaps-series-note.md",
-    "docs/field-comparison.md": "docs/research/field-comparison.md",
-    "docs/image-processing-record.md": "docs/research/image-processing-record.md",
-    "docs/river-reconstruction.md": "docs/research/river-reconstruction.md",
-    "docs/worked-example-1882.md": "docs/research/worked-example-1882.md"
+    "work/vectorize": "work/archive/vectorize"
   }
 }

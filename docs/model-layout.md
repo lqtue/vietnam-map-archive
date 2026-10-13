@@ -33,8 +33,7 @@ sources at `docs/paper/`. Shared engineering references, model documents, plans 
 their established canonical names. `docs/archive/` and `roadmap-record.md` remain frozen.
 
 Older river-pilot and segmentation-review paths, `work/ocr/outputs`, `work/ocr/logs`,
-`work/vectorize`, and the five
-research record paths at the docs root are relative compatibility symlinks. New references should
+and `work/vectorize` are relative compatibility symlinks. New references should
 use the physical locations. These links preserve existing scripts and historical citations;
 they are not duplicate stores. The remaining work-folder links are temporary and will be
 removed after the 1882 plan's reference audit. River reference tools and modern overlays
