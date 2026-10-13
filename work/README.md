@@ -29,8 +29,10 @@ python3 work/image-processing/build_catalog.py
 ```
 
 Image commands live in [image-processing/scripts](image-processing/scripts/README.md).
-OCR commands and shared IIIF, georeference, model and database helpers stay in `ocr/scripts/`;
-the Python environment remains at `ocr/.venv`. SAM2 retains its own code in `MapSAM2/`.
+OCR commands stay in `ocr/scripts/`. The shared IIIF, georeference and database helpers now live
+in [core/](core/README.md) (`vma_core`); `ocr/scripts/{iiif_tiles,scale,supabase_client}.py` are
+thin shims over it. The Python environment remains at `ocr/.venv`; the segmentation scripts'
+extra packages are listed in `seg-requirements-cpu.txt` and `seg-requirements-gpu.txt`. SAM2 retains its own code in `MapSAM2/`.
 The older river-pilot and segmentation-review paths, `ocr/outputs`, `ocr/logs` and `vectorize`
 remain temporary compatibility symlinks. Use physical paths for new commands. Remove the
 remaining links only after the reference audit in the [1882 plan](../docs/image-processing-1882-plan.md).

@@ -13,6 +13,8 @@ Consult each command's `--help` and the pipeline reference before running it.
 
 Shared modules include `iiif_tiles.py`, `scale.py`, `cache.py`, `gemini_client.py`, `local_vision.py`,
 `supabase_client.py`, `labels.py`, `prompt.py`, `pricing.py`, and `eval_metrics.py`.
+`iiif_tiles.py`, `scale.py` and `supabase_client.py` are shims: the code is in
+[`work/core/vma_core`](../../core/README.md) and the old names re-export it.
 Image commands live in [image-processing/scripts](../../image-processing/scripts/README.md)
 and import these helpers by path. `test_*.py` files check pipeline behavior, including the
 relocated review-figure tool. `oneoff/` holds completed backfills, retained as records;
