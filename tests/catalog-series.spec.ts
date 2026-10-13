@@ -8,13 +8,15 @@ test('catalog begins with compact disclosures while collection links remain in t
   const html = await response!.text();
   expect(html).toContain('/catalog/area/ho-chi-minh');
   expect(html).toContain('/catalog?region=mekong-delta');
+  // Wait for hydration: a click before it opens the <details> natively, then hydration folds it again.
+  await page.waitForLoadState('networkidle');
   await expect(page.locator('.collection-browser')).not.toHaveAttribute('open');
   await expect(page.locator('.series-band')).not.toBeVisible();
-  await expect(page.locator('.filters .add-filter select')).not.toBeVisible();
+  await expect(page.locator('.primary .add-filter select').first()).not.toBeVisible();
   await page.locator('.collection-browser > summary').click();
   await expect(page.locator('.series-band')).toBeVisible();
   await page.locator('.collection-browser > summary').click();
-  await page.locator('.filters .add-filter > summary').click();
+  await page.locator('.primary .add-filter > summary').click();
   await expect(page.getByLabel('Series or type')).toBeVisible();
   await expect(page.getByLabel('Place')).toBeVisible();
 });

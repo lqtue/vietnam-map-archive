@@ -468,7 +468,7 @@ record resolves and the attribution is sound:
 | venue | NCVPRIPG 2025 proceedings, published by Springer; scite dates the volume **2026** |
 | access | **closed.** `contentDenied: true`, `oaStatus: "closed"`, no full text and no abstract served. Orderable at about $37.95 |
 
-**The problem.** `docs/field-comparison.md` and the plan attribute specific figures to it — *internal
+**The problem.** `docs/research/field-comparison.md` and the plan attribute specific figures to it — *internal
 RMSE < 5 m, validation < 30 m on 11 of 12 sheets, < 350 s per sheet*. **None of those can be
 verified**, because nothing of the paper's body is readable through scite and the abstract was not
 served either. They are in the same position the MapSAM2 "+12.8% F1" claim was in, and they get the
@@ -690,7 +690,7 @@ paper and are called out individually.
 > nominally green OA per scite metadata, but `read_fulltext` returned `contentDenied` and both the
 > Springer chapter page (login redirect) and the EPFL infoscience handle (405) blocked direct fetch.
 
-**A misattribution found and fixed.** `docs/image-processing-record.md:219` cited this as **"(Zou et
+**A misattribution found and fixed.** `docs/research/image-processing-record.md:219` cited this as **"(Zou et
 al. 2025)"**. scite gives the first author as **Yijun Lin** (confirmed independently by the
 competition's own site, `rrc.cvc.uab.es/?ch=32`, which lists the full 25-name organiser roster —
 Lin, Tual, Li, Jang, Chiang, Weinman, Chazalon, Carlinet, Perret, Abadie, Duménieu, Chan, Liao, Su,
@@ -858,7 +858,7 @@ it reports none.
 ## Still to do in Phase 1
 
 - [x] Verify the remaining citations asserted in `work/archive/deck-and-kg-2026-05/kg/AUDIT.md` and
-      `docs/field-comparison.md` §Sources. **7 of 7 done 2026-09-19 — see §5 and §7 above.**
+      `docs/research/field-comparison.md` §Sources. **7 of 7 done 2026-09-19 — see §5 and §7 above.**
       - [x] **Tyagi & Dubey** — DOI and authorship verified; **closed access, numbers unverifiable**,
             and a decision is pending on whether to buy it (§5).
       - [x] **The GPT-4o legend paper** — verified as Kirsanova, Chiang & Duan (2025), 88% F-1 /

@@ -1,35 +1,41 @@
-# Python dependencies for work/ocr/ and work/worker/.
+# Python dependencies for work/core, work/ocr and work/worker.
 #
 #   python3 -m venv work/ocr/.venv
 #   source work/ocr/.venv/bin/activate
 #   pip install -r work/ocr/requirements.txt
 #
-# This is NOT a `pip freeze` of the existing venv — that venv carries 241
-# packages (jupyter, geopandas, contextily) from interactive analysis, none of
-# which the pipeline imports. These eight are what the scripts actually use,
-# read off their import statements and pinned to the versions the venv that
-# produced EVAL-BASELINE.md was running.
+# Not a `pip freeze`: the venv also carries transitive packages (httpx,
+# pydantic, cryptography ...) that google-genai pulls in. These are the packages
+# the code imports, read off the import statements under work/core, work/ocr and
+# work/worker, and pinned to what work/ocr/.venv holds (checked 2026-10-12 with
+# `work/ocr/.venv/bin/pip freeze`; every self-check in work/ocr/scripts passes
+# on exactly these versions).
 #
-# Not listed because they are not pip packages: `vips` and `rclone` (needed on
-# PATH before the worker will claim `tile_to_r2`) and the `tesseract` binary
-# behind pytesseract. `brew install vips rclone tesseract`.
+# The file used to pin pillow 12.3.0 and requests 2.33.0; the venv has 12.0.0 and
+# 2.32.5, which is what the checks ran on, so those are the pins now.
 #
-# MapSAM2 (`seg`) is deliberately absent: torch and an upstream SAM2 clone
-# belong to whichever GPU machine runs that kind, not to this venv.
+# Segmentation and analysis scripts need more (opencv, the geo stack): see
+# work/seg-requirements-cpu.txt, which includes this file.
+#
+# Not pip packages: `vips` and `rclone` (needed on PATH before the worker will
+# claim `tile_to_r2`) and the `tesseract` binary behind pytesseract.
+#   brew install vips rclone tesseract
 
-google-genai==2.16.0
-numpy==2.5.1
-pillow==12.3.0
-python-dotenv==1.2.2
-requests==2.33.0
-scipy==1.17.1
-shapely==2.1.2
+google-genai==2.16.0      # ocr/scripts/gemini_client.py
+numpy==2.5.1              # core iiif/georef, ocr
+pillow==12.0.0            # core iiif, ocr
+python-dotenv==1.2.2      # core paths/db/iiif, ocr, gemini_client
+requests==2.32.5          # core iiif/db/georef, ocr, worker
+scipy==1.17.1             # core iiif (density pre-pass), ocr
+shapely==2.1.2            # ocr/scripts/eval_metrics.py, join_labels
 
-# modern_prior.py only — a thin GDAL binding, so a GPKG can be clipped and read
-# without dragging geopandas (and pandas, and pyproj) in behind it.
-pyogrio==0.12.1
-
-# local_vision.py, which ocr.py imports at module level (ocr.py:64) — so this
-# is required, not optional. pytesseract itself is imported lazily inside the
-# function (local_vision.py:115), but the module is on the import path.
+# local_vision.py, which ocr.py imports at module level - required, not optional.
+# pytesseract itself is imported lazily inside the function, but the module is on
+# the import path.
 pytesseract==0.3.13
+
+# The next two are not imported by core or OCR. They stay here because the
+# image tools' README tells people to run everything with this one venv, and
+# modern_prior.py needs pyogrio; the venv has it. They move to the seg file
+# when seg gets its own environment.
+pyogrio==0.12.1
