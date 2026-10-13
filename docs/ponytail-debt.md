@@ -15,22 +15,22 @@ this file is gone (Sept 2026)** — nothing regenerates it automatically, so it
 only tells the truth right after someone runs that grep. Every `file:line`
 below is copied from its output.
 
-Scanned **2026-10-06**: **91 tracked markers** (the grep also hits gitignored output under `work/image-processing/results/` — skip those). Previous scan 2026-09-15 (72).
-The two OCR controller entries were retired 2026-10-06: a shared draft cache now
-keeps failed saves and coalesces rotation edits until explicit Save. The 2026-10-06
-rescan added two rows that the 2026-10-05 ledger had missed: `catalogFilters.ts:76`
-and `work/ocr/scripts/sheet_features.py:120`.
+Scanned **2026-10-13** against `origin/main` (11c4a368): **99 tracked markers** across 77 files.
+Previous scan 2026-10-06 (91). The grep also hits gitignored output under
+`work/image-processing/results/` — skip those. The 2026-10-13 rescan added ten rows the
+2026-10-06 ledger had missed (`sheetPairs.ts`, `YearTimeline.svelte`, `edgeCache.ts`, the series
+annotation route, `117_map_series_ungeoreferenced.sql`, `landmarks_1882.py`, `name_today.py` ×2,
+`review_page.py`, `review_record.py`), moved two rows whose lines had shifted (`catalogFilters.ts`,
+the editorial front page), re-pointed the two `iiif_tiles.py` markers to `work/core/vma_core/iiif.py`
+(PR #67 moved the code; the old file is a shim with no marker), and dropped the duplicate
+`work/ocr/scripts/sheet_features.py` row and the `core/geo/wkb.ts` row (that file is deleted).
+The earlier history is under *What changed since 2026-09-10* at the foot.
 
-Against the
-2026-09-10 scan that is +19 markers, and a great many line numbers have moved —
-the ledger had gone stale in both directions, so this is a full rewrite rather
-than a patch. See *What changed since 2026-09-10* at the foot.
+## src/lib/core/sheetPairs.ts
 
-## src/lib/core/geo/wkb.ts
-
-- **:9** — the EWKB parser handles points only, little-endian only. ceiling: every row Supabase has
-  ever returned; a LINESTRING or big-endian order returns `null` rather than a wrong coordinate.
-  upgrade: take a real WKB library if the archive ever stores non-point geometry — do not grow this.
+- **:7** — the pairs of sheets whose legends read together (the 1942 Saigon and Cholon halves) are
+  a constant, not a column. ceiling: one pair. upgrade: move to `maps.extra_metadata` or a series
+  row when a second pair appears (ROADMAP `saigon-1942-pair-view`).
 
 ## src/lib/core/iiif/annotationUrl.ts
 
@@ -88,9 +88,14 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   on its own and nothing else on the map animates. upgrade: reach for `postrender` only if a second
   animated layer shows up.
 
+## src/lib/features/shared/YearTimeline.svelte
+
+- **:19** — the eras of the year scrubber are hand-listed spans for the Saigon archive. ceiling:
+  one archive's periodisation. upgrade: lift to `core/` if another page needs them.
+
 ## src/lib/features/shared/catalogFilters.ts
 
-- **:76** — `seriesShort()` derives a table-cell survey name from the collection string. ceiling: a
+- **:88** — `seriesShort()` derives a table-cell survey name from the collection string. ceiling: a
   new series with an odd name falls back to the head of its name. upgrade: a `series.short_name`
   column.
 
@@ -162,12 +167,26 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   numbers are not readable back out of it. upgrade: use `transformToGeo` directly if a writer ever
   needs them, rather than parsing this.
 
+## src/lib/server/edgeCache.ts
+
+- **:39** — a fixed 5-minute TTL (`ttl = 300`), so a publish shows for up to five minutes on a
+  warm colo. ceiling: that delay. upgrade: purge the key (`caches.default.delete`) from the publish
+  path.
+
 ## src/routes/(editorial)/+page.svelte
 
-- **:59** — the hero's demo sheet is hardcoded, not queried. ceiling: it is the only sheet carrying
+- **:73** — the hero's demo sheet is hardcoded, not queried. ceiling: it is the only sheet carrying
   all three layers the sequence shows — a georeference, traced footprints and validated OCR labels —
   so it is the only one where the demo tells the truth. upgrade: when a second sheet is this
   complete, write the join then.
+
+## src/routes/api/series/[key]/annotation/+server.ts
+
+- **:6** — one storage download per sheet, so the page is capped at `MAX_SHEETS = 60` and the
+  `.limit(60)` truncates with no signal. ceiling: **reached** — L7014 has 586 georeferenced sheets
+  and Indochine 100k 2nd edition 337, so the Allmaps viewer link shows an arbitrary 60 (about 48
+  items come back). upgrade: annotations merged ahead of time, or a signal that the result was
+  cut — ROADMAP `series-annotation-cap`.
 
 ## src/routes/api/export/footprints/+server.ts
 
@@ -275,12 +294,19 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   look at after retiring a sheet anyway. upgrade: add a trigger only if that query starts coming
   back non-empty for reasons nobody remembers.
 
+## supabase/migrations/117_map_series_ungeoreferenced.sql
+
+- **:6** — a series with no bbox at all falls back to a Vietnam-wide extent, so every bounds
+  consumer keeps getting four numbers. ceiling: a scan-only series is drawn as the whole country.
+  upgrade: null-safe bounds, which would touch the whole layer stack.
+
 ## eslint.config.js
 
-- **:16** — `@typescript-eslint/no-explicit-any` is off. ceiling: ~100 `as any` casts today, tracked
-  as debt rather than a lint failure. upgrade: _none named in the comment_ — `no-trigger`. (The
-  route is known and worth writing down: pass `<Database>` to every `createClient(...)`, which
-  removes most of them, then flip the rule to `warn`.)
+- **:16** — `@typescript-eslint/no-explicit-any` is off. ceiling: 36 `as any` casts in `src/` and
+  `tests/` (counted 2026-10-13; the comment in the config and the old row said ~100), tracked as debt
+  rather than a lint failure. upgrade: _none named in the comment_ — `no-trigger`. (The route is
+  known and worth writing down: pass `<Database>` to every `createClient(...)`, which removes most
+  of them, then flip the rule to `warn`; at 36 that is within reach.)
 
 ## playwright.config.ts
 
@@ -325,15 +351,16 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   columns; this keeps the row key unique (duplicate names exist) and carries the body-numeral join
   key. upgrade: add real columns if the number-join gets clumsy.
 
-## work/ocr/scripts/iiif_tiles.py
+## work/core/vma_core/iiif.py
 
-- **:519** — CLAHE in pure numpy + Pillow, ~30 lines. ceiling: there is no cv2 wheel for Python 3.14
+- **:528** — CLAHE in pure numpy + Pillow, ~30 lines. ceiling: there is no cv2 wheel for Python 3.14
   and this must add no dependency; a full 2048px tile costs ~0.2 s and four 256-entry float32 LUT
   gathers (~64 MB peak), and the bilinear interpolation matches cv2's so output is equivalent but
   not bit-identical. upgrade: if it ever shows up in the profile,
   `cv2.createCLAHE(clipLimit, tileGridSize).apply(L)` on the same L channel, same flag surface, then
-  delete `_clahe_lut`.
-- **:789** — the AOI is an axis-aligned rectangle in pixel space. ceiling: a rotated or skewed map
+  delete `_clahe_lut`. (Moved here from `work/ocr/scripts/iiif_tiles.py` by PR #67; that file is
+  now a re-export shim.)
+- **:798** — the AOI is an axis-aligned rectangle in pixel space. ceiling: a rotated or skewed map
   means the caller's pixel bbox over-covers the true geo polygon, so a few extra tiles survive;
   over-covering costs API calls where under-covering would lose labels, so this is the safe side.
   upgrade: _none named_ — `no-trigger`.
@@ -348,12 +375,6 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 - **:49** — char accuracy via `difflib.SequenceMatcher.ratio()`, a 2·M/T similarity, not a true
   CharACC/CER. ceiling: tracks regressions fine, but the absolute number is not a CER. upgrade: swap
   for `rapidfuzz.normalized_similarity` if an exact CER is ever needed.
-
-## work/ocr/scripts/sheet_features.py
-
-- **:120** — clipped least squares, not true NNLS; exact when both concentrations are ≥ 0. A copy of
-  the `work/image-processing/scripts/sheet_features.py:120` row. upgrade: _none named_ —
-  `no-trigger`.
 
 ## work/ocr/scripts/local_vision.py
 
@@ -465,6 +486,20 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   printer laid one tint heavier than another; per-class alphas are five scalars
   fitted the same way, and the trigger is a class that is systematically
   mis-assigned in one direction while the others are right.
+
+## work/image-processing/scripts/landmarks_1882.py
+
+- **:158** — the landmark table is hand-written on purpose. ceiling: a name match against the TASCO
+  layer found 1,369 named points in this extent and a school every 200 m; the identity step is the
+  only place a human reads a source, so it stays a table, not an inference. upgrade: _none named_ —
+  `no-trigger`.
+
+## work/image-processing/scripts/name_today.py
+
+- **:110** — `metres()` is equirectangular. ceiling: fine to <0.1% over a few hundred metres.
+  upgrade: _none named_ — `no-trigger`.
+- **:208** — only 3 cached relations carry outlines; the rest are measured to their bounding box.
+  ceiling: a bounding box over-states a long thin feature. upgrade: cache more outlines.
 
 ## work/image-processing/scripts/modern_prior.py
 
@@ -604,6 +639,16 @@ than a patch. See *What changed since 2026-09-10* at the foot.
 
 - **:218** — the pinch-to-zoom range (0.03–0.25) is eyeballed against one webcam at arm's length.
   upgrade: retune if zoom feels dead or pinned at an end.
+
+## work/review-kit/review_page.py
+
+- **:54** — `MAP_1882` is the one sheet the "over today" link opens. ceiling: one sheet. upgrade:
+  pass `item["map"]` for another.
+
+## work/review-kit/review_record.py
+
+- **:31** — `IDLE_S = 300`, one fixed idle cut. ceiling: a task whose real items run longer than
+  five minutes loses time as idle. upgrade: per-task cuts.
 
 ## What changed since 2026-09-10
 
