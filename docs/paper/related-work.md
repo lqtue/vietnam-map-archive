@@ -633,7 +633,7 @@ Stated carefully, because the comparison is easy to make dishonestly:
 > 12.7 m geodetic figure also predates the later change from 10 to 8 GCPs
 > (`docs/research/worked-example-1882.md`). The 2.3–19.0 m range is worse than superseded — it understated
 > the six-sheet ceiling by nearly 4×. Measuring all six District 4 sheets through one code path
-> (`work/analysis/district4/georef_error.md`) puts **1942 at 72.3 m RMSE, worst point 193.7 m**, on
+> (`work/analysis/district4/georef_error.md`) puts **1942 at 72.3 m RMSE on 12 GCPs, worst point 193.7 m**, on
 > the sheet carrying 31.7% of all extractions. Two of the six cannot be measured from their own GCPs
 > at all.
 >
