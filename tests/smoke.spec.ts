@@ -137,11 +137,17 @@ test('catalog search returns maps', async ({ page }) => {
   await page.goto('/catalog');
   await page.getByPlaceholder(/Search by title/i).fill('saigon');
 
-  // Results come from /api/search over the tsvector column.
-  const search = page.waitForResponse((r) => r.url().includes('/api/search') && r.status() === 200);
-  const body = await (await search).json();
-  expect(Array.isArray(body.maps)).toBe(true);
-  expect(body.maps.length).toBeGreaterThan(0);
+  // /catalog fetches the whole archive once (`/api/search?include=maps`) and
+  // searches it in the browser (`localSearch`), so no single /api/search
+  // response carries "the results for saigon". The first 200 to arrive is the
+  // labels-only call, which returns 0 maps and used to fail this test every
+  // time. Check what a reader sees instead: the toolbar's tally says N > 0 maps
+  // in the archive (it counts the filtered list, and reads "0 in archive" until
+  // the fetch lands), and the table under it has a row.
+  await expect(page.locator('.v2-count')).toHaveText(/^\s*[1-9][\d,]*\s+in archive/, {
+    timeout: 20_000,
+  });
+  await expect(page.locator('.data-table tbody tr').first()).toBeVisible();
 });
 
 test('explore mounts an OpenLayers map', async ({ page }) => {
