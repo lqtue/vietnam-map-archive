@@ -149,11 +149,10 @@ nothing meaning "this sheet" — `?map=`, the Info rail, story playback, the yea
 answers with a series row, whose synthetic `series:<key>` id resolves to no catalogue row and hands
 out a share link that opens an empty page; plus the localStorage migration, since a survey was one
 stack row per route until Sept 2026 and a reader who had L7014 on the map has two saved rows for one
-survey — a ref that no longer parses takes the layer off the map with no error at all, and the fold
+survey (the mosaic half is dropped on load since its retirement, 2026-10-03) — a ref that no longer parses takes the layer off the map with no error at all, and the fold
 that puts the halves back together has to land on the *same* id the /explore list offers or the next
-tap draws the survey twice), `tests/series-rows.spec.ts` (the /explore series list: that a raster
-archive and the database series it is `halfOf` are one row and one layer, parts bottom-up so the
-warped city sheets draw above the mosaic pixels they fill in for, and that its count and coverage
+tap draws the survey twice), `tests/series-rows.spec.ts` (the /explore series list: that a survey is
+one row holding one sheets part under its stable key, and that its count and coverage
 link say what the survey holds rather than what `maps` happens to know), `tests/ink.spec.ts`
 (`inkAlpha` and the footprint fill it now backs — a wrong parse paints a footprint invisible),
 `tests/wkb.spec.ts` (the EWKB point parser behind the home page's label layer — a byte-order slip
@@ -228,8 +227,8 @@ on production), `tests/series-sheets.spec.ts` (what a survey *contains*, read fo
 status of a cell, the tally the coverage bar draws, the camera a scan-less cell opens over, and the
 paged read behind the index. None of the four fails loudly — a wrong status is a plausible badge, a
 dropped page of rows is a smaller denominator, and a bad camera is a map over the wrong ground. The
-traps pinned by name: `source` is provenance, not possession, so a cell arriving as mosaic pixels
-has no source URL and is still **held**; the three statuses must partition the survey, because the
+traps pinned by name: `source` is provenance, not possession, so a cell that arrived without a source URL
+(the retired L7014 mosaic's pixels were one such case) is still **held**; the three statuses must partition the survey, because the
 bar draws them as three segments of one whole and the prose says "N of TOTAL"; a degenerate cell has
 to ask for a zoom a basemap actually has rather than `Infinity`; and a survey that exactly fills a
 page still has to stop), `tests/tile-size-segment.spec.ts` (the IIIF **size segment**, and the 404
@@ -305,7 +304,7 @@ Local ports are **54421** for the API and **54420** for the shadow DB, not the C
 54321/54320 collide with another local project. `-x vector -x logflare` is needed under colima:
 those containers bind-mount `/var/run/docker.sock`, which colima cannot provide.
 
-Pending migrations 105–108 have a separate database regression fixture at
+Migrations 105–108 (applied to production 2026-10-04) have a separate database regression fixture at
 `tests/sql/l7014-model.sql`. It applies the actual migration files to a small disposable pre-105
 schema in local PostgreSQL, including the prior generated-key index and dependent view, then checks
 legacy data backfills without changing addresses or scan metadata and without guessed printing

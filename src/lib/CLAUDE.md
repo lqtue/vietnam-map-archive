@@ -8,8 +8,8 @@ before touching the OpenLayers layer; what follows is only the shape.
 **Legacy, NOT runes.** Use `$:`, `export let`, `createEventDispatcher`, `$store`.
 Do not use `$state`, `$derived`, `$effect`.
 
-**House rules live in one place**: the `svelte-core-bestpractices` skill (`.agents/skills/`,
-symlinked into `.claude/skills/`) — a project fork of the upstream `sveltejs/ai-tools` skill,
+**House rules live in one place**: the `svelte-core-bestpractices` skill (`.agents/skills/`; a local symlink
+into the gitignored `.claude/skills/` makes Claude Code see it) — a project fork of the upstream `sveltejs/ai-tools` skill,
 rewritten for this dialect and merged with
 <https://github.com/spiegelgraphics/svelte-best-practices>.
 **Load it before creating, editing or reviewing any `.svelte` file.** It covers the dialect, the

@@ -51,7 +51,7 @@ and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line
 
 - **layersStore** — single source of truth for what the map renders.
   `{ base: LayerRef, overlays: OverlayLayer[] }` where `base` is either `{ kind: 'basemap', key }`
-  (`'g-streets' | 'g-satellite' | 'none'`) or
+  (`'g-streets' | 'g-archive' | 'g-satellite' | 'g-custom' | 'none'`) or
   `{ kind: 'historical', mapId, allmapsId, name?, thumbnail? }`. `overlays` is top-of-stack-first;
   each item has its own `opacity`, `visible`, and stable local `id`. There is no fixed overlay count limit. Hold and drag the three-dot layer menu to reorder, with a floating card and insertion marker; tapping opens actions and keyboard arrows also reorder. Order commits on release, and opacity sliders remain separate. Layer menus use the browser top layer and flip above cards near the viewport bottom.
   Persists to `localStorage` as `vma-layers-v1`. API: `setBase`, `addOverlay`, `removeOverlay`,
@@ -103,7 +103,7 @@ params, not routes. The grouping is **by shell**, not by verb — `/explore` is 
 MapShell surface and `/scan` the ImageShell one — which is what lets the OL map,
 the PMTiles source and the warped tiles stay warm across a mode change instead
 of being torn down and rebuilt. **The tool is called Studio, and `?mode=annotate` is its live
-alias.** `MODE_ALIASES` in the dispatcher maps it to `studio` rather than redirecting, because the
+alias.** `EXPLORE_MODE_ALIASES` in `core/routeModes.ts` (read by `resolveExploreMode()` in the dispatcher) maps it to `studio` rather than redirecting, because the
 mode shipped under that name and it is still in share links and bookmarks; an unknown mode falls
 through to browse, so an un-aliased old link would open the archive with no error anywhere —
 `tests/smoke.spec.ts` asserts both spellings reach the Studio title. `/studio` and `/annotate` both
@@ -455,8 +455,8 @@ out of `catalog/` in Sept 2026, when four features turned out to import them):
   of GPS on both viewports.
 - **`PlaceSearchBar.svelte`** — the Nominatim place search: field, clear button and the
   `LocationSearch` results list. Inline in `LayerControlsPanel` until Sept 2026, when /explore's
-  right rail wanted one at its crown; `.mo-search` is global (`components/modal.css`), so the
-  component is markup plus three lines of scoped CSS.
+  right rail wanted one at its crown; `.mo-search` has since been deleted from `components/modal.css`, so the
+  component carries its own scoped CSS.
 - **`CatalogSidebarPanel.svelte`** (`features/catalog/shared/`) — compact catalog browser used by
   tool pages other than /explore. It composes the whole catalog feature, so it is catalog's public
   entry point, not a shared primitive.
@@ -563,10 +563,9 @@ pending count) and `?mode=inspect` keeps the *un*georeferenced scans `fetchLabel
 The rail also carries the **mode switcher** in its footer, gated by its `mode` prop: unset — which
 is how `?mode=inspect` mounts it — there is no switcher, because inspect is unlisted (its public job
 moved to `/catalog/[id]` in Sept 2026; what is left is the plain look at a *draft* scan) and the
-other three want a session. `SidebarTabs.svelte` beside it is the one tab strip every `/scan`
-sidebar wears, links or buttons depending on whether a row carries an `href`; it was
-`digitalize/PhaseTabs.svelte`, hard-wired to that page's three phases. Also
-`ToolPanelHeader.svelte`, `EmptyPanel.svelte`, `SidebarToggleButton.svelte`,
+other three want a session. The tab strip every `/scan` rail wears is `$lib/ui/Tabs.svelte`
+(`tone="rail"`), links or buttons depending on whether a row carries an `href`. Also
+`ToolPanelHeader.svelte`, `EmptyPanel.svelte`,
 `CliCommandBlock.svelte` (copy-paste CLI block), `bboxHandles.ts` (flip helpers live in
 `$lib/core/geo/rectUtils.ts`), `iiifSource.ts` (`resolveMapIiifInfoUrl`). Data clients:
 `src/lib/features/contribute/shared/ocrApi.ts` and `src/lib/features/contribute/pipelineApi.ts`.
@@ -578,7 +577,7 @@ Category/colour/status constants have one home: `src/lib/features/contribute/sha
 sheet, **one component** (`DigitalizePage.svelte`) mounted for both: the dispatcher's `{#if}` covers
 the pair, so moving between them is a prop change and the OL map, the IIIF tile source and the open
 sheet all stay warm. Two page components would rebuild the canvas every time an operator checked
-their crop. The switcher is the **left rail's footer** (`SidebarTabs` in `ScanLeftRail`, three
+their crop. The switcher is the **left rail's footer** (`Tabs` in `ScanLeftRail`, three
 links), which is where it belongs — beside the sheet list, which also does not change with the mode.
 
 - **Prepare**: `TriageTool.svelte` (neatline rect + tile priority grid; click cycles normal → low-res amber → skip gray), `RegionsTool.svelte` (the layout regions — one labelled rect per part of the sheet, click to select, drag to correct; a dashed edge is the model's proposal and a solid one a person's) and `TriageSidebar.svelte`, whose five steps are **Layout · Neatline · Tiles · Save triage · Run OCR** — now a *check* rather than a build: the `layout` job adopts its own `main_map` region as `triage.neatline` (stamping `neatline_src`), tile priorities come from `--auto-priority` at run time, and **Save triage is the acceptance** (`triage.validated_at`), which is the only thing `enqueue_ocr_all.mjs` will queue on. `triageState()` in `src/lib/data/maps/triageTypes.ts` is the one predicate — `ready | proposed | needs_crop | needs_layout` — and the fleet script carries a hand copy because it is `.mjs`; `tests/triage-state.spec.ts` is the contract. The gate used to be `triage.neatline`, which **no sheet in the corpus had**, so the script's default mode queued nothing and reported success. **Detect** on step 1 enqueues a `layout` job: one low-resolution look at the whole sheet asking the model where the main map, title block, legend, name list, inset and furniture are. It is a job and not a route because the Gemini key lives on the worker and deliberately not in the web app. The answer lands in `maps.triage.regions` and the page polls for it. **Save triage** writes the neatline, tile grid and per-tile priorities to `maps.triage` (mig 069) — localStorage stays the working draft, but only a saved triage is visible to `scripts/enqueue_ocr_all.mjs`, which by default queues **only** triaged sheets (`--untriaged` includes the rest in auto mode) and crops to the `main_map` region when the layout pass found one, falling back to the neatline. "Run OCR" **enqueues a `pipeline_jobs` row** and returns 202; nothing runs until a worker claims it. Same behaviour in dev and on Cloudflare — the old `child_process` spawn and its `{ cli_only, cli_command }` fallback are gone. `CliCommandBlock` now only serves the segmentation panel.
@@ -709,8 +708,8 @@ map-selector source for `/scan?mode=prepare` and `?mode=shapes`.
 **Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
 
 **The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
-Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.5,8.5,108.5,21.6`, z0–15) in
-the `vma-tiles` R2 bucket at key `basemap/vietnam-20260906.pmtiles`, served straight off the bucket
+Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.0,8.5,108.5,22.0`, z0–15) in
+the `vma-tiles` R2 bucket at key `basemap/vietnam-20260913.pmtiles`, served straight off the bucket
 at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to
 cache and no longer invoke the worker (PMTiles is nothing but byte-range reads, and the worker could
 not cache them: `cache.put()` rejects a 206). **The key carries the Protomaps build date on
@@ -726,7 +725,7 @@ Foundation's own tiles have a usage policy that does not cover a busy site. `PUB
 is gone from `.env.example` too — nothing read it and nothing needs it. The Saigon-only extract it
 replaced (37 MB, bbox `106.3,10.3,107.1,11.2`) left 21 of 40 georeferenced maps — every Huế and
 Hanoi sheet — on bare `earth` fill; `basemap/saigon.pmtiles` is still in the bucket, unreferenced.
-Rebuild with `scripts/pmtiles_extract.sh vietnam 105.5,8.5,108.5,21.6 15 --upload`. **Two archives,
+Rebuild with `scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload`. **Two archives,
 one style, one handoff at z8.** That extract stops at its own bbox, so zoomed out the neighbours
 were simply missing and the tile edge around Vietnam read as a hole punched in the page.
 `basemap/seasia-20260912.pmtiles` (28 MB, bbox `90,-13,132,32`, **z0–8**) is the same Protomaps
@@ -735,72 +734,23 @@ z8. `REGION_PMTILES_URL` draws for `zoom <= 8` and `BASEMAP_PMTILES_URL` for `zo
 is `minZoom < zoom <= maxZoom`, so exactly one is ever live; both drawing at once would declutter
 Vietnam's labels twice and print them twice. Rebuild it with
 `scripts/pmtiles_extract.sh seasia 90,-13,132,32 8 --upload`. Both layers also paint `C.water` as
-their OL layer `background`, so anywhere past *either* bbox (west of 105.5° at z12, say) reads as
+their OL layer `background`, so anywhere past *either* bbox (west of 105.0° at z12, say) reads as
 sea rather than as the page's own black.
 
-**The 1960s topographic sheet is a second PMTiles archive, not 510 maps rows.** The US Army Map
-Service's Series L7014 (Vietnam 1:50,000) is published by the Perry-Castañeda Library as GeoPDFs
-that carry their own georeference — eight NGA control points, the printed neatline as a polygon, and
-an XMP block with title, edition, date and graticule corners — so `scripts/l7014_mosaic.py` clips
-each sheet to its neatline, warps it to Web Mercator and tiles the whole series into one raster
-archive at `overlay/l7014-<build date>.pmtiles`, read through `L7014_PMTILES_URL` in
-`basemapStyle.ts`. **It is a layer, not a basemap** — the raster `part` of a `SeriesRef` on
-`layersStore.overlays` (the archive itself is declared in `map/rasterSeries.ts`, which is pure data
-so that `overlayKind.ts` and the browser-less tests can read it; `LayerRenderer` turns each part
-into an OL layer), added from the **Series** row of `LayerControlsPanel`. It was a `BASEMAP_DEFS`
-entry for one iteration, which was wrong twice over: a series is one thing among the archive's
-sheets and belongs on the stack with an opacity slider, and as a basemap the ~99 missing sheets
-showed the basemap *beneath* it — in dark mode that is `#232019`, so every gap read as a black hole
-punched in the page. As an overlay a gap simply shows the reader's own basemap. Past the mosaic's
-native resolution (~4.2 m/px, z15) the tiles run out and the basemap shows through the same way. The
-overlay stack now holds two kinds of thing — catalogued sheets and whole surveys — so everything
-meaning "this sheet" (`?map=`, the Info rail, story playback, the year scrubber) reads past a series
-row via `isSheetLayer` (`map/stores/overlayKind.ts`, kept apart from `layersStore` so it is
-importable without `$app`); `tests/layer-stack.spec.ts` is what fails if a series starts answering
-for the sheet on top, since the symptom is only a share link that opens nothing. Adjacent sheet
-edges agree to 2.5–14 m where the two sheets were warped the same way, inside the series' own
-drafting accuracy, and what is visible at such a seam is scan brightness, not geometry — **but the
-live archive `l7014-20260913` is wrong and a rebuild is pending**: 285 of its 437 GeoPDFs shipped
-without the Indian 1960 datum shift and sit ~470 m northwest of where they belong, so 56 of the 750
-seams are over 300 m and all 33 where a hand-georeferenced sheet meets the mosaic are ~460 m. The
-fix and the `fit` phase that fails on the shipped archive are in `scripts/l7014_mosaic.py`; nothing
-has been re-warped or re-uploaded. `docs/pipelines.md` trap 1 has the cause. **24 of the 535 sheets
-are plain JPGs with no georeference and they are the ones over Saigon** — Thành phố Hồ Chí Minh,
-Biên Hòa, Nhơn Trạch, Cần Giuộc, Cần Giờ, Gò Công, plus Huế, Đà Nẵng and Hải Phòng — so the mosaic
-has a hole exactly over the city; they are recorded in `work/l7014/sheets.json` with `kind: "jpg"`
-rather than dropped. (A twenty-fifth, Phu Vang 6542-3, is published both ways and is already in the
-mosaic as a GeoPDF.) **PCL publishes the series twice and neither list is complete**: the flat
-alphabetical page the scraper reads is missing two sheets the clickable `vietnam_index.html` diagram
-has — Bến Cát 6331-3 and Xóm Ruông 6331-4, both immediately north of Saigon — and the diagram is
-missing 37 the flat page has, so `phase_index` reads both and merges. That page's prose also
-misprints two sheet numbers (Giao San 5654-1 as 5641-1, Ban Kho 5949-3 as 5943-3), so the
-**filename** wins over the printed number wherever it parses. **The ground half of the missing
-sheets' georeference is free.** The ArcGIS index `Vietnam_50k_L7014.mpk` (627 cells, one per sheet,
-converted once to `work/l7014/index.geojson`) draws every sheet as an exact 15′×15′ cell and labels
-the layer WGS 84 — it is not. Those corners are the printed graticule, which is **Indian 1960**;
-taken at face value every sheet lands ~480 m northwest, which is trap #1 walking back in through the
-front door. Shifted to WGS 84 they agree with the GeoPDFs' own `NEATLINE` to 4–17 m, inside the
-series' drafting error — but **not via EPSG:4131**: PROJ picks a transformation with a partial area
-of use, and for a point outside it GDAL returns the input *unchanged* instead of failing. It is not
-a clean boundary — probed, `106.00,16.00` moves 470 m and `109.25,13.25` moves 0 — so which sheets
-come back silently unshifted is not predictable from where they are, which is why `warp` shipped 285
-of them that way. The Helmert is spelled out (`+a=6377276.345 +rf=300.8017 +towgs84=198,881,317`)
-and the phase probes it before trusting it. `l7014_mosaic.py corners` writes those four corners per
-sheet to `work/l7014/corners.csv`. The **pixel** half is not free and no index has it — a scan has a
-collar and a little skew — so it is four clicks per sheet in QGIS's Georeferencer, not a detector.
-The three ways this pipeline returns a plausible wrong map (GDAL silently defaulting an unmapped NGA
-datum code to WGS84, alpha-less JPEG tiles painting holes black, and a tile zoom past what the paper
-holds) are in `docs/pipelines.md`; `l7014_mosaic.py check` is the one that asserts the datum test
-can actually fail.
+**The 1960s topographic sheet (Series L7014) is no longer a second PMTiles archive.** The
+pre-tiled mosaic, `map/rasterSeries.ts`, `L7014_PMTILES_URL` and the raster renderer were retired
+2026-10-03 in `598fbe1b`. All 510 sheets are `maps` rows now and L7014 is an ordinary IIIF series,
+offered and warped like any other (below). The mosaic's build and datum traps are recorded in
+`docs/pipelines.md`.
 
 **A series does not have to be a mosaic.** The Indochine 1:25,000 survey of Tonkin and Thanh Hóa is
 56 ordinary `maps` rows warped live by Allmaps, offered as **one** stack row — a `SeriesRef` whose
-single part is `{ kind: 'sheets', collection }`, the same row type the mosaic arrives in and the
-second thing `layersStore.overlays` holds that is not a sheet. The trick that makes it affordable is
+single part is `{ kind: 'sheets', collection }`, the second thing `layersStore.overlays`
+holds that is not a sheet. The trick that makes it affordable is
 that a `WarpedMapLayer` is a *set* of georeferenced maps rather than one:
 `addGeoreferenceAnnotationByUrl` is additive, so 56 sheets cost one OL layer, one z-index and one
-opacity instead of 56 of each, and no pipeline, no 4 GB archive and no rebuild — which is the entire
-reason L7014 had to be pre-tiled and this does not. `loadSeriesInView` (`warpedOverlay.ts`) is the
+opacity instead of 56 of each, and no pipeline, no 4 GB archive and no rebuild — which is what let
+L7014 stop being pre-tiled. `loadSeriesInView` (`warpedOverlay.ts`) is the
 loader; `fetchSeriesSheets` (`data/maps/service.ts`) resolves `maps.collection` to annotation
 sources at render time, so the stored row is four short fields and a series that gains a sheet needs
 no re-add. **It loads the sheets the reader can see, and only those.** The renderer already draws
@@ -835,33 +785,23 @@ Indochine 1:25,000's cells are held in two editions each, so counting rows offer
 53, and two printings of a single sheet could qualify as a series on their own. 084 also left-joins
 `series_cells` (083) for `survey_sheets`, so the row reads "9 of 627 sheets" — what the survey
 contains, which `maps` cannot say because it holds only successes. What the view deliberately does
-**not** expose is how many cells reach a reader by *any* route (461 for L7014, 452 of them pixels in
-the mosaic): the /explore row is a control, and it must say what it draws, not what the archive
-holds. The gate is spelled out in the view body rather than left to `security_invoker` — 081's
+**not** expose is how many cells reach a reader by *any* route (L7014's mosaic pixels counted
+until they were retired): the /explore row is a control, and it must say what it draws, not what
+the archive holds. The gate is spelled out in the view body rather than left to `security_invoker` — 081's
 lesson repeated, since a service-client caller bypasses RLS. Two consequences worth knowing: a
 wholly-draft survey has **no row at all** for an anonymous reader, which is why there is no `draft`
 flag in the UI (that was a fact about the data kept in the code, and it went stale the moment a
 sheet was published); and because the count is of rows *this* reader can see, a survey with one
 published sheet is not offered publicly at all — it appears when a second is published.
 `fetchMapSeries` reads it, `tests/write.spec.ts` asserts both halves of the gate against real
-Postgres. The **L7014 mosaic stays hardcoded** (`RASTER_SERIES` in `map/rasterSeries.ts`), because
-it is the one series that is not `maps` rows: it is a raster archive on our tile domain and nothing
-in the database describes it. **It is not its own row, though**: `buildSeriesRows`
-(`features/explore/seriesRows.ts`, `tests/series-rows.spec.ts`) folds a raster archive together with
-the database series it declares itself `halfOf`, so L7014 is **one row that is one layer** — a
-`SeriesRef` whose two `parts` are the mosaic under and the nine warped city sheets over — reading
-*461 of 627 sheets*, with one name, one opacity slider, one eye, one × and one of the ten stack
-slots. It was two rows until Sept 2026, which is what a stack restored from localStorage still
-holds: `readOverlayRef` reads each saved half as a one-part row and `foldLegacyOverlays` puts the
-pair back together in the higher of their two positions (both in `map/stores/overlayKind.ts`, pinned
-by `tests/layer-stack.spec.ts`). A survey saved as one half comes back whole, because the archive
-knows its own key — the sheets half cannot be recovered the same way, since only the sheets row
-carries the collection name. The two are complementary, not alternative: the mosaic has a hole
-exactly over Saigon, because those 24 sheets are the plain JPGs with no embedded georeference, which
-is why they are `maps` rows at all. Offered as two rows they read as a choice between two things.
-That is also why nothing is offered until `fetchMapSeries` answers — the raster half is a constant
-and would render at once, and a tap in that window puts the mosaic up without the sheets that fill
-its hole.
+Postgres. Every series is a database series now: the L7014 mosaic that used
+to be hardcoded beside them was retired on 2026-10-03 (`598fbe1b`). `buildSeriesRows`
+(`features/explore/seriesRows.ts`, `tests/series-rows.spec.ts`) turns each `map_series` row into
+**one row that is one layer** — a `SeriesRef` whose single part is the live-warped sheets — with one
+name, one opacity slider, one eye, one × and one of the ten stack slots. A stack saved earlier
+still holds the old rows: `readOverlayRef` drops a saved `raster` part, and `foldLegacyOverlays`
+folds the rest back into one row per survey and renames the retired `l7014` key (both in
+`map/stores/overlayKind.ts`, pinned by `tests/layer-stack.spec.ts`).
 
 **OpenLayers is the only map engine** (MapShell + ImageShell); `@allmaps/openlayers` warps
 historical tiles. MapLibre GL was removed (Aug 2026) along with `@allmaps/maplibre`,
