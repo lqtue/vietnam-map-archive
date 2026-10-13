@@ -90,6 +90,16 @@
   let message = '';
   /** "Add another point" is armed: the next click on the scan adds a point to the open entry. */
   let addingMore = false;
+  /** "Click on sheet": another scan of the same year shown in place of this one, for an
+   *  entry whose place is printed on the neighbouring half (Cholon's legend, Saigon's ground). */
+  let sourceId = '';
+  $: siblings = currentMap
+    ? maps.filter(
+        (m) => m.id !== currentMap!.id && !!m.iiif_image && !!m.year && m.year === currentMap!.year
+      )
+    : [];
+  $: source = siblings.find((m) => m.id === sourceId) ?? null;
+  $: stageInfoUrl = source?.iiif_image ? source.iiif_image + '/info.json' : iiifInfoUrl;
 
   $: view = rows.map((row) => staged[row.id] ?? row);
   // A detected numeral that could name an unplaced entry, and the subset that
@@ -187,6 +197,7 @@
   function selectMap(map: MapListItem) {
     if (currentMap?.id === map.id) return;
     currentMap = map;
+    sourceId = '';
     iiifInfoUrl = map.iiif_image ? map.iiif_image + '/info.json' : null;
     void loadLegend(map.id);
   }
@@ -220,8 +231,27 @@
     addingMore = false;
   }
 
-  function place(x: number, y: number, extra: boolean) {
-    if (selected) put(selected, x, y, extra);
+  async function place(x: number, y: number, extra: boolean) {
+    if (!selected || !currentMap) return;
+    if (!source) return put(selected, x, y, extra);
+    // Clicked on the sibling scan: carry the pixel across through both georeferences.
+    const row = selected;
+    const id = currentMap.id;
+    try {
+      const res = await fetch(`/api/admin/maps/${id}/px-from`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: source.id, x, y }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.message ?? `HTTP ${res.status}`);
+      if (currentMap?.id !== id) return;
+      if (result.x < 0 || result.y < 0)
+        throw new Error($t('That spot is above or left of this scan, which cannot be stored.'));
+      put(row, result.x, result.y, extra);
+    } catch (err) {
+      message = err instanceof Error ? err.message : $t('Could not place the point.');
+    }
   }
 
   function acceptCandidate(c: LegendCandidate, extra = false) {
@@ -423,6 +453,15 @@
             {#if message}<p role="alert">{message}</p>{/if}
           </div>
         {:else}
+          {#if siblings.length}
+            <label class="source">
+              {$t('Click on sheet')}
+              <select bind:value={sourceId}>
+                <option value="">{currentMap.name}</option>
+                {#each siblings as m (m.id)}<option value={m.id}>{m.name}</option>{/each}
+              </select>
+            </label>
+          {/if}
           <LegendSidebar
             rows={view}
             {selectedId}
@@ -452,13 +491,13 @@
       </ToolSidebarShell>
     </svelte:fragment>
 
-    {#if currentMap && iiifInfoUrl}
-      <ImageShell {iiifInfoUrl} {imageOpacity}>
+    {#if currentMap && stageInfoUrl}
+      <ImageShell iiifInfoUrl={stageInfoUrl} {imageOpacity}>
         <LegendTool
-          placed={view}
-          {candidates}
-          {grid}
-          {rects}
+          placed={source ? [] : view}
+          candidates={source ? [] : candidates}
+          grid={source ? null : grid}
+          rects={source ? [] : rects}
           selectedN={selected?.n ?? null}
           showPlaced={show.placed}
           showCandidates={show.candidates}
@@ -489,6 +528,14 @@
   .no-legend {
     padding: 0 0.75rem;
     font-size: 0.8rem;
+  }
+  .source {
+    display: block;
+    padding: 0 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  .source select {
+    width: 100%;
   }
   .no-legend p {
     margin: 0.3rem 0 0;

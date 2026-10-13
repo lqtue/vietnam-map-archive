@@ -406,14 +406,17 @@ textureLoader.crossOrigin = 'anonymous';
 async function load() {
   const response = await fetch('layers.json');
   if (!response.ok) throw Error(`Layer data: HTTP ${response.status}`);
+  const places = await fetch('places.json').then(r => r.ok ? r.json() : {}).catch(() => ({})); // enrich.py; optional
   const { layers, links, legend = [], legend_links: legendLinks = [], meters_per_unit: metersPerUnit, ground_origin_m: groundOrigin,
     meters_per_degree: metersPerDegree, span } = await response.json();
   // Oldest sheet sits on top of the stack, facing the camera first; newer
   // sheets stack below it, descending in world Y. Spacing is by sheet index,
   // not calendar gap, so a 9-year and a 25-year gap between sheets look the
   // same distance apart.
-  const indexByYear = new Map(layers.map((l, i) => [l.year, i]));
-  const mid = (layers.length - 1) / 2;
+  // The 1942 pair (Saigon + Cholon) shares one year, so one layer plane.
+  const years = [...new Set(layers.map(l => l.year))];
+  const indexByYear = new Map(years.map((y, i) => [y, i]));
+  const mid = (years.length - 1) / 2;
   const layerY = year => (mid - indexByYear.get(year)) * 130;
   let focus = null, hovered = null, loaded = 0, failed = 0;
   const rows = [], shortcutRows = [], sheetCorners = [], meshes = [], fabrics = [], lowTextures = [], yearBadges = [];
@@ -465,7 +468,7 @@ async function load() {
     if (l && expand) sidebar.expand(true);
     // Mobile's top pill is the only thing visible with the sheet collapsed,
     // so the current selection has to surface there too, not just in the list.
-    $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : 'Six sheets in view';
+    $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : `${layers.length} sheets in view`;
     showBasis(l, focus);
   }
   // The same steps docs/system-graph.md draws for the whole archive, answered
@@ -548,8 +551,10 @@ async function load() {
     const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: scanOpacity, side: THREE.DoubleSide, depthWrite: false });
     const mesh = new THREE.Mesh(imageGeometry, material);
     scene.add(mesh); meshes.push(mesh);
-    const badge = yearBadge(l.year, ly);
-    scene.add(badge); yearBadges.push(badge);
+    if (index === 0 || layers[index - 1].year !== l.year) { // one badge per year plane
+      const badge = yearBadge(l.year, ly);
+      scene.add(badge); yearBadges.push(badge);
+    }
 
     const fabricPositions = [];
     for (const ring of l.polys) {
@@ -643,10 +648,10 @@ async function load() {
   // different gaps) as separate buttons instead of merging them.
   const groups = new Map(), pins = [];
   const pickables = [];
-  // Legend links (k: 'll' legend-legend, 'lb' legend-body; a is the legend end) share chain ids with the name links.
+  // Legend links (k: 'll' legend-legend by name, 'ls' legend-legend by site, 'lb' legend-body; a is the legend end) share chain ids with the name links.
   for (const link of [...links, ...legendLinks]) {
     const key = link.c;
-    if (!groups.has(key)) groups.set(key, { name: link.t, elements: [], anchors: new Map(), years: new Set(), doling: null, members: [] });
+    if (!groups.has(key)) groups.set(key, { key, name: link.t, elements: [], anchors: new Map(), years: new Set(), doling: null, members: [] });
     const group = groups.get(key);
     if (!group.doling && link.d) group.doling = link.d;
     const a = toWorld(link.p, layerY(layers[link.a].year)), b = toWorld(link.q, layerY(layers[link.b].year));
@@ -656,7 +661,7 @@ async function load() {
     const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: .16, depthTest: false }));
     scene.add(line); group.elements.push(line);
     for (const [i, [point, year]] of [[a, layers[link.a].year], [b, layers[link.b].year]].entries()) {
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: link.k && (i === 0 || link.k === 'll') ? pinTexture : anchorTexture, color: lineColor, transparent: true, opacity: .2, depthTest: false }));
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: link.k && (i === 0 || link.k === 'll' || link.k === 'ls') ? pinTexture : anchorTexture, color: lineColor, transparent: true, opacity: .2, depthTest: false }));
       sprite.position.set(...point); sprite.scale.set(8, 8, 1);
       sprite.userData.pixelSize = 10; screenSpaceSprites.add(sprite);
       scene.add(sprite); group.elements.push(sprite); group.years.add(year);
@@ -680,6 +685,7 @@ async function load() {
   // Popup: detail on the name clicked in either the list or the scene.
   const popup = $('popup'), popupBody = $('popup-body');
   function closePopup() { popup.classList.remove('open'); }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   function popupHTML(group) {
     const years = [...group.years].sort().join(' → ');
     let html = `<h2>${group.name}</h2><p>${years} · tentative match, not a verified rename.</p>`;
@@ -689,7 +695,15 @@ async function load() {
         `<p>Per Tim Doling, <em>Historic Vietnam</em>: “${d.post_title}” (${d.post_date}). ` +
         `<a href="${d.post_url}" target="_blank" rel="noopener">Read →</a></p></div>`;
     }
-    for (const r of group.members) html += `<p>${r.year} · ${layers[r.sheet].label} · no. ${r.n}: ${r.name}${r.vn ? ` / ${r.vn}` : ''}</p>`;
+    for (const r of group.members.sort((p, q) => p.year - q.year)) html += `<p>${r.year} · ${layers[r.sheet].label} · no. ${r.n}: ${r.name}${r.vn ? ` / ${r.vn}` : ''}</p>`;
+    const place = places[group.key];
+    if (place) {
+      const w = place.wikipedia, dates = [place.inception && `built ${place.inception}`, place.dissolved && `ended ${place.dissolved}`].filter(Boolean).join(', ');
+      html += `<div class="doling"><p><strong>On this site today:</strong> ${esc(place.label || place.osm.name)}${place.description ? ` — ${esc(place.description)}` : ''}${dates ? ` (${dates})` : ''}</p>` +
+        (w ? `<p>“${esc(w.extract)}” <a href="${w.url}" target="_blank" rel="noopener">${w.lang}.wikipedia.org →</a> (CC BY-SA)</p>` : '') +
+        `<p><small>Matched by position (${place.m} m) to <a href="${place.osm.url}" target="_blank" rel="noopener">OpenStreetMap ${place.osm.id}</a> (© OpenStreetMap contributors, ODbL)` +
+        ` and <a href="https://www.wikidata.org/wiki/${place.wikidata}" target="_blank" rel="noopener">Wikidata ${place.wikidata}</a>. A site match, not proof it is the same building.</small></p></div>`;
+    }
     return html;
   }
   function showPopup(x, y, group) {

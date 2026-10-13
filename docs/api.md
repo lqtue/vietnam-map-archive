@@ -153,6 +153,12 @@ Public / other:
   depot of two yards). The first stays `px=`; the rest are `more=x,y|x,y` in the notes, at most 20,
   dropped when the entry has no first point. The public GET keeps `points` one per number and adds a
   separate `more: Point[]` that only the map's pins read.
+  A px may lie past the scan's right/bottom edge (a Cholon entry printed on the Saigon half); the
+  PATCH refuses a ground click that lands above or left of the scan (400), since `px=` is unsigned.
+- `/api/admin/maps/[id]/px-from` — **admin or mod** POST `{ from: <map uuid>, x, y }` → `{ x, y }`: a
+  pixel read off another sheet, carried through both georeferences into this sheet's pixels. The
+  legend tool's "Click on sheet" (same-year siblings) uses it; the result may be negative, which the
+  caller refuses.
 - `/api/admin/maps/work-state` — **admin or mod** GET, `?map=<uuid>` narrows to one: `{ [mapId]: WorkFacts }`
   (`$lib/core/sheetWork.ts`), what has been done to each sheet — triage state, which regions the
   layout found (title, legend, index), which kinds OCR read, OCR/segmentation ran, text/shapes

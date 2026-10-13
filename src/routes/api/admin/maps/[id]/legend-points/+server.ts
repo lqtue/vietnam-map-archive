@@ -247,6 +247,15 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
     if (!row || row.review_status === 'rejected') throw error(404, 'Legend entry not found');
     if (!legendNumber(row.text_corrected ?? row.text, row.notes))
       throw error(400, 'A selected entry has no legend number');
+    // A point may sit past the scan's right/bottom edge (a Cholon entry printed
+    // on the Saigon half), but px is stored unsigned: above/left of the scan
+    // would save and then read back as unplaced.
+    const px = pixel(edit.point);
+    if (px && (px[0] < 0 || px[1] < 0))
+      throw error(
+        400,
+        `№${legendNumber(row.text_corrected ?? row.text, row.notes)} falls above or left of this scan, which cannot be stored`
+      );
   }
 
   const updates = await Promise.all(
