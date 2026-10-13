@@ -1290,9 +1290,9 @@ library directly, which also made two things possible:
 
 **The archive answers on http only** — there is no https listener. A server-side
 subrequest is fine with that, but a browser on an https page blocks a
-mixed-content image, so thumbnails still go through the hanoimaps proxy, which
-is https and passes `crop` straight through. That is now the only thing the
-proxy is used for.
+mixed-content image, so thumbnails go through our own `/api/press/image`, which
+fetches server-side and passes `crop` straight through. (Until 2026-10-12 this
+was the hanoimaps proxy; `scripts/place_report.mjs` still points at it.)
 
 ### Three things that decide what can be collected
 

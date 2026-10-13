@@ -78,12 +78,12 @@ const NLV_PAGE = 50;
  * The archive answers on **http only** — no https listener at all. A server-side
  * subrequest is fine with that, but a browser on an https page blocks an http
  * image, so thumbnails cannot come from the library's own image server. They
- * come from the hanoimaps proxy instead, which is https and passes Veridian's
- * `crop` straight through. That crop is the box of the matched phrase on the
- * page, so a thumbnail is now the clipping itself at ~120 kB rather than the
+ * come from our own `/api/press/image`, which fetches server-side and passes
+ * Veridian's `crop` straight through. That crop is the box of the matched phrase
+ * on the page, so a thumbnail is the clipping itself at ~120 kB rather than the
  * whole newspaper page at ~1.4 MB.
  */
-const NLV_IMAGE = 'https://baochi-tvqg.vercel.app/api/image';
+const NLV_IMAGE = '/api/press/image';
 /**
  * Measured over a working day: 3-5 s warm, and up to 20 s on a cold CGI. The
  * page size barely moves it (o=20 and o=50 both land around 3.5 s), so this is
@@ -233,8 +233,8 @@ export function nlvItem(r: NlvRow): PressItem {
     snippet: '',
     url: `${NLV_SEARCH}?a=d&d=${r.oid}`,
     thumb: r.crop
-      ? `${NLV_IMAGE}?oid=${r.oid}&area=1&crop=${r.crop}&w=${r.crop.split(',')[2]}&color=all&ext=jpg`
-      : `${NLV_IMAGE}?oid=${r.oid}&area=1&w=480&color=all&ext=jpg`,
+      ? `${NLV_IMAGE}?oid=${r.oid}&crop=${r.crop}&w=${r.crop.split(',')[2]}`
+      : `${NLV_IMAGE}?oid=${r.oid}&w=480`,
   };
 }
 

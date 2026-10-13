@@ -189,6 +189,7 @@ Public / other:
   facet, so there is no `curve.gallica`; a curve there would be one request per decade. NLV is
   queried directly at `baochi.nlv.gov.vn`, which is http-only, so thumbnails route through an https
   image proxy — see `docs/pipelines.md`.
+- `/api/press/image/` — **public** GET `?oid=&w=[&crop=x,y,w,h]`: a newspaper-page clipping from the National Library, fetched server-side because the library is http only. Fixed host, every param pattern-checked (400 otherwise), 502 when the library does not answer, edge-cached 30 days. Used as the `thumb` of NLV hits.
 - `/api/search/` — unified GET over `maps` + (admin/mod) `scout_candidates`. Postgres tsvector via
   `.textSearch('search_vector', q, { config: 'simple' })`. Query:
   `q, area, region, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels, limit, offset`.

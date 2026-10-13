@@ -180,20 +180,18 @@ test('nlvDate unpacks the packed date, degrading on zeroed parts', () => {
 test('nlvItem maps a parsed row to the response shape', () => {
   const [withCrop, without] = parseNlvRows(NLV_HTML);
   // The thumbnail is the archive's snippet box rather than the whole newspaper
-  // page: ~120 kB rather than ~1.4 MB. It goes through the https proxy because
-  // the archive itself is http only and a browser blocks a mixed-content image.
+  // page: ~120 kB rather than ~1.4 MB. It goes through our own /api/press/image
+  // because the archive itself is http only and a browser blocks a mixed-content image.
   expect(nlvItem(withCrop)).toEqual({
     source: 'nlv',
     title: 'Sài Gòn — Chợ Khánh Hội',
     date: '1923-05-01',
     snippet: '',
     url: 'http://baochi.nlv.gov.vn/baochi/cgi-bin/baochi?a=d&d=RbD19230501.2.9.1',
-    thumb:
-      'https://baochi-tvqg.vercel.app/api/image?oid=RbD19230501.2.9.1&area=1' +
-      '&crop=209,3322,621,81&w=621&color=all&ext=jpg',
+    thumb: '/api/press/image?oid=RbD19230501.2.9.1&crop=209,3322,621,81&w=621',
   });
   // No crop stated: fall back to the whole page at a small width.
-  expect(nlvItem(without).thumb).toContain('&w=480&');
+  expect(nlvItem(without).thumb).toContain('&w=480');
 });
 
 test('nlvSearchUrl quotes the label, because txq ANDs unquoted words', () => {
