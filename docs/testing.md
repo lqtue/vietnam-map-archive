@@ -39,7 +39,7 @@ is linked while its count is described as indexed cities.
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **474** tests (`npx playwright test --list`, 2026-10-08):
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **470** tests (`npx playwright test --list`, 2026-10-13, after `wkb.spec.ts` went):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
@@ -155,8 +155,7 @@ tap draws the survey twice), `tests/series-rows.spec.ts` (the /explore series li
 one row holding one sheets part under its stable key, and that its count and coverage
 link say what the survey holds rather than what `maps` happens to know), `tests/ink.spec.ts`
 (`inkAlpha` and the footprint fill it now backs — a wrong parse paints a footprint invisible),
-`tests/wkb.spec.ts` (the EWKB point parser behind the home page's label layer — a byte-order slip
-drops every label off West Africa instead of throwing), `tests/hero-fabric.spec.ts` (the home page
+`tests/hero-fabric.spec.ts` (the home page
 hero's frozen footprints and labels — generated data the hero draws with no runtime filter, so a bad
 regeneration would paint the front page's third and fourth beats empty, or off West Africa, without
 an error anywhere), `tests/theme.spec.ts` (both faces of the palette, parsed out of `tokens.css` and
