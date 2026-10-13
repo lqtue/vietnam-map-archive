@@ -103,8 +103,8 @@ paper, other people's symbology, other people's script. Two-regime toponymy
 with diacritics, on sheets 1791–1968, is not a corner case the field has
 priced in — it is a corpus the field has not seen.
 
-→ `docs/field-comparison.md` §5 · `docs/theory.md` §"The open gap"
-→ `docs/image-processing-record.md` §4 (nine rejected approaches — evidence of
+→ `docs/research/field-comparison.md` §5 · `docs/theory.md` §"The open gap"
+→ `docs/research/image-processing-record.md` §4 (nine rejected approaches — evidence of
    what recalibration actually cost)
 
 ## §4 · What checking cost, itemised
@@ -127,8 +127,8 @@ list that was wrong in a file about to be used for outreach.
 discovers that a meaningful fraction of them fail. That is the base rate, not a
 scandal. Almost nobody publishes it, which is why nobody knows the base rate.
 
-→ `claim-audit.md` · `REGEN.md` · `docs/field-comparison.md` §7
-→ `docs/image-processing-record.md` §5 ("what is not established")
+→ `claim-audit.md` · `REGEN.md` · `docs/research/field-comparison.md` §7
+→ `docs/research/image-processing-record.md` §5 ("what is not established")
 
 ## §5 · Who pays for verification
 
