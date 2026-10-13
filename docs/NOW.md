@@ -48,18 +48,17 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
-| Place links + then-now (offline, ports 8792/8793) | Claude | `measured-pipeline` (committed) | Tue's sittings, then Opus scores |
-| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Tue's sittings, run from `vma-audit` (verdicts live there) |
+| Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64) | Tue's sittings, then Opus scores |
+| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Tue's sittings from `vma-audit`; rebase on main (#64 holds its base) |
 | Paper: claim-audit R rows 23 and 99 | Claude | `docs/paper/` | Clear both rows |
 | 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
-| 1942 pair / legend | Claude | `legend-sheet-pair` (rebuilt on main) | Force-push, then PR |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
 | Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
 | 1882/1898 river | **Tue** | `vma-1882-river` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
-| Catalog info two years · institution pages · L909 tables/USGS | — | `vma-catalog`, `vma-institutions`, `vma-l909-*` | Check state |
+| L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | PR: scripts and records only, both ran 2026-10-06 |
 
 ## Parked
 
