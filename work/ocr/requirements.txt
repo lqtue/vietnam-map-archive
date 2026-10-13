@@ -7,12 +7,12 @@
 # Not a `pip freeze`: the venv also carries transitive packages (httpx,
 # pydantic, cryptography ...) that google-genai pulls in. These are the packages
 # the code imports, read off the import statements under work/core, work/ocr and
-# work/worker, and pinned to what work/ocr/.venv holds (checked 2026-10-12 with
-# `work/ocr/.venv/bin/pip freeze`; every self-check in work/ocr/scripts passes
-# on exactly these versions).
-#
-# The file used to pin pillow 12.3.0 and requests 2.33.0; the venv has 12.0.0 and
-# 2.32.5, which is what the checks ran on, so those are the pins now.
+# work/worker, and pinned to what work/ocr/.venv holds (checked 2026-10-13 with
+# `work/ocr/.venv/bin/pip freeze`). pillow and requests carry security fixes, so
+# they sit at pillow 12.3.0 and requests 2.33.0. Every self-check under work/core,
+# work/ocr and work/worker (22 runs) was rerun on exactly these versions on
+# 2026-10-13; all passed, with the same output as on pillow 12.0.0 / requests
+# 2.32.5. Rerun them before moving any pin.
 #
 # Segmentation and analysis scripts need more (opencv, the geo stack): see
 # work/seg-requirements-cpu.txt, which includes this file.
@@ -23,9 +23,9 @@
 
 google-genai==2.16.0      # ocr/scripts/gemini_client.py
 numpy==2.5.1              # core iiif/georef, ocr
-pillow==12.0.0            # core iiif, ocr
+pillow==12.3.0            # core iiif, ocr
 python-dotenv==1.2.2      # core paths/db/iiif, ocr, gemini_client
-requests==2.32.5          # core iiif/db/georef, ocr, worker
+requests==2.33.0          # core iiif/db/georef, ocr, worker
 scipy==1.17.1             # core iiif (density pre-pass), ocr
 shapely==2.1.2            # ocr/scripts/eval_metrics.py, join_labels
 

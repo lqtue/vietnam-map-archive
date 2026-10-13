@@ -30,6 +30,7 @@ export const load: PageServerLoad = async ({ setHeaders, platform }) => {
   // header below is per response and stays outside. `ok` refuses a result in which a
   // failed query read as zero.
   const stats = await cached(platform, 'about-v1', loadStats, {
+    setHeaders,
     ok: (s) =>
       s.published > 0 &&
       s.labels > 0 &&

@@ -65,7 +65,7 @@ const PLACES = [
   { key: 'vietnam', area: '', spec: {} },
 ];
 
-export const load: PageServerLoad = async ({ platform }) => {
+export const load: PageServerLoad = async ({ platform, setHeaders }) => {
   // Public data, the same for every reader (the session lives in +layout.server.ts),
   // so the whole object is cached at the edge. `ok` refuses a result the data layer
   // degraded to zeros and empty lists after a failed query.
@@ -86,6 +86,9 @@ export const load: PageServerLoad = async ({ platform }) => {
 
       return { mapCount, series, places };
     },
-    { ok: (d) => d.mapCount > 0 && d.series.length > 0 && d.places.every((p) => p.total > 0) }
+    {
+      ok: (d) => d.mapCount > 0 && d.series.length > 0 && d.places.every((p) => p.total > 0),
+      setHeaders,
+    }
   );
 };
