@@ -69,7 +69,8 @@
     LABEL_ZOOM,
   } from '$lib/features/explore/exploreUrl';
   import type { LabelHit } from '$lib/features/shared/catalogSearch';
-  import { OPACITY_STEP, isTypingTarget, stepByYear } from '$lib/features/explore/exploreKeys';
+  import { OPACITY_STEP, stepByYear } from '$lib/features/explore/exploreKeys';
+  import { isTypingTarget } from '$lib/core/utils/commandPalette';
   import '$styles/layouts/mode-shared.css';
 
   type Mode = 'location' | 'all';

@@ -59,12 +59,6 @@ export function isLocale(v: unknown): v is Locale {
   return v === 'en' || v === 'vi';
 }
 
-/** Reads the cookie the server also reads, for the `ssr = false` tool routes. */
-export function localeFromCookie(cookie: string): Locale {
-  const m = /(?:^|;\s*)vma-lang=(en|vi)/.exec(cookie);
-  return m ? (m[1] as Locale) : 'en';
-}
-
 /** Picks a locale and remembers it. One year, path `/`, no reload needed. */
 export function setLocale(next: Locale): void {
   locale.set(next);

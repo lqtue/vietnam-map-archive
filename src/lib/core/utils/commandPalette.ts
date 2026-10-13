@@ -40,7 +40,6 @@ export const pageOwnsSearch = writable(false);
 /** Zero-argument on purpose: it is used directly as an `on:click` handler. */
 export const openPalette = () => openPaletteWith('');
 export const closePalette = () => paletteOpen.set(false);
-export const togglePalette = () => paletteOpen.update((v) => !v);
 
 /** True for the keystroke that opens the palette: ⌘K on a Mac, Ctrl+K elsewhere. */
 export function isPaletteShortcut(e: KeyboardEvent): boolean {

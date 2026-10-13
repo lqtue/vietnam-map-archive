@@ -212,4 +212,7 @@ test('the legend list filters, searches without accents, and keeps the open row'
   expect(ns({ query: 'theatre' })).toEqual([1]);
   expect(ns({ query: 'hotel' })).toEqual([3]);
   expect(ns({ filter: 'placed', keepId: 'r2' })).toEqual([1, 2]);
+  // đ has no Unicode decomposition: it must fold by hand, so "dinh" finds "Đình"
+  const dinh = [row(4, 'Đình', null, null), row(5, 'Casino', null, null)];
+  expect(filterRows(dinh, { ...base, query: 'dinh' }).map((r) => r.n)).toEqual([4]);
 });

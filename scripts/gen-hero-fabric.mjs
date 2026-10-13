@@ -42,9 +42,8 @@ const roundDeep = (v) => (typeof v === 'number' ? round(v) : v.map(roundDeep));
 
 /**
  * EWKB hex → [lng, lat]. Little-endian point only, which is what PostGIS emits
- * here; anything else is skipped rather than guessed at. The runtime twin is
- * `parsePointHex` in `$lib/core/geo/wkb.ts` — this exists so the browser does
- * not have to carry it for the hero.
+ * here; anything else is skipped rather than guessed at. Done here, at build
+ * time, so the browser does not have to carry a parser for the hero.
  */
 function parsePoint(hex) {
   if (typeof hex !== 'string' || !hex.startsWith('0101000020')) return null;

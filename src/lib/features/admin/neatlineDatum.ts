@@ -8,7 +8,7 @@
  */
 import { INDIAN_1960, type DatumParams } from '$lib/core/geo/datum';
 
-export { shiftToWgs84, geographicToECEF, ecefToGeographic } from '$lib/core/geo/datum';
+export { shiftToWgs84 } from '$lib/core/geo/datum';
 
 export interface DatumPreset extends DatumParams {
   label: string;
