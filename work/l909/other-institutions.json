@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-10-06",
+  "series": "ams-l909-viet-nam-city-maps-1-12-500",
+  "scope": "Online holdings of Series L909 at institutions other than PCL (already indexed) and USGS (indexed separately). Partial: only what could be opened on 2026-10-06; see `unverified` and `unreachable`. Records state what each catalogue asserts; nothing is inferred.",
+  "items": [
+    {
+      "index": true,
+      "institution": "Princeton",
+      "sourceRef": "princeton-dcxw42nk34n",
+      "url": "https://maps.princeton.edu/catalog/princeton-dcxw42nk34n",
+      "cell": "Vinh và Bến Thủy",
+      "title": "Vinh and Bé̂n Thu̓y",
+      "edition": "3-TPC",
+      "year": 1970,
+      "side": "recto (single scan; no verso recorded)",
+      "digitised": true,
+      "digitisedEvidence": "Figgy (Princeton's repository) record 04a3b49f-0bd4-4ec0-864a-6c0752313051, resource type 'Scanned Map', state 'complete'; IIIF manifest https://figgy.princeton.edu/concern/scanned_maps/04a3b49f-0bd4-4ec0-864a-6c0752313051/manifest has one canvas 11600 x 8900 and a PDF rendering.",
+      "downloadUrl": "https://figgy.princeton.edu/concern/scanned_maps/04a3b49f-0bd4-4ec0-864a-6c0752313051/pdf",
+      "rights": "No Known Copyright (http://rightsstatements.org/vocab/NKC/1.0/)",
+      "catalogueText": "Vietnam city maps 1:12,500 Vinh and Bé̂n Thu̓y, Vietnam. / prepared under the direction of the Department of Defense and published by the U.S. Tophographic Command. Author: United States. Army Map Service. Publisher: Washington, D.C. : U.S. Army Topographic Command 1970 ; [Bethesda, Md.] : Reprinted by National Imagery and Mapping Agency, 2000. Edition 3-TPC. Scale 1:12,500; transverse Mercator projection. 1 map : color ; 42 x 59 cm. 'Compiled in 1970.' Standard map series designation: Series L909 'NSN 7643014027971 Ed. No. 03'. 'NIMA Ref. No.: L909XVINBENT'. Call number G8024.V6C2 1970 .A7M3. Catalogue record 9955651283506421 (OCLC 1340190240).",
+      "note": "Princeton catalogue assertion, checked 2026-10-06: Edition 3-TPC; published 1970 by U.S. Army Topographic Command; reprinted by NIMA 2000 (the scan is of the Princeton copy, whose printing date the catalogue gives as both). NIMA ref L909XVINBENT. Digitised in Figgy (IIIF, PDF). Printing identity and collar details remain unreviewed."
+    },
+    {
+      "index": true,
+      "institution": "TTU",
+      "sourceRef": "MAP12060301",
+      "url": "https://vva.vietnam.ttu.edu/repositories/2/digital_objects/609517",
+      "cell": "Sài Gòn",
+      "title": "Saigon City Map",
+      "edition": "1-AMS (FE)",
+      "year": 1964,
+      "side": "recto MAP12060301; a second file MAP12060301B is attached to the same record (the record does not say whether it is the verso)",
+      "digitised": true,
+      "digitisedEvidence": "Record lists PDF and JPEG files for MAP12060301 and MAP12060301B (Large/Medium JPEG, PDF, 8.5x11 PDF).",
+      "downloadUrl": "https://vva.vietnam.ttu.edu/images.php?img=/maps/PDF/MAP12060301.pdf",
+      "rights": null,
+      "catalogueText": "Saigon City Map. Item Number MAP12060301. Author: Army Map Service, Corps of Engineers. Pat Clifton Collection. Physical location Section 12, Drawer 06, Folder 03. Country Vietnam; Alt. name South Vietnam. Series L909. Edition 1-AMS (FE). Scale 1:12500. Languages eng, vie. Dates: Existence: December 1964; Existence: Majority of material found within 01 January 1922 - 01 December 1964. Copies 1. Added 28 Jul 2005; updated 07 Feb 2011. No copyright statement on the record.",
+      "note": "TTU Virtual Vietnam Archive catalogue assertion, checked 2026-10-06: Series L909, Edition 1-AMS (FE), existence December 1964, Pat Clifton Collection, item MAP12060301. Files MAP12060301 and MAP12060301B (PDF/JPEG) are attached; the record does not say what the B file is. Printing identity and collar details remain unreviewed."
+    }
+  ],
+  "unverified": [
+    {
+      "institution": "Library of Congress",
+      "reason": "loc.gov answers 403 (Cloudflare) to every scripted request, so whether any L909 sheet is digitised online could not be checked. The bibliographic records (LC catalogue, SRU http://lx2.loc.gov:210/lcdb) carry no electronic location. Not written.",
+      "records": [
+        {
+          "lccn": "2006635395",
+          "title": "Vietnam city maps. Series L909 (serial-level record, 'Bàn đồ thị trấn')",
+          "edition": "Ed. 1-TPC-",
+          "date": "1966-",
+          "note": "prepared and published by the Defense Mapping Agency, Topographic Center; 'Predominant scale 1:12,500. Some maps at scale 1:15,000 or 1:10,000.'; earlier sheets by Army Map Service, 29th Engineer Battalion, U.S. Army Topographic Command"
+        },
+        {
+          "lccn": "71004766",
+          "city": "Sài Gòn",
+          "title": "Vietnam city maps 1:12,500 Sài Gòn (Saigon)",
+          "edition": "Edition 1-A.M.S. (FE)",
+          "date": "1963",
+          "series": "Series A.M.S. L909",
+          "note": "'Index on verso'; 103 x 84 cm"
+        },
+        {
+          "lccn": "71004815",
+          "city": "An Túc (An Khê)",
+          "title": "Vietnam city maps 1:12,500 An Túc (An Khê)",
+          "edition": "Edition 2-TPC",
+          "date": "1970",
+          "series": "Series L909",
+          "newCity": true
+        },
+        {
+          "lccn": "72001034",
+          "city": "Huế",
+          "title": "Ban đồ thi trần, Huế, 1:12,500 = Vietnam city maps, Huế",
+          "edition": "Edition 4 LĐ1ĐH",
+          "date": "1971",
+          "series": "L909 (Its Loai series)",
+          "note": "'Reprint in 4-1971'; Vietnamese and English; 'Guide to numbered features on verso'"
+        },
+        {
+          "lccn": "86694387",
+          "city": "Đồ Sơn",
+          "title": "Vietnam city maps 1:12,500 Đồ Sơn",
+          "edition": "Ed. 1-TPC",
+          "date": "1970",
+          "series": "Series L909",
+          "note": "NIMA/DMA ref L909XDOSON; compiled 1969; printed 3-70",
+          "newCity": true
+        }
+      ]
+    },
+    {
+      "institution": "National Library of Australia",
+      "url": "https://nla.gov.au/nla.obj-234148923/mapindex",
+      "reason": "nla.gov.au, catalogue.nla.gov.au and trove.nla.gov.au sit behind a proof-of-work bot challenge and the Trove v2 API is gone (410). A web-search snippet of the record says: 'Vietnam city maps / prepared and published by the Defense Mapping Agency, Topographic Center', created in Washington from 1964, 4 items, and 'only 3 editions of the Saigon / Ho Chi Minh City sheet have been digitized as of February 2022'. Editions, years and the series statement were not seen. Not written."
+    },
+    {
+      "institution": "TTU",
+      "reason": "Further L909 items at Texas Tech could not be found: the search UI is image-captcha gated, and after about 700 sequential item-page requests the host began answering every request with the same captcha (error 338), so crawling was stopped. None of the eight leads given (635107, 623847, 635169, 718507, 608733, 718544, 635282, 652196) is L909: they are L7014 (635107 Ho Chi Minh City 5-DMA; 608733 Long My), L9011 Vientiane (623847), L8020 Pictomaps (718507, 718544, 635282), L607 (652196) and a Hammond map (635169). Other leads seen only in search results, not opened: digital_objects 609067 (titled 'Da Nang (Tourane)'), 609208, 635075, 650379. Virtual Saigon (virtual-saigon.net) records TTU item MAP12090115 'Sài Gòn' 1968 1:15,000, 'Saigon Series L909', Vietnamese, Vietnam Archive Map Collection; the TTU record itself was not opened."
+    },
+    {
+      "institution": "Princeton",
+      "reason": "Princeton also catalogues Đà Lạt, Ed. 1-A.M.S. (FE), 1964 (NIMA reprint 2001), Series L909, record 9955640823506421, Lewis Library Map Collection. It is a print holding: no electronic access in the catalogue and no Figgy record. Not an online holding; not written."
+    }
+  ],
+  "unreachable": [
+    {
+      "institution": "Vietnam MONRE eLib",
+      "url": "https://elib.monre.gov.vn/DigitalDocument/Detail?treeId=6680&fileId=83400",
+      "reason": "Connection timed out from this network on 2026-10-06 (host resolves to 103.9.85.168; no response on 80 or 443). Not opened, nothing written."
+    }
+  ],
+  "notIndependentHoldings": [
+    {
+      "institution": "Virtual Saigon (Virtual Cities Project, CNRS/IAO)",
+      "reason": "Its L909 records reproduce PCL and TTU files and link to them. Biên Hòa 2-TPC 1968 (ID 1057) points to PCL's txu-pclmaps-bien_hoa-1968.jpg, not to TTU; Sài Gòn (ID 838) points to TTU MAP12060301; Sài Gòn (ID 1092) to TTU MAP12090115. Not indexed as a separate holder."
+    }
+  ],
+  "versos": "No verso scan found at any institution beyond PCL's Nha Trang and Qui Nhon. TTU MAP12060301B and LoC 'Index on verso' notes are unconfirmed."
+}
