@@ -11,6 +11,8 @@
  * non-Cloudflare run) it simply calls `load`.
  */
 
+import { version } from '$app/environment';
+
 /** The three Cache methods used here; the full type lives in an uninstalled package. */
 interface EdgeCache {
   match(key: string): Promise<Response | undefined>;
@@ -42,7 +44,9 @@ export async function cached<T>(
   const cache = p?.caches?.default;
   if (!cache) return load();
 
-  const url = `https://cache.internal/${key}`;
+  // The build version in the key: a deploy starts cold, so new code never reads
+  // a value shaped by the old code.
+  const url = `https://cache.internal/${version}/${key}`;
   try {
     const hit = await cache.match(url);
     if (hit) return (await hit.json()) as T;
