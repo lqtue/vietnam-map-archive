@@ -43,11 +43,3 @@ export function stepByYear(
   if (i < 0) return null;
   return ordered[i + dir] ?? null;
 }
-
-/** True when a keystroke belongs to whatever the user is typing in, not to the map. */
-export function isTypingTarget(target: EventTarget | null): boolean {
-  const el = target as HTMLElement | null;
-  if (!el || !el.tagName) return false;
-  if (el.isContentEditable) return true;
-  return ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName);
-}
