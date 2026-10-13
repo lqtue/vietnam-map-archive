@@ -31,6 +31,10 @@ interface EdgePlatform {
  * - `ok` guards the quieter failure: the data layer here logs a failed query and
  *   returns 0 or `[]`. Pass a check that is false for such a result, or an
  *   outage would be served for the whole TTL.
+ * - `setHeaders` (the load's own) reports what happened as `x-edge-cache`: `hit`,
+ *   `miss` (it loaded, whether or not the value passed `ok` and was stored) or
+ *   `bypass` (no cache to ask). It is called once per `cached` call, and SvelteKit
+ *   throws if a header name is set twice in one load, so pass it to one call only.
  */
 // ponytail: a fixed TTL, so a publish shows for up to 5 minutes (`ttl`) on a warm
 // colo. Upgrade: purge the key (caches.default.delete) from the publish path.
@@ -38,22 +42,38 @@ export async function cached<T>(
   platform: unknown,
   key: string,
   load: () => Promise<T>,
-  { ttl = 300, ok = () => true }: { ttl?: number; ok?: (value: T) => boolean } = {}
+  {
+    ttl = 300,
+    ok = () => true,
+    setHeaders,
+  }: {
+    ttl?: number;
+    ok?: (value: T) => boolean;
+    setHeaders?: (headers: Record<string, string>) => void;
+  } = {}
 ): Promise<T> {
   const p = platform as EdgePlatform | undefined;
   const cache = p?.caches?.default;
-  if (!cache) return load();
+  if (!cache) {
+    setHeaders?.({ 'x-edge-cache': 'bypass' });
+    return load();
+  }
 
   // The build version in the key: a deploy starts cold, so new code never reads
   // a value shaped by the old code.
   const url = `https://cache.internal/${version}/${key}`;
   try {
     const hit = await cache.match(url);
-    if (hit) return (await hit.json()) as T;
+    if (hit) {
+      const cachedValue = (await hit.json()) as T;
+      setHeaders?.({ 'x-edge-cache': 'hit' });
+      return cachedValue;
+    }
   } catch (err) {
     console.error('edgeCache read:', err);
   }
 
+  setHeaders?.({ 'x-edge-cache': 'miss' });
   const value = await load();
   if (ok(value)) {
     const put = cache

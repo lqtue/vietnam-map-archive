@@ -17,7 +17,7 @@ import { fetchInstitutionCatalog } from '$lib/data/maps/institutions';
 import { dbError } from '$lib/server/http';
 import { cached } from '$lib/server/edgeCache';
 
-export const load: PageServerLoad = async ({ url, platform }) => {
+export const load: PageServerLoad = async ({ url, platform, setHeaders }) => {
   // Nothing cached here reads the query string or the session: the same for every
   // anonymous reader, so `?area=` and `?region=` are read after the cache, below.
   // `ok` refuses a result the data layer degraded to empty lists after a failed query.
@@ -54,7 +54,10 @@ export const load: PageServerLoad = async ({ url, platform }) => {
           ),
       };
     },
-    { ok: (d) => d.series.length > 0 && d.areas.length > 0 && d.institutions.length > 0 }
+    {
+      ok: (d) => d.series.length > 0 && d.areas.length > 0 && d.institutions.length > 0,
+      setHeaders,
+    }
   );
   return {
     ...shared,
