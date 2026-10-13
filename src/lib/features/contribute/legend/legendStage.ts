@@ -1,5 +1,7 @@
 /** Pure helpers for the legend tool: which entry is next, which numeral to accept. */
 
+import { foldForSearch } from '$lib/core/utils/unaccent';
+
 export type LegendRow = {
   id: string;
   n: number;
@@ -55,9 +57,6 @@ export function mapStatus(s: { total: number; placed: number } | undefined): Map
 
 export type RowFilter = 'all' | 'unplaced' | 'suggested' | 'placed' | 'edited';
 
-const plain = (text: string | null) =>
-  (text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
-
 /**
  * The legend list as shown: filtered, then searched (number, name, Vietnamese
  * name, grid; accents ignored). Sorting is `LegendTable`'s. The `keepId` row
@@ -74,13 +73,15 @@ export function filterRows(
     keepId: string | null;
   }
 ): LegendRow[] {
-  const q = plain(opts.query.trim());
+  const q = foldForSearch(opts.query.trim());
   return rows.filter((row) => {
     if (row.id === opts.keepId) return true;
     if (opts.filter === 'unplaced' && row.x != null) return false;
     if (opts.filter === 'suggested' && !opts.suggested.has(row.n)) return false;
     if (opts.filter === 'placed' && row.x == null) return false;
     if (opts.filter === 'edited' && !opts.staged.has(row.id)) return false;
-    return !q || plain(`${row.n} ${row.name} ${row.vn ?? ''} ${row.grid ?? ''}`).includes(q);
+    return (
+      !q || foldForSearch(`${row.n} ${row.name} ${row.vn ?? ''} ${row.grid ?? ''}`).includes(q)
+    );
   });
 }
