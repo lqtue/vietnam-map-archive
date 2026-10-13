@@ -122,9 +122,6 @@ export function destroyWarpedLayer(layer: WarpedMapLayer): void {
 
 // ── Load overlay ─────────────────────────────────────────────────
 
-// Re-exported from its new home in $lib/core/iiif so existing importers keep working.
-export { annotationUrlForSource } from '$lib/core/iiif/annotationUrl';
-
 /**
  * Loads an overlay into a WarpedMapLayer using `addGeoreferenceAnnotationByUrl`.
  *

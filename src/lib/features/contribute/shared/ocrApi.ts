@@ -126,16 +126,6 @@ export async function batchSetStatus(
   return data.count ?? ids.length;
 }
 
-/** Reverts rows this user validated in the last `minutes`. Returns the count. */
-export async function revertRecent(mapId: string, minutes: number): Promise<number> {
-  const data = await request<{ count?: number }>(`${base(mapId)}/revert-recent`, {
-    method: 'POST',
-    headers: JSON_HEADERS,
-    body: JSON.stringify({ windowMins: minutes }),
-  });
-  return data.count ?? 0;
-}
-
 /** Creates a hand-drawn bbox (model: 'manual'). Returns the new row's id. */
 export async function createManualBbox(mapId: string, body: ManualBboxInput): Promise<string> {
   const data = await request<{ id: string }>(base(mapId), {
@@ -219,30 +209,6 @@ export async function saveRowStatus(
       : state.rows.map((r) => (r.id === id ? { ...r, status, validated_at } : r));
 
   return { rows, statusCounts };
-}
-
-/**
- * Writes one row's edited text and category, leaving its status alone. Returns
- * the next rows, with the edit buffer promoted to the validated columns.
- */
-export async function saveRowText(
-  mapId: string,
-  rows: EditableOcrExtraction[],
-  id: string
-): Promise<EditableOcrExtraction[]> {
-  const row = rows.find((r) => r.id === id);
-  if (!row) return rows;
-
-  await patchExtraction(mapId, {
-    id,
-    text: row._editText,
-    category: row._editCategory,
-    status: row.status,
-  });
-
-  return rows.map((r) =>
-    r.id === id ? { ...r, text_validated: r._editText, category_validated: r._editCategory } : r
-  );
 }
 
 /** True when a row's text or category has diverged from what is stored. */
