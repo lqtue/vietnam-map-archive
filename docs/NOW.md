@@ -3,7 +3,7 @@
 **Read this first, every session.** It holds the goal, the bets that serve it, what only Tue can
 do, and who is working on what. `ROADMAP.md` is the backlog behind it; nothing here repeats its
 detail. Keep this file under 70 lines: when a bet closes, replace it, and when an idea arrives, put
-it through the gate before it gets a branch. Updated 2026-10-12. Public repo: no application dates,
+it through the gate before it gets a branch. Updated 2026-10-13. Public repo: no application dates,
 referees or contacts here — those live in `docs/private/`.
 
 ## Goal
@@ -48,22 +48,23 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
-| Place links + then-now (offline, ports 8792/8793) | Claude | main checkout, untracked; goes to `measured-pipeline` | Tue's sittings, then Opus scores |
-| paper-audit-100k (§9 audit) | Claude/Sonnet | — | Not started |
+| Place links + then-now (offline, ports 8792/8793) | Claude | `measured-pipeline` (committed) | Tue's sittings, then Opus scores |
+| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Tue's sittings, run from `vma-audit` (verdicts live there) |
 | Paper: claim-audit R rows 23 and 99 | Claude | `docs/paper/` | Clear both rows |
-| 1882 extraction + Simplify (mig 120–121, uncommitted) | Codex | main checkout, on `legend-sheet-pair` | Codex confirms its files, then its own branch; 120/121 not known applied |
-| 1942 pair / legend | Claude | `legend-sheet-pair` | Commit and PR |
+| 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
+| 1942 pair / legend | Claude | `legend-sheet-pair` (rebuilt on main) | Force-push, then PR |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
-| Indochine 100k printed-tick audit | Claude | main checkout, dirty `scripts/indochine100k_georef.py` | Two-sided reader check — `.claude/handoff-indochine100k.md` |
+| Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
 | 1882/1898 river | **Tue** | `vma-1882-river` | See Tue only 5 |
+| Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | Catalog info two years · institution pages · L909 tables/USGS | — | `vma-catalog`, `vma-institutions`, `vma-l909-*` | Check state |
 
 ## Parked
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
-- City reconstruction / 3D (`city-reconstruction-plan.md`) — after the 1882 layer ships.
-- Names over time / Vietnam admin gazetteer.
-- Walk (`walk-plan.md`), Gallica text harvest, street-name pairs.
+- City reconstruction / 3D (`city-reconstruction-plan.md`), with 3D landmark models and the Favre
+  panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
+- Names over time / Vietnam admin gazetteer · Walk (`walk-plan.md`) · Gallica text harvest · street-name pairs.

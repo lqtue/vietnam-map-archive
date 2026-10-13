@@ -53,6 +53,9 @@ Most exist to catch a failure that looks like data rather than a bug.
 
 ## Rules
 
+- **The main checkout stays on `main`, clean. One stream = one branch = one worktree.** Start with
+  `git worktree add ../vma-<stream> -b <stream> origin/main` and write only there; the NOW.md board
+  names the folder. Five sessions writing into one checkout left 114 mixed files (2026-10-13).
 - **Svelte is legacy mode, not runes.** `$:`, `export let`, `createEventDispatcher`, `$store` —
   never `$state`/`$derived`/`$effect`. Load the `svelte-core-bestpractices` skill before any
   `.svelte` edit.
