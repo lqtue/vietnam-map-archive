@@ -9,7 +9,5 @@ for open work.
 - [cleanup 2026 08](cleanup-2026-08.md)
 - [gamification](gamification.md)
 - [iiif r2 plan](iiif-r2-plan.md)
-- [mode layout](mode-layout.md)
-- [page structure redesign](page-structure-redesign.md)
 - [pipeline 3d](pipeline-3d.md)
 - [processing plan 1882 1898](processing-plan-1882-1898.md) — superseded 2026-10-03 by `docs/image-processing-1882-plan.md`
