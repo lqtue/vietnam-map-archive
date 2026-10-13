@@ -5,6 +5,7 @@ use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../REA
 
 | Record | Subject |
 |---|---|
+| [261013](261013-panorama-match.md) | Favre 1881 engraving to the ground: 131 m held-out error against a 60 m limit — the pin tool is killed |
 | [261006](261006-1898-ocr-prep.md) | 1898 Saigon Plan OCR prep: no road numbers printed, `Rue` split from names, review the existing run |
 | [261006](261006-1882-ocr-review-patterns.md) | 1882 OCR review: what 212 validated rows say about the other District 4 sheets |
 | [261006](261006-legend-fabric.md) | Legend points across District 4 sheets in the fabric proto: chains, drift, gaps |

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painting ↔ map</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/openseadragon.min.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font: 13px system-ui, sans-serif; background: #f4f1ea; color: #222; }
+  main { display: grid; grid-template-columns: 1fr 1fr; height: calc(100% - 34px); }
+  #paint, #map { height: 100%; }
+  #paint { background: #ddd; border-right: 2px solid #222; }
+  header { height: 34px; display: flex; gap: 16px; align-items: center; padding: 0 10px; }
+  header output { color: #555; }
+  @media (max-width: 700px) { main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <b>Favre 1881 ↔ 1882 cadastral ↔ today</b>
+  <label>1882 sheet <input id="op" type="range" min="0" max="1" step="0.05" value="0.7"></label>
+  <output id="msg">Click the painting or the map.</output>
+</header>
+<main><div id="paint"></div><div id="map"></div></main>
+<script type="module">
+import L from 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/+esm'
+import { WarpedMapLayer } from 'https://cdn.jsdelivr.net/npm/@allmaps/leaflet@1.0.0-beta.55/+esm'
+
+// Gallica's IIIF sends no CORS header to localhost, so this is the Wikimedia Commons copy of the same
+// Gallica scan (btv1b53062212t, 10717 x 7527 — the pixel space the GCPs were clicked in), tiled with
+// `vips dzsave --layout iiif3 --tile-size 512 --id http://localhost:8794/results/panorama-match`.
+// The owner's local scan (10601 x 7443) is NOT the same pixel space.
+const PAINTING = '../../results/panorama-match/favre1881/info.json'
+const SHEET_1882 = 'https://maparchive.vn/api/maps/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b/annotation'
+const GCPS = 'favre1881-tue.gcps'
+const MIN_R = 30 // metres; a circle never claims better than this
+
+// ---- thin-plate spline: exact at every control point, smooth between them ----
+function solve(A, b) { // Gaussian elimination with partial pivoting, A n x n, b n x k
+  const n = A.length, M = A.map((r, i) => [...r, ...b[i]])
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]]
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k < M[r].length; k++) M[r][k] -= f * M[c][k] }
+  }
+  return M.map((r, i) => r.slice(n).map(v => v / r[i]))
+}
+const U = (a, b) => { const r2 = (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2; return r2 ? r2 * Math.log(r2) / 2 : 0 }
+function tps(src, dst) {
+  const n = src.length, A = [], b = []
+  for (let i = 0; i < n; i++) { A.push([...src.map(s => U(src[i], s)), 1, ...src[i]]); b.push(dst[i]) }
+  for (let k = 0; k < 3; k++) { A.push([...src.map(s => k ? s[k - 1] : 1), 0, 0, 0]); b.push([0, 0]) }
+  const w = solve(A, b)
+  return p => [0, 1].map(d => w[n][d] + w[n + 1][d] * p[0] + w[n + 2][d] * p[1] + src.reduce((s, q, i) => s + w[i][d] * U(p, q), 0))
+}
+
+// ---- control points: painting px <-> local metres ----
+const rows = (await (await fetch(GCPS)).text()).trim().split('\n').map(l => l.replace('-gcp', '').trim().split(/\s+/).slice(0, 4).map(Number))
+const px = rows.map(r => [r[0], r[1]]), ll = rows.map(r => [r[2], r[3]])
+const O = [ll.reduce((s, p) => s + p[0], 0) / ll.length, ll.reduce((s, p) => s + p[1], 0) / ll.length]
+const K = [111320 * Math.cos(O[1] * Math.PI / 180), 111133]
+const toM = p => [(p[0] - O[0]) * K[0], (p[1] - O[1]) * K[1]], toLL = m => [m[0] / K[0] + O[0], m[1] / K[1] + O[1]]
+// tps on pixels/1000 keeps the system well conditioned
+const pk = px.map(p => [p[0] / 1000, p[1] / 1000]), mk = ll.map(p => toM(p).map(v => v / 1000))
+const fwd0 = tps(pk, mk), inv0 = tps(mk, pk)
+const paintToM = p => fwd0([p[0] / 1000, p[1] / 1000]).map(v => v * 1000)
+const mToPaint = m => inv0([m[0] / 1000, m[1] / 1000]).map(v => v * 1000)
+// how wrong each point is when left out: the honest radius near it
+const loo = pk.map((_, i) => {
+  const f = tps(pk.filter((_, j) => j !== i), mk.filter((_, j) => j !== i))(pk[i])
+  return 1000 * Math.hypot(f[0] - mk[i][0], f[1] - mk[i][1])
+})
+const radius = m => { // inverse-distance weighted left-out error
+  let s = 0, w = 0
+  mk.forEach((q, i) => { const d = Math.hypot(m[0] - q[0] * 1000, m[1] - q[1] * 1000) + 1; s += loo[i] / d ** 2; w += 1 / d ** 2 })
+  return Math.max(MIN_R, s / w)
+}
+
+// ---- map: today + 1882 sheet ----
+const map = L.map('map', { zoomAnimationThreshold: 1 }).setView([O[1], O[0]], 15)
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map)
+const sheet = new WarpedMapLayer(SHEET_1882).addTo(map)
+sheet.setOpacity(0.7)
+document.getElementById('op').oninput = e => sheet.setOpacity(+e.target.value)
+ll.forEach((p, i) => L.circleMarker([p[1], p[0]], { radius: 4, color: '#06c', weight: 2 }).bindTooltip(`${i + 1} · ${Math.round(loo[i])} m`).addTo(map))
+const mapMark = L.layerGroup().addTo(map)
+
+// ---- painting ----
+const viewer = OpenSeadragon({ element: document.getElementById('paint'), tileSources: PAINTING, showNavigationControl: false, gestureSettingsMouse: { clickToZoom: false } })
+const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg')
+const shape = document.createElementNS(NS, 'polygon'), dot = document.createElementNS(NS, 'circle')
+viewer.addHandler('open', () => {
+  const { x: W, y: H } = viewer.world.getItemAt(0).getContentSize()
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('preserveAspectRatio', 'none')
+  svg.style.cssText = 'width:100%;height:100%;pointer-events:none'
+  px.forEach((p, i) => {
+    const c = document.createElementNS(NS, 'circle')
+    Object.entries({ cx: p[0], cy: p[1], r: 25, fill: 'none', stroke: '#06c', 'stroke-width': 10 }).forEach(([k, v]) => c.setAttribute(k, v))
+    svg.append(c)
+  })
+  Object.entries({ fill: 'rgba(230,40,20,.18)', stroke: '#e62814', 'stroke-width': 12 }).forEach(([k, v]) => shape.setAttribute(k, v))
+  Object.entries({ r: 18, fill: '#e62814' }).forEach(([k, v]) => dot.setAttribute(k, v))
+  svg.append(shape, dot)
+  viewer.addOverlay({ element: svg, location: new OpenSeadragon.Rect(0, 0, 1, H / W) })
+})
+
+// ---- the link, both ways ----
+function show(m, from) {
+  const r = radius(m), c = toLL(m), p = mToPaint(m)
+  const ring = Array.from({ length: 36 }, (_, k) => mToPaint([m[0] + r * Math.cos(k * Math.PI / 18), m[1] + r * Math.sin(k * Math.PI / 18)]))
+  shape.setAttribute('points', ring.map(q => q.join(',')).join(' '))
+  dot.setAttribute('cx', p[0]); dot.setAttribute('cy', p[1])
+  mapMark.clearLayers()
+  L.circle([c[1], c[0]], { radius: r, color: '#e62814', weight: 2, fillOpacity: 0.15 }).addTo(mapMark)
+  L.circleMarker([c[1], c[0]], { radius: 4, color: '#e62814', fillOpacity: 1 }).addTo(mapMark)
+  if (from !== 'map') map.panTo([c[1], c[0]])
+  if (from !== 'paint') viewer.viewport.panTo(viewer.viewport.imageToViewportCoordinates(p[0], p[1]))
+  document.getElementById('msg').textContent =
+    `${c[1].toFixed(5)}, ${c[0].toFixed(5)} · painting ${Math.round(p[0])}, ${Math.round(p[1])} · ±${Math.round(r)} m`
+}
+map.on('click', e => show(toM([e.latlng.lng, e.latlng.lat]), 'map'))
+viewer.addHandler('canvas-click', e => {
+  if (!e.quick) return
+  const q = viewer.viewport.viewportToImageCoordinates(viewer.viewport.pointFromPixel(e.position))
+  show(paintToM([q.x, q.y]), 'paint')
+})
+</script>
+</body>
+</html>

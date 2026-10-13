@@ -1,0 +1,18 @@
+id,lng,lat,gap_m,streets,look_for
+q-hamnghi,106.70623,10.770895,0.0,Tôn Đức Thắng x Hàm Nghi,quay at the mouth of the Grand Canal (filled 1887)
+q-nguyenhue,106.706271,10.771432,0.0,Tôn Đức Thắng x Nguyễn Huệ,quay at the mouth of the Charner canal (filled 1887)
+q-dongkhoi,106.706401,10.772985,0.0,Tôn Đức Thắng x Đồng Khởi,rue Catinat meets the quay
+q-leduan,106.703068,10.785131,0.0,Tôn Đức Thắng x Lê Duẩn,bd Norodom meets the quay at the arsenal; same corner as Đinh Tiên Hoàng
+dk-leloi,106.70297,10.776167,0.0,Đồng Khởi x Lê Lợi,Catinat x bd Bonnard
+dk-lethanhton,106.701804,10.777241,0.0,Đồng Khởi x Lê Thánh Tôn,Catinat x rue d'Espagne
+dk-lytutrong,106.701035,10.777952,0.0,Đồng Khởi x Lý Tự Trọng,Catinat x rue Lagrandière
+ld-pasteur,106.697378,10.779138,0.0,Lê Duẩn x Pasteur,"bd Norodom, west of the cathedral"
+ld-namky,106.696496,10.778206,0.0,Lê Duẩn x Nam Kỳ Khởi Nghĩa,bd Norodom in front of the Governor's palace
+ld-haibatrung,106.699636,10.781476,0.0,Lê Duẩn x Hai Bà Trưng,"bd Norodom, east of the cathedral"
+ld-macdinhchi,106.701204,10.78316,0.0,Lê Duẩn x Mạc Đĩnh Chi,bd Norodom at the citadel's west side
+hbt-lethanhton,106.702924,10.778525,0.0,Hai Bà Trưng x Lê Thánh Tôn,mid-town
+pasteur-leloi,106.700938,10.774485,0.0,Pasteur x Lê Lợi,"mid-town, left"
+nk-leloi,106.700127,10.773322,0.0,Nam Kỳ Khởi Nghĩa x Lê Lợi,"left, towards the old market"
+nmk-haibatrung,106.698116,10.782881,0.0,Nguyễn Thị Minh Khai x Hai Bà Trưng,"far edge, rue Chasseloup-Laubat"
+nmk-namky,106.694991,10.779575,0.0,Nguyễn Thị Minh Khai x Nam Kỳ Khởi Nghĩa,"far edge, behind the palace"
+notre-dame,106.699021,10.779779,0,footprint centroid,"cathedral: centre of the nave at ground level, between the two towers' feet"
