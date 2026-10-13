@@ -49,8 +49,10 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Strategy](strategy.md)                      | Product direction and funding narrative              |
 | [Theory](theory.md)                          | Intellectual framework                               |
 | [Knowledge system](knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
+| [Digest pipeline](digest-pipeline-plan.md)   | How a map goes from found to linked: machine proposes, person decides, every decision timed (bet 1a) |
 | [Search](search-plan.md)                     | Finding labels, shapes and period sources            |
 | [Usage measurement](usage-measurement-plan.md) | Study, grant and support evidence; opt-in journeys and confirmed outcomes |
+| [Usage evidence sheet](usage-evidence-template.md) | Monthly template for an aggregate usage report |
 | [Catalog](catalog-plan.md)                   | The public list: columns, facets, speed, search       |
 | [Walk](walk-plan.md)                         | Proposed district walks; forks the separate HACW app |
 | [Evidence chain](evidence-chain-plan.md)     | Source-backed claims, review and reuse               |
