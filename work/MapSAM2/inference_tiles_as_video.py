@@ -30,6 +30,9 @@ Full run on Colab with LoRA checkpoint + OCR seeds:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import subprocess
+import platform
 import json
 import os
 import sys
@@ -267,18 +270,19 @@ def preprocess_tile(img: np.ndarray) -> np.ndarray:
     return clahe.apply(img)
 
 
-def _run_automatic(generator, tile_img: np.ndarray) -> list[PolygonResult]:
+def _run_automatic(generator, tile_img: np.ndarray, min_area=400, max_area=200_000) -> list[PolygonResult]:
     """Run grid-scan automatic segmentation on one tile."""
     masks_data = generator.generate(tile_img)
     masks  = [m["segmentation"] for m in masks_data]
     scores = [m["predicted_iou"] for m in masks_data]
-    return masks_to_polygons(masks, scores)
+    return masks_to_polygons(masks, scores, min_area=min_area, max_area=max_area)
 
 
 def _run_prompted(predictor, tile_img: np.ndarray,
                   seeds: list[dict],
                   prompt: str = "box",
-                  pick: str | None = None) -> list[PolygonResult]:
+                  pick: str | None = None,
+                  min_area=400, max_area=200_000, context=None) -> list[PolygonResult]:
     """Run prompted inference for each OCR seed on one tile.
 
     `prompt` decides what SAM2 is asked with:
@@ -341,9 +345,18 @@ def _run_prompted(predictor, tile_img: np.ndarray,
             best = int(np.argmax(scores))
         all_masks.append(masks[best])
         all_scores.append(float(scores[best]))
-        all_seed_refs.append(seed)
+        ref = dict(seed)
+        from seg_context import legend_suggestion
+        suggestion = legend_suggestion(tile_img, masks[best], context)
+        if suggestion:
+            ref['category_suggestion'] = suggestion
+        all_seed_refs.append(ref)
+        if hasattr(predictor, 'remember_mask'):
+            predictor.remember_mask(masks[best], float(scores[best]))
 
-    return masks_to_polygons(all_masks, all_scores, all_seed_refs)
+    if hasattr(predictor, 'finish_tile'):
+        predictor.finish_tile()
+    return masks_to_polygons(all_masks, all_scores, all_seed_refs, min_area=min_area, max_area=max_area)
 
 
 def infer_tile(
@@ -355,6 +368,8 @@ def infer_tile(
     text_mask: np.ndarray | None = None,
     prompt: str = "box",
     pick: str | None = None,
+    context=None,
+    render_size=RENDER_SIZE,
 ) -> list[PolygonResult]:
     """
     Fetch one IIIF tile, run inference, return polygons in full-image pixel coords.
@@ -367,17 +382,24 @@ def infer_tile(
     if mode == "prompted" and not seeds:
         return []
 
-    pil = fetch_crop(iiif_base, tx, ty, tw, th, size=RENDER_SIZE)
+    pil = fetch_crop(iiif_base, tx, ty, tw, th, size=render_size)
     render_w, render_h = pil.size   # should be RENDER_SIZE × (RENDER_SIZE or smaller)
-    img_np = preprocess_tile(np.array(pil))
+    raw_image = np.array(pil)
+    if not hasattr(model, 'tile_manifest'):
+        model.tile_manifest = []
+    model.tile_manifest.append({'region': list(tile_region), 'render_size': [render_w, render_h],
+        'rgb_sha256': hashlib.sha256(raw_image.tobytes()).hexdigest()})
+    img_np = preprocess_tile(raw_image)
 
     if text_mask is not None:
         img_np = apply_text_mask(img_np, text_mask, tile_region, render_w, render_h)
 
+    from seg_context import mask_area_bounds
+    min_area, max_area = mask_area_bounds(context, tw / render_w, th / render_h)
     if mode == "automatic":
-        polys = _run_automatic(model, img_np)
+        polys = _run_automatic(model, img_np, min_area=min_area, max_area=max_area)
     else:
-        polys = _run_prompted(model, img_np, seeds or [], prompt=prompt, pick=pick)
+        polys = _run_prompted(model, img_np, seeds or [], prompt=prompt, pick=pick, min_area=min_area, max_area=max_area, context=context)
 
     if not polys:
         return []
@@ -629,6 +651,8 @@ def write_to_supabase(
     }
     endpoint = f"{url}/rest/v1/footprints"
 
+    if any(p.holes for p in polys):
+        raise ValueError('Footprint storage accepts only an exterior ring. Resolve holes before importing; JSON preserves them.')
     rows = []
     for p in polys:
         # Column names are footprints', not PolygonResult's: the
@@ -725,10 +749,20 @@ def parse_args() -> argparse.Namespace:
                                          "without this argparse rejected the whole job.")
     p.add_argument("--prior",       help="modern_prior.py blocks.geojson to prompt from as well as "
                                          "(or instead of) OCR. Nameless, so its polygons carry no label")
+    p.add_argument("--memory", action="store_true", help="Condition prompted tiles through a diverse SAM2 memory bank (experimental)")
+    p.add_argument("--memory-size", type=int, default=8)
+    p.add_argument("--memory-k", type=int, default=3)
+    p.add_argument("--memory-confidence", type=float, default=0.85)
+    p.add_argument("--context", help="Pinned map metadata JSON; explicit target/prompt/area settings and legend suggestions")
+    p.add_argument("--no-live-crop", action="store_true", help="Use pinned prior/region without a changing database triage crop")
+    p.add_argument("--prior-types", help="Comma-separated prior seed categories to include, e.g. land_plot,parcel")
+    p.add_argument("--allow-partial", action="store_true", help="Permit partial output after tile errors; never used in comparison runs")
     p.add_argument("--region",      help="x,y,w,h crop in full-image pixels (default: full image)")
     p.add_argument("--tile-size",   type=int, default=1024, help="Tile width/height in source pixels")
+    p.add_argument("--render-size", type=int, default=1024, help="IIIF input width (128–1024); lower values suppress fine ink before SAM2 encoding")
     p.add_argument("--overlap",     type=int, default=128,  help="Tile overlap in source pixels")
     p.add_argument("--device",      default="cpu", help="cpu | cuda | mps")
+    p.add_argument("--seed", type=int, default=42, help="Fixed initialization seed for reproducible comparisons")
     p.add_argument("--out-json",    default="footprints.json")
     p.add_argument("--preview",     action="store_true", help="Save preview PNG")
     p.add_argument("--write-supabase", action="store_true")
@@ -818,7 +852,9 @@ def main() -> None:
             raise SystemExit(f"--{req.replace('_', '-')} is required (or use --self-check)")
     if not os.path.exists(args.checkpoint):
         raise FileNotFoundError(f"Checkpoint not found: {args.checkpoint}")
-    if args.overlap >= args.tile_size:
+    if not 128 <= args.render_size <= 1024:
+        raise ValueError('--render-size must be between 128 and 1024')
+    if args.tile_size <= 0 or args.overlap < 0 or args.overlap >= args.tile_size:
         raise ValueError(
             f"--overlap ({args.overlap}) must be less than --tile-size ({args.tile_size})"
         )
@@ -836,6 +872,9 @@ def main() -> None:
     iiif_base = args.iiif_base or resolve_iiif_base(args.map_id)
     print(f"IIIF base: {iiif_base}")
 
+    info = get_image_info(iiif_base)
+    full_w, full_h = info["width"], info["height"]
+
     # ── parse region ───────────────────────────────────────────────────────────
     if args.region:
         rx, ry, rw, rh = map(int, args.region.split(","))
@@ -845,9 +884,21 @@ def main() -> None:
         rw, rh = info["width"], info["height"]
         print(f"Full image: {rw}×{rh}")
 
+    if rx < 0 or ry < 0 or rw <= 0 or rh <= 0 or rx + rw > full_w or ry + rh > full_h:
+        raise ValueError('Region must be positive and inside the pinned scan')
     region = (rx, ry, rw, rh)
 
     # ── build tile grid ────────────────────────────────────────────────────────
+    context, context_hash = None, None
+    if args.context:
+        from seg_context import load_context
+        context, context_hash = load_context(args.context, args.map_id, (full_w, full_h))
+        args.feature_type = context['target_feature_type']
+        args.prompt = context.get('prompt', args.prompt)
+        args.pick = context.get('pick', args.pick)
+    if args.memory and args.mode != 'prompted':
+        raise ValueError('--memory currently requires --mode prompted; no silent automatic fallback')
+
     tiles = list(tile_grid(rw, rh, tile=args.tile_size, overlap=args.overlap,
                            region=(rx, ry, rw, rh)))
     print(f"Tiles: {len(tiles)} ({args.tile_size}px, {args.overlap}px overlap)")
@@ -856,11 +907,9 @@ def main() -> None:
     ocr_seeds_by_tile: dict[tuple, list[dict]] = {}
     if args.mode == "prompted":
         if not (args.ocr_run_id or args.prior):
-            print("WARNING: prompted mode requires --ocr-run-id or --prior; falling back to automatic")
-            args.mode = "automatic"
+            raise ValueError('Prompted mode requires --ocr-run-id or --prior')
         elif not _HAS_SEEDS:
-            print("WARNING: to_sam2_seeds.py not found; falling back to automatic")
-            args.mode = "automatic"
+            raise RuntimeError('to_sam2_seeds.py missing; cannot perform prompted inference')
         else:
             all_seeds: list[dict] = []
             if args.ocr_run_id:
@@ -874,17 +923,24 @@ def main() -> None:
                 # sits on is worth prompting twice from two boxes, not once.
                 print(f"Loading prior seeds from {args.prior} ...")
                 from to_sam2_seeds import load_seeds_from_prior
-                all_seeds += load_seeds_from_prior(args.prior, args.map_id)
+                all_seeds += load_seeds_from_prior(args.prior, args.map_id, resolve_crop=not args.no_live_crop)
             # One owner per seed. Calling seeds_for_tile per tile instead gives
             # every seed in an overlap band to both its neighbours and every
             # corner seed to four — on the 1959 sheet that was 17,317 prompts
             # for 13,037 seeds, a third of the GPU spent on masks the cross-tile
             # dedup then throws away.
+            if args.prior_types:
+                wanted = set(args.prior_types.split(','))
+                all_seeds = [seed for seed in all_seeds if seed.get('category') in wanted]
+            if not all_seeds:
+                raise ValueError('No eligible seeds: check the prior class selection and input region')
             from to_sam2_seeds import partition_seeds
             ocr_seeds_by_tile, seed_counts = partition_seeds(
-                all_seeds, tiles, render_size=RENDER_SIZE
+                all_seeds, tiles, render_size=args.render_size
             )
             loaded = len([t for t in ocr_seeds_by_tile.values() if t])
+            if not loaded:
+                raise ValueError('No eligible prompts in the requested region; no model run was performed')
             print(f"Seeds loaded: {seed_counts['placed']} across {loaded}/{len(tiles)} tiles")
             if seed_counts["oversized"]:
                 print(f"  {seed_counts['oversized']} dropped: box fills its tile, "
@@ -893,12 +949,23 @@ def main() -> None:
                 print(f"  WARNING: {seed_counts['unplaced']} seeds fell outside every tile")
 
     # ── load model ────────────────────────────────────────────────────────────
+    import random
+    import torch
+    random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
     print(f"Loading model ({args.mode}, {'LoRA' if args.lora else 'base'})...")
     if args.mode == "automatic":
         model = load_model_automatic(args.checkpoint, args.encoder, args.device)
     else:
         model = load_model_predictor(args.checkpoint, args.encoder, args.device,
                                      lora=args.lora, mapsam2_dir=args.mapsam2_dir)
+
+    if args.memory:
+        from memory_predictor import MemoryImagePredictor
+        model = MemoryImagePredictor(model, args.memory_size, args.memory_k, args.memory_confidence)
 
     # ── build text mask ──────────────────────────────────────────────────────
     text_mask = None
@@ -914,6 +981,7 @@ def main() -> None:
     t0 = time.time()
 
     skipped = 0
+    tile_errors = []
     for i, tile in enumerate(tiles):
         tx, ty, tw, th = tile
         seeds = ocr_seeds_by_tile.get(tile, [])
@@ -923,11 +991,12 @@ def main() -> None:
         print(f"  Tile {i+1}/{len(tiles)}: ({tx},{ty},{tw},{th})  seeds={len(seeds)}", end=" ")
         try:
             polys = infer_tile(model, iiif_base, tile, seeds, args.mode,
-                               text_mask=text_mask, prompt=args.prompt, pick=args.pick)
+                               text_mask=text_mask, prompt=args.prompt, pick=args.pick, context=context, render_size=args.render_size)
             print(f"→ {len(polys)} polygons")
             all_polys.extend(polys)
         except Exception as e:
             print(f"→ ERROR: {e}")
+            tile_errors.append({"tile": list(tile), "error": str(e)})
 
     elapsed = time.time() - t0
     if skipped:
@@ -945,6 +1014,16 @@ def main() -> None:
     # ── write JSON ────────────────────────────────────────────────────────────
     out = Path(args.out_json)
     out.parent.mkdir(parents=True, exist_ok=True)
+    def file_hash(path):
+        if not path or not Path(path).is_file():
+            return None
+        digest = hashlib.sha256()
+        with open(path, 'rb') as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                digest.update(chunk)
+        return digest.hexdigest()
+    code_revision = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=_HERE,
+        capture_output=True, text=True).stdout.strip()
     payload = {
         "map_id":    args.map_id,
         "region":    list(region),
@@ -952,12 +1031,30 @@ def main() -> None:
         "lora":      args.lora,
         "ocr_run_id": args.ocr_run_id,
         "tile_size": args.tile_size,
+        "render_size": args.render_size,
         "overlap":   args.overlap,
         "n_tiles":   len(tiles),
         "n_polys":   len(all_polys),
         "elapsed_s": round(elapsed, 1),
+        "feature_type": args.feature_type,
+        "errors": tile_errors,
+        "complete": not tile_errors,
+        "memory": getattr(model, 'stats', None),
+        "tile_inputs": getattr(model, 'tile_manifest', []),
+        "context": context,
+        "context_sha256": context_hash,
+        "provenance": {"code_revision": code_revision, "python": platform.python_version(),
+            "code_sha256": {name: file_hash(_HERE / name) for name in ("inference_tiles_as_video.py", "memory_predictor.py", "seg_context.py", "masks_to_polygons.py", "to_sam2_seeds.py")},
+            "checkpoint_sha256": file_hash(args.checkpoint), "prior_sha256": file_hash(args.prior),
+            "source_size": [full_w, full_h], "iiif_base": iiif_base,
+            "device": args.device, "seed": args.seed, "torch": torch.__version__,
+            "prompt": args.prompt, "pick": args.pick,
+            "text_mask": args.text_mask, "watershed": args.watershed,
+            "memory_size": args.memory_size, "memory_k": args.memory_k,
+            "memory_confidence": args.memory_confidence},
         "polygons": [
             {
+                "feature_type": args.feature_type,
                 "coords": p.coords,
                 "holes":  p.holes,
                 "area":   round(p.area, 1),
@@ -969,6 +1066,9 @@ def main() -> None:
     }
     out.write_text(json.dumps(payload, indent=2))
     print(f"Written → {out}")
+
+    if tile_errors and not args.allow_partial:
+        raise RuntimeError(f'{len(tile_errors)} tile(s) failed; diagnostic JSON saved; no database write')
 
     # ── preview ───────────────────────────────────────────────────────────────
     if args.preview:

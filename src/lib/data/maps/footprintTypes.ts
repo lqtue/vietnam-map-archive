@@ -7,9 +7,10 @@ export type LegendItem = string | { val: string; label: string };
 export type PixelCoord = [number, number];
 
 // Geometry type — determines Polygon vs LineString rendering
-// Polygon: building, land_plot, green_space, water_body
-// LineString: road, waterway
+// Polygon: parcel, building, land_plot, green_space, water_body; closed road/water surface rings
+// LineString: open road/waterway centrelines
 export type FeatureType =
+  | 'parcel' // a street block: holds land_plots and buildings; roads are the space between
   | 'building'
   | 'land_plot'
   | 'road'
@@ -19,6 +20,7 @@ export type FeatureType =
   | 'other';
 
 export const FEATURE_TYPE_LABELS: Record<FeatureType, string> = {
+  parcel: 'Parcel',
   building: 'Building',
   land_plot: 'Land Plot',
   road: 'Road',
@@ -37,6 +39,7 @@ export const FEATURE_TYPE_LABELS: Record<FeatureType, string> = {
  * values, because that is the public surface.
  */
 export const FEATURE_TYPE_COLORS: Record<FeatureType, string> = {
+  parcel: INK.purple,
   building: INK.green,
   land_plot: INK.yellow,
   road: INK.red,
@@ -48,6 +51,7 @@ export const FEATURE_TYPE_COLORS: Record<FeatureType, string> = {
 
 /** Canvas fill opacity per type — a road wants less ink than a building. */
 const FILL_ALPHA: Record<FeatureType, number> = {
+  parcel: 0.1, // the plots and buildings inside it stay readable
   building: 0.35,
   land_plot: 0.25,
   road: 0.3,
@@ -64,8 +68,20 @@ export function featureTypeFill(ft: string): string {
 }
 
 // Geometry kind derived from feature type
-export function geometryKind(ft: FeatureType): 'Polygon' | 'LineString' {
-  return ft === 'road' || ft === 'waterway' ? 'LineString' : 'Polygon';
+export function geometryKind(ft: FeatureType, pixels?: PixelCoord[]): 'Polygon' | 'LineString' {
+  if (ft !== 'road' && ft !== 'waterway') return 'Polygon';
+  // Closed rings from surface-mask extraction are areas; hand-drawn open
+  // sequences remain centrelines. Closure is part of the pixel geometry contract.
+  const first = pixels?.[0],
+    last = pixels?.at(-1);
+  return pixels &&
+    pixels.length >= 4 &&
+    first &&
+    last &&
+    first[0] === last[0] &&
+    first[1] === last[1]
+    ? 'Polygon'
+    : 'LineString';
 }
 
 export interface FootprintSubmission {
@@ -76,5 +92,5 @@ export interface FootprintSubmission {
   name: string | null;
   category: string | null;
   featureType: FeatureType;
-  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  status: 'draft' | 'submitted' | 'needs_review' | 'approved' | 'rejected';
 }

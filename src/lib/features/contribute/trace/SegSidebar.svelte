@@ -106,7 +106,19 @@
             </select>
           </label>
         </div>
+        <label class="seg-field">
+          <span>Map context file (optional)</span>
+          <input type="text" bind:value={config.contextPath} placeholder="/content/context.json" />
+        </label>
         <div class="seg-row seg-row--checks">
+          <label class="seg-check">
+            <input
+              type="checkbox"
+              bind:checked={config.useMemory}
+              disabled={!status?.ocr_run_id && !config.priorPath}
+            />
+            Cross-tile memory (experimental)
+          </label>
           <label class="seg-check">
             <input type="checkbox" bind:checked={config.useTextMask} />
             Text mask

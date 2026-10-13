@@ -2,7 +2,13 @@
 
 How SAM2 fine-tuning works, what MapSAM2 does on top of it, how VMA's data feeds in, and where the improvement opportunities are.
 
-> **Path note:** file names such as `sam_lora_image_encoder.py`, `func_2d/*.py`, `yolo.py`, `train_2d.py` and `train_3d.py` refer to the **upstream MapSAM2 repository**, cloned separately (on Colab, passed as `--mapsam2-dir`). They are not files in this repo — VMA's own MapSAM2 code is just `inference_tiles_as_video.py`, `masks_to_polygons.py`, `evaluate.py` and the training notebook.
+**Inference update, 2026-10-12:** the standard VMA image predictor runs tiles independently.
+Cross-tile memory is now an opt-in `memory_predictor.py` adapter, retaining instance prompts
+and using confidence-gated deterministic retrieval. It is not the complete semantic pipeline
+described in the paper. [COMPARISON.md](COMPARISON.md) documents the current metadata/memory
+experiment; the architecture and training notes below are background, not evidence of accuracy.
+
+> **Path note:** file names such as `sam_lora_image_encoder.py`, `func_2d/*.py`, `yolo.py`, `train_2d.py` and `train_3d.py` refer to the **upstream MapSAM2 repository**, cloned separately (on Colab, passed as `--mapsam2-dir`). They are not files in this repo. VMA's inference, mask conversion, prompt, memory, context, bundle and evaluation adapters live alongside this document.
 
 ---
 

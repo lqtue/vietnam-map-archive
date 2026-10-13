@@ -2277,6 +2277,23 @@ export type Database = {
         Returns: number
       }
       set_footprint_geom: { Args: { p_rows: Json }; Returns: number }
+      review_footprint_if_current: {
+        Args: {
+          p_id: string
+          p_status: string
+          p_user: string
+          p_expected_polygon: Json
+          p_expected_feature_type: string
+          p_expected_status: string
+          p_pixel_polygon?: Json
+          p_feature_type?: string
+          p_name?: string
+          p_category?: string
+          p_review_tags?: string[]
+          p_review_note?: string
+        }
+        Returns: string
+      }
       set_footprint_status: {
         Args: {
           p_category?: string

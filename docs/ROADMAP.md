@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-07)
+# Roadmap — open work (updated 2026-10-12)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -118,25 +118,12 @@ measurement, metadata that maintains itself, and corpus size.
       over 2px against a version-28 snapshot. 46 holds remain: 24 catalogue-span, 4 axis-scale-only,
       12 mixed, 3 shape/aspect, 3 persistent exclusions. Resume from
       `docs/journals/260929-series561-handoff.md`.
-- [ ] **`shape-precision`** — measure shapes before tuning them. There is a recall-ish number and
-      **no
-      precision number at all**, so every segmentation change to date is unfalsifiable. Trace one
-      bounded 1882 window completely, run `seg_eval --window` (already built and self-checked —
-      `python work/image-processing/scripts/seg_eval.py --self-check`), keep machine predictions out of the
-      ground truth by construction. **A candidate window is scoped, not traced** (2026-09-22): the
-      triangular îlot bounded by Rue Mac, Rue No. 15 and Rue Pellerin, source pixels roughly
-      `4420,3800,650,550` on map `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b` (the 1882 cadastral).
-      9 of the sheet's 46 volunteer traces (6 `building`, 3 `land_plot`, all `approved`) already
-      sit inside it — checked against `footprints` directly, not estimated — against
-      roughly 11 real parcels/buildings visible in an IIIF crop of the same box. That leaves on the
-      order of **one or two features** to add before the window is exhaustive, which is a single
-      sitting at `/scan?mode=shapes`, not a research task — a person has to do the actual tracing
-      and confirm nothing was missed, an LLM producing plausible polygons here would be fabricating
-      the exact ground truth this item exists to make trustworthy. Related and blocking the
-      District 4 table: **there are no footprints inside District 4** — all 46 volunteer traces are
-      in District 1, the nearest 68 m north of the Bến Nghé canal. Review is not the blocker;
-      tracing the peninsula is. Exit: a precision figure alongside the recall one, with its sample
-      and limitations recorded beside it.
+- [ ] **`shape-precision`** — freeze two exhaustive owner-traced 1882 parcel windows outside
+      the LoRA training traces before extraction tuning. The old `4420,3800,650,550` window
+      contains training traces and is development-only. Audit the evaluator's class filtering and
+      use one-to-one matches so duplicate predictions cannot count as successes. Exit: precision,
+      recall, boundary error and correction effort on fixed references, with limitations recorded.
+      Lots/buildings require their own reference classes. Plan: `docs/image-processing-1882-plan.md`.
 - [ ] **`tonkin-review`** — a person looks at all 62. `graticule-georef` (the machine half of this
       item) is done and was already shipped before this list existed: `scripts/tonkin_georef.py`
       reads each sheet's own printed corners (grades from the Paris meridian,
@@ -273,9 +260,12 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
 **Then, in order** (detail in `docs/search-plan.md`, engine design in
 `docs/platform-design.md`):
 
-- [ ] **`colab-seg-run`** — mint a `seg`-scoped worker key, run `vma_worker.py --kinds seg`.
-      Exit: one `seg` job goes `queued → done` and writes `footprints` rows with
-      `source='sam-auto'`.
+- [ ] **`colab-seg-run`** — prepare an interactive T4 comparison notebook, pin code/checkpoint,
+      run colour-prompted SAM2 with local/Drive artifacts and no database writes. Add and compare
+      cross-tile memory explicitly. Notebook, context and memory adapter are implemented and
+      checked locally; the ordinary image predictor has no memory. Exit: a
+      reproducible GPU artifact and comparison against the fixed parcel reference, including
+      memory/context ablations. Owner runtime startup is required. Plan: `docs/image-processing-1882-plan.md`.
 - [ ] **`district4-table`** — the review that fills it. `work/analysis/district4/` is built and
       self-checking; what is left
       is human. The series is **six** sheets, generated not remembered: 1882 · 1895 · 1923 · 1942 ·
@@ -487,16 +477,20 @@ system — what a result must retain, and the two kinds of check — is in the r
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any
       number means anything. Same blocker as `district4-table`.
-- [ ] **`colour-blocks`** — the sheet-colour pipeline exists (`colour_blocks.py`, CPU only), and
-      later passes moved 1882 best-match mean IoU to **0.343** on 24 `land_plot` traces and
-      **0.355** on 17 `building` traces. The early P1 null and its retracted P3 interpretation
-      remain in `docs/journals/260918-colour-blocks.md` as the method history, not the current
-      verdict. The traces are selected and do not measure precision; the 46-trace SAM2 LoRA has
-      no independent test set. Exit: the bounded `shape-precision` reference window, a measured
-      false-positive rate, and a MapSAM2 run prompted by the *same* colour prior before claiming
-      one method improves the other. River is tracked separately under `river-reconstruction`.
-      1882 and 1898 are run independently: swapping their auto-derived constants costs 1882 0.08
-      land_plot IoU and its road proposals (`docs/journals/261001-colour-pair-1882-1898.md`).
+- [ ] **`colour-blocks`** — recover whole 1882 street blocks first, then lots/buildings within
+      approved parcels. Compare the current colour baseline, text-aware boundary refinement and
+      colour-prompted SAM2 on identical target objects and fixed references. Contour tracing alone
+      and rectangle text blanking already failed; preserve that evidence. Keep saved corrections,
+      rank suspected residue for review, and import only reviewed-method proposals as `needs_review`.
+      Exit: measured false/missing objects, boundary quality and correction effort, then owner-approved
+      1882 parcels/roads/lots/buildings. Water remains `river-reconstruction`; 1898 is deferred.
+      Plan: `docs/image-processing-1882-plan.md`; evidence: `docs/journals/261001-1882-layer-review.md`.
+- [ ] **`shape-simplify`** — a reversible Simplify preview in Validate, starting from the current
+      saved outline; 2/4/6 source-pixel trials, visible area/vertex/boundary changes, validity and
+      neighbour checks, cancel without writes, accept/undo and stale-preview protection. Exit:
+      simpler editing without overwriting corrections or silently damaging parcel boundaries.
+      Implemented locally with pure/browser/SQL checks; migration 121 and deployment remain pending.
+      Plan: `docs/image-processing-1882-plan.md` step 1.
 - [ ] **`shapes-deferred`** — the gazetteer link and the LoRA shot set. Neither has a gate;
       both wait on `seg-eval-set` having data.
 
@@ -545,8 +539,9 @@ system — what a result must retain, and the two kinds of check — is in the r
       a blended score.
 - [ ] **`gazetteer-depth`** — `place_names` exists; the view is only as good as the corpus, so this
       waits on ≥ 20 maps carrying extractions. Same queue as 4b/4c.
-- [~] **`temporal-fabric`** — code done 2026-09-02. Left: one real Colab `seg` run
-      (`colab-seg-run`) and review of what it writes.
+- [~] **`temporal-fabric`** — code done 2026-09-02. Left: consume the owner-approved 1882
+      feature layer after the parcel comparison and review, per `docs/image-processing-1882-plan.md`.
+      A completed GPU job alone does not close this item.
 - [~] **`corpus-growth`** — the georef sprint by decade gap. `three-point-residuals` and
       `tonkin-review` are its two halves; runs
       whenever there is human time.

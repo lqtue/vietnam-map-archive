@@ -104,7 +104,7 @@
     footprintSource.clear();
     for (const fp of footprints) {
       const coords = toOlCoords(fp.pixelPolygon);
-      const geomKind = geometryKind(fp.featureType);
+      const geomKind = geometryKind(fp.featureType, fp.pixelPolygon);
       let feature: Feature;
       if (geomKind === 'LineString') {
         feature = new Feature({

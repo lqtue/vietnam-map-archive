@@ -120,16 +120,27 @@ async function footprintColumns(supabase: SupabaseClient<Database>): Promise<str
 
 export async function fetchMapFootprints(
 	supabase: SupabaseClient<Database>,
-	mapId: string
+	mapId: string,
+	strict = false
 ): Promise<FootprintSubmission[]> {
-	const { data, error } = await supabase
-		.from('footprints')
-		.select(await footprintColumns(supabase))
-		.eq('map_id', mapId)
-		.order('created_at', { ascending: true });
-
-	if (error) { console.error('fetchMapFootprints:', error); return []; }
-	return (data as unknown as DbFootprint[]).map(toFootprint);
+	// Paged: a machine run puts well over the 1000-row cap on one sheet (1882: 1485).
+	const columns = await footprintColumns(supabase);
+	try {
+		const data = await readAllPages((from, to) =>
+			supabase
+				.from('footprints')
+				.select(columns)
+				.eq('map_id', mapId)
+				.order('created_at', { ascending: true })
+				.order('id')
+				.range(from, to)
+		);
+		return (data as unknown as DbFootprint[]).map(toFootprint);
+	} catch (error) {
+		if (strict) throw error;
+		console.error('fetchMapFootprints:', error);
+		return [];
+	}
 }
 
 /**

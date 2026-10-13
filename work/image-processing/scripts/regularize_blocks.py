@@ -14,8 +14,8 @@ For each feature, in source pixels:
 
 Nothing is squared: a plot with an irregular boundary stays irregular. The input file is never
 edited; the output sits beside it as `blocks.regularized.geojson`, same features, same order, same
-`source_index`, plus `reg` (kept | cut | snap) and `iou_orig`. Holes are dropped (ten polygons
-carry one; the queue stores none) and the audit counts them.
+`source_index`, plus `reg` (kept | cut | snap) and `iou_orig`. Holes and MultiPolygon parts are preserved; unsupported queue geometry must be
+flagged at import, never flattened by this geometry step.
 
   python3 work/image-processing/scripts/regularize_blocks.py --sheet 1882
   python3 work/image-processing/scripts/regularize_blocks.py --self-check
@@ -31,7 +31,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 from scipy import ndimage
-from shapely.geometry import Polygon, shape, mapping
+from shapely.geometry import Polygon, MultiPolygon, shape, mapping
 
 from clean_blocks import ROOT, SHEETS
 sys.path.insert(0, str(ROOT / "work" / "ocr" / "scripts"))
@@ -100,10 +100,17 @@ def iou(a, b):
     return a.intersection(b).area / a.union(b).area if a.union(b).area else 0.0
 
 
-def regularize(geom, rgb=None, origin=(0, 0)):
+def regularize(geom, rgb=None, origin=(0, 0), ink_map=None):
     """geom: shapely polygon in source px. rgb: crop whose top-left is `origin`. -> (polygon, how)."""
-    g = geom if geom.geom_type == "Polygon" else max(geom.geoms, key=lambda p: p.area)
-    g = Polygon(g.exterior)
+    if geom.geom_type == "MultiPolygon":
+        parts = [regularize(part, rgb, origin, ink_map) for part in geom.geoms]
+        merged = MultiPolygon([part for part, _ in parts])
+        if not merged.is_valid or iou(merged, geom) < GUARD:
+            return geom, "kept"
+        return merged, "snap" if any(how == "snap" for _, how in parts) else "cut"
+    if geom.geom_type != "Polygon":
+        return geom, "kept"
+    g = geom
     if g.area <= 0:
         return g, "kept"
     r = g.area ** .5
@@ -112,12 +119,12 @@ def regularize(geom, rgb=None, origin=(0, 0)):
         return g, "kept"
     ox, oy = origin
     P = cut_corners(np.array(s.exterior.coords)[:-1] - [ox, oy], r)
-    cut = Polygon(P + [ox, oy])
+    cut = Polygon(P + [ox, oy], g.interiors)
     if not cut.is_valid or cut.is_empty or iou(cut, g) < GUARD:
         return g, "kept"
     if rgb is None:
         return cut, "cut"
-    out = Polygon(snap_edges(P, ink(rgb)) + [ox, oy])
+    out = Polygon(snap_edges(P, ink_map if ink_map is not None else ink(rgb)) + [ox, oy], g.interiors)
     if not out.is_valid or out.is_empty or iou(out, cut) < GUARD:
         return cut, "cut"
     return out, "snap"
@@ -155,7 +162,7 @@ def run(tag):
     for f, (q, how) in zip(feats, res):
         g = shape(f["geometry"])
         io = iou(Polygon(g.exterior if g.geom_type == "Polygon" else max(g.geoms, key=lambda p: p.area).exterior), q)
-        audit["holes_dropped"] += len(g.interiors) if g.geom_type == "Polygon" else sum(len(p.interiors) for p in g.geoms)
+        # This regularizer preserves interior rings; imports must check their storage contract.
         audit["how"][how] = audit["how"].get(how, 0) + 1
         cls = f["properties"].get("source_class", "?")
         audit["by_class"].setdefault(cls, {}).setdefault(how, 0)

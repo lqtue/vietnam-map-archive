@@ -8,6 +8,8 @@
                Emits drawPolygon when the shape is complete.
     'select' — Select+Modify on the footprintLayer. Delete key removes selected
                footprints that belong to myUserId. Emits modifyFootprint on drag.
+               Right-click a vertex of the selected shape removes that point;
+               right-click any other shape removes the shape.
 
   Dispatches:
     drawPolygon    { pixelPolygon: PixelCoord[] }
@@ -29,7 +31,9 @@
   import Polygon from 'ol/geom/Polygon';
   import LineString from 'ol/geom/LineString';
   import { click as clickCondition } from 'ol/events/condition';
+  import type { VectorSourceEvent } from 'ol/source/Vector';
   import { getImageShellStore } from '$lib/map/shell/imageContext';
+  import { vertexStyle } from '$lib/map/shell/vertexStyle';
   import type { ImageShellContext } from '$lib/map/shell/imageContext';
   import type { PixelCoord } from '$lib/data/maps/footprintTypes';
   import { olCoordsToImage } from '$lib/core/geo/rectUtils';
@@ -54,6 +58,24 @@
   let modifyInteraction: Modify | null = null;
   let isDrawing = false;
   let drawingPointCount = 0;
+  let detachContextMenu: (() => void) | null = null;
+
+  function canEdit(feature: any): boolean {
+    return !!feature.get('footprintId') && !(myUserId && feature.get('userId') !== myUserId);
+  }
+
+  /**
+   * ImageShell rebuilds every feature whenever `footprints` changes — including
+   * right after our own edit is saved — so the selected feature goes stale and
+   * the highlight drops. Swap the fresh feature (same id) back into the selection.
+   */
+  function reselect(evt: VectorSourceEvent) {
+    const sel = selectInteraction?.getFeatures();
+    const fresh = evt.feature;
+    if (!sel || !fresh) return;
+    const i = sel.getArray().findIndex((f) => f !== fresh && f.getId() === fresh.getId());
+    if (i >= 0) sel.setAt(i, fresh);
+  }
 
   function clearInteractions(ctx: ImageShellContext) {
     if (drawInteraction) {
@@ -72,6 +94,9 @@
       ctx.map.removeInteraction(modifyInteraction);
       modifyInteraction = null;
     }
+    detachContextMenu?.();
+    detachContextMenu = null;
+    ctx.footprintSource?.un('addfeature', reselect);
     isDrawing = false;
     drawingPointCount = 0;
   }
@@ -83,11 +108,13 @@
     image: new CircleStyle({ radius: 5, fill: new Fill({ color: INK.yellow }) }),
   });
 
-  // Style for selected footprint
-  function createSelectedStyle(feature: any): Style {
+  const SELECTED_VERTICES = vertexStyle(INK.red);
+
+  // Style for selected footprint, with its vertices dotted
+  function createSelectedStyle(feature: any): Style[] {
     const geomType = feature.getGeometry()?.getType();
     const isLine = geomType === 'LineString';
-    return new Style({
+    const outline = new Style({
       stroke: new Stroke({ color: INK.red, width: isLine ? 3 : 2.5 }),
       fill: isLine ? undefined : new Fill({ color: inkAlpha(INK.red, 0.2) }),
       image: new CircleStyle({
@@ -96,6 +123,7 @@
         stroke: new Stroke({ color: INK.paper, width: 2 }),
       }),
     });
+    return [outline, SELECTED_VERTICES];
   }
 
   function setupInteractions(
@@ -204,6 +232,26 @@
 
       ctx.map.addInteraction(selectInteraction);
       ctx.map.addInteraction(modifyInteraction);
+
+      // Right-click: a vertex of the selected shape → drop that point (modifyend
+      // above saves it); any other shape → delete it.
+      const select = selectInteraction;
+      const modify = modifyInteraction;
+      const onContextMenu = (evt: MouseEvent) => {
+        evt.preventDefault();
+        const selected = select.getFeatures().getArray();
+        const hit = ctx.map.forEachFeatureAtPixel(ctx.map.getEventPixel(evt), (f) => f, {
+          layerFilter: (layer) => layer === targetLayer,
+          hitTolerance: 4,
+        });
+        if (selected.some(canEdit) && modify.removePoint(ctx.map.getEventCoordinate(evt))) return;
+        if (!hit || selected.includes(hit as any) || !canEdit(hit)) return;
+        dispatch('removeFootprint', { footprintId: hit.get('footprintId') });
+      };
+      ctx.footprintSource?.on('addfeature', reselect);
+      const viewport = ctx.map.getViewport();
+      viewport.addEventListener('contextmenu', onContextMenu);
+      detachContextMenu = () => viewport.removeEventListener('contextmenu', onContextMenu);
     }
   }
 
@@ -249,11 +297,8 @@
         if (!selectInteraction) return;
         const features = selectInteraction.getFeatures().getArray().slice();
         for (const feature of features) {
-          const footprintId = feature.get('footprintId');
-          const userId = feature.get('userId');
-          if (!footprintId) continue;
-          if (myUserId && userId !== myUserId) continue;
-          dispatch('removeFootprint', { footprintId });
+          if (canEdit(feature))
+            dispatch('removeFootprint', { footprintId: feature.get('footprintId') });
         }
         selectInteraction.getFeatures().clear();
       }
@@ -287,7 +332,8 @@
   {/if}
 {:else if drawMode === 'select'}
   <div class="trace-status select-mode">
-    Click a shape to select · drag vertices to edit · <kbd>Delete</kbd> to remove
+    Click a shape to select · drag vertices to edit · right-click a vertex to drop it · right-click
+    another shape or <kbd>Delete</kbd> to remove
   </div>
 {/if}
 

@@ -1477,6 +1477,22 @@ under the prose rather than instead of it.
 
 ## MapSAM2 inference (`work/MapSAM2/`)
 
+**1882 comparison update (2026-10-12):** the standalone
+`work/MapSAM2/vma_seg_comparison.ipynb` runs a fixed baseline/context/memory/both comparison,
+without `--write-supabase`. Build its upload archive with `prepare_comparison.py`; it includes
+pinned local source, metadata and colour/street-water priors, with no service key or reference
+traces. `--memory` activates the SAM2 memory encoder/attention through `memory_predictor.py`;
+the ordinary image predictor remains the baseline. Metadata is structured configuration, not
+prose input to SAM2. GPU accuracy remains unmeasured until the owner starts the notebook and
+provides independent references. Current plan: `docs/image-processing-1882-plan.md`.
+
+Text masking and watershed now default off consistently in the launcher/enqueuer/worker; both
+are explicit experiments. JSON records code/checkpoint/prior/context hashes, rendered tile input
+hashes and failures; a failed tile prevents database writeback unless partial output is explicitly
+allowed. Prior point prompts use an interior representative point. Substantive mask components
+and holes survive local output; the current outer-ring storage contract refuses holes on import.
+
+
 SAM2/MapSAM2 segmentation: IIIF tiles → masks → polygons → `footprints`. Colab (GPU) or
 local M1 (base SAM2 only).
 

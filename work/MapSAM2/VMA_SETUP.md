@@ -1,5 +1,9 @@
 # VMA × MapSAM2 — Setup Guide
 
+For the current 1882 inference experiment, use [COMPARISON.md](COMPARISON.md) and
+`vma_seg_comparison.ipynb`. The training snapshot and setup below are historical;
+they do not describe the current feature layer or activate cross-tile memory.
+
 ## Database Snapshot
 
 > **Snapshot taken 2026-04-04 — counts are stale.** Re-query `footprint_submissions` for the current totals before training; the map ID below is still correct.

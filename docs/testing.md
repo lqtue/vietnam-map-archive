@@ -1,5 +1,17 @@
 # Test inventory
 
+1882 shape review (2026-10-12): `shape-simplify.spec.ts` pins notches/diagonals, invalid and
+collapsed rings, boundary movement, neighbour contact versus overlap, preview/cancel isolation,
+undo, stale previews and the original-geometry guard on verdicts. `shape-simplify-browser.spec.ts`
+exercises the actual Validate controls with synthetic image/data and an intercepted verdict; it
+performs no live writes and is excluded by `PURE_ONLY`. `tests/sql/footprint-review-current.sql`
+uses a disposable local `vma_footprint_review` database, checks migration 121's stale-review refusal,
+review stamps, cache invalidation/warp enqueue and service-only grants, and rolls back.
+`work/MapSAM2/test_comparison.py` checks matching, context identity/units, memory selection,
+components/holes and optional real-model tensor flow; set `SAM2_SOURCE_DIR` for the latter.
+None of these establishes historical-map extraction accuracy.
+
+
 Usage measurement (2026-10-06): `measurement.spec.ts` verifies opt-in gating,
 role exclusion, parameter/route sanitization, page deduplication, revocation and
 best-effort failure handling using an injected adapter. These are privacy and

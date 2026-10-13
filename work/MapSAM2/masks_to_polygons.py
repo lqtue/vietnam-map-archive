@@ -35,16 +35,16 @@ class PolygonResult:
     holes:  list[list[list[float]]] = field(default_factory=list)  # interior rings (courtyards)
 
 
-def mask_to_polygon(
+def mask_components(
     mask: np.ndarray,
     iou: float = 0.0,
     seed: dict | None = None,
     min_area: int = MIN_AREA_PX,
     max_area: int = MAX_AREA_PX,
-) -> PolygonResult | None:
+) -> list[PolygonResult]:
     """
-    Convert a single H×W binary mask to a PolygonResult.
-    Returns None if no contour passes the area filter or simplification fails.
+    Convert every substantive component of one H×W mask to a PolygonResult.
+    Returns an empty list if no contour passes area/validity checks.
     Interior rings (courtyards) ≥ HOLE_MIN_AREA px² are preserved in PolygonResult.holes.
 
     Preprocessing:
@@ -63,40 +63,50 @@ def mask_to_polygon(
     # RETR_CCOMP gives a two-level hierarchy: outer contours + their direct holes
     contours, hierarchy = cv2.findContours(m, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
     if not contours or hierarchy is None:
-        return None
+        return []
 
     h = hierarchy[0]  # (N, 4): [next, prev, first_child, parent]
 
     # Top-level (outer) contours have parent == -1
     outer_indices = [i for i in range(len(contours)) if h[i][3] == -1]
     if not outer_indices:
-        return None
+        return []
 
-    # Largest outer contour = the building footprint
-    main_idx = max(outer_indices, key=lambda i: cv2.contourArea(contours[i]))
-    main_c = contours[main_idx]
-    area = float(cv2.contourArea(main_c))
-    if area < min_area or area > max_area:
-        return None
+    results = []
+    for component_index, main_idx in enumerate(outer_indices):
+        main_c = contours[main_idx]
+        area = float(cv2.contourArea(main_c))
+        if area < min_area or area > max_area:
+            continue
 
-    # Simplify with perimeter-relative epsilon (not a fixed pixel value)
-    eps = APPROX_EPS_RATIO * cv2.arcLength(main_c, True)
-    approx = cv2.approxPolyDP(main_c, eps, closed=True)
-    if len(approx) < 3:
-        return None
-    coords = [[float(p[0][0]), float(p[0][1])] for p in approx]
+        # Simplify with perimeter-relative epsilon (not a fixed pixel value)
+        eps = APPROX_EPS_RATIO * cv2.arcLength(main_c, True)
+        approx = cv2.approxPolyDP(main_c, eps, closed=True)
+        if len(approx) < 3:
+            continue
+        coords = [[float(p[0][0]), float(p[0][1])] for p in approx]
+        coords.append(coords[0].copy())
 
-    # Collect interior rings: direct children of main_c above the courtyard threshold.
-    # Holes below HOLE_MIN_AREA are residual label artifacts that MORPH_CLOSE didn't seal.
-    holes: list[list[list[float]]] = []
-    for i in range(len(contours)):
-        if h[i][3] == main_idx and cv2.contourArea(contours[i]) >= HOLE_MIN_AREA:
-            h_eps = APPROX_EPS_RATIO * cv2.arcLength(contours[i], True)
-            h_approx = cv2.approxPolyDP(contours[i], h_eps, closed=True)
-            if len(h_approx) >= 3:
-                holes.append([[float(p[0][0]), float(p[0][1])] for p in h_approx])
+        # Collect interior rings: direct children of main_c above the courtyard threshold.
+        # Holes below HOLE_MIN_AREA are residual label artifacts that MORPH_CLOSE didn't seal.
+        holes: list[list[list[float]]] = []
+        for i in range(len(contours)):
+            if h[i][3] == main_idx and cv2.contourArea(contours[i]) >= HOLE_MIN_AREA:
+                h_eps = APPROX_EPS_RATIO * cv2.arcLength(contours[i], True)
+                h_approx = cv2.approxPolyDP(contours[i], h_eps, closed=True)
+                if len(h_approx) >= 3:
+                    ring = [[float(p[0][0]), float(p[0][1])] for p in h_approx]
+                    holes.append([*ring, ring[0].copy()])
 
-    return PolygonResult(coords=coords, area=area, iou=float(iou), seed=seed, holes=holes)
+        ref = {**seed, "component_index": component_index, "component_count": len(outer_indices)} if seed else None
+        results.append(PolygonResult(coords=coords, area=area, iou=float(iou), seed=ref, holes=holes))
+    return results
+
+
+def mask_to_polygon(mask, iou=0.0, seed=None, min_area=MIN_AREA_PX, max_area=MAX_AREA_PX):
+    """Legacy single-object helper; the pipeline uses all substantive components."""
+    parts = mask_components(mask, iou, seed, min_area, max_area)
+    return max(parts, key=lambda part: part.area) if parts else None
 
 
 def masks_to_polygons(
@@ -121,9 +131,7 @@ def masks_to_polygons(
 
     raw: list[PolygonResult] = []
     for mask, iou, seed in zip(masks, iou_scores, seeds):
-        r = mask_to_polygon(mask, iou, seed, min_area, max_area)
-        if r is not None:
-            raw.append(r)
+        raw.extend(mask_components(mask, iou, seed, min_area, max_area))
 
     if not raw:
         return []
@@ -134,32 +142,26 @@ def masks_to_polygons(
     kept_geom: list[Polygon] = []
 
     for cand in raw:
-        try:
-            p = make_valid(Polygon(cand.coords, cand.holes))
-            if p.is_empty:
+        original = Polygon(cand.coords, cand.holes)
+        fixed = make_valid(original)
+        if fixed.is_empty:
+            continue
+        components = [fixed] if fixed.geom_type == "Polygon" else [g for g in fixed.geoms if g.geom_type == "Polygon"]
+        for component in components:
+            if component.area < min_area or component.area > max_area:
                 continue
-            suppress = any(
-                (inter := p.intersection(kp).area) > 0
-                and inter / p.union(kp).area > dedup_iou
-                for kp in kept_geom
-            )
-            if not suppress:
-                kept.append(cand)
-                kept_geom.append(p)
-        except Exception as e:
-            # Geometry is malformed — try stripping holes and re-validating
-            try:
-                fixed = make_valid(Polygon(cand.coords))
-                if not fixed.is_empty:
-                    kept.append(PolygonResult(
-                        coords=list(list(c) for c in fixed.exterior.coords),
-                        area=cand.area,
-                        iou=cand.iou,
-                        seed=cand.seed,
-                    ))
-                    kept_geom.append(fixed)
-            except Exception:
-                pass  # truly unfixable — skip silently
+            suppress = any((inter := component.intersection(kp).area) > 0
+                           and inter / component.union(kp).area > dedup_iou for kp in kept_geom)
+            if suppress:
+                continue
+            ref = dict(cand.seed or {})
+            if not original.is_valid:
+                ref["geometry_repaired"] = True
+            kept.append(PolygonResult(
+                coords=[list(c) for c in component.exterior.coords],
+                holes=[[list(c) for c in ring.coords] for ring in component.interiors],
+                area=float(component.area), iou=cand.iou, seed=ref or None))
+            kept_geom.append(component)
 
     return kept
 

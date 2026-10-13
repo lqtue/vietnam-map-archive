@@ -231,11 +231,8 @@ def blocks_to_seeds(features: list[dict]) -> list[dict]:
     which is what SAM2 is given here (`predictor.predict(box=...)`), so the
     polygon's ring is read only for its bounds and then dropped.
 
-    ponytail: the ring is thrown away. A block is L- or U-shaped often enough
-    that its box covers a chunk of the street beside it, and SAM2 gets the box
-    either way. If prompts start bleeding into the roadway, the upgrade is a
-    point prompt at the polygon's representative point alongside the box, which
-    `seeds_for_tile` already carries a slot for.
+    Point prompts use a guaranteed interior representative point, including for
+    concave blocks and polygons with holes; a bbox centre can land in the street.
     """
     seeds: list[dict] = []
     for feat in features or []:
@@ -266,17 +263,22 @@ def blocks_to_seeds(features: list[dict]) -> list[dict]:
         # only route by which C6's write-back can stamp a cadastral class on
         # what SAM2 returns; dropping it here made that unreachable.
         klass = ((feat or {}).get("properties") or {}).get("feature_type")
+        from shapely.geometry import shape
+        polygon = shape(geom)
+        if polygon.is_empty or not polygon.is_valid:
+            continue
+        interior = polygon.representative_point()
         seeds.append({
             "extraction_id": None,      # nothing in ocr_labels to point at
             "text": "",
             "category": str(klass) if klass else "block",
             "bbox": [x0, y0, w, h],     # full-image px, y-down
-            "centroid": [x0 + w / 2, y0 + h / 2],
+            "centroid": [interior.x, interior.y],
         })
     return seeds
 
 
-def load_seeds_from_prior(path: str, map_id: str) -> list[dict]:
+def load_seeds_from_prior(path: str, map_id: str, *, resolve_crop: bool = True) -> list[dict]:
     """Read a `modern_prior --blocks` GeoJSON as seeds, clipped to `main_map`.
 
     The CRS is checked before anything else and the mismatch is fatal. This is
@@ -299,7 +301,7 @@ def load_seeds_from_prior(path: str, map_id: str) -> list[dict]:
         )
 
     seeds = blocks_to_seeds(doc.get("features") or [])
-    crop = fetch_tiling_crop(map_id)
+    crop = fetch_tiling_crop(map_id) if resolve_crop else None
     if crop:
         before = len(seeds)
         seeds = clip_seeds_to(seeds, crop)

@@ -92,8 +92,13 @@ const payload = {
   device,
   tile_size: 1024,
   overlap: 128,
-  text_mask: true,
-  watershed: true,
+  text_mask: args.includes('--text-mask'),
+  watershed: args.includes('--watershed'),
+  memory: args.includes('--memory'),
+  ...(flag('--context') ? { context: flag('--context') } : {}),
+  ...(flag('--prior') ? { prior: flag('--prior') } : {}),
+  ...(flag('--prior-types') ? { prior_types: flag('--prior-types') } : {}),
+  ...(flag('--feature-type') ? { feature_type: flag('--feature-type') } : {}),
   ...(ocrRunId ? { ocr_run_id: ocrRunId } : {}),
 };
 

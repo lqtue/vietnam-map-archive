@@ -29,6 +29,7 @@
   export let selectedIds: string[] = [];
   export let total = 0;
   export let reviewed = 0;
+  export let previewing = false;
   export let approving: string | null = null; // id currently being saved
   /** Pipeline mutation state — owned by ReviewPage, mirrored here for the button. */
   export let markingReviewed = false;
@@ -64,7 +65,7 @@
 
   $: selected = new Set(selectedIds);
   $: multiple = selectedIds.length > 1;
-  $: busy = approving !== null;
+  $: busy = approving !== null || previewing;
 
   /** The cadastral classes this queue also sees, on top of the feature types.
       Swatches are data, not theme: they identify a class on the canvas. */
@@ -129,6 +130,7 @@
 
   function onKeydown(e: KeyboardEvent) {
     if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (previewing && ['v', 'x'].includes(e.key)) return;
     switch (e.key) {
       case 'j':
       case 'ArrowDown':
@@ -292,14 +294,14 @@
               <div class="fp-actions">
                 <button
                   class="sb-btn is-success is-sm"
-                  disabled={approving === fp.id}
+                  disabled={busy}
                   on:click={() => dispatch('approve', { id: fp.id })}
                 >
                   {approving === fp.id ? '…' : '✓ Approve'}
                 </button>
                 <button
                   class="sb-btn is-danger is-sm"
-                  disabled={approving === fp.id}
+                  disabled={busy}
                   on:click={() => dispatch('reject', { id: fp.id })}
                 >
                   ✕ Reject
@@ -311,6 +313,8 @@
       {/each}
     </ul>
   {/if}
+
+  <slot name="geometry" />
 
   <div class="hint-bar">
     Click row to select · <kbd>j</kbd>/<kbd>k</kbd> next/prev · <kbd>v</kbd> approve ·

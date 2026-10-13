@@ -272,34 +272,41 @@ def called_area(path: str):
 
 
 def load_run(path: str) -> list:
-    from shapely.geometry import Polygon
-    from shapely.validation import make_valid
-
-    doc = json.load(open(path, encoding="utf-8"))
-    polys = []
-    for p in doc.get("polygons") or []:
-        coords = p.get("coords")
-        if coords and len(coords) >= 3:
-            g = make_valid(Polygon(coords))
-            if not g.is_empty:
-                polys.append(g)
-    return polys
+    return [geom for geom, _ in load_run_records(path)]
 
 
 def load_run_records(path: str) -> list[tuple[object, str]]:
-    """Usable run polygons with their optional feature type for window FPs."""
-    from shapely.geometry import Polygon
+    """Read JSON masks or GeoJSON, preserving holes and explicit target classes."""
+    from shapely.geometry import Polygon, shape
     from shapely.validation import make_valid
 
-    doc = json.load(open(path, encoding="utf-8"))
+    with open(path, encoding="utf-8") as stream:
+        doc = json.load(stream)
     records = []
-    for p in doc.get("polygons") or []:
-        coords = p.get("coords")
-        if coords and len(coords) >= 3:
-            geom = make_valid(Polygon(coords))
-            if not geom.is_empty:
-                records.append((geom, p.get("feature_type") or "unknown"))
+    for item in doc.get("features", []) if doc.get("type") == "FeatureCollection" else doc.get("polygons", []):
+        if "geometry" in item:
+            geom = shape(item["geometry"])
+            props = item.get("properties", {})
+        else:
+            coords = item.get("coords")
+            if not coords or len(coords) < 3:
+                continue
+            geom = Polygon(coords, item.get("holes") or [])
+            props = item
+        geom = make_valid(geom)
+        if not geom.is_empty and geom.area > 0:
+            records.append((geom, props.get("feature_type") or "unknown"))
     return records
+
+
+def load_reference(path: str, map_id: str):
+    with open(path, encoding="utf-8") as stream:
+        doc = json.load(stream)
+    if doc.get("crs") != "source-pixels-y-down":
+        raise ValueError("Reference must explicitly declare crs=source-pixels-y-down; geographic exports are not pixel truth")
+    if doc.get("map_id") not in (None, map_id):
+        raise ValueError("Reference belongs to a different map")
+    return [(kind, geom) for geom, kind in load_run_records(path)]
 
 
 def parse_window(value: str) -> tuple[float, float, float, float]:
@@ -314,66 +321,90 @@ def parse_window(value: str) -> tuple[float, float, float, float]:
 
 
 def window_score(gt: list[tuple[str, object]], records: list[tuple[object, str]],
-                 window: tuple[float, float, float, float], threshold: float) -> dict:
-    """Precision/recall in an exhaustively traced source-pixel rectangle.
+                 window: tuple[float, float, float, float], threshold: float,
+                 types: list[str] | None = None, prediction_type: str | None = None) -> dict:
+    """Class-aware maximum-cardinality one-to-one matching in an exhaustive window.
 
-    Both sides are clipped before IoU. An edge-spanning parcel is still one
-    real object in the window, and clipping both shapes removes only the area
-    neither side was asked to account for. Including whole shapes would lower
-    an otherwise matching edge prediction merely for its unobserved outside
-    portion; centroid ownership would discard it altogether. Boundary-only
-    touches have zero scoreable area and are excluded after clipping.
+    Duplicate predictions remain false positives. Among equally large matchings,
+    maximize total IoU. Unknown predictions are counted, never silently filtered out;
+    callers must explicitly declare their target class to score legacy untyped runs.
     """
+    import numpy as np
+    from scipy.optimize import linear_sum_assignment
     from shapely.geometry import box
 
+    if not 0 < threshold <= 1:
+        raise ValueError("IoU threshold must be in (0, 1]")
     x, y, width, height = window
     area = box(x, y, x + width, y + height)
-    clipped_gt = [(kind, geom.intersection(area)) for kind, geom in gt if geom.intersects(area)]
+    wanted = set(types) if types else None
+    clipped_gt = [(kind, geom.intersection(area)) for kind, geom in gt
+                  if (wanted is None or kind in wanted) and geom.intersects(area)]
     clipped_gt = [(kind, geom) for kind, geom in clipped_gt if not geom.is_empty and geom.area > 0]
-    clipped_preds = [(geom.intersection(area), kind) for geom, kind in records if geom.intersects(area)]
+    normalized = [(geom, prediction_type if kind == "unknown" and prediction_type else kind)
+                  for geom, kind in records]
+    clipped_preds = [(geom.intersection(area), kind) for geom, kind in normalized
+                     if (wanted is None or kind in wanted or kind == "unknown") and geom.intersects(area)]
     clipped_preds = [(geom, kind) for geom, kind in clipped_preds if not geom.is_empty and geom.area > 0]
-    gt_best = [max((iou(geom, pred) for pred, _ in clipped_preds), default=0.0)
-               for _, geom in clipped_gt]
-    pred_best = [max((iou(pred, geom) for _, geom in clipped_gt), default=0.0)
-                 for pred, _ in clipped_preds]
-    matched_gt = sum(value >= threshold for value in gt_best)
-    matched_preds = sum(value >= threshold for value in pred_best)
-    recall = matched_gt / len(clipped_gt) if clipped_gt else 0.0
-    precision = matched_preds / len(clipped_preds) if clipped_preds else 0.0
-    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
-    false_positives = sorted(
-        ((geom.area, kind, best) for (geom, kind), best in zip(clipped_preds, pred_best)
-         if best < threshold), reverse=True
-    )
+    n_gt, n_pred = len(clipped_gt), len(clipped_preds)
+    overlaps = np.zeros((n_gt, n_pred), dtype=float)
+    for i, (kind, geom) in enumerate(clipped_gt):
+        for j, (pred, pred_kind) in enumerate(clipped_preds):
+            if kind == pred_kind:
+                overlaps[i, j] = iou(geom, pred)
+    matches = []
+    if n_gt and n_pred:
+        # A whole extra match outweighs any possible summed IoU tie-break.
+        reward = (overlaps >= threshold).astype(float) + overlaps / (min(n_gt, n_pred) + 1)
+        rows, cols = linear_sum_assignment(-reward)
+        matches = [(int(i), int(j)) for i, j in zip(rows, cols) if overlaps[i, j] >= threshold]
+    matched_gt = {i for i, _ in matches}
+    matched_preds = {j for _, j in matches}
+    recall = len(matches) / n_gt if n_gt else 0.0
+    precision = len(matches) / n_pred if n_pred else 0.0
+    best_gt = overlaps.max(axis=1).tolist() if n_pred else [0.0] * n_gt
+    best_pred = overlaps.max(axis=0).tolist() if n_gt else [0.0] * n_pred
+    false_positives = sorted(((geom.area, kind, best_pred[j])
+                             for j, (geom, kind) in enumerate(clipped_preds)
+                             if j not in matched_preds), reverse=True)
+    boundary_distances = [clipped_gt[i][1].boundary.hausdorff_distance(clipped_preds[j][0].boundary)
+                          for i, j in matches]
+    duplicate_candidates = sum(best_pred[j] >= threshold for j in range(n_pred) if j not in matched_preds)
     return {
-        "n_gt": len(clipped_gt), "n_pred": len(clipped_preds), "matched_gt": matched_gt,
-        "matched_pred": matched_preds, "precision": precision, "recall": recall, "f1": f1,
-        "false_positives": false_positives,
+        "n_gt": n_gt, "n_pred": n_pred, "matched_gt": len(matches), "matched_pred": len(matches),
+        "precision": precision, "recall": recall,
+        "f1": 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
+        "false_positives": false_positives, "false_negatives": n_gt - len(matches),
+        "duplicate_candidates": duplicate_candidates,
+        "mean_best_iou": st.mean(best_gt) if best_gt else 0.0,
+        "median_best_iou": st.median(best_gt) if best_gt else 0.0,
+        "matched_boundary_hausdorff_mean_px": st.mean(boundary_distances) if boundary_distances else None,
+        "matched_boundary_hausdorff_max_px": max(boundary_distances) if boundary_distances else None,
+        "matches": [{"reference": i, "prediction": j, "iou": overlaps[i, j]} for i, j in matches],
     }
 
 
 def report_window(gt: list[tuple[str, object]], paths: list[str],
-                  window: tuple[float, float, float, float], threshold: float) -> None:
-    """Print precision, recall and the largest unmatched predictions per run."""
+                  window: tuple[float, float, float, float], threshold: float,
+                  types: list[str] | None = None, prediction_type: str | None = None) -> list[dict]:
+    """Window metrics require a complete reference, separate from training/tuning."""
     x, y, width, height = window
-    print(f"\n== exhaustively traced window ({x:g},{y:g},{width:g},{height:g}); IoU ≥ {threshold:.2f}")
+    print(f"\n== exhaustive window ({x:g},{y:g},{width:g},{height:g}); IoU ≥ {threshold:.2f}; one-to-one, class-aware")
     print(f"{'run':30s}{'n_gt':>7s}{'n_pred':>8s}{'precision':>11s}{'recall':>8s}{'F1':>7s}")
     results = []
     for path in paths:
+        result = window_score(gt, load_run_records(path), window, threshold, types, prediction_type)
         name = Path(path).stem
-        result = window_score(gt, load_run_records(path), window, threshold)
-        results.append((name, result))
         print(f"{name[:30]:30s}{result['n_gt']:7d}{result['n_pred']:8d}"
               f"{result['precision']:11.2f}{result['recall']:8.2f}{result['f1']:7.2f}")
-    print("  Precision is meaningful only because every parcel in this window is traced; "
-          "it does not describe untraced parts of the sheet.")
-    for name, result in results:
-        rows = result["false_positives"]
-        print(f"\n  {len(rows)} false positives in {name}, largest clipped area first.")
-        for area, kind, best in rows[:20]:
-            print(f"    {area:10.0f} px²  {kind:<14} best IoU {best:.3f}")
-        if len(rows) > 20:
-            print(f"    ... and {len(rows) - 20} more")
+        results.append({"run": path, "threshold": threshold, "window": list(window), **result})
+    print("  These metrics describe only exhaustively traced windows; boundary distances describe matched objects only.")
+    for result in results:
+        print(f"\n  {len(result['false_positives'])} unmatched predictions in {Path(result['run']).stem} "
+              f"({result['duplicate_candidates']} duplicate candidates), {result['false_negatives']} missed references.")
+        for area, kind, best in result["false_positives"][:20]:
+            print(f"    {area:10.0f} px²  {kind:<14} best class IoU {best:.3f}")
+    return results
 
 
 def score(gt: list, preds: list) -> dict:
@@ -419,7 +450,7 @@ def run(args: argparse.Namespace) -> int:
         report_labels(args.map_id, {Path(p).stem: load_run(p) for p in args.runs},
                       ocr_run_id=args.ocr_run_id)
         return 0
-    gt = load_gt(args.map_id)
+    gt = (load_reference(args.reference, args.map_id) if args.reference else load_gt(args.map_id))
     if not gt:
         print(f"No hand traces on {args.map_id}", file=sys.stderr)
         return 1
@@ -461,7 +492,12 @@ def run(args: argparse.Namespace) -> int:
 
     _report(groups, runs)
     if args.window:
-        report_window(gt, args.runs, args.window, args.iou)
+        results = []
+        for threshold in ([float(v) for v in args.iou_thresholds.split(",")] if args.iou_thresholds else [args.iou]):
+            results.extend(report_window(gt, args.runs, args.window, threshold, wanted, args.prediction_type))
+        if args.report_json:
+            Path(args.report_json).write_text(json.dumps({"map_id": args.map_id, "reference": args.reference,
+                                                         "types": wanted, "results": results}, indent=2))
     return 0
 
 
@@ -510,12 +546,29 @@ def _self_check() -> None:
     edge_gt = Polygon([(8, 0), (18, 0), (18, 10), (8, 10)])
     extra = Polygon([(1, 1), (3, 1), (3, 3), (1, 3)])
     window = window_score(
-        [("land_plot", edge_gt)], [(edge_gt, "plot"), (extra, "furniture")],
+        [("land_plot", edge_gt)], [(edge_gt, "land_plot"), (extra, "furniture")],
         (0, 0, 10, 10), 0.3,
     )
     assert window["n_gt"] == 1 and window["n_pred"] == 2, window
     assert window["precision"] == 0.5 and window["recall"] == 1.0, window
     assert window["f1"] == 2 / 3 and window["false_positives"][0][1] == "furniture", window
+
+    duplicated = window_score([("parcel", unit)], [(unit, "parcel"), (unit, "parcel")],
+                              (0, 0, 20, 20), 0.5)
+    assert duplicated["precision"] == 0.5 and duplicated["duplicate_candidates"] == 1
+    wrong_class = window_score([("parcel", unit)], [(unit, "building")], (0, 0, 20, 20), 0.5)
+    assert wrong_class["precision"] == 0 and wrong_class["recall"] == 0
+    typed = window_score([("parcel", unit), ("building", unit)],
+                         [(unit, "parcel"), (unit, "building")], (0, 0, 20, 20), 0.5, ["parcel"])
+    assert typed["n_gt"] == typed["n_pred"] == 1 and typed["f1"] == 1
+    # Two candidates for one GT cannot inflate recall or evade the FP denominator.
+    split = window_score([("parcel", unit)], [(left, "parcel"), (right, "parcel")],
+                         (0, 0, 20, 20), 0.5)
+    assert split["precision"] == 0.5 and split["recall"] == 1
+    untyped = window_score([("parcel", unit)], [(unit, "unknown")], (0, 0, 20, 20), 0.5, ["parcel"])
+    assert untyped["n_pred"] == 1 and untyped["precision"] == 0
+    assert window_score([("parcel", unit)], [(unit, "unknown")], (0, 0, 20, 20), 0.5,
+                        ["parcel"], "parcel")["f1"] == 1
 
     # A dense OCR sheet cannot silently lose its second PostgREST page.
     starts = []
@@ -543,6 +596,10 @@ def main() -> int:
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("runs", nargs="*", help="run JSON files")
     p.add_argument("--map-id", default=MAP_1882)
+    p.add_argument("--reference", help="Frozen source-pixel reference JSON/GeoJSON; avoids a changing database reference")
+    p.add_argument("--prediction-type", help="Explicit class for legacy untyped predictions only")
+    p.add_argument("--iou-thresholds", help="Window thresholds, e.g. 0.5,0.75")
+    p.add_argument("--report-json", help="Save window metrics and matching diagnostics")
     p.add_argument("--types", help="comma-separated feature_types to report")
     p.add_argument("--in-frame", metavar="RUN.json",
                    help="score only the traces this run's crops actually covered")
@@ -556,8 +613,8 @@ def main() -> int:
                         "pooled and their row counts are printed")
     p.add_argument("--window", type=parse_window, metavar="x,y,w,h",
                    help="exhaustively traced source-pixel rectangle for precision/recall")
-    p.add_argument("--iou", type=float, default=0.3,
-                   help="IoU match threshold for --window (default: 0.3)")
+    p.add_argument("--iou", type=float, default=0.5,
+                   help="IoU match threshold for --window (default: 0.5)")
     p.add_argument("--pooled", action="store_true",
                    help="also print the pooled row, for comparison with older numbers")
     p.add_argument("--self-check", action="store_true")

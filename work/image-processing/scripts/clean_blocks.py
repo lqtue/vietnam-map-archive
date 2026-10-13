@@ -87,11 +87,12 @@ def clean(features, bbox, building_max, frame_span=0.6):
 
 def run(tag, blocks_rel, scout_rel, building_max):
     src = ROOT / blocks_rel
-    feats = json.loads(src.read_text())["features"]
+    document = json.loads(src.read_text())
+    feats = document["features"]
     bbox = json.loads((ROOT / scout_rel).read_text())["map_content_bbox"]
     kept, log = clean(feats, bbox, building_max)
     out = src.with_name("blocks.clean.geojson")
-    out.write_text(json.dumps({"type": "FeatureCollection", "features": kept},
+    out.write_text(json.dumps({**document, "type": "FeatureCollection", "crs": "source-pixels-y-down", "features": kept},
                               separators=(",", ":")))
     audit = {"sheet": tag, "source": blocks_rel, "map_content_bbox": bbox,
              "building_max_px": building_max, "in": len(feats), "out": len(kept), **log}

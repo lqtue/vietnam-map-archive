@@ -16,7 +16,7 @@ export default defineConfig({
   testDir: 'tests',
   // write.spec.ts has its own config: it needs a local Supabase and a seeded user.
   testIgnore: pureOnly
-    ? ['write.spec.ts', 'smoke.spec.ts', 'catalog-series.spec.ts']
+    ? ['write.spec.ts', 'smoke.spec.ts', 'catalog-series.spec.ts', 'shape-simplify-browser.spec.ts']
     : 'write.spec.ts',
   timeout: 30_000,
   fullyParallel: true,

@@ -15,6 +15,7 @@
  * which take up to 1000 rows per call. One map is a handful of round trips.
  */
 
+import { geometryKind, type FeatureType } from '$lib/data/maps/footprintTypes';
 import { adminClient } from './supabaseAdmin';
 import { bboxCentre, pointEwkt, polygonEwkt, resolveMapWarp, type MapWarp } from './warp';
 
@@ -141,9 +142,12 @@ export async function rewarpMap(mapId: string): Promise<RewarpResult> {
     id: string;
     geom_src: string | null;
     pixel_polygon: unknown;
-  }>('footprints', 'id, geom_src, pixel_polygon', 'set_footprint_geom', (row, w) => {
+    feature_type: string;
+  }>('footprints', 'id, geom_src, pixel_polygon, feature_type', 'set_footprint_geom', (row, w) => {
     const ring = row.pixel_polygon as [number, number][] | null;
-    return ring ? polygonEwkt(w, ring) : null;
+    return ring && geometryKind(row.feature_type as FeatureType, ring) === 'Polygon'
+      ? polygonEwkt(w, ring)
+      : null;
   });
 
   return {

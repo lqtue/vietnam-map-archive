@@ -14,6 +14,8 @@ export type SegConfig = {
   encoder: 'vit_t' | 'vit_s' | 'vit_b' | 'vit_l';
   useTextMask: boolean;
   useWatershed: boolean;
+  useMemory: boolean;
+  contextPath: string;
 };
 
 /**
@@ -31,7 +33,9 @@ export const DEFAULT_SEG_CONFIG: SegConfig = {
   priorPath: '',
   encoder: 'vit_s',
   useTextMask: false,
-  useWatershed: true,
+  useWatershed: false,
+  useMemory: false,
+  contextPath: '',
 };
 
 /**
@@ -58,6 +62,8 @@ export function buildSegCommand(
     hasOcr ? `  --ocr-run-id ${ocrRunId}` : null,
     hasPrior ? `  --prior ${cfg.priorPath}` : null,
     `  --tile-size 1024 --overlap 128`,
+    cfg.useMemory && hasPrompts ? `  --memory` : null,
+    cfg.contextPath ? `  --context ${cfg.contextPath}` : null,
     cfg.useTextMask ? `  --text-mask` : null,
     cfg.useWatershed ? `  --watershed` : null,
     `  --device cuda`,
@@ -80,6 +86,8 @@ export function loadSegConfig(mapId: string, base: SegConfig = DEFAULT_SEG_CONFI
     ...(typeof data.priorPath === 'string' ? { priorPath: data.priorPath } : {}),
     ...(data.encoder ? { encoder: data.encoder } : {}),
     ...(typeof data.useTextMask === 'boolean' ? { useTextMask: data.useTextMask } : {}),
+    ...(typeof data.useMemory === 'boolean' ? { useMemory: data.useMemory } : {}),
+    ...(typeof data.contextPath === 'string' ? { contextPath: data.contextPath } : {}),
     ...(typeof data.useWatershed === 'boolean' ? { useWatershed: data.useWatershed } : {}),
   };
 }

@@ -64,7 +64,11 @@ Pipeline:
 - `/api/admin/maps/[id]/pipeline/` — GET the composed stage + timestamps; PATCH records a **human**
   stage (`reviewed`, `seg_reviewed`, `exported`, `idle`) via `set_review_mark`. The machine stages
   come from `pipeline_jobs` and are rejected with a 400.
-- `/api/admin/footprints/` — GET/PATCH SAM2 review (staff only).
+- `/api/admin/footprints/` — paged GET/PATCH shape review (staff only). Optional
+  `expected_pixel_polygon`, `expected_feature_type`, `expected_status` activate migration 121's
+  atomic compare-and-review; a concurrent change returns 409, a missing migration returns 503.
+  Edited geometry invalidates its geographic cache and queues warp. Validate stages simplification
+  with the existing approve/reject verdict rather than saving a preview.
 - `/api/admin/stories/` — GET the `submitted` queue, PATCH a decision (`approved` / `rejected` /
   `draft`) via `set_story_status`. Admin **or mod**.
 - `/api/contribute/footprints/` — POST a hand-traced polygon. Any signed-in user; `user_id` comes

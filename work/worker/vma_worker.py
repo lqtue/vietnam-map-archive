@@ -358,6 +358,14 @@ def layout_argv(job: dict, python_bin: str) -> list[str]:
         "--render-size", str(p.get("render_size", 2048)),
         "--save-triage",
     ]
+    if p.get("memory", False):
+        argv.append("--memory")
+    if p.get("context"):
+        argv += ["--context", str(p["context"])]
+    if p.get("prior_types"):
+        argv += ["--prior-types", str(p["prior_types"])]
+    if p.get("feature_type"):
+        argv += ["--feature-type", str(p["feature_type"])]
     if p.get("run_id"):
         argv += ["--run-id", str(p["run_id"])]
     if p.get("model"):
@@ -428,6 +436,7 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
         argv += ["--mode", "automatic"]
     argv += [
         "--tile-size", str(p.get("tile_size", 1024)),
+        "--render-size", str(p.get("render_size", 1024)),
         "--overlap", str(p.get("overlap", 128)),
         "--device", str(p.get("device", "cuda")),
         "--out-json", "footprints.json",
@@ -438,7 +447,7 @@ def seg_argv(job: dict, python_bin: str) -> list[str]:
     if p.get("text_mask", False):
         argv.append("--text-mask")
     # Watershed is unmeasured: EVAL-BASELINE.md records no watershed run.
-    if p.get("watershed", True):
+    if p.get("watershed", False):
         argv.append("--watershed")
     if p.get("run_id"):
         argv += ["--run-id", str(p["run_id"])]

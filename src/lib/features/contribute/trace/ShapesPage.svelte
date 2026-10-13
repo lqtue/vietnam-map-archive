@@ -31,10 +31,12 @@
   import TraceTool from './TraceTool.svelte';
   import TraceSidebar from './TraceSidebar.svelte';
   import SegSidebar from './SegSidebar.svelte';
+  import SimplifyPanel from '$lib/features/contribute/review/SimplifyPanel.svelte';
   import ReviewTool from '$lib/features/contribute/review/ReviewTool.svelte';
   import ReviewSidebar from '$lib/features/contribute/review/ReviewSidebar.svelte';
   import '$styles/layouts/tool-page.css';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { fetchUserRole } from '$lib/data/supabase/role';
   import { trackMeasurement } from '$lib/data/measurement';
   import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
   import { createTrace } from './traceData';
@@ -51,6 +53,8 @@
 
   const { supabase, session } = getSupabaseContext();
   const userId = session?.user?.id ?? null;
+  /** Mods and admins edit anyone's shape — machine output has no owner. RLS has the final say. */
+  let canEditAll = false;
 
   const TABS = [
     { key: 'draw', label: 'Draw' },
@@ -100,8 +104,14 @@
   ];
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  $: myFootprints = userId ? $trace.footprints.filter((f) => f.userId === userId) : [];
+  /** The table lists what this person may edit: their own, or everything (machine runs too) for a mod. */
+  $: editableFootprints = canEditAll
+    ? $trace.footprints
+    : userId
+      ? $trace.footprints.filter((f) => f.userId === userId)
+      : [];
   $: traceCategories = currentMap?.categories?.length ? currentMap.categories : [];
+  $: selectedReviewFootprint = $queue.footprints.find((f) => f.id === $queue.selectedId) ?? null;
   $: reviewed = $queue.total - $queue.footprints.length;
   /** Validate is a queue, the other tabs are the archive. */
   $: railMaps =
@@ -219,6 +229,7 @@
   onMount(() => {
     wanted = $page.url.searchParams.get('map') ?? '';
     queue.loadQueue();
+    fetchUserRole(supabase, userId).then((r) => (canEditAll = r === 'admin' || r === 'mod'));
   });
 </script>
 
@@ -286,6 +297,7 @@
               total={$queue.total}
               {reviewed}
               approving={$queue.deciding}
+              previewing={$queue.simplifyPreview !== null}
               {markingReviewed}
               {markReviewedError}
               reviewTags={$queue.feedback.tags}
@@ -304,12 +316,24 @@
               on:feedback={(e) =>
                 queue.setFeedback(e.detail.id, { tags: e.detail.tags, note: e.detail.note })}
               on:markReviewed={markReviewed}
-            />
+            >
+              <SimplifyPanel
+                slot="geometry"
+                footprint={$queue.selectedIds.length === 1 ? selectedReviewFootprint : null}
+                preview={$queue.simplifyPreview}
+                busy={$queue.deciding !== null}
+                canUndo={$queue.canUndoGeometry}
+                on:preview={(e) => queue.previewSimplification(e.detail.id, e.detail.tolerance)}
+                on:cancel={queue.cancelSimplification}
+                on:accept={queue.acceptSimplification}
+                on:undo={(e) => queue.undoGeometry(e.detail.id)}
+              />
+            </ReviewSidebar>
           {/if}
         {:else}
           <TraceSidebar
             {traceCategories}
-            placedFootprints={myFootprints}
+            placedFootprints={editableFootprints}
             {drawMode}
             newFootprintId={$trace.newId}
             on:removeFootprint={(e) => trace.remove(e.detail.footprintId)}
@@ -335,15 +359,17 @@
           <ReviewTool
             footprints={canvasFootprints}
             selectedId={$queue.selectedId}
+            previewPolygon={$queue.simplifyPreview?.trial.polygon ?? null}
             on:select={(e) => queue.select(e.detail.id)}
             on:edit={(e) => queue.edit(e.detail.id, e.detail.pixelPolygon)}
+            on:reject={(e) => decideFootprint(e.detail.id, 'rejected')}
           />
         {:else if tab === 'draw'}
           <TraceTool
             {drawMode}
             {geometryMode}
             placingEnabled={drawMode === 'trace'}
-            myUserId={userId}
+            myUserId={canEditAll ? null : userId}
             on:drawPolygon={(e) => trace.draw(e.detail.pixelPolygon, geometryMode)}
             on:modifyFootprint={(e) => trace.modify(e.detail.footprintId, e.detail.pixelPolygon)}
             on:removeFootprint={(e) => trace.remove(e.detail.footprintId)}

@@ -6,18 +6,24 @@
   Orange = needs review · yellow = selected (and zoomed to) · green vertices =
   the Modify handles, which are only attached to the selected polygon.
 
+  Right-click a vertex of the selected polygon drops that point (an edit);
+  right-click any other polygon rejects it.
+
   Dispatches:
     select { id }
     edit   { id, pixelPolygon }   — after a vertex drag, in IIIF pixel space
+    reject { id }                 — right-click on an unselected polygon
 -->
 <script lang="ts">
   import { onDestroy, createEventDispatcher } from 'svelte';
-  import { INK } from '$lib/core/ink';
+  import { INK, inkAlpha } from '$lib/core/ink';
   import { get } from 'svelte/store';
   import VectorSource from 'ol/source/Vector';
   import VectorLayer from 'ol/layer/Vector';
   import Feature from 'ol/Feature';
   import Polygon from 'ol/geom/Polygon';
+  import LineString from 'ol/geom/LineString';
+  import { geometryKind } from '$lib/data/maps/footprintTypes';
   import Style from 'ol/style/Style';
   import Fill from 'ol/style/Fill';
   import Stroke from 'ol/style/Stroke';
@@ -27,16 +33,19 @@
   import { unByKey } from 'ol/Observable';
   import type { EventsKey } from 'ol/events';
   import { getImageShellStore } from '$lib/map/shell/imageContext';
+  import { vertexStyle } from '$lib/map/shell/vertexStyle';
   import type { ImageShellContext } from '$lib/map/shell/imageContext';
   import type { SamFootprint } from '$lib/data/supabase/footprints';
   import { toOlCoords, olCoordsToImage } from '$lib/core/geo/rectUtils';
 
   export let footprints: SamFootprint[] = [];
   export let selectedId: string | null = null;
+  export let previewPolygon: [number, number][] | null = null;
 
   const dispatch = createEventDispatcher<{
     select: { id: string };
     edit: { id: string; pixelPolygon: [number, number][] };
+    reject: { id: string };
   }>();
 
   const shellStore = getImageShellStore();
@@ -44,22 +53,27 @@
   let source: VectorSource | null = null;
   let layer: VectorLayer | null = null;
   let modify: Modify | null = null;
+  let previewSource: VectorSource | null = null;
+  let previewLayer: VectorLayer | null = null;
   let clickKey: EventsKey | null = null;
+  let detachContextMenu: (() => void) | null = null;
   const modifyTargets = new Collection<Feature>();
   let initialized = false;
 
   // Canvas colours, matching the legend below.
   const styleDefault = new Style({
     stroke: new Stroke({ color: INK.orange, width: 1.5 }),
-    fill: new Fill({ color: 'rgba(249,115,22,0.12)' }),
+    fill: new Fill({ color: inkAlpha(INK.orange, 0.12) }),
   });
   const styleSelected = new Style({
     stroke: new Stroke({ color: INK.yellow, width: 2.5 }),
-    fill: new Fill({ color: 'rgba(234,179,8,0.22)' }),
+    fill: new Fill({ color: inkAlpha(INK.yellow, 0.22) }),
   });
 
-  function getStyle(feature: any): Style {
-    return feature.getId() === selectedId ? styleSelected : styleDefault;
+  const styleSelectedVertices = [styleSelected, vertexStyle(INK.yellow)];
+
+  function getStyle(feature: any): Style | Style[] {
+    return feature.getId() === selectedId ? styleSelectedVertices : styleDefault;
   }
 
   /** Rebuilds the vector features, re-points Modify, and repaints the styles. */
@@ -74,10 +88,23 @@
     if (!source) return;
     source.clear();
     for (const fp of list) {
-      const feature = new Feature({ geometry: new Polygon([toOlCoords(fp.pixelPolygon)]) });
+      const feature = new Feature({
+        geometry:
+          geometryKind(fp.featureType, fp.pixelPolygon) === 'LineString'
+            ? new LineString(toOlCoords(fp.pixelPolygon))
+            : new Polygon([toOlCoords(fp.pixelPolygon)]),
+      });
       feature.setId(fp.id);
       source.addFeature(feature);
     }
+  }
+
+  function renderPreview(polygon: [number, number][] | null) {
+    if (!previewSource) return;
+    previewSource.clear();
+    if (polygon)
+      previewSource.addFeature(new Feature({ geometry: new Polygon([toOlCoords(polygon)]) }));
+    modify?.setActive(!polygon);
   }
 
   function focusSelected(id: string | null) {
@@ -105,6 +132,16 @@
     source = new VectorSource();
     layer = new VectorLayer({ source, zIndex: 5, style: getStyle });
     ctx.map.addLayer(layer);
+    previewSource = new VectorSource();
+    previewLayer = new VectorLayer({
+      source: previewSource,
+      zIndex: 6,
+      style: new Style({
+        stroke: new Stroke({ color: INK.blue, width: 2.5, lineDash: [7, 5] }),
+        fill: new Fill({ color: inkAlpha(INK.blue, 0.06) }),
+      }),
+    });
+    ctx.map.addLayer(previewLayer);
 
     modify = new Modify({
       features: modifyTargets,
@@ -118,12 +155,14 @@
     });
     modify.on('modifyend', (event) => {
       event.features.forEach((f: Feature) => {
-        const geom = f.getGeometry() as Polygon;
+        const geom = f.getGeometry() as Polygon | LineString;
         if (!geom) return;
         // OL coords are y-flipped; hand the caller IIIF pixel space back.
         dispatch('edit', {
           id: String(f.getId()),
-          pixelPolygon: olCoordsToImage(geom.getCoordinates()[0]),
+          pixelPolygon: olCoordsToImage(
+            geom instanceof LineString ? geom.getCoordinates() : geom.getCoordinates()[0]
+          ),
         });
       });
     });
@@ -134,18 +173,36 @@
       if (hit) dispatch('select', { id: String(hit.getId()) });
     }) as EventsKey;
 
+    const onContextMenu = (evt: MouseEvent) => {
+      evt.preventDefault();
+      if (modifyTargets.getLength() && modify?.removePoint(ctx.map.getEventCoordinate(evt))) return;
+      const hit = ctx.map.forEachFeatureAtPixel(ctx.map.getEventPixel(evt), (f, l) =>
+        l === layer ? f : undefined
+      );
+      if (hit && hit.getId() !== selectedId) dispatch('reject', { id: String(hit.getId()) });
+    };
+    const viewport = ctx.map.getViewport();
+    viewport.addEventListener('contextmenu', onContextMenu);
+    detachContextMenu = () => viewport.removeEventListener('contextmenu', onContextMenu);
+
     render(footprints, selectedId);
+    renderPreview(previewPolygon);
   }
 
   $: setup($shellStore);
   $: render(footprints, selectedId);
   $: focusSelected(selectedId);
+  $: renderPreview(previewPolygon);
 
   onDestroy(() => {
     const ctx = get(shellStore);
     if (clickKey) unByKey(clickKey);
+    detachContextMenu?.();
     if (ctx && modify) ctx.map.removeInteraction(modify);
     if (ctx && layer) ctx.map.removeLayer(layer);
+    if (ctx && previewLayer) ctx.map.removeLayer(previewLayer);
+    previewSource = null;
+    previewLayer = null;
     source = null;
     layer = null;
     modify = null;
@@ -155,7 +212,8 @@
 <div class="legend">
   <span class="legend-dot orange"></span> Needs review
   <span class="legend-dot yellow"></span> Selected
-  <span class="legend-dot green"></span> Drag to edit
+  <span class="legend-dot green"></span> Drag to edit · right-click a vertex to drop it, another shape
+  to reject it
 </div>
 
 <style>

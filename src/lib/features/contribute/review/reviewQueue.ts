@@ -15,11 +15,18 @@ import { get, writable } from 'svelte/store';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
 import {
+  fetchMapFootprints,
   fetchMapsWithSubmittedFootprints,
   fetchSubmittedFootprints,
   type SamFootprint,
 } from '$lib/data/supabase/footprints';
-import type { FeatureType } from '$lib/data/maps/footprintTypes';
+import { geometryKind, type FeatureType } from '$lib/data/maps/footprintTypes';
+import {
+  ringSignature,
+  ringsOverlap,
+  simplifyRing,
+  type SimplifyTrial,
+} from '$lib/core/geo/simplifyRing';
 import { resolveMapIiifInfoUrl } from '$lib/features/contribute/shared/iiifSource';
 
 export type QueueRow = Awaited<ReturnType<typeof fetchMapsWithSubmittedFootprints>>[number];
@@ -29,6 +36,13 @@ export type QueueRow = Awaited<ReturnType<typeof fetchMapsWithSubmittedFootprint
     is the state /api/export/footprints filters on (migration 090). */
 export type Verdict = 'approved' | 'rejected';
 export type ReviewFeedback = { tags: string[]; note: string };
+
+export type SimplifyPreview = {
+  id: string;
+  original: string;
+  trial: SimplifyTrial;
+  overlaps: string[];
+};
 
 export type ReviewQueueState = {
   /** Sheets with shapes waiting, newest count first. */
@@ -47,6 +61,9 @@ export type ReviewQueueState = {
   /** Id currently being written, so its row can say so. */
   deciding: string | null;
   feedback: ReviewFeedback;
+  neighbours: SamFootprint[];
+  simplifyPreview: SimplifyPreview | null;
+  canUndoGeometry: boolean;
   /** The open sheet's IIIF base (no `/info.json`) and pixel dimensions, for the
    *  sidebar's ink crops. Resolved once per `open()`; null/0 until it lands, or
    *  if it can't be resolved at all — the crop just stays unmounted. */
@@ -66,6 +83,9 @@ const EMPTY: ReviewQueueState = {
   error: '',
   deciding: null,
   feedback: { tags: [], note: '' },
+  neighbours: [],
+  simplifyPreview: null,
+  canUndoGeometry: false,
   iiifBase: null,
   imageWidth: 0,
   imageHeight: 0,
@@ -79,6 +99,8 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   let pendingEdits: Record<string, { pixelPolygon?: [number, number][]; featureType?: string }> =
     {};
   let pendingFeedback: Record<string, ReviewFeedback> = {};
+  let baseline: Record<string, SamFootprint> = {};
+  let geometryHistory: Record<string, [number, number][][]> = {};
 
   async function loadQueue() {
     try {
@@ -98,6 +120,8 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   function reset() {
     pendingEdits = {};
     pendingFeedback = {};
+    baseline = {};
+    geometryHistory = {};
     imgSeq++;
     update((s) => ({ ...EMPTY, queue: s.queue, queueError: s.queueError }));
   }
@@ -107,19 +131,25 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     const seq = imgSeq;
     update((s) => ({ ...s, loading: true }));
     try {
-      const footprints = await fetchSubmittedFootprints(supabase, mapId);
+      const [footprints, neighbours] = await Promise.all([
+        fetchSubmittedFootprints(supabase, mapId),
+        fetchMapFootprints(supabase, mapId, true),
+      ]);
+      if (seq !== imgSeq) return;
+      baseline = Object.fromEntries(footprints.map((f) => [f.id, structuredClone(f)]));
       update((s) => ({
         ...s,
         footprints,
+        neighbours,
         total: footprints.length,
         selectedId: footprints[0]?.id ?? null,
         selectedIds: footprints[0] ? [footprints[0].id] : [],
       }));
       void loadImageInfo(mapId, seq);
     } catch (e: any) {
-      update((s) => ({ ...s, error: e.message }));
+      if (seq === imgSeq) update((s) => ({ ...s, error: e.message }));
     } finally {
-      update((s) => ({ ...s, loading: false }));
+      if (seq === imgSeq) update((s) => ({ ...s, loading: false }));
     }
   }
 
@@ -157,6 +187,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
    */
   function select(id: string | null, mode: 'replace' | 'toggle' | 'range' = 'replace') {
     update((s) => {
+      s = { ...s, simplifyPreview: null, canUndoGeometry: !!geometryHistory[id ?? '']?.length };
       if (id === null)
         return { ...s, selectedId: null, selectedIds: [], feedback: { tags: [], note: '' } };
 
@@ -205,17 +236,87 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   function selectAll() {
     update((s) => ({
       ...s,
+      simplifyPreview: null,
       selectedIds: s.footprints.map((f) => f.id),
       selectedId: s.selectedId ?? s.footprints[0]?.id ?? null,
     }));
   }
 
   function clearSelection() {
-    update((s) => ({ ...s, selectedIds: s.selectedId ? [s.selectedId] : [] }));
+    update((s) => ({
+      ...s,
+      simplifyPreview: null,
+      selectedIds: s.selectedId ? [s.selectedId] : [],
+    }));
   }
 
-  function edit(id: string, pixelPolygon: [number, number][]) {
-    pendingEdits[id] = { ...pendingEdits[id], pixelPolygon };
+  function edit(id: string, pixelPolygon: [number, number][], remember = true) {
+    const row = get(store).footprints.find((f) => f.id === id);
+    if (!row || get(store).deciding) return;
+    if (remember)
+      geometryHistory[id] = [...(geometryHistory[id] ?? []), structuredClone(row.pixelPolygon)];
+    const polygon = structuredClone(pixelPolygon);
+    pendingEdits[id] = { ...pendingEdits[id], pixelPolygon: polygon };
+    update((s) => ({
+      ...s,
+      simplifyPreview: null,
+      canUndoGeometry: !!geometryHistory[s.selectedId ?? '']?.length,
+      footprints: s.footprints.map((f) => (f.id === id ? { ...f, pixelPolygon: polygon } : f)),
+    }));
+  }
+
+  function previewSimplification(id: string, tolerance: number) {
+    const state = get(store),
+      row = state.footprints.find((f) => f.id === id);
+    if (!row || state.deciding || geometryKind(row.featureType, row.pixelPolygon) === 'LineString')
+      return;
+    const trial = simplifyRing(row.pixelPolygon, tolerance);
+    const live = new Map(state.footprints.map((f) => [f.id, f]));
+    const neighbours = state.neighbours.map((f) => live.get(f.id) ?? f);
+    const overlaps = trial.valid
+      ? neighbours
+          .filter(
+            (f) =>
+              f.id !== id &&
+              f.status !== 'rejected' &&
+              f.featureType === row.featureType &&
+              geometryKind(f.featureType, f.pixelPolygon) === 'Polygon' &&
+              ringsOverlap(trial.polygon, f.pixelPolygon) &&
+              !ringsOverlap(row.pixelPolygon, f.pixelPolygon)
+          )
+          .map((f) => f.id)
+      : [];
+    update((s) => ({
+      ...s,
+      simplifyPreview: { id, original: ringSignature(row.pixelPolygon), trial, overlaps },
+    }));
+  }
+
+  function cancelSimplification() {
+    update((s) => ({ ...s, simplifyPreview: null }));
+  }
+
+  function acceptSimplification() {
+    const state = get(store),
+      preview = state.simplifyPreview;
+    if (!preview || state.deciding) return;
+    const row = state.footprints.find((f) => f.id === preview.id);
+    if (!row || ringSignature(row.pixelPolygon) !== preview.original) {
+      update((s) => ({
+        ...s,
+        simplifyPreview: null,
+        error: 'The outline changed. Preview again.',
+      }));
+      return;
+    }
+    if (preview.trial.valid && !preview.overlaps.length) edit(preview.id, preview.trial.polygon);
+  }
+
+  function undoGeometry(id: string) {
+    const previous = geometryHistory[id]?.at(-1);
+    if (!previous || get(store).deciding) return;
+    geometryHistory[id] = geometryHistory[id].slice(0, -1);
+    edit(id, previous, false);
   }
 
   function retype(id: string, featureType: string) {
@@ -223,6 +324,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     // Local too, so the sidebar swatch follows the choice before the verdict.
     update((s) => ({
       ...s,
+      simplifyPreview: null,
       footprints: s.footprints.map((f) =>
         f.id === id ? { ...f, featureType: featureType as FeatureType } : f
       ),
@@ -232,7 +334,15 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   /** One PATCH. Returns the server's message on failure, null on success. */
   async function writeVerdict(id: string, status: Verdict): Promise<string | null> {
     const edits = pendingEdits[id];
-    const body: Record<string, any> = { id, status };
+    const original = baseline[id];
+    if (!original) return 'The original outline is missing. Reload the sheet.';
+    const body: Record<string, any> = {
+      id,
+      status,
+      expected_pixel_polygon: original.pixelPolygon,
+      expected_feature_type: original.featureType,
+      expected_status: original.status,
+    };
     if (edits?.pixelPolygon) body.pixel_polygon = edits.pixelPolygon;
     if (edits?.featureType) body.feature_type = edits.featureType;
     const feedback = pendingFeedback[id];
@@ -250,15 +360,18 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }
     delete pendingEdits[id];
     delete pendingFeedback[id];
+    delete baseline[id];
+    delete geometryHistory[id];
     return null;
   }
 
   /** Drop decided rows from the list, the selection and the rail's count. */
-  function forget(mapId: string, ids: string[]) {
+  function forget(mapId: string, ids: string[], status: Verdict) {
     const gone = new Set(ids);
     update((s) => {
       const idx = s.footprints.findIndex((f) => gone.has(f.id));
       const footprints = s.footprints.filter((f) => !gone.has(f.id));
+      const decided = new Map(s.footprints.filter((f) => gone.has(f.id)).map((f) => [f.id, f]));
       const selectedId =
         s.footprints[idx] && gone.has(s.footprints[idx].id)
           ? (footprints[idx]?.id ?? footprints[idx - 1]?.id ?? null)
@@ -266,6 +379,14 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
       return {
         ...s,
         footprints,
+        // Accepted geometry remains a neighbour after leaving the queue;
+        // rejected proposals stop constraining the next preview.
+        neighbours: s.neighbours.map((f) => {
+          const row = decided.get(f.id);
+          return row ? { ...row, status } : f;
+        }),
+        simplifyPreview: null,
+        canUndoGeometry: !!geometryHistory[selectedId ?? '']?.length,
         selectedId,
         selectedIds: selectedId ? [selectedId] : [],
         feedback: pendingFeedback[selectedId ?? ''] ?? { tags: [], note: '' },
@@ -278,6 +399,10 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
   }
 
   async function decide(mapId: string, id: string, status: Verdict) {
+    if (get(store).simplifyPreview) {
+      update((s) => ({ ...s, error: 'Use or cancel the outline preview first.' }));
+      return;
+    }
     update((s) => ({ ...s, deciding: id, error: '' }));
     try {
       const message = await writeVerdict(id, status);
@@ -288,7 +413,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
         }));
         return;
       }
-      forget(mapId, [id]);
+      forget(mapId, [id], status);
     } finally {
       update((s) => ({ ...s, deciding: null }));
     }
@@ -304,6 +429,10 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
    */
   async function decideMany(mapId: string, ids: string[], status: Verdict) {
     if (!ids.length) return;
+    if (get(store).simplifyPreview) {
+      update((s) => ({ ...s, error: 'Use or cancel the outline preview first.' }));
+      return;
+    }
     const done: string[] = [];
     const failures: string[] = [];
     update((s) => ({ ...s, error: '' }));
@@ -315,7 +444,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }
     // Whatever succeeded leaves the queue even when a later row failed, so a
     // retry is over the remainder rather than over everything again.
-    if (done.length) forget(mapId, done);
+    if (done.length) forget(mapId, done, status);
     update((s) => ({
       ...s,
       deciding: null,
@@ -334,6 +463,10 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     selectAll,
     clearSelection,
     edit,
+    previewSimplification,
+    cancelSimplification,
+    acceptSimplification,
+    undoGeometry,
     retype,
     setFeedback,
     decide,

@@ -30,6 +30,7 @@
  *   # Polygon is already crop-relative in coco['annotations'][i]['segmentation']
  */
 
+import { geometryKind, type FeatureType } from '$lib/data/maps/footprintTypes';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createClient } from '@supabase/supabase-js';
@@ -138,6 +139,7 @@ const CATEGORY_IDS: Record<string, number> = {
   green_space: 5,
   water_body: 6,
   other: 7,
+  parcel: 8,
 };
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -212,6 +214,7 @@ export const GET: RequestHandler = async ({ url }) => {
         annotationCache
       );
       const pixelRing: [number, number][] = row.pixel_polygon;
+      const kind = geometryKind((row.feature_type ?? 'building') as FeatureType, pixelRing);
       let coordinates: [number, number][];
 
       if (annData) {
@@ -219,7 +222,13 @@ export const GET: RequestHandler = async ({ url }) => {
           const [lng, lat] = annData.transformer.transformToGeo([px, py]);
           return [lng, lat] as [number, number];
         });
-        if (coordinates.length > 0) coordinates.push(coordinates[0]);
+        if (
+          kind === 'Polygon' &&
+          coordinates.length > 0 &&
+          (coordinates[0][0] !== coordinates.at(-1)![0] ||
+            coordinates[0][1] !== coordinates.at(-1)![1])
+        )
+          coordinates.push(coordinates[0]);
       } else {
         coordinates = pixelRing.map(([x, y]) => [x, y] as [number, number]);
       }
@@ -232,7 +241,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
       features.push({
         type: 'Feature',
-        geometry: { type: 'Polygon', coordinates: [coordinates] },
+        geometry:
+          kind === 'LineString'
+            ? { type: 'LineString', coordinates }
+            : { type: 'Polygon', coordinates: [coordinates] },
         properties: {
           id: row.id,
           map_id: row.map_id,
@@ -288,7 +300,11 @@ export const GET: RequestHandler = async ({ url }) => {
     if (!annData?.iiifBaseUrl) continue;
 
     const pixelRing: [number, number][] = row.pixel_polygon;
-    if (!pixelRing?.length) continue;
+    if (
+      !pixelRing?.length ||
+      geometryKind((row.feature_type ?? 'building') as FeatureType, pixelRing) === 'LineString'
+    )
+      continue;
 
     // Bounding box in IIIF pixel space
     const xs = pixelRing.map(([x]) => x);
@@ -381,6 +397,7 @@ export const GET: RequestHandler = async ({ url }) => {
       { id: 5, name: 'green_space', supercategory: 'open_land' },
       { id: 6, name: 'water_body', supercategory: 'open_land' },
       { id: 7, name: 'other', supercategory: 'other' },
+      { id: 8, name: 'parcel', supercategory: 'structure' },
     ],
     images: cocoImages,
     annotations: cocoAnnotations,
