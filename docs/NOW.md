@@ -48,9 +48,9 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
-| Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64) | Tue's sittings, then Opus scores |
-| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Tue's sittings from `vma-audit`; rebase on main (#64 holds its base) |
-| Paper: claim-audit R rows 23 and 99 | Claude | `docs/paper/` | Clear both rows |
+| Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64); `work/image-processing/experiments/{place-links,then-now}/` | Tue's sittings, then Opus scores |
+| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | 3 commits, rebased onto #70 on 2026-10-13; Tue's sittings from `vma-audit` |
+| Paper: claim-audit R rows 23 and 99 | Claude | `paper-claim-rows` (1 commit, unmerged) | Review, merge, then the rows are clear |
 | 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
 | Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` | Two-sided reader check — `.claude/handoff-indochine100k.md` |

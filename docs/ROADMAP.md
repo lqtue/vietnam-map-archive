@@ -1,4 +1,4 @@
-# Roadmap — open work (updated 2026-10-07)
+# Roadmap — open work (updated 2026-10-13)
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
@@ -218,8 +218,11 @@ Do them when the surrounding work opens the file.
       and annotation. Decided 2026-10-08 against re-hosting the legend on the archived whole sheet
       (`eca788e5`), whose georeference sits 60–95 m off Cholon's. The legend stays per image: the 15
       Cholon "(1)" entries printed on the Saigon half already carry `px=` beyond Cholon's right edge,
-      which its Helmert carries exactly. Exit: one `/explore` address opens both halves, and a Cholon
-      "(1)" pin lands on its numeral on the Saigon half.
+      which its Helmert carries exactly. Done: the Legend tab lists both halves, draws both sets of
+      pins, and `px-from` stores a pin clicked on the sister scan (#63, #69). Open: the half that is not
+      a layer still needs its "Show this sheet on the map" button, so one `/explore` address does not
+      yet open both. Exit: one `/explore` address opens both halves, and a Cholon "(1)" pin lands on
+      its numeral on the Saigon half.
 - [ ] **`hue-rescans`** — two Huế sheets (800×628, 754×877) are under the scout's 1024 px floor.
       They need larger
       scans, which is sourcing, not code.
@@ -258,12 +261,12 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       corpus will drift. Keep its own pass only for what the view drops — `legend_entry` rows,
       `--min-confidence`, per-sighting provenance. Exit: the script's ground-name count equals the
       view's, and `--self-check` still passes.
-- [ ] **`text-box-groups`** — deploy the matching app changes; migrations 112–114 applied
-      2026-10-06 and the OCR reader verified with grouping available. Local implementation keeps original oriented boxes linked in click order under
+- [ ] **`text-box-groups`** — shipped with 7.5 (migrations 112–114 applied 2026-10-06; the app is
+      live and 21 real groups exist). Left: verify one real ungroup in Text. The implementation keeps original oriented boxes linked in click order under
       one combined label, with Shift-click selection and Ungroup. All Text edits now share
       a per-user/map browser draft cache and explicit Save drafts; the single list has local
       Type/Region filters and task presets. Controller, browser
-      interaction (mocked writes) and isolated SQL checks pass. Exit: deploy, then verify
+      interaction (mocked writes) and isolated SQL checks pass. Exit: verify
       one real group and ungroup in Text without changing its
       original readings; search returns the combined label once.
 - [ ] **`dictionary-review`** — after the drain. The first artefact a human can check against the
@@ -452,7 +455,7 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
       20 known city cells, 3 served maps and 17 externally obtainable; 21 PCL source items include
       Nha Trang and Quy Nhơn versos without counting them as extra cities. Import/read-back:
       `scripts/oneoff/import_l909_series_cells.mjs`; evidence: `work/l909/pcl-city-maps.json`.
-      The coverage page, catalog link and partial-index wording are implemented locally.
+      The coverage page, catalog link and partial-index wording are live (#59).
       The 19 missing indexed scans (17 city rectos + 2 versos) are now mirrored and ingested as drafts;
       native pixels, thumbnails, overviews, source links and representative tiles were verified.
       Record manifest: `work/l909/ingested-scans.json`; preparation/georeferencing remain pending.
@@ -477,6 +480,12 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
       gap 110 closed; the old JSON copies of the three keys stay on rows nobody re-saves. Not
       `created_by` (the RLS policies need it) and not `printing_id`. Exit: no filter or sort in
       `src/` reads `extra_metadata`.
+- [ ] **`series-annotation-cap`** — `/api/series/[key]/annotation` reads at most 60 sheets
+      (`MAX_SHEETS`) and returns about 48 items, while L7014 has 586 georeferenced sheets and
+      Indochine 100k 2nd edition has 337. It truncates silently, so the Allmaps viewer link shows an
+      arbitrary 60. Serves the corpus bet (bet 3). Fix: annotations merged ahead of time, or a
+      signal that the result was cut. Exit: a series with more than 60 georeferenced sheets opens
+      whole, or says it was cut.
 
 ## After 7.3
 
@@ -760,6 +769,14 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
       while they are red. Tue decides whether public-but-unplaced is intended; if it is, teach both
       scripts to treat those sheets as known. Also watch: client JS grew 15% gzip from 13 Sep to
       13 Oct (/catalog +23%), all first-party. Exit: both scripts exit 0 on production data.
+- [ ] **`ci-python-worker`** — Python tests, the two `*.test.mjs` files and the `worker/` type-check
+      and routing tests run in no CI. Add a cheap job: `work/core/vma_core/test_core.py`,
+      `work/ocr/scripts/test_*.py` (skip `test_l7014_gcp.py`, which needs `osgeo`),
+      `node --test scripts/lib/cells.test.mjs scripts/scoutDerive.test.mjs` (the first needs the
+      gitignored dumps; see `cells-test-ci`), a `tsc --noEmit` over `worker/`, and a routing test for
+      `worker/src/index.ts`. Exit: all of them run on every PR.
+- [ ] **`history-rewrite`** — drop committed build output, `node_modules` and `.vercel` output from
+      git history (the repo is 250 MB). Details in `docs/private/`.
 
 ## Infrastructure
 
@@ -768,13 +785,10 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
       Use opt-in GA4 journeys, existing DB-confirmed outcomes and voluntary reuse
       evidence; defer the custom collector/dashboard. Implement role exclusion,
       canonical navigation and meaningful search/contribution hooks; configure and
-      verify production separately. Exit: 6–8 weeks of documented observation,
+      verify production separately. The opt-in GA4 code and tests shipped in 7.5 (#55); production
+      configuration and the observation remain. Exit: 6–8 weeks of documented observation,
       one evidence sheet and one justified product/study/support recommendation.
 
-- [ ] **`preview-env-vars`** — the Preview environment has none. Production holds all five, Preview
-      holds none, so
-      every preview build fails at the first `$env/static/*` import. Dashboard only —
-      `wrangler pages secret` has no environment flag in any current version.
 
 ## Order
 
