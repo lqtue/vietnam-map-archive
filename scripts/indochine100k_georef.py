@@ -9,10 +9,21 @@ Run with the OCR virtualenv (google-genai is installed there):
     work/ocr/.venv/bin/python scripts/indochine100k_georef.py calibrate --count 12
     work/ocr/.venv/bin/python scripts/indochine100k_georef.py place <map-id>
     work/ocr/.venv/bin/python scripts/indochine100k_georef.py check
+    work/ocr/.venv/bin/python scripts/indochine100k_georef.py audit [<map-id>]
+    work/ocr/.venv/bin/python scripts/indochine100k_georef.py audit --self-test
     work/ocr/.venv/bin/python scripts/indochine100k_georef.py annotate
 
-`annotate --apply` is draft-only and requires an accepted calibration and a
-clean lattice check. The first series-wide calibration failed those gates; see
+`audit` re-reads the printed tick labels on every saved clear placement and
+compares each placed edge with the printed one (work/indochine-100k/
+printed-audit.json; read-only, writes no database row). Committed input: the
+catalogue box only selects WHICH ticks to read. A read more than 0.015 g from
+that target is refused, so a catalogue error larger than ~1.6 km shows as
+`unreadable`, never as `pass`. That is the one input the audit still shares
+with the placement.
+
+`annotate --apply` is draft-only and requires an accepted calibration, a
+clean lattice check and a matching `pass` in printed-audit.json (same wgs84
+hash, same DETECT_VERSION). The first series-wide calibration failed those gates; see
 docs/journals/260923-indochine100k-georef.md.
 """
 import argparse
@@ -52,6 +63,19 @@ ACROSS, MAXIN, MINGAP, LIM, TRIM = (190, 300), 250, 10, 34, 3.0
 # rim appear to have an anomalous offset (Gia Ray, Kratié, Hà Giang).
 NEAR, RESIDUAL = 12, 15.0
 GRADE, PARIS = 0.9, 2.337229166666667
+AUDIT_FILE = WORK / "printed-audit.json"
+# Fixed before the first audit run (2026-10-07). Above the calibration's
+# 76 m mean / 188 m max residual band; Tri Binh's uncorrected ~500 m is far over.
+AUDIT_THRESHOLD_M = 150
+# PREDICTIONS, written before the first real audit run (2026-10-07):
+#  1. Census: Tri Binh (W) 1f025a9f-... PASSES, because its saved placement was
+#     built from SOURCE_REVIEWED_CORRECTED_BOX (already corrected).
+#  2. POSITIVE CONTROL: Tri Binh audited against the placement the UNCORRECTED
+#     catalogue box would give (corrected_edges() on the raw UNIMARC box, same
+#     printed read) FAILS on west and south, at about +509 m and +544 m.
+#  3. The calibration-sample sheets (calibration-fit.json observations) PASS.
+#  Quang Ngai is held upstream (placement_error / verdict), so it is not in the census.
+#  Every disagreement with these is reported, not tuned away.
 CORNERS = ("NW", "NE", "SE", "SW")
 # Tri Binh (W) ("1f025a9f-...") was held here after its 2026-09-23 two-tick
 # Gemini read came out 741.5m off the accepted latitude fit -- removed
@@ -1606,7 +1630,7 @@ def catalogue():
     return by_fkey
 
 
-def record_box(row, records):
+def record_box(row, records, corrected=True):
     """Use this maps row's fkey, never the unioned series_sheets bbox."""
     meta = row.get("extra_metadata") or {}
     keys = meta.get("cartomundi_fkeys") or []
@@ -1619,9 +1643,9 @@ def record_box(row, records):
     vals = {side: unimarc(u.get(side)) for side in "wens"}
     if any(v is None for v in vals.values()):
         return None, f"fkey {keys[0]} has incomplete UNIMARC corners"
-    corrected = SOURCE_REVIEWED_CORRECTED_BOX.get(row.get("id"))
-    if corrected and str(keys[0]) == corrected[0]:
-        vals = {**vals, **corrected[1]}
+    override = SOURCE_REVIEWED_CORRECTED_BOX.get(row.get("id")) if corrected else None
+    if override and str(keys[0]) == override[0]:
+        vals = {**vals, **override[1]}
     box = {"west": vals["w"], "east": vals["e"], "north": vals["n"], "south": vals["s"], "fkey": keys[0]}
     if not (box["west"] < box["east"] and box["south"] < box["north"]):
         return None, f"fkey {keys[0]} has inverted bbox"
@@ -2199,6 +2223,162 @@ def regress(tolerance=2.0):
     return not bad
 
 
+def audit_deltas(wgs84, printed):
+    """Placed edge minus printed edge, in metres (+ = placed east / north of print).
+
+    Edges: west = NW lon, east = NE lon, north = NW lat, south = SW lat.
+    `printed` is read_printed()'s grades dict (west/east/north/south in grades).
+    """
+    pw, pe = printed["west"] * GRADE + PARIS, printed["east"] * GRADE + PARIS
+    ps, pn = printed["south"] * GRADE, printed["north"] * GRADE
+    placed = {"west": wgs84["NW"][0], "east": wgs84["NE"][0],
+              "north": wgs84["NW"][1], "south": wgs84["SW"][1]}
+    target = {"west": pw, "east": pe, "north": pn, "south": ps}
+    out = {}
+    for side in ("west", "east"):
+        out[side] = (placed[side] - target[side]) * metres_per_degree(
+            (placed["north"] + placed["south"]) / 2)[0]
+    for side in ("north", "south"):
+        d = placed[side] - target[side]
+        out[side] = (1 if d >= 0 else -1) * north_metres(placed[side], target[side])
+    return out
+
+
+def audit_outcome(deltas, threshold=AUDIT_THRESHOLD_M):
+    return "pass" if all(abs(v) <= threshold for v in deltas.values()) else "fail"
+
+
+def wgs84_sha1(wgs84):
+    return hashlib.sha1(json.dumps(wgs84, sort_keys=True).encode()).hexdigest()
+
+
+def audit_record(saved, deltas, error, wgs84=None):
+    wgs84 = wgs84 or saved["wgs84"]
+    return {"id": saved["id"], "name": saved.get("name"),
+            "deltas_m": {k: round(v, 1) for k, v in deltas.items()} if deltas else None,
+            "outcome": ("unreadable" if deltas is None else audit_outcome(deltas)),
+            "error": error, "wgs84_sha1": wgs84_sha1(wgs84),
+            "detector_version": saved.get("detector_version")}
+
+
+def audit_one(row, records, saved, cal):
+    box, err = record_box(row, records)
+    if err:
+        return audit_record(saved, None, err), None
+    base = row["iiif_image"] or f"https://iiif.maparchive.vn/iiif/{row['id']}"
+    try:
+        info = T.get_image_info(base)
+        printed, err = read_printed(base, info["width"], info["height"], saved, box)
+    except Exception as exc:
+        return audit_record(saved, None, f"{type(exc).__name__}: {exc}"), None
+    if err:
+        return audit_record(saved, None, err), None
+    rec = audit_record(saved, audit_deltas(saved["wgs84"], printed["grades"]), None)
+    raw, rerr = record_box(row, records, corrected=False)
+    if rerr or box == raw:
+        return rec, None
+    # Positive control: the placement the uncorrected catalogue box would give.
+    e = corrected_edges(raw, cal)
+    west, east = e["west"] * GRADE + PARIS, e["east"] * GRADE + PARIS
+    north, south = e["north"] * GRADE, e["south"] * GRADE
+    control = {"NW": [west, north], "NE": [east, north], "SE": [east, south], "SW": [west, south]}
+    ctl = audit_record(saved, audit_deltas(control, printed["grades"]), None, control)
+    ctl["note"] = ("uncorrected catalogue box -> corrected_edges() -> same printed read; "
+                   "not a stored placement")
+    return rec, ctl
+
+
+def audit_self_test():
+    """No network: one saved clear placement, a fake printed read, +0 m and +500 m."""
+    saved = next(json.loads(f.read_text()) for f in sorted(WORK.glob("*.json"))
+                 if re.fullmatch(r"[0-9a-f-]{36}", f.stem)
+                 and not json.loads(f.read_text()).get("verdict")
+                 and not json.loads(f.read_text()).get("printed_quad_review"))
+    w = saved["wgs84"]
+    printed = {"west": (w["NW"][0] - PARIS) / GRADE, "east": (w["NE"][0] - PARIS) / GRADE,
+               "north": w["NW"][1] / GRADE, "south": w["SW"][1] / GRADE}
+    zero = audit_deltas(w, printed)
+    assert audit_outcome(zero) == "pass" and all(abs(v) < 1e-6 for v in zero.values()), zero
+    shift = 500 / metres_per_degree(w["NW"][1])[0]
+    moved = {k: [v[0] + shift if k in ("NW", "SW") else v[0], v[1]] for k, v in w.items()}
+    d = audit_deltas(moved, printed)
+    assert audit_outcome(d) == "fail" and abs(d["west"] - 500) < 1 and abs(d["east"]) < 1e-6, d
+    n = 500 / metres_per_degree(w["NW"][1])[1]
+    south = {k: [v[0], v[1] - n if k in ("SW", "SE") else v[1]] for k, v in w.items()}
+    d = audit_deltas(south, printed)
+    assert audit_outcome(d) == "fail" and abs(d["south"] + 500) < 1.5, d
+    assert audit_record(saved, None, "x")["outcome"] == "unreadable"
+    print(f"audit self-test ok on {saved['name']}: 0 m -> pass, +500 m west -> fail, 500 m south -> fail")
+
+
+def audit(map_id=None):
+    """Read each clear placement's printed ticks against where it was placed."""
+    cal = json.loads(OFFSET_FILE.read_text())
+    records = catalogue()
+    dbrows = {r["id"]: r for r in rows()}
+    done = json.loads(AUDIT_FILE.read_text()) if AUDIT_FILE.exists() else {"entries": {}}
+    entries = done.setdefault("entries", {})
+    controls = done.setdefault("positive_control", {})
+    files = [f for f in sorted(WORK.glob("*.json")) if re.fullmatch(r"[0-9a-f-]{36}", f.stem)
+             and (map_id is None or f.stem == map_id)]
+    if map_id and not files:
+        raise SystemExit(f"no saved placement for {map_id}")
+    todo = []
+    for f in files:
+        saved = json.loads(f.read_text())
+        if not all(k in saved for k in ("lines", "corners", "wgs84")):
+            continue
+        if map_id is None and saved.get("verdict"):
+            continue
+        if saved["id"] not in dbrows:
+            continue
+        todo.append(saved)
+    if map_id and todo and todo[0].get("verdict"):
+        print(f"note: {todo[0]['name']} is held ({'; '.join(todo[0]['verdict'])}); auditing via the single-id path")
+    def save():
+        counts, split = {}, {}
+        for e in entries.values():
+            public = dbrows.get(e["id"], {}).get("status") == "public"
+            counts[e["outcome"]] = counts.get(e["outcome"], 0) + 1
+            k = f"{'public' if public else 'not_public'}:{e['outcome']}"
+            split[k] = split.get(k, 0) + 1
+        edges = sorted(((abs(v), e["name"], e["id"], side, v) for e in entries.values()
+                        if e["deltas_m"] for side, v in e["deltas_m"].items()), reverse=True)[:10]
+        done["summary"] = {"threshold_m": AUDIT_THRESHOLD_M, "n": len(entries), "by_outcome": counts,
+                           "public_vs_not": split,
+                           "worst_edges": [{"name": n, "id": i, "edge": s, "delta_m": v}
+                                           for _, n, i, s, v in edges]}
+        AUDIT_FILE.write_text(json.dumps(done, indent=1))
+        return counts, split
+
+    for i, saved in enumerate(todo, 1):
+        old = entries.get(saved["id"])
+        if (map_id is None and old and old["wgs84_sha1"] == wgs84_sha1(saved["wgs84"])
+                and old["detector_version"] == saved.get("detector_version")):
+            continue  # resumable census: already audited this exact placement
+        rec, ctl = audit_one(dbrows[saved["id"]], records, saved, cal)
+        entries[saved["id"]] = rec
+        if ctl:
+            controls[saved["id"]] = ctl
+        save()  # a long census survives an interruption
+        print(f"{i}/{len(todo)} {saved['name']}: {rec['outcome']} {rec['deltas_m'] or rec['error']}", flush=True)
+    counts, split = save()
+    print(f"audit: {len(entries)} sheets: {counts}; public/not: {split}")
+    return done
+
+
+def audit_state(got, audits):
+    """None if the placement's own audit passes and still matches; else the hold reason."""
+    e = audits.get(got["id"])
+    if e is None:
+        return "missing audit"
+    if e.get("wgs84_sha1") != wgs84_sha1(got["wgs84"]) or e.get("detector_version") != DETECT_VERSION:
+        return "stale audit"
+    if e["outcome"] != "pass":
+        return f"audit {e['outcome']}: {e.get('error') or e.get('deltas_m')}"
+    return None
+
+
 def annotate(write=False, only_new=True, only_ids=None):
     """Build annotations for sheets that cleared every gate; --apply stores them (draft rows only)."""
     if not OFFSET_FILE.exists() or not calibration_ready(json.loads(OFFSET_FILE.read_text())):
@@ -2208,7 +2388,8 @@ def annotate(write=False, only_new=True, only_ids=None):
     dbrows = {r["id"]: r for r in rows()}
     outdir = WORK / "annotations"
     outdir.mkdir(parents=True, exist_ok=True)
-    ready, held = [], 0
+    audits = json.loads(AUDIT_FILE.read_text()).get("entries", {}) if AUDIT_FILE.exists() else {}
+    ready, held, reasons = [], 0, {}
     for file in sorted(WORK.glob("*.json")):
         if not re.fullmatch(r"[0-9a-f-]{36}", file.stem):
             continue
@@ -2219,25 +2400,36 @@ def annotate(write=False, only_new=True, only_ids=None):
                 (only_ids is not None and got.get("id") not in only_ids)):
             held += 1
             continue
+        reason = audit_state(got, audits)
+        if reason:
+            held += 1
+            kind = reason.split(":")[0]
+            reasons[kind] = reasons.get(kind, 0) + 1
+            print(f"  HOLD {got['name']}: {reason}")
+            continue
         mid = got["id"]
         iiif = row["iiif_image"] or f"https://iiif.maparchive.vn/iiif/{mid}"
         info = T.get_image_info(iiif)
         ann = annotation(iiif, info["width"], info["height"], got)
         (outdir / f"{mid}.json").write_text(json.dumps(ann, indent=1))
         ready.append(outdir / f"{mid}.json")
-    print(f"{len(ready)} built, {held} held")
+    print(f"{len(ready)} built, {held} held; audit holds: {reasons}")
+    for mid, e in sorted(audits.items()):
+        if e["outcome"] == "fail" and dbrows.get(mid, {}).get("status") == "public":
+            print(f"  PUBLIC FAIL (decide: unpublish or correct) {e['name']} {mid}: {e['deltas_m']}")
     G.store(ready, "catalogue+calibration", apply=write)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("phase", choices=["calibrate", "candidates", "detect", "place", "check", "annotate", "regress"])
+    parser.add_argument("phase", choices=["calibrate", "candidates", "detect", "place", "check", "annotate", "regress", "audit"])
     parser.add_argument("map_id", nargs="?")
     parser.add_argument("--count", type=int, default=12, help="latitude-stratified calibration sample size")
     parser.add_argument("--extra", action="append", default=[], help="additional series-561 map id for calibration")
     parser.add_argument("--lat-min", type=float, default=19, help="candidates: minimum catalogue latitude")
     parser.add_argument("--lat-max", type=float, default=23.5, help="candidates: maximum catalogue latitude")
     parser.add_argument("--apply", action="store_true", help="annotate: write draft-only annotation and flag")
+    parser.add_argument("--self-test", action="store_true", help="audit: no-network delta/outcome check")
     parser.add_argument("--ids", help="annotate: comma-separated map ids to restrict to")
     args = parser.parse_args()
     if args.phase == "calibrate":
@@ -2256,6 +2448,8 @@ def main():
             raise SystemExit(1)
     elif args.phase == "annotate":
         annotate(args.apply, only_ids=set(args.ids.split(",")) if args.ids else None)
+    elif args.phase == "audit":
+        audit_self_test() if args.self_test else audit(args.map_id)
     elif args.phase == "regress":
         if not regress():
             raise SystemExit(1)
