@@ -10,7 +10,7 @@
   import { addFavorite, removeFavorite } from '$lib/data/supabase/favorites';
   import { loadFavorites, resolveThumbnails } from '$lib/features/catalog/homeCatalog';
   import FeaturedSheet from '$lib/features/catalog/FeaturedSheet.svelte';
-  import HeroDemo from '$lib/features/explore/HeroDemo.svelte';
+  import HowItWorks from '$lib/features/explore/HowItWorks.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import PaletteSearchField from '$lib/ui/PaletteSearchField.svelte';
   import { openPaletteWith, pageOwnsSearch } from '$lib/core/utils/commandPalette';
@@ -44,81 +44,27 @@
   $: seeAllHref = place?.area ? `/catalog?area=${encodeURIComponent(place.area)}` : '/catalog';
 
   /**
-   * The sheet the "how this works" section plays, and how to hold it.
-   *
-   * `bbox` is what to frame, so the demo shows the whole sheet with a margin
-   * rather than a pinned detail of it — `HeroMap.fitSheet` works out the zoom
-   * from the stage's own size, which is the only way one number is right on a
-   * phone and on a 27-inch screen at once.
-   *
-   * It is **not** `maps.bbox`. That column is the bbox of the georeferenced
-   * *mask*; what the warped layer actually draws is the whole scan — paper
-   * edges, shelfmark, legend — which here runs 830 m further east than the
-   * mask does, so fitting the column cropped the bottom of the sheet. These
-   * are the scan's four corners `(0,0)…(width,height)` put through the
-   * annotation's own transform. Swapping the sheet means recomputing them;
-   * the cheap check is the shot itself, since anything clipped is visible in
-   * `hero-1882.webp`.
-   *
-   * `rotation` holds the sheet square in the frame, which for this one is
-   * essentially a quarter turn: the scan's own x-axis runs north, so at
-   * rotation 0 the sheet stands on end and a 16:9 stage is mostly margin.
-   * /explore is where to find it for another sheet — ⌘/ctrl-drag until the
-   * sheet sits square, then take the `r` out of the address bar
-   * (`#@<lat>,<lng>,<zoom>z,<rotation>r`).
-   *
-   * The sheet has to be georeferenced and mirrored (publishing enqueues
-   * `mirror_annotation`), because HeroMap plays our own copy of the annotation.
-   *
-   * ponytail: hardcoded rather than queried. Picking "the sheet with the most
-   * of everything" needs a join the front page has no other use for; when a
-   * second sheet is this complete, that is the moment to write it. This one is
-   * the only sheet carrying all three layers the demo shows — a georeference,
-   * 46 traced footprints and 43 validated OCR labels — so it is the only one
-   * where the sequence tells the truth.
+   * The sheet the "how this works" section opens, and the header stills show.
+   * Pinned alongside nothing else: the section is four screenshots now, so the
+   * only thing the page needs from the sheet is where the outbound link goes.
+   * `maps.slug` can be re-minted and `maps.id` cannot, but a stale slug 301s.
    */
-  const HERO_SHEET = {
-    id: '0e02b9d9-9d40-4cca-8e41-8c8373d54d3b',
-    /* Pinned alongside the uuid rather than looked up: this is a hard-coded
-       sheet, and the slug is what the outbound link should say. The uuid stays
-       as the identity — `maps.slug` can be re-minted, `maps.id` cannot. */
-    slug: 'plan-cadastral-de-la-ville-de-saigon-cochinchine-francaise',
-    view: {
-      bbox: [106.687488, 10.759901, 106.716015, 10.797223] as [number, number, number, number],
-      rotation: 1.5772,
-    },
-  };
+  const HERO_SLUG = 'plan-cadastral-de-la-ville-de-saigon-cochinchine-francaise';
 
   /**
    * The header used to be the live map itself, which put OpenLayers,
    * ol-pmtiles and Allmaps in the front page's first chunk — 179 kB of
    * JavaScript with ~390 kB of basemap behind it — before the masthead had
    * painted. It is two stills now, cross-faded by the slider in the column,
-   * and the real map plays further down in `HeroDemo` for a reader who
-   * scrolls to it. The two come out of one shoot, which is why the ends of the
-   * slider line up to the pixel.
+   * The two come out of one shoot, which is why the ends of the slider line up
+   * to the pixel.
    *
-   * They are a **pinned close-up, kept on purpose**. `HERO_SHEET` below now
-   * frames the whole sheet, and the live section was refitted to it; the
-   * header was left as it was. So `scripts/gen-hero-still.mjs`, which shoots
-   * the live section, would replace these with the wide view — a decision,
-   * not a repair. Re-run it only when you want the header to follow the demo
-   * again.
+   * They are a **pinned close-up, kept on purpose**. `scripts/gen-hero-still.mjs`
+   * shoots `HeroDemo`'s stage, which the front page no longer renders, so it
+   * cannot be re-run as it stands; the committed pair is the header's only copy.
    */
   const HERO_NOW = '/images/hero-now.webp';
   const HERO_1882 = '/images/hero-1882.webp';
-
-  /**
-   * The demo section's own assets, which are **not** the header's. These come
-   * out of `scripts/gen-hero-video.mjs`, which records the live section — so
-   * they are the wide camera the section actually uses, and the poster is the
-   * clip's own first frame. Handing the section `HERO_1882` instead is what put
-   * an enlarged sheet behind the live map: that still is the pinned close-up,
-   * kept deliberately for the header above and wrong for the section below.
-   */
-  const HERO_CLIP = '/video/hero-demo.mp4';
-  const HERO_CLIP_SMALL = '/video/hero-demo-800.mp4';
-  const HERO_CLIP_POSTER = '/video/hero-demo-poster.webp';
 
   /**
    * The header image is full-bleed, so a 390px phone was being handed the whole
@@ -126,14 +72,8 @@
    * of it pixels the screen cannot draw. `gen-hero-still.mjs` writes an 800px
    * cut beside each one; this is the naming convention, in the one place that
    * needs to know it.
-   *
-   * `wide` because the two shoots do not agree on it: the stills are 1600 and
-   * the clip's poster is 1200, which is the width its own recording is encoded
-   * at. Declaring the poster as 1600w would have the browser pick it for a
-   * screen it cannot fill.
    */
-  const twoCuts = (src: string, wide = 1600) =>
-    `${src.replace('.webp', '-800.webp')} 800w, ${src} ${wide}w`;
+  const twoCuts = (src: string) => `${src.replace('.webp', '-800.webp')} 800w, ${src} 1600w`;
 
   /**
    * How much of the 1882 sheet the header shows: 1 is the sheet, 0 is the
@@ -212,28 +152,26 @@
   }
 
   /**
-   * The figures quoted in the copy below. A dated snapshot on purpose —
-   * refresh them when they embarrass us, which is the point of putting them on
-   * the front page. `labels` is distinct names, not rows: the OCR pass has been
-   * re-run on some sheets and `ocr_extractions` holds 1,767 rows for 958 actual
-   * labels, so quoting the row count would inflate the number by 85%.
-   */
-  /**
-   * The front page's hand-kept numbers. `mapCount` beside them is a real query
-   * over `maps`, and the two answer different questions on purpose: a catalogue
-   * record is a sheet someone can open, while `sheetsDrawn` counts everything
-   * the map can paint — 452 of which are cells of the L7014 mosaic and have no
-   * `maps` row at all. Say which is which wherever both appear.
+   * The front page's hand-kept numbers, a dated snapshot on purpose — refresh
+   * them when they embarrass us, which is the point of putting them on the
+   * front page. `mapCount` beside them is a real query over `maps`.
+   *
+   * `names` is distinct validated names, not rows: the OCR pass has been
+   * re-run on some sheets, so 1,228 validated rows are 1,178 actual names.
+   * `footprints` is the approved ones (all on the 1882 sheet); the rest of the
+   * traced outlines wait for review. `legendEntries` is what
+   * `/api/maps/[id]/legend-points` returns, summed over the sheets that have a
+   * placed legend (1878, 1923, both 1942 halves, 1959, 1968).
    */
   const STATS = {
-    snapshot: 'September 2026',
-    labels: 958,
-    labelsChecked: 43,
+    snapshot: 'October 2026',
+    names: 1178,
+    nameSheets: 12,
     footprints: 46,
-    l7014Held: 461,
+    legendEntries: 846,
+    legendSheets: 6,
+    l7014Held: 512,
     l7014Total: 627,
-    sheetsDrawn: 583,
-    sheetsDrawnBefore: 94,
   };
 
   /**
@@ -274,8 +212,9 @@
    * drifts the day a fortieth sheet publishes.
    */
   $: metaDescription =
-    `A small volunteer archive of historical maps of Vietnam — Saigon, Huế and Hanoi so far. ` +
-    `${mapCount} sheets are georeferenced and readable in a browser; tracing and label work have only just started.`;
+    `A small volunteer archive of historical maps of Vietnam. ` +
+    `${mapCount} sheets are georeferenced and readable in a browser; the names on them are searchable, ` +
+    `and numbered legends are being placed on the ground, a sheet at a time.`;
 
   /**
    * Absolute, because a share card is read by a crawler with no page to resolve
@@ -469,12 +408,9 @@
         Vietnam<br /><span class="text-highlight">Map Archive</span>
       </h1>
       <p class="hero-subtitle">
-        {$t(
-          '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.',
-          {
-            N: mapCount,
-          }
-        )}
+        {$t('{N} sheets of Vietnam — 1791 to 2006 — laid back over the ground they drew.', {
+          N: mapCount,
+        })}
       </p>
       <!-- The field is a paper plate sitting on the masthead's dark ground, so
            `on-light-plate` inside the component keeps it off the paper ink. -->
@@ -607,17 +543,15 @@
     </section>
 
     <!-- ============ HOW THIS WORKS ============
-         The animated hero, moved out of the header. Same map, same four beats;
-         the difference is that a reader who never scrolls this far never pays
-         for OpenLayers. -->
-    <HeroDemo
-      mapId={HERO_SHEET.id}
-      slug={HERO_SHEET.slug}
-      view={HERO_SHEET.view}
-      video={HERO_CLIP}
-      videoSmall={HERO_CLIP_SMALL}
-      poster={HERO_CLIP_POSTER}
-      posterSrcset={twoCuts(HERO_CLIP_POSTER, 1200)}
+         Four screenshots with a paragraph each. It used to be a clip of the
+         map, which was one composition for every screen. -->
+    <HowItWorks
+      slug={HERO_SLUG}
+      footprints={STATS.footprints}
+      names={STATS.names}
+      nameSheets={STATS.nameSheets}
+      legendEntries={STATS.legendEntries}
+      legendSheets={STATS.legendSheets}
     />
 
     <!-- ============ THE BAND ============
@@ -689,7 +623,7 @@
         <h2 class="band-title">{$t('About the project')}</h2>
         <p class="band-desc">
           {$t(
-            "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL."
+            "Volunteers put those sheets on the ground they drew. Now the work is reading what is printed on them: a model reads the names and a person checks them, numbered legends are placed on the map, and buildings are traced. The aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data. The 1882 cadastral survey of Saigon is where it started; the city plans of 1923, 1942, 1959 and 1968 are where the legends are. Everything published will be CC-BY / ODbL."
           )}
         </p>
         <a href="/about" class="info-link">{$t("What's actually done →")}</a>
@@ -700,22 +634,22 @@
         <p class="band-note">{STATS.snapshot}</p>
         <p class="band-desc">
           {$t(
-            'Two surveys went on the map this week: the US Army 1:50,000 of Vietnam — {N} of its {T} sheets — and the Indochine 1:25,000 of Tonkin. The map draws {D} sheets now, against {B} a week ago.',
-            {
-              N: STATS.l7014Held,
-              T: STATS.l7014Total,
-              D: STATS.sheetsDrawn,
-              B: STATS.sheetsDrawnBefore,
-            }
+            'Most of the {N} sheets come from a few surveys: the US Army 1:50,000 of Vietnam — {M} of its {T} sheets — two editions of the Indochine 1:100,000, and the Indochine 1:25,000 of Tonkin.',
+            { N: mapCount, M: STATS.l7014Held, T: STATS.l7014Total }
           )}
         </p>
         <p class="band-desc">
           {$t(
-            'The OCR pass has read {N} distinct place names off six sheets, {M} of which have been checked by a person — so that queue has barely started.',
-            { N: STATS.labels, M: STATS.labelsChecked }
+            'A person has checked {N} names the OCR pass read off {M} sheets, and the numbered legends of {L} sheets are placed on the ground: {P} entries you can click.',
+            {
+              N: STATS.names,
+              M: STATS.nameSheets,
+              L: STATS.legendSheets,
+              P: STATS.legendEntries,
+            }
           )}
           {$t(
-            '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet.',
+            '{N} building outlines on the 1882 cadastral survey are approved, and more are waiting for review.',
             { N: STATS.footprints }
           )}
         </p>
@@ -737,7 +671,7 @@
     <section class="home-cta">
       <h2 class="home-cta-title">{$t('What will you find?')}</h2>
       <p class="home-cta-sub">
-        {$t('Most people come for one street and stay for the city. {N} sheets, 1791 to 1984.', {
+        {$t('Most people come for one street and stay for the city. {N} sheets, 1791 to 2006.', {
           N: mapCount,
         })}
       </p>

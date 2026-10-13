@@ -82,55 +82,37 @@ test('the hero field hands its first keystrokes to the palette', async ({ page }
  * back to shipping ~179 kB of JavaScript and ~390 kB of basemap to everyone who
  * scrolls past.
  */
-test('the how-it-works demo loads early, plays when scrolled to, and mounts no map until asked', async ({
+test('how-it-works is four pictures with a paragraph each, and the names step opens the palette', async ({
   page,
 }) => {
   await page.goto('/');
   await hydrated(page);
 
-  const stage = page.locator('.hero-demo-stage');
-  const clip = page.locator('.hero-demo-clip');
+  const steps = page.locator('#how-it-works .how-step');
+  await expect(steps).toHaveCount(4);
 
-  // The catalog above the section renders after its fetch, which moves the
-  // stage down the page — scroll before that and the offset means nothing.
-  await expect(page.locator('.maps-loading')).toHaveCount(0, { timeout: 20000 });
+  // Lazy images: bring each into view, then check it decoded rather than 404ed.
+  for (const shot of await page.locator('#how-it-works .how-shot').all()) {
+    await shot.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => shot.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0), {
+        timeout: 12000,
+      })
+      .toBe(true);
+  }
 
-  // 200px below the fold: inside the 400px lead, outside the viewport.
-  await page.evaluate(() => {
-    const el = document.querySelector('.hero-demo-stage');
-    if (!el) throw new Error('no hero demo stage');
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo(0, top - window.innerHeight - 200);
-  });
+  // The copy quotes counts; an unfilled placeholder would print as "{N}".
+  await expect(page.locator('#how-it-works')).not.toContainText(/\{[A-Z]\}/);
 
-  await expect(clip).toBeAttached({ timeout: 12000 });
-  // Past the point where a clip that was going to start off screen would have.
-  await page.waitForTimeout(2000);
-  expect(await clip.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+  // Nothing on the page fetches OpenLayers any more.
+  await expect(page.locator('#how-it-works canvas')).toHaveCount(0);
 
-  await stage.scrollIntoViewIfNeeded();
-  await expect
-    .poll(async () => clip.evaluate((v: HTMLVideoElement) => v.currentTime > 0), {
-      timeout: 12000,
-    })
-    .toBe(true);
-
-  // Nothing has fetched OpenLayers yet.
-  await expect(stage.locator('canvas')).toHaveCount(0);
-
-  // The offer of the live map waits for the clip to finish. The clip burns its
-  // own captions along the bottom of the frame and the button sits in that same
-  // slot, so an offer made while it is still playing lands on top of "46 plots
-  // and waterways, traced by hand".
-  const tryIt = stage.getByRole('button', { name: /Try it yourself/ });
-  await expect(tryIt).toBeHidden();
-
-  await expect(tryIt).toBeVisible({ timeout: 20000 });
-  await tryIt.click();
-  // `.first()`: MapShell paints more than one canvas, and a bare locator on
-  // three of them is a strict-mode violation, not a wait.
-  await expect(stage.locator('canvas').first()).toBeAttached({ timeout: 20000 });
-  await expect(page.locator('.hero-caption p')).toBeVisible({ timeout: 20000 });
+  await steps
+    .nth(2)
+    .getByRole('button', { name: /Search for Khánh Hội/ })
+    .click();
+  await expect(page.getByRole('dialog', { name: /Search the archive/ })).toBeVisible();
+  await expect(page.locator('.cp-field input')).toHaveValue('Khánh Hội');
 });
 
 test('catalog search returns maps', async ({ page }) => {

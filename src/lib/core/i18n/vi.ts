@@ -87,8 +87,8 @@ export const vi: Record<string, string> = {
   open: 'mở',
   'Vietnam Map Archive — historical maps of Vietnam, open and georeferenced':
     'Kho Lưu trữ Bản đồ Việt Nam — bản đồ lịch sử mở và đã định vị tọa độ',
-  '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.':
-    '{N} mảnh bản đồ Sài Gòn, Huế và Hà Nội (1791–1984) được chồng khớp lên không gian thực tế.',
+  '{N} sheets of Vietnam — 1791 to 2006 — laid back over the ground they drew.':
+    '{N} mảnh bản đồ Việt Nam (1791–2006) được chồng khớp lên không gian thực tế.',
   Today: 'Hôm nay',
   'The 1882 cadastral survey of Saigon laid over the modern city, fading between the two':
     'Bản đồ địa chính Sài Gòn năm 1882 chồng lên thành phố hiện đại, hiệu ứng chuyển đổi giữa hai thời kỳ',
@@ -121,25 +121,49 @@ export const vi: Record<string, string> = {
     'Ghim bản scan vào tọa độ thực tế trong Allmaps Editor',
   'About the project': 'Về dự án',
   'Where things stand': 'Trạng thái hiện tại',
-  'The OCR pass has read {N} distinct place names off six sheets, {M} of which have been checked by a person — so that queue has barely started.':
-    'Bộ lọc OCR đã đọc {N} địa danh riêng biệt từ 6 bản đồ, với {M} địa danh đã được kiểm duyệt thủ công — tiến độ mới chỉ bắt đầu.',
-  'Two surveys went on the map this week: the US Army 1:50,000 of Vietnam — {N} of its {T} sheets — and the Indochine 1:25,000 of Tonkin. The map draws {D} sheets now, against {B} a week ago.':
-    'Tuần này có hai bộ bản đồ địa hình lên bản đồ: bộ 1:50.000 của Lục quân Hoa Kỳ ({N} trong tổng số {T} mảnh) và bộ Đông Dương 1:25.000 vùng Bắc Kỳ. Bản đồ hiện hiển thị {D} mảnh, so với {B} mảnh một tuần trước.',
-  '{N} building outlines have been traced on the 1882 cadastral survey, and none are approved yet.':
-    '{N} khối công trình đã được vẽ trên bản đồ địa chính 1882, chưa có bản nào được phê duyệt.',
+  'Most of the {N} sheets come from a few surveys: the US Army 1:50,000 of Vietnam — {M} of its {T} sheets — two editions of the Indochine 1:100,000, and the Indochine 1:25,000 of Tonkin.':
+    'Phần lớn trong {N} mảnh bản đồ thuộc một số bộ: bộ 1:50.000 của Lục quân Hoa Kỳ ({M} trong tổng số {T} mảnh), hai lần xuất bản bộ Đông Dương 1:100.000 và bộ Đông Dương 1:25.000 vùng Bắc Kỳ.',
+  'A person has checked {N} names the OCR pass read off {M} sheets, and the numbered legends of {L} sheets are placed on the ground: {P} entries you can click.':
+    'Đã có người kiểm tra {N} địa danh mà OCR đọc từ {M} bản đồ, và chú giải đánh số của {L} bản đồ đã được đặt lên không gian thực: {P} mục có thể nhấp vào.',
+  '{N} building outlines on the 1882 cadastral survey are approved, and more are waiting for review.':
+    '{N} khối công trình trên bản đồ địa chính 1882 đã được phê duyệt, và còn nhiều khối khác đang chờ kiểm duyệt.',
   'Read the update →': 'Đọc bài cập nhật →',
   'Open L7014 on the map →': 'Mở bộ L7014 trên bản đồ →',
   'What will you find?': 'Bạn sẽ tìm thấy gì?',
-  'Most people come for one street and stay for the city. {N} sheets, 1791 to 1984.':
-    'Khám phá {N} bản đồ từ năm 1791 đến 1984 của Sài Gòn và các vùng lân cận.',
+  'Most people come for one street and stay for the city. {N} sheets, 1791 to 2006.':
+    'Khám phá {N} bản đồ từ năm 1791 đến 2006 của Sài Gòn và các vùng khác trên cả nước.',
   "Crop a map's neatline, set tile priorities, and check the place names the OCR pass read off the sheet. Around 950 distinct names are waiting; 43 have been checked.":
     'Cắt khung bản đồ, thiết lập mức độ ưu tiên và kiểm tra địa danh OCR. Khoảng 950 địa danh đang chờ xử lý; 43 đã hoàn thành.',
   "Data is openly licensed (CC-BY / ODbL) and the code is public. Every sheet credits the institution holding the scan — the Bibliothèque nationale de France, Université Côte d'Azur, UT Austin, the Library of Congress and others — and links back to their record. None of that is a formal partnership. Any city with a map archive can fork the whole thing and run it locally; that is the point of building it this way.":
     "Dữ liệu cấp phép mở (CC-BY / ODbL) và mã nguồn mở. Các bản scan ghi nhận bản quyền từ các thư viện gốc như Bibliothèque nationale de France, Đại học Côte d'Azur, UT Austin, Thư viện Quốc hội Hoa Kỳ và các đơn vị khác. Bất kỳ kho lưu trữ nào cũng có thể sao chép và triển khai độc lập.",
-  "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL.":
-    'Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc tiếp theo là đọc tên địa danh và số hóa công trình từ bản đồ thời kỳ thuộc địa vào dữ liệu mở, với sự kiểm duyệt thủ công. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL.',
+  "Volunteers put those sheets on the ground they drew. Now the work is reading what is printed on them: a model reads the names and a person checks them, numbered legends are placed on the map, and buildings are traced. The aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data. The 1882 cadastral survey of Saigon is where it started; the city plans of 1923, 1942, 1959 and 1968 are where the legends are. Everything published will be CC-BY / ODbL.":
+    'Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc hiện nay là đọc những gì in trên bản đồ: máy đọc địa danh và con người kiểm tra, các chú giải đánh số được đặt lên bản đồ, và công trình được số hóa. Mục tiêu là đưa công trình và tên đường từ bản đồ thời thuộc địa vào dữ liệu mở. Bản đồ địa chính Sài Gòn năm 1882 là điểm khởi đầu; các bản đồ thành phố năm 1923, 1942, 1959 và 1968 là nơi có chú giải. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL.',
   "What's actually done →": 'Tiến độ thực tế →',
   'How this works': 'Cách thức hoạt động',
+  'From a scan in a library to a name you can search: four steps, and every picture below is the real app.':
+    'Từ một bản scan trong thư viện đến một địa danh có thể tìm kiếm: bốn bước, và mọi hình ảnh dưới đây đều chụp từ ứng dụng thật.',
+  'The edge of the 1882 Saigon survey, half-transparent over the modern map':
+    'Rìa bản đồ khảo sát Sài Gòn năm 1882, bán trong suốt trên bản đồ hiện đại',
+  'Pin the scan to the ground': 'Ghim bản scan vào mặt đất',
+  'Volunteers match points on the scan — a street corner, a church, a bend in the river — to the same places on the modern map. The sheet then lies over the city, and you can see where the streets stayed and where they did not.':
+    'Tình nguyện viên khớp các điểm trên bản scan — một góc phố, một nhà thờ, một khúc quanh của sông — với cùng địa điểm trên bản đồ hiện đại. Bản đồ khi đó phủ lên thành phố, và bạn thấy được đường phố nào còn nguyên, đường nào đã đổi.',
+  'Traced plots and buildings drawn over the 1882 survey of Saigon':
+    'Các ô đất và công trình được vẽ trên bản đồ khảo sát Sài Gòn năm 1882',
+  'Trace what it shows': 'Số hóa những gì bản đồ vẽ',
+  '{N} building outlines on the 1882 survey have been traced and approved, and more are waiting for a second look. Outlines turn a picture of a city into shapes a computer can count, compare and search.':
+    '{N} khối công trình trên bản đồ 1882 đã được vẽ và phê duyệt, và còn nhiều khối khác đang chờ kiểm tra lại. Các đường viền biến bức tranh thành phố thành hình khối mà máy tính có thể đếm, so sánh và tìm kiếm.',
+  'A search for Khánh Hội: the places the archive has read, and the maps that print the name':
+    'Tìm kiếm Khánh Hội: các địa danh kho lưu trữ đã đọc, và những bản đồ in tên này',
+  'Read the names off it': 'Đọc tên địa danh trên bản đồ',
+  'A model reads every printed word and a person checks its work. {N} names on {M} sheets have been checked so far, and each one becomes a place you can search for, across every map that prints it.':
+    'Máy đọc từng chữ in trên bản đồ và con người kiểm tra lại. Đến nay đã kiểm tra {N} địa danh trên {M} bản đồ, và mỗi địa danh trở thành một địa điểm có thể tìm kiếm trên mọi bản đồ có in tên đó.',
+  'Search for Khánh Hội': 'Tìm Khánh Hội',
+  'The Legend tab of the 1923 Saigon–Cholon plan: a numbered list beside the map, with entry 9, the Institut Pasteur, marked on it':
+    'Tab Chú giải của bản đồ Sài Gòn – Chợ Lớn năm 1923: danh sách đánh số bên cạnh bản đồ, với mục 9, Viện Pasteur, được đánh dấu trên bản đồ',
+  'Follow the legend': 'Lần theo chú giải',
+  'Many plans print a numbered key to their buildings. Each number is placed on the ground, so the key becomes a list you can click: {N} entries on {M} sheets so far, from Saigon in 1878 to the city plans of 1968.':
+    'Nhiều bản đồ in một bảng chú giải đánh số cho các công trình. Mỗi số được đặt lên mặt đất, nên bảng chú giải trở thành danh sách có thể nhấp vào: đến nay có {N} mục trên {M} bản đồ, từ Sài Gòn năm 1878 đến các bản đồ thành phố năm 1968.',
+  'Open the 1923 plan': 'Mở bản đồ năm 1923',
   'A scan of an 1882 survey, pinned to real coordinates, laid back over the ground it drew — then the plots traced off it and the names read off it. Drag the slider to move between the two cities.':
     'Bản scan khảo sát năm 1882 được ghim tọa độ thực, chồng khớp lên không gian thực tế; kèm theo các ô đất được số hóa và tên địa danh được trích xuất. Kéo thanh trượt để so sánh hai thời kỳ.',
   'The 1882 cadastral survey of Saigon laid over the modern city around the Charner canal':
@@ -420,7 +444,6 @@ export const vi: Record<string, string> = {
   'Saved {N}.': 'Đã lưu {N}.',
   placed: 'đã đặt',
   unplaced: 'chưa đặt',
-  draft: 'bản nháp',
   'Vietnamese name': 'Tên tiếng Việt',
   'Grid reference': 'Ô lưới tham chiếu',
   'Remove point': 'Xóa điểm',
@@ -488,6 +511,7 @@ export const vi: Record<string, string> = {
   To: 'Đến',
   'The archive holds {held} of {total} indexed sheets. The full historical series total is not established.':
     'Kho lưu trữ có {held} trong {total} tờ đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử.',
+  draft: 'bản nháp',
   Saigon: 'Sài Gòn',
   'Across Vietnam': 'Toàn Việt Nam',
   'See all {N} in the catalog': 'Xem cả {N} bản đồ trong danh mục',

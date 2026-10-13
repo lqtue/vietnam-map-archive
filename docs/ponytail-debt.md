@@ -162,13 +162,6 @@ than a patch. See *What changed since 2026-09-10* at the foot.
   numbers are not readable back out of it. upgrade: use `transformToGeo` directly if a writer ever
   needs them, rather than parsing this.
 
-## src/routes/(editorial)/+page.svelte
-
-- **:59** — the hero's demo sheet is hardcoded, not queried. ceiling: it is the only sheet carrying
-  all three layers the sequence shows — a georeference, traced footprints and validated OCR labels —
-  so it is the only one where the demo tells the truth. upgrade: when a second sheet is this
-  complete, write the join then.
-
 ## src/routes/api/export/footprints/+server.ts
 
 - **:63** — `ringIntersectsBbox` includes a polygon whose bounding box clips the AOI even when its

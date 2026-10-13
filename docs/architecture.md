@@ -304,6 +304,17 @@ also fires on a **place pick**: `handlePickLocation` sets `focusPoint`, so a Nom
 legend row both get the ring instead of moving the camera and leaving the reader to guess which of
 the hundred things under the crosshair they asked for.
 
+**Superseded (Oct 2026): the section is `HowItWorks.svelte` now — four real screenshots, each beside
+a paragraph.** The clip-plus-live-map below was one 16:9 composition fitted to every screen: a film on a
+desktop, a cropped stripe of bare satellite on a phone, with the sheet on screen for a few seconds of
+nine. Pictures and sentences reflow instead, and nothing has to load or play. The shots are written by
+`scripts/gen-how-it-works-shots.mjs` (needs `cwebp`; re-run when a sheet's data changes — the legend
+counts and traced plots they show are quoted in the copy from `STATS` on the page). The front page no
+longer renders `HeroDemo`, `HeroMap`, `HeroSequence`, `heroFabric.ts` or the `hero-demo*` clips; they are
+kept until the new section has been judged, and `gen-hero-still.mjs` cannot be re-run without
+`HeroDemo`'s stage. Delete the lot, with `tests/hero-fabric.spec.ts`, if it sticks. What follows is the
+old design.
+
 `src/lib/features/explore/HeroDemo.svelte` is the section (`#how-it-works`, between the catalog and
 the band). **What plays by default is a clip, not the map** (Sept 2026).
 `scripts/gen-hero-video.mjs` records the real section, so the clip is the same four beats — 699 kB
