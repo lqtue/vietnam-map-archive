@@ -103,6 +103,7 @@ export default ts.config(
   ),
   {
     ignores: [
+      '.claude/',
       '.svelte-kit/',
       'build/',
       'node_modules/',
