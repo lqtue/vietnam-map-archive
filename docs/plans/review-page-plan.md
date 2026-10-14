@@ -1,6 +1,6 @@
 # Review page — requirements, design and interaction
 
-Status: proposal, 2026-10-14. Nothing built. Serves bet 2 (`review-events`) and bet 1a (`place-links`).
+Status: proposal, 2026-10-14. PR 1 (Store) built on branch `review-store`: migration 122, the two pipeline endpoints, `review_sync.py`, the place-link adapter. Nothing else. Serves bet 2 (`review-events`) and bet 1a (`place-links`).
 
 **Question.** Can the offline review pages (`work/review-kit/`) move into the VMA web app, so that
 anyone we invite can judge items, without changing what a verdict means or how its time is measured?
@@ -79,6 +79,10 @@ review_events  id bigint pk, task, item_id, bound, reviewer uuid → auth.users,
                verdicts jsonb, readings jsonb, note text, client jsonb  (viewport, user agent)
 ```
 
+- As built (PR 1): `review_events` also carries `client_id uuid` (unique; the retry key), `reviewer` is
+  nullable (`on delete set null`, exported as `deleted-user`), and an event's `(task, item_id)` points
+  at its item with `on delete restrict`. `review_sync.py pull` turns a reviewer uuid into a handle
+  from `profiles.display_name` (rule in its docstring; `--as UUID=handle` overrides).
 - `payload` is everything the page shows on both arms; `proposal` is what only the shown arm gets.
 - `review_events` is insert-only: no update or delete grant, not even for staff. Writes go through
   the API with the service role; RLS lets a reviewer read only their own rows.
