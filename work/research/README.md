@@ -12,5 +12,5 @@ Source-derived data, rights evidence and prospective release packages. [Work gui
 | [Reports](reports/) | Local generated reports |
 
 `press/`, `legend/` and `reports/` are gitignored and may be absent in a fresh checkout.
-For commands use [Pipelines](../../docs/pipelines.md); for findings use the
+For commands use [Pipelines](../../docs/guides/pipelines.md); for findings use the
 [journal index](../../docs/journals/README.md). Check provenance and rights before reuse.

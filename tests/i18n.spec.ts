@@ -45,7 +45,7 @@ test('every translated key is still called from somewhere', () => {
   expect(
     orphans,
     `Translated but no longer used — the English copy changed, or the string was deleted.\n` +
-      `Fix the English side in work/copy/translate-vi.md, then: node scripts/gen-i18n.mjs\n` +
+      `Fix the English side in work/copy/translate-vi.md, then: node scripts/gen/gen-i18n.mjs\n` +
       orphans.map((o) => `  ${JSON.stringify(o)}`).join('\n')
   ).toEqual([]);
 });

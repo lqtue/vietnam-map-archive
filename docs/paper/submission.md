@@ -49,7 +49,7 @@ Historical map series often supply their own georeferencing control, but agreeme
 
 ## Before you press submit
 
-- [ ] Zenodo deposited, DOI pasted into §11 of `draft.md`, `node scripts/render-paper.mjs` re-run,
+- [ ] Zenodo deposited, DOI pasted into §11 of `draft.md`, `node scripts/gen/render-paper.mjs` re-run,
       `tectonic` re-run, PDF re-checked.
 - [x] Janata & Cajthaml year — **resolved 2026-09-20, 2020 is correct and the draft already had
       it.** MDPI's page prints 2021 because volume 11 is a 2021 volume; the publisher's Crossref

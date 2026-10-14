@@ -153,7 +153,7 @@
                     <span
                       class="badge-chip is-sm"
                       title={$t(
-                        'Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.'
+                        'Georeference made by our pipeline (scripts/indochine100k/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten.'
                       )}>{$t('Pipeline-maintained')}</span
                     >
                   {:else}

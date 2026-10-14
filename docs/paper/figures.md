@@ -162,14 +162,14 @@ sheet numbers 0 rows out of order
 | `fit` verdict on the shipped archive | 341 of 452 sheets more than 150 m off their cell | ibid |
 | PROJ non-uniformity (probed) | `106.00,16.00` moves **470 m**; `109.25,13.25` moves **0** | ibid |
 | the blind self-check, at population scale | of 510 source files, 62 have no usable control; **448** reach `graticule_error`; it rejects **11**, leaving **437** in the faulty build, including **all 269** displaced sheets; the rejections it did issue fire at **0.004–0.076 deg** off the printed graticule, so this is not a sensitivity limit | `regen/warp-faulty.log`, 2026-09-20 |
-| matched-pair seam result | same 715 PDF/PDF edges before/after correction: **189 → 0** above 100 m, max corrected edge 72.4 m; the two faulty-only edges (excluded from the match) measure 3.6 m and 15.6 m, so attrition cannot explain the tail's disappearance | `seam-paired-analysis.json`, `scripts/paper-seam-pairs.mjs`, 2026-09-20 |
+| matched-pair seam result | same 715 PDF/PDF edges before/after correction: **189 → 0** above 100 m, max corrected edge 72.4 m; the two faulty-only edges (excluded from the match) measure 3.6 m and 15.6 m, so attrition cannot explain the tail's disappearance | `seam-paired-analysis.json`, `scripts/l7014/paper-seam-pairs.mjs`, 2026-09-20 |
 | **A Lưới is _not_ a displaced sheet** | `6441-4` resolves to `declared`, CRS displacement **0.00 m**; `graticule_error` **2.167e-12**. It demonstrates the blind check on a *correctly placed* sheet. Never describe it as displaced — the earlier "2e-12 against a real 470 m displacement" conflated two sheets | `regen/datum-split.csv` + `REGEN.md`, 2026-09-20 |
 | CRS selection against the adopted frame | `pick_crs` scores registration points against the lattice cell (150 m cutoff, refuses above it); `cell_corners` shares the same Everest 1830 (1937 Adj.) Helmert parameters as the alternative candidate, so agreement tests consistency with the adopted frame, not independent absolute accuracy at the ~15 m index-to-outline scale | ibid |
 | the Helmert | Everest 1830 (1937 Adj.) `+a=6377276.345 +rf=300.8017 +towgs84=198,881,317` | ibid |
 | `fit`, faulty pass | **161 of 437** on cell, median **11 m**, worst **50 m**; **276** more than 150 m off cell | `regen/fit-faulty.log`, 2026-09-20 |
 | `fit`, corrected pass | **434 of 436** on cell, median **10 m**, worst **95 m**; **2** more than 150 m off cell — `6630-4` Xa Phan Thiet (mean 662 m, worst 2623 m) and `6349-4` Cua Tra Ly (mean 396 m, worst 1565 m) | `regen/fit-fixed.log`, 2026-09-20 |
-| ~~dry run of the fix: median 430 m → 0 m, p95 9 m, max 115 m, none over 150~~ | **withdrawn 2026-09-20.** Sourced to `pipelines.md`, which predates the controlled A/B. `fit` reports no all-sheet median — it reports a median over the *on-cell* subset plus a count of off-cell sheets, so "430 → 0" was never a statistic `fit` computes. Superseded by the two rows above | — |
-| ArcGIS index, shifted correctly | agrees with the GeoPDFs' own `NEATLINE` to **4–17 m** | `architecture.md` |
+| ~~dry run of the fix: median 430 m → 0 m, p95 9 m, max 115 m, none over 150~~ | **withdrawn 2026-09-20.** Sourced to `guides/pipelines.md`, which predates the controlled A/B. `fit` reports no all-sheet median — it reports a median over the *on-cell* subset plus a count of off-cell sheets, so "430 → 0" was never a statistic `fit` computes. Superseded by the two rows above | — |
+| ArcGIS index, shifted correctly | agrees with the GeoPDFs' own `NEATLINE` to **4–17 m** | `guides/architecture.md` |
 | hand-georeferenced sheets | 2.3–19.0 m rms, unaffected | ibid |
 
 **State to report, not hide:** the live archive `l7014-20260913` is **not rebuilt**. `fit` fails on
@@ -200,7 +200,7 @@ Bình's lattice cell. `allmaps-series-note.md` §2.
 | failure rate at full resolution | **0%** | ibid |
 | one level below the whole-sheet overview | **58.6%** of tiles, across the 83-sheet Indochine survey | ibid |
 | why it survived a year | the one real key the old test pinned (`3758*256/4096 = 234.875`) rounds the same under `ceil` and `round` | ibid |
-| test | `tests/tile-size-segment.spec.ts`, 29 checks against keys read out of the bucket | `docs/testing.md` |
+| test | `tests/tile-size-segment.spec.ts`, 29 checks against keys read out of the bucket | `docs/guides/testing.md` |
 
 ### 3.7 Series 561 — automated placement from catalogue extents (added 2026-09-30)
 
@@ -221,7 +221,7 @@ recorded runs; none was re-run for this ledger (claim-audit label **B**). `J` =
 | Quang Ngai, frame aspect | detected pixel aspect implied a **0.428ᵍ** longitude span against the declared 0.5235ᵍ | J, 2026-09-30 "the last four held Vietnam sheets" |
 | tick labels | printed every **0.1ᵍ**; northern sheets include **0.2ᵍ** labels | J, 2026-09-24 "first real latitude-stratified calibration" |
 | Quang Ngai, printed ticks | catalogue east edge off by **~9.2 km**; declared lon span 0.5235ᵍ → printed 0.4281ᵍ; held by the span gate before any tick was read | ibid |
-| wrong-line landing (v29) | two sheets pinned on a kilometre-grid line **~52 px** inside the neatline; that line fit **0.28–0.48 px** residual vs **~3.2 px** for the engraved frame (24 patches); caught only by a per-pixel profile | J, 2026-09-29 "thirteen more boundary trials"; `docs/lessons.md` 2026-09-29 |
+| wrong-line landing (v29) | two sheets pinned on a kilometre-grid line **~52 px** inside the neatline; that line fit **0.28–0.48 px** residual vs **~3.2 px** for the engraved frame (24 patches); caught only by a per-pixel profile | J, 2026-09-29 "thirteen more boundary trials"; `docs/guides/lessons.md` 2026-09-29 |
 | detector versions | `DETECT_VERSION` **3 → 39**, 2026-09-24 to 2026-09-30 | J; H |
 | public, georeferenced | **314** of 360 rows, DB state verified before/after the write, 2026-09-29 | J, 2026-09-29 "publishing the clear backlog" |
 | lattice `check()` | **328** clean placements, zero conflicts, 2026-09-30; 9 later local clears not re-checked | H |
@@ -261,13 +261,13 @@ sheet. The metric survives; this evidence does not.
 | $12–24 for the corpus OCR | pre-correction basis; billed is **$31–63** (thinking tokens) |
 | 118, unqualified | three different senses circulate — polygons produced, the retracted trace set, and rows scored |
 | any `cost_usd` as settled | the 3.5–4× thinking-token multiplier is still unverified against an invoice |
-| the monorepo in `platform-design.md` | a proposal; `contracts/` holds three schemas and a ~50-line subset walker |
+| the monorepo in `plans/platform-design.md` | a proposal; `contracts/` holds three schemas and a ~50-line subset walker |
 | anything from the old knowledge-graph working files (no longer in the public tree) | frozen 2026-06-04 snapshot; migration head 048, 101 maps |
 
 ---
 
 **Correction, 2026-09-19 (same day).** The row above previously read *"where MapEdge's inward walk
-stops here"*. MapEdge has no inward walk — that is `scripts/l7014_neatline.py`, ours.
+stops here"*. MapEdge has no inward walk — that is `scripts/l7014/l7014_neatline.py`, ours.
 `allmaps-series-note.md:109` and `docs/private/allmaps.md:195` were correct all along; this file
 compressed the sentence and reassigned the method to Meijers & Schoonman. Caught by reading the
 paper in full. Recorded rather than silently rewritten, per the `note:` convention.
@@ -296,7 +296,7 @@ than silently rewritten, per the `note:` convention.
 - **2026-09-19** — MapEdge read in full; §2's "inward walk" row corrected (it described our detector,
   not theirs) and two rows added. See `related-work.md` §4.
 - **2026-09-19** — created. Phase 0 of the paper plan. Live counts pulled; ten documented
-  contradictions resolved across `pipelines.md`, `field-comparison.md`, `image-processing-record.md`,
-  `digitalize-guide.md`, `db-guidelines.md`, `src/lib/CLAUDE.md`, `worked-example-1882.md`,
+  contradictions resolved across `guides/pipelines.md`, `field-comparison.md`, `image-processing-record.md`,
+  `guides/digitalize-guide.md`, `guides/db-guidelines.md`, `src/lib/CLAUDE.md`, `worked-example-1882.md`,
   `network.md`, `260918-colour-blocks.md`, `work/MapSAM2/evaluate.py`, the two frozen `kg/` files and
   two published blog posts.

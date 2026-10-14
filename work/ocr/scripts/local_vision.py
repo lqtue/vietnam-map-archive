@@ -11,7 +11,7 @@ Why local for exactly these two: geometry (bordered boxes) and digits are the
 parts of map OCR that classical/local tools do as well as a frontier VLM —
 and for free. Semantic text (place names, legend descriptions) stays on Gemini
 because faded/rotated/multilingual recognition is where the frontier model earns
-its keep. See docs/pipelines.md.
+its keep. See docs/guides/pipelines.md.
 
 ponytail: pure scipy + Tesseract, chosen because cv2/PaddleOCR have no clean
 Python 3.14 wheel today. Upgrade path if digit recall is too low — swap

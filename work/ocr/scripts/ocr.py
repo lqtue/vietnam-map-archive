@@ -624,7 +624,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
     # ── Ground-distance tiling ────────────────────────────────────────────────
     # `--tile-metres` sizes the grid from the sheet's own georeference instead of
     # from a pixel count someone worked out by hand. It is the flag
-    # `docs/pipelines.md` step 3 has referred to since it was written, and the
+    # `docs/guides/pipelines.md` step 3 has referred to since it was written, and the
     # first thing on the Python side that can see the ground.
     #
     # Sized off `grid_region` when a crop is already known — which means a
@@ -3909,7 +3909,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_batch.add_argument("--tile-metres", type=float,
                          help="Size the tile grid to hold this much ground per call, read "
                               "from the sheet's own georeference (1400 is the measured "
-                              "value; see docs/pipelines.md step 3). Overrides --tile-size, "
+                              "value; see docs/guides/pipelines.md step 3). Overrides --tile-size, "
                               "--overlap and --render-size, and wins over --target-calls. "
                               "Needs 4+ GCPs on the map; falls back to --tile-size and says "
                               "so when the georeference cannot support it.")

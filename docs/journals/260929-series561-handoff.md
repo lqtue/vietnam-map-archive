@@ -22,8 +22,8 @@ exactly the 11 accepted sheets flipped from held to clear.
 Logs: `/private/tmp/indochine-place-v29.log`, `-v30.log`, `-v31.log`.
 **No annotations or database statuses changed.**
 
-Tracked changes: `scripts/indochine100k_georef.py`,
-`docs/journals/260923-indochine100k-georef.md`, `docs/lessons.md`, `docs/ROADMAP.md`, and
+Tracked changes: `scripts/indochine100k/indochine100k_georef.py`,
+`docs/journals/260923-indochine100k-georef.md`, `docs/guides/lessons.md`, `docs/ROADMAP.md`, and
 this handoff.
 
 | Remaining holds (46) | Count |
@@ -75,7 +75,7 @@ Two review methods missed real errors this session before a third caught them:
   terrain (content there simply doesn't read darker than paper, which is not a placement
   defect: confirmed by eye for Pa-Kha E's L/R/T and Pa-Kha W's T this session).
 
-Read `docs/lessons.md`'s new entry (2026-09-29) before reviewing any further boundary pick.
+Read `docs/guides/lessons.md`'s new entry (2026-09-29) before reviewing any further boundary pick.
 
 ## Lang Son (E) — put back in holds
 
@@ -118,7 +118,7 @@ handoff's "Other holds to investigate" section — none of that material changed
 
 ## Operational constraints
 
-Same as the 2026-09-28 handoff: read `docs/lessons.md` before a pass producing numbers,
+Same as the 2026-09-28 handoff: read `docs/guides/lessons.md` before a pass producing numbers,
 `work/CLAUDE.md` before editing under `work/`. Crops, cache, and per-map JSON under
 `work/indochine-100k/` are intentionally untracked; preserve them. Do not run
 `annotate --apply`, publish, or change database statuses without an explicit request.

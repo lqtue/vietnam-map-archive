@@ -28,7 +28,7 @@ Logs: `/private/tmp/indochine-place-v28.log` and
 `/private/tmp/indochine-regress-v28.log`.
 **No annotations or database statuses changed.**
 
-Tracked changes: `scripts/indochine100k_georef.py`,
+Tracked changes: `scripts/indochine100k/indochine100k_georef.py`,
 `docs/journals/260923-indochine100k-georef.md`, `docs/ROADMAP.md`, and this handoff.
 The main journal records versions 12–23; its final section records versions 24–28.
 
@@ -161,7 +161,7 @@ matches catalogue geometry and is not independent accuracy evidence.
 
 ## Operational constraints
 
-Read `docs/lessons.md` before a pass producing numbers and `work/CLAUDE.md` before
+Read `docs/guides/lessons.md` before a pass producing numbers and `work/CLAUDE.md` before
 editing under work. Crops, cache, and per-map JSON under `work/indochine-100k/`
 are intentionally untracked. Preserve them. `place()` regenerates local JSON;
 persistent exclusions must live in `CALIBRATION_HOLDS`.

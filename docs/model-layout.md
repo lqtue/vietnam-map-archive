@@ -1,6 +1,6 @@
 # Where files belong in the system model
 
-The layers and object names come from [Knowledge system §9](knowledge-system-plan.md#9-open-work-by-layer).
+The layers and object names come from [Knowledge system §9](plans/knowledge-system-plan.md#9-open-work-by-layer).
 The [workspace mapping](workspace-model.json) declares the primary responsibility of documentation
 and working folders. It records existing storage; it does not create database objects or another task tracker.
 Open work stays in [ROADMAP](ROADMAP.md).
@@ -8,12 +8,12 @@ Open work stays in [ROADMAP](ROADMAP.md).
 | Model layer               | Working material                                                                                                                        | Documentation                                                                                                  |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Sources and surveys       | [Rights and sources](../work/research/README.md)                                                                                        | [Survey note](research/allmaps-series-note.md)                                                                 |
-| Holdings                  | Scan and tile datasets beside their series; shared operator code                                                                        | [Sheet preparation](digitalize-guide.md), [catalog operations](admin-tooling.md)                               |
+| Holdings                  | Scan and tile datasets beside their series; shared operator code                                                                        | [Sheet preparation](guides/digitalize-guide.md), [catalog operations](guides/admin-tooling.md)                               |
 | Placement                 | [Indochine](../work/indochine-100k/), [Tonkin](../work/tonkin/), local L7014 builds, [Saigon controls](../work/analysis/saigon6/)       | [Review procedure](journals/260930-series-georef-review-loop.md)                                               |
 | Readings                  | [OCR](../work/ocr/README.md), [SAM2](../work/MapSAM2/VMA_SETUP.md), [image experiments and results](../work/image-processing/README.md) | [Processing record](research/image-processing-record.md), [river research](research/river-reconstruction.md)   |
-| Entities and vocabularies | [Doling street-name data](../work/research/doling/SOURCE.md)                                                                            | [Knowledge model](knowledge-system-plan.md)                                                                    |
+| Entities and vocabularies | [Doling street-name data](../work/research/doling/SOURCE.md)                                                                            | [Knowledge model](plans/knowledge-system-plan.md)                                                                    |
 | Assertions and studies    | [District 4](../work/analysis/district4/README.md), [deposit preparation](../work/research/zenodo/README.md)                            | [Paper](paper/README.md), [research records](research/README.md), [journals](journals/README.md)               |
-| Surfaces                  | [Prototypes](../work/proto/), [copy](../work/copy/)                                                                                     | [User guide](user-guide.md), [Search](search-plan.md), [Walk](walk-plan.md), [design system](design-system.md) |
+| Surfaces                  | [Prototypes](../work/proto/), [copy](../work/copy/)                                                                                     | [User guide](guides/user-guide.md), [Search](plans/search-plan.md), [Walk](plans/walk-plan.md), [design system](guides/design-system.md) |
 | Outside the model         | [Worker](../work/worker/), catalog builder and execution logs                                                                           | Engineering references in the [docs guide](README.md)                                                          |
 
 A folder may span layers: District 4 includes placement diagnostics, while the image processing

@@ -192,7 +192,7 @@
     inset: 0;
     /* Over the nav bar (300) and under nothing else: the modal layer is 9999
        and this is not a modal — a MapEditModal opened behind it would be
-       unreachable. There is no z-index token; `docs/design-system.md` has the
+       unreachable. There is no z-index token; `docs/guides/design-system.md` has the
        ladder. */
     z-index: 400;
     gap: 0;

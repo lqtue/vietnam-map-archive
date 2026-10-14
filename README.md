@@ -140,7 +140,7 @@ rather than leaving someone to remember it.
    the Allmaps ID, and probes the annotation server to see whether it is already georeferenced.
 2. **In bulk** (`/admin?tab=bulk` + `scripts/bulk_upload_local.sh`) — for our own scans. Rows, tiles
    and thumbnail in one pass.
-3. **From Scout** (`/admin?tab=scout`) — `scripts/scout_*.mjs` crawl external IIIF endpoints; a
+3. **From Scout** (`/admin?tab=scout`) — `scripts/scout/scout_*.mjs` crawl external IIIF endpoints; a
    moderator records why a candidate is worth having and imports it.
 
 Georeferencing happens in the Allmaps Editor, which has no webhook, so a
@@ -194,7 +194,7 @@ npx wrangler pages dev .svelte-kit/cloudflare     # local Cloudflare preview
 ```
 
 Three rules, each of which cost a run of dead builds to learn — the full account
-is in [`docs/deploy.md`](docs/deploy.md):
+is in [`docs/guides/deploy.md`](docs/guides/deploy.md):
 
 - **There is no root `wrangler.toml`, on purpose.** One that carries `pages_build_output_dir`
   replaces the dashboard's entire environment, secrets included. The R2 tile worker's own
@@ -216,17 +216,17 @@ written for both people and coding agents. Then:
 | --- | --- |
 | `docs/ROADMAP.md` | The one tracker, open work only: the foundations pass, the OCR drain, Shapes, Search, Walk, Debt |
 | `docs/roadmap-record.md` | Frozen record of closed passes — what each one measured and what it turned up |
-| `docs/lessons.md` | The rules paid for more than once, each with the failure that taught it |
-| `docs/system-guidelines.md` | Layering rule, page structure, component patterns, known debt (§11) |
-| `docs/db-guidelines.md` | Schema conventions every migration follows, table by table |
-| `docs/api.md` | Every server route, its auth class, its contract |
-| `docs/deploy.md` | Cloudflare Pages, and the ten dead builds behind each rule |
-| `docs/design-system.md` | Tokens, the CSS file map, the page template |
-| `docs/digitalize-guide.md` | Operator guide for `/scan?mode=prepare` — including the failure modes that return plausible output while dropping data |
-| `docs/pipelines.md` | OCR + MapSAM2 commands, and what not to re-attempt |
-| `docs/admin-tooling.md` | Map editing, bulk upload, Scout, the R2 worker |
-| `docs/search-plan.md`, `docs/platform-design.md` | The temporal-fabric plan; the shared-platform proposal |
-| `docs/strategy.md`, `docs/theory.md`, `docs/user-guide.md` | Vision and outward-facing prose |
+| `docs/guides/lessons.md` | The rules paid for more than once, each with the failure that taught it |
+| `docs/guides/system-guidelines.md` | Layering rule, page structure, component patterns, known debt (§11) |
+| `docs/guides/db-guidelines.md` | Schema conventions every migration follows, table by table |
+| `docs/guides/api.md` | Every server route, its auth class, its contract |
+| `docs/guides/deploy.md` | Cloudflare Pages, and the ten dead builds behind each rule |
+| `docs/guides/design-system.md` | Tokens, the CSS file map, the page template |
+| `docs/guides/digitalize-guide.md` | Operator guide for `/scan?mode=prepare` — including the failure modes that return plausible output while dropping data |
+| `docs/guides/pipelines.md` | OCR + MapSAM2 commands, and what not to re-attempt |
+| `docs/guides/admin-tooling.md` | Map editing, bulk upload, Scout, the R2 worker |
+| `docs/plans/search-plan.md`, `docs/plans/platform-design.md` | The temporal-fabric plan; the shared-platform proposal |
+| `docs/plans/strategy.md`, `docs/plans/theory.md`, `docs/guides/user-guide.md` | Vision and outward-facing prose |
 | `docs/journals/` | Dated research notes |
 | `work/MapSAM2/TECHNICAL.md`, `work/ocr/EVAL-BASELINE.md` | Model notes; the measured OCR quality gate |
 | `docs/archive/` | Frozen. Historical plans and the record of the August 2026 cleanup — not current |
@@ -246,7 +246,7 @@ self-hosted too.
 
 The archive is worth more with more sheets in it and more names read off them.
 `/contribute` says what needs doing; georeferencing needs no code, and
-`docs/digitalize-guide.md` is the operator guide for the reading pipeline.
+`docs/guides/digitalize-guide.md` is the operator guide for the reading pipeline.
 
 ## Licence
 

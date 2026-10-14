@@ -345,5 +345,5 @@ else
   echo "  pixels until that copy is re-pointed at $SERVICE_URL too."
   echo "  Do NOT reach for Mirror to R2 to do it — it rebuilds the base as"
   echo "  $WORKER_BASE/$MAP_ID and would quietly undo both updates above."
-  echo "  docs/admin-tooling.md → 'Re-tiling a mirrored map'."
+  echo "  docs/guides/admin-tooling.md → 'Re-tiling a mirrored map'."
 fi

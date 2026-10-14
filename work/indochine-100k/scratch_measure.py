@@ -1,5 +1,5 @@
 import sys, os, hashlib, pickle
-sys.path.insert(0, "scripts")
+sys.path.insert(0, "scripts/tonkin")
 sys.path.insert(0, "work/ocr/scripts")
 
 CACHE = "work/indochine-100k/.fetch_cache"

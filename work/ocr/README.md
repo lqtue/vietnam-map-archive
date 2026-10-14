@@ -49,5 +49,5 @@ which one is suitable. Folder names such as `baseline`, `batch_v6`, `seq-v1-shif
 historical experiment IDs. The generated catalog exposes their saved settings rather than assigning
 quality based on their names. A `normalized` suffix does not establish approval or import.
 
-Use [Pipelines](../../docs/pipelines.md) for commands and [worker instructions](../CLAUDE.md)
+Use [Pipelines](../../docs/guides/pipelines.md) for commands and [worker instructions](../CLAUDE.md)
 for queued jobs. Preserve UUID paths and run IDs already used by pipeline readers and database rows.

@@ -102,7 +102,7 @@ So the whole route is four steps, and the first two are automatic:
 
 ### The detector, and the one substitution MapEdge needs here
 
-`scripts/tonkin_georef.py` follows MapEdge's shape — low-resolution look, full-resolution
+`scripts/tonkin/tonkin_georef.py` follows MapEdge's shape — low-resolution look, full-resolution
 strips at the edges only, a trimmed line fit per side, intersect — with one change.
 
 **The change is *which* line.** These sheets print, from the outside in: a thin line, a
@@ -319,7 +319,7 @@ Vietnam, built on Allmaps and OpenLayers. Derived data — annotations, extracti
 footprints, gazetteer — is CC-BY-4.0. Scans remain under their holding institutions'
 terms and are referenced by IIIF URL rather than redistributed.
 
-Code and scripts referenced above: `scripts/tonkin_georef.py`, `scripts/l7014_mosaic.py`,
-`scripts/l7014_neatline.py`.
+Code and scripts referenced above: `scripts/tonkin/tonkin_georef.py`, `scripts/l7014/l7014_mosaic.py`,
+`scripts/l7014/l7014_neatline.py`.
 
 Contact: lequangtuevn@gmail.com

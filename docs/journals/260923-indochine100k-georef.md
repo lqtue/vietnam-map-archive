@@ -6,7 +6,7 @@
 `/catalog/series` until at least one sheet is both `georef_done` and published (`map_series`,
 migration 082, gates on both), and hand-placing GCPs for hundreds of cells in the Allmaps Editor
 is not a reasonable ask. The sibling Indochine 1:25,000 Tonkin & Thanh Hóa series solved the same
-problem with `scripts/tonkin_georef.py`, because those sheets print their own corner coordinates.
+problem with `scripts/tonkin/tonkin_georef.py`, because those sheets print their own corner coordinates.
 Question: does this survey too?
 
 ## What three sample sheets showed
@@ -52,7 +52,7 @@ for a one-time ~15–20 sheet calibration pass (Phase 2 below), not per sheet.
 
 ## Plan
 
-New script `scripts/indochine100k_georef.py`, structured like `scripts/tonkin_georef.py`
+New script `scripts/indochine100k/indochine100k_georef.py`, structured like `scripts/tonkin/tonkin_georef.py`
 (`detect` → geometry, `finish` → coordinates + gate + verdict, `annotate` → write), coordinate
 source swapped to `series_sheets.bbox` via a `catalogue_edges()`-equivalent instead of per-sheet
 OCR.
@@ -167,20 +167,20 @@ right way to do the real `calibrate()` pass before writing anything to the datab
 `ACROSS`/`MAXIN`/loosened-residual override + a disk cache wrapping `fetch_crop_level0`, keyed by
 request args, at `work/indochine-100k/.fetch_cache/` — reuse this across iterations, each cached
 fetch was costing ~3min uncached) — this is scaffolding for the next build session, not meant to
-be the final script. The real `scripts/indochine100k_georef.py` should fold these constants in as
+be the final script. The real `scripts/indochine100k/indochine100k_georef.py` should fold these constants in as
 its own module-level values (not by importing and monkey-patching `tonkin_georef`'s), following
 step 2-5 of the plan above with the corrected coordinate source (per-record `fkey`, not
 `series_sheets.bbox`) from step 4.
 
 **Still open, unchanged from the original plan**: the real `calibrate()` pass (this session only
 eyeballed one label on one sheet), the stratified sample across the series' full latitude range,
-building the actual `scripts/indochine100k_georef.py` (detect → finish → GATE/verdict →
+building the actual `scripts/indochine100k/indochine100k_georef.py` (detect → finish → GATE/verdict →
 annotate), and everything from "run, review, close the loop" onward. No database writes occurred
 this session; `series_sheets`/`maps` are untouched.
 
 ## 2026-09-24 — first real latitude-stratified calibration; global offset rejected
 
-Built `scripts/indochine100k_georef.py` as an independent series-561 pipeline:
+Built `scripts/indochine100k/indochine100k_georef.py` as an independent series-561 pipeline:
 per-record `maps.extra_metadata.cartomundi_fkeys[0]` → source UNIMARC bbox,
 446/492 records passing the pre-established 0.36–0.43g longitude and 0.48–0.53g
 latitude span gate; consensus frame detection with `ACROSS=(190,300)`,
@@ -395,7 +395,7 @@ geometry before another placement attempt. Counts come from the completed
 
 ## 2026-09-24 — series 561 catalogue matching grid
 
-`scripts/indochine100k_grid.py --apply` now generates a local matching grid
+`scripts/indochine100k/indochine100k_grid.py --apply` now generates a local matching grid
 from the per-record CartoMundi coordinates and the accepted catalogue
 correction. It queries map rows only to attach UUIDs by their unique
 `cartomundi_fkeys[0]`; it writes no database data. The resulting
@@ -440,7 +440,7 @@ for replacing the image georeference.
 CartoMundi's IGN series 325 endpoint returned 514 WKT records. The local
 serie-325 catalogue contains 512 fkeys, all present in that response; the two
 extras are unnumbered Saigon and Rach-Gia records and are excluded from the
-grid. The generalized `scripts/indochine100k_grid.py --series 325 --apply`
+grid. The generalized `scripts/indochine100k/indochine100k_grid.py --series 325 --apply`
 matches those records to the 221 current VMA rows by fkey. It writes 143
 numbered cells, 286 W/E slots, and a 512-record crosswalk under
 `work/indochine-100k/grid-325/`. There are 61 W/E slots without source records
@@ -1055,11 +1055,11 @@ The 2026-09-29 handoff's deferred next step: version 28 accepted eight sheets
 Dong-Hoi W, Dô-Son W) on resized contact-strip review alone — the method that
 this session's own boundary-trial batch showed can miss a wrong pin (Muong
 Phine W, Muong-Song-Khone E). Ran the narrow per-pixel profile check
-(`docs/lessons.md`'s "Verifying" entry) against all 32 sides (4 × 8) of those
+(`docs/guides/lessons.md`'s "Verifying" entry) against all 32 sides (4 × 8) of those
 eight sheets, read-only, no code or data changes.
 
 First two passes of the audit script were themselves wrong, in ways worth
-recording since they reproduce failure modes already in `docs/lessons.md`:
+recording since they reproduce failure modes already in `docs/guides/lessons.md`:
 
 - Averaging the per-pixel profile over the strip's **full along-axis span**
   (the whole `SPAN` fetch window, ~76% of the sheet's height/width) smeared
@@ -1179,7 +1179,7 @@ own answer moved the answer by the same ~12px again, each time, not
 converging — a real place-name label ("Ban Taphane") sits close enough to the
 true edge to be pulling the patch-fit around depending on the seed. Landing an
 unstable fit is exactly the "residual looks fine, verify the artefact anyway"
-trap `docs/lessons.md` already names; left held rather than guessed.
+trap `docs/guides/lessons.md` already names; left held rather than guessed.
 
 `DETECT_VERSION` stays 31, nothing written. Both leads are real and
 reproducible (scripts not preserved:
@@ -1390,7 +1390,7 @@ country. Got sign-off on four items via `AskUserQuestion`:
    caveat below.
 
 **Landed:** `SOURCE_REVIEWED_AXES_DISAGREE`, a new registry
-(`scripts/indochine100k_georef.py` ~L1060-1082) of sheets whose rim is already
+(`scripts/indochine100k/indochine100k_georef.py` ~L1060-1082) of sheets whose rim is already
 confirmed correct — via `SOURCE_REVIEWED_RIMS`/`SOURCE_REVIEWED_BOUNDARIES`/
 `SOURCE_REVIEWED_SPECIAL_SPANS`, or (Bun-Tai (E), Mon-Cay (E), Muong Ou Tay
 (W)) an earlier-thread crop check that found the rim correct with real
@@ -1426,7 +1426,7 @@ cap of 3%, not the approved 5%, and silently dropped 3 of the 12 registry
 sheets. Fixed: the guard now also admits `shape off by` problems, and checks
 both `aspect_err` and `scale_gap` against the cap. Re-verified the premise
 this rests on before re-running: `annotation()`'s transform is a first-order
-polynomial (`scripts/indochine100k_georef.py` ~L637, `{"type": "polynomial",
+polynomial (`scripts/indochine100k/indochine100k_georef.py` ~L637, `{"type": "polynomial",
 "options": {"order": 1}}`) — an affine fit over 4 corner GCPs, 6 free
 parameters, independent x/y scale and shear all representable. A differential
 axis-scale distortion genuinely is absorbed by this transform, not thrown
@@ -1522,7 +1522,7 @@ to succeed on the *outer* (rough-overview) rule for every corrected side,
 even a `direct` one whose offset is discarded and never uses that fit's
 result. Sam-Neua (E)'s R side has no straight line at all in its rough
 guess's textured zone, so the gate refused unconditionally. Changed
-`detect()` (`scripts/indochine100k_georef.py`, the `manual` block) to skip
+`detect()` (`scripts/indochine100k/indochine100k_georef.py`, the `manual` block) to skip
 the outer-rule fit entirely when the side is `direct`.
 
 Added Sam-Neua (E) (`85967c9c-9bb7-4acb-9688-2eaf3d93216b`) to
@@ -1590,7 +1590,7 @@ measurements agreeing within ~2-3% is the bar this project holds itself to; land
 **New code path**, since neither existing registry fit: `SOURCE_REVIEWED_SPECIAL_SPANS`
 only *validates* a declared span already equal to the catalogue's own number — it has no
 way to substitute a different one (the exact gap the coastal-family investigation hit and
-retracted over). Added `SOURCE_REVIEWED_CORRECTED_BOX` (`scripts/indochine100k_georef.py`
+retracted over). Added `SOURCE_REVIEWED_CORRECTED_BOX` (`scripts/indochine100k/indochine100k_georef.py`
 ~L150), keyed by map id, overlaying corrected UNIMARC fields onto the fkey's box inside
 `record_box()` before the span is computed. Phan Rang (E)'s corrected lat_g (0.501g) lands
 inside the standard 0.48-0.53g band on its own, no further registration needed. Phan Rang
@@ -1602,7 +1602,7 @@ itself is right).
 Phan Rang (E) then held on two more things after the abnormal-span gate cleared:
 `rim offsets spread 15%` (its B side sits ~25px outside the ~170-175px family band other
 sides use, at 199.2px) and `axes disagree 2.2%`. Checked B with the per-pixel-profile
-method (`docs/lessons.md`, 2026-09-29 entry): uniformly blank paper (values 20-24) all the
+method (`docs/guides/lessons.md`, 2026-09-29 entry): uniformly blank paper (values 20-24) all the
 way from the family-band offset out to where the one real line rises and peaks — no
 second, competing line anywhere in between. Same "genuinely wider margin on this one
 side" case as Muong-Tè (E)/Ha-Lang (W)/Quan-Ba (E), not a double-frame pick. Added to
@@ -1641,7 +1641,7 @@ the margin the way Phan Rang had. Converting the kilometric northing to true lat
 needs the actual Bonne projection formula for this zone (`Mo:115°G_Lo:19°G` origin,
 printed on the sheet) — not implemented anywhere in this script, and not something to
 derive and trust without real verification; a wrong projection assumption here would
-produce exactly the "looks right, quietly isn't" failure `docs/lessons.md` warns against.
+produce exactly the "looks right, quietly isn't" failure `docs/guides/lessons.md` warns against.
 
 Presented the choice to the user (leave held / attempt the projection math / move on to
 publishing) — **chose to leave Cao-Bang held for now**, not worth the risk for a rushed
@@ -1831,7 +1831,7 @@ in a low-value gap, and B similarly; reverted to held rather than guessed at the
 
 Re-ran `detect()` clean (no overrides) first: it now fits both sides confidently — R offset
 149.9px (residual 3.9px, 24/24), B offset 216.8px (residual 3.5px, 24/24). Confident numbers
-aren't the same as correct ones (`docs/lessons.md`, 2026-09-29), so checked what's actually
+aren't the same as correct ones (`docs/guides/lessons.md`, 2026-09-29), so checked what's actually
 printed at each landed pixel with a native darkness scan rather than trusting the residual.
 
 **Both sides land in a genuinely quiet gap**, same failure as the note flagged: R's pick

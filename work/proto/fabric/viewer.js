@@ -471,7 +471,7 @@ async function load() {
     $('current-sheet').textContent = l ? `${l.year} · ${l.label}` : `${layers.length} sheets in view`;
     showBasis(l, focus);
   }
-  // The same steps docs/system-graph.md draws for the whole archive, answered
+  // The same steps docs/guides/system-graph.md draws for the whole archive, answered
   // for the one sheet in focus from facts layers.json already carries.
   function showBasis(l, index) {
     const box = $('sheet-basis');
@@ -495,7 +495,7 @@ async function load() {
       const dd = document.createElement('dd'); dd.textContent = text; if (caution) dd.className = 'caution';
       dl.append(dt, dd);
     }
-    const more = document.createElement('a'); more.href = 'https://github.com/lqtue/vietnam-map-archive/blob/main/docs/system-graph.md';
+    const more = document.createElement('a'); more.href = 'https://github.com/lqtue/vietnam-map-archive/blob/main/docs/guides/system-graph.md';
     more.target = '_blank'; more.rel = 'noopener'; more.textContent = 'All five steps ↗';
     box.replaceChildren(h, dl, more);
   }

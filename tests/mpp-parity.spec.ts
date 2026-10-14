@@ -12,7 +12,7 @@
  *      transform, square-rooted. Rotation- and skew-invariant, and *local* to
  *      that rectangle rather than global to the sheet. Feeds the D4 table that
  *      reports 2.80 m/px for the same 1959 sheet, which is the figure
- *      `docs/pipelines.md` § Full resolution derives "6.5 m/px delivered" and
+ *      `docs/guides/pipelines.md` § Full resolution derives "6.5 m/px delivered" and
  *      "cannot resolve a street name" from.
  *
  * Same pattern as `tests/density-parity.spec.ts`: one committed fixture of real

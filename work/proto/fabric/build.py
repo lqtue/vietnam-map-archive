@@ -93,7 +93,7 @@ def load_doling():
     """key(colonial or modern name) -> {modern, kind, sightings, post_title, post_date,
     post_url}, from Tim Doling's Historic Vietnam (work/research/doling/street-name-pairs.csv,
     given by the author, cited with permission -- see the file's own header for terms).
-    Unreviewed by a human yet (docs/search-plan.md's `doling-review`), so this is shown
+    Unreviewed by a human yet (docs/plans/search-plan.md's `doling-review`), so this is shown
     in the viewer as an attributed citation, never merged into a printed label as fact.
     Colonial keys checked first, since five of the six sheets print colonial names; a
     modern key is only added where no colonial one already claims it."""

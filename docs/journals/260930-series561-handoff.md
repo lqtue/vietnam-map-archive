@@ -121,7 +121,7 @@ Last 9 rows: `clear` from a direct `placement()` call, not from `annotate`'s own
 (same credential gap) — re-run `annotate` once real access is available to confirm.
 
 Command to publish drafts (does not flip `status`, only writes the annotation + flags
-`is_georeferenced`): `work/ocr/.venv/bin/python scripts/indochine100k_georef.py annotate
+`is_georeferenced`): `work/ocr/.venv/bin/python scripts/indochine100k/indochine100k_georef.py annotate
 --apply`. Not run.
 
 ### Held list, now 23 (was 34 — Phan Rang (E)/(W), the 4 coastal sheets, Lang Son (E), Lai Châu (E), Tu Lê (E), Tri Binh (W) and Quang Ngai cleared this session)
@@ -188,5 +188,5 @@ cluster).
 
 Snapshot `work/indochine-100k/*.json` before any future `DETECT_VERSION` bump; `regress()`
 alone only checks self-consistency against whatever's currently saved, not cross-version
-movement. Read `docs/lessons.md`'s 2026-09-29 entry before reviewing any boundary pick.
+movement. Read `docs/guides/lessons.md`'s 2026-09-29 entry before reviewing any boundary pick.
 No `annotate --apply`, no publish, no database writes without an explicit request.

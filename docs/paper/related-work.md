@@ -364,7 +364,7 @@ geometry. There is no ground truth in the paper and no accuracy claim against on
 > | where MapEdge's inward walk stops here | at the graticule band — 40 px / 170 m short, residuals
 > 14–41 px, every edge rejected |
 
-**MapEdge has no inward walk.** The inward walk is *ours* — `scripts/l7014_neatline.py`, which walks
+**MapEdge has no inward walk.** The inward walk is *ours* — `scripts/l7014/l7014_neatline.py`, which walks
 in from the blank margin until the paper stops being paper. `allmaps-series-note.md:109` and
 `docs/private/allmaps.md:195` both say so correctly; the figures file compressed the sentence and
 moved the method from us to them. Fixed in this commit.

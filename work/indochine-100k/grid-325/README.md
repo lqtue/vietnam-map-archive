@@ -3,7 +3,7 @@
 Generate locally with:
 
 ```bash
-work/ocr/.venv/bin/python scripts/indochine100k_grid.py --series 325 --apply
+work/ocr/.venv/bin/python scripts/indochine100k/indochine100k_grid.py --series 325 --apply
 ```
 
 Cell and half-sheet geometry comes from the WKT in `../sources/serie-325-wkt.json`,

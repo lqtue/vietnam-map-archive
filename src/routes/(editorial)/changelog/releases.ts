@@ -32,7 +32,7 @@ export interface Release {
    * 3.0 through 6.0 have no deployed instance, and their code against today's
    * database renders error pages rather than that version's front page. A
    * reconstruction would be a picture of something that never shipped. Both
-   * files come from `scripts/gen-changelog-shots.mjs`; `src` is the 1200px cut
+   * files come from `scripts/gen/gen-changelog-shots.mjs`; `src` is the 1200px cut
    * and the 600 beside it is offered as the small end of the srcset.
    */
   image?: { src: string; alt: string; caption: string };

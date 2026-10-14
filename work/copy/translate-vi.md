@@ -301,7 +301,7 @@ the catalogue.
 | Layers | Các lớp bản đồ |
 | Browse | Duyệt |
 | The surveys the archive holds part of, and where. Pick one to see which of its sheets are here, then open it on the map or read its sheet list. | Các bộ bản đồ mà kho lưu trữ đang lưu giữ một phần và vị trí của chúng. Chọn một bộ để xem các mảnh hiện có, rồi mở trên bản đồ hoặc đọc danh sách mảnh. |
-| Georeference made by our pipeline (scripts/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten. | Định vị được tạo bằng quy trình của chúng tôi (scripts/indochine100k_georef.py), không phải trên Allmaps. Hãy chạy lại quy trình để sửa; chỉnh sửa trên Allmaps sẽ bị ghi đè. |
+| Georeference made by our pipeline (scripts/indochine100k/indochine100k_georef.py), not on Allmaps. Fix it by re-running the pipeline; an edit in Allmaps would be overwritten. | Định vị được tạo bằng quy trình của chúng tôi (scripts/indochine100k/indochine100k_georef.py), không phải trên Allmaps. Hãy chạy lại quy trình để sửa; chỉnh sửa trên Allmaps sẽ bị ghi đè. |
 | Pipeline-maintained | Được duy trì bằng quy trình tự động |
 | The archive holds {held} of this survey’s {total} sheets — {pct}%. | Kho lưu trữ có {held} trên {total} mảnh của bộ này — {pct}%. |
 | {N} held | {N} mảnh đang có |

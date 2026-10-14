@@ -3,7 +3,7 @@
   one rectangle per cell, tinted by whether the archive holds it.
 
   Plain SVG. Under the cells, when the survey has one, goes a picture of our own
-  basemap (`scripts/gen-series-coverage-bg.mjs` crops it and writes
+  basemap (`scripts/gen/gen-series-coverage-bg.mjs` crops it and writes
   `coverageBackdrops.json` with the picture's extent). The picture is
   web-mercator, so the cells are projected the same way — x is longitude, y the
   mercator ordinate in the same degree-sized units — which is what puts a cell

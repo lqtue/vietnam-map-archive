@@ -3,7 +3,7 @@
 Part of the **operations** layer — see [ATLAS](../docs/ATLAS.md).
 
 The archive's public output shapes, written down once so more than one consumer
-can rely on them. Design rationale in `docs/platform-design.md` §3.
+can rely on them. Design rationale in `docs/plans/platform-design.md` §3.
 
 **The rule for adding a file here: name the second consumer.** A shape with one
 consumer belongs in that consumer's own types, not in this directory. "Something

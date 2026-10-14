@@ -105,7 +105,7 @@ def undeclared_folders(model, files):
 def find_errors(model, files, atlas_text=None):
     errors, declared, local = [], set(), set()
     if [layer["key"] for layer in model["layers"]] != EXPECTED_LAYERS:
-        errors.append("Layer order differs from knowledge-system-plan.md §9")
+        errors.append("Layer order differs from docs/plans/knowledge-system-plan.md §9")
     for layer in model["layers"]:
         for entry in layer["entries"]:
             path = entry["path"]

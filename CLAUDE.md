@@ -48,7 +48,7 @@ npm run test:write     # Write-path tests against that local stack
 npm run deploy         # Build + wrangler deploy to Cloudflare Pages
 ```
 
-What each test pins, and why, is `docs/testing.md` — read it before changing or adding a check.
+What each test pins, and why, is `docs/guides/testing.md` — read it before changing or adding a check.
 Most exist to catch a failure that looks like data rather than a bug.
 
 ## Rules
@@ -65,7 +65,7 @@ Most exist to catch a failure that looks like data rather than a bug.
   `new Map()` in a child.
 - **Never import a Node builtin bare** — use `node:path`, not `path`; the CF Functions bundle fails.
 - **A blank page right after deploy is edge propagation**, not a bug. Wait, hard-reload, then use
-  the `curl` check in `docs/deploy.md`.
+  the `curl` check in `docs/guides/deploy.md`.
 - **Migrations:** production head is **119**. Local files past it may exist unpushed — run
   `supabase migration list` before assuming. How to add one: `supabase/CLAUDE.md`.
 - **A sheet's address is its slug** (`maps.slug`), not its uuid; old addresses 301 to it. Rule and
@@ -73,7 +73,7 @@ Most exist to catch a failure that looks like data rather than a bug.
 
 ## Deployment
 
-Only `main` reaches production. Full story: `docs/deploy.md`.
+Only `main` reaches production. Full story: `docs/guides/deploy.md`.
 
 - **No root `wrangler.toml`** — it would replace the dashboard environment, secrets included.
   (`worker/wrangler.toml` is separate and fine.)
@@ -86,12 +86,12 @@ Only `main` reaches production. Full story: `docs/deploy.md`.
 
 `docs/ATLAS.md` (generated) maps every folder to its layer and the doc to read first.
 
-`docs/README.md` is the index. Before code: `architecture.md`, `conventions.md`,
-`system-guidelines.md`, `api.md`, `testing.md`. Before a migration or any number-producing run:
-`db-guidelines.md`, `lessons.md`. Before deploying: `deploy.md`.
+`docs/README.md` is the index. Before code: `docs/guides/architecture.md`, `docs/guides/conventions.md`,
+`docs/guides/system-guidelines.md`, `docs/guides/api.md`, `docs/guides/testing.md`. Before a migration or any number-producing run:
+`docs/guides/db-guidelines.md`, `docs/guides/lessons.md`. Before deploying: `docs/guides/deploy.md`.
 
 - **`ROADMAP.md`** is the one backlog, open items only. Close an item by deleting it, and move its
-  name in `knowledge-system-plan.md` §9 in the same commit.
+  name in `docs/plans/knowledge-system-plan.md` §9 in the same commit.
 - **Journals** (`docs/journals/YYMMDD-slug.md`) open with Question → Answer → So what.
 - **`docs/private/` is gitignored — never publish.** The repo is public.
 - **Frozen, never cite as current:** `roadmap-record.md`, `docs/archive/`.

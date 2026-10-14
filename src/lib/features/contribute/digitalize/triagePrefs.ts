@@ -12,7 +12,7 @@
  * localStorage is the working draft — it autosaves on every edit and never
  * leaves the browser. `maps.triage` (migration 069) is the deliberate save: a
  * person pressing the button is asserting "this sheet is triaged", and that is
- * what `scripts/enqueue_ocr_all.mjs` reads when it decides what to queue. Both
+ * what `scripts/queue/enqueue_ocr_all.mjs` reads when it decides what to queue. Both
  * carry the same `StoredTriage` shape so neither has to translate.
  */
 

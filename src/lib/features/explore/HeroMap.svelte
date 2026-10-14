@@ -10,7 +10,7 @@
 
   It is **not** the front page's header any more. The header is two stills —
   `hero-now.webp` and `hero-1882.webp`, photographed out of this section by
-  `scripts/gen-hero-still.mjs` and cross-faded by a slider, though they predate
+  `scripts/gen/gen-hero-still.mjs` and cross-faded by a slider, though they predate
   the refit below and hold the sheet closer than this does —
   and this plays further down, mounted by `HeroDemo.svelte` only once the
   reader scrolls it into view, so OpenLayers, ol-pmtiles, Allmaps and ~390 kB

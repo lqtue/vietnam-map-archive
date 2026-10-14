@@ -3,8 +3,8 @@
 A record of taking a single map from scan to exported geometry, with the number
 each stage actually produced. Written 2026-09-16 against production.
 
-Its purpose is not to describe the pipeline — `docs/pipelines.md` and
-`docs/digitalize-guide.md` do that. It is to say what happens when you run the
+Its purpose is not to describe the pipeline — `docs/guides/pipelines.md` and
+`docs/guides/digitalize-guide.md` do that. It is to say what happens when you run the
 whole thing on one sheet, because until this week **no sheet had ever been
 through all of it**, and four of the stages had never completed once.
 
@@ -201,7 +201,7 @@ Three observations worth carrying:
 ### Segment — `seg`
 
 ```bash
-node --env-file=.env scripts/enqueue_seg.mjs --map-id 0e02b9d9-…   # seeds off v1b
+node --env-file=.env scripts/queue/enqueue_seg.mjs --map-id 0e02b9d9-…   # seeds off v1b
 # a Colab T4 running work/MapSAM2/vma_seg_worker.ipynb claims it
 ```
 
@@ -272,7 +272,7 @@ collection since it was written.
 
 Every defect found while running this chain returned **plausible output while
 dropping data**, or refused work while looking like something else. That is the
-habit `docs/digitalize-guide.md` already names, and it held again four times.
+habit `docs/guides/digitalize-guide.md` already names, and it held again four times.
 
 **1. The newest run is not the reviewed run.** `join_labels.py` pins the most
 recent OCR run when it is not told which to use. On this sheet that is
@@ -365,11 +365,11 @@ feature that could not work, for the fourth time this month.
 #    (the fit above is in scratch; the stored figure is maps → annotation_url)
 
 # 1. read — already done; v1b is canonical for this sheet
-node --env-file=.env scripts/enqueue_ocr_all.mjs --dry --tile-metres 1400
+node --env-file=.env scripts/queue/enqueue_ocr_all.mjs --dry --tile-metres 1400
 
 # 2. shapes — a Colab GPU session as a worker
 #    work/MapSAM2/vma_seg_worker.ipynb, then from here:
-node --env-file=.env scripts/enqueue_seg.mjs --map-id 0e02b9d9-… --dry
+node --env-file=.env scripts/queue/enqueue_seg.mjs --map-id 0e02b9d9-… --dry
 
 # 3. review at /scan?mode=shapes&tab=validate
 #    click / ctrl-click / shift-click, then Approve N

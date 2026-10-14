@@ -14,7 +14,7 @@ For product and engineering guidance use the [docs guide](../docs/README.md).
 | Entities and vocabularies | [Doling source and street-name pairs](research/doling/SOURCE.md)                                                                                        |
 | Assertions and studies    | [Analysis guide](analysis/README.md), [Zenodo preparation](research/zenodo/README.md), local generated reports                                          |
 | Surfaces                  | [Viewer prototypes](proto/), [copy and translations](copy/)                                                                                             |
-| Outside the model         | [Worker instructions](CLAUDE.md), [pipeline commands](../docs/pipelines.md), local execution logs                                                       |
+| Outside the model         | [Worker instructions](CLAUDE.md), [pipeline commands](../docs/guides/pipelines.md), local execution logs                                                       |
 | Historical material       | [Archive](archive/README.md)                                                                                                                            |
 
 ## Image processing is consolidated
@@ -35,7 +35,7 @@ thin shims over it. The Python environment remains at `ocr/.venv`; the segmentat
 extra packages are listed in `seg-requirements-cpu.txt` and `seg-requirements-gpu.txt`. SAM2 retains its own code in `MapSAM2/`.
 The older river-pilot and segmentation-review paths, `ocr/outputs`, `ocr/logs` and `vectorize`
 remain temporary compatibility symlinks. Use physical paths for new commands. Remove the
-remaining links only after the reference audit in the [1882 plan](../docs/image-processing-1882-plan.md).
+remaining links only after the reference audit in the [1882 plan](../docs/plans/image-processing-1882-plan.md).
 
 ## Keep evidence and outputs distinct
 

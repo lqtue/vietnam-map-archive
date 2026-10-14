@@ -523,7 +523,7 @@ def adaptive_render_size(image: Image.Image, low: int = 1024, high: int = 2048, 
 # hue and saturation, and `compute_tile_colours` scores the water/vegetation
 # wash in HSV — the pre-pass must never be able to reach that signal. It cannot:
 # it runs on the per-tile render on its way to the model, long after the shared
-# overview the colour pass reads. See docs/pipelines.md.
+# overview the colour pass reads. See docs/guides/pipelines.md.
 #
 # ponytail: pure numpy + Pillow, ~30 lines, because there is no cv2 wheel for
 # Python 3.14 and this must not add a dependency. Ceiling: a full 2048px tile
@@ -695,7 +695,7 @@ def compute_tile_colours(
     green parks are pale enough to read as warm paper in HSV. So on a
     warm-toned colonial scan the wash demotion is a no-op. Do not rely on it
     until it has been measured on a sheet where it fires; see
-    `docs/pipelines.md` and `EVAL-BASELINE.md`.
+    `docs/guides/pipelines.md` and `EVAL-BASELINE.md`.
     """
     try:
         import numpy as np

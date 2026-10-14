@@ -213,7 +213,7 @@ The earlier history is under *What changed since 2026-09-10* at the foot.
   ~10k sheets. upgrade: if a survey lands that makes this slow, that is the moment to write the view
   and delete this.
 
-## scripts/dedupe_ocr.mjs
+## scripts/queue/dedupe_ocr.mjs
 
 - **:19** — `IOU` fixed at 0.3. ceiling: the cut is flat from 0.1 to 0.5, so tuning buys nothing.
   upgrade: _none named_ — `no-trigger`.
@@ -228,7 +228,7 @@ The earlier history is under *What changed since 2026-09-10* at the foot.
   the database does not carry, and `l7014_mosaic.py fit` already covers the one series where seams
   found the bug. upgrade: add it when a second lattice-less survey exists.
 
-## scripts/legend_timeline.mjs
+## scripts/scout/legend_timeline.mjs
 
 - **:17** — a lexicon of ~25 type words, not a translation model. ceiling: the proper name is a
   proper name in both languages (Bình Tây, Khánh Hội, Grall, Phúc Kiến), which is what makes the
@@ -236,13 +236,13 @@ The earlier history is under *What changed since 2026-09-10* at the foot.
   unmatched list on purpose rather than being guessed at. upgrade: a real model only when the
   unmatched list stops being readable by hand.
 
-## scripts/scout_nlv_press.mjs
+## scripts/scout/scout_nlv_press.mjs
 
 - **:24** — HTML regexes, not a DOM parser. ceiling: Veridian's output is machine-generated and has
   not moved in years, and a template change breaks loudly — zero results on a query whose total is
   non-zero, which `--selftest` pins. upgrade: reach for a parser when that actually happens.
 
-## scripts/l7014_ttu_fetch.py
+## scripts/l7014/l7014_ttu_fetch.py
 
 - **:38** — `PAUSE = 1.5`, a fixed courtesy delay with no backoff. ceiling: a 25-file run, once.
   upgrade: _none named_ — `no-trigger`.
@@ -569,7 +569,7 @@ The earlier history is under *What changed since 2026-09-10* at the foot.
 - **:53** — dedupe matches exact rings only. upgrade: canonicalise rotation/winding if a producer
   ever emits the same polygon from a different start vertex.
 
-## scripts/md2pdf.py
+## scripts/gen/md2pdf.py
 
 - **:4** — needs `markdown` + `weasyprint`, kept out of the repo's deps because nothing else makes a
   PDF; run from its own venv. upgrade: _none named_ — `no-trigger`.
@@ -684,5 +684,5 @@ puts most of its module-level ones — and every SQL `--` comment. A bare
 **Hand-drop the prose mentions.** The grep scope above returns four non-marker
 hits under `work/archive/cleanup/` (`TODO.md` and two dated audit notes, all gitignored scratch notes rather than comments on
 code). Widen the scope beyond it and you also pick up this file's own header,
-`CLAUDE.md`, `contracts/README.md:22` and `docs/search-plan.md:232` — all
+`CLAUDE.md`, `contracts/README.md:22` and `docs/plans/search-plan.md:232` — all
 cross-references to the convention, none of them markers.

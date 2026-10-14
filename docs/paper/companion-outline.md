@@ -30,7 +30,7 @@ failure. It cannot make the argument below, because the argument is *about*
 the conditions under which that paper's own numbers were produced. Keep them
 separate, and cite `draft.md` for every geometric claim.
 
-Against `docs/theory.md` §"The Publication Strategy", this is a sixth paper,
+Against `docs/plans/theory.md` §"The Publication Strategy", this is a sixth paper,
 not a rewrite of any of the five. It is closest in audience to #5 and closest
 in evidence to #1.
 
@@ -64,7 +64,7 @@ from an EPSG code returns `(lat, lon)` and one from a PROJ4 string returns
 `(lon, lat)`, and **370 of 437 sheets were rejected as `offgrid`** — the datum
 fix discarded by the very check meant to supersede it.
 
-→ `scripts/l7014_mosaic.py:500` · commit `0aa04f0b`
+→ `scripts/l7014/l7014_mosaic.py:500` · commit `0aa04f0b`
 
 **The beat this section lands.** Three failures, one apparatus, each invisible
 to the layer above it. The third is the one that should worry a reader: a
@@ -84,7 +84,7 @@ inheriting its assumptions — including the one that made the check blind. The
 apparatus that produced the fault and the apparatus that failed to detect it
 arrived together, from the same source, as a single package.
 
-→ `draft.md` §3, §5, §6 · `docs/architecture.md`
+→ `draft.md` §3, §5, §6 · `docs/guides/architecture.md`
 
 **Do not overreach here.** This is one corpus. It is not a general theory of
 colonial data, and the piece should say so in the section, not in a footnote.
@@ -103,7 +103,7 @@ paper, other people's symbology, other people's script. Two-regime toponymy
 with diacritics, on sheets 1791–1968, is not a corner case the field has
 priced in — it is a corpus the field has not seen.
 
-→ `docs/research/field-comparison.md` §5 · `docs/theory.md` §"The open gap"
+→ `docs/research/field-comparison.md` §5 · `docs/plans/theory.md` §"The open gap"
 → `docs/research/image-processing-record.md` §4 (nine rejected approaches — evidence of
    what recalibration actually cost)
 
@@ -139,10 +139,10 @@ project has no leverage over the sources — but it is the downstream project
 whose readers see a street in the wrong place.
 
 Keep this grounded in what the project actually spends and refuses to spend.
-`docs/strategy.md` §"Economic Model" and §"Engineering vs. Research" are the
+`docs/plans/strategy.md` §"Economic Model" and §"Engineering vs. Research" are the
 source; do not inflate them into a general claim about heritage funding.
 
-→ `docs/strategy.md` §"Economic Model", §"Sustainability tiers"
+→ `docs/plans/strategy.md` §"Economic Model", §"Sustainability tiers"
 
 ## §6 · Practices, stated as claims
 

@@ -2,10 +2,10 @@
 
 **Everything in this file is open.** Nothing closed lives here: the record of finished passes, with
 the measurements and the defects each one turned up, is `docs/roadmap-record.md` (frozen
-2026-09-22), and the rules that keep getting re-learned are `docs/lessons.md`. **Close an item by
+2026-09-22), and the rules that keep getting re-learned are `docs/guides/lessons.md`. **Close an item by
 deleting it**, never by ticking it: the commit that deletes it carries the closing measurement, and
-anything worth re-learning goes into `docs/lessons.md`. Remove its name from
-`docs/knowledge-system-plan.md` §9 in the same commit.
+anything worth re-learning goes into `docs/guides/lessons.md`. Remove its name from
+`docs/plans/knowledge-system-plan.md` §9 in the same commit.
 
 Ordered where order is claimed. Each item names the check that says it is finished.
 
@@ -57,7 +57,7 @@ measurement, metadata that maintains itself, and corpus size.
       separate bug: it's every unheld cell's ground rectangle, not a warped sheet's position. Affects
       all 627 cells in the L7014 index, so every gap the coverage page draws is ~470 m off from
       where the survey actually places it. A database backfill, independent of any mosaic build — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
-      (`scripts/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
+      (`scripts/l7014/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
       `series_cells` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
       `CELL_TOL` (150 m) against `lattice.json`.
 - [ ] **`three-point-residuals`** — give the 11 remaining three-point sheets a measurable one. A
@@ -74,7 +74,7 @@ measurement, metadata that maintains itself, and corpus size.
       every one.
 - [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print, the
       way `tonkin_georef.py` does for the sibling 1:25,000 survey. **561: pipeline built and
-      working, first batch published 2026-09-24** — `scripts/indochine100k_georef.py`
+      working, first batch published 2026-09-24** — `scripts/indochine100k/indochine100k_georef.py`
       (`calibrate`/`place`/`check`/`annotate`) mirrors Tonkin's catalogue-driven
       `from_catalogue()`/`calibrate()` fallback against `extra_metadata.cartomundi_fkeys[0]`'s own
       UNIMARC bbox (not the unioned `series_cells.bbox` — see the journal). Calibration accepted
@@ -142,7 +142,7 @@ measurement, metadata that maintains itself, and corpus size.
       tracing the peninsula is. Exit: a precision figure alongside the recall one, with its sample
       and limitations recorded beside it.
 - [ ] **`tonkin-review`** — a person looks at all 62. `graticule-georef` (the machine half of this
-      item) is done and was already shipped before this list existed: `scripts/tonkin_georef.py`
+      item) is done and was already shipped before this list existed: `scripts/tonkin/tonkin_georef.py`
       reads each sheet's own printed corners (grades from the Paris meridian,
       `grades × 0.9 + 2.337229` = degrees east), cross-checks against the pixel quad and the
       series' own lattice, and placed 121 sheets by 2026-09-15, then 84 more by hand-corners and
@@ -151,7 +151,7 @@ measurement, metadata that maintains itself, and corpus size.
       committed). The two that do not are the two that cannot: An Thi 1904 (serie 243 does not hold
       that year) and Phat Diem 1927 (IGN never digitised the east half) — a permanent gap, not a
       bug. What is left is the pipeline's own last step, by design
-      (`annotate()`'s docstring in `scripts/tonkin_georef.py`): every one of the 62 sits at
+      (`annotate()`'s docstring in `scripts/tonkin/tonkin_georef.py`): every one of the 62 sits at
       `status = draft` with `is_georeferenced = true`, visible to a signed-in reviewer at `/explore` and
       nowhere else, on purpose, because nobody has looked at all of them yet. Exit: each reviewed,
       then `annotate(write=True, only_new=True)` plus a status flip to `public` for the ones that
@@ -192,7 +192,7 @@ Do them when the surrounding work opens the file.
 - [ ] **`scripts-apply-flag`** — sixteen one-off scripts write on a bare invocation; nine converted,
       seven not. The
       note said four such scripts existed, the next morning's audit found nine, and the real
-      number is **sixteen**: `scripts/enqueue_seg.mjs`, `enqueue_layout_all.mjs`,
+      number is **sixteen**: `scripts/queue/enqueue_seg.mjs`, `enqueue_layout_all.mjs`,
       `enqueue_ocr_all.mjs`, `collection_aoi.mjs`, `import-seg-geojson.mjs`,
       `enqueue_warp_all.mjs` and `oneoff/backfill_map_bbox.mjs` are each still
       `const dry = args.includes('--dry')` over a real write. Verified 2026-09-21: every one
@@ -245,7 +245,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       `GEMINI_API_KEYS`; 38 maps unattended is the run that needs the spare. Google no longer
       publishes per-model limits — read <https://aistudio.google.com/rate-limit>. Exit: two keys
       set, and the daily request cap written down here.
-- [ ] **`queue-the-pass`** — `scripts/enqueue_ocr_all.mjs --dry`, then without. It queues only
+- [ ] **`queue-the-pass`** — `scripts/queue/enqueue_ocr_all.mjs --dry`, then without. It queues only
       triaged sheets, so 3h comes first or nothing is queued at all. Exit: the queued count matches
       the script's own.
 - [ ] **`drain-the-queue`** — `python work/worker/vma_worker.py --worker $(hostname)`. Hours, not
@@ -277,8 +277,8 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       the spot, read the press panel, check a draft's labels are absent when signed out. Exit: hits
       from ≥ 5 maps, and `/api/context?lng=106.70098&lat=10.77653` returns labels.
 
-**Then, in order** (detail in `docs/search-plan.md`, engine design in
-`docs/platform-design.md`):
+**Then, in order** (detail in `docs/plans/search-plan.md`, engine design in
+`docs/plans/platform-design.md`):
 
 - [ ] **`colab-seg-run`** — mint a `seg`-scoped worker key, run `vma_worker.py --kinds seg`.
       Exit: one `seg` job goes `queued → done` and writes `footprints` rows with
@@ -303,7 +303,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
 ## Evidence and legibility (planned 2026-09-19)
 
 Deliberately not first, but no longer blocked on it either: `stale-after-change` closed 2026-09-22
-(`docs/lessons.md`, `tests/stale-after-change.spec.ts`) — a corrected sheet's rebuild set is now
+(`docs/guides/lessons.md`, `tests/stale-after-change.spec.ts`) — a corrected sheet's rebuild set is now
 named, not remembered. The three I-items that duplicated live work are gone: they were
 `l7014-iiif`, `shape-precision` and `stale-after-change`. Rationale for the whole
 system — what a result must retain, and the two kinds of check — is in the record.
@@ -333,13 +333,13 @@ system — what a result must retain, and the two kinds of check — is in the r
       were measured on. Not blocked by `ocr-merge-evidence`; `source-agreement` and
       `attested-variants` build on its `claim_evidence` rather than beside it. Exit: a public
       claim opens its exact source region; the packet survives an OCR or georeference correction;
-      draft evidence stays private. Plan: `docs/evidence-chain-plan.md`.
+      draft evidence stays private. Plan: `docs/plans/evidence-chain-plan.md`.
 - [ ] **`georef-versions`** — finish recording a database row for every georeference writer.
       Migration 103 supplies the version table and `map_georef_current`; GCP coordinates and
       masks remain in the versioned annotation. One row per stored version, appended by every writer
       (`mirrorAnnotation`, the neatline PATCH, the sync script, the pipeline georef scripts). Exit:
       one query lists every 1882 version with GCP count and named RMSE, and a `geom_src` join shows
-      stale labels. Plan: `docs/knowledge-system-plan.md` §5. **Built 2026-10-01, pushed:**
+      stale labels. Plan: `docs/plans/knowledge-system-plan.md` §5. **Built 2026-10-01, pushed:**
       migration 103, the three TS/JS writers, `scripts/backfill_georef_versions.mjs`, one write
       test. Read-only check 2026-10-05: 604 version rows on 591 maps, including two history rows
       for 1882; both have origin `unrecorded`, consistent with the catch-up backfill. This is an
@@ -397,18 +397,18 @@ system — what a result must retain, and the two kinds of check — is in the r
       dated point sets; live 1882/1942 fits reproduced in `research/framework-audit-followup.md`.
       The 1942 declared affine fit is 26.5 m; 33.6 m above is the comparison similarity fit.
       Left: rerun the 1882/1898 overlap in `docs/journals/260921-sheet-overlap.md` on the new
-      fit. The example hash in `evidence-chain-plan.md` is now tied to the live mirror read
+      fit. The example hash in `plans/evidence-chain-plan.md` is now tied to the live mirror read
       2026-10-05 (`93c4487e621f83c9`); comparing that mirror with upstream remains in the pilot.
       Exit: each cites a figure together with the GCP set and named measure it was measured on.
 - [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
       neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
-      writes the first from the second. Name them in `docs/conventions.md`. Exit: no doc or comment
+      writes the first from the second. Name them in `docs/guides/conventions.md`. Exit: no doc or comment
       uses a bare "mask" for more than one.
 
 ## Measured pipeline (planned 2026-10-12)
 
 Machines propose, a person decides at a named gate, and every verdict records its time and the
-exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the starting numbers:
+exact thing it judged. Plan and rules: `docs/plans/digest-pipeline-plan.md`; the starting numbers:
 `docs/journals/261012-manual-baseline.md`.
 
 - [ ] **`place-links`** — what stands today where a sheet names a place. 1882 first: suggestions
@@ -437,7 +437,7 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
       `maps.collection`; persisted layer references; and curated non-survey groups such as city
       plans.
       Do not close on local SQL checks. Exit: no series fact lives only in `extra_metadata` and the
-      deployed readers use stable identity. Plan: `docs/knowledge-system-plan.md` §1.
+      deployed readers use stable identity. Plan: `docs/plans/knowledge-system-plan.md` §1.
 
 - [ ] **`multi-printing-cells`** — preserve `series_cells` as one index row per cell; do not widen
       its primary key and count printings as cells. Migration 106 (in production since 2026-10-04) adds independent
@@ -518,7 +518,7 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
       and dry citadel ramparts. The v1 method scored 96.5% on 289 blind owner point labels;
       v3's 74/74 on batch 4 also holds for v2 and does not establish an improvement.
       Exit: owner-reviewed 1882 water polygons approved and rendered on `/explore`.
-      1898 is deferred until 1882 ships. Current scope: `docs/image-processing-1882-plan.md`;
+      1898 is deferred until 1882 ships. Current scope: `docs/plans/image-processing-1882-plan.md`;
       evidence: `docs/research/river-reconstruction.md`.
 - [ ] **`seg-eval-set`** — the eval harness is blocked on data, not code. The OCR side exists
       (`work/ocr/EVAL-BASELINE.md`); segmentation needs ~20 hand-labelled Saigon tiles before any
@@ -548,7 +548,7 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
       is no accuracy number for the extraction, which is `shape-precision`'s problem in another
       corpus: unfalsifiable until measured. The author's own markup is the cheapest ground truth
       available. Exit: a precision figure with its sample recorded, and his corrections kept as the
-      eval set. Detail: `docs/search-plan.md` §E3b.
+      eval set. Detail: `docs/plans/search-plan.md` §E3b.
 - [ ] **`gallica-text-harvest`** — primary sources, politely, offline. Gallica exposes OCR'd full
       text; **NLV does not** — verified 2026-09-22, the article view offers `img` only and the
       issue PDF 404s without a session `key`, so NLV stays a consumer of names
@@ -618,7 +618,7 @@ exact thing it judged. Plan and rules: `docs/digest-pipeline-plan.md`; the start
 ## Walk — one route on a phone, the sheets underneath
 
 One District 4 route on foot, warped sheets underneath, old names on top — HACW forked for Saigon.
-Plan: `docs/walk-plan.md`.
+Plan: `docs/plans/walk-plan.md`.
 
 - [ ] **`walk-the-route`** — on a phone, and decide whether offline is real. If it is not, this
       whole
@@ -644,7 +644,7 @@ Plan: `docs/walk-plan.md`.
       `l7014` pattern already in `BASEMAP_DEFS`.
 - [ ] **`story-contract`** — `contracts/story.schema.json` + `GET /api/stories/[id].json`, validated
       in the write
-      smoke. Independent of the two above and it jumps `platform-design.md` §6's queue: it needs
+      smoke. Independent of the two above and it jumps `plans/platform-design.md` §6's queue: it needs
       neither the
       engine nor `packages/contracts`.
 - [ ] **`hacw-fork`** — fork HACW → D4 content, Saigon extract, `pull-archive.mjs`, `checkStory()` —
@@ -707,7 +707,7 @@ existing map runtime. Open work is tracked here; the entries below are the plan.
 
 ## OCR setup — open improvements from the 1959 re-run (2026-09-10)
 
-Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix first.
+Measured in `docs/guides/pipelines.md` §"Reading a sheet's margins". Cheapest fix first.
 
 - [ ] **`triage-scan-identity`** — triage must record which image it was computed for. Store
       `img_width`/`img_height` in the
@@ -772,7 +772,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 - [ ] **`ci-python-worker`** — Python tests, the two `*.test.mjs` files and the `worker/` type-check
       and routing tests run in no CI. Add a cheap job: `work/core/vma_core/test_core.py`,
       `work/ocr/scripts/test_*.py` (skip `test_l7014_gcp.py`, which needs `osgeo`),
-      `node --test scripts/lib/cells.test.mjs scripts/scoutDerive.test.mjs` (the first needs the
+      `node --test scripts/lib/cells.test.mjs scripts/scout/scoutDerive.test.mjs` (the first needs the
       gitignored dumps; see `cells-test-ci`), a `tsc --noEmit` over `worker/`, and a routing test for
       `worker/src/index.ts`. Exit: all of them run on every PR.
 - [ ] **`history-rewrite`** — drop committed build output, `node_modules` and `.vercel` output from
@@ -781,7 +781,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 ## Infrastructure
 
 - [ ] **`usage-measurement`** — purposeful measurement for a bounded user study,
-      grant evidence and eventual donation invitations. Plan: [usage measurement](usage-measurement-plan.md).
+      grant evidence and eventual donation invitations. Plan: [usage measurement](plans/usage-measurement-plan.md).
       Use opt-in GA4 journeys, existing DB-confirmed outcomes and voluntary reuse
       evidence; defer the custom collector/dashboard. Implement role exclusion,
       canonical navigation and meaningful search/contribution hooks; configure and

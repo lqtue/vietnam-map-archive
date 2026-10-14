@@ -8,7 +8,7 @@ import requests
 from iiif_tiles import auto_tile_overrides, compute_tile_densities, fetch_crop, get_iiif_base_from_supabase, get_image_info, tile_grid
 from scale import DEFAULT_OVERLAP_RATIO, annotation_for_map, metres_per_pixel, tile_size_for
 
-OVERVIEW_WIDTH = 2048  # same as ocr.py cmd_batch; do not lower (docs/pipelines.md)
+OVERVIEW_WIDTH = 2048  # same as ocr.py cmd_batch; do not lower (docs/guides/pipelines.md)
 TILES_PER_CALL = 4
 USD_PER_CALL = (0.011, 0.018)  # measured 2026-10-05: $0.134/12 calls @700m, $0.089/5 calls @1400m
 INDEX_USD = 0.25               # per ~384-name index pass

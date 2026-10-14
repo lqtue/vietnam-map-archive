@@ -1,6 +1,6 @@
 # src/lib — the rules for this tree
 
-Root context: `/CLAUDE.md`. Full map-runtime reference: `docs/architecture.md` — read it
+Root context: `/CLAUDE.md`. Full map-runtime reference: `docs/guides/architecture.md` — read it
 before touching the OpenLayers layer; what follows is only the shape.
 
 ## Svelte dialect
@@ -74,7 +74,7 @@ error, not a code-review catch.
   `triageTypes.ts`, `service.ts`, `iiifManifest.ts`, `georef.ts`). `src/lib/map/types.ts` is
   UI-only.
 - **The default basemap uses OpenStreetMap tiles.** Regional PMTiles on `tiles.maparchive.vn` remain an optional Archive base — see
-  `docs/architecture.md` §Map libraries before changing a URL, a zoom range or a build key.
+  `docs/guides/architecture.md` §Map libraries before changing a URL, a zoom range or a build key.
 - **`@allmaps/openlayers` is loaded on demand** — one runtime importer, `createWarpedLayer` in
   `map/shell/warpedOverlay.ts`, which is why it is `async`. Keep any new importer type-only or
   151 kB goes back in front of /explore's first paint.
@@ -101,7 +101,7 @@ carries.
   2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
   changes only a default). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
-  history and the `--local` trap: `docs/conventions.md` §Supabase types.
+  history and the `--local` trap: `docs/guides/conventions.md` §Supabase types.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
   what forces most `as any` casts downstream.
 - **Realtime is stubbed out of the browser bundle** (`vite.config.ts` aliases
@@ -124,14 +124,14 @@ one tab strip; `.sb-search` the one search field; `$lib/ui/DataTable.svelte` + `
 `core/utils/tableSort.ts` the one table and one sort. All CSS in `src/styles/` via `$styles`;
 colours are `var(--token)`, canvas ink is `INK`/`inkAlpha` in `core/ink.ts`. Two themes, one value
 each — `light-dark()` in `tokens.css`, and four things deliberately do not flip. **Before adding any
-of these, read `docs/conventions.md` §Component vocabulary** — it lists the twenty-seven selectors
+of these, read `docs/guides/conventions.md` §Component vocabulary** — it lists the twenty-seven selectors
 these eleven replaced, so a second one is a regression, not a new component. `tests/screens.spec.ts`
 fails if a retired name reappears.
 
 **The fonts are self-hosted** (`src/styles/fonts.css` + `static/fonts/`, latin · latin-ext ·
 vietnamese only, Inter variable). Do not reintroduce the Google Fonts link or the Translate widget —
-`docs/conventions.md` §Fonts.
+`docs/guides/conventions.md` §Fonts.
 
 **One place, not one spelling.** The gazetteer (`place_names`) groups by `core_key`, and the rule
 exists twice — `place_core_key()` in Postgres and `placeCoreKey` in `$lib/core/utils/placeKey.ts`.
-The two must agree or a place page 404s. `docs/conventions.md` §The gazetteer key.
+The two must agree or a place page 404s. `docs/guides/conventions.md` §The gazetteer key.

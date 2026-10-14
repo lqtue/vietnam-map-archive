@@ -2,7 +2,7 @@
 --
 -- `maps` carried both `status` (draft/public/featured) and the booleans
 -- `is_public`/`is_featured`, and different code paths gated on different ones.
--- docs/db-guidelines.md has warned about this since migration 038; the enum
+-- docs/guides/db-guidelines.md has warned about this since migration 038; the enum
 -- wins, because it is the one the API and the RLS policies already agree on.
 --
 -- Four policies read `maps.is_public`, so they are rewritten first — dropping

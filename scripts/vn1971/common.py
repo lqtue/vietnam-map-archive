@@ -9,7 +9,7 @@ So the shift is spelled out (`INDIAN_1960_PROJ4`, from the L7014 pipeline, never
 """
 import glob, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path[:0] = [HERE, os.path.dirname(HERE)]
+sys.path[:0] = [HERE, os.path.dirname(HERE), os.path.join(os.path.dirname(HERE), "l7014")]
 from pyproj import Transformer
 from l7014_mosaic import INDIAN_1960_PROJ4
 

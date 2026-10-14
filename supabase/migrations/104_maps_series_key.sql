@@ -7,7 +7,7 @@
 --
 -- `maps.series_key` is generated from `collection`, so nothing can write it and
 -- nothing can drift from it. That is deliberately the smallest step
--- (docs/knowledge-system-plan.md §5, `series-identity`): `collection` is still the
+-- (docs/plans/knowledge-system-plan.md §5, `series-identity`): `collection` is still the
 -- display string and still the only input. Making the key independent of the label
 -- needs a `series` table, which should wait until scale, producer and edition need
 -- columns of their own.

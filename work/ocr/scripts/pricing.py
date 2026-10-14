@@ -6,7 +6,7 @@ those logs back to enforce a per-job budget. Importing `gemini_client` from the
 worker would drag in PIL and google.genai for the sake of three numbers.
 
 The rates themselves live in `work/ocr/prices.json`, not here, because
-`scripts/enqueue_ocr_all.mjs` needs the same numbers in JavaScript to estimate
+`scripts/queue/enqueue_ocr_all.mjs` needs the same numbers in JavaScript to estimate
 a sweep before it is queued. One file read by both beats a copy in each, which
 would be a duplicated signal needing a parity test to stay honest.
 """
@@ -45,7 +45,7 @@ def call_cost_usd(
     """USD for one call, or None when the model has no published rate.
 
     Billed output is taken as `total - input` — candidates plus thinking —
-    which is what `docs/pipelines.md` §Cost concluded on 2026-09-10. That
+    which is what `docs/guides/pipelines.md` §Cost concluded on 2026-09-10. That
     conclusion was inferred from token counts and has never been checked
     against an invoice; if it is wrong, every figure derived from this is
     about 2.5x too high. Settling it needs no new data collection, because

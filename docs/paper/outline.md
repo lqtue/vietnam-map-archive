@@ -18,7 +18,7 @@ things under one number and the placeholders could not land.
 | **4** | **C1 · Modelling the survey** — cell / sheet / printing; status derived not stored; no FK on purpose | migrations 083–087 |
 | **5** | C2 method A — L7014, GeoPDF GCPs, neatline cutline, PMTiles mosaic | `allmaps-series-note.md` §1 |
 | **6** | C2 method B — Indochine, printed corners in grades, the thick-line anchor, one rotation per sheet | ibid §2 |
-| **7** | **C3 · Verification** — split below | ibid §2, `pipelines.md`, `worker/src/iiifKeys.ts` |
+| **7** | **C3 · Verification** — split below | ibid §2, `guides/pipelines.md`, `worker/src/iiifKeys.ts` |
 | **8** | Negative results | ibid §5, `260919-seg-audit.md` W8 |
 | **9** | Discussion — what generalises; what the ecosystem is missing | ibid §3 |
 | **10** | Data and code availability — Zenodo DOI, CC-BY-4.0 derived data, IIIF-referenced scans | `260912-postgrad-route.md` |

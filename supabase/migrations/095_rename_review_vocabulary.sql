@@ -16,7 +16,7 @@
 -- deploy carrying the renamed reads has shipped — do not add that migration here.
 --
 -- Data changes (the name-cleanup rules, the rights/language collapses) are
--- migration 096, kept separate per docs/db-guidelines.md §10 (schema change and
+-- migration 096, kept separate per docs/guides/db-guidelines.md §10 (schema change and
 -- its own backfill together; unrelated changes apart).
 
 -- ────────────────────────────────────────────────────────────────────────────

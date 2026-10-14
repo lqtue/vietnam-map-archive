@@ -119,7 +119,7 @@ export default {
     //
     // Not edge-cached: cache.put() rejects a 206, and every read here is a
     // range read. Putting this file behind an R2 custom domain would let
-    // Cloudflare's CDN serve the ranges itself — see docs/admin-tooling.md.
+    // Cloudflare's CDN serve the ranges itself — see docs/guides/admin-tooling.md.
     const basemap = url.pathname.match(/^\/basemap\/([A-Za-z0-9._-]+)$/);
     if (basemap) return safeResponse(await serveRange(env, `basemap/${basemap[1]}`, request));
 

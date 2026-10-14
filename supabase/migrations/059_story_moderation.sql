@@ -5,7 +5,7 @@
 -- visibility on a boolean the author sets themselves.
 --
 -- `is_public` is dropped rather than kept alongside `status`: two visibility
--- models on one table is exactly the mess docs/db-guidelines.md warns about on
+-- models on one table is exactly the mess docs/guides/db-guidelines.md warns about on
 -- `maps`. Publishing now means "submitted"; a mod approves.
 
 alter table public.stories

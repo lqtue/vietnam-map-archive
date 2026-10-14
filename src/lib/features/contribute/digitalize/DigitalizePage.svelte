@@ -5,7 +5,7 @@
   Prepare — five steps: ask the model what the sheet is made of (Layout), set
             the neatline, size the tile grid and per-tile priority, save the
             triage to `maps.triage`, then queue an OCR batch.
-            Operator guide: docs/digitalize-guide.md.
+            Operator guide: docs/guides/digitalize-guide.md.
   Text    — validate / reject / redraw what came back (OcrBboxTool + OcrSidebar).
 
   **One component for both modes on purpose.** The dispatcher mounts this file

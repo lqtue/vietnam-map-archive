@@ -5,7 +5,7 @@
 > `docs/roadmap-record.md`.
 
 A verified, ordered checklist for rebuilding and republishing the AMS Series L7014 raster
-archive with the committed datum fix. Written after tracing `scripts/l7014_mosaic.py`
+archive with the committed datum fix. Written after tracing `scripts/l7014/l7014_mosaic.py`
 (`index`/`fetch`/`warp`/`manifest`/`fit`/`tile`/`upload`), `scripts/geo_audit.mjs`, every
 reference to the dated key, `src/lib/data/maps/seriesSheets.ts` /
 `src/lib/map/rasterSeries.ts`, `work/l7014/regen/REGEN.md`, and the disk/log state on this
@@ -27,7 +27,7 @@ holds the faulty pass.
   the corrected and faulty warp on 2026-09-20 (commit `7ee5d947` + the two source changes
   below, both now committed at `0aa04f0b`). **`tile` and `upload` were never run — production
   R2 is untouched**, exactly as REGEN.md states.
-- `git status --porcelain scripts/l7014_mosaic.py` is clean: the `--no-datum-shift` flag and
+- `git status --porcelain scripts/l7014/l7014_mosaic.py` is clean: the `--no-datum-shift` flag and
   the `graticule_error` axis-order fix that REGEN.md calls "two uncommitted changes" are
   **already committed** (`0aa04f0b fix(l7014): the graticule check was rejecting its own
   datum correction`, present on this branch). No source patch is needed before rebuilding.
@@ -57,7 +57,7 @@ holds the faulty pass.
 | `scripts/oneoff/fix_l7014_editions.mjs:29` | `MANIFEST` path constant | only if this one-off is ever re-run; it's a completed migration script, flag rather than silently update |
 | `src/lib/map/rasterSeries.ts:45` | `RASTER_SERIES[0].sheets` (**452**, hand-maintained) | **yes** — see "Sheet count" below |
 | `tests/series-rows.spec.ts:20,96` | mirrors the `452` literal and asserts the `'452 sheets'` label | **yes**, together with the above or the test fails |
-| `docs/architecture.md`, `docs/pipelines.md`, `docs/ROADMAP.md` (I3) | prose describing the *current, faulty* archive by name and by its seam/fit numbers | **yes** — becomes stale prose the moment the archive changes |
+| `docs/guides/architecture.md`, `docs/guides/pipelines.md`, `docs/ROADMAP.md` (I3) | prose describing the *current, faulty* archive by name and by its seam/fit numbers | **yes** — becomes stale prose the moment the archive changes |
 | `docs/paper/draft.md` §7.6, `docs/paper/blind-by-construction.tex`, `docs/paper/figures.md` §3.3 | explicitly frame `l7014-20260913` as **not yet rebuilt**, as a deliberate evidentiary point | **editorial decision, not a mechanical find-replace** — see hazard 8 |
 
 Not affected: `tests/layer-stack.spec.ts`, `tests/series-sheets.spec.ts`, `tests/ingest-cells.spec.ts`,
@@ -100,7 +100,7 @@ ls work/l7014/pdfs/*.pdf | wc -l        # expect 510
 test -e work/l7014/index.geojson && echo ok
 ```
 *Works if:* 510 and `ok`. If either fails, the symlinked source at `~/Work/Maps/l7014/` has
-moved and `fetch` (needs network, ~4 GB, ~2 hours per `docs/pipelines.md`) becomes necessary
+moved and `fetch` (needs network, ~4 GB, ~2 hours per `docs/guides/pipelines.md`) becomes necessary
 again — confirm before assuming it isn't.
 
 **3. Check free disk.**
@@ -134,11 +134,11 @@ is the single highest-value step in this whole checklist to get right.
 
 **6. Corrected warp — no `--no-datum-shift`.**
 ```bash
-time python3 scripts/l7014_mosaic.py warp --jobs 6 2>&1 | tee work/l7014/regen/warp-rebuild.log
+time python3 scripts/l7014/l7014_mosaic.py warp --jobs 6 2>&1 | tee work/l7014/regen/warp-rebuild.log
 ```
 *Before:* step 5 done; step 2 confirmed. *Measured basis:* the corrected pass took 13m39s in
 today's dry run under identical conditions (same machine, same `--jobs`, same already-local
-PDFs) — expect roughly that, not the ~2-hour figure in `docs/pipelines.md`, which is
+PDFs) — expect roughly that, not the ~2-hour figure in `docs/guides/pipelines.md`, which is
 dominated by a download this run doesn't need.
 *Works if:* the tally line reads `warp: nogeo=62, offcell=11, offgrid=1, ok=436` (today's
 dry-run numbers) or close to it — a materially different `ok` count means something about
@@ -147,7 +147,7 @@ lines.
 
 **7. Build the sheet manifest.**
 ```bash
-python3 scripts/l7014_mosaic.py manifest --key l7014-<newdate> 2>&1 | tee work/l7014/regen/manifest-rebuild.log
+python3 scripts/l7014/l7014_mosaic.py manifest --key l7014-<newdate> 2>&1 | tee work/l7014/regen/manifest-rebuild.log
 ```
 *Before:* step 6 ok. *Works if:* `manifest: 436 sheets -> work/l7014/build/l7014-<newdate>.geojson`
 (no `UNKNOWN`/`ASTRAY` lines; the phase already refuses to exit 0 if any sheet lands outside
@@ -155,7 +155,7 @@ Vietnam).
 
 **8. Fit gate — must pass.**
 ```bash
-python3 scripts/l7014_mosaic.py fit --key l7014-<newdate>
+python3 scripts/l7014/l7014_mosaic.py fit --key l7014-<newdate>
 echo "exit: $?"
 ```
 *Before:* step 7 with the same `--key`. *Works if:* exit code is **0** and the printed line
@@ -179,10 +179,10 @@ present, 627 cells). *Works if:* exit 0, no `FAIL` lines.
 
 **10. Build MBTiles + PMTiles.**
 ```bash
-time python3 scripts/l7014_mosaic.py tile --key l7014-<newdate> 2>&1 | tee work/l7014/regen/tile-rebuild.log
+time python3 scripts/l7014/l7014_mosaic.py tile --key l7014-<newdate> 2>&1 | tee work/l7014/regen/tile-rebuild.log
 ```
 *Before:* steps 6–9 all clean. *No local timing exists for this phase* — REGEN.md is explicit
-that `tile` was never run this cycle. Do not assume the ~2-hour `docs/pipelines.md` figure;
+that `tile` was never run this cycle. Do not assume the ~2-hour `docs/guides/pipelines.md` figure;
 that bundles the download. Budget disk for a transient `.mbtiles` plus the final `.pmtiles`
 on top of the 23 GB of COGs already on disk (WEBP quality 80, the default, produced roughly
 3 GB against 4.9 GB for the previously-shipped archive per the script's own comments — PNG
@@ -211,7 +211,7 @@ outline artifacts appeared around holes beyond the known WEBP cosmetic one.
 
 **12. 🔴🌐 Upload.**
 ```bash
-python3 scripts/l7014_mosaic.py upload --key l7014-<newdate>
+python3 scripts/l7014/l7014_mosaic.py upload --key l7014-<newdate>
 ```
 *Before:* steps 8, 9, 10, 11 all clean — per ROADMAP I3, "require `fit` and `geo_audit.mjs`
 before treating the new build as usable." *What it does:* `rclone copyto` the `.pmtiles` to
@@ -262,7 +262,7 @@ npm run deploy
 *Before:* step 14 clean, on a branch/commit the user wants in production. *This is the step
 that changes what real readers see* — everything before it is either local or an R2 object
 nothing yet references. Per `CLAUDE.md`: a blank page immediately after is edge propagation,
-not a bug; wait and hard-reload, or use the `curl` check in `docs/deploy.md`, before
+not a bug; wait and hard-reload, or use the `curl` check in `docs/guides/deploy.md`, before
 concluding something is wrong.
 
 **16. Post-deploy check.**
@@ -272,8 +272,8 @@ hand-georeferenced sheet (e.g. one of the 24) no longer shows the ~450 m jump.
 
 ### Phase E — close the loop on the record (not code; still part of "republish")
 
-**17. Update prose that names the old key or the old numbers.** `docs/architecture.md`,
-`docs/pipelines.md` (including its own `> The live archive l7014-20260913 is wrong…` callout),
+**17. Update prose that names the old key or the old numbers.** `docs/guides/architecture.md`,
+`docs/guides/pipelines.md` (including its own `> The live archive l7014-20260913 is wrong…` callout),
 and `docs/ROADMAP.md` (tick I3, or move it to done with the actual measured numbers — expect
 436 sheets / ~436 on-cell, not the dry run's 452/750-seam figures the paper currently cites).
 
@@ -329,5 +329,5 @@ the paper claims to have measured.
    and its test mirror deliberately; nothing will catch a stale count except the one test
    assertion in `tests/series-rows.spec.ts:96`.
 10. **`tile`/`upload` timing is a genuine unknown**, not merely an estimate — they've never
-    been run. Don't schedule around the ~2-hour figure in `docs/pipelines.md`; that includes
+    been run. Don't schedule around the ~2-hour figure in `docs/guides/pipelines.md`; that includes
     a download this rebuild skips. Time it and log it this time.

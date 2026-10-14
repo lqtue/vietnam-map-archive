@@ -4,7 +4,7 @@
  * Everything the archive knows about a spot: the maps that cover it, the OCR'd
  * labels and reviewed footprints near it, and any story point standing there.
  * The place-time index behind it is `context_at` (migration 066); design notes
- * in `docs/platform-design.md` §0.
+ * in `docs/plans/platform-design.md` §0.
  *
  * Public. Anonymous callers see published maps and approved stories only; that
  * gate lives in the RPC, because this route runs on the service client and

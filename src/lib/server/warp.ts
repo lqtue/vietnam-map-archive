@@ -1,7 +1,7 @@
 /**
  * warp.ts — pixel → geography, for the place-time index.
  *
- * Design: `docs/platform-design.md` §0. Pixel coordinates are the master; the
+ * Design: `docs/plans/platform-design.md` §0. Pixel coordinates are the master; the
  * `geom` columns are derived. This module is what the writers use to fill them,
  * and what the `warp` job uses to refill them after a re-georeference.
  *
