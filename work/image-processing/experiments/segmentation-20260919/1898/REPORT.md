@@ -30,7 +30,7 @@ IMG = ".tile_cache/ocr/full_c03b7f44a1d8d455c2b476d248651265.jpg"
 and took **pixels from `--image`** while taking scale, water points, furniture
 mask and OCR labels from `--map-id`. So `--map-id <anything>` without `--image`
 rendered **1882 pixels** labelled as the other map, silently. That is the exact
-failure class `docs/digitalize-guide.md` warns about — output that looks right
+failure class `docs/guides/digitalize-guide.md` warns about — output that looks right
 while the data underneath is wrong.
 
 *Fixed* by deleting the default: the sheet is now fetched by map id through

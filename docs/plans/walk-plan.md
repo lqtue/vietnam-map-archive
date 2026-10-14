@@ -4,7 +4,7 @@ Was "Time walk"; renamed 2026-09-22 because it and "Time machine" were indisting
 
 **Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `main` @ fbfbfc2e;
 HACW-rebuild `main` @ 2026-09-11 (`~/Downloads/Personal/test/HACW-rebuild`);
-`docs/search-plan.md` and `docs/platform-design.md` read 2026-09-12.
+`docs/plans/search-plan.md` and `docs/plans/platform-design.md` read 2026-09-12.
 
 Walk, in `docs/ROADMAP.md`. Search turns the raster corpus into searchable
 text and dated vector fabric; this is the surface a person **walks through** —
@@ -85,7 +85,7 @@ walk draws has to be warped server-side, once, into PMTiles.
    neatline, which is what keeps the legend and the paper edge out of the
    overlay.
 
-Its three named failure modes carry over unchanged and are in `docs/pipelines.md`:
+Its three named failure modes carry over unchanged and are in `docs/guides/pipelines.md`:
 a datum code silently defaulting to WGS84, alpha-less tiles painting holes black,
 and tiling past what the paper actually holds. Keep the `check` subcommand.
 

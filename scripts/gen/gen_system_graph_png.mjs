@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const browser = await chromium.launch();
 for (const name of ['system-graph', 'system-graph-technical']) {
-  const svg = readFileSync(`docs/${name}.svg`, 'utf8');
+  const svg = readFileSync(`docs/guides/${name}.svg`, 'utf8');
   const width = Number(/viewBox="0 0 (\d+)/.exec(svg)[1]);
   const page = await browser.newPage({
     colorScheme: 'light',
@@ -13,6 +13,6 @@ for (const name of ['system-graph', 'system-graph-technical']) {
     viewport: { width, height: 1200 },
   });
   await page.setContent(`<body style="margin:0">${svg}</body>`);
-  await page.locator('svg').screenshot({ path: `docs/${name}.png` });
+  await page.locator('svg').screenshot({ path: `docs/guides/${name}.png` });
 }
 await browser.close();

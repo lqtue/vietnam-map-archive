@@ -50,11 +50,11 @@ This pass did not stage or commit that work.
 `2026-09-22T08-08-00-262Z` and `2026-09-23T06-34-13-510Z`. Their named `gcp-roundtrip-rms`
 values are 6.61543 m and 15.1354 m. These are a different measure from similarity-fit RMSE.
 Rehashing the live 1882 mirror with the shared `describeAnnotation()` implementation gives
-`93c4487e621f83c9`, 8 GCPs and a 12102 × 8982 source. `evidence-chain-plan.md` now cites that
+`93c4487e621f83c9`, 8 GCPs and a 12102 × 8982 source. `plans/evidence-chain-plan.md` now cites that
 version instead of presenting the older `245d98f7f8d61572` as current. No upstream sync was run.
 The 604-row inventory shows that the version table is populated; it does not establish complete
 coverage of every Storage annotation or every writer. The four missing writers remain open in
-`knowledge-system-plan.md` §5 and ROADMAP `georef-versions`.
+`plans/knowledge-system-plan.md` §5 and ROADMAP `georef-versions`.
 
 Re-run against the currently served annotations:
 

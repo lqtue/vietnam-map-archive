@@ -684,5 +684,5 @@ puts most of its module-level ones — and every SQL `--` comment. A bare
 **Hand-drop the prose mentions.** The grep scope above returns four non-marker
 hits under `work/archive/cleanup/` (`TODO.md` and two dated audit notes, all gitignored scratch notes rather than comments on
 code). Widen the scope beyond it and you also pick up this file's own header,
-`CLAUDE.md`, `contracts/README.md:22` and `docs/search-plan.md:232` — all
+`CLAUDE.md`, `contracts/README.md:22` and `docs/plans/search-plan.md:232` — all
 cross-references to the convention, none of them markers.

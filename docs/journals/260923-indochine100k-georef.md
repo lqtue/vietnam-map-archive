@@ -1055,11 +1055,11 @@ The 2026-09-29 handoff's deferred next step: version 28 accepted eight sheets
 Dong-Hoi W, Dô-Son W) on resized contact-strip review alone — the method that
 this session's own boundary-trial batch showed can miss a wrong pin (Muong
 Phine W, Muong-Song-Khone E). Ran the narrow per-pixel profile check
-(`docs/lessons.md`'s "Verifying" entry) against all 32 sides (4 × 8) of those
+(`docs/guides/lessons.md`'s "Verifying" entry) against all 32 sides (4 × 8) of those
 eight sheets, read-only, no code or data changes.
 
 First two passes of the audit script were themselves wrong, in ways worth
-recording since they reproduce failure modes already in `docs/lessons.md`:
+recording since they reproduce failure modes already in `docs/guides/lessons.md`:
 
 - Averaging the per-pixel profile over the strip's **full along-axis span**
   (the whole `SPAN` fetch window, ~76% of the sheet's height/width) smeared
@@ -1179,7 +1179,7 @@ own answer moved the answer by the same ~12px again, each time, not
 converging — a real place-name label ("Ban Taphane") sits close enough to the
 true edge to be pulling the patch-fit around depending on the seed. Landing an
 unstable fit is exactly the "residual looks fine, verify the artefact anyway"
-trap `docs/lessons.md` already names; left held rather than guessed.
+trap `docs/guides/lessons.md` already names; left held rather than guessed.
 
 `DETECT_VERSION` stays 31, nothing written. Both leads are real and
 reproducible (scripts not preserved:
@@ -1602,7 +1602,7 @@ itself is right).
 Phan Rang (E) then held on two more things after the abnormal-span gate cleared:
 `rim offsets spread 15%` (its B side sits ~25px outside the ~170-175px family band other
 sides use, at 199.2px) and `axes disagree 2.2%`. Checked B with the per-pixel-profile
-method (`docs/lessons.md`, 2026-09-29 entry): uniformly blank paper (values 20-24) all the
+method (`docs/guides/lessons.md`, 2026-09-29 entry): uniformly blank paper (values 20-24) all the
 way from the family-band offset out to where the one real line rises and peaks — no
 second, competing line anywhere in between. Same "genuinely wider margin on this one
 side" case as Muong-Tè (E)/Ha-Lang (W)/Quan-Ba (E), not a double-frame pick. Added to
@@ -1641,7 +1641,7 @@ the margin the way Phan Rang had. Converting the kilometric northing to true lat
 needs the actual Bonne projection formula for this zone (`Mo:115°G_Lo:19°G` origin,
 printed on the sheet) — not implemented anywhere in this script, and not something to
 derive and trust without real verification; a wrong projection assumption here would
-produce exactly the "looks right, quietly isn't" failure `docs/lessons.md` warns against.
+produce exactly the "looks right, quietly isn't" failure `docs/guides/lessons.md` warns against.
 
 Presented the choice to the user (leave held / attempt the projection math / move on to
 publishing) — **chose to leave Cao-Bang held for now**, not worth the risk for a rushed
@@ -1831,7 +1831,7 @@ in a low-value gap, and B similarly; reverted to held rather than guessed at the
 
 Re-ran `detect()` clean (no overrides) first: it now fits both sides confidently — R offset
 149.9px (residual 3.9px, 24/24), B offset 216.8px (residual 3.5px, 24/24). Confident numbers
-aren't the same as correct ones (`docs/lessons.md`, 2026-09-29), so checked what's actually
+aren't the same as correct ones (`docs/guides/lessons.md`, 2026-09-29), so checked what's actually
 printed at each landed pixel with a native darkness scan rather than trusting the residual.
 
 **Both sides land in a genuinely quiet gap**, same failure as the note flagged: R's pick

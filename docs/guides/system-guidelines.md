@@ -4,7 +4,7 @@ Canonical reference for code organisation, page structure, and component pattern
 and components follow these rules; deviations need a comment saying why.
 
 Companion docs: `db-guidelines.md` (schema), `design-system.md` (tokens + CSS), `admin-tooling.md`,
-`pipelines.md`, `theory.md` (the intellectual framing), `archive/cleanup-2026-08.md` (what the Aug-2026
+`pipelines.md`, `plans/theory.md` (the intellectual framing), `archive/cleanup-2026-08.md` (what the Aug-2026
 restructure changed).
 
 ---
@@ -24,7 +24,7 @@ with knowledge → serve to users and researchers.
 ```
 
 Layers 1, 2, 4 and 6 are built. Layer 3 and 5 are aspirations — no schema and no code. See
-`docs/theory.md` for the underlying data-stack model and `docs/strategy.md` for what is funded or
+`docs/plans/theory.md` for the underlying data-stack model and `docs/plans/strategy.md` for what is funded or
 planned.
 
 ---
@@ -294,7 +294,7 @@ from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Data
 supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
 ```
 
-It is current against migration head 116 (`docs/conventions.md` §Supabase types keeps the date). Insert/Update payloads use `?:` optional fields, not
+It is current against migration head 116 (`docs/guides/conventions.md` §Supabase types keeps the date). Insert/Update payloads use `?:` optional fields, not
 `Partial<{...}>` (which resolves as `never`).
 
 ---
@@ -303,7 +303,7 @@ It is current against migration head 116 (`docs/conventions.md` §Supabase types
 
 Everything shared lives in `src/styles/`, reached via the `$styles` alias. `global.css` imports
 `tokens.css` plus the always-on component sheets; layout and page sheets are imported by whoever
-needs them. The full file map and the token list are in `docs/design-system.md`.
+needs them. The full file map and the token list are in `docs/guides/design-system.md`.
 
 **Token rule.** Never hardcode a colour, border or shadow in a component `<style>` block. Component
 CSS carries layout and positioning; everything visual goes through `var(--token)`.

@@ -2,7 +2,7 @@
 
 This is the engineering plan for the evidence-backed research pages discussed in
 September 2026. The open-work entry is `evidence-chain` in `docs/ROADMAP.md`
-(§Evidence and legibility). `docs/search-plan.md` remains the plan for finding
+(§Evidence and legibility). `docs/plans/search-plan.md` remains the plan for finding
 labels, shapes, and period texts; this plan describes how to cite, connect,
 review, and reuse their results.
 
@@ -154,7 +154,7 @@ one Allmaps serves, and the rights wording is the provider's own.
 
 ### 2. Claims, cited evidence, and one subject
 
-One migration, following `docs/db-guidelines.md`: `subjects`, `claims`,
+One migration, following `docs/guides/db-guidelines.md`: `subjects`, `claims`,
 `claim_evidence` (invariant 4). RLS copies `map_images_select_visible_parent`:
 a claim or its evidence is readable anonymously only when every cited map is
 public. Create one reviewed subject for the selected feature and link its
@@ -283,4 +283,4 @@ after step 4's exit passes.
 
 - [ ] Export JSON (+ CSV/GeoJSON) with every field listed in step 4.
 - [ ] Freeze it; prove an OCR correction afterwards leaves it unchanged.
-- [ ] `docs/testing.md` entries and the test count in `CLAUDE.md`.
+- [ ] `docs/guides/testing.md` entries and the test count in `CLAUDE.md`.

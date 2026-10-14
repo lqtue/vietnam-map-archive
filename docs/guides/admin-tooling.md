@@ -159,7 +159,7 @@ The version lives in the **image service id** rather than a query parameter or a
 because that is the only thing a IIIF client takes tile URLs from: it derives every one of them
 from `info.json`'s `id`. Change anything else and the client goes on constructing the old keys.
 Same discipline as `basemap/vietnam-20260906.pmtiles` and `overlay/l7014-<date>.pmtiles`, and what
-`docs/platform-design.md` means by "derived is disposable, immutable, content-addressed, no
+`docs/plans/platform-design.md` means by "derived is disposable, immutable, content-addressed, no
 `latest`".
 
 **The upload is inert until the database moves.** `tile_map.sh` writes nothing to Supabase — on
@@ -187,7 +187,7 @@ behind a miss is a property of the map, not of a render, and every version wants
 is also never revisited when `is_primary` changes** — confirmed corpus-wide 2026-09-23: all 39
 R2-primary maps still hold their original tiling-time origin in `sources/<uuid>`, so `is_primary`
 flipping to `r2` in Supabase does not stop a request the pre-tiled derivative set can't answer from
-proxying to archive.org/Gallica/ContentDM/humazur. See `docs/lessons.md`.
+proxying to archive.org/Gallica/ContentDM/humazur. See `docs/guides/lessons.md`.
 
 ### Why pre-tiled
 

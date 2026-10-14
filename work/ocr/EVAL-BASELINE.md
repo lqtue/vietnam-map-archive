@@ -7,7 +7,7 @@ Regenerate: `eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --run-id 
 
 > **The baseline below predates the prompt-plumbing fix of 2026-09-08.** Every run in this
 > file was measured while `extract_labels_sequence()` was sending its own hardcoded "1882
-> Saigon cadastral map" prompt instead of `PROMPTS["v8"]` (see `docs/pipelines.md`). The
+> Saigon cadastral map" prompt instead of `PROMPTS["v8"]` (see `docs/guides/pipelines.md`). The
 > numbers stand as the gate — the harness is unchanged — but they are *not* a measurement
 > of v8. The first post-fix run has to be eval'd against them before anything else in the
 > call is touched, and `char_acc` is the column to watch: the fix targets diacritics, which
@@ -52,7 +52,7 @@ Regenerate: `eval.py ocr --map-id 0e02b9d9-9d40-4cca-8e41-8c8373d54d3b --run-id 
 ## Prompt plumbing fix: v8 on the row-sequence path — REJECTED as the default (2026-09-08)
 
 `ed92e484` made the row-sequence call send the prompt the run selected instead of a
-hardcoded fallback (see `docs/pipelines.md`). Correct as plumbing. But the prompt it now
+hardcoded fallback (see `docs/guides/pipelines.md`). Correct as plumbing. But the prompt it now
 delivers — `PROMPTS["v8"] + sequence_frame_rules(n)` — scores worse than the fallback it
 replaced, on the same sheet, same model (`gemini-3-flash-preview`), same tiling
 (2400/300/1024, 30 tiles, 10 row calls), one variable.
@@ -485,7 +485,7 @@ character comparison where `Đại Lộ Lê Lợi` / `Đại Lộ Lê Lai` do no
 street names are two or three short syllables that differ in one, and the generic
 is most of the string. 85 GT labels on one French sheet is the wrong instrument
 for a corpus that is mostly Vietnamese. See *Getting more out of OCR* in
-`docs/pipelines.md` for the cheap fix: a sheet's own printed street index is 384
+`docs/guides/pipelines.md` for the cheap fix: a sheet's own printed street index is 384
 name→cell-range pairs of free ground truth, and needs no human labelling.
 
 **And that instrument now exists**: `eval.py index-agreement`. Scored against the

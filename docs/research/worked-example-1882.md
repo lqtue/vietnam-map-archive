@@ -3,8 +3,8 @@
 A record of taking a single map from scan to exported geometry, with the number
 each stage actually produced. Written 2026-09-16 against production.
 
-Its purpose is not to describe the pipeline — `docs/pipelines.md` and
-`docs/digitalize-guide.md` do that. It is to say what happens when you run the
+Its purpose is not to describe the pipeline — `docs/guides/pipelines.md` and
+`docs/guides/digitalize-guide.md` do that. It is to say what happens when you run the
 whole thing on one sheet, because until this week **no sheet had ever been
 through all of it**, and four of the stages had never completed once.
 
@@ -272,7 +272,7 @@ collection since it was written.
 
 Every defect found while running this chain returned **plausible output while
 dropping data**, or refused work while looking like something else. That is the
-habit `docs/digitalize-guide.md` already names, and it held again four times.
+habit `docs/guides/digitalize-guide.md` already names, and it held again four times.
 
 **1. The newest run is not the reviewed run.** `join_labels.py` pins the most
 recent OCR run when it is not told which to use. On this sheet that is

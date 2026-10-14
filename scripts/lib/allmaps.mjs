@@ -4,7 +4,7 @@
  * VMA storage is the master. A sheet is POSTed once and PATCHed after that (a second
  * POST creates a duplicate map on the same image), and what Allmaps holds is never
  * pulled back for a script-made sheet; `scripts/allmaps_drift.mjs` only reports a
- * difference. Facts from the 1971 pilot (docs/pipelines.md): `@context` must be the
+ * difference. Facts from the 1971 pilot (docs/guides/pipelines.md): `@context` must be the
  * single string below (an array 500s), and the read-back at
  * `annotations.allmaps.org/maps/<id>` is a W3C annotation, not a Georeferenced Map.
  */

@@ -16,7 +16,7 @@ follow the docs: 14 + 12 + 27 + 3 + 16 = 72, plus 9 for keeping it running, whic
 ## Engineer view
 
 `system-graph-technical.png` (and `.svg`) shows the plan's eight layers unfolded, as in
-`docs/knowledge-system-plan.md` §9, with the tools, research files and git branches in each row.
+`docs/plans/knowledge-system-plan.md` §9, with the tools, research files and git branches in each row.
 
 - **Containment is the link.** A tool or research strand sits in the row of the layer it acts on.
   The diagram placement was inferred from names and locations (2026-10-01).
@@ -37,8 +37,8 @@ stretch, names read, names matched across years — from facts `layers.json` alr
 ## Regenerating
 
 ```
-python3 scripts/gen/gen_system_graph.py            # plain view     -> docs/system-graph.svg
-python3 scripts/gen/gen_system_graph_technical.py  # engineer view  -> docs/system-graph-technical.svg
+python3 scripts/gen/gen_system_graph.py            # plain view     -> docs/guides/system-graph.svg
+python3 scripts/gen/gen_system_graph_technical.py  # engineer view  -> docs/guides/system-graph-technical.svg
 node scripts/gen/gen_system_graph_png.mjs          # both           -> .png, 2x, light theme
 ```
 

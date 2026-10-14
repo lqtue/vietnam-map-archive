@@ -1,6 +1,6 @@
 -- Migration 066 — the place-time index
 --
--- Design: docs/platform-design.md §0. Until now every map-derived row lived in
+-- Design: docs/plans/platform-design.md §0. Until now every map-derived row lived in
 -- source-image pixel space and was warped to lng/lat in TypeScript, per
 -- request, so "what was here in 1923" could not be one query. This adds the
 -- derived geometry that makes it one.

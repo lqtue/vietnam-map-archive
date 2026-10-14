@@ -31,7 +31,7 @@ it could have caught the mistake. Three kinds of check look like confirmation an
   sources that do not share an origin.
 
 So VMA records, for each fact, who or what checked it, what exactly they judged, and whether that
-check was independent of what it checked. The plan for this is `docs/digest-pipeline-plan.md`.
+check was independent of what it checked. The plan for this is `docs/plans/digest-pipeline-plan.md`.
 
 ---
 

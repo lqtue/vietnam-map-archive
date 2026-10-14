@@ -38,10 +38,10 @@ Layer `holdings`. Map identity, scans, tiles and addresses.
 
 | Folder | What it is | Read first |
 | --- | --- | --- |
-| [docs/digitalize-guide.md](digitalize-guide.md) | Sheet preparation guide | this file |
-| [docs/admin-tooling.md](admin-tooling.md) | Catalog and holdings operations | this file |
-| [supabase](../supabase/) | Database schema, migrations and the local test stack | [CLAUDE.md](../supabase/CLAUDE.md), [docs/db-guidelines.md](db-guidelines.md) |
-| [work/analysis/catalog](../work/analysis/catalog/) | Map-type audit data from 2026-10-06 | [docs/catalog-map-type-audit.md](catalog-map-type-audit.md) |
+| [docs/guides/digitalize-guide.md](guides/digitalize-guide.md) | Sheet preparation guide | this file |
+| [docs/guides/admin-tooling.md](guides/admin-tooling.md) | Catalog and holdings operations | this file |
+| [supabase](../supabase/) | Database schema, migrations and the local test stack | [CLAUDE.md](../supabase/CLAUDE.md), [docs/guides/db-guidelines.md](guides/db-guidelines.md) |
+| [work/analysis/catalog](../work/analysis/catalog/) | Map-type audit data from 2026-10-06 | [docs/plans/catalog-map-type-audit.md](plans/catalog-map-type-audit.md) |
 | [work/analysis/l7014](../work/analysis/l7014/) | L7014 cell and map inventory from read-only database reads | [README.md](../work/analysis/l7014/README.md) |
 
 ## 2. Placement
@@ -56,7 +56,7 @@ Layer `placement`. Georeferences, GCPs, transformations, masks and fit.
 | [work/analysis/saigon6](../work/analysis/saigon6/) | Saigon control-point picker | [work/analysis/README.md](../work/analysis/README.md) |
 | [work/analysis/georef_coverage.md](../work/analysis/georef_coverage.md) | Dated georeference coverage measurements | this file |
 | [docs/journals/260930-series-georef-review-loop.md](journals/260930-series-georef-review-loop.md) | Placement review procedure | this file |
-| [work/vn1971](../work/vn1971/) | 1971 provincial maps: grid georeferences and Allmaps annotations | [docs/pipelines.md](pipelines.md) |
+| [work/vn1971](../work/vn1971/) | 1971 provincial maps: grid georeferences and Allmaps annotations | [docs/guides/pipelines.md](guides/pipelines.md) |
 | [work/l909](../work/l909/) | L909 city index, ingested scans and annotations | [README.md](../work/l909/README.md) |
 
 ## 3. Readings
@@ -70,14 +70,14 @@ Layer `readings`. OCR labels, polygons, legends and layout regions with run prov
 | [work/MapSAM2](../work/MapSAM2/) | Learned segmentation code | [VMA_SETUP.md](../work/MapSAM2/VMA_SETUP.md) |
 | [work/image-processing/experiments/river-1882](../work/image-processing/experiments/river-1882/) | 1882 river experiment | [README.md](../work/image-processing/experiments/river-1882/README.md) |
 | [work/image-processing/experiments/river-1882-1898](../work/image-processing/experiments/river-1882-1898/) | Paired river experiment | [README.md](../work/image-processing/experiments/river-1882-1898/README.md) |
-| [work/image-processing/experiments/segmentation-20260919](../work/image-processing/experiments/segmentation-20260919/) | Dated segmentation review pack; prose retained in repository | [docs/image-processing-1882-plan.md](image-processing-1882-plan.md) |
+| [work/image-processing/experiments/segmentation-20260919](../work/image-processing/experiments/segmentation-20260919/) | Dated segmentation review pack; prose retained in repository | [docs/plans/image-processing-1882-plan.md](plans/image-processing-1882-plan.md) |
 | [work/image-processing/experiments/modern-overlays](../work/image-processing/experiments/modern-overlays/) | Modern overlay tools with local derived outputs | [README.md](../work/image-processing/experiments/modern-overlays/README.md) |
 | [work/image-processing/experiments/river-reference](../work/image-processing/experiments/river-reference/) | Blind windows, owner point labels, traces and reference tools; local crops | [README.md](../work/image-processing/experiments/river-reference/README.md) |
 | [work/image-processing/results](../work/image-processing/results/) *(local)* | Generated OCR, layout, polygon and reference outputs | [work/image-processing/README.md](../work/image-processing/README.md) |
 | [work/ocr/EVAL-BASELINE.md](../work/ocr/EVAL-BASELINE.md) | Recorded OCR and segmentation quality gate | this file |
 | [docs/research/image-processing-record.md](research/image-processing-record.md) | Processing methods and recorded measurements | this file |
 | [docs/research/river-reconstruction.md](research/river-reconstruction.md) | Exploratory river reconstruction record | this file |
-| [work/review-kit](../work/review-kit/) | Review page and record writers for reading checks | [docs/digest-pipeline-plan.md](digest-pipeline-plan.md) |
+| [work/review-kit](../work/review-kit/) | Review page and record writers for reading checks | [docs/plans/digest-pipeline-plan.md](plans/digest-pipeline-plan.md) |
 | [work/image-processing/experiments/osm-warp](../work/image-processing/experiments/osm-warp/) | OSM warp evidence for the 1882/1898 colour study | [README.md](../work/image-processing/experiments/osm-warp/README.md) |
 
 ## 4. Entities and vocabularies
@@ -88,7 +88,7 @@ Layer `entities`. Place-name groups, attested names and classification terms.
 | --- | --- | --- |
 | [work/research/doling](../work/research/doling/) | Source-derived street-name pairs and provenance | [SOURCE.md](../work/research/doling/SOURCE.md) |
 | [work/image-processing/experiments/place-links](../work/image-processing/experiments/place-links/) | Machine-proposed 1882 label-to-today place links, confirmed by a person | [README.md](../work/image-processing/experiments/place-links/README.md) |
-| [work/image-processing/experiments/then-now](../work/image-processing/experiments/then-now/) | Review page where the owner judges 1882 then-now block differences | [docs/digest-pipeline-plan.md](digest-pipeline-plan.md) |
+| [work/image-processing/experiments/then-now](../work/image-processing/experiments/then-now/) | Review page where the owner judges 1882 then-now block differences | [docs/plans/digest-pipeline-plan.md](plans/digest-pipeline-plan.md) |
 
 ## 5. Assertions and studies
 
@@ -103,7 +103,7 @@ Layer `studies`. Claims, cited evidence and study figures.
 | [docs/research/field-comparison.md](research/field-comparison.md) | Comparison with external methods | this file |
 | [docs/research/worked-example-1882.md](research/worked-example-1882.md) | Dated one-sheet case study | this file |
 | [docs/journals](journals/) | Dated evidence and handoffs across layers | [README.md](journals/README.md) |
-| [docs/evidence-chain-plan.md](evidence-chain-plan.md) | Cross-layer identity and evidence plan | this file |
+| [docs/plans/evidence-chain-plan.md](plans/evidence-chain-plan.md) | Cross-layer identity and evidence plan | this file |
 
 ## Surfaces
 
@@ -113,12 +113,12 @@ Layer `surfaces`. Pages and apps that read the model.
 | --- | --- | --- |
 | [work/proto](../work/proto/) | Viewer prototypes | [work/README.md](../work/README.md) |
 | [work/copy](../work/copy/) | Copy and translations | [work/README.md](../work/README.md) |
-| [docs/user-guide.md](user-guide.md) | Reader and contributor guide | this file |
-| [docs/design-system.md](design-system.md) | Product visual language | this file |
-| [docs/search-plan.md](search-plan.md) | Search plan | this file |
-| [docs/walk-plan.md](walk-plan.md) | Walk plan | this file |
+| [docs/guides/user-guide.md](guides/user-guide.md) | Reader and contributor guide | this file |
+| [docs/guides/design-system.md](guides/design-system.md) | Product visual language | this file |
+| [docs/plans/search-plan.md](plans/search-plan.md) | Search plan | this file |
+| [docs/plans/walk-plan.md](plans/walk-plan.md) | Walk plan | this file |
 | [src](../src/) | SvelteKit app: routes, map runtime, data access, components | [lib/CLAUDE.md](../src/lib/CLAUDE.md), [routes/CLAUDE.md](../src/routes/CLAUDE.md) |
-| [static](../static/) | Fonts, icons and images the app serves | [docs/design-system.md](design-system.md) |
+| [static](../static/) | Fonts, icons and images the app serves | [docs/guides/design-system.md](guides/design-system.md) |
 
 ## Outside the model
 
@@ -129,25 +129,25 @@ Layer `operations`. Operations, CI and shared engineering guidance.
 | [work/worker](../work/worker/) | Pipeline orchestration across layers | [work/CLAUDE.md](../work/CLAUDE.md) |
 | [work/image-processing/build_catalog.py](../work/image-processing/build_catalog.py) | Local result navigation | this file |
 | [work/image-processing/logs](../work/image-processing/logs/) *(local)* | Execution transcripts | [work/image-processing/README.md](../work/image-processing/README.md) |
-| [docs/architecture.md](architecture.md) | Map runtime reference | this file |
-| [docs/api.md](api.md) | Server API reference | this file |
-| [docs/conventions.md](conventions.md) | Implementation conventions | this file |
-| [docs/db-guidelines.md](db-guidelines.md) | Database rules | this file |
-| [docs/deploy.md](deploy.md) | Deployment guidance | this file |
-| [docs/lessons.md](lessons.md) | Operational and measurement lessons | this file |
-| [docs/pipelines.md](pipelines.md) | Commands spanning layers | this file |
-| [docs/system-guidelines.md](system-guidelines.md) | Code organization | this file |
-| [docs/testing.md](testing.md) | Verification inventory | this file |
+| [docs/guides/architecture.md](guides/architecture.md) | Map runtime reference | this file |
+| [docs/guides/api.md](guides/api.md) | Server API reference | this file |
+| [docs/guides/conventions.md](guides/conventions.md) | Implementation conventions | this file |
+| [docs/guides/db-guidelines.md](guides/db-guidelines.md) | Database rules | this file |
+| [docs/guides/deploy.md](guides/deploy.md) | Deployment guidance | this file |
+| [docs/guides/lessons.md](guides/lessons.md) | Operational and measurement lessons | this file |
+| [docs/guides/pipelines.md](guides/pipelines.md) | Commands spanning layers | this file |
+| [docs/guides/system-guidelines.md](guides/system-guidelines.md) | Code organization | this file |
+| [docs/guides/testing.md](guides/testing.md) | Verification inventory | this file |
 | [docs/ponytail-debt.md](ponytail-debt.md) | Deliberate shortcuts | this file |
-| [docs/strategy.md](strategy.md) | Product strategy | this file |
-| [docs/theory.md](theory.md) | Intellectual framework | this file |
-| [docs/platform-design.md](platform-design.md) | Platform proposal | this file |
+| [docs/plans/strategy.md](plans/strategy.md) | Product strategy | this file |
+| [docs/plans/theory.md](plans/theory.md) | Intellectual framework | this file |
+| [docs/plans/platform-design.md](plans/platform-design.md) | Platform proposal | this file |
 | `work/archive/vectorize` *(local)* | Retired colour-profile previews retained as evidence | [work/archive/README.md](../work/archive/README.md) |
-| [scripts](../scripts/) | Commands that act on the live system: ingest, enqueue, audit, georeference writes, layout check | [docs/pipelines.md](pipelines.md), [docs/admin-tooling.md](admin-tooling.md) |
+| [scripts](../scripts/) | Commands that act on the live system: ingest, enqueue, audit, georeference writes, layout check | [docs/guides/pipelines.md](guides/pipelines.md), [docs/guides/admin-tooling.md](guides/admin-tooling.md) |
 | [work/core](../work/core/) | Shared Python package (vma_core) for the OCR, segmentation and worker pipelines | [README.md](../work/core/README.md) |
-| [tests](../tests/) | Playwright checks: read-only, plus write-path tests on a local stack | [docs/testing.md](testing.md) |
+| [tests](../tests/) | Playwright checks: read-only, plus write-path tests on a local stack | [docs/guides/testing.md](guides/testing.md) |
 | [contracts](../contracts/) | JSON Schemas for output shapes shared with other apps | [README.md](../contracts/README.md) |
-| [worker](../worker/) | Cloudflare Worker that proxies IIIF tile requests to R2 | [docs/admin-tooling.md](admin-tooling.md) |
+| [worker](../worker/) | Cloudflare Worker that proxies IIIF tile requests to R2 | [docs/guides/admin-tooling.md](guides/admin-tooling.md) |
 | [.github](../.github/) | Pull request checks: app, write tests, Python, worker, layout | [workflows/ci.yml](../.github/workflows/ci.yml) |
 
 ## Frozen

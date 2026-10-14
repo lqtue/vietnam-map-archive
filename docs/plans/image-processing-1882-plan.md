@@ -20,7 +20,7 @@ otherwise have to rediscover.
 
 ### The project in one paragraph
 Vietnam Map Archive (VMA): a SvelteKit app over georeferenced historical maps of Saigon. Read `/CLAUDE.md`,
-`work/CLAUDE.md` and `docs/lessons.md` first. Polygons live in the Supabase `footprints` table
+`work/CLAUDE.md` and `docs/guides/lessons.md` first. Polygons live in the Supabase `footprints` table
 (`pixel_polygon` = outer ring in source pixels; `feature_type` ∈ building, land_plot, road, waterway, green_space,
 water_body, other; `source` ∈ volunteer, sam-auto, sam-corrected, import; `review_status`; `run_id`; `geom` filled by
 the `warp` job, migration 066). Only `approved` rows reach `/explore` (`/api/export/footprints`). OCR labels join to
@@ -105,7 +105,7 @@ The checkout details below record the plan’s starting point, rather than the c
   - Keep `docs/private/` out of everything.
   - The HCMC modern layers' licence is unresolved, so their outputs stay local.
 - **Docs:**
-  - Close a ROADMAP item by moving it out and mirror it in `docs/knowledge-system-plan.md` §9 in the same commit.
+  - Close a ROADMAP item by moving it out and mirror it in `docs/plans/knowledge-system-plan.md` §9 in the same commit.
   - Add a journal row to `docs/journals/README.md`.
 - **Owner preferences:**
   - Short answers.
@@ -143,7 +143,7 @@ The checkout details below record the plan’s starting point, rather than the c
    - `work/tmp/`
 6. **Remove the compatibility symlinks** (`ocr/outputs`, `ocr/logs`, `analysis/*`, `work/vectorize`) once grep finds no live reference. Then remove the worktree.
 7. **Fix the docs** (text, not only paths):
-   - **`docs/pipelines.md`:** its Files table (around lines 566-582) lists only `modern_prior` of the image scripts. Add `colour_blocks`, `sheet_features`, `river_pass`, `road_pass` and `mask_to_footprints` at their new paths.
+   - **`docs/guides/pipelines.md`:** its Files table (around lines 566-582) lists only `modern_prior` of the image scripts. Add `colour_blocks`, `sheet_features`, `river_pass`, `road_pass` and `mask_to_footprints` at their new paths.
    - **`docs/ponytail-debt.md`:** the headings around lines 368-453 point at `work/ocr/scripts/{name_masks,colour_blocks,seg_eval,modern_prior}.py`.
    - **`work/README.md`, `work/CLAUDE.md:4` and `work/image-processing/README.md`:** they say code stays in `ocr/` and describe the symlinks as permanent. Rewrite both claims.
    - **`docs/research/image-processing-record.md`:** paths, plus line ~189 ("finish the scoped 4420 window"), which Phase 2 replaces.

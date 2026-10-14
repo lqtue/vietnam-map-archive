@@ -540,7 +540,7 @@ reports `level0` and lists only sizes that resolve — but nothing about the add
 **2026-09-23: the 404 was fixed, but `fetch_crop` still tried the raw region URL first** — which,
 for every R2-primary map, no longer 404s but instead silently proxies to whatever origin
 (archive.org/Gallica/ContentDM/humazur) `worker/`'s frozen `sources/{mapId}` snapshot was written
-from at tiling time (see `docs/lessons.md`'s "a 'primary' flag is not what gets served"). So every
+from at tiling time (see `docs/guides/lessons.md`'s "a 'primary' flag is not what gets served"). So every
 crop still paid for a third-party fetch it didn't need. `fetch_crop` now checks `info.json` for a
 tile pyramid up front and tries `fetch_crop_level0` first when one exists — origin only stays first
 for a map with no pyramid yet. Verified across all 39 R2-primary maps: 39/39 succeeded, 0
@@ -648,7 +648,7 @@ including a null result, so nobody re-runs this experiment blind.
 
 These commands share `work/ocr/.venv` and import the IIIF, georeference, model and database
 helpers from `work/ocr/scripts/`. Their generated outputs use `work/image-processing/results/`.
-Follow `docs/image-processing-1882-plan.md` before running them: frozen masks and blind
+Follow `docs/plans/image-processing-1882-plan.md` before running them: frozen masks and blind
 windows are evidence, and a fresh execution does not establish approval.
 
 | File | Purpose |

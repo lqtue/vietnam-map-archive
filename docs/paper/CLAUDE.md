@@ -20,7 +20,7 @@ Loads when you open a file in `docs/paper/`. Repo-wide rules are in the root `CL
 `claim-audit.md` is the authoring record. A new or changed number gets a row with an evidence label:
 **A** reproduced now from the repo · **B** recorded run, not reproduced · **C** checked against a
 retrieved publication · **D** logical statement under stated inputs · **R** revise or remove.
-Read `docs/lessons.md` before any pass that produces a number.
+Read `docs/guides/lessons.md` before any pass that produces a number.
 
 ## Claim discipline (what reviewers have already pushed on)
 

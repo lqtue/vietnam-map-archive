@@ -1,7 +1,7 @@
 # supabase — schema, migrations, the local test stack
 
 Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each constraint:
-`docs/db-guidelines.md` §11.
+`docs/guides/db-guidelines.md` §11.
 
 ## The rules in one breath
 

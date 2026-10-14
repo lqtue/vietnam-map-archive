@@ -10,9 +10,9 @@ This document sits above three existing plans, and it does not repeat them:
 
 | Plan | Owns |
 |---|---|
-| `docs/evidence-chain-plan.md` | Identity and citation: the identity table, claims, `cited_value` snapshots, invariant 8 (naming the error measure) |
-| `docs/search-plan.md` | Finding things: label search, the temporal fabric, period sources |
-| `docs/platform-design.md` §0 | The place-time index: PostGIS geometry warped on write, `geom_src`/`geom_rmse` |
+| `docs/plans/evidence-chain-plan.md` | Identity and citation: the identity table, claims, `cited_value` snapshots, invariant 8 (naming the error measure) |
+| `docs/plans/search-plan.md` | Finding things: label search, the temporal fabric, period sources |
+| `docs/plans/platform-design.md` §0 | The place-time index: PostGIS geometry warped on write, `geom_src`/`geom_rmse` |
 
 This plan adds four things the others do not have:
 
@@ -29,7 +29,7 @@ until rollout and reviewed evidence are complete.
 *Update 2026-10-05:* `supabase migration list` shows 103 to 111 applied to production, so "pending" below
 is the state on 2026-10-01. Row counts of `maps` here are all rows, drafts included (859, of which 528
 published); the anon-visible published set on 2026-10-05 is 1,038 (`catalog-plan.md`). The figure of 274
-in `paper/` and `pipelines.md` is the same all-rows count on 2026-09-15 to 20, before the Indochine
+in `paper/` and `guides/pipelines.md` is the same all-rows count on 2026-09-15 to 20, before the Indochine
 1:100,000 (created 2026-09-21 to 23) and L7014 (2026-10-01 to 02) ingests, by `created_at`.
 
 *Service-role follow-up, 2026-10-05 15:43 UTC:* 1,499 maps across all statuses (1,033 public,
@@ -226,7 +226,7 @@ Each gap is named for its subject. "Owner" points at the plan that already holds
    **Exit:** every label's and polygon's `geom_src` matches its map's current version. Update the
    pinned value in `evidence-chain-plan.md` step 1 at the same time.
 3. **`mask-names`: one name for each of the three masks** (§2c). Record the names in
-   `docs/conventions.md`. Decide whether the neatline editor should keep writing the georef mask.
+   `docs/guides/conventions.md`. Decide whether the neatline editor should keep writing the georef mask.
    **Exit:** no code comment or document uses a bare "mask" for more than one of the three.
 4. **`series-identity`: make the series an explicit key, not a side effect of the display string.**
    Smallest step: a generated `maps.series_key` column, with `collection` treated as the display
@@ -260,7 +260,7 @@ not exist yet.
   foreign keys in Postgres, the same position as `evidence-chain-plan.md`.
 - **Gaps 1–3 are cheap and fix things that are wrong today.** Gaps 4–5 change how the data is
   shaped; do them after the `evidence-chain` pilot shows which axes its queries actually use.
-- Each new table follows `docs/db-guidelines.md` and copies the
+- Each new table follows `docs/guides/db-guidelines.md` and copies the
   `map_images_select_visible_parent` RLS shape, so a draft map's derived rows stay private.
 
 ## 7. Recommendation: three groupings, three names
@@ -368,10 +368,10 @@ engineering layers, which are an order of work and not reader language. Anything
 is never an item on a public page.
 
 **The blog inherits the evidence rule, not the layers.** A post is a layer-5 surface, so it follows
-`docs/evidence-chain-plan.md`: each factual claim cites an object (a map slug, a `georef_versions`
-stamp, an OCR run) instead of resting on a screenshot. It uses the tokens in `docs/design-system.md`
+`docs/plans/evidence-chain-plan.md`: each factual claim cites an object (a map slug, a `georef_versions`
+stamp, an OCR run) instead of resting on a screenshot. It uses the tokens in `docs/guides/design-system.md`
 and no separate blog theme.
 
 **Is it necessary?** No. The product works without it. It is worth doing once a post or release
-needs to claim "this rests on that work", which is what `docs/strategy.md` asks the public pages to
+needs to claim "this rests on that work", which is what `docs/plans/strategy.md` asks the public pages to
 show.

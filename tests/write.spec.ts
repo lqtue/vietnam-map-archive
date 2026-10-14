@@ -1533,7 +1533,7 @@ test('/api/context returns legend points for a public map, hides a draft, and ke
 
 test('the published contracts match what the API actually returns', async () => {
   // contracts/ is the written definition consumers outside this repo rely on
-  // (docs/platform-design.md §3). This is the executable half: if a field
+  // (docs/plans/platform-design.md §3). This is the executable half: if a field
   // changes shape, it fails here rather than in someone else's app.
   const runId = `write-smoke-contract-${Date.now()}`;
   created.runIds.push(runId);

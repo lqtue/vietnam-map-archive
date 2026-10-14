@@ -161,7 +161,7 @@ matches catalogue geometry and is not independent accuracy evidence.
 
 ## Operational constraints
 
-Read `docs/lessons.md` before a pass producing numbers and `work/CLAUDE.md` before
+Read `docs/guides/lessons.md` before a pass producing numbers and `work/CLAUDE.md` before
 editing under work. Crops, cache, and per-map JSON under `work/indochine-100k/`
 are intentionally untracked. Preserve them. `place()` regenerates local JSON;
 persistent exclusions must live in `CALIBRATION_HOLDS`.

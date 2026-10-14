@@ -76,7 +76,7 @@ Measured georeference error for all six sheets, added 2026-09-19:
 **The 1959 row above is stale as of 2026-09-10.** It is what `collection_aoi.mjs`
 measured on 2026-09-04, against the 5,000×3790 scan. The scan the OCR pipeline
 reads today is 14,000×10,773 — nearly three times the pixel width, the same
-city at 0.999 m/px rather than 2.80 (`docs/pipelines.md`'s 2026-09-10 note;
+city at 0.999 m/px rather than 2.80 (`docs/guides/pipelines.md`'s 2026-09-10 note;
 `scale.py`'s self-check fits `(0.999, 14000, 10773)` for this sheet, and
 `tests/mpp-parity.spec.ts` pins that GCP-fit estimator against
 `collection_aoi.mjs`'s own to 0.24% agreement). Nobody has re-run
@@ -143,7 +143,7 @@ ceiling.
 
 † **Superseded, 2026-09-10.** This whole row describes the 5,000×3790 scan
 `collection_aoi.mjs` measured on 2026-09-04. The OCR pipeline now reads a
-14,000×10,773 scan of the same sheet — `docs/pipelines.md`'s crop evidence
+14,000×10,773 scan of the same sheet — `docs/guides/pipelines.md`'s crop evidence
 (`work/image-processing/results/34d4edb2-*/runs/idx-20260910/run_config.json`, a
 `1148,775,11704,9221` crop, which alone puts the image at ≥12,852 px wide) and
 `scale.py`'s GCP fit (0.999 m/px, asserted in its self-check) agree, and

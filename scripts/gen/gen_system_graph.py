@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Render docs/system-graph.svg: the plain-language picture, for readers who are not engineers.
+"""Render docs/guides/system-graph.svg: the plain-language picture, for readers who are not engineers.
 
 Five steps a map goes through, each with why it matters, what is done, and what is open now. No
 code names. The engineer view (tools, branches, files) is gen_system_graph_technical.py.
-Open-task counts are parsed from docs/knowledge-system-plan.md §9; the prose is written here from
-CHANGELOG.md, the /changelog headlines and docs/knowledge-system-plan.md. Run:
+Open-task counts are parsed from docs/plans/knowledge-system-plan.md §9; the prose is written here from
+CHANGELOG.md, the /changelog headlines and docs/plans/knowledge-system-plan.md. Run:
 python3 scripts/gen/gen_system_graph.py
 """
 import re
@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# The five layers of docs/knowledge-system-plan.md §9 folded to what a visitor can follow, the same five
+# The five layers of docs/plans/knowledge-system-plan.md §9 folded to what a visitor can follow, the same five
 # the animation (work/proto/fabric/journey.html) uses. "Keep it running" stays apart: it is not a layer.
 # (group id, title, why it matters, technical name, done [(when, text)], doing [plain tasks])
 STEPS = [
@@ -61,7 +61,7 @@ STEPS = [
 GROWTH = [("Apr 2025", "one web page of scans"), ("Oct 2025", "rebuilt as a real application"), ("Feb 2026", "accounts, database, stories"),
           ("Apr 2026", "catalogue, tracing, first text reading"), ("Aug 2026", "automatic processing queue"), ("Sep 2026", "one site, names as addresses")]
 
-plan = (ROOT / "docs/knowledge-system-plan.md").read_text()
+plan = (ROOT / "docs/plans/knowledge-system-plan.md").read_text()
 rows = {}
 for line in plan.split("## 9.")[1].split("\n"):
     m = re.match(r"\| \*\*(\d\.|Surfaces|Outside)", line)
@@ -179,5 +179,5 @@ svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {H_TOTAL}
 <rect width="{WIDTH}" height="{H_TOTAL}" fill="var(--bg)"/>
 {"".join(o)}
 </svg>"""
-(ROOT / "docs/system-graph.svg").write_text(svg)
-print("wrote docs/system-graph.svg", counts)
+(ROOT / "docs/guides/system-graph.svg").write_text(svg)
+print("wrote docs/guides/system-graph.svg", counts)

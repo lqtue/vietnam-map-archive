@@ -15,7 +15,7 @@
 import { parseAnnotation } from '@allmaps/annotation';
 import { GcpTransformer } from '@allmaps/transform';
 
-/** Names the RMSE measure, per `evidence-chain-plan.md` invariant 8. */
+/** Names the RMSE measure, per `docs/plans/evidence-chain-plan.md` invariant 8. */
 export const RMSE_METHOD = 'gcp-roundtrip-rms';
 
 const EARTH_RADIUS_M = 6_371_008.8;

@@ -3,7 +3,7 @@
 Part of the **readings** layer — see [ATLAS](../../../docs/ATLAS.md).
 
 Reusable feature extraction, polygon cleanup, registration and review tools.
-[Workspace](../README.md) · [Pipeline commands](../../../docs/pipelines.md).
+[Workspace](../README.md) · [Pipeline commands](../../../docs/guides/pipelines.md).
 Run from the repository root with `work/ocr/.venv/bin/python`; the environment is shared
 with OCR. Commands that need OCR's IIIF, georeference, database or model helpers add
 `work/ocr/scripts/` to their import path. Those shared modules remain with OCR.
@@ -19,7 +19,7 @@ with OCR. Commands that need OCR's IIIF, georeference, database or model helpers
 
 Generated outputs use `work/image-processing/results/`. The reference window registry,
 owner labels, traces and blind-safe preview helper live in `experiments/river-reference/`.
-Follow the [1882 plan](../../../docs/image-processing-1882-plan.md) before running a pass:
+Follow the [1882 plan](../../../docs/plans/image-processing-1882-plan.md) before running a pass:
 water v3 is frozen, road v3 is diagnostic, and held-out scoring must not be repeated.
 
-Consult `--help` and [lessons](../../../docs/lessons.md) before model calls or database writes.
+Consult `--help` and [lessons](../../../docs/guides/lessons.md) before model calls or database writes.

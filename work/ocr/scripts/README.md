@@ -1,6 +1,6 @@
 # OCR commands and shared helpers
 
-[OCR workspace](../README.md) · [Pipeline command reference](../../../docs/pipelines.md).
+[OCR workspace](../README.md) · [Pipeline command reference](../../../docs/guides/pipelines.md).
 Run commands from the repository root, using `work/ocr/.venv/bin/python` where dependencies require it.
 Consult each command's `--help` and the pipeline reference before running it.
 
@@ -21,4 +21,4 @@ relocated review-figure tool. `oneoff/` holds completed backfills, retained as r
 it is not a queue of commands to rerun.
 
 Some commands call models or write through the pipeline API/database. Check their flags and the
-[lessons](../../../docs/lessons.md) before an unattended run or database write.
+[lessons](../../../docs/guides/lessons.md) before an unattended run or database write.

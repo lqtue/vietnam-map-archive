@@ -28,10 +28,10 @@ that proposes and a person who decides, and **measuring** how often each link is
 costs to check. A check counts only if it could have caught the mistake: a machine test that shares
 the error, a reviewer who only agrees with the machine, or a second map copied from the first all
 look like confirmation and are not. This matters more now that AI writes plausible history for
-free. The repo-side order of work is [`docs/NOW.md`](./NOW.md).
+free. The repo-side order of work is [`docs/NOW.md`](../NOW.md).
 
 **The frame.** The city as a six-layer data stack, built bottom-up, with political and economic
-context cutting across every layer. Full argument in [`docs/theory.md`](./theory.md) — not repeated
+context cutting across every layer. Full argument in [`docs/plans/theory.md`](theory.md) — not repeated
 here.
 
 ---
@@ -170,7 +170,7 @@ which political and economic conditions. Phase 1 gives *where*; Phase 2 gives *w
 | Public entity explorer + research library of citeable sources | Engineering |
 
 The population method is geographical text analysis over the colonial corpus — see
-[`docs/theory.md`](./theory.md).
+[`docs/plans/theory.md`](theory.md).
 
 **Honest note:** 1880–1930 is unusually well documented; French colonial administration kept land
 registers, business permits, and censuses, much of it now digitised. The KG is structured indexing

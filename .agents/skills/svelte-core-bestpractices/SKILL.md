@@ -79,7 +79,7 @@ Never reach into the DOM to do what the template can do. `bind:this` +
   `var(--foo)` in the `<style>` block. Style a child through a custom property
   first; `:global` only when there is no other way in.
 - Colour, border and shadow always go through a `var(--token)`; the component's
-  own `<style>` carries layout and position only. See `docs/design-system.md`.
+  own `<style>` carries layout and position only. See `docs/guides/design-system.md`.
 
 ## Size and cleanup
 

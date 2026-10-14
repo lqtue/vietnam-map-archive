@@ -3,7 +3,7 @@
 Updated 6 October 2026. This plan replaces the proposed custom telemetry collector
 and Usage dashboard with GA4 journey measurement, existing database outcomes and
 voluntary qualitative evidence. Implementation is tracked as `usage-measurement`
-in [ROADMAP](ROADMAP.md). The goal is evidence for product decisions, a bounded
+in [ROADMAP](../ROADMAP.md). The goal is evidence for product decisions, a bounded
 user study, grant applications and eventual support invitations.
 
 ## Questions and evidence

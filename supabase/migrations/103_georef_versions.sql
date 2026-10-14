@@ -10,7 +10,7 @@
 --
 -- One row per stored version, i.e. per history file: `stamp` is the file's key,
 -- so `GET /api/maps/<id>/annotation?version=<stamp>` serves the row's JSON.
--- Plan: docs/knowledge-system-plan.md §5 (`georef-versions`).
+-- Plan: docs/plans/knowledge-system-plan.md §5 (`georef-versions`).
 --
 -- Decisions (the first three changed the plan's first draft):
 --

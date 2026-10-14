@@ -5,7 +5,7 @@ exists. This is the "before" for the auto-queue. One read-only pass against the 
 (PostgREST, service key, paged `select`s; nothing written) plus `git log` on `scripts/oneoff/` and
 `docs/journals/`. Counts are as of 2026-10-12.
 
-Two rules from `lessons.md` govern every number below. **Say which number you mean:** "elapsed" is wall
+Two rules from `guides/lessons.md` govern every number below. **Say which number you mean:** "elapsed" is wall
 clock between two stored timestamps, never effort; "machine" is `started_at` to `finished_at` on a
 `pipeline_jobs` row; "wait" is `created_at` to `started_at` on the same row (a queue, not a person);
 "events" are distinct stored review timestamps, not clicks. **Measure before tuning:** where the data

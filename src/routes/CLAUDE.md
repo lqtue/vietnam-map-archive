@@ -1,7 +1,7 @@
 # src/routes — surfaces and the API contract
 
 Root context: `/CLAUDE.md`. Library-side rules (layering, the map runtime, the component
-vocabulary): `src/lib/CLAUDE.md`. Per-route API reference: `docs/api.md`.
+vocabulary): `src/lib/CLAUDE.md`. Per-route API reference: `docs/guides/api.md`.
 
 ## Route groups
 
@@ -109,7 +109,7 @@ Map CRUD is inline in `/catalog`, gated by `role === 'admin' | 'mod'`:
 `CatalogUnifiedSearch.svelte` dispatches `edit`, and the **route page**
 `src/routes/(editorial)/catalog/+page.svelte` renders `MapEditModal`. Plus the dedicated pages
 `/admin?tab=bulk` and `/admin?tab=scout`. There is no general `/admin` route. Full reference in
-`docs/admin-tooling.md`.
+`docs/guides/admin-tooling.md`.
 
 **Per-sheet work state** (staff only) is derived, never stored: `GET /api/admin/maps/work-state`
 (`requireRole` admin/mod) reads `maps.triage`, `ocr_labels.category` and `map_pipeline_status` into

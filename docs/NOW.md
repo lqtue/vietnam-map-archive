@@ -18,9 +18,9 @@ check, not an echo). That measured, linked record is the product (VMA) and the P
 
 | Bet | So what | Done when |
 |---|---|---|
-| **1a. Place links, 1882** (`place-links`, `then-now-blocks`) | One owner sitting gives a measured linkage result now. | Owner-confirmed links with measured accuracy and seconds per item. Plan: `digest-pipeline-plan.md` |
+| **1a. Place links, 1882** (`place-links`, `then-now-blocks`) | One owner sitting gives a measured linkage result now. | Owner-confirmed links with measured accuracy and seconds per item. Plan: `plans/digest-pipeline-plan.md` |
 | **2. Measured gates** (`review-events`, `paper-audit-100k`) | Turns "it works" into numbers: error rate with an interval, seconds per item. The paper's contribution. | The baseline's "unmeasured" cells have numbers |
-| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `image-processing-1882-plan.md` |
+| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md` |
 | **3. Corpus to link against** — series georef, OCR drain | Serves the product, not the next weeks. | **Later**, after 1a and 2. ROADMAP *Do next* |
 
 ## Tue only — the bottleneck
@@ -66,4 +66,4 @@ Ideas with a plan but no current bet. Reopen by moving one into a bet, not by st
 
 - City reconstruction / 3D (`city-reconstruction-plan.md`), with 3D landmark models and the Favre
   panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
-- Names over time / Vietnam admin gazetteer · Walk (`walk-plan.md`) · Gallica text harvest · street-name pairs.
+- Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs.

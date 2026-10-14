@@ -1,6 +1,6 @@
 -- ============================================================
 -- Migration 035 — Apply DB design guidelines
--- Ref: docs/db-guidelines.md
+-- Ref: docs/guides/db-guidelines.md
 --
 -- Changes:
 --   1. profiles.role CHECK: add 'cataloger'

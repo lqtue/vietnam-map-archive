@@ -34,7 +34,7 @@ Self-check:  `node scripts/oneoff/extract_doling_placenames.mjs --check`
 
 ## Why the two press feeds are different shapes
 
-They are different kinds of archive, and `docs/pipelines.md` already says so.
+They are different kinds of archive, and `docs/guides/pipelines.md` already says so.
 
 **Gallica (BnF) has OCR'd full text.** `src/lib/server/gallica.ts` queries it with SRU
 CQL and takes `extra` spellings per place name, so the feed is keyed by the modern name

@@ -23,7 +23,7 @@ The numbers come from the 260930 handoff and the journal:
   `CALIBRATION_HOLDS`. That makes it impossible to say how often a reviewed decision is wrong.
 - **Review has already been wrong once.** Version 29 landed two sheets on a kilometre-grid line
   about 52 px inside the true neatline. The grid line fit *straighter* (0.28–0.48 px) than the
-  engraved frame (~3.2 px). Only a per-pixel profile caught it (`docs/lessons.md`, 2026-09-29).
+  engraved frame (~3.2 px). Only a per-pixel profile caught it (`docs/guides/lessons.md`, 2026-09-29).
 - **314 sheets are public**: 135 on 09-24, and 179 more in the 09-29 backlog publish. All went out
   on geometry gates plus the lattice check. No one looked at them in `/explore`.
 - **325 has not been started. Tonkin's 62 sheets still wait for `tonkin-review`.**
@@ -92,7 +92,7 @@ map id, which the loop in §4 writes.
 **Where it lives.** This extends a UI we already have. `/scan?mode=prepare` (triage accepted,
 gated on `validated_at`) and `/scan?mode=shapes&tab=validate` (approve/reject plus Model feedback
 tags keyed to `run_id`) already implement "the model proposes, you decide"
-(`docs/digitalize-guide.md`). Add a georef tab that follows the same pattern.
+(`docs/guides/digitalize-guide.md`). Add a georef tab that follows the same pattern.
 
 **Two questions, not one.** A correct frame is not a correct placement. Placement comes from
 catalogue coordinates plus the calibration offset. Quang Ngai (east edge about 9.2 km wrong in the

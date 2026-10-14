@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Render docs/system-graph-technical.svg: one row per knowledge layer, columns for tools, research and
-branches, and the open-item count per layer parsed from docs/knowledge-system-plan.md §9.
+"""Render docs/guides/system-graph-technical.svg: one row per knowledge layer, columns for tools, research and
+branches, and the open-item count per layer parsed from docs/plans/knowledge-system-plan.md §9.
 
 Fixed grid on purpose: an auto-layout (Mermaid, Graphviz) staggers the boxes and clips titles.
 Which tool or doc sits in which layer is inferred from names and locations, not declared in the
@@ -66,7 +66,7 @@ VERSIONS = [("1.0", "Apr 2025", "one page"), ("3.0", "Oct 2025", "SvelteKit rewr
 EDGES = ["sheets exist", "scan + tiles", "ground truth", "labels + shapes", "names", "claims cite objects"]  # bottom to top
 
 # open items per layer, from the §9 table: count the backticked names in each row's last column
-plan = (ROOT / "docs/knowledge-system-plan.md").read_text()
+plan = (ROOT / "docs/plans/knowledge-system-plan.md").read_text()
 counts = {}
 for line in plan.split("## 9.")[1].split("\n"):
     m = re.match(r"\| \*\*(\d\.|Surfaces|Outside)", line)
@@ -187,5 +187,5 @@ svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {total_h}
 <rect width="{WIDTH}" height="{total_h}" fill="var(--bg)"/>
 {"".join(o)}
 </svg>"""
-(ROOT / "docs/system-graph-technical.svg").write_text(svg)
-print("wrote docs/system-graph-technical.svg", counts)
+(ROOT / "docs/guides/system-graph-technical.svg").write_text(svg)
+print("wrote docs/guides/system-graph-technical.svg", counts)

@@ -145,7 +145,7 @@ function periodOf(year: number | null | undefined): string | null {
 
 /**
  * Public answers are the same for everyone, so they are kept at the edge for five minutes
- * (docs/catalog-plan.md decision 1). Pages Functions run *before* Cloudflare's CDN, so a
+ * (docs/plans/catalog-plan.md decision 1). Pages Functions run *before* Cloudflare's CDN, so a
  * `Cache-Control` header alone caches nothing here: the Cache API is what does it. Staff see drafts and
  * must see their own edits at once, so they bypass it, and `X-VMA-Cache` says which path answered.
  */

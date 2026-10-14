@@ -2,8 +2,8 @@
 
 **Status:** proposed · **Owner:** lqtue · **Baseline:** VMA `feat/label-search` @ bccd495, HACW
 `main` @ 2026-08-30, Tasco `platform/docs` read 2026-09-02.
-Detail for the "Platform" idea in `docs/strategy.md`; the Search product plan is
-`docs/search-plan.md`, Walk is `docs/walk-plan.md` — which forks the event app rather
+Detail for the "Platform" idea in `docs/plans/strategy.md`; the Search product plan is
+`docs/plans/search-plan.md`, Walk is `docs/plans/walk-plan.md` — which forks the event app rather
 than merging it, and jumps §6's queue with `story.schema.json` (it needs neither the engine nor
 `packages/contracts`).
 
@@ -135,7 +135,7 @@ So step 2 of §6 leads with `context.schema.json`, and `story.schema.json` follo
 | One entrypoint; CI runs the same targets | `operating-model.md:494-504` | Root `pnpm -r check/lint/test/build`; no per-app CI logic |
 | Logic in env-driven scripts; make / jobs are thin shells | `map-data-build-and-release.md:284-296` | Already true for `vma_worker.py` + `ocr.py`; keep for `pmtiles_extract.sh` |
 | Master vs derived: derived is disposable, immutable, content-addressed, **no `latest`** | `map-data-operations.md:39-45`, `operating-model.md:441-473` | Postgres + Storage annotations = master; R2 tiles, PMTiles, exports, thumbs = derived, keyed by content hash |
-| Machine may create, never overwrite a human edit | `map-data-operations.md:45` | Already in RPCs (`text_validated` wins); written into `db-guidelines.md` as invariant |
+| Machine may create, never overwrite a human edit | `map-data-operations.md:45` | Already in RPCs (`text_validated` wins); written into `guides/db-guidelines.md` as invariant |
 | Plain queue jobs, no DAG until a DAG exists; idempotent, keyed | `map-data-build-and-release.md:147-152` | `pipeline_jobs` stays as is |
 | Rules live in **absent code paths**, not prose | `map-data-operations.md:280-289` | e.g. anon has no path to draft rows (mig 063/065), workers have no DB creds |
 | Evidence discipline: every claim cites a file/query; phase exits are commands, not adjectives | `map-data-operations.md:18-30` | ROADMAP already "measured against production"; add Status/Owner/Baseline headers |

@@ -159,7 +159,7 @@ on the digitalize page and advanced by the review tools.
 - **Mirror to R2** — copies an external IIIF source to VMA's own storage for speed and long-term
   availability.
 
-Command reference for both pipelines: `docs/pipelines.md`.
+Command reference for both pipelines: `docs/guides/pipelines.md`.
 
 ---
 

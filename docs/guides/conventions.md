@@ -185,7 +185,7 @@ The OpenLayers basemap is painted, not styled, so `basemapStyle.ts` carries its 
 colours. Warped historical sheets keep their own ink in both themes — they are photographs of paper.
 `.mirror-cmd`'s console and `--is-canvas-*` in `mode-shared.css` are pinned dark on purpose.
 Component `<style>` blocks carry layout/positioning; every colour, border and shadow goes through a
-`var(--token)`. New pages use the template in `docs/design-system.md`; nav and footer come once from
+`var(--token)`. New pages use the template in `docs/guides/design-system.md`; nav and footer come once from
 `src/routes/(editorial)/+layout.svelte`, so a new editorial page only needs the links added in
 `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
 

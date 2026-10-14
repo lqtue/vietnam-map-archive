@@ -60,7 +60,7 @@ it is computable today from the existing 46 traces on a held-out region, it is t
 reports, and it would tell us whether our pipeline is roughly at the published state of the art or
 far below it. Right now nobody, us included, knows which.
 
-**Memory attention, verified.** `docs/pipelines.md` says MapSAM2 measures memory attention alone at
+**Memory attention, verified.** `docs/guides/pipelines.md` says MapSAM2 measures memory attention alone at
 +14.3% IoU on vineyards and +16.1% on railways. Checked against Table 2 of the paper: vineyard
 10-shot 67.6 with, 53.3 without; railway 10-shot 73.0 with, 56.7 without. The repo's reading is
 correct. Our `inference_tiles_as_video.py` still runs SAM2's default FIFO memory, so **we have
@@ -102,7 +102,7 @@ clearest evidence: a general VLM with in-context examples and *no training* beat
 model on a map task, published November 2025. That is the same bet as `--mode prompted
 --ocr-run-id` and the Gemini layout pass. Our reason for the bet — open vocabulary, several
 categories per call, and the text *and* the box from one call, so OCR and prompt generation are the
-same pass — is stated in `docs/pipelines.md` and is now externally corroborated rather than merely
+same pass — is stated in `docs/guides/pipelines.md` and is now externally corroborated rather than merely
 plausible.
 
 **Two results we appear to hold alone:**
@@ -337,11 +337,11 @@ is not, and the measurement gap is a tracing job rather than a research problem.
 
 ## 7. Corrections this comparison turned up in our own docs
 
-- ~~**`docs/pipelines.md:1240` cites a "SODUCO F1=0.59 baseline"**~~ — **RESOLVED 2026-09-19**,
+- ~~**`docs/guides/pipelines.md:1240` cites a "SODUCO F1=0.59 baseline"**~~ — **RESOLVED 2026-09-19**,
   checked against the paper via scite. Chen, Chazalon & Carlinet (2024) use **COCO Panoptic Quality
   throughout** and report no F1: best pipeline **51.1% PQ**, 46.7% before augmentation, and
   47.1 → 45.1 for the mini-U-Net footprint ablation. So the F1 was unsourced *and* the 47.1% that
-  travelled with it was an ablation row, not the headline. `evaluate.py` and `pipelines.md:1240`
+  travelled with it was an ablation row, not the headline. `evaluate.py` and `guides/pipelines.md:1240`
   both now quote 51.1% PQ and say it is not our axis.
 - **The MapSAM2 memory-attention figures check out** (+14.3 vineyard, +16.1 railway, both 10-shot,
   against Table 2). The **"+12.8% F1 for prompt quality" is still unverified** after a second pass

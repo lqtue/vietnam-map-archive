@@ -1,7 +1,7 @@
 # Image processing workspace
 
 One entry point for text recognition, segmentation, polygon cleanup and image comparisons.
-[Work guide](../README.md) · [Pipeline commands](../../docs/pipelines.md).
+[Work guide](../README.md) · [Pipeline commands](../../docs/guides/pipelines.md).
 
 ## Browse the actual results
 

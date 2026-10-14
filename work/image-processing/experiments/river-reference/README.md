@@ -6,7 +6,7 @@ Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
 (`docs/research/river-reconstruction.md`), and the same for the road stage. Everything here is source
 pixels from `iiif.maparchive.vn` fixed tiles.
 
-**Current scope:** the [1882 plan](../../../../docs/image-processing-1882-plan.md) freezes
+**Current scope:** the [1882 plan](../../../../docs/plans/image-processing-1882-plan.md) freezes
 water v3 for hand review. Road batch 7 and the 1898 follow-ups below are historical
 work, deferred by that plan; do not label or tune those batches as part of consolidation.
 

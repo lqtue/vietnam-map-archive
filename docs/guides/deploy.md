@@ -67,7 +67,7 @@ build does not prove the production database has that schema.
 
 On 2026-10-04 the series catalog returned 500 because PR #36 had deployed while production
 remained at migration 104. Applying 105–108 restored the page without redeploying the app.
-See [the recovery record](journals/261004-l7014-metadata.md).
+See [the recovery record](../journals/261004-l7014-metadata.md).
 
 ## Blank page right after a deploy
 

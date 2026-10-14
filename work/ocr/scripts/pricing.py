@@ -45,7 +45,7 @@ def call_cost_usd(
     """USD for one call, or None when the model has no published rate.
 
     Billed output is taken as `total - input` — candidates plus thinking —
-    which is what `docs/pipelines.md` §Cost concluded on 2026-09-10. That
+    which is what `docs/guides/pipelines.md` §Cost concluded on 2026-09-10. That
     conclusion was inferred from token counts and has never been checked
     against an invoice; if it is wrong, every figure derived from this is
     about 2.5x too high. Settling it needs no new data collection, because

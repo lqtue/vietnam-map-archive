@@ -55,7 +55,7 @@ retraction screen I ran; the scite tools were not used.
    tiling for VLM calls; a documented catalogue of silent failures. Most rest on one or two sheets.
 4. **Linkage is the weakest stage by the repo's own numbers**: 8 labels link to a polygon (`ocr_labels.footprint_id`;
    A: reproduced 2026-10-05 as 8 of the 10,574 labels the public key can read, on 22 maps; the recorded
-   denominator of 14,506 in `knowledge-system-plan.md` is historical; the service-role follow-up
+   denominator of 14,506 in `plans/knowledge-system-plan.md` is historical; the service-role follow-up
    counted 8 of 15,133 rows on 24 maps at 15:43 UTC, including rejected and legend rows),
    there is no entity table, no legend link, and no precision/recall for any cross-map match.
 5. **The credibility-check step is not implemented.** `scout_candidates` stores scraped provenance fields
@@ -85,7 +85,7 @@ retraction screen I ran; the scite tools were not used.
 Allmaps editing and storage, IIIF tiles on R2, a job queue with a keyed worker, VLM calls with context
 caching and key rotation, a review UI that writes the ground truth, per-row `run_id`, `geom_src` hashing
 of the control-point set so stale derived geometry is queryable, cost logged per call. The integration is
-the project's real asset and its defects are well documented (`docs/lessons.md`: the gate green over a
+the project's real asset and its defects are well documented (`docs/guides/lessons.md`: the gate green over a
 broken thing, a refused probe read as "no", a 31.8% white-hole overview scored 7/7). Systems with the same
 shape exist: MapReader (patch classification and text spotting, ~16,000 Ordnance Survey sheets, ~30.5M
 patches [V]) and mapKurator (60,000+ maps, 100M+ labels [V]). VMA is smaller by orders of magnitude.
@@ -94,10 +94,10 @@ patches [V]) and mapKurator (60,000+ maps, 100M+ labels [V]). VMA is smaller by 
 
 | item | evidence in repo | what I found outside | status |
 |---|---|---|---|
-| Ground-distance tiling for VLM calls | 1959 sheet: 5.7 km per call found 1 label, 2.9 km found 2, 1.4 km found 6 (5 on repeat); +19% across six sheets; run-to-run spread of one label (R, `digitalize-guide.md`, `pipelines.md`) | The map-text work I read is stated in pixels (PALETTE, MapText [V]). No paper stating this effect for VLMs found; the search was not exhaustive | n = 1 sheet, counts in single digits: a lead, not a result |
-| Index-agreement gate | 1959: name_recall 0.7947 (298/375), agreement 0.9434 (R). 1968: 0.0245 (9 of 367) before any body pass (R, `pipelines.md`), then 0.3270 (120/367), agreement 0.9603, after the first body pass (R, `EVAL-BASELINE.md` 2026-09-10). Two runs, not a disagreement | Four searches found no paper using a sheet's own printed index as recall ground truth. Weinman 2013 aligns recognised toponyms to an external gazetteer [S], which is a different use | Two sheets. Plausibly a defensible small method; needs more sheets with printed indexes |
-| Legend-timeline matching across a French-to-Vietnamese rename | (canonical type, folded proper name) key plus a ~27-word lexicon: 602 entries to 447 threads, 85 on more than one sheet, 12 reaching the 1959 legend (R, `pipelines.md`) | Cross-edition entity alignment uses string, spatial and topological cues (Sun 2020 [V]); a bilingual rename key is not in what I opened. Kitamoto & Nishimura's ruins case (one site recorded under different names and types across expedition and survey reports, linked by hand) is a manual precedent for rename-aware identity [A] | No precision or recall. Counts only |
-| Name-based sheet registration | 50 shared unique names, 35 inliers, 25.1 m from names alone, 16.1 m after ICP; two routes to the 1898 georeference differ by median 48 m, max 117 m (R, `260921-sheet-overlap.md`, 2026-09-21; **measured against the 1898 georeference that had 3 control points (`docs/journals/260921-sheet-overlap.md`) and was re-fitted to 9 control points by 2026-10-01** per `knowledge-system-plan.md` §4 and `docs/journals/261002-colour-eda-1882-1898.md`; A: the repo confirms the 3-to-9 change but 2026-10-01 is the date the stale derived geometry was found and re-warped, not necessarily the day of the re-fit. These figures need re-running) | Pope & Frean 2025 georeference against cadastral line intersections [S]; Vaienti 2025 uses feature matching [P] | One pair of sheets, and the script is kept as a cross-check, not the production route |
+| Ground-distance tiling for VLM calls | 1959 sheet: 5.7 km per call found 1 label, 2.9 km found 2, 1.4 km found 6 (5 on repeat); +19% across six sheets; run-to-run spread of one label (R, `guides/digitalize-guide.md`, `guides/pipelines.md`) | The map-text work I read is stated in pixels (PALETTE, MapText [V]). No paper stating this effect for VLMs found; the search was not exhaustive | n = 1 sheet, counts in single digits: a lead, not a result |
+| Index-agreement gate | 1959: name_recall 0.7947 (298/375), agreement 0.9434 (R). 1968: 0.0245 (9 of 367) before any body pass (R, `guides/pipelines.md`), then 0.3270 (120/367), agreement 0.9603, after the first body pass (R, `EVAL-BASELINE.md` 2026-09-10). Two runs, not a disagreement | Four searches found no paper using a sheet's own printed index as recall ground truth. Weinman 2013 aligns recognised toponyms to an external gazetteer [S], which is a different use | Two sheets. Plausibly a defensible small method; needs more sheets with printed indexes |
+| Legend-timeline matching across a French-to-Vietnamese rename | (canonical type, folded proper name) key plus a ~27-word lexicon: 602 entries to 447 threads, 85 on more than one sheet, 12 reaching the 1959 legend (R, `guides/pipelines.md`) | Cross-edition entity alignment uses string, spatial and topological cues (Sun 2020 [V]); a bilingual rename key is not in what I opened. Kitamoto & Nishimura's ruins case (one site recorded under different names and types across expedition and survey reports, linked by hand) is a manual precedent for rename-aware identity [A] | No precision or recall. Counts only |
+| Name-based sheet registration | 50 shared unique names, 35 inliers, 25.1 m from names alone, 16.1 m after ICP; two routes to the 1898 georeference differ by median 48 m, max 117 m (R, `260921-sheet-overlap.md`, 2026-09-21; **measured against the 1898 georeference that had 3 control points (`docs/journals/260921-sheet-overlap.md`) and was re-fitted to 9 control points by 2026-10-01** per `plans/knowledge-system-plan.md` §4 and `docs/journals/261002-colour-eda-1882-1898.md`; A: the repo confirms the 3-to-9 change but 2026-10-01 is the date the stale derived geometry was found and re-warped, not necessarily the day of the re-fit. These figures need re-running) | Pope & Frean 2025 georeference against cadastral line intersections [S]; Vaienti 2025 uses feature matching [P] | One pair of sheets, and the script is kept as a cross-check, not the production route |
 | Silent-failure taxonomy (datum fault, blind self-checks) | `claim-audit.md` rows, `related-work.md` headline | Luft & Schiewe 2021, Janata & Cajthaml 2020 [P] | Paper 1, already narrowed by its own audit |
 
 ### 1c. Research claims, and the test of the `related-work.md` verdict
@@ -193,7 +193,7 @@ Criteria used, for the table and for §6: **(C1)** evidence on this corpus: n, h
 | **Linked Places, WHG, Pelagios, Recogito** [V] | attestation with citation | n/a | n/a | n/a | place attestations, temporal scoping | annotation | standards, not pipelines |
 | **OpenHistoricalMap, Wikidata** [V] | volunteer | trace from georeferenced maps | n/a | vector with start/end dates | `wikidata=` cross-reference | volunteer | sparse coverage as of 2024 [V] |
 | **Vietnam / SE Asia** | Virtual Saigon: 559 map documents, rich metadata, no georeferencing stated on the page [V]; HCMGIS GeoReference: user-driven image georeferencing service [V]; Historical Maps of SE Asia (Yale-NUS, Leiden, NLB, Bodleian, Beinecke; 1,400+ maps pre-1900, georeference tool) [S]; Hanoi: GIS of scanned maps called "a rough picture" by its authors (Duan & Shibayama, Kyoto CSEAS) [V] | | | | | | I found no Vietnamese text-spotting or linkage effort |
-| **VMA** [R] | 1,067 scout candidates with provenance and relevance score (R, `knowledge-system-plan.md`; the public key cannot read this staff-only table) | Allmaps; rechecked 2026-10-05: 1882 12.3 m similarity RMSE on 8 GCPs; 1942 26.5 m affine RMSE (declared model), 33.6 m comparison similarity RMSE, on 8 GCPs (follow-up record) | Gemini VLM, two-pass vote, review | colour blocks; MapSAM2 fork | 8 label-to-polygon links among 15,133 service-role-visible OCR rows on 24 maps at 15:43 UTC (follow-up; historical total 14,506); no entity table | owner-reviewed | OCR rows on 24 maps; 499 validated rows in the service-role follow-up (includes legend entries); earlier public-key audit: 492 validated on 22 maps |
+| **VMA** [R] | 1,067 scout candidates with provenance and relevance score (R, `plans/knowledge-system-plan.md`; the public key cannot read this staff-only table) | Allmaps; rechecked 2026-10-05: 1882 12.3 m similarity RMSE on 8 GCPs; 1942 26.5 m affine RMSE (declared model), 33.6 m comparison similarity RMSE, on 8 GCPs (follow-up record) | Gemini VLM, two-pass vote, review | colour blocks; MapSAM2 fork | 8 label-to-polygon links among 15,133 service-role-visible OCR rows on 24 maps at 15:43 UTC (follow-up; historical total 14,506); no entity table | owner-reviewed | OCR rows on 24 maps; 499 validated rows in the service-role follow-up (includes legend entries); earlier public-key audit: 492 validated on 22 maps |
 
 **Document AI.** For clean print, modern tools converge: ~0.6% CER, with early-modern print at
 2.15-10.03% depending on tool, in a July 2026 working paper that is not peer reviewed [V, Clifford et
@@ -216,7 +216,7 @@ are not in the field's unit.
 | alternative | what it would change for VMA | cost | evidence |
 |---|---|---|---|
 | **Text-first** (spot all text, then derive layout from clusters and links; mapKurator style) | Drops the scout call and the accept-triage gate. Legend and index text would be read like the rest and filtered later | Pays full tile cost on legends; VMA found local layout detection found 0 of 17 legend and index boxes on nine sheets, while the VLM scout costs ~$0.009 a sheet (R) | Layout-first is supported by repo numbers. VLM scout itself checked on two sheets by eye (R) |
-| **Active learning on the review queue** | Order review by uncertainty. VMA's `confidence` cannot do it: median 0.9, p90 = p99 = 1.0 (R, `pipelines.md`). The two-pass vote gives a free query-by-committee signal that is already computed | A day of work and an ordering experiment | Generic HITL literature only; I found no map-specific active-learning paper |
+| **Active learning on the review queue** | Order review by uncertainty. VMA's `confidence` cannot do it: median 0.9, p90 = p99 = 1.0 (R, `guides/pipelines.md`). The two-pass vote gives a free query-by-committee signal that is already computed | A day of work and an ordering experiment | Generic HITL literature only; I found no map-specific active-learning paper |
 | **Probabilistic linkage** (Fellegi-Sunter: link / possible link / non-link with m and u weights [V]; Bayesian variants [S]) | Replaces the hard (type, folded name) key with weights. "Possible link" maps onto review. The georeference error enters as a spatial-gate width | Needs a labelled correspondence set VMA does not have | Sun et al. combine three cues [V]; none of these papers carries georeference error forward as far as I could see |
 | **Graph-first, attestation-based** (factoid model [V], Linked Places, PLATO with CertaintyLevel [V], PeGazUs) | Make the reading the primary object and entities derived. VMA's `ocr_labels` already are source assertions with a pixel region; the missing layer is `subjects` and `claims` (planned, checklist unticked) | Schema, review burden, and the risk the plan already names (no universal node/edge table) | Strong fit in shape; no evidence yet on VMA data |
 | **Cross-edition propagation** (age tracing: pseudo-labels from adjacent editions, mIoU 77.3% from one map [S]; Xia 2024 [V]) | Use the better-checked sheet (1882) to seed labels on 1898/1923. `sheet_register.py` is the geometric half | Small | Preprint-level evidence |
@@ -245,11 +245,11 @@ correct [V].
 | georeference | 12.7 m (1882 similarity, 10-GCP set), 10.6 m affine, `geom_rmse` 16.50 stored. 1898 was RMSE 0.0 from 3 GCPs by arithmetic; re-fitted 2026-10-01 to 9 GCPs, 8.4 m misfit (R) | per sheet | three figures for one sheet, now named; the 1882 and 1898 fits changed on 2026-10-01 |
 | cross-map | 33 name pairs within 150 m, median 25 m (1882/1898, 2026-09-21, old 3-GCP 1898 fit) | one pair | upper bound, labels sit near features; to be re-run on the 9-GCP fit |
 
-The "validated" rows are mostly whole-legend entries: `knowledge-system-plan.md` (2026-10-01) gives 118 validated
+The "validated" rows are mostly whole-legend entries: `plans/knowledge-system-plan.md` (2026-10-01) gives 118 validated
 labels on 22 OCR'd maps; the public database on 2026-10-05 shows 492 validated rows on those 22 maps,
 367 of them `legend_entry` (A; the two figures are not reconciled here). Validated rows outside the legend
 categories sit on 1882 (90, plus one `legend`), 1799 (22) and 1895 (8), with a few street rows on 1959 and 1968;
-`digitalize-guide.md` still says only 1882 and 1799 have real validated map labels, which is out of date
+`guides/digitalize-guide.md` still says only 1882 and 1799 have real validated map labels, which is out of date
 (A). The 1898 sheet has none. The harness had its own contamination: 72 machine rows sat in the
 ground-truth table and voided every n = 89 figure until found (`EVAL-BASELINE.md`, 2026-09-18).
 
@@ -277,8 +277,8 @@ ground-truth table and voided every n = 89 figure until found (`EVAL-BASELINE.md
 |---|---|---|
 | **InterPARES** [V, 2008 lecture slides] | trustworthiness = reliability (statement of fact; author competence, controls on creation), accuracy, authenticity (identity + integrity metadata) | Not used. `scout_candidates` (mig 045) holds scraped provenance (source, external id, creator, publisher, date, rights, holding institution, raw payload), a keyword relevance `score`, and a review status pending/approved/rejected/ingested with a `review_note` (A: schema read). No creator-competence, survey-method or process-control field, and no code that scores them |
 | **RiC-O 1.1** [V], **LRM** [V], **DCRM(C)** [S] | RiC: record resources in context as linked data. LRM: Work, Expression, Manifestation, Item (adopted 2017). DCRM(C): cataloguing rules for rare maps | Series, cell, printing, map, scan (migs 105-106) are WEMI-shaped. I infer the mapping; the repo does not state it. Printings are "reviewed, never inferred" |
-| **PROV-O** [V] | Entity, Activity, Agent | `run_id`, `model`, `prompt`, `reviewed_by` and the `geom_src` hash are Activity/Agent/Entity-shaped. A repo-wide search for PROV-O, CIDOC, Linked Places, Pelagios, Pleiades and GeoNames found no use; only `search-plan.md` names Wikidata, for street-name history |
-| **Linked Places / PLATO** [V] | attestation with citation, temporal scoping, certainty level | `claims` and `claim_evidence` with `cited_value` snapshots are planned (`evidence-chain-plan.md`); no migration creates them as of migration 110 |
+| **PROV-O** [V] | Entity, Activity, Agent | `run_id`, `model`, `prompt`, `reviewed_by` and the `geom_src` hash are Activity/Agent/Entity-shaped. A repo-wide search for PROV-O, CIDOC, Linked Places, Pelagios, Pleiades and GeoNames found no use; only `plans/search-plan.md` names Wikidata, for street-name history |
+| **Linked Places / PLATO** [V] | attestation with citation, temporal scoping, certainty level | `claims` and `claim_evidence` with `cited_value` snapshots are planned (`plans/evidence-chain-plan.md`); no migration creates them as of migration 110 |
 | **Data criticism** (Kitamoto) [V] | evidence, hypothesis, fact, reliability attributed to a scholar; quantified spatial accuracy of maps | Closest published match to the planned claims design. VMA's `georef_versions` (mig 103) names the error method |
 | **Harley** [S] | maps are not neutral records; authorship and power belong in the description | Not represented (inferred) |
 
@@ -335,7 +335,7 @@ Current read-only service-role counts and reproduction details are in
 | OCR coverage | 6 sheets / 43 checked is an early benchmark; 958 distinct names is untraced. 13,525 and 14,506 are historical row counts; the service-role follow-up reads 15,133 rows on 24 maps, including rejected and legend rows |
 | 1882 error | 12.7 m similarity and 10.6 m affine were a 10-GCP set; current 8-GCP fit reproduces 12.3 m similarity. Stored `gcp-roundtrip-rms` is a different measure |
 | 1942 error | Current 8-GCP fit: 26.5 m affine (declared model), 33.6 m comparison similarity; 72.3 m is historical, and the 112 m nine-point state remains prose-backed only |
-| 1968 name_recall | 0.0245 baseline and 0.3270 body pass are different runs; `pipelines.md` now labels both |
+| 1968 name_recall | 0.0245 baseline and 0.3270 body pass are different runs; `guides/pipelines.md` now labels both |
 | Two “118”s | Historical validated-row count and segmentation dataset size are unrelated. Segmentation had 46 traces + 72 model rows |
 | Georeference versions | Migration 103 is applied; 604 rows on 591 maps. Four writers still need coverage. Migration history matches locally/remotely through 111 |
 | Tyagi & Dubey | Unverified comparison figures remain excluded |
@@ -452,7 +452,7 @@ or downgraded where the page was or was not reachable.
 
 **Reproduced now.** 8 labels carry a `footprint_id` (8 of 10,574 publicly readable labels on 22 maps).
 The 3-point 1898 fit and its replacement by 9 points: documented in `docs/journals/260921-sheet-overlap.md`
-and `docs/journals/261002-colour-eda-1882-1898.md` and `knowledge-system-plan.md`; the exact date of the
+and `docs/journals/261002-colour-eda-1882-1898.md` and `plans/knowledge-system-plan.md`; the exact date of the
 re-fit was not established, only that it was in place by 2026-10-01. 1,415.9 m (1909 Thua-thien sheet) is in
 `work/analysis/georef_coverage.md`.
 

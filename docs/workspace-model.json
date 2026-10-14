@@ -1,5 +1,5 @@
 {
-  "model": "docs/knowledge-system-plan.md#9-open-work-by-layer",
+  "model": "docs/plans/knowledge-system-plan.md#9-open-work-by-layer",
   "note": "Primary responsibility only. Multi-layer folders retain their per-object provenance; this index is not a task tracker.",
   "layers": [
     {
@@ -43,12 +43,12 @@
       "description": "Map identity, scans, tiles and addresses",
       "entries": [
         {
-          "path": "docs/digitalize-guide.md",
+          "path": "docs/guides/digitalize-guide.md",
           "purpose": "Sheet preparation guide",
           "availability": "repository"
         },
         {
-          "path": "docs/admin-tooling.md",
+          "path": "docs/guides/admin-tooling.md",
           "purpose": "Catalog and holdings operations",
           "availability": "repository"
         },
@@ -58,14 +58,14 @@
           "availability": "repository",
           "read": [
             "supabase/CLAUDE.md",
-            "docs/db-guidelines.md"
+            "docs/guides/db-guidelines.md"
           ]
         },
         {
           "path": "work/analysis/catalog",
           "purpose": "Map-type audit data from 2026-10-06",
           "availability": "repository",
-          "read": "docs/catalog-map-type-audit.md"
+          "read": "docs/plans/catalog-map-type-audit.md"
         },
         {
           "path": "work/analysis/l7014",
@@ -117,7 +117,7 @@
           "path": "work/vn1971",
           "purpose": "1971 provincial maps: grid georeferences and Allmaps annotations",
           "availability": "repository",
-          "read": "docs/pipelines.md"
+          "read": "docs/guides/pipelines.md"
         },
         {
           "path": "work/l909",
@@ -160,7 +160,7 @@
           "path": "work/image-processing/experiments/segmentation-20260919",
           "purpose": "Dated segmentation review pack; prose retained in repository",
           "availability": "repository",
-          "read": "docs/image-processing-1882-plan.md"
+          "read": "docs/plans/image-processing-1882-plan.md"
         },
         {
           "path": "work/image-processing/experiments/modern-overlays",
@@ -197,7 +197,7 @@
           "path": "work/review-kit",
           "purpose": "Review page and record writers for reading checks",
           "availability": "repository",
-          "read": "docs/digest-pipeline-plan.md"
+          "read": "docs/plans/digest-pipeline-plan.md"
         },
         {
           "path": "work/image-processing/experiments/osm-warp",
@@ -225,7 +225,7 @@
           "path": "work/image-processing/experiments/then-now",
           "purpose": "Review page where the owner judges 1882 then-now block differences",
           "availability": "repository",
-          "read": "docs/digest-pipeline-plan.md"
+          "read": "docs/plans/digest-pipeline-plan.md"
         }
       ]
     },
@@ -271,7 +271,7 @@
           "availability": "repository"
         },
         {
-          "path": "docs/evidence-chain-plan.md",
+          "path": "docs/plans/evidence-chain-plan.md",
           "purpose": "Cross-layer identity and evidence plan",
           "availability": "repository"
         }
@@ -295,22 +295,22 @@
           "read": "work/README.md"
         },
         {
-          "path": "docs/user-guide.md",
+          "path": "docs/guides/user-guide.md",
           "purpose": "Reader and contributor guide",
           "availability": "repository"
         },
         {
-          "path": "docs/design-system.md",
+          "path": "docs/guides/design-system.md",
           "purpose": "Product visual language",
           "availability": "repository"
         },
         {
-          "path": "docs/search-plan.md",
+          "path": "docs/plans/search-plan.md",
           "purpose": "Search plan",
           "availability": "repository"
         },
         {
-          "path": "docs/walk-plan.md",
+          "path": "docs/plans/walk-plan.md",
           "purpose": "Walk plan",
           "availability": "repository"
         },
@@ -327,7 +327,7 @@
           "path": "static",
           "purpose": "Fonts, icons and images the app serves",
           "availability": "repository",
-          "read": "docs/design-system.md"
+          "read": "docs/guides/design-system.md"
         }
       ]
     },
@@ -354,47 +354,47 @@
           "read": "work/image-processing/README.md"
         },
         {
-          "path": "docs/architecture.md",
+          "path": "docs/guides/architecture.md",
           "purpose": "Map runtime reference",
           "availability": "repository"
         },
         {
-          "path": "docs/api.md",
+          "path": "docs/guides/api.md",
           "purpose": "Server API reference",
           "availability": "repository"
         },
         {
-          "path": "docs/conventions.md",
+          "path": "docs/guides/conventions.md",
           "purpose": "Implementation conventions",
           "availability": "repository"
         },
         {
-          "path": "docs/db-guidelines.md",
+          "path": "docs/guides/db-guidelines.md",
           "purpose": "Database rules",
           "availability": "repository"
         },
         {
-          "path": "docs/deploy.md",
+          "path": "docs/guides/deploy.md",
           "purpose": "Deployment guidance",
           "availability": "repository"
         },
         {
-          "path": "docs/lessons.md",
+          "path": "docs/guides/lessons.md",
           "purpose": "Operational and measurement lessons",
           "availability": "repository"
         },
         {
-          "path": "docs/pipelines.md",
+          "path": "docs/guides/pipelines.md",
           "purpose": "Commands spanning layers",
           "availability": "repository"
         },
         {
-          "path": "docs/system-guidelines.md",
+          "path": "docs/guides/system-guidelines.md",
           "purpose": "Code organization",
           "availability": "repository"
         },
         {
-          "path": "docs/testing.md",
+          "path": "docs/guides/testing.md",
           "purpose": "Verification inventory",
           "availability": "repository"
         },
@@ -404,17 +404,17 @@
           "availability": "repository"
         },
         {
-          "path": "docs/strategy.md",
+          "path": "docs/plans/strategy.md",
           "purpose": "Product strategy",
           "availability": "repository"
         },
         {
-          "path": "docs/theory.md",
+          "path": "docs/plans/theory.md",
           "purpose": "Intellectual framework",
           "availability": "repository"
         },
         {
-          "path": "docs/platform-design.md",
+          "path": "docs/plans/platform-design.md",
           "purpose": "Platform proposal",
           "availability": "repository"
         },
@@ -429,8 +429,8 @@
           "purpose": "Commands that act on the live system: ingest, enqueue, audit, georeference writes, layout check",
           "availability": "repository",
           "read": [
-            "docs/pipelines.md",
-            "docs/admin-tooling.md"
+            "docs/guides/pipelines.md",
+            "docs/guides/admin-tooling.md"
           ]
         },
         {
@@ -442,7 +442,7 @@
           "path": "tests",
           "purpose": "Playwright checks: read-only, plus write-path tests on a local stack",
           "availability": "repository",
-          "read": "docs/testing.md"
+          "read": "docs/guides/testing.md"
         },
         {
           "path": "contracts",
@@ -453,7 +453,7 @@
           "path": "worker",
           "purpose": "Cloudflare Worker that proxies IIIF tile requests to R2",
           "availability": "repository",
-          "read": "docs/admin-tooling.md"
+          "read": "docs/guides/admin-tooling.md"
         },
         {
           "path": ".github",

@@ -188,5 +188,5 @@ cluster).
 
 Snapshot `work/indochine-100k/*.json` before any future `DETECT_VERSION` bump; `regress()`
 alone only checks self-consistency against whatever's currently saved, not cross-version
-movement. Read `docs/lessons.md`'s 2026-09-29 entry before reviewing any boundary pick.
+movement. Read `docs/guides/lessons.md`'s 2026-09-29 entry before reviewing any boundary pick.
 No `annotate --apply`, no publish, no database writes without an explicit request.

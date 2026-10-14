@@ -3,7 +3,7 @@
 Was "Time machine"; renamed 2026-09-22 because it and "Time walk" were indistinguishable.
 
 Design detail for **Search** in `docs/ROADMAP.md` (the single tracker). Vision in
-`docs/strategy.md` / `docs/theory.md`; this file is the engineering plan only.
+`docs/plans/strategy.md` / `docs/plans/theory.md`; this file is the engineering plan only.
 
 **One sentence.** Turn the georeferenced raster corpus into searchable text, dated
 vector fabric and linked period sources, so a visitor can type a place name, land on
@@ -150,7 +150,7 @@ query from `place_names` variants (or the raw label), OR's spelling forms
 `[{ title, date, snippet, url, thumb }]`. `Cache-Control: public, max-age=86400` so the
 CF edge absorbs repeats; Gallica sees each (q, decade) once a day. (The route is
 `/api/press`, not `/api/context` — that name belongs to the place-time index in
-`docs/platform-design.md` §0.)
+`docs/plans/platform-design.md` §0.)
 
 **UI.** On /explore, clicking an E1 result marker or a `LegendPointsLayer` point opens a
 compact "In the press, ±10 y" list in the sidebar. /explore only; the SSR share page must

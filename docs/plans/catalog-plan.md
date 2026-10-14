@@ -72,7 +72,7 @@ laptop, so absolute values include its distance to Cloudflare and Supabase; the 
 ## Principles
 
 1. Show a column only if it varies. A single-valued column gets hidden or removed.
-2. Filter and sort on real columns (`db-guidelines.md` §8). `extra_metadata` is for unknown keys.
+2. Filter and sort on real columns (`guides/db-guidelines.md` §8). `extra_metadata` is for unknown keys.
 3. One meaning per flag — `georef-flag-one-meaning`.
 4. Additive migrations, no drops now. `created_by` stays (the RLS policies in 038/079/100/101/103
    read it); `triage_reviewed_by` is written by `set_triage_key` and read by nothing, harmless.
@@ -130,7 +130,7 @@ Files: `catalogTableModel.ts`, `CatalogTable.svelte`, `ArchiveMapRows.svelte`, `
 - **Rail overlap.** `ArchiveBrowser.svelte` is edited by other work in flight; rebase before touching.
 
 Tests: add pure checks for the year-range filter and the plans/surveys split; update
-`docs/testing.md` and the test count in `CLAUDE.md` (it appears in `CLAUDE.md` more than once).
+`docs/guides/testing.md` and the test count in `CLAUDE.md` (it appears in `CLAUDE.md` more than once).
 
 Exit: no public column in the table or the rail is a single value.
 

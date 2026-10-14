@@ -41,7 +41,7 @@
 // THE TWO ARCHIVES TAKE DIFFERENT FEEDS, because they are different things.
 // Gallica has OCR'd full text and takes `extra` spellings per place name
 // (`spellingVariants`), so it gets JSON keyed by the modern name. The NLV
-// archive has NO TEXT -- `docs/pipelines.md` is explicit: "There is no text,
+// archive has NO TEXT -- `docs/guides/pipelines.md` is explicit: "There is no text,
 // only the scan". It can only be queried with a phrase, so it gets a quoted
 // query list in the form `scripts/scout/nlv-queries.txt` already uses. Neither file
 // is applied by this script; both are inputs a person reviews first.

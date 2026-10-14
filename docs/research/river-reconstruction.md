@@ -2,7 +2,7 @@
 
 **Record date: 2026-10-01, updated through 2026-10-03. Status: exploratory; no river layer approved.**
 
-Current work follows the [1882-only plan](../image-processing-1882-plan.md); the paired
+Current work follows the [1882-only plan](../plans/image-processing-1882-plan.md); the paired
 1898 work below is retained as research history and is deferred until 1882 ships.
 
 The 1882 cadastral sheet is the first in-depth reconstruction. River is the first

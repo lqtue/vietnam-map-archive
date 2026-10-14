@@ -12,7 +12,7 @@ Primary sources, in order of evidential weight:
 | `docs/journals/260918-colour-blocks.md` | the colour-block pass, built and measured over two days |
 | `docs/journals/260919-seg-audit.md` | the audit of that pass, its work list, and the results |
 | `docs/research/worked-example-1882.md` | one sheet through every stage, with the four defects it exposed |
-| `docs/pipelines.md` | command reference + design rationale |
+| `docs/guides/pipelines.md` | command reference + design rationale |
 | `docs/private/260912-postgrad-route.md` | the dataset card and first-paper outline already drafted |
 | `docs/private/network.md` §4a, §4d-bis | who works on this, and what may be claimed to them |
 
@@ -97,7 +97,7 @@ the source of the contamination described in §5.
 | Same change, six-sheet collection | **+19%**, not 5× | EVAL-BASELINE |
 | Rendering above 1:1 | byte-identical output — the scan is the ceiling | EVAL-BASELINE |
 | Cost, 1882 two-pass merge / 1968 body pass | USD **0.945** / **1.236** (thinking tokens included) | EVAL-BASELINE |
-| Spend spread over 1,192 calls | \$0.0012–\$0.155 per call; dearest tenth carries 28% | `docs/pipelines.md` |
+| Spend spread over 1,192 calls | \$0.0012–\$0.155 per call; dearest tenth carries 28% | `docs/guides/pipelines.md` |
 
 The transferable result here is the third row: **what starves a VLM read is one call covering too
 much ground, and a fixed pixel tile is a different amount of ground on every sheet** (2048 px is
@@ -280,7 +280,7 @@ anchors:
 - **SODUCO — the benchmark is COCO PQ, not F1.** Chen, Chazalon & Carlinet (2024), PLOS ONE
   10.1371/journal.pone.0298217: best pipeline **51.1% COCO PQ** (U-Net + contrast + TPS
   augmentation); 46.7% before augmentation; 47.1→45.1 is the mini-U-Net ablation. No F1 is
-  reported anywhere in it. `evaluate.py` and `pipelines.md:1240` carried "F1 = 0.59 @ IoU 0.5,
+  reported anywhere in it. `evaluate.py` and `guides/pipelines.md:1240` carried "F1 = 0.59 @ IoU 0.5,
   PQ = 47.1%" — the F1 unsourced, the PQ an ablation row rather than the headline. Both
   corrected 2026-09-19 (verified via scite). **And it is still not our axis**: we report mean
   IoU by best-match-per-trace with no precision term, so 51.1% PQ and `land_plot` 0.331 cannot

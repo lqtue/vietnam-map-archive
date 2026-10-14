@@ -172,13 +172,13 @@ Public / other:
   and its source items; POST creates one on that cell. `.../[id]/` — PATCH its fields
   (`$lib/server/sheetPrintingFields.ts` decides which). `/api/admin/cell-printings/[id]/` — PATCH
   links or unlinks one institution source item to a printing (`{ printing_id }`, `null` clears).
-- `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/admin-tooling.md`.
+- `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/guides/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
   small failed-job list). Admin or mod.
 - `/api/context/` — **public** GET `?lng=&lat=&radius=&year_from=&year_to=&limit=`: everything the
   archive knows about a spot — covering maps, nearby OCR labels and reviewed footprints, story
   points — via the `context_at` RPC (mig 066). Every item carries `distance_m` and `geom_rmse`;
-  ungeoreferenced maps are absent by construction. Design in `docs/platform-design.md` §0.
+  ungeoreferenced maps are absent by construction. Design in `docs/plans/platform-design.md` §0.
   The route adds `legend: [{ map_id, year, n, name, vn, lng, lat, src, distance_m }]` — numbered
   legend references from the public maps the RPC returned, warped per request through the same
   `warpLegend` as `/api/maps/[id]/legend-points` (so `src` is `manual | numeral | grid`; a `grid`
@@ -194,7 +194,7 @@ Public / other:
   — which comes free with the NLV response (its results page carries a decade facet). Gallica has no
   facet, so there is no `curve.gallica`; a curve there would be one request per decade. NLV is
   queried directly at `baochi.nlv.gov.vn`, which is http-only, so thumbnails route through an https
-  image proxy — see `docs/pipelines.md`.
+  image proxy — see `docs/guides/pipelines.md`.
 - `/api/search/` — unified GET over `maps` + (admin/mod) `scout_candidates`. Postgres tsvector via
   `.textSearch('search_vector', q, { config: 'simple' })`. Query:
   `q, area, region, institution, type, period, source, scoutSource, category, georef, include=maps,scout,labels,places, fields=slim, limit, offset`.

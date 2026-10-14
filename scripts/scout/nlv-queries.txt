@@ -8,7 +8,7 @@
 # Geography is NOT a query term. "bản đồ" "Sài Gòn" is only 41 rows — a paper
 # printing a city map rarely names the city in the same breath. The HCMC corpus
 # comes from the publication instead: harvest the vocabulary, then split on the
-# southern titles (--pub, or the publication facet). See docs/pipelines.md.
+# southern titles (--pub, or the publication facet). See docs/guides/pipelines.md.
 "bản đồ"        # 838
 "quy hoạch"     # 562  — post-1975
 "carte"         # 457  — French, and the papers do print it

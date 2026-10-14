@@ -1,6 +1,6 @@
 """Sheet scale from a map's own georeference — metres per source pixel.
 
-Why this exists: tile size is a *ground-distance* decision (`docs/pipelines.md`
+Why this exists: tile size is a *ground-distance* decision (`docs/guides/pipelines.md`
 § Getting more out of OCR, step 3 — "ground per call is still the biggest single
 lever"), and until now nothing on the Python side could see the ground. Every
 tile size in the corpus was chosen by hand, per sheet, from a number someone

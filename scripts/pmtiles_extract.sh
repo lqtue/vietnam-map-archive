@@ -22,7 +22,7 @@
 #
 # Why this script exists: both the archive and the event app ship a self-hosted
 # Protomaps extract, and both carried their own copy of this command in a code
-# comment. One recipe, two consumers — see docs/platform-design.md §3. When the
+# comment. One recipe, two consumers — see docs/plans/platform-design.md §3. When the
 # pnpm workspace lands this moves to packages/basemap unchanged.
 #
 # The archive's bbox becomes the map's maxBounds in the app, so panning cannot

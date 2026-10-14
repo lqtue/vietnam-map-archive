@@ -741,7 +741,7 @@ sea rather than as the page's own black.
 pre-tiled mosaic, `map/rasterSeries.ts`, `L7014_PMTILES_URL` and the raster renderer were retired
 2026-10-03 in `598fbe1b`. All 510 sheets are `maps` rows now and L7014 is an ordinary IIIF series,
 offered and warped like any other (below). The mosaic's build and datum traps are recorded in
-`docs/pipelines.md`.
+`docs/guides/pipelines.md`.
 
 **A series does not have to be a mosaic.** The Indochine 1:25,000 survey of Tonkin and Thanh Hóa is
 56 ordinary `maps` rows warped live by Allmaps, offered as **one** stack row — a `SeriesRef` whose

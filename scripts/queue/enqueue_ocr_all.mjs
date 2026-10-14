@@ -176,7 +176,7 @@ const RENDER_FLOOR = 1024;
 // same crop and same 1:1 rendering, changing only the tile: 5.7 km/call found 1
 // label inside the study area, 2.9 km found 2, 1.4 km found 6. Corpus-wide the
 // same change is +19%, concentrated entirely in the sheets whose ground-per-call
-// actually dropped a long way — see docs/pipelines.md.
+// actually dropped a long way — see docs/guides/pipelines.md.
 //
 // Off by default for two reasons. A saved triage carries the tile size a person
 // chose, and overriding that silently would defeat the point of saving one. And
