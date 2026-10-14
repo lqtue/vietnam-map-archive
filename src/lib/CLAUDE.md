@@ -94,6 +94,25 @@ most of it `extra_metadata` and the long source fields no list renders; the name
 `fetchMapRow` still takes the whole row, because the admin editor writes back columns no list
 carries.
 
+**A helper that fails says so.** A read helper throws (use `queryError` in
+`data/supabase/queryError.ts`) or returns `{ data, error }` (as `readAll` in `paged.ts` does). It
+never returns `[]`, `null` or `0` for a failed query: the page cannot tell that from "nothing
+here", and shows the wrong face. The page keeps `loading` and `failed` beside the data and shows
+`LoadError` with Retry (`docs/guides/design-system.md` § States).
+
+```ts
+export async function fetchPublicStories(supabase: Client): Promise<Story[]> {
+  const { data, error } = await supabase.from('stories').select('*').eq('review_status', 'approved');
+  if (error) throw queryError('fetchPublicStories', error); // not: return []
+  return (data ?? []).map(rowToStory);
+}
+// page: try { rows = await fetchPublicStories(supabase); failed = false } catch { failed = true }
+```
+
+Known helpers that still return `[]` on error (fix each when its page is next touched):
+`fetchPublicStories` (`stories.ts`), `fetchMapFootprints` and the label-maps read (`footprints.ts`),
+the favourites read (`favorites.ts`), several in `maps/service.ts`.
+
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).

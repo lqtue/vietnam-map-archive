@@ -263,6 +263,7 @@ See them all rendered together at **`/screens`**.
 | `PageHero` | **The hero on every editorial page.** Props `eyebrow` · `title` · `sub` · `badges`; slots `title` (wins over the prop, for `.text-highlight` markup), `sub`, `actions`, `eyebrow`. Do not hand-roll `.editorial-hero`. |
 | `NavBar` · `EditorialFooter` | Mounted once by `(editorial)/+layout.svelte`. A page never renders either. |
 | `AuthGate` | The signed-out "sign in to continue" card. |
+| `LoadError` | A read that failed, with Retry. See *House rules → States*. |
 | `CatalogGrid` · `CatalogCard` · `MapCard` | Map listings. |
 | `LibraryGrid` | Project / story library grids. |
 | `ChunkyTabs` | The tab strip. Use it instead of a row of buttons that toggle a variable. |
@@ -461,6 +462,47 @@ sections.
 3. Add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
 4. Add a row to the route map in `docs/guides/system-guidelines.md` §2.
 5. Build content from `.editorial-main` + `.section-card`; don't invent new layout patterns.
+
+---
+
+## House rules
+
+Rules that cut across pages. They came out of the page audit (`docs/guides/pages/README.md`, "Gaps
+that need a house rule"). The review page (`docs/plans/review-page-plan.md`) is the first to follow
+them; old pages move over when each is next touched.
+
+### States — an error never looks like "nothing here"
+
+Every block of loaded data has four states, and each looks different:
+
+| State | Face |
+|---|---|
+| loading | `.spinner`, or a line saying what is loading |
+| ready | the data |
+| empty | `.empty-state` — says why nothing is here and what to do |
+| error | `LoadError` — says what failed, and offers Retry |
+
+- An error never renders as empty. "Every map is georeferenced" over a failed query is a lie the
+  reader believes.
+- Every error face offers Retry. A page that cannot retry says so, and says to reload.
+- The data helper reports the failure (see `src/lib/CLAUDE.md` § Data access). The page cannot show
+  an error that the helper swallowed.
+
+```svelte
+{#if loading}
+  <div class="spinner" role="status" aria-label={$t('Loading')}></div>
+{:else if failed}
+  <LoadError message={$t('Could not load your contributions.')} on:retry={load} />
+{:else if rows.length === 0}
+  <p class="empty-state">{$t('You have not contributed yet.')}</p>
+{:else}
+  <!-- the data -->
+{/if}
+```
+
+Order matters: `failed` is tested before `rows.length === 0`. No wrapper component: it would
+hide that order, and the four faces already exist. A first load shows the error; a refresh that
+fails after a good load keeps the old rows and shows `LoadError` above them.
 
 ---
 
