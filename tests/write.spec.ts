@@ -8,7 +8,7 @@ import { createClient, type Session } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { loadSchema, unsupportedKeywords, validate } from './schemaCheck';
 import { placeCoreKey } from '../src/lib/core/utils/placeKey';
-import { createHmac } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 
 /**
  * Write-path smokes (roadmap-record A5). Unlike smoke.spec.ts these DO write rows, so
@@ -2139,4 +2139,297 @@ test('a uuid link and a retired name both 301 to the readable address', async ()
     404
   );
   await anon.dispose();
+});
+
+// --- Review store (mig 122) -------------------------------------------------------------------
+//
+// review_events is insert-only by grant, so a test that writes events cannot take them back out:
+// each run uses a task key of its own and leaves the rows. `npm run db:test:reset` clears them, and
+// CI's stack is thrown away. The tasks and items are the only things deleted (before any event).
+
+const REVIEW_OCR_ONLY_TOKEN = 'write-smoke-review-ocr-only-token';
+
+function reviewTask(key: string, over: Record<string, unknown> = {}) {
+  return {
+    key,
+    title: 'Write smoke',
+    question: 'What is this?',
+    method: 'write-smoke@1',
+    seed: 11,
+    blind_frac: 0.2,
+    ...over,
+  };
+}
+
+async function workerContext(token?: string) {
+  return playwrightRequest.newContext({
+    baseURL: 'http://localhost:5199',
+    extraHTTPHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+}
+
+function eventRow(task: string, item: string, reviewer: string | null, extra = {}) {
+  return {
+    task,
+    item_id: item,
+    bound: 'b1',
+    reviewer,
+    order_idx: 0,
+    shown_at: '2026-10-14T01:00:00.000Z',
+    decided_at: '2026-10-14T01:00:09.500Z',
+    proposal_shown: true,
+    verdicts: { relation: 'moved' },
+    readings: { hidden_ms: 0 },
+    note: '',
+    ...extra,
+  };
+}
+
+test('a worker key upserts a review task and its items; bad input is refused', async () => {
+  const key = `ws-items-${Date.now()}`;
+  const asWorker = await workerContext(TEST_WORKER_TOKEN);
+  const items = [
+    { item_id: 'a', bound: 'h1', payload: { text: 'MARCHÉ' }, proposal: [{ name: 'Chợ' }] },
+    { item_id: 'b', bound: 'h2', payload: { text: 'ÉGLISE' } },
+  ];
+
+  const first = await asWorker.post('/api/pipeline/review-items', {
+    data: { task: reviewTask(key), items },
+  });
+  expect(first.ok(), await first.text()).toBe(true);
+  expect((await first.json()).items).toBe(2);
+
+  const { data: task } = await admin.from('review_tasks').select('*').eq('key', key).single();
+  expect(task).toMatchObject({ status: 'draft', audience: 'staff', seed: 11 });
+
+  // Idempotent: the same call with a new proposal and bound replaces, not duplicates.
+  const again = await asWorker.post('/api/pipeline/review-items', {
+    data: {
+      task: reviewTask(key, { status: 'open', title: 'Write smoke 2' }),
+      items: [{ ...items[0], bound: 'h1b', proposal: [{ name: 'Chợ Bến Thành' }] }, items[1]],
+    },
+  });
+  expect(again.ok(), await again.text()).toBe(true);
+  const { data: rows } = await admin
+    .from('review_items')
+    .select('item_id, bound, proposal, gold, active')
+    .eq('task', key)
+    .order('item_id');
+  expect(rows).toHaveLength(2);
+  expect(rows![0]).toMatchObject({
+    bound: 'h1b',
+    proposal: [{ name: 'Chợ Bến Thành' }],
+    active: true,
+  });
+  expect(rows![1].proposal).toBeNull();
+  const { data: renamed } = await admin
+    .from('review_tasks')
+    .select('title, status')
+    .eq('key', key)
+    .single();
+  expect(renamed).toEqual({ title: 'Write smoke 2', status: 'open' });
+
+  for (const bad of [
+    { task: reviewTask(key, { blind_frac: 20 }), items },
+    { task: reviewTask(key), items: [] },
+    { task: reviewTask(key), items: [{ item_id: 'a', bound: 'h', payload: [] }] },
+    { task: reviewTask(key, { Seed: 1 }), items },
+  ]) {
+    expect((await asWorker.post('/api/pipeline/review-items', { data: bad })).status()).toBe(400);
+  }
+  const notJson = await asWorker.post('/api/pipeline/review-items', {
+    headers: { 'Content-Type': 'application/json' },
+    data: '{nope',
+  });
+  expect(notJson.status()).toBe(400);
+
+  // A worker key scoped to another kind may not write review items.
+  await admin.from('worker_keys').delete().eq('name', 'write-smoke-review-ocr-only');
+  await admin.from('worker_keys').insert({
+    name: 'write-smoke-review-ocr-only',
+    kinds: ['ocr'],
+    token_hash: createHash('sha256').update(REVIEW_OCR_ONLY_TOKEN).digest('hex'),
+  });
+  const scoped = await workerContext(REVIEW_OCR_ONLY_TOKEN);
+  expect(
+    (
+      await scoped.post('/api/pipeline/review-items', { data: { task: reviewTask(key), items } })
+    ).status()
+  ).toBe(403);
+  expect((await scoped.get(`/api/pipeline/review-events?task=${key}`)).status()).toBe(403);
+  await scoped.dispose();
+  await admin.from('worker_keys').delete().eq('name', 'write-smoke-review-ocr-only');
+
+  const anon = await workerContext();
+  expect(
+    (
+      await anon.post('/api/pipeline/review-items', { data: { task: reviewTask(key), items } })
+    ).status()
+  ).toBe(401);
+  expect((await anon.get(`/api/pipeline/review-events?task=${key}`)).status()).toBe(401);
+  await anon.dispose();
+
+  // No events yet, so the task and its items can still be taken back out.
+  await admin.from('review_items').delete().eq('task', key);
+  await admin.from('review_tasks').delete().eq('key', key);
+  await asWorker.dispose();
+});
+
+test('review events are insert-only; a reviewer reads only their own; clients never read items', async () => {
+  const key = `ws-events-${Date.now()}`;
+  await admin.from('review_tasks').insert(reviewTask(key));
+  await admin.from('review_items').insert([
+    { task: key, item_id: 'a', bound: 'h1', payload: {}, proposal: [{ name: 'secret proposal' }] },
+    { task: key, item_id: 'b', bound: 'h2', payload: {} },
+  ]);
+
+  const email = `write-smoke-other-${Date.now()}@vma.test`;
+  const { data: other, error: otherErr } = await admin.auth.admin.createUser({
+    email,
+    password: 'write-smoke-password',
+    email_confirm: true,
+  });
+  expect(otherErr, otherErr?.message).toBeNull();
+  const otherId = other.user!.id;
+
+  const staffId = session.user.id;
+  const { error: insErr } = await admin
+    .from('review_events')
+    .insert([
+      eventRow(key, 'a', staffId),
+      eventRow(key, 'b', staffId, { order_idx: 1 }),
+      eventRow(key, 'a', otherId),
+    ]);
+  expect(insErr, insErr?.message).toBeNull();
+
+  // Insert-only: no UPDATE and no DELETE, not even for the service role.
+  const upd = await admin.from('review_events').update({ note: 'edited' }).eq('task', key);
+  expect(upd.error?.code).toBe('42501');
+  const del = await admin.from('review_events').delete().eq('task', key);
+  expect(del.error?.code).toBe('42501');
+  const { data: still } = await admin.from('review_events').select('note').eq('task', key);
+  expect(still).toHaveLength(3);
+  expect(still!.every((r) => r.note === '')).toBe(true);
+
+  // Each event's own id is its only name; a retry carries the same client_id and is refused.
+  const { data: first } = await admin
+    .from('review_events')
+    .select('client_id')
+    .eq('task', key)
+    .limit(1)
+    .single();
+  const dup = await admin
+    .from('review_events')
+    .insert(eventRow(key, 'b', staffId, { client_id: first!.client_id }));
+  expect(dup.error?.code).toBe('23505');
+  // decided before shown, an event for an item that does not exist, a bad shape: all refused.
+  const backwards = await admin
+    .from('review_events')
+    .insert(eventRow(key, 'a', staffId, { decided_at: '2026-10-14T00:59:00Z' }));
+  expect(backwards.error?.code).toBe('23514');
+  const orphan = await admin.from('review_events').insert(eventRow(key, 'nope', staffId));
+  expect(orphan.error?.code).toBe('23503');
+  const shape = await admin
+    .from('review_events')
+    .insert(eventRow(key, 'a', staffId, { verdicts: [] }));
+  expect(shape.error?.code).toBe('23514');
+
+  // An item or task that has events cannot be deleted; retire an item with active = false.
+  expect(
+    (await admin.from('review_items').delete().eq('task', key).eq('item_id', 'a')).error?.code
+  ).toBe('23503');
+  expect((await admin.from('review_tasks').delete().eq('key', key)).error?.code).toBe('23503');
+
+  // A reviewer reads only their own rows, and cannot write.
+  const asStaff = createClient(SUPABASE_URL, ANON_KEY, {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: `Bearer ${session.access_token}` } },
+  });
+  const mine = await asStaff.from('review_events').select('reviewer').eq('task', key);
+  expect(mine.error).toBeNull();
+  expect(mine.data).toHaveLength(2);
+  expect(mine.data!.every((r) => r.reviewer === staffId)).toBe(true);
+  expect(
+    (await asStaff.from('review_events').insert(eventRow(key, 'b', staffId))).error?.code
+  ).toBe('42501');
+
+  const asOther = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
+  const signIn = await asOther.auth.signInWithPassword({ email, password: 'write-smoke-password' });
+  expect(signIn.error, signIn.error?.message).toBeNull();
+  const theirs = await asOther.from('review_events').select('reviewer').eq('task', key);
+  expect(theirs.data).toHaveLength(1);
+  expect(theirs.data![0].reviewer).toBe(otherId);
+
+  // Blind means blind: no client role can read the proposals or the tasks at all.
+  for (const client of [asStaff, asOther, createClient(SUPABASE_URL, ANON_KEY)]) {
+    expect((await client.from('review_items').select('proposal')).error?.code).toBe('42501');
+    expect((await client.from('review_tasks').select('key')).error?.code).toBe('42501');
+  }
+  const noUser = await createClient(SUPABASE_URL, ANON_KEY).from('review_events').select('id');
+  expect(noUser.error?.code).toBe('42501');
+
+  // Deleting an account keeps the evidence.
+  await admin.auth.admin.deleteUser(otherId);
+  const { data: kept } = await admin.from('review_events').select('reviewer').eq('task', key);
+  expect(kept).toHaveLength(3);
+  expect(kept!.filter((r) => r.reviewer === null)).toHaveLength(1);
+});
+
+test('GET /api/pipeline/review-events pages by id and freezes the task once events exist', async () => {
+  const key = `ws-export-${Date.now()}`;
+  const asWorker = await workerContext(TEST_WORKER_TOKEN);
+  const items = [
+    { item_id: 'a', bound: 'h1', payload: {} },
+    { item_id: 'b', bound: 'h2', payload: {} },
+  ];
+  expect(
+    (
+      await asWorker.post('/api/pipeline/review-items', { data: { task: reviewTask(key), items } })
+    ).ok()
+  ).toBe(true);
+
+  const empty = await asWorker.get(`/api/pipeline/review-events?task=${key}`);
+  expect(await empty.json()).toEqual({ events: [], reviewers: {}, next_after: null });
+  expect((await asWorker.get('/api/pipeline/review-events?task=ws-no-such-task')).status()).toBe(
+    404
+  );
+  expect((await asWorker.get('/api/pipeline/review-events?task=Bad%20Key')).status()).toBe(400);
+  expect((await asWorker.get(`/api/pipeline/review-events?task=${key}&limit=0`)).status()).toBe(
+    400
+  );
+
+  const staffId = session.user.id;
+  await admin
+    .from('review_events')
+    .insert([
+      eventRow(key, 'a', staffId),
+      eventRow(key, 'b', staffId, { order_idx: 1 }),
+      eventRow(key, 'a', staffId, { order_idx: 2, verdicts: { undone: true } }),
+    ]);
+
+  const page1 = await (
+    await asWorker.get(`/api/pipeline/review-events?task=${key}&limit=2`)
+  ).json();
+  expect(page1.events).toHaveLength(2);
+  expect(page1.events.map((e: { order_idx: number }) => e.order_idx)).toEqual([0, 1]);
+  expect(page1.next_after).toBe(page1.events[1].id);
+  expect(Object.keys(page1.reviewers)).toEqual([staffId]);
+  expect(page1.events[0]).not.toHaveProperty('client');
+  const page2 = await (
+    await asWorker.get(`/api/pipeline/review-events?task=${key}&limit=2&after=${page1.next_after}`)
+  ).json();
+  expect(page2.events).toHaveLength(1);
+  expect(page2.events[0].verdicts).toEqual({ undone: true });
+  expect(page2.next_after).toBeNull();
+
+  // Frozen: with events, the seed and blind share cannot move under a running sitting.
+  const moved = await asWorker.post('/api/pipeline/review-items', {
+    data: { task: reviewTask(key, { seed: 12 }), items },
+  });
+  expect(moved.status()).toBe(409);
+  const same = await asWorker.post('/api/pipeline/review-items', {
+    data: { task: reviewTask(key, { status: 'open' }), items },
+  });
+  expect(same.ok(), await same.text()).toBe(true);
+  await asWorker.dispose();
 });
