@@ -143,6 +143,13 @@
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
+      // A retry sends only rows not yet created; a created row keeps its line in the script.
+      if (r.id && r.status === 'created') {
+        cmds.push(`./scripts/tile_map.sh ${r.id} ${shellQuote(r.path)}`);
+        cmds.push(`# ↑ ${r.name} (${r.year || '?'})`);
+        okCount++;
+        continue;
+      }
       if (!r.path.trim() || !r.name.trim()) {
         rows[i] = { ...r, status: 'failed', error: 'path and name required' };
         failCount++;
