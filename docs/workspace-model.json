@@ -15,12 +15,14 @@
         {
           "path": "work/research/press",
           "purpose": "Period newspaper searches",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/research/README.md"
         },
         {
           "path": "work/research/legend",
           "purpose": "Period-text timeline artifacts",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/research/README.md"
         },
         {
           "path": "docs/research/allmaps-series-note.md",
@@ -30,7 +32,8 @@
         {
           "path": "work/usgs",
           "purpose": "USGS and NGA Vietnam product list",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/README.md"
         }
       ]
     },
@@ -48,6 +51,26 @@
           "path": "docs/admin-tooling.md",
           "purpose": "Catalog and holdings operations",
           "availability": "repository"
+        },
+        {
+          "path": "supabase",
+          "purpose": "Database schema, migrations and the local test stack",
+          "availability": "repository",
+          "read": [
+            "supabase/CLAUDE.md",
+            "docs/db-guidelines.md"
+          ]
+        },
+        {
+          "path": "work/analysis/catalog",
+          "purpose": "Map-type audit data from 2026-10-06",
+          "availability": "repository",
+          "read": "docs/catalog-map-type-audit.md"
+        },
+        {
+          "path": "work/analysis/l7014",
+          "purpose": "L7014 cell and map inventory from read-only database reads",
+          "availability": "repository"
         }
       ]
     },
@@ -59,22 +82,26 @@
         {
           "path": "work/indochine-100k",
           "purpose": "Survey placement dataset and tuning",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/README.md"
         },
         {
           "path": "work/tonkin",
           "purpose": "Tonkin placement dataset",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/README.md"
         },
         {
           "path": "work/l7014",
           "purpose": "L7014 scans and placement builds",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/analysis/l7014/README.md"
         },
         {
           "path": "work/analysis/saigon6",
           "purpose": "Saigon control-point picker",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/analysis/README.md"
         },
         {
           "path": "work/analysis/georef_coverage.md",
@@ -89,7 +116,8 @@
         {
           "path": "work/vn1971",
           "purpose": "1971 provincial maps: grid georeferences and Allmaps annotations",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "docs/pipelines.md"
         },
         {
           "path": "work/l909",
@@ -131,7 +159,8 @@
         {
           "path": "work/image-processing/experiments/segmentation-20260919",
           "purpose": "Dated segmentation review pack; prose retained in repository",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "docs/image-processing-1882-plan.md"
         },
         {
           "path": "work/image-processing/experiments/modern-overlays",
@@ -146,7 +175,8 @@
         {
           "path": "work/image-processing/results",
           "purpose": "Generated OCR, layout, polygon and reference outputs",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/image-processing/README.md"
         },
         {
           "path": "work/ocr/EVAL-BASELINE.md",
@@ -166,6 +196,12 @@
         {
           "path": "work/review-kit",
           "purpose": "Review page and record writers for reading checks",
+          "availability": "repository",
+          "read": "docs/digest-pipeline-plan.md"
+        },
+        {
+          "path": "work/image-processing/experiments/osm-warp",
+          "purpose": "OSM warp evidence for the 1882/1898 colour study",
           "availability": "repository"
         }
       ]
@@ -179,6 +215,17 @@
           "path": "work/research/doling",
           "purpose": "Source-derived street-name pairs and provenance",
           "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/place-links",
+          "purpose": "Machine-proposed 1882 label-to-today place links, confirmed by a person",
+          "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/then-now",
+          "purpose": "Review page where the owner judges 1882 then-now block differences",
+          "availability": "repository",
+          "read": "docs/digest-pipeline-plan.md"
         }
       ]
     },
@@ -200,7 +247,8 @@
         {
           "path": "work/research/reports",
           "purpose": "Generated research reports",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/analysis/README.md"
         },
         {
           "path": "docs/paper",
@@ -237,12 +285,14 @@
         {
           "path": "work/proto",
           "purpose": "Viewer prototypes",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/README.md"
         },
         {
           "path": "work/copy",
           "purpose": "Copy and translations",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/README.md"
         },
         {
           "path": "docs/user-guide.md",
@@ -263,6 +313,21 @@
           "path": "docs/walk-plan.md",
           "purpose": "Walk plan",
           "availability": "repository"
+        },
+        {
+          "path": "src",
+          "purpose": "SvelteKit app: routes, map runtime, data access, components",
+          "availability": "repository",
+          "read": [
+            "src/lib/CLAUDE.md",
+            "src/routes/CLAUDE.md"
+          ]
+        },
+        {
+          "path": "static",
+          "purpose": "Fonts, icons and images the app serves",
+          "availability": "repository",
+          "read": "docs/design-system.md"
         }
       ]
     },
@@ -274,7 +339,8 @@
         {
           "path": "work/worker",
           "purpose": "Pipeline orchestration across layers",
-          "availability": "repository"
+          "availability": "repository",
+          "read": "work/CLAUDE.md"
         },
         {
           "path": "work/image-processing/build_catalog.py",
@@ -284,7 +350,8 @@
         {
           "path": "work/image-processing/logs",
           "purpose": "Execution transcripts",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/image-processing/README.md"
         },
         {
           "path": "docs/architecture.md",
@@ -354,21 +421,97 @@
         {
           "path": "work/archive/vectorize",
           "purpose": "Retired colour-profile previews retained as evidence",
-          "availability": "local"
+          "availability": "local",
+          "read": "work/archive/README.md"
         },
         {
           "path": "scripts",
           "purpose": "Commands that act on the live system: ingest, enqueue, audit, georeference writes, layout check",
-          "availability": "repository"
+          "availability": "repository",
+          "read": [
+            "docs/pipelines.md",
+            "docs/admin-tooling.md"
+          ]
         },
         {
           "path": "work/core",
           "purpose": "Shared Python package (vma_core) for the OCR, segmentation and worker pipelines",
           "availability": "repository"
+        },
+        {
+          "path": "tests",
+          "purpose": "Playwright checks: read-only, plus write-path tests on a local stack",
+          "availability": "repository",
+          "read": "docs/testing.md"
+        },
+        {
+          "path": "contracts",
+          "purpose": "JSON Schemas for output shapes shared with other apps",
+          "availability": "repository"
+        },
+        {
+          "path": "worker",
+          "purpose": "Cloudflare Worker that proxies IIIF tile requests to R2",
+          "availability": "repository",
+          "read": "docs/admin-tooling.md"
+        },
+        {
+          "path": ".github",
+          "purpose": "Pull request checks: app, write tests, Python, worker, layout",
+          "availability": "repository",
+          "read": ".github/workflows/ci.yml"
         }
       ]
     }
   ],
+  "start_here": [
+    {
+      "path": "CLAUDE.md",
+      "purpose": "Rules, commands and names; loads every session"
+    },
+    {
+      "path": "docs/NOW.md",
+      "purpose": "Goal, current bets, the idea gate, who works on what"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "purpose": "The one backlog; open items only"
+    },
+    {
+      "path": "docs/README.md",
+      "purpose": "Index of every guide, plan and record"
+    },
+    {
+      "path": "src/lib/CLAUDE.md",
+      "purpose": "App code: Svelte dialect, layering, map runtime, data access"
+    },
+    {
+      "path": "src/routes/CLAUDE.md",
+      "purpose": "Routes, modes, API contract, admin tooling"
+    },
+    {
+      "path": "supabase/CLAUDE.md",
+      "purpose": "Schema rules, migrations, local write-test stack"
+    },
+    {
+      "path": "work/CLAUDE.md",
+      "purpose": "The worker, OCR and MapSAM2"
+    },
+    {
+      "path": "docs/paper/CLAUDE.md",
+      "purpose": "The manuscript: source of truth, number ledger, claim rules"
+    }
+  ],
+  "scan": [
+    "",
+    "work",
+    "work/analysis",
+    "work/research",
+    "work/image-processing/experiments"
+  ],
+  "unlisted": {
+    ".agents": "Agent skill files, not project material"
+  },
   "historical": [
     "docs/archive",
     "docs/roadmap-record.md",

@@ -1,5 +1,7 @@
 # Place links, 1882 Plan Cadastral (offline prototype)
 
+Part of the **entities** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 Machines suggest "what stands here today" for each place-naming label; a person confirms; every verdict
 records its time and the exact candidate list it judged. Map `0e02b9d9-9d40-4cca-8e41-8c8373d54d3b`.
 

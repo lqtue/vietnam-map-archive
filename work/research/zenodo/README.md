@@ -1,5 +1,7 @@
 # Zenodo release preparation — L7014 verification artifacts
 
+Part of the **studies** layer — see [ATLAS](../../../docs/ATLAS.md).
+
 This directory is a release preparation record. It is not a Zenodo deposition and
 contains no DOI. The source scans and generated rasters remain outside the repository;
 the release should contain derived geometry, verification tables, provenance, and the

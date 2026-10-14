@@ -84,6 +84,8 @@ Only `main` reaches production. Full story: `docs/deploy.md`.
 
 ## Docs
 
+`docs/ATLAS.md` (generated) maps every folder to its layer and the doc to read first.
+
 `docs/README.md` is the index. Before code: `architecture.md`, `conventions.md`,
 `system-guidelines.md`, `api.md`, `testing.md`. Before a migration or any number-producing run:
 `db-guidelines.md`, `lessons.md`. Before deploying: `deploy.md`.

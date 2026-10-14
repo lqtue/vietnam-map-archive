@@ -1,5 +1,7 @@
 # CartoMundi rights index — 2026-09-30
 
+Part of the **sources** layer — see [ATLAS](../../../docs/ATLAS.md).
+
 `sheets.csv` lists every distinct Nakala DOI found in VMA's local CartoMundi
 source files for the Tonkin 1:25,000 and Indochine 1:100,000 surveys. The script
 queried each DOI's public `GET https://api.nakala.fr/datas/<doi>` record and read

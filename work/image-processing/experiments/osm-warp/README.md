@@ -1,5 +1,7 @@
 # OSM warp evidence (2026-10-02)
 
+Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 Record: [colour EDA journal](../../../../docs/journals/261002-colour-eda-1882-1898.md).
 The local evidence is `summary.json`, `streets_warped_1882.geojson`, and the three
 `fig_*.png` figures. These derived outputs remain gitignored pending the modern-layer

@@ -1,5 +1,7 @@
 # L909 catalogue-backed city index
 
+Part of the **placement** layer — see [ATLAS](../../docs/ATLAS.md).
+
 The source snapshot records PCL’s explicitly labelled L909 city-map items from
 https://maps.lib.utexas.edu/maps/vietnam.html, checked 2026-10-06. It contains 21
 items for 19 distinct cities; the Nha Trang and Qui Nhon versos belong to their

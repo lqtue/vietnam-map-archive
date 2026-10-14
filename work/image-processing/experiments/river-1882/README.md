@@ -1,5 +1,7 @@
 # 1882 river pilot — source-pixel windows
 
+Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 The five windows in `river-windows.json` were selected by looking at the 1882
 cadastral scan at native resolution on 2026-10-01. Their canonical image service is
 **VMA's IIIF mirror** at `https://iiif.maparchive.vn/iiif/0e02b9d9-9d40-4cca-8e41-8c8373d54d3b`.

@@ -1,5 +1,7 @@
 # 1882 and 1898 river EDA
 
+Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 **2026-10-01.** Both images come from `iiif.maparchive.vn`, using its fixed
 tile URLs. `eda.py` caches the *original JPEG response bytes* in
 `/private/tmp/vma-river-iiif-raw-cache`; the shared `fetch_crop_level0` helper

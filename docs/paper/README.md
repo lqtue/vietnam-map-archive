@@ -1,5 +1,7 @@
 # Paper reading guide
 
+Part of the **studies** layer — see [ATLAS](../ATLAS.md).
+
 *Blind by construction: verifying a georeferenced map series when the check shares the error.*
 [Documentation guide](../README.md).
 

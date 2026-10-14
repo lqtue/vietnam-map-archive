@@ -1,6 +1,7 @@
 # Vietnam Map Archive documentation
 
 Start here to find a guide, understand the system, or locate the evidence behind a result.
+For a folder-by-folder map of the workspace, with what each holds and what to read first, use the [Atlas](ATLAS.md).
 For scripts, datasets and local experiments, use the [work directory guide](../work/README.md).
 
 The [directory layout](model-layout.md) follows the same layers as the knowledge system.
