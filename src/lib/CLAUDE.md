@@ -45,7 +45,7 @@ else under another feature is private. Routes may import anything under `feature
 
 ```
 src/lib/
-├─ core/      pure — no OL, no Supabase        geo/ georef/ i18n/ iiif/ utils/ (+ utils/persistence/)
+├─ core/      pure — no OL, no Supabase        geo/ georef/ i18n/ iiif/ review/ utils/ (+ utils/persistence/)
 ├─ data/      DB/HTTP access + canonical types  supabase/ maps/ admin/
 ├─ server/    $lib/server — SvelteKit blocks client import
 │             auth.ts supabaseAdmin.ts http.ts storage.ts ia.ts mapFields.ts
@@ -135,6 +135,35 @@ SUPABASE_SERVICE_KEY            # admin API routes only; the sb_secret_… key
 IA_S3_ACCESS_KEY, IA_S3_SECRET_KEY   # Internet Archive upload
 VMA_API_URL, VMA_WORKER_KEY     # worker machines only — never the web app
 ```
+
+## Review words and saving
+
+**Words.** A person's decision has three words: `pending`, `approved`, `rejected`. A machine's
+output is `proposed` until a person decides. On screen a person "approves": "validated" and
+"accepted" are database words only. The database columns keep their own words; `core/review/status.ts` maps
+each table's to the house word and a label (`reviewWord('ocr', 'validated') === 'approved'`). Use
+it for any badge, filter or count that names a status. Tables: OCR, footprints, scout, stories,
+triage. A new review table adds a row there and a test in `tests/review-status.spec.ts`.
+
+**Two save models, no third.**
+
+| | Decisions | Edits |
+|---|---|---|
+| What | approve, reject, pick, mark | boxes, text, points, fields |
+| Saves | at once, one request per item | as a draft, by a "Save N" button |
+| Undo | yes: `u` undoes the last decision | discard the draft |
+| Guard | none needed | `beforeunload` and a `confirm` before switching item or sheet |
+
+- A decision that fails stays on screen with Retry; the row does not leave the queue. Never count a
+  failed request as done: `fetch` does not throw on 4xx or 5xx, so check `res.ok`.
+- A draft shows how many changes it holds. Leaving with some asks first. `OcrDraftSession` and the
+  Legend guard (`LegendPage`: `beforeunload` plus `confirm('Discard {N} unsaved changes?')`) are the
+  examples.
+- Studio and Story autosave to `localStorage`. That is the edit model with a local cache: the
+  server still gets the work only on Save or Submit, so the guard still applies.
+- Every decision will also write a `review_events` row (who, what, `shown_at`, `decided_at`) once
+  the review-page plan lands (`docs/plans/review-page-plan.md`). Today only some tools stamp the
+  reviewer. Do not build a second log.
 
 ## The component vocabulary is one of each
 

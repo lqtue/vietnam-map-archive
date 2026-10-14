@@ -39,14 +39,14 @@ is linked while its count is described as indexed cities.
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **481** tests (`npx playwright test --list`, 2026-10-14, after `keys.spec.ts` came):
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **493** tests (`npx playwright test --list`, 2026-10-14, after `keys.spec.ts` came):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
 catalog drawer pointed at the old address; it uses a synthetic uuid on purpose, because the redirect
 is a URL rewrite that knows nothing about the row and pinning it to a real sheet would fail the day
 that sheet is unpublished) and the **eleven** in `tests/catalog-series.spec.ts`, which are
-**read-only** (they hit the real Supabase project but never write), plus 451 browser-less pure
+**read-only** (they hit the real Supabase project but never write), plus 470 browser-less pure
 checks that ride the same runner — `tests/l7014-model.spec.ts` (series facets match the durable key
 after a display-label change and omit unlinked maps; two scans group only when they have the same
 printing UUID; unresolved scans remain separate, and an institution is held only through
@@ -55,7 +55,7 @@ an explicit matching printing or source-item link), `tests/sheet-printing-fields
 dates are not guessed from booleans/fractions, and metadata edits preserve existing evidence),
 `tests/press.spec.ts` (the Gallica CQL builder and the NLV year
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
-camera survives its own `?map=`), `tests/keys.spec.ts` (`use:keys`, the one keyboard action: it skips typing fields, held Ctrl/Meta/Alt unless the binding asks, a key already taken, and Enter or Space on a focused button; `update` swaps the map and `destroy` removes the listener. Events are plain objects, so a regression is a wrong key swallowed in a field, which does not look like a bug until someone types a `v`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
+camera survives its own `?map=`), `tests/review-status.spec.ts` (the review words: each table's own status — OCR `validated`, footprint `needs_review`, scout `ingested`, story `submitted`, triage `ready` — maps to `pending`, `approved`, `rejected` or, for a machine's unjudged output, `proposed`. A wrong row shows a rejected footprint as "Approved" and the page reads fine; the file also fails to compile if an app status type gains a value the map has not heard of), `tests/keys.spec.ts` (`use:keys`, the one keyboard action: it skips typing fields, held Ctrl/Meta/Alt unless the binding asks, a key already taken, and Enter or Space on a focused button; `update` swaps the map and `destroy` removes the listener. Events are plain objects, so a regression is a wrong key swallowed in a field, which does not look like a bug until someone types a `v`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
 animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker),
 `tests/map-region.spec.ts` (the 63 provinces fold into exactly 34, a sheet takes the province under most of it rather than under its centre, open water keeps its province but a neighbour's land does not, a country-scale bbox gets none),
 `tests/local-search.spec.ts` (the catalog's in-browser search: accents and đ fold both ways, every token must start a word, `1920s` is a prefix, a sheet number matches its column exactly),
