@@ -165,16 +165,20 @@ Side states: stale (409), offline or server error, all done, not signed in, not 
 | `u` | Undo your last live verdict and show that item again | |
 | `o` `v` `w` | Open today's view: 1882 over today, satellite, street view | New tab, from the item's own position |
 
-- **Key clashes with other tools** (`x` rejects in Text, `v` validates, `n` is next in Legend;
-  `docs/guides/pages/tools.md`, Keyboard map): the offline keys stay for the first test, so the
-  timing compares like for like. The house keymap settles them before contributors arrive.
+- **Keys and the house keymap** (`docs/guides/design-system.md` § Keys). Agree already: `/` search,
+  `u` undo, `Esc` cancel. Clash: `?` is "unsure" here but "show keys" in the house map, and `v` opens
+  satellite here but approves elsewhere. The offline keys stay for the first test, so the timing
+  compares like for like. Before contributors (v2): "unsure" moves to `.`, `?` shows the keys, and
+  the See-today links move to `Shift`+`O` `V` `W`. Place-link has no approve or reject (its verdict
+  is a relation), so `v` and `x` are not reused for other meanings once it moves.
 - **Send is one key, no confirm step.** A wrong verdict is fixed with `u`, as offline. This keeps
   seconds per item comparable.
 - **Saving:** the buttons lock and the next item loads when the server answers. The next item's
   timer starts only when its views have loaded, so a slow network adds no human time.
 - **Stale (409):** "This item changed since it was loaded; your verdict was not saved." Next item.
 - **Network error:** the verdict stays on screen with Retry; nothing is lost and nothing is sent twice
-  (the request carries a client id the server treats as a unique key).
+  (the request carries a client id the server treats as a unique key). A failed item load shows
+  `LoadError` with Retry, never an empty "all done" (house rule: States).
 - **All done:** the count, your median seconds per item, and a link back to `/review`.
 - **Accessibility:** every key has a button with `aria-keyshortcuts`; focus is visible; the result of
   each send is announced in a polite live region; colour is never the only cue.
@@ -213,9 +217,14 @@ Legacy mode, as everywhere: `$:`, `export let`, stores, `<svelte:component>`; no
 - **Overlay in image pixels for free.** Each view is an `<img>` with an `<svg viewBox="0 0 w h">`
   of the same box on top. Markers, boxes and outlines use the image's own pixel numbers, so the
   15 px drift the offline template once had cannot happen, and no JS measures the DOM.
-- **Keys come from the task definition.** One `<svelte:window on:keydown>` in the frame looks the key
-  up in `task.keys`, skips when `isTypingTarget` (`$lib/core/utils/commandPalette`) is true, and calls
-  the same function as the button. Each button carries `aria-keyshortcuts`.
+- **Keys come from the task definition.** The frame passes `task.keys` (plus `u`, `/`, `t` and the
+  See-today keys) to `use:keys` (`$lib/core/utils/keys.ts`), which skips typing fields and held
+  modifiers and tears itself down. Each key calls the same function as its button, and each button
+  carries `aria-keyshortcuts`.
+- **Review words** (`src/lib/CLAUDE.md` § Review words and saving): an item is `proposed` (the
+  machine's candidates) until a person sends a verdict. The verdict is a decision, saved at once with
+  undo — save model (a). The task's own values (`same_building`, `gone`, …) are readings inside
+  `verdicts`, not status words, so `core/review/status.ts` needs no entry for them.
 - **Stamps from the template, not timers.** `on:load` on each `<img>` counts loads; the last one
   sets `shown_at`. `<svelte:document on:visibilitychange>` adds to `hidden_ms`. No `setInterval`.
 - **The task overlay is `<svelte:component this={task.overlay} {payload} {proposal} />`.** On the
