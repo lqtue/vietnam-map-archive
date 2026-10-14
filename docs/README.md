@@ -5,6 +5,8 @@ For a folder-by-folder map of the workspace, with what each holds and what to re
 For scripts, datasets and local experiments, use the [work directory guide](../work/README.md).
 Guides (`guides/`) say how the system works and how to work on it; plans (`plans/`) say where it is going.
 
+[Page specs](guides/pages/README.md) — every web page in one template, with the bugs and house-rule gaps found on 2026-10-14.
+
 The [directory layout](model-layout.md) follows the same layers as the knowledge system.
 The [map-type audit](plans/catalog-map-type-audit.md) records the original-map review and pending classification questions.
 The [workspace mapping](workspace-model.json) declares each area's primary responsibility;
