@@ -165,6 +165,9 @@ Side states: stale (409), offline or server error, all done, not signed in, not 
 | `u` | Undo your last live verdict and show that item again | |
 | `o` `v` `w` | Open today's view: 1882 over today, satellite, street view | New tab, from the item's own position |
 
+- **Key clashes with other tools** (`x` rejects in Text, `v` validates, `n` is next in Legend;
+  `docs/guides/pages/tools.md`, Keyboard map): the offline keys stay for the first test, so the
+  timing compares like for like. The house keymap settles them before contributors arrive.
 - **Send is one key, no confirm step.** A wrong verdict is fixed with `u`, as offline. This keeps
   seconds per item comparable.
 - **Saving:** the buttons lock and the next item loads when the server answers. The next item's
