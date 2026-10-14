@@ -219,7 +219,7 @@ Public / other:
   drafts gated by role) and each hit's bbox centre warped to lng/lat via
   `$lib/server/transformer.ts`. Rendered by `LabelHits.svelte` on /catalog (links to
   `/explore?map=<id>&at=<lng>,<lat>`) and in /explore's browse pane (stacks the map, lands on the
-  spot). Only maps that have been OCR'd can hit — `scripts/enqueue_ocr_all.mjs` queues the rest —
+  spot). Only maps that have been OCR'd can hit — `scripts/queue/enqueue_ocr_all.mjs` queues the rest —
   triaged sheets only, unless `--untriaged`. **`include=places`** searches the gazetteer (mig 067's
   `place_names` view); a hit resolves to its `/place/<slug>` page (which 301s to `/catalog/place/`)
   and is what the command palette turns into place rows.

@@ -37,9 +37,9 @@ stretch, names read, names matched across years — from facts `layers.json` alr
 ## Regenerating
 
 ```
-python3 scripts/gen_system_graph.py            # plain view     -> docs/system-graph.svg
-python3 scripts/gen_system_graph_technical.py  # engineer view  -> docs/system-graph-technical.svg
-node scripts/gen_system_graph_png.mjs          # both           -> .png, 2x, light theme
+python3 scripts/gen/gen_system_graph.py            # plain view     -> docs/system-graph.svg
+python3 scripts/gen/gen_system_graph_technical.py  # engineer view  -> docs/system-graph-technical.svg
+node scripts/gen/gen_system_graph_png.mjs          # both           -> .png, 2x, light theme
 ```
 
 The layouts are fixed grids on purpose: an auto-layout (Mermaid, Graphviz) staggers the boxes and

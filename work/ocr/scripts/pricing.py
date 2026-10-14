@@ -6,7 +6,7 @@ those logs back to enforce a per-job budget. Importing `gemini_client` from the
 worker would drag in PIL and google.genai for the sake of three numbers.
 
 The rates themselves live in `work/ocr/prices.json`, not here, because
-`scripts/enqueue_ocr_all.mjs` needs the same numbers in JavaScript to estimate
+`scripts/queue/enqueue_ocr_all.mjs` needs the same numbers in JavaScript to estimate
 a sweep before it is queued. One file read by both beats a copy in each, which
 would be a duplicated signal needing a parity test to stay honest.
 """

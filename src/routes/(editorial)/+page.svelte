@@ -100,7 +100,7 @@
    *
    * They are a **pinned close-up, kept on purpose**. `HERO_SHEET` below now
    * frames the whole sheet, and the live section was refitted to it; the
-   * header was left as it was. So `scripts/gen-hero-still.mjs`, which shoots
+   * header was left as it was. So `scripts/gen/gen-hero-still.mjs`, which shoots
    * the live section, would replace these with the wide view — a decision,
    * not a repair. Re-run it only when you want the header to follow the demo
    * again.
@@ -110,7 +110,7 @@
 
   /**
    * The demo section's own assets, which are **not** the header's. These come
-   * out of `scripts/gen-hero-video.mjs`, which records the live section — so
+   * out of `scripts/gen/gen-hero-video.mjs`, which records the live section — so
    * they are the wide camera the section actually uses, and the poster is the
    * clip's own first frame. Handing the section `HERO_1882` instead is what put
    * an enlarged sheet behind the live map: that still is the pinned close-up,

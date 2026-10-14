@@ -57,7 +57,7 @@ measurement, metadata that maintains itself, and corpus size.
       separate bug: it's every unheld cell's ground rectangle, not a warped sheet's position. Affects
       all 627 cells in the L7014 index, so every gap the coverage page draws is ~470 m off from
       where the survey actually places it. A database backfill, independent of any mosaic build — re-derive each cell's bbox from `index.geojson` through `cell_corners()`
-      (`scripts/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
+      (`scripts/l7014/l7014_mosaic.py`), the same function `lattice.json` already uses. Exit: every
       `series_cells` row in `series-l7014-vietnam-1-50-000` measures inside `geo_audit.mjs`'s
       `CELL_TOL` (150 m) against `lattice.json`.
 - [ ] **`three-point-residuals`** — give the 11 remaining three-point sheets a measurable one. A
@@ -74,7 +74,7 @@ measurement, metadata that maintains itself, and corpus size.
       every one.
 - [ ] **`indochine-100k-georef`** — auto-georeference both 100k series from what they print, the
       way `tonkin_georef.py` does for the sibling 1:25,000 survey. **561: pipeline built and
-      working, first batch published 2026-09-24** — `scripts/indochine100k_georef.py`
+      working, first batch published 2026-09-24** — `scripts/indochine100k/indochine100k_georef.py`
       (`calibrate`/`place`/`check`/`annotate`) mirrors Tonkin's catalogue-driven
       `from_catalogue()`/`calibrate()` fallback against `extra_metadata.cartomundi_fkeys[0]`'s own
       UNIMARC bbox (not the unioned `series_cells.bbox` — see the journal). Calibration accepted
@@ -142,7 +142,7 @@ measurement, metadata that maintains itself, and corpus size.
       tracing the peninsula is. Exit: a precision figure alongside the recall one, with its sample
       and limitations recorded beside it.
 - [ ] **`tonkin-review`** — a person looks at all 62. `graticule-georef` (the machine half of this
-      item) is done and was already shipped before this list existed: `scripts/tonkin_georef.py`
+      item) is done and was already shipped before this list existed: `scripts/tonkin/tonkin_georef.py`
       reads each sheet's own printed corners (grades from the Paris meridian,
       `grades × 0.9 + 2.337229` = degrees east), cross-checks against the pixel quad and the
       series' own lattice, and placed 121 sheets by 2026-09-15, then 84 more by hand-corners and
@@ -151,7 +151,7 @@ measurement, metadata that maintains itself, and corpus size.
       committed). The two that do not are the two that cannot: An Thi 1904 (serie 243 does not hold
       that year) and Phat Diem 1927 (IGN never digitised the east half) — a permanent gap, not a
       bug. What is left is the pipeline's own last step, by design
-      (`annotate()`'s docstring in `scripts/tonkin_georef.py`): every one of the 62 sits at
+      (`annotate()`'s docstring in `scripts/tonkin/tonkin_georef.py`): every one of the 62 sits at
       `status = draft` with `is_georeferenced = true`, visible to a signed-in reviewer at `/explore` and
       nowhere else, on purpose, because nobody has looked at all of them yet. Exit: each reviewed,
       then `annotate(write=True, only_new=True)` plus a status flip to `public` for the ones that
@@ -192,7 +192,7 @@ Do them when the surrounding work opens the file.
 - [ ] **`scripts-apply-flag`** — sixteen one-off scripts write on a bare invocation; nine converted,
       seven not. The
       note said four such scripts existed, the next morning's audit found nine, and the real
-      number is **sixteen**: `scripts/enqueue_seg.mjs`, `enqueue_layout_all.mjs`,
+      number is **sixteen**: `scripts/queue/enqueue_seg.mjs`, `enqueue_layout_all.mjs`,
       `enqueue_ocr_all.mjs`, `collection_aoi.mjs`, `import-seg-geojson.mjs`,
       `enqueue_warp_all.mjs` and `oneoff/backfill_map_bbox.mjs` are each still
       `const dry = args.includes('--dry')` over a real write. Verified 2026-09-21: every one
@@ -245,7 +245,7 @@ Full context and the per-call measurements: `docs/roadmap-record.md`, "The OCR p
       `GEMINI_API_KEYS`; 38 maps unattended is the run that needs the spare. Google no longer
       publishes per-model limits — read <https://aistudio.google.com/rate-limit>. Exit: two keys
       set, and the daily request cap written down here.
-- [ ] **`queue-the-pass`** — `scripts/enqueue_ocr_all.mjs --dry`, then without. It queues only
+- [ ] **`queue-the-pass`** — `scripts/queue/enqueue_ocr_all.mjs --dry`, then without. It queues only
       triaged sheets, so 3h comes first or nothing is queued at all. Exit: the queued count matches
       the script's own.
 - [ ] **`drain-the-queue`** — `python work/worker/vma_worker.py --worker $(hostname)`. Hours, not
@@ -772,7 +772,7 @@ Measured in `docs/pipelines.md` §"Reading a sheet's margins". Cheapest fix firs
 - [ ] **`ci-python-worker`** — Python tests, the two `*.test.mjs` files and the `worker/` type-check
       and routing tests run in no CI. Add a cheap job: `work/core/vma_core/test_core.py`,
       `work/ocr/scripts/test_*.py` (skip `test_l7014_gcp.py`, which needs `osgeo`),
-      `node --test scripts/lib/cells.test.mjs scripts/scoutDerive.test.mjs` (the first needs the
+      `node --test scripts/lib/cells.test.mjs scripts/scout/scoutDerive.test.mjs` (the first needs the
       gitignored dumps; see `cells-test-ci`), a `tsc --noEmit` over `worker/`, and a routing test for
       `worker/src/index.ts`. Exit: all of them run on every PR.
 - [ ] **`history-rewrite`** — drop committed build output, `node_modules` and `.vercel` output from

@@ -162,7 +162,7 @@ sheet numbers 0 rows out of order
 | `fit` verdict on the shipped archive | 341 of 452 sheets more than 150 m off their cell | ibid |
 | PROJ non-uniformity (probed) | `106.00,16.00` moves **470 m**; `109.25,13.25` moves **0** | ibid |
 | the blind self-check, at population scale | of 510 source files, 62 have no usable control; **448** reach `graticule_error`; it rejects **11**, leaving **437** in the faulty build, including **all 269** displaced sheets; the rejections it did issue fire at **0.004–0.076 deg** off the printed graticule, so this is not a sensitivity limit | `regen/warp-faulty.log`, 2026-09-20 |
-| matched-pair seam result | same 715 PDF/PDF edges before/after correction: **189 → 0** above 100 m, max corrected edge 72.4 m; the two faulty-only edges (excluded from the match) measure 3.6 m and 15.6 m, so attrition cannot explain the tail's disappearance | `seam-paired-analysis.json`, `scripts/paper-seam-pairs.mjs`, 2026-09-20 |
+| matched-pair seam result | same 715 PDF/PDF edges before/after correction: **189 → 0** above 100 m, max corrected edge 72.4 m; the two faulty-only edges (excluded from the match) measure 3.6 m and 15.6 m, so attrition cannot explain the tail's disappearance | `seam-paired-analysis.json`, `scripts/l7014/paper-seam-pairs.mjs`, 2026-09-20 |
 | **A Lưới is _not_ a displaced sheet** | `6441-4` resolves to `declared`, CRS displacement **0.00 m**; `graticule_error` **2.167e-12**. It demonstrates the blind check on a *correctly placed* sheet. Never describe it as displaced — the earlier "2e-12 against a real 470 m displacement" conflated two sheets | `regen/datum-split.csv` + `REGEN.md`, 2026-09-20 |
 | CRS selection against the adopted frame | `pick_crs` scores registration points against the lattice cell (150 m cutoff, refuses above it); `cell_corners` shares the same Everest 1830 (1937 Adj.) Helmert parameters as the alternative candidate, so agreement tests consistency with the adopted frame, not independent absolute accuracy at the ~15 m index-to-outline scale | ibid |
 | the Helmert | Everest 1830 (1937 Adj.) `+a=6377276.345 +rf=300.8017 +towgs84=198,881,317` | ibid |
@@ -267,7 +267,7 @@ sheet. The metric survives; this evidence does not.
 ---
 
 **Correction, 2026-09-19 (same day).** The row above previously read *"where MapEdge's inward walk
-stops here"*. MapEdge has no inward walk — that is `scripts/l7014_neatline.py`, ours.
+stops here"*. MapEdge has no inward walk — that is `scripts/l7014/l7014_neatline.py`, ours.
 `allmaps-series-note.md:109` and `docs/private/allmaps.md:195` were correct all along; this file
 compressed the sentence and reassigned the method to Meijers & Schoonman. Caught by reading the
 paper in full. Recorded rather than silently rewritten, per the `note:` convention.

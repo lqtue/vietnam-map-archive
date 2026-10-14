@@ -5,7 +5,7 @@
 // N rows. This collapses those into one thread per thing.
 //
 // Labels dedupe by placeKey (same folding as place_key(), mig 067, and
-// scripts/dedupe_ocr.mjs) — "Rue de Khánh-Hội" 1923 and "Khanh Hoi" 1959 fold
+// scripts/queue/dedupe_ocr.mjs) — "Rue de Khánh-Hội" 1923 and "Khanh Hoi" 1959 fold
 // to the same key. Footprints have no name to key on, so they dedupe by
 // spatial proximity: greedy-cluster centroids within --thresh metres of each
 // other (haversine, same fn as scripts/sheet_align.mjs). ponytail: greedy

@@ -10,7 +10,7 @@ The current manuscript and PDF have not been changed. The exact replacements bel
 
 ## New analysis: matched seams
 
-Executed `node scripts/paper-seam-pairs.mjs` on the saved CSVs. Complete measurements and input hashes are in [seam-paired-analysis.json](seam-paired-analysis.json). A separate Python CSV calculation reproduced the overlap, thresholds, medians and excluded pairs.
+Executed `node scripts/l7014/paper-seam-pairs.mjs` on the saved CSVs. Complete measurements and input hashes are in [seam-paired-analysis.json](seam-paired-analysis.json). A separate Python CSV calculation reproduced the overlap, thresholds, medians and excluded pairs.
 
 | Quantity | Faulty | Corrected |
 | --- | ---: | ---: |
@@ -33,17 +33,17 @@ The median paired change is only −0.0335 m. This is a different statistic from
 
 ### Reference independence
 
-In `scripts/l7014_mosaic.py`, both `indian_1960_geog` (used by `cell_corners`) and `indian_1960_utm` (the alternative in `pick_crs`) use `INDIAN_1960_PROJ4`. The lattice is separate from each PDF declaration but shares the alternative's datum transformation. It cannot validate those parameters independently. An independent checkpoint study remains necessary for an absolute-accuracy claim; no such study was performed here.
+In `scripts/l7014/l7014_mosaic.py`, both `indian_1960_geog` (used by `cell_corners`) and `indian_1960_utm` (the alternative in `pick_crs`) use `INDIAN_1960_PROJ4`. The lattice is separate from each PDF declaration but shares the alternative's datum transformation. It cannot validate those parameters independently. An independent checkpoint study remains necessary for an absolute-accuracy claim; no such study was performed here.
 
 The implementation scores registration points, not two newly warped rasters: for each expected corner it finds the nearest transformed registration point, then averages those distances. It chooses the minimum candidate score if at most 150 m. When all scores are unavailable it keeps the declared/fallback CRS. The existing prose's unconditional refusal claim misses this case.
 
 ### Hand-sheet joins
 
-`scripts/l7014_hand.py:ground_quad` reads the control points' ground coordinates (or supplied ground quad); it does not measure independently warped image boundaries. Both JPG/PDF and JPG/JPG joins therefore inherit the lattice-derived control. The 0.0–0.6 m JPG/JPG result is consistency of the supplied boundaries, not free image-registration evidence. The earlier `REGEN.md` interpretation calling JPG/JPG free is superseded by this code inspection; retain it as a historical run note, not current evidentiary authority.
+`scripts/l7014/l7014_hand.py:ground_quad` reads the control points' ground coordinates (or supplied ground quad); it does not measure independently warped image boundaries. Both JPG/PDF and JPG/JPG joins therefore inherit the lattice-derived control. The 0.0–0.6 m JPG/JPG result is consistency of the supplied boundaries, not free image-registration evidence. The earlier `REGEN.md` interpretation calling JPG/JPG free is superseded by this code inspection; retain it as a historical run note, not current evidentiary authority.
 
 ### What the seam statistic measures
 
-`scripts/l7014_seams.py:measure_edge` samples 25 positions along the central 80% of an expected shared edge, compares nearest outline points, and reports the median and maximum. Census summaries use each edge's median. This measures outline agreement, not matching roads or buildings. The normal-component explanation is appropriate for nearly straight parallel edges, not a universal displacement estimator.
+`scripts/l7014/l7014_seams.py:measure_edge` samples 25 positions along the central 80% of an expected shared edge, compares nearest outline points, and reports the median and maximum. Census summaries use each edge's median. This measures outline agreement, not matching roads or buildings. The normal-component explanation is appropriate for nearly straight parallel edges, not a universal displacement estimator.
 
 ### Published population and method-comparison claims
 
@@ -165,7 +165,7 @@ the large-displacement tail. Matched-cohort medians are 9.2 m before and 6.8 m a
 
 These are descriptive comparisons within one series. Edges share sheets and are not independent
 replicates; their distances do not measure absolute accuracy or content alignment. The matched
-analysis, input hashes and excluded pairs are reproducible with `scripts/paper-seam-pairs.mjs`.
+analysis, input hashes and excluded pairs are reproducible with `scripts/l7014/paper-seam-pairs.mjs`.
 ```
 
 ### R7

@@ -22,7 +22,7 @@ exactly the 11 accepted sheets flipped from held to clear.
 Logs: `/private/tmp/indochine-place-v29.log`, `-v30.log`, `-v31.log`.
 **No annotations or database statuses changed.**
 
-Tracked changes: `scripts/indochine100k_georef.py`,
+Tracked changes: `scripts/indochine100k/indochine100k_georef.py`,
 `docs/journals/260923-indochine100k-georef.md`, `docs/lessons.md`, `docs/ROADMAP.md`, and
 this handoff.
 

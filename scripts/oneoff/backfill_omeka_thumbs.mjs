@@ -4,7 +4,7 @@
 // Omeka stores the thumbnail on the *media* object, not the item, so it takes
 // two hops: /api/items/{id} → first o:media @id → /api/media/{id} →
 // o:thumbnail_urls. Which instance a row belongs to comes from its source_url
-// host (see OMEKA_HOSTS in scripts/scoutDerive.mjs), not from `source` — the
+// host (see OMEKA_HOSTS in scripts/scout/scoutDerive.mjs), not from `source` — the
 // Bordeaux 3 rows arrive labelled `gallica`, via SRU federation.
 //
 // Supersedes backfill_humazur_thumbs.mjs, which hardcoded the one host.
@@ -16,7 +16,7 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { OMEKA_HOSTS, host, omekaItemId } from '../scoutDerive.mjs';
+import { OMEKA_HOSTS, host, omekaItemId } from '../scout/scoutDerive.mjs';
 
 const env = Object.fromEntries(
   readFileSync(resolve(process.cwd(), '.env'), 'utf8')

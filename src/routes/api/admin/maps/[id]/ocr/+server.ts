@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
   // overlap, concurrency, confidence floor, render size, pass count, prompt —
   // belongs to the worker (`_ocr_batch_argv`), which is the one place that turns
   // a payload into a command line. Restating them here is how the button came to
-  // run a 2.34x downsample while scripts/enqueue_ocr_all.mjs ran the same sheet
+  // run a 2.34x downsample while scripts/queue/enqueue_ocr_all.mjs ran the same sheet
   // at 1:1, and how `passes` came to be declared in three files.
   const payload = {
     run_id: runId,

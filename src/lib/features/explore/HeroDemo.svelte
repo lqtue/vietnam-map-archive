@@ -9,7 +9,7 @@
   What plays by default is a **clip**, not the map. The section's claim is a
   sheet arriving over the city, and a reader who never got OpenLayers — metered,
   WebGL refused, gone before ~600 kB of map arrived — used to see one frozen
-  frame of the end state and none of the movement. `scripts/gen-hero-video.mjs`
+  frame of the end state and none of the movement. `scripts/gen/gen-hero-video.mjs`
   records the real section, so the clip is the same four beats: 699 kB at
   1200px, 298 kB at 800px, against ~179 kB of JavaScript plus ~390 kB of basemap
   before OL draws a tile. Cheaper than what it stands in for, and it moves.
@@ -49,7 +49,7 @@
   export let view: { bbox: [number, number, number, number]; rotation: number };
   /**
    * The clip, wide cut and phone cut, and the poster it opens on. All four come
-   * out of `scripts/gen-hero-video.mjs` in one pass, so the poster is literally
+   * out of `scripts/gen/gen-hero-video.mjs` in one pass, so the poster is literally
    * the clip's first frame — which is what keeps the still and the moving
    * picture on the same camera. The header's own stills are a pinned close-up
    * kept on purpose and are deliberately not reused here.

@@ -64,7 +64,7 @@ from an EPSG code returns `(lat, lon)` and one from a PROJ4 string returns
 `(lon, lat)`, and **370 of 437 sheets were rejected as `offgrid`** — the datum
 fix discarded by the very check meant to supersede it.
 
-→ `scripts/l7014_mosaic.py:500` · commit `0aa04f0b`
+→ `scripts/l7014/l7014_mosaic.py:500` · commit `0aa04f0b`
 
 **The beat this section lands.** Three failures, one apparatus, each invisible
 to the layer above it. The third is the one that should worry a reader: a

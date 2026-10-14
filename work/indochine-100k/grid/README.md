@@ -3,7 +3,7 @@
 Generate locally with:
 
 ```bash
-work/ocr/.venv/bin/python scripts/indochine100k_grid.py --apply
+work/ocr/.venv/bin/python scripts/indochine100k/indochine100k_grid.py --apply
 ```
 
 The geometry comes from [CartoMundi's IGN series 561 sheet endpoint](https://www.cartomundi.fr/ctmd-services/public/etablissement/3/serie/561/feuille/exemplaire/all),
@@ -31,4 +31,4 @@ assigns their western records the same geometry key. Both carry a
 
 These polygons identify a sheet's place in the survey. They do not map its
 image pixels to ground coordinates or approve any georeference. The separate
-placement and visual checks in `scripts/indochine100k_georef.py` still apply.
+placement and visual checks in `scripts/indochine100k/indochine100k_georef.py` still apply.

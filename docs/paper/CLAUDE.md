@@ -8,7 +8,7 @@ Loads when you open a file in `docs/paper/`. Repo-wide rules are in the root `CL
 - **`draft.md` is the only hand-edited manuscript.** `blind-by-construction.tex` and `.pdf` are
   generated; `submission.md` is generated from the draft so its abstract cannot drift. Never edit
   them by hand.
-- Rebuild: `node scripts/render-paper.mjs`, then `cd docs/paper && tectonic blind-by-construction.tex`.
+- Rebuild: `node scripts/gen/render-paper.mjs`, then `cd docs/paper && tectonic blind-by-construction.tex`.
   The render also rewrites `figures/*.pdf` (needs `rsvg-convert`), so expect those in the diff.
 - Every paragraph carries `<!--block:Bnnnn-->`. New blocks take the next free id (last used:
   **B0157**) and are not yet in `revision/draft.block-manifest.json`.
@@ -37,7 +37,7 @@ Read `docs/lessons.md` before any pass that produces a number.
 
 ## Scripts and data
 
-- `scripts/paper_fault_injection.py` → `fault-injection.json` (§7.9). `scripts/paper-seam-pairs.mjs`
+- `scripts/l7014/paper_fault_injection.py` → `fault-injection.json` (§7.9). `scripts/l7014/paper-seam-pairs.mjs`
   → the matched seam analysis (§7.3). Both are reproducible from `work/l7014/`.
 - `work/l7014/` PDFs are gitignored and local only; the Zenodo deposit is not yet minted, so
   reproducibility is prospective until it is (§11, `submission.md`).

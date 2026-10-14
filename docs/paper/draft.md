@@ -708,7 +708,7 @@ the large-displacement tail. Matched-cohort medians are 9.2 m before and 6.8 m a
 <!--block:B0139-->
 These are descriptive comparisons within one series. Edges share sheets and are not independent
 replicates; their distances do not measure absolute accuracy or content alignment. The matched
-analysis, input hashes and excluded pairs are reproducible with `scripts/paper-seam-pairs.mjs`.
+analysis, input hashes and excluded pairs are reproducible with `scripts/l7014/paper-seam-pairs.mjs`.
 
 <!--block:B0091-->
 This is also the limit of the instrument. What the seam census detects is *differential*
@@ -960,7 +960,7 @@ rate.
 Table 1 is argued from each check's inputs and from one incident per cell. That is a claim about
 mechanism, not a measurement, so for the four checks this paper runs we tested the L7014 cells by
 injecting faults whose size is known by construction and running the checks unchanged
-(`scripts/paper_fault_injection.py`; output `docs/paper/fault-injection.json`). The predictions
+(`scripts/l7014/paper_fault_injection.py`; output `docs/paper/fault-injection.json`). The predictions
 were written in the script before its first run and are graded against it. Thirty sheets were drawn
 with a fixed seed from the corrected build, after requiring a clean baseline of each (graticule
 error within tolerance, lattice error under 30 m); one drawn sheet failed that requirement and was
@@ -1149,7 +1149,7 @@ over the underlying scans.
 <!--block:B0130-->
 The implementation includes the L7014 mosaic pipeline, the Indochine frame and corner-reading
 pipeline, the 1:100,000 frame, calibration and placement pipeline
-(`scripts/indochine100k_georef.py`), the series-index migrations, and the checks described in §7. The figures ledger records
+(`scripts/indochine100k/indochine100k_georef.py`), the series-index migrations, and the checks described in §7. The figures ledger records
 the source and measurement date of every number quoted in this paper. The serving archive is also
 versioned separately from a proposed correction: reproducibility requires readers to distinguish
 the evidence measured on the current layer from the dry run that supports its rebuild.

@@ -95,7 +95,7 @@ What that means in practice:
 | **Proposed — needs a look** | The AI worked out the border. Nobody has agreed. | Glance at it, press **Save triage**. |
 | **Accepted** | A person agreed. The batch script will take this sheet. | Nothing. |
 | **Layout found no main map** | The model could not find the map body. | Open it — **Suggest** reads the ink instead. |
-| **No layout pass yet** | Nothing has run. | `scripts/enqueue_layout_all.mjs`, then a worker. |
+| **No layout pass yet** | Nothing has run. | `scripts/queue/enqueue_layout_all.mjs`, then a worker. |
 
 Nothing is read, and nothing is paid for, until a person has accepted. That is
 the only manual gate left, and it is there because a wrong crop is silent: the
@@ -338,10 +338,10 @@ Triage a handful by hand first. Then queue the rest:
 
 ```bash
 # See what it would do, and read the km/call column
-node --env-file=.env scripts/enqueue_ocr_all.mjs --dry --tile-metres 1400
+node --env-file=.env scripts/queue/enqueue_ocr_all.mjs --dry --tile-metres 1400
 
 # Queue it
-node --env-file=.env scripts/enqueue_ocr_all.mjs --tile-metres 1400
+node --env-file=.env scripts/queue/enqueue_ocr_all.mjs --tile-metres 1400
 ```
 
 By default this queues **only** sheets a person has accepted. Two escape
@@ -361,13 +361,13 @@ layout pass. The whole-corpus order is therefore:
 
 ```bash
 # 1. Propose everything (cents for the corpus — one call per sheet)
-node --env-file=.env scripts/enqueue_layout_all.mjs
+node --env-file=.env scripts/queue/enqueue_layout_all.mjs
 python work/worker/vma_worker.py --worker $(hostname)   # drains it
 
 # 2. Accept them at /scan?mode=prepare — the only manual step
 
 # 3. Queue the reading
-node --env-file=.env scripts/enqueue_ocr_all.mjs --tile-metres 1400
+node --env-file=.env scripts/queue/enqueue_ocr_all.mjs --tile-metres 1400
 ```
 
 `--tile-metres` is opt-in and only ever makes a tile **finer**, never coarser: a saved triage

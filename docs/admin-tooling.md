@@ -260,11 +260,11 @@ a `no image` flag instead, which is the fact that actually decides whether inges
 
 | Script | What it does |
 |--------|--------------|
-| `scripts/scout_all_sources.mjs` | Gallica SRU (BnF + federated: Bordeaux 3, Paris, Sorbonne) + David Rumsey Luna API + Library of Congress JSON API + UWM AGDM CONTENTdm API. 15 Vietnam place keywords, `--sources` to pick. |
-| `scripts/scout_humazur.mjs` | Humazur Omeka S API (sets 59 Cartothèque ASEMI + 519 Indochine française). `--merge <existing>.json` to combine. |
-| `scripts/categorize_scout_results.mjs` | Scores + categorizes candidates. Outputs `scripts/scout_review.csv`. |
-| `scripts/load_scout_to_db.mjs` | Loads merged scout JSON into `scout_candidates`. Fixes Humazur manifest URLs (must use `iiif/{item_id}/manifest`, NOT media_id). Derives Gallica thumbnails from ARK pattern. |
-| `scripts/scoutDerive.mjs` | Per-source URL derivation, shared by the loader and the backfill so a pattern is written once: Omeka S manifests, the LoC Image API, protocol-relative permalinks. Self-check: `node scripts/scoutDerive.test.mjs`. |
+| `scripts/scout/scout_all_sources.mjs` | Gallica SRU (BnF + federated: Bordeaux 3, Paris, Sorbonne) + David Rumsey Luna API + Library of Congress JSON API + UWM AGDM CONTENTdm API. 15 Vietnam place keywords, `--sources` to pick. |
+| `scripts/scout/scout_humazur.mjs` | Humazur Omeka S API (sets 59 Cartothèque ASEMI + 519 Indochine française). `--merge <existing>.json` to combine. |
+| `scripts/scout/categorize_scout_results.mjs` | Scores + categorizes candidates. Outputs `scripts/scout_review.csv`. |
+| `scripts/scout/load_scout_to_db.mjs` | Loads merged scout JSON into `scout_candidates`. Fixes Humazur manifest URLs (must use `iiif/{item_id}/manifest`, NOT media_id). Derives Gallica thumbnails from ARK pattern. |
+| `scripts/scout/scoutDerive.mjs` | Per-source URL derivation, shared by the loader and the backfill so a pattern is written once: Omeka S manifests, the LoC Image API, protocol-relative permalinks. Self-check: `node scripts/scout/scoutDerive.test.mjs`. |
 | `scripts/oneoff/backfill_omeka_thumbs.mjs` | Backfills thumbnails for any Omeka S host (Omeka stores them on the media object, not the item — needs `/api/media/{id}`). Picks rows by `source_url` host, since the Bordeaux rows are labelled `gallica`. Throttled 150ms/req, dry-run by default. Replaced `backfill_humazur_thumbs.mjs`, which hardcoded the one host. |
 | `scripts/oneoff/fix_scout_iiif.mjs` | Applied `scoutDerive` to the 985 rows loaded before it existed: 41 Bordeaux manifests, 42 LoC image URLs, 5 protocol-relative permalinks. Dry-run by default. |
 
@@ -311,11 +311,11 @@ Princeton GeoBlacklight (geographic-bbox-indexed, 0 hits for "vietnam"); Harvard
 
 ```bash
 # 1. Discover (~15 min)
-NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/scout_all_sources.mjs
-NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/scout_humazur.mjs --merge scripts/scout_all_<ts>.json
+NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/scout/scout_all_sources.mjs
+NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/scout/scout_humazur.mjs --merge scripts/scout_all_<ts>.json
 
 # 2. Load into DB (auto-picks latest scout JSON)
-node scripts/load_scout_to_db.mjs
+node scripts/scout/load_scout_to_db.mjs
 
 # 3. (Optional) Backfill Omeka S thumbnails — dry run, then --apply
 NODE_TLS_REJECT_UNAUTHORIZED=0 node scripts/oneoff/backfill_omeka_thumbs.mjs

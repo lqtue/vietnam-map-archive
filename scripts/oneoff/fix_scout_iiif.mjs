@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Backfill the IIIF fields on scout_candidates rows loaded before
-// scripts/scoutDerive.mjs existed.
+// scripts/scout/scoutDerive.mjs existed.
 //
 // Three fixes, all derived from data already on the row — no source fetches:
 //   1. Omeka S rows (Bordeaux 3) arrived with no manifest_url; derive it.
@@ -18,7 +18,7 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { deriveManifestUrl, deriveImageUrl, fixSourceUrl } from '../scoutDerive.mjs';
+import { deriveManifestUrl, deriveImageUrl, fixSourceUrl } from '../scout/scoutDerive.mjs';
 
 const env = Object.fromEntries(
   readFileSync(resolve(process.cwd(), '.env'), 'utf8')

@@ -10,7 +10,7 @@
 // Two sources, because a survey's sheets reach a reader two ways and the
 // printing is recorded in a different place for each:
 //
-//   1. `work/l7014/sheets.json` — what `scripts/l7014_mosaic.py` read out of
+//   1. `work/l7014/sheets.json` — what `scripts/l7014/l7014_mosaic.py` read out of
 //      each GeoPDF's XMP while warping it. This is the only record of the
 //      printing behind the 452 mosaic cells, which have no `maps` row. 442 of
 //      the 535 scanned sheets carry it; the other 93 say nothing, and null is

@@ -20,7 +20,7 @@ SC = ["--self-check"]
 RUN = {
     "scripts/check_workspace_layout.py": SC,
     "scripts/lib/georef_annotation.py": [],
-    "scripts/tonkin_georef.py": ["selfcheck"],
+    "scripts/tonkin/tonkin_georef.py": ["selfcheck"],
     "work/MapSAM2/to_sam2_seeds.py": SC,
     "work/analysis/district4/georef_error.py": SC,
     "work/analysis/district4/metrics.py": SC,
@@ -73,11 +73,11 @@ RUN = {
 RUN["work/ocr/scripts/ocr.py"] = ["self-check"]
 
 SKIP = {
-    "scripts/l7014_autoplace.py": "needs GDAL (osgeo), which pip cannot install",
-    "scripts/l7014_hand.py": "needs GDAL (osgeo), which pip cannot install",
-    "scripts/l7014_seams.py": "needs GDAL (osgeo), which pip cannot install",
-    "scripts/paper_fault_injection.py": "needs GDAL (osgeo), which pip cannot install",
-    "scripts/test_l7014_gcp.py": "needs GDAL (osgeo), which pip cannot install",
+    "scripts/l7014/l7014_autoplace.py": "needs GDAL (osgeo), which pip cannot install",
+    "scripts/l7014/l7014_hand.py": "needs GDAL (osgeo), which pip cannot install",
+    "scripts/l7014/l7014_seams.py": "needs GDAL (osgeo), which pip cannot install",
+    "scripts/l7014/paper_fault_injection.py": "needs GDAL (osgeo), which pip cannot install",
+    "scripts/l7014/test_l7014_gcp.py": "needs GDAL (osgeo), which pip cannot install",
     "scripts/vn1971/common.py": "needs GDAL (osgeo), which pip cannot install",
     "work/ocr/scripts/local_vision.py": "reads drawn digits with the tesseract binary; its answer changes with the tesseract version",
     "work/MapSAM2/inference_tiles_as_video.py": "needs torch (a GPU stack)",

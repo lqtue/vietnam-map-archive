@@ -46,7 +46,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     /* 14 */ db.from('pipeline_jobs').select('*', head).in('status', ['claimed', 'running']),
     /* 15 */ db.from('pipeline_jobs').select('*', head).eq('status', 'failed'),
     // A sheet counts as triaged when a person has **accepted** its crop, which is
-    // the same predicate `scripts/enqueue_ocr_all.mjs` gates on — so this row
+    // the same predicate `scripts/queue/enqueue_ocr_all.mjs` gates on — so this row
     // answers "how many sheets would a plain enqueue run actually queue?".
     //
     // It used to count a saved neatline, and no sheet in the corpus had one,

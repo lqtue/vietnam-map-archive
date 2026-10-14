@@ -1,7 +1,7 @@
 /**
  * The home page hero's frozen fabric.
  *
- * `scripts/gen-hero-fabric.mjs` writes this file from the live archive, and the
+ * `scripts/gen/gen-hero-fabric.mjs` writes this file from the live archive, and the
  * hero draws it without asking anything at runtime. That trade only holds while
  * the generated data is actually drawable: a footprint whose properties lost
  * `feature_type` renders in the fallback colour, a label whose coordinates came

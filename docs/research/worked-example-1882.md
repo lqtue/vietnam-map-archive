@@ -201,7 +201,7 @@ Three observations worth carrying:
 ### Segment — `seg`
 
 ```bash
-node --env-file=.env scripts/enqueue_seg.mjs --map-id 0e02b9d9-…   # seeds off v1b
+node --env-file=.env scripts/queue/enqueue_seg.mjs --map-id 0e02b9d9-…   # seeds off v1b
 # a Colab T4 running work/MapSAM2/vma_seg_worker.ipynb claims it
 ```
 
@@ -365,11 +365,11 @@ feature that could not work, for the fourth time this month.
 #    (the fit above is in scratch; the stored figure is maps → annotation_url)
 
 # 1. read — already done; v1b is canonical for this sheet
-node --env-file=.env scripts/enqueue_ocr_all.mjs --dry --tile-metres 1400
+node --env-file=.env scripts/queue/enqueue_ocr_all.mjs --dry --tile-metres 1400
 
 # 2. shapes — a Colab GPU session as a worker
 #    work/MapSAM2/vma_seg_worker.ipynb, then from here:
-node --env-file=.env scripts/enqueue_seg.mjs --map-id 0e02b9d9-… --dry
+node --env-file=.env scripts/queue/enqueue_seg.mjs --map-id 0e02b9d9-… --dry
 
 # 3. review at /scan?mode=shapes&tab=validate
 #    click / ctrl-click / shift-click, then Approve N

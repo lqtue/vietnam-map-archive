@@ -140,7 +140,7 @@ rather than leaving someone to remember it.
    the Allmaps ID, and probes the annotation server to see whether it is already georeferenced.
 2. **In bulk** (`/admin?tab=bulk` + `scripts/bulk_upload_local.sh`) — for our own scans. Rows, tiles
    and thumbnail in one pass.
-3. **From Scout** (`/admin?tab=scout`) — `scripts/scout_*.mjs` crawl external IIIF endpoints; a
+3. **From Scout** (`/admin?tab=scout`) — `scripts/scout/scout_*.mjs` crawl external IIIF endpoints; a
    moderator records why a candidate is worth having and imports it.
 
 Georeferencing happens in the Allmaps Editor, which has no webhook, so a

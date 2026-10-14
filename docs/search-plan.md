@@ -73,7 +73,7 @@ per distinct map, ≤ 20 maps per query; mirror URLs live on Storage so this is 
 - `applyExploreUrlParams` reads `at=` → after `zoomToMap`, `view.animate({center, zoom:17})`
   and a 3 s pulse marker. One param, one reader, done.
 
-**Feeder.** E1 is worth nothing on one map. `scripts/enqueue_ocr_all.mjs`: for every
+**Feeder.** E1 is worth nothing on one map. `scripts/queue/enqueue_ocr_all.mjs`: for every
 `is_georeferenced` map with no `ocr` job, insert one `pipeline_jobs` row (worker already
 runs `ocr,join`). Gemini Flash cost is cents per map. Run the worker on M1 overnight.
 
@@ -211,7 +211,7 @@ columns. **Not planned.** Revisit only if E3b's extraction proves worth scaling.
 - [ ] **`gallica-text-harvest`** — polite, offline, its own script. **Not through
       `src/lib/server/gallica.ts`**, which is a live per-reader lookup with a 6 s deadline, three
       snippets and no rate limiter; harvesting through it would be rude to BnF and wrong for the
-      job. Model it on `scripts/scout_nlv_press.mjs`: sequential, resumable offsets, a saved
+      job. Model it on `scripts/scout/scout_nlv_press.mjs`: sequential, resumable offsets, a saved
       fixture, `--selftest` pinning the parser so a template change fails loudly. Titles, and they
       are the three `docs/private/network.md` names as Ian Gregory's material: *Annuaires de
       l'Indochine*, *L'Opinion*, *La Dépêche d'Indochine*. Exit: text on disk with per-document

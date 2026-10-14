@@ -27,7 +27,7 @@ redistributed here; this directory holds only derived, reviewable tables.
 |---|---|
 | `street-name-pairs.csv` | 89 candidate colonial ↔ modern name pairs, classified, one row per distinct pair, each with the sentence it came from and its post citation |
 | `gallica-variants.json` | 63 place names → attested colonial spellings, keyed by the modern name, for `spellingVariants(name, extra)` in `src/lib/server/gallica.ts` |
-| `nlv-queries.txt` | 138 quoted phrases for `scripts/scout_nlv_press.mjs`, both sides of each pair, tagged colonial/modern |
+| `nlv-queries.txt` | 138 quoted phrases for `scripts/scout/scout_nlv_press.mjs`, both sides of each pair, tagged colonial/modern |
 
 Regenerate: `node scripts/oneoff/extract_doling_placenames.mjs --press`
 Self-check:  `node scripts/oneoff/extract_doling_placenames.mjs --check`
@@ -44,7 +44,7 @@ already handles — it unaccents each form itself.
 **The NLV archive has no text at all.** *"There is no text, only the scan"* — a hit carries
 a headline, a date and a crop box, nothing more. So it can never be a **source** of place
 names, only a **consumer** of them, and its feed is a flat list of quoted phrases. Quoted
-because Veridian's `txq` ANDs an unquoted query's words; `scripts/nlv-queries.txt` records
+because Veridian's `txq` ANDs an unquoted query's words; `scripts/scout/nlv-queries.txt` records
 what that mistake cost.
 
 Neither file has been applied. The counts in `nlv-queries.txt` are blank until a harvest

@@ -219,7 +219,7 @@ for `--hand`, `catalogue+calibration` for `--auto` (detected corners against the
 cell). Tonkin, Indochine 100k and both L7014 scripts go through this path; the L909
 scripts do not yet. A new series script writes only step 1 and calls the other two.
 
-## AMS Series L7014 mosaic (`scripts/l7014_mosaic.py`)
+## AMS Series L7014 mosaic (`scripts/l7014/l7014_mosaic.py`)
 
 The US Army Map Service's 1:50,000 coverage of Vietnam, as **one raster PMTiles
 archive** rather than 509 catalogue rows. It is served exactly the way the
@@ -234,14 +234,14 @@ and wants an opacity slider, and underneath it the ~99 missing sheets showed the
 in the page.
 
 ```bash
-python3 scripts/l7014_mosaic.py index           # scrape the PCL index
-python3 scripts/l7014_mosaic.py fetch --jobs 4  # download the GeoPDFs (~4 GB)
-python3 scripts/l7014_mosaic.py warp            # clip to neatline, reproject
-python3 scripts/l7014_mosaic.py tile            # mosaic -> MBTiles -> PMTiles
-python3 scripts/l7014_mosaic.py upload          # rclone to r2:vma-tiles/overlay/
-python3 scripts/l7014_mosaic.py manifest         # one outline per sheet in the archive
-python3 scripts/l7014_mosaic.py fit             # where every warped sheet actually landed
-python3 scripts/l7014_mosaic.py check           # prove the datum check can fail
+python3 scripts/l7014/l7014_mosaic.py index           # scrape the PCL index
+python3 scripts/l7014/l7014_mosaic.py fetch --jobs 4  # download the GeoPDFs (~4 GB)
+python3 scripts/l7014/l7014_mosaic.py warp            # clip to neatline, reproject
+python3 scripts/l7014/l7014_mosaic.py tile            # mosaic -> MBTiles -> PMTiles
+python3 scripts/l7014/l7014_mosaic.py upload          # rclone to r2:vma-tiles/overlay/
+python3 scripts/l7014/l7014_mosaic.py manifest         # one outline per sheet in the archive
+python3 scripts/l7014/l7014_mosaic.py fit             # where every warped sheet actually landed
+python3 scripts/l7014/l7014_mosaic.py check           # prove the datum check can fail
 ```
 
 > **The live archive `l7014-20260913` is wrong and a rebuild is pending.** 285 of
@@ -510,7 +510,7 @@ The system + task prompt go into an explicit Gemini context cache per (key, mode
 2026-09-04; it was `gemini-3-flash-preview`, which still answers but is absent from Google's pricing
 page — no published rate, no stated support window. `--model` overrides per run, an `ocr` job
 payload's `model` overrides per job (the worker passes it through), and
-`scripts/enqueue_ocr_all.mjs --model NAME` sets it for a whole batch. Measured on this corpus at
+`scripts/queue/enqueue_ocr_all.mjs --model NAME` sets it for a whole batch. Measured on this corpus at
 5,156 in / 1,810 out tokens per call and 30–60 calls per sheet, that is roughly $0.50 a map, or
 $0.06 on `gemini-2.5-flash-lite`. Rate limits are no longer published per model — read them at
 <https://aistudio.google.com/rate-limit>. `GEMINI_API_KEYS` (comma-separated) rotates keys when one
@@ -569,7 +569,7 @@ The payoff is `main_map`. `enqueue_ocr_all.mjs` crops to it in preference to the
 the neatline is the *printed border* — a legend or a street index printed inside the border is
 inside the neatline too, and gets tiled at full resolution for nothing.
 
-**Queueing a batch.** `scripts/enqueue_ocr_all.mjs` queues only sheets with a saved triage in
+**Queueing a batch.** `scripts/queue/enqueue_ocr_all.mjs` queues only sheets with a saved triage in
 `maps.triage` (migration 069) — the neatline, tile size, overlap and per-tile priorities someone set
 in `/scan?mode=prepare` and pressed **Save triage** on — and spreads them into the payload
 unchanged. A triaged sheet therefore runs with `--crop` and no scout pass, because there is nothing
@@ -1236,7 +1236,7 @@ per pixel from the georeference; `python scale.py` self-checks). Self-checks, al
 `python scale.py`, `python eval_metrics.py`, `python test_prompt_plumbing.py`,
 `python test_tile_cache.py`.
 
-## NLV press harvest (`scripts/scout_nlv_press.mjs`)
+## NLV press harvest (`scripts/scout/scout_nlv_press.mjs`)
 
 The National Library of Vietnam's newspaper archive (`baochi.nlv.gov.vn`, 81
 titles, 1865–2013) has no API, but it runs **Veridian**, whose search is a plain
@@ -1253,15 +1253,15 @@ form offers). The script pages that, parses the results HTML, and appends
 against what is on disk. Neither the jsonl nor `--images` output is in git.
 
 ```bash
-node scripts/scout_nlv_press.mjs --selftest
-node scripts/scout_nlv_press.mjs --pubs                     # the 81 titles + ids
-node scripts/scout_nlv_press.mjs --queries scripts/nlv-queries.txt
-node scripts/scout_nlv_press.mjs '"bản đồ"' --pub RbD,WHfY  # southern papers only
-node scripts/scout_nlv_press.mjs '"bản đồ"' --from 1920 --to 1945
-node scripts/scout_nlv_press.mjs --report
+node scripts/scout/scout_nlv_press.mjs --selftest
+node scripts/scout/scout_nlv_press.mjs --pubs                     # the 81 titles + ids
+node scripts/scout/scout_nlv_press.mjs --queries scripts/scout/nlv-queries.txt
+node scripts/scout/scout_nlv_press.mjs '"bản đồ"' --pub RbD,WHfY  # southern papers only
+node scripts/scout/scout_nlv_press.mjs '"bản đồ"' --from 1920 --to 1945
+node scripts/scout/scout_nlv_press.mjs --report
 ```
 
-Measured 2026-09-13: the fifteen phrases in `scripts/nlv-queries.txt` are **2,921
+Measured 2026-09-13: the fifteen phrases in `scripts/scout/nlv-queries.txt` are **2,921
 rows in about 90 seconds**, every query paged to 100%.
 
 ### The app queries it directly too
@@ -1299,14 +1299,14 @@ proxy is used for.
 - **`txq` ANDs words. It does not match phrases.** `bản đồ` and `đồ bản` both
   return **15,154** — every page carrying *bản* and *đồ* anywhere on it, nearly
   all of it noise. Quoting asks for the phrase: `"bản đồ"` is **838**. Every line
-  in `scripts/nlv-queries.txt` is quoted for that reason, and the count beside
+  in `scripts/scout/nlv-queries.txt` is quoted for that reason, and the count beside
   each line is its measured total. An unquoted query is a different and much
   noisier question; the 74,524 "results" the unquoted list first reported were
   this mistake.
 - **Geography is not a query term.** `"bản đồ" "Sài Gòn"` is 41 rows: a Saigon
   paper printing a city map rarely names the city in the same breath. The paper
   itself is the evidence of where, so the HCMC corpus is a **publication** split —
-  `--pub`, or `scripts/nlv-southern-pubs.txt`, whose ids `--report` subtotals.
+  `--pub`, or `scripts/scout/nlv-southern-pubs.txt`, whose ids `--report` subtotals.
   Of the 2,921 rows, **928 are southern press, 1890–1988** (Sài Gòn 302, Công luận
   báo 177, Sài Gòn Giải phóng 77, Lục Tỉnh Tân Văn 70, …). That file is tagged by
   eye — the archive publishes no place-of-publication field.
@@ -1337,7 +1337,7 @@ proxy is used for.
   template change fails loudly instead of reading as an archive with nothing in
   it. `--selftest` exits non-zero. Re-run `--fixture` if the page size changes.
 
-## Legend timeline (`scripts/legend_timeline.mjs` + `legend_press.mjs`)
+## Legend timeline (`scripts/scout/legend_timeline.mjs` + `legend_press.mjs`)
 
 Four Saigon sheets carry a numbered legend that OCR has read, which is four dated
 lists of the same city's institutions:
@@ -1355,11 +1355,11 @@ per-decade press curve off each match, from the NLV (Vietnamese) and Gallica
 none of it in git.
 
 ```bash
-node scripts/legend_timeline.mjs --selftest
-node scripts/legend_timeline.mjs                 # read the DB, match, report
-node scripts/legend_press.mjs --baseline         # the corpus's own shape, once
-node scripts/legend_press.mjs --threads cross    # only threads crossing 1959
-node scripts/legend_press.mjs --report           # normalised; --raw for counts
+node scripts/scout/legend_timeline.mjs --selftest
+node scripts/scout/legend_timeline.mjs                 # read the DB, match, report
+node scripts/scout/legend_press.mjs --baseline         # the corpus's own shape, once
+node scripts/scout/legend_press.mjs --threads cross    # only threads crossing 1959
+node scripts/scout/legend_press.mjs --report           # normalised; --raw for counts
 ```
 
 ### Matching across a language change
@@ -1430,14 +1430,14 @@ decade facet with counts. Gallica has no facet, so it is one request per decade.
 Politeness is the same rule as the NLV harvest: sequential, ~1.2 s apart, one
 retry, two public archives.
 
-## Place report (`scripts/place_report.mjs`)
+## Place report (`scripts/scout/place_report.mjs`)
 
 A cited, dated evidence report for one place from both period archives.
 
 ```bash
-node scripts/place_report.mjs --selftest
-node scripts/place_report.mjs "Khánh Hội" --max 14
-node scripts/place_report.mjs "Khánh Hội" --variants "Khanh Hoi,Khánh-Hội"
+node scripts/scout/place_report.mjs --selftest
+node scripts/scout/place_report.mjs "Khánh Hội" --max 14
+node scripts/scout/place_report.mjs "Khánh Hội" --variants "Khanh Hoi,Khánh-Hội"
 ```
 
 Writes `work/research/reports/<slug>.md` (gitignored): the decade curve, a synthesis, then
@@ -1796,7 +1796,7 @@ either.
 
 **2026-09-14 — cost is now computed in the code, not in this file.** The rates
 live in `work/ocr/prices.json`, read by `work/ocr/scripts/pricing.py` (Python)
-and `scripts/enqueue_ocr_all.mjs` (the dry-run estimate). One file, two
+and `scripts/queue/enqueue_ocr_all.mjs` (the dry-run estimate). One file, two
 languages, no copy to drift. Four things follow:
 
 - **Every logged call carries `cost_usd`.** `gemini_client._log_call` writes it

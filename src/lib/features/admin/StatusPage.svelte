@@ -157,7 +157,7 @@
             tone: m.withLayout === 0 ? 'warn' : 'good',
             next:
               m.withLayout < m.georeferenced
-                ? 'Run scripts/enqueue_layout_all.mjs for the whole collection at once, then leave a worker running. It proposes the border too.'
+                ? 'Run scripts/queue/enqueue_layout_all.mjs for the whole collection at once, then leave a worker running. It proposes the border too.'
                 : undefined,
           },
         ],
@@ -175,7 +175,7 @@
             tone: m.read === 0 ? 'bad' : m.read < m.georeferenced ? 'warn' : 'good',
             next:
               unread > 0
-                ? `${num(unread)} pinned maps have never been read. Queue them with scripts/enqueue_ocr_all.mjs, then run the worker.`
+                ? `${num(unread)} pinned maps have never been read. Queue them with scripts/queue/enqueue_ocr_all.mjs, then run the worker.`
                 : undefined,
           },
           {

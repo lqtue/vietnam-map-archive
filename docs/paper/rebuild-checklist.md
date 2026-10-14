@@ -5,7 +5,7 @@
 > `docs/roadmap-record.md`.
 
 A verified, ordered checklist for rebuilding and republishing the AMS Series L7014 raster
-archive with the committed datum fix. Written after tracing `scripts/l7014_mosaic.py`
+archive with the committed datum fix. Written after tracing `scripts/l7014/l7014_mosaic.py`
 (`index`/`fetch`/`warp`/`manifest`/`fit`/`tile`/`upload`), `scripts/geo_audit.mjs`, every
 reference to the dated key, `src/lib/data/maps/seriesSheets.ts` /
 `src/lib/map/rasterSeries.ts`, `work/l7014/regen/REGEN.md`, and the disk/log state on this
@@ -27,7 +27,7 @@ holds the faulty pass.
   the corrected and faulty warp on 2026-09-20 (commit `7ee5d947` + the two source changes
   below, both now committed at `0aa04f0b`). **`tile` and `upload` were never run — production
   R2 is untouched**, exactly as REGEN.md states.
-- `git status --porcelain scripts/l7014_mosaic.py` is clean: the `--no-datum-shift` flag and
+- `git status --porcelain scripts/l7014/l7014_mosaic.py` is clean: the `--no-datum-shift` flag and
   the `graticule_error` axis-order fix that REGEN.md calls "two uncommitted changes" are
   **already committed** (`0aa04f0b fix(l7014): the graticule check was rejecting its own
   datum correction`, present on this branch). No source patch is needed before rebuilding.
@@ -134,7 +134,7 @@ is the single highest-value step in this whole checklist to get right.
 
 **6. Corrected warp — no `--no-datum-shift`.**
 ```bash
-time python3 scripts/l7014_mosaic.py warp --jobs 6 2>&1 | tee work/l7014/regen/warp-rebuild.log
+time python3 scripts/l7014/l7014_mosaic.py warp --jobs 6 2>&1 | tee work/l7014/regen/warp-rebuild.log
 ```
 *Before:* step 5 done; step 2 confirmed. *Measured basis:* the corrected pass took 13m39s in
 today's dry run under identical conditions (same machine, same `--jobs`, same already-local
@@ -147,7 +147,7 @@ lines.
 
 **7. Build the sheet manifest.**
 ```bash
-python3 scripts/l7014_mosaic.py manifest --key l7014-<newdate> 2>&1 | tee work/l7014/regen/manifest-rebuild.log
+python3 scripts/l7014/l7014_mosaic.py manifest --key l7014-<newdate> 2>&1 | tee work/l7014/regen/manifest-rebuild.log
 ```
 *Before:* step 6 ok. *Works if:* `manifest: 436 sheets -> work/l7014/build/l7014-<newdate>.geojson`
 (no `UNKNOWN`/`ASTRAY` lines; the phase already refuses to exit 0 if any sheet lands outside
@@ -155,7 +155,7 @@ Vietnam).
 
 **8. Fit gate — must pass.**
 ```bash
-python3 scripts/l7014_mosaic.py fit --key l7014-<newdate>
+python3 scripts/l7014/l7014_mosaic.py fit --key l7014-<newdate>
 echo "exit: $?"
 ```
 *Before:* step 7 with the same `--key`. *Works if:* exit code is **0** and the printed line
@@ -179,7 +179,7 @@ present, 627 cells). *Works if:* exit 0, no `FAIL` lines.
 
 **10. Build MBTiles + PMTiles.**
 ```bash
-time python3 scripts/l7014_mosaic.py tile --key l7014-<newdate> 2>&1 | tee work/l7014/regen/tile-rebuild.log
+time python3 scripts/l7014/l7014_mosaic.py tile --key l7014-<newdate> 2>&1 | tee work/l7014/regen/tile-rebuild.log
 ```
 *Before:* steps 6–9 all clean. *No local timing exists for this phase* — REGEN.md is explicit
 that `tile` was never run this cycle. Do not assume the ~2-hour `docs/pipelines.md` figure;
@@ -211,7 +211,7 @@ outline artifacts appeared around holes beyond the known WEBP cosmetic one.
 
 **12. 🔴🌐 Upload.**
 ```bash
-python3 scripts/l7014_mosaic.py upload --key l7014-<newdate>
+python3 scripts/l7014/l7014_mosaic.py upload --key l7014-<newdate>
 ```
 *Before:* steps 8, 9, 10, 11 all clean — per ROADMAP I3, "require `fit` and `geo_audit.mjs`
 before treating the new build as usable." *What it does:* `rclone copyto` the `.pmtiles` to

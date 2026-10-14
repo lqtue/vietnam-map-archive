@@ -75,7 +75,7 @@ walk draws has to be warped server-side, once, into PMTiles.
 
 ## 2. Warping a sheet — the pipeline already exists
 
-`scripts/l7014_mosaic.py` is already control points → `gdalwarp -t_srs EPSG:3857
+`scripts/l7014/l7014_mosaic.py` is already control points → `gdalwarp -t_srs EPSG:3857
 -r cubic -dstalpha` → mbtiles → `pmtiles convert` → R2. A sibling
 `scripts/sheet_pmtiles.py <mapId> --bbox` changes two things:
 
@@ -117,7 +117,7 @@ sources and the year control.
 
 ## 4. Space travel is the names, and that is what a raster cannot give you
 
-`scripts/gen-hero-fabric.mjs` already generates exactly the needed artifact —
+`scripts/gen/gen-hero-fabric.mjs` already generates exactly the needed artifact —
 one sheet's footprints and validated labels, warped to lng/lat, frozen as a
 module, **5.9 kB gzipped**. Run it per sheet clipped to the route bbox and ship
 the JSON. Standing on Bến Vân Đồn and reading what the street was called in 1912
@@ -222,7 +222,7 @@ Two ideas worth carrying **back** to VMA, neither of them runtime:
 
 - **Rasters are ready for all 17 sheets; names are ready for one.** The year
   slider works now; the name layer is 1882 and nothing else until
-  `scripts/enqueue_ocr_all.mjs` has run the corpus and the rows are reviewed.
+  `scripts/queue/enqueue_ocr_all.mjs` has run the corpus and the rows are reviewed.
 - **Warp error is per sheet.** 1799 has few GCPs and metres of residual. Every
   row carries `geom_rmse`; show it, never pretend.
 - **Eight languages of content** is the largest line in the fork's cost. The i18n
