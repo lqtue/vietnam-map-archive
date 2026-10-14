@@ -71,3 +71,50 @@ jobs:
       - run: npm run db:test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:write
+
+  # Three checks that used to run nowhere, so a break in them went unseen. They
+  # need no secrets and no database, and each finishes in about a minute.
+  #
+  # The Python self-checks are assert-based scripts under scripts/ and work/.
+  # run_selfchecks.py lists the ones that run offline and the ones it skips on
+  # purpose (they need GDAL or torch), and fails if a new self-check is in
+  # neither list. Pins come from the seg requirements file, which includes the
+  # OCR one.
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: |
+            work/seg-requirements-cpu.txt
+            work/ocr/requirements.txt
+      - run: pip install -r work/seg-requirements-cpu.txt
+      - run: python scripts/run_selfchecks.py
+
+  # worker/ is its own Cloudflare Worker with its own lockfile, so the root
+  # `npm run check` never sees it.
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - run: npm ci
+      - run: npm run check
+
+  # docs/workspace-model.json says which layer owns each folder; the checker
+  # confirms every declared path exists and every compatibility link resolves.
+  layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/check_workspace_layout.py

@@ -303,6 +303,14 @@ Local ports are **54421** for the API and **54420** for the shadow DB, not the C
 54321/54320 collide with another local project. `-x vector -x logflare` is needed under colima:
 those containers bind-mount `/var/run/docker.sock`, which colima cannot provide.
 
+Three more checks run on every PR, each as its own job in `ci.yml`. The `python` job runs
+`scripts/run_selfchecks.py`: every offline Python self-check under `scripts/` and `work/` (51 runs,
+no network, no key, no GPU). It lists the 10 it skips and why (GDAL or torch is missing, the check
+reads files another script wrote, or tesseract reads the test image differently by version), and fails when a new self-check is in neither list, so a check
+cannot be added and then never run. The `worker` job type-checks `worker/` (`npm run check`), which
+the root `npm run check` never reaches. The `layout` job runs `scripts/check_workspace_layout.py`:
+every path in `docs/workspace-model.json` exists and every compatibility link still resolves.
+
 Migrations 105–108 (applied to production 2026-10-04) have a separate database regression fixture at
 `tests/sql/l7014-model.sql`. It applies the actual migration files to a small disposable pre-105
 schema in local PostgreSQL, including the prior generated-key index and dependent view, then checks
