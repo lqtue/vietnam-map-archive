@@ -54,6 +54,7 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Theory](plans/theory.md)                          | Intellectual framework                               |
 | [Knowledge system](plans/knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
 | [Digest pipeline](plans/digest-pipeline-plan.md)   | How a map goes from found to linked: machine proposes, person decides, every decision timed (bet 1a) |
+| [Review page](plans/review-page-plan.md)           | The offline review pages moved into the app: one engine, one record, open to contributors later |
 | [Search](plans/search-plan.md)                     | Finding labels, shapes and period sources            |
 | [Usage measurement](plans/usage-measurement-plan.md) | Study, grant and support evidence; opt-in journeys and confirmed outcomes |
 | [Usage evidence sheet](plans/usage-evidence-template.md) | Monthly template for an aggregate usage report |
