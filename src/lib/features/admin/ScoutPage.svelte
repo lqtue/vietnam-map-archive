@@ -141,22 +141,26 @@
     actionMsg = `Updating ${selected.size}...`;
     const ids = [...selected];
     const review_note = bulkNote.trim() || null;
-    let ok = 0;
+    const failed: string[] = [];
     for (const id of ids) {
       try {
-        await fetch(`/api/admin/scout/${id}`, {
+        const r = await fetch(`/api/admin/scout/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status, review_note }),
         });
-        ok++;
+        if (!r.ok) failed.push(id);
       } catch {
-        /* per-row error swallowed */
+        failed.push(id);
       }
     }
-    actionMsg = `Updated ${ok}/${ids.length} to ${status}`;
-    selected = new Set();
-    bulkNote = '';
+    const ok = ids.length - failed.length;
+    actionMsg = failed.length
+      ? `Updated ${ok}/${ids.length} to ${status}; ${failed.length} failed`
+      : `Updated ${ok}/${ids.length} to ${status}`;
+    // Failed rows stay selected (and the note stays) so the same click retries them.
+    selected = new Set(failed);
+    if (!failed.length) bulkNote = '';
     loadCandidates();
   }
 
