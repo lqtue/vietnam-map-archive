@@ -382,3 +382,20 @@ test('a failed georef queue is an error, not "every map is georeferenced"', asyn
   await expect(page.locator('.empty-state.error[role="alert"]')).toBeVisible();
   await expect(page.getByText('Every map is georeferenced')).toHaveCount(0);
 });
+
+test('an unknown address gets the site error page, with the nav and a way home', async ({
+  page,
+}) => {
+  for (const [path, title] of [
+    ['/no-such-page', 'Page not found'],
+    ['/vi/no-such-page', 'Không tìm thấy trang'],
+    ['/catalog/no-such-sheet-0000', /./],
+  ] as const) {
+    const res = await page.goto(path);
+    expect(res?.status(), path).toBe(404);
+    await expect(page.locator('h1.hero-title'), path).toHaveText(title);
+    await expect(page.locator('nav.top-nav'), path).toBeVisible();
+    await expect(page.locator('main a[href="/"]'), path).toBeVisible();
+    await expect(page.locator('main a[href="/catalog"]'), path).toBeVisible();
+  }
+});
