@@ -39,7 +39,7 @@ is linked while its count is described as indexed cities.
 What `npm run test` actually runs, and why each check exists. Moved out of `CLAUDE.md` (Sept 2026).
 Verbatim.
 
-`npm run test` starts a dev server on 5173, or reuses one already running. It runs **470** tests (`npx playwright test --list`, 2026-10-13, after `wkb.spec.ts` went):
+`npm run test` starts a dev server on 5173, or reuses one already running. It runs **481** tests (`npx playwright test --list`, 2026-10-14, after `keys.spec.ts` came):
 the **twelve** smokes in `tests/smoke.spec.ts` (the twelfth, Sept 2026, pins that a retired
 `/scan?map=<id>` link lands on that sheet's own page rather than dropping the id at `/catalog` — the
 public viewer merged into `/catalog/[id]`, and every bookmark, every /explore action strip and the
@@ -55,7 +55,7 @@ an explicit matching printing or source-item link), `tests/sheet-printing-fields
 dates are not guessed from booleans/fractions, and metadata edits preserve existing evidence),
 `tests/press.spec.ts` (the Gallica CQL builder and the NLV year
 window), `tests/explore-keys.spec.ts` (the /explore time scrubber, and whether a share link's hash
-camera survives its own `?map=`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
+camera survives its own `?map=`), `tests/keys.spec.ts` (`use:keys`, the one keyboard action: it skips typing fields, held Ctrl/Meta/Alt unless the binding asks, a key already taken, and Enter or Space on a focused button; `update` swaps the map and `destroy` removes the listener. Events are plain objects, so a regression is a wrong key swallowed in a field, which does not look like a bug until someone types a `v`), `tests/tween.spec.ts` (the annotate-mode easing that replaced
 animejs), `tests/search-fold.spec.ts` (diacritic folding in the map picker),
 `tests/map-region.spec.ts` (the 63 provinces fold into exactly 34, a sheet takes the province under most of it rather than under its centre, open water keeps its province but a neighbour's land does not, a country-scale bbox gets none),
 `tests/local-search.spec.ts` (the catalog's in-browser search: accents and đ fold both ways, every token must start a word, `1920s` is a prefix, a sheet number matches its column exactly),
