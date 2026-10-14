@@ -620,6 +620,12 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Drag across the timeline to pick a range | Kéo trên dòng thời gian để chọn khoảng năm |
 
 
+## 21 · Page fixes (Oct 2026)
+
+| English | Tiếng Việt |
+|---|---|
+| Discard {N} unsaved changes? | Bỏ {N} thay đổi chưa lưu? |
+
 # PENDING — translated, not yet wired
 
 | All areas | Tất cả khu vực |

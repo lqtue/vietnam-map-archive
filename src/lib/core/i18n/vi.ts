@@ -517,4 +517,5 @@ export const vi: Record<string, string> = {
   Plans: 'Bình đồ',
   maps: 'bản đồ',
   'Drag across the timeline to pick a range': 'Kéo trên dòng thời gian để chọn khoảng năm',
+  'Discard {N} unsaved changes?': 'Bỏ {N} thay đổi chưa lưu?',
 };
