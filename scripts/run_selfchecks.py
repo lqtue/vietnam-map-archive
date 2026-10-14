@@ -31,6 +31,7 @@ RUN = {
     "work/core/vma_core/test_core.py": [],
     "work/image-processing/experiments/place-links/build.py": SC,
     "work/image-processing/experiments/place-links/confirm.py": SC,
+    "work/image-processing/experiments/place-links/review_items.py": SC,
     "work/image-processing/experiments/river-reference/qgis.py": ["selfcheck"],
     "work/image-processing/experiments/river-reference/score.py": ["--selfcheck"],
     "work/image-processing/experiments/then-now/review.py": SC,
@@ -68,6 +69,7 @@ RUN = {
     "work/ocr/scripts/test_tile_cache.py": [],
     "work/review-kit/review_page.py": SC,
     "work/review-kit/review_record.py": [],
+    "work/review-kit/review_sync.py": SC,
     "work/worker/vma_worker.py": SC,
 }
 RUN["work/ocr/scripts/ocr.py"] = ["self-check"]
