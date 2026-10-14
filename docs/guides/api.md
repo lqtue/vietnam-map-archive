@@ -85,6 +85,15 @@ Worker-authenticated (`Authorization: Bearer <worker_keys token>`, **not** a use
   `set_triage_key` RPC so it cannot clobber a hand-drawn neatline — and regions whose `source` is
   `human` are kept, so a second **Detect** no longer discards every correction), and/or
   `status` (→ `finish_job`). There is no stage field: closing the job advances the stage.
+- `/api/pipeline/review-items/` — POST `{ task, items }` (≤200 items): upserts a `review_tasks` row
+  and its `review_items` (migration 122). Needs an unscoped key or the `review` kind. Shapes are
+  checked (`$lib/server/reviewUpload.ts`): 400 on a bad field or an unknown key, 413 on size. Once a
+  task has events its `seed`, `blind_frac` and `method` are frozen (409). Sent by
+  `work/review-kit/review_sync.py push`.
+- `/api/pipeline/review-events/` — GET `?task=&after=&limit=` (limit ≤1000): the task's events by id
+  → `{ events, reviewers: {uuid: display_name}, next_after }`; `next_after` is null on the last page.
+  The `client` column (viewport, user agent) is not returned. Read by `review_sync.py pull`, which
+  writes `review_record` lines.
 - `/api/pipeline/execute/` — POST `{ job_id }` for the kinds whose work belongs on the server
   (`mirror_annotation`, `sync_allmaps`, `warp`): they need the service key, which a worker deliberately
   lacks. The handler runs the mirror and closes the job itself. Kinds with real compute (`ocr`,
