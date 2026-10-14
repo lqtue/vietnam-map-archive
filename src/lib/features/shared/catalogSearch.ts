@@ -62,6 +62,8 @@ export interface CatalogSearchController {
   loading: Readable<boolean>;
   /** True only after the latest archive-map read succeeded. */
   mapsReady: Readable<boolean>;
+  /** True when the latest archive-map read failed — the list is empty because of that, not because nothing matches. */
+  mapsError: Readable<boolean>;
   rawMaps: Readable<Row[]>;
   rawScout: Readable<Row[]>;
   filteredMaps: Readable<Row[]>;
@@ -161,6 +163,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
   const includeScout = writable(false);
   const loading = writable(false);
   const mapsReady = writable(false);
+  const mapsError = writable(false);
   const rawMaps = writable<Row[]>([]);
   const rawScout = writable<Row[]>([]);
   const labels = writable<LabelHit[]>([]);
@@ -184,6 +187,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     if (mapsLoaded) return mapsLoaded;
     mapsPending = true;
     mapsReady.set(false);
+    mapsError.set(false);
     syncLoading();
     mapsLoaded = (async () => {
       try {
@@ -194,6 +198,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
       } catch (e) {
         mapsLoaded = null; // so the next keystroke tries again
         mapsReady.set(false);
+        mapsError.set(true);
         console.error('catalog search failed:', e);
       } finally {
         mapsPending = false;
@@ -394,6 +399,7 @@ export function createCatalogSearch(opts: CatalogSearchOptions = {}): CatalogSea
     includeScout,
     loading,
     mapsReady,
+    mapsError,
     rawMaps,
     rawScout,
     labels,

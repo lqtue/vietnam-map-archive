@@ -14,6 +14,7 @@
   import NameDialog from '$lib/ui/NameDialog.svelte';
   import NavDropdown from '$lib/ui/NavDropdown.svelte';
   import LocationSearch from '$lib/ui/LocationSearch.svelte';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import type { MapListItem } from '$lib/data/maps/types';
   import '$styles/pages/screens.css';
   // the Status tones section renders real .status-row markup
@@ -456,6 +457,17 @@
               >The hero on every editorial page. You are looking at one above.</span
             >
           </div>
+        </div>
+
+        <div class="sc-item">
+          <div class="sc-item-head">
+            <code class="sc-code">LoadError</code>
+            <span class="sc-role"
+              >A read that failed: the <code>.empty-state.error</code> face plus Retry. Use it so a failure
+              never reads as an empty result.</span
+            >
+          </div>
+          <LoadError message="Couldn't reach the archive." />
         </div>
 
         <div class="sc-item">

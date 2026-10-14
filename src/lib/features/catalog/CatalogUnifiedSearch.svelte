@@ -16,6 +16,7 @@
   import { sliceGroups } from '$lib/features/catalog/sliceGroups';
   import MapCard from '$lib/ui/MapCard.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import { atWidth } from '$lib/core/iiif/thumbUrl';
   import { readJson, writeJson } from '$lib/core/utils/persistence/storage';
   import CatalogDetailDrawer from '$lib/features/catalog/CatalogDetailDrawer.svelte';
@@ -91,6 +92,7 @@
     query,
     loading,
     mapsReady,
+    mapsError,
     results,
     facets,
     total,
@@ -312,7 +314,9 @@
   {/if}
 
   <LabelHits hits={$labels} />
-  {#if $results.length === 0 && $labels.length === 0 && !$loading}
+  {#if $mapsError && $results.length === 0}
+    <LoadError message={$t('Could not load the catalog.')} on:retry={search.refresh} />
+  {:else if $results.length === 0 && $labels.length === 0 && !$loading}
     <!-- `state-title`/`state-desc` carry no rule here; they are the hooks
          layouts/catalog.css uses for the two type sizes. The `state-panel`
          card around them is gone — see that file. -->

@@ -359,3 +359,26 @@ test('sign-in carries ?next= into the OAuth redirect', async ({ page }) => {
   expect(url.pathname).toBe('/auth/callback');
   expect(url.searchParams.get('next')).toBe('/explore?mode=studio');
 });
+
+test('a failed catalog load says so, and Retry recovers', async ({ page }) => {
+  let fail = true;
+  await page.route('**/api/search?include=maps**', (route) =>
+    fail ? route.fulfill({ status: 500, body: 'boom' }) : route.continue()
+  );
+  await page.goto('/catalog');
+  await hydrated(page);
+  const alert = page.locator('.empty-state.error[role="alert"]');
+  await expect(alert).toBeVisible();
+  await expect(page.getByText('Nothing matches.')).toHaveCount(0);
+  fail = false;
+  await alert.getByRole('button', { name: 'Retry' }).click();
+  await expect(alert).toHaveCount(0);
+});
+
+test('a failed georef queue is an error, not "every map is georeferenced"', async ({ page }) => {
+  await page.route('**/rest/v1/maps**', (route) => route.fulfill({ status: 500, body: '{}' }));
+  await page.goto('/contribute/georef');
+  await hydrated(page);
+  await expect(page.locator('.empty-state.error[role="alert"]')).toBeVisible();
+  await expect(page.getByText('Every map is georeferenced')).toHaveCount(0);
+});

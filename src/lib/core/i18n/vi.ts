@@ -518,4 +518,8 @@ export const vi: Record<string, string> = {
   maps: 'bản đồ',
   'Drag across the timeline to pick a range': 'Kéo trên dòng thời gian để chọn khoảng năm',
   'Discard {N} unsaved changes?': 'Bỏ {N} thay đổi chưa lưu?',
+  Retry: 'Thử lại',
+  'Could not load the maps.': 'Không thể tải danh sách bản đồ.',
+  'Could not load your contributions.': 'Không thể tải đóng góp của bạn.',
+  'Could not load the catalog.': 'Không thể tải danh mục.',
 };

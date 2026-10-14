@@ -625,6 +625,10 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | English | Tiếng Việt |
 |---|---|
 | Discard {N} unsaved changes? | Bỏ {N} thay đổi chưa lưu? |
+| Retry | Thử lại |
+| Could not load the maps. | Không thể tải danh sách bản đồ. |
+| Could not load your contributions. | Không thể tải đóng góp của bạn. |
+| Could not load the catalog. | Không thể tải danh mục. |
 
 # PENDING — translated, not yet wired
 
