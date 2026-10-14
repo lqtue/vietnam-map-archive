@@ -274,7 +274,7 @@ test('the old /scan mode names still open the mode they became', async ({ page }
 
 test('auth-gated and legacy routes redirect', async ({ page }) => {
   await page.goto('/profile');
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/login\?next=%2Fprofile$/);
 
   // Compared as strings, not regexes: half these targets carry a `?`, which a
   // RegExp reads as "the previous character is optional" — `/explore?mode=…`
@@ -342,4 +342,20 @@ test('an old ?mode=annotate link still opens the studio', async ({ page }) => {
     await page.goto(`/explore?mode=${mode}`);
     await expect(page).toHaveTitle(/^Studio —/);
   }
+});
+
+test('sign-in carries ?next= into the OAuth redirect', async ({ page }) => {
+  // Stop at the provider's authorize URL: nothing is signed in and nothing is written.
+  let redirectTo = '';
+  await page.route('**/auth/v1/authorize**', (route) => {
+    redirectTo = new URL(route.request().url()).searchParams.get('redirect_to') ?? '';
+    return route.abort();
+  });
+  await page.goto('/login?next=%2Fexplore%3Fmode%3Dstudio');
+  await hydrated(page);
+  await page.locator('.auth-btn').click();
+  await expect.poll(() => redirectTo).not.toBe('');
+  const url = new URL(redirectTo);
+  expect(url.pathname).toBe('/auth/callback');
+  expect(url.searchParams.get('next')).toBe('/explore?mode=studio');
 });
