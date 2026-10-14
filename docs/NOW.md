@@ -3,7 +3,7 @@
 **Read this first, every session.** It holds the goal, the bets that serve it, what only Tue can
 do, and who is working on what. `ROADMAP.md` is the backlog behind it; nothing here repeats its
 detail. Keep this file under 70 lines: when a bet closes, replace it, and when an idea arrives, put
-it through the gate before it gets a branch. Updated 2026-10-13. Public repo: no application dates,
+it through the gate before it gets a branch. Updated 2026-10-14. Public repo: no application dates,
 referees or contacts here — those live in `docs/private/`.
 
 ## Goal
@@ -49,16 +49,17 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
 | Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64); `work/image-processing/experiments/{place-links,then-now}/` | Tue's sittings, then Opus scores |
-| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | 3 commits, rebased onto #70 on 2026-10-13; Tue's sittings from `vma-audit` |
-| Paper: claim-audit R rows 23 and 99 | Claude | `paper-claim-rows` (1 commit, unmerged) | Review, merge, then the rows are clear |
+| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Rebase onto main (scripts moved in #77), then Tue's sittings from `vma-audit` |
+| Paper: claim-audit R rows 23 and 99 | Claude | `paper-claim-rows` (1 commit), worktree `.claude/worktrees/agent-a3289…` | Rebase, review, merge |
 | 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
-| Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` | Two-sided reader check — `.claude/handoff-indochine100k.md` |
+| Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` (pushed, no worktree) | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
 | 1882/1898 river | **Tue** | `vma-1882-river` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
-| L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | PR: scripts and records only, both ran 2026-10-06 |
+| L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | Rebase onto main (#77), then PR: scripts and records only |
+| Review page in the app (bet 2, `review-events`) | Claude | `review-web`, worktree `vma-review-web`; plan #81 | PR 1: store + export (`docs/plans/review-page-plan.md` §8) |
 
 ## Parked
 

@@ -426,7 +426,7 @@ exact thing it judged. Plan and rules: `docs/plans/digest-pipeline-plan.md`; the
 - [ ] **`review-events`** — human time in the app's own review tools (OCR review, footprint
       validate, legend), one row per sitting, and the stamp gaps the baseline found: a reject
       clears `reviewed_at`, footprint `reviewed_at` is never set. Exit: the baseline's
-      "unmeasured" cells for those stages have numbers.
+      "unmeasured" cells for those stages have numbers. Table and page: [review page plan](plans/review-page-plan.md).
 
 ## Survey layer and catalog
 
