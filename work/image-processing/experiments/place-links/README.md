@@ -8,6 +8,7 @@ records its time and the exact candidate list it judged. Map `0e02b9d9-9d40-4cca
     python3 work/image-processing/experiments/place-links/build.py            # items.json, candidates.csv, score.json
     python3 work/image-processing/experiments/place-links/confirm.py          # review page, http://127.0.0.1:8792
     python3 work/image-processing/experiments/place-links/confirm.py --self-check
+    python3 work/image-processing/experiments/place-links/review_items.py     # items for the web review page (docs/plans/review-page-plan.md); then work/review-kit/review_sync.py push
     python3 work/image-processing/scripts/name_today.py --self-check
 
 Everything written goes to `work/image-processing/results/prior/0e02…/place-links/` (gitignored):

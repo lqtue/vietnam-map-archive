@@ -1031,7 +1031,7 @@ from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Data
 
 ### Supabase types
 
-- `src/lib/data/supabase/types.ts` is current against migration head **116** (verified 2026-10-06: every 116 `maps`/`map_images` column is present; 115 only replaces a function body, so it changes no type. `edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified 2026-10-05:
+- `src/lib/data/supabase/types.ts` is current against migration head **116**, plus 122's three review tables (spliced from `--local` generator output, 2026-10-14; nothing else of that output was taken) (verified 2026-10-06: every 116 `maps`/`map_images` column is present; 115 only replaces a function body, so it changes no type. `edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified 2026-10-05:
   106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108 changes
   only a column default, which the types do not carry). Regenerate from the linked project after
   every push; a zero-line diff after a hand edit is the cheapest confirmation it was right.

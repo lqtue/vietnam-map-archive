@@ -29,7 +29,9 @@ Every route, with its purpose, source folder and who can open it: `docs/guides/a
 - Three auth classes: **admin/mod session** (`/api/admin/*`), **any signed-in user**
   (`/api/contribute/*`, `user_id` from the session, rate-limited by `assertUnderRateLimit`), and
   **worker token** (`/api/pipeline/*`, `Authorization: Bearer <worker_keys token>` via
-  `$lib/server/workerAuth.ts`; mint with `scripts/mint-worker-key.mjs`). `/api/search`,
+  `$lib/server/workerAuth.ts`; mint with `scripts/mint-worker-key.mjs`; the review pair
+  `POST /api/pipeline/review-items` and `GET /api/pipeline/review-events?task=` need an unscoped key
+  or the `review` kind, and are what `work/review-kit/review_sync.py` calls). `/api/search`,
   `/api/context`, `/api/press`, `/api/maps/[id]/legend-points` are public and enforce
   `status IN ('public','featured')` server-side. `/api/search` takes
   `include=maps,scout,labels,places`; `places` searches the mig 067 gazetteer and is what the

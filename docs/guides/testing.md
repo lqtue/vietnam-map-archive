@@ -283,12 +283,24 @@ into a pass on an empty set.
 that subset through `unsupportedKeywords` rather than passing it silently, so adding an unsupported
 keyword to a contract fails loudly instead of going unchecked.
 
+Three write checks and `tests/review-upload.spec.ts` pin the review store (mig 122). The write checks:
+a worker key upserts a task and its items (idempotent; bad shapes 400; a key scoped to another kind
+403; no token 401); `review_events` refuses UPDATE and DELETE from the **service role**, refuses a
+duplicate `client_id`, a `decided_at` before `shown_at` and an event for no item, and an item or task
+with events cannot be deleted; a reviewer reads only their own events and no client role can read
+`review_items` (the blind arm's proposal) or `review_tasks`; and `GET /api/pipeline/review-events`
+pages by id and freezes the task's seed once events exist. Events cannot be deleted, so each run uses
+its own task key and leaves them behind (`npm run db:test:reset` clears them). The pure spec pins the
+shape checks (`blind_frac: 20` would show nobody a proposal and nothing else would notice).
+`work/review-kit/review_sync.py --self-check` pins the export: events formatted as `review_record`
+lines are byte-identical to the originals and give the same `load()`, `sittings()` and `wilson()`.
+
 One write check pins `/api/context`'s `legend[]`: a public fixture map with a validated `px=` legend
 entry returns one point (inside the radius and the year window, `src: 'manual'`, passing
 `context.schema.json`); the entry's stray `geom` never appears under `labels` (mig 115); and the
 same map as a draft gives no `legend` to an anonymous caller or to staff.
 
-**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 38 tests)
+**Write paths** are covered separately by `npm run test:write` (`tests/write.spec.ts`, 41 tests)
 against a **local** stack, never production: `npm run db:test` runs
 `supabase start -x vector -x logflare` and seeds one staff user + one map via
 `scripts/seed-test-db.mjs`. The suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and
