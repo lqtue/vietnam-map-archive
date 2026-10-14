@@ -116,7 +116,7 @@ selected, ochre for hover, red once for the error line.
 ```
 ┌ VMA  Catalog · About · Blog                                  Tools ▾  (avatar) ┐
 ├────────────────────────────────────────────────────────────────────────────────┤
-│ Place links · 1882 Plan Cadastral        38 / 92 ▓▓▓▓▓▓▓░░░░░   12 s   ⏸ hidden │
+│ Place links · 1882 Plan Cadastral                        38 / 92 ▓▓▓▓▓▓▓░░░░░ │
 ├──────────────────────────────────────────────┬─────────────────────────────────┤
 │ CLOSE (≈ 200 m)          CONTEXT (≈ 700 m)    │ What is this 1882 place today?  │
 │ ┌──────────────────┐ ┌──────────────────┐    │                                 │
@@ -139,9 +139,9 @@ selected, ochre for hover, red once for the error line.
 └──────────────────────────────────────────────┴─────────────────────────────────┘
 ```
 
-- **Header bar:** task name, progress (done / total and a bar), the live timer for this item, and
-  a "hidden" mark when the tab was left. The timer is for the reviewer's own pacing; the stored time
-  comes from the timestamps.
+- **Header bar:** task name and progress (done / total and a bar). **No running timer:** the
+  offline pages have none, and a clock on screen changes how fast people work, so it would break the
+  comparison. Seconds per item show only on the all-done screen.
 - **Views:** fixed size per the method, scaled down together only when the window is narrower than
   both. Below 1280 px wide they stack. Candidate markers carry their number as well as their colour.
 - **Decision column:** question first, then the item, then the proposal (shown arm) or the
@@ -195,6 +195,37 @@ export const placeLink: ReviewTask = {
 The shared frame (header, views, timer, keys, undo, states, the send) lives once in
 `src/lib/features/review/`. Then-now is a second definition with two verdicts per item (V1 outlines,
 V2 class), which the frame supports as steps.
+
+## 7a. Svelte shape (review against `svelte-core-bestpractices`)
+
+Legacy mode, as everywhere: `$:`, `export let`, stores, `<svelte:component>`; no runes.
+
+- **The logic is a store, not a component.** `reviewSession.ts` exports
+  `createReviewSession({ task, fetch })`, the same shape as `createReviewQueue` in
+  `contribute/review/`. It holds the item, the stamps, `hidden_ms`, the pick, the step, and `send` /
+  `undo` / `retry`. Components read it with `$session` and call its methods; no `$:` writes state.
+  It can be tested without a page.
+- **No file over 500 lines.** `ReviewPage` (frame, ~150), `ReviewHeader`, `ReviewViews`,
+  `DecisionColumn`, and per task one overlay and, if it needs one, one decision panel.
+- **Overlay in image pixels for free.** Each view is an `<img>` with an `<svg viewBox="0 0 w h">`
+  of the same box on top. Markers, boxes and outlines use the image's own pixel numbers, so the
+  15 px drift the offline template once had cannot happen, and no JS measures the DOM.
+- **Keys come from the task definition.** One `<svelte:window on:keydown>` in the frame looks the key
+  up in `task.keys`, skips when `isTypingTarget` (`$lib/core/utils/commandPalette`) is true, and calls
+  the same function as the button. Each button carries `aria-keyshortcuts`.
+- **Stamps from the template, not timers.** `on:load` on each `<img>` counts loads; the last one
+  sets `shown_at`. `<svelte:document on:visibilitychange>` adds to `hidden_ms`. No `setInterval`.
+- **The task overlay is `<svelte:component this={task.overlay} {payload} {proposal} />`.** On the
+  blind arm `proposal` is `null` because the server never sent it.
+- **Keyed lists:** candidates and search hits by their place id, never by position.
+- **Search:** `bind:value` on the input, results fetched by a handler with a short debounce.
+- **Styles:** tokens only. The three candidate colours are `--color-primary`, `--color-blue` and
+  `--color-green` (red, blue, green, as offline). Column width is a custom property on the frame.
+- **Where it lives:** `src/lib/features/review/`. It may import `contribute/shared/**` (that
+  feature's public API) and nothing else from `contribute`. Routes stay thin: `+page.server.ts`
+  gates the role and loads the task row; the API handlers follow `requireRole → adminClient`.
+- **Tests:** the verdict, undo and stale paths in `npm run test:write` against the local stack; the
+  blind arm's missing proposal in the same suite (the response must not contain it).
 
 ## 8. Build order
 
