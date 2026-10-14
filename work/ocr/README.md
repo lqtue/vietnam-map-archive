@@ -1,5 +1,7 @@
 # OCR workspace and shared Python environment
 
+Part of the **readings** layer — see [ATLAS](../../docs/ATLAS.md).
+
 Text recognition, sheet layout, OCR evaluation and label joining live here. Image extraction,
 polygon cleanup, registration and segmentation evaluation live in
 [image-processing/scripts](../image-processing/scripts/README.md). Both areas share the Python

@@ -1,5 +1,7 @@
 # contracts
 
+Part of the **operations** layer — see [ATLAS](../docs/ATLAS.md).
+
 The archive's public output shapes, written down once so more than one consumer
 can rely on them. Design rationale in `docs/platform-design.md` §3.
 

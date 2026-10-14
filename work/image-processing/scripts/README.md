@@ -1,5 +1,7 @@
 # Image-processing scripts
 
+Part of the **readings** layer — see [ATLAS](../../../docs/ATLAS.md).
+
 Reusable feature extraction, polygon cleanup, registration and review tools.
 [Workspace](../README.md) · [Pipeline commands](../../../docs/pipelines.md).
 Run from the repository root with `work/ocr/.venv/bin/python`; the environment is shared

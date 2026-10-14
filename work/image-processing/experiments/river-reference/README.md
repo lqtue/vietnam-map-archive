@@ -1,5 +1,7 @@
 # River and road reference windows, 1882 + 1898
 
+Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 **2026-10-01.** Step 1 and the scoring half of step 3 of the `river-reconstruction` gate
 (`docs/research/river-reconstruction.md`), and the same for the road stage. Everything here is source
 pixels from `iiif.maparchive.vn` fixed tiles.

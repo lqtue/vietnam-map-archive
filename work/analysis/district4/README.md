@@ -1,5 +1,7 @@
 # District 4 — urban evolution
 
+Part of the **studies** layer — see [ATLAS](../../../docs/ATLAS.md).
+
 The morphology series behind "the urban evolution of District 4": for each
 historical sheet that covers the peninsula between the Bến Nghé and Tẻ canals,
 how much of it was built, how coarse the blocks were, how dense the streets,

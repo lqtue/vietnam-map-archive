@@ -1,5 +1,7 @@
 # Modern HCMC layers on the 1882 and 1898 sheets
 
+Part of the **readings** layer — see [ATLAS](../../../../docs/ATLAS.md).
+
 **2026-10-01.** A look at whether 2023 geodata can seed the river/road/block/building work
 (`docs/archive/processing-plan-1882-1898.md`, "Using today's HCMC layers"). **Not a score**: no trace exists yet.
 Data: `~/Work/Projects/hcmc-buildings/{hcmc_vector,hcmc_buildings_3d}.parquet` (government portal,

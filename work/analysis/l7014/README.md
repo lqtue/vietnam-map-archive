@@ -1,5 +1,7 @@
 # L7014 catalog and processing inventory
 
+Part of the **holdings** layer — see [ATLAS](../../../docs/ATLAS.md).
+
 Inventory first: reconcile the survey's cells, institutional source items, archive records and
 local processing inputs before changing printing metadata or placement. The dated
 [audit](../../../docs/journals/261003-l7014-audit.md) describes the earlier status snapshot and

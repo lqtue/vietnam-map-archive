@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SC = ["--self-check"]
 
 RUN = {
+    "scripts/check_workspace_layout.py": SC,
     "scripts/lib/georef_annotation.py": [],
     "scripts/tonkin_georef.py": ["selfcheck"],
     "work/MapSAM2/to_sam2_seeds.py": SC,

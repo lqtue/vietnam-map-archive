@@ -1,5 +1,7 @@
 # work/core
 
+Part of the **operations** layer — see [ATLAS](../../docs/ATLAS.md).
+
 Code the OCR, segmentation and worker pipelines share. One package, `vma_core`.
 
 | Module | Holds | Old home (now a re-export shim) |

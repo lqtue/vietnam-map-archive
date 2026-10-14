@@ -1,5 +1,7 @@
 # Research journal index
 
+Part of the **studies** layer — see [ATLAS](../ATLAS.md).
+
 Dated runs, audits and handoffs, newest first. These records describe the state at their dates;
 use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../README.md).
 
