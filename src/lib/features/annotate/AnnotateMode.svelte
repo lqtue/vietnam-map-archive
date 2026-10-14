@@ -277,17 +277,12 @@
     activeView = 'editor';
   }
 
-  function handleLibraryCreate(event: CustomEvent<{ title: string }>) {
+  async function handleLibraryCreate(event: CustomEvent<{ title: string }>) {
     const mapId = $mapStore.activeMapId || '';
-    const id = projectStore.createProject(event.detail.title, mapId);
-    setTimeout(() => {
-      const newProject = $projectStore.projects.find((p) => p.id === id);
-      if (newProject) {
-        currentProject = newProject;
-        studioMeasurement.enterProject(newProject.features);
-        activeView = 'editor';
-      }
-    }, 50);
+    const project = await projectStore.createProject(event.detail.title, mapId);
+    currentProject = project;
+    studioMeasurement.enterProject(project.features);
+    activeView = 'editor';
   }
 
   function handleLibraryRename(event: CustomEvent<{ item: AnnotationSet; title: string }>) {
