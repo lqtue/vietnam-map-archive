@@ -1142,6 +1142,154 @@ export type Database = {
         }
         Relationships: []
       }
+      review_events: {
+        Row: {
+          bound: string
+          client: Json
+          client_id: string
+          decided_at: string
+          id: number
+          item_id: string
+          note: string
+          order_idx: number
+          proposal_shown: boolean
+          readings: Json
+          received_at: string
+          reviewer: string | null
+          shown_at: string
+          task: string
+          verdicts: Json
+        }
+        Insert: {
+          bound: string
+          client?: Json
+          client_id?: string
+          decided_at: string
+          id?: never
+          item_id: string
+          note?: string
+          order_idx: number
+          proposal_shown: boolean
+          readings?: Json
+          received_at?: string
+          reviewer?: string | null
+          shown_at: string
+          task: string
+          verdicts?: Json
+        }
+        Update: {
+          bound?: string
+          client?: Json
+          client_id?: string
+          decided_at?: string
+          id?: never
+          item_id?: string
+          note?: string
+          order_idx?: number
+          proposal_shown?: boolean
+          readings?: Json
+          received_at?: string
+          reviewer?: string | null
+          shown_at?: string
+          task?: string
+          verdicts?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_events_task_item_id_fkey"
+            columns: ["task", "item_id"]
+            isOneToOne: false
+            referencedRelation: "review_items"
+            referencedColumns: ["task", "item_id"]
+          },
+        ]
+      }
+      review_items: {
+        Row: {
+          active: boolean
+          bound: string
+          created_at: string
+          gold: Json | null
+          item_id: string
+          payload: Json
+          proposal: Json | null
+          task: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          bound: string
+          created_at?: string
+          gold?: Json | null
+          item_id: string
+          payload?: Json
+          proposal?: Json | null
+          task: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          bound?: string
+          created_at?: string
+          gold?: Json | null
+          item_id?: string
+          payload?: Json
+          proposal?: Json | null
+          task?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_items_task_fkey"
+            columns: ["task"]
+            isOneToOne: false
+            referencedRelation: "review_tasks"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      review_tasks: {
+        Row: {
+          audience: string
+          blind_frac: number
+          created_at: string
+          key: string
+          method: string
+          question: string
+          question_vi: string | null
+          seed: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          blind_frac?: number
+          created_at?: string
+          key: string
+          method: string
+          question: string
+          question_vi?: string | null
+          seed: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          blind_frac?: number
+          created_at?: string
+          key?: string
+          method?: string
+          question?: string
+          question_vi?: string | null
+          seed?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scout_candidates: {
         Row: {
           category: string | null
