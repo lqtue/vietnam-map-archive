@@ -16,6 +16,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { beforeNavigate } from '$app/navigation';
   import { t } from '$lib/core/i18n';
   import ToolLayout from '$lib/map/shell/ToolLayout.svelte';
   import ImageShell from '$lib/map/shell/ImageShell.svelte';
@@ -194,8 +195,19 @@
     }
   }
 
+  $: unsavedCount = Object.keys(staged).length;
+
+  /** Staged edits live only in this page; leaving the sheet or the page drops them. */
+  function confirmDiscard(): boolean {
+    return !unsavedCount || confirm($t('Discard {N} unsaved changes?', { N: unsavedCount }));
+  }
+  beforeNavigate((nav) => {
+    if (!nav.willUnload && !confirmDiscard()) nav.cancel();
+  });
+
   function selectMap(map: MapListItem) {
     if (currentMap?.id === map.id) return;
+    if (!confirmDiscard()) return;
     currentMap = map;
     sourceId = '';
     iiifInfoUrl = map.iiif_image ? map.iiif_image + '/info.json' : null;
@@ -398,7 +410,12 @@
   });
 </script>
 
-<svelte:window on:keydown={onKey} />
+<svelte:window
+  on:keydown={onKey}
+  on:beforeunload={(e) => {
+    if (unsavedCount) e.preventDefault();
+  }}
+/>
 
 <svelte:head>
   <title>{currentMap ? `${currentMap.name} — ` : ''}{$t('Legend')} — Vietnam Map Archive</title>

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { t } from '$lib/core/i18n';
+  import { page } from '$app/stores';
   import { getSupabaseContext } from '$lib/data/supabase/context';
+  import { signInWithGoogle } from '$lib/core/utils/signIn';
 
   const { supabase, session } = getSupabaseContext();
 
@@ -11,12 +13,10 @@
     error = '';
     loading = true;
 
-    const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    const { error: authError } = await signInWithGoogle(
+      supabase,
+      $page.url.searchParams.get('next')
+    );
 
     if (authError) {
       error = authError.message;

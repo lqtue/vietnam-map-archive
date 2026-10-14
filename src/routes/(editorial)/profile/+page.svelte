@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import PageHero from '$lib/ui/PageHero.svelte';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import MfaPanel from '$lib/features/account/MfaPanel.svelte';
   import type { PageData } from './$types';
   import '$styles/pages/profile.css';
@@ -35,9 +36,12 @@
     setLocale($locale === 'vi' ? 'en' : 'vi');
   }
 
-  onMount(async () => {
+  let statsFailed = false;
+
+  async function loadStats() {
+    loading = true;
+    statsFailed = false;
     try {
-      // Get counts
       const [pinsRes, tracesRes] = await Promise.all([
         supabase
           .from('label_pins')
@@ -48,6 +52,8 @@
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id),
       ]);
+      // supabase-js reports a failed query in `.error`; it does not throw.
+      if (pinsRes.error || tracesRes.error) throw pinsRes.error ?? tracesRes.error;
 
       stats = {
         pins: pinsRes.count || 0,
@@ -56,10 +62,13 @@
       };
     } catch (e) {
       console.error('Failed to load profile stats:', e);
+      statsFailed = true;
     } finally {
       loading = false;
     }
-  });
+  }
+
+  onMount(loadStats);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -104,6 +113,8 @@
         <h3 class="section-title">{$t('Your contributions')}</h3>
         {#if loading}
           <div class="loading-pulse">{$t('Counting…')}</div>
+        {:else if statsFailed}
+          <LoadError message={$t('Could not load your contributions.')} on:retry={loadStats} />
         {:else}
           <div class="stats-grid">
             <div class="stat-tile">

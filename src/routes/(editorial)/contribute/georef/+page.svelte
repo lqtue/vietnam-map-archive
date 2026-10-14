@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { getSupabaseContext } from '$lib/data/supabase/context';
   import PageHero from '$lib/ui/PageHero.svelte';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import { fetchUserRole } from '$lib/data/supabase/role';
 
   $: heroTitle = splitHighlight($t('Pin a map **to the world.**'));
@@ -20,17 +21,28 @@
   let fixable: GeorefFixItem[] = [];
   let role: 'user' | 'mod' | 'admin' = 'user';
   let loading = true;
+  let loadFailed = false;
   let fixSearch = '';
 
-  onMount(async () => {
-    [maps, role] = await Promise.all([
-      fetchGeorefQueue(supabase),
-      fetchUserRole(supabase, session?.user?.id).then((r) => r ?? 'user'),
-    ]);
-    // Same gate as the share page's "Fix georeference" button.
-    if (role === 'admin' || role === 'mod') fixable = await fetchGeorefFixList(supabase);
-    loading = false;
-  });
+  async function load() {
+    loading = true;
+    loadFailed = false;
+    try {
+      [maps, role] = await Promise.all([
+        fetchGeorefQueue(supabase),
+        fetchUserRole(supabase, session?.user?.id).then((r) => r ?? 'user'),
+      ]);
+      // Same gate as the share page's "Fix georeference" button.
+      if (role === 'admin' || role === 'mod') fixable = await fetchGeorefFixList(supabase);
+    } catch (e) {
+      console.error('georef load failed:', e);
+      loadFailed = true;
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(load);
 
   $: pending = maps.filter((m) => !m.georef_done);
   $: canFix = role === 'admin' || role === 'mod';
@@ -90,6 +102,10 @@
       <section class="state-card">
         <div class="spinner"></div>
         <span>{$t('Loading maps…')}</span>
+      </section>
+    {:else if loadFailed}
+      <section class="section-card">
+        <LoadError message={$t('Could not load the maps.')} on:retry={load} />
       </section>
     {:else}
       <section class="section-card">

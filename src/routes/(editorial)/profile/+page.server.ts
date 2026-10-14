@@ -13,7 +13,7 @@ import { adminClient } from '$lib/server/supabaseAdmin';
  */
 export const load: PageServerLoad = async ({ locals }) => {
   const { session, user } = await locals.safeGetSession();
-  if (!session || !user) throw redirect(303, '/login');
+  if (!session || !user) throw redirect(303, '/login?next=%2Fprofile');
   const { data: profile } = await adminClient()
     .from('profiles')
     .select('role')

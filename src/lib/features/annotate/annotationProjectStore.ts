@@ -31,11 +31,27 @@ export function createAnnotationProjectStore(supabase?: SupabaseClient, userId?:
 
   loadFromSupabase();
 
-  function createProject(title: string, mapId: string): string {
-    const id = crypto.randomUUID();
+  // Resolves with the stored project once its final id is known: the database id when the
+  // insert succeeds, else the local one. The project enters the store once, under that id,
+  // so nothing holds an id that is swapped out later.
+  async function createProject(title: string, mapId: string): Promise<AnnotationSet> {
     const now = Date.now();
     const mapIds = mapId ? [mapId] : [];
     const emptyFeatures: FeatureCollection = { type: 'FeatureCollection', features: [] };
+    let id: string = crypto.randomUUID();
+
+    if (supabase && userId) {
+      const sbId = await annotationsApi.createAnnotationSet(supabase, {
+        title,
+        mapId,
+        mapIds,
+        userId,
+        features: emptyFeatures,
+        isPublic: false,
+      });
+      if (sbId) id = sbId;
+    }
+
     const project: AnnotationSet = {
       id,
       title,
@@ -48,27 +64,7 @@ export function createAnnotationProjectStore(supabase?: SupabaseClient, userId?:
       updatedAt: now,
     };
     store.update((lib) => ({ projects: [...lib.projects, project] }));
-
-    if (supabase && userId) {
-      annotationsApi
-        .createAnnotationSet(supabase, {
-          title,
-          mapId,
-          mapIds,
-          userId,
-          features: emptyFeatures,
-          isPublic: false,
-        })
-        .then((sbId) => {
-          if (sbId) {
-            store.update((lib) => ({
-              projects: lib.projects.map((p) => (p.id === id ? { ...p, id: sbId } : p)),
-            }));
-          }
-        });
-    }
-
-    return id;
+    return project;
   }
 
   function updateProject(id: string, updates: Partial<Pick<AnnotationSet, 'title'>>) {

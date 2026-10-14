@@ -2,6 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/data/supabase/types';
+import { queryError } from '$lib/data/supabase/queryError';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { allmapsEditorSourceUrl, verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 
@@ -48,10 +49,7 @@ export async function fetchGeorefFixList(
     .neq('status', 'archived')
     .order('name');
 
-  if (error) {
-    console.error('fetchGeorefFixList:', error);
-    return [];
-  }
+  if (error) throw queryError('fetchGeorefFixList', error);
   return Promise.all(
     (data ?? []).map(async (m) => {
       const verifiedSourceId = await verifiedEditorSourceId(m, m.map_images ?? []);
@@ -68,7 +66,7 @@ export async function fetchGeorefFixList(
   );
 }
 
-/** The georeferencing queue: maps not yet published, highest priority first. */
+/** The georeferencing queue: maps not yet published, highest priority first. Throws on a failed read. */
 export async function fetchGeorefQueue(
   supabase: SupabaseClient<Database>
 ): Promise<GeorefMapItem[]> {
@@ -81,10 +79,7 @@ export async function fetchGeorefQueue(
     .order('priority', { ascending: false })
     .order('name');
 
-  if (error) {
-    console.error('fetchGeorefQueue:', error);
-    return [];
-  }
+  if (error) throw queryError('fetchGeorefQueue', error);
   return (data ?? []) as GeorefMapItem[];
 }
 

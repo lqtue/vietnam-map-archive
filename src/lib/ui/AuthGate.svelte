@@ -7,16 +7,18 @@
   import { t } from '$lib/core/i18n';
   import '$styles/components/auth-gate.css';
   import type { SupabaseClient } from '@supabase/supabase-js';
+  import { signInWithGoogle } from '$lib/core/utils/signIn';
 
   export let supabase: SupabaseClient;
   export let title: string;
   export let body: string;
 
   async function signIn() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
+    // Come back to the tool the reader was on, not the home page.
+    const { error } = await signInWithGoogle(
+      supabase,
+      window.location.pathname + window.location.search
+    );
     if (error) console.error('Google sign-in failed:', error.message);
   }
 </script>

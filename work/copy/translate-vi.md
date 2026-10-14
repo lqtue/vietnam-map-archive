@@ -620,6 +620,20 @@ resolves to two points ~480 m apart — both are offered, labelled by datum.
 | Drag across the timeline to pick a range | Kéo trên dòng thời gian để chọn khoảng năm |
 
 
+## 21 · Page fixes (Oct 2026)
+
+| English | Tiếng Việt |
+|---|---|
+| Discard {N} unsaved changes? | Bỏ {N} thay đổi chưa lưu? |
+| Retry | Thử lại |
+| Could not load the maps. | Không thể tải danh sách bản đồ. |
+| Could not load your contributions. | Không thể tải đóng góp của bạn. |
+| Could not load the catalog. | Không thể tải danh mục. |
+| Page not found | Không tìm thấy trang |
+| Something went wrong | Đã xảy ra sự cố |
+| There is no page at this address. It may have moved, or the link may be wrong. | Không có trang nào tại địa chỉ này. Trang có thể đã được chuyển đi, hoặc liên kết bị sai. |
+| The archive hit a problem on our side. Try again in a moment. | Kho lưu trữ gặp sự cố ở phía chúng tôi. Vui lòng thử lại sau giây lát. |
+
 # PENDING — translated, not yet wired
 
 | All areas | Tất cả khu vực |
