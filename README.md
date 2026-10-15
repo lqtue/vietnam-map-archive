@@ -6,7 +6,9 @@ Historical maps of Vietnam, put back in place. We take scans of old city plans,
 pin them to real coordinates so they line up with the city as it is now, and
 read the names and shapes printed on them — so a street name from an 1882
 survey becomes something you can search for, and a building traced off a 1959
-sheet becomes a shape with a location.
+sheet becomes a shape with a location. Then we link each one to other maps, to
+its sources (documents, photos, studies, writings) and to the city today: a
+machine proposes each link and a person decides. What VMA is, on one page: [`docs/CONCEPT.md`](docs/CONCEPT.md).
 
 Saigon in the French colonial period is where the work goes deepest; Hanoi, Huế
 and the rest of the country are in the archive too. A SvelteKit application over

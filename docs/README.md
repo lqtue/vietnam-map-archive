@@ -16,7 +16,8 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 
 | I want to… | Start here |
 | --- | --- |
-| See what matters now, and why | [Now](NOW.md): the goal, the bets, the idea gate, who is on what |
+| Know what VMA is, and the words for it | [Concept](CONCEPT.md): the line, four verbs, the goal, the scope |
+| See what matters now, and why | [Now](NOW.md): the bets, the idea gate, who is on what |
 | See what is open | [Roadmap](ROADMAP.md): the one backlog |
 | Explore maps or contribute | [User guide](guides/user-guide.md) |
 | Prepare and read a scanned sheet | [Reading a sheet](guides/digitalize-guide.md) |

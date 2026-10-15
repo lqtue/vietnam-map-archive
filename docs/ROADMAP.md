@@ -599,6 +599,14 @@ exact thing it judged. Plan and rules: `docs/plans/digest-pipeline-plan.md`; the
 - [ ] **`source-agreement`** — a reading attested on a sheet *and* in a dated period source is two
       sources agreeing. Feeds `ocr-merge-evidence`. Exit: a reviewer sees which sources agree, not
       a blended score.
+- [ ] **`admin-units-saigon`** — administrative units over time, Saigon–Gia Định–Ho Chi Minh City
+      first (`docs/NOW.md` bet 1c; `docs/CONCEPT.md` §What it makes). Each change is a link between
+      two units with a relation (renamed · merged · split · abolished · boundary moved · name
+      reused), a source and who checked it. The official list starts in 2004 with codes, legal texts
+      and dates but no boundaries; none found yet for 1862–2004 (WHG, OpenHistoricalMap not yet checked). Sources from 1862 are French and
+      modern Vietnamese. A reused name stays *name reused* until a map shows the same ground.
+      First test: Xuân Hòa ward, 2025 back to the 1882 topographic plan of the 20th arrondissement (villages and cantons; the cadastral plan only names the village beyond the city line). Exit: that chain recorded as typed
+      links with sources, and a count of steps with an independent source.
 - [ ] **`gazetteer-depth`** — `place_names` exists; the view is only as good as the corpus, so this
       waits on ≥ 20 maps carrying extractions. Same queue as 4b/4c.
 - [~] **`temporal-fabric`** — code done 2026-09-02. Left: one real Colab `seg` run

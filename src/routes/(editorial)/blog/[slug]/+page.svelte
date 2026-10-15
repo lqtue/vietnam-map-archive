@@ -83,7 +83,7 @@
         <h3 class="sidebar-title">{$t('About the project')}</h3>
         <p class="sidebar-text">
           {$t(
-            'Vietnam Map Archive puts historical maps of Vietnam on real coordinates and reads what is printed on them. Saigon in the colonial period is where the deep work starts.'
+            'Vietnam Map Archive puts old maps of Vietnam back in place, reads what is printed on them, and links each one to other maps and to the city today. Saigon is where the work goes deepest.'
           )}
         </p>
         <a href="/about" class="sidebar-link">{$t('Project overview')}</a>

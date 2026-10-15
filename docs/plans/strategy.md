@@ -2,6 +2,7 @@
 
 _Funder-facing: what VMA is, what exists, where it goes, how it pays for itself._
 _Last updated: 12 October 2026 (current focus); the rest dates from August 2026. Supersedes `strategy-roadmap.md` and `startup-strategy.md`._
+_What VMA is today, and the words for it: [`docs/CONCEPT.md`](../CONCEPT.md). The time-layered city below is the horizon, not the current claim._
 
 ---
 
@@ -48,7 +49,8 @@ make contribution cheaper, which attracts contributors, which produces better mo
 documented know-how.
 
 VMA is simultaneously (1) a public infrastructure project on the OSM/Wikipedia model and (2) the
-research infrastructure for a PhD in urban planning & design on the spatial history of Saigon. These
+research infrastructure for a PhD in information science: linking records that never agree, and
+checking the links (`docs/CONCEPT.md` §The goal). These
 are not in tension — Peter Bol built CHGIS as both field infrastructure and his own research
 instrument.
 
