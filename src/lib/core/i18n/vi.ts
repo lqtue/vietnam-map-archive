@@ -85,10 +85,10 @@ export const vi: Record<string, string> = {
   Place: 'Địa điểm',
   move: 'di chuyển',
   open: 'mở',
-  'Vietnam Map Archive — historical maps of Vietnam, open and georeferenced':
-    'Kho Lưu trữ Bản đồ Việt Nam — bản đồ lịch sử mở và đã định vị tọa độ',
-  '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.':
-    '{N} mảnh bản đồ Sài Gòn, Huế và Hà Nội (1791–1984) được chồng khớp lên không gian thực tế.',
+  'Vietnam Map Archive — old maps of Vietnam, put back in place':
+    'Kho Lưu trữ Bản đồ Việt Nam — bản đồ lịch sử Việt Nam, khôi phục về đúng vị trí',
+  '{N} sheets of Vietnam, 1791 to 1984, laid back over the ground they drew.':
+    '{N} mảnh bản đồ Việt Nam (1791–1984) được chồng khớp lên không gian thực tế.',
   Today: 'Hôm nay',
   'The 1882 cadastral survey of Saigon laid over the modern city, fading between the two':
     'Bản đồ địa chính Sài Gòn năm 1882 chồng lên thành phố hiện đại, hiệu ứng chuyển đổi giữa hai thời kỳ',
@@ -136,8 +136,8 @@ export const vi: Record<string, string> = {
     'Cắt khung bản đồ, thiết lập mức độ ưu tiên và kiểm tra địa danh OCR. Khoảng 950 địa danh đang chờ xử lý; 43 đã hoàn thành.',
   "Data is openly licensed (CC-BY / ODbL) and the code is public. Every sheet credits the institution holding the scan — the Bibliothèque nationale de France, Université Côte d'Azur, UT Austin, the Library of Congress and others — and links back to their record. None of that is a formal partnership. Any city with a map archive can fork the whole thing and run it locally; that is the point of building it this way.":
     "Dữ liệu cấp phép mở (CC-BY / ODbL) và mã nguồn mở. Các bản scan ghi nhận bản quyền từ các thư viện gốc như Bibliothèque nationale de France, Đại học Côte d'Azur, UT Austin, Thư viện Quốc hội Hoa Kỳ và các đơn vị khác. Bất kỳ kho lưu trữ nào cũng có thể sao chép và triển khai độc lập.",
-  "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL.":
-    'Các tình nguyện viên đang đưa bản đồ trở về đúng vị trí thực tế. Công việc tiếp theo là đọc tên địa danh và số hóa công trình từ bản đồ thời kỳ thuộc địa vào dữ liệu mở, với sự kiểm duyệt thủ công. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều tuân theo giấy phép CC-BY / ODbL.',
+  'Volunteers put those sheets back on the ground they drew. Next we read what is printed on them, names and shapes, and link each one to other maps, to its sources and to the city today. A machine proposes each link and a person decides, and we record how often they were right. The 1882 cadastral survey of Saigon is where it starts. Everything published will be CC-BY / ODbL.':
+    'Các tình nguyện viên đưa những tấm bản đồ này về đúng vị trí trên mặt đất. Bước tiếp theo là đọc những gì in trên đó — tên địa danh và hình dạng công trình — rồi liên kết từng thứ với các bản đồ khác, với nguồn gốc của nó và với thành phố ngày nay. Máy đề xuất từng liên kết, con người quyết định, và chúng tôi ghi lại tỉ lệ quyết định đúng. Khởi đầu là bản đồ địa chính Sài Gòn năm 1882. Mọi dữ liệu xuất bản đều theo giấy phép CC-BY / ODbL.',
   "What's actually done →": 'Tiến độ thực tế →',
   'How this works': 'Cách thức hoạt động',
   'A scan of an 1882 survey, pinned to real coordinates, laid back over the ground it drew — then the plots traced off it and the names read off it. Drag the slider to move between the two cities.':
@@ -155,6 +155,9 @@ export const vi: Record<string, string> = {
   'No published dataset.': 'Chưa có tập dữ liệu phát hành công khai.',
   'Nothing traced has been reviewed and released. That is the next thing, and it needs people rather than code.':
     'Dữ liệu số hóa chưa được kiểm duyệt hoàn tất và phát hành.',
+  'No public links yet.': 'Chưa có liên kết công khai.',
+  'Linking a name on one map to the same place on another is being tested offline on the 1882 survey. Nothing is published.':
+    'Việc liên kết một địa danh trên bản đồ này với cùng địa điểm trên bản đồ khác đang được thử nghiệm ngoại tuyến trên bản đồ năm 1882. Chưa có gì được công bố.',
   'No building histories.': 'Chưa có lịch sử công trình chi tiết.',
   'Who built a place, who owned it, what replaced it — there is no database for any of that, only a design.':
     'Chưa có cơ sở dữ liệu về quyền sở hữu hay quá trình thay đổi kiến trúc.',
@@ -295,8 +298,8 @@ export const vi: Record<string, string> = {
     'Mọi công trình số hóa, ảnh được gán nhãn và nguồn trích dẫn đều được ghi nhận vĩnh viễn trong kho lưu trữ.',
   'Start contributing': 'Bắt đầu đóng góp',
   'Read the project overview': 'Đọc tổng quan dự án',
-  'Vietnam Map Archive puts historical maps of Vietnam on real coordinates and reads what is printed on them. Saigon in the colonial period is where the deep work starts.':
-    'Kho Lưu trữ Bản đồ Việt Nam ghim các bản đồ lịch sử lên tọa độ thực tế và trích xuất nội dung văn bản. Giai đoạn Sài Gòn thời thuộc địa là trọng tâm khởi đầu.',
+  'Vietnam Map Archive puts old maps of Vietnam back in place, reads what is printed on them, and links each one to other maps and to the city today. Saigon is where the work goes deepest.':
+    'Kho Lưu trữ Bản đồ Việt Nam đưa bản đồ lịch sử Việt Nam về đúng vị trí, đọc những gì in trên đó và liên kết từng bản đồ với các bản đồ khác và với thành phố ngày nay. Sài Gòn là nơi công việc đi sâu nhất.',
   'Project overview': 'Tổng quan dự án',
   'More posts': 'Bài viết khác',
   'Funder, researcher, volunteer, or just curious?':
@@ -420,7 +423,6 @@ export const vi: Record<string, string> = {
   'Saved {N}.': 'Đã lưu {N}.',
   placed: 'đã đặt',
   unplaced: 'chưa đặt',
-  draft: 'bản nháp',
   'Vietnamese name': 'Tên tiếng Việt',
   'Grid reference': 'Ô lưới tham chiếu',
   'Remove point': 'Xóa điểm',
@@ -432,10 +434,6 @@ export const vi: Record<string, string> = {
   'The legend tool is for staff.': 'Công cụ chú giải chỉ dành cho quản trị viên.',
   'Could not load this sheet’s legend.': 'Không thể tải chú giải của tờ này.',
   'Could not save the legend.': 'Không thể lưu chú giải.',
-  'Could not place the point.': 'Không thể đặt điểm.',
-  'That spot is above or left of this scan, which cannot be stored.':
-    'Vị trí đó nằm phía trên hoặc bên trái bản scan này nên không thể lưu.',
-  'Click on sheet': 'Nhấp trên tờ bản đồ',
   'Pick a map to place its legend.': 'Chọn một bản đồ để đặt chú giải.',
   'Place the legend': 'Đặt chú giải',
   'Open legend tool': 'Mở công cụ chú giải',
@@ -491,7 +489,7 @@ export const vi: Record<string, string> = {
   From: 'Từ',
   To: 'Đến',
   'The archive holds {held} of {total} indexed sheets. The full historical series total is not established.':
-    'Kho lưu trữ có {held} trong {total} tờ đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử.',
+    'Kho lưu trữ có {held} trong {total} tờ bản đồ thành phố đã lập chỉ mục. Chưa xác định được tổng số tờ của bộ bản đồ trong lịch sử.',
   Saigon: 'Sài Gòn',
   'Across Vietnam': 'Toàn Việt Nam',
   'See all {N} in the catalog': 'Xem cả {N} bản đồ trong danh mục',
@@ -528,4 +526,9 @@ export const vi: Record<string, string> = {
     'Không có trang nào tại địa chỉ này. Trang có thể đã được chuyển đi, hoặc liên kết bị sai.',
   'The archive hit a problem on our side. Try again in a moment.':
     'Kho lưu trữ gặp sự cố ở phía chúng tôi. Vui lòng thử lại sau giây lát.',
+  draft: 'bản nháp',
+  'Could not place the point.': 'Không thể đặt điểm.',
+  'That spot is above or left of this scan, which cannot be stored.':
+    'Vị trí đó nằm phía trên hoặc bên trái bản scan này nên không thể lưu.',
+  'Click on sheet': 'Nhấp trên tờ bản đồ',
 };

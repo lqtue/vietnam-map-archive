@@ -1,18 +1,15 @@
 # Now — what matters this month, and why
 
-**Read this first, every session.** It holds the goal, the bets that serve it, what only Tue can
-do, and who is working on what. `ROADMAP.md` is the backlog behind it; nothing here repeats its
+**Read this first, every session.** It holds the bets that serve the goal, what only Tue can
+do, and who is working on what. What VMA is, and the goal itself, is `CONCEPT.md`. `ROADMAP.md` is the backlog behind it; nothing here repeats its
 detail. Keep this file under 70 lines: when a bet closes, replace it, and when an idea arrives, put
-it through the gate before it gets a branch. Updated 2026-10-14. Public repo: no application dates,
+it through the gate before it gets a branch. Updated 2026-10-15. Public repo: no application dates,
 referees or contacts here — those live in `docs/private/`.
 
 ## Goal
 
-Show that historical maps which never agree can still be **linked** — map to map, map to source,
-map to today — with a machine that proposes and a person who decides; **measure** what that costs
-and how often it is right; and show **which checks are independent of what they check** (a real
-check, not an echo). That measured, linked record is the product (VMA) and the PhD pitch
-(information science) at once.
+**Link** maps that never agree, **measure** what it costs and how often it is right, and count only
+**checks that could have failed**. Full text: `CONCEPT.md` §The goal.
 
 ## Bets
 
@@ -20,6 +17,7 @@ check, not an echo). That measured, linked record is the product (VMA) and the P
 |---|---|---|
 | **1a. Place links, 1882** (`place-links`, `then-now-blocks`) | One owner sitting gives a measured linkage result now. | Owner-confirmed links with measured accuracy and seconds per item. Plan: `plans/digest-pipeline-plan.md` |
 | **2. Measured gates** (`review-events`, `paper-audit-100k`) | Turns "it works" into numbers: error rate with an interval, seconds per item. The paper's contribution. | The baseline's "unmeasured" cells have numbers |
+| **1c. Admin units over time, Saigon** (test) | The link applied to units, and the 2025 reform made into data: the first record beyond the 1882 sheet (`CONCEPT.md` §What it makes). | Test: trace Xuân Hoà ward from 2025 to the 1882 topographic plan (`plan-topographique-du-20e-arrondissement-et-ses-environs`; villages and cantons, not the cadastral city plan), each step a typed link with its source; count the steps with an independent source. Kill: 1975–2004 rests on one printed book → Saigon only, nation parked |
 | **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md` |
 | **3. Corpus to link against** — series georef, OCR drain | Serves the product, not the next weeks. | **Later**, after 1a and 2. ROADMAP *Do next* |
 
@@ -59,12 +57,13 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | 1882/1898 river | **Tue** | `vma-1882-river` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | Rebase onto main (#77), then PR: scripts and records only |
+| What VMA is: `docs/CONCEPT.md` + app copy | Claude | `concept`, worktree `vma-concept` | Tue reads the copy, then PR |
+| Admin bounds by machine (bet 1c groundwork) | Claude | `admin-lines`, worktree `vma-admin-lines` | PR #83 (scripts + note); then Tue traces Xuân Hòa |
 | Review page in the app (bet 2, `review-events`) | Claude | `review-web`, worktree `vma-review-web`; plan #81 | PR 1: store + export (`docs/plans/review-page-plan.md` §8) |
 
 ## Parked
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
-- City reconstruction / 3D (`city-reconstruction-plan.md`), with 3D landmark models and the Favre
-  panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
-- Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs.
+- Walk (`plans/walk-plan.md`): first ask people for photo sets of standing buildings (place, date, CC BY); 3D later, from those sets. Test: one landmark, two weeks. Kill: under ~5 usable sets, or no clear licence.
+- The 4D city, behind Walk (`CONCEPT.md` §The horizon; `panorama-match` killed at 131 m) · admin units for all of Vietnam (after 1c; needs a line-type model for 1:25k bounds — test: trace one Sơn Tây tile per legend class, train, score a second tile; kill: commune dots unreadable at scan resolution; `experiments/admin-lines/`) · Gallica text harvest · street-name pairs.

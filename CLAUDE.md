@@ -1,10 +1,16 @@
 # CLAUDE.md
 
-Vietnam Map Archive (VMA) — a SvelteKit app for exploring georeferenced historical maps of
-Saigon/Ho Chi Minh City. Integrates Allmaps with OpenLayers.
+Vietnam Map Archive (VMA): Vietnam's places, kept through time. It ties maps, documents, photos and
+writings to the place and time they describe (link, the core), saves what could be lost (keep) and
+lets anyone see a place as its sources show it (show) — a research tool whose records anyone can
+search, cite and download. A SvelteKit app over Allmaps and OpenLayers.
 
-**Start with `docs/NOW.md`** (imported below): the goal, the three current bets, the idea gate and
-who is working on what. A new idea goes through that gate before it gets a branch.
+**`docs/CONCEPT.md`** (imported below) is what VMA is: the line, the three jobs, the four verbs, what a link
+is, what it makes, the goal, the scope, the horizon and the words to use. Describe VMA in its words, in code comments and app copy alike.
+**`docs/NOW.md`** (also imported) holds the current bets, the idea gate and who is working on what.
+A new idea goes through that gate before it gets a branch.
+
+@docs/CONCEPT.md
 
 @docs/NOW.md
 
