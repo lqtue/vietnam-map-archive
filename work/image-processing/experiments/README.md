@@ -11,6 +11,7 @@ Layer 3 readings in the [system model](../../../docs/model-layout.md).
 | Modern overlays               | `modern-overlays/`                                      | Local image overlays under `out/`                                     |
 | River reference tools         | [river-reference](river-reference/README.md) | Blind-window registry, point labels, traces and scorer; local images under `crops/` |
 | OSM warp evidence | [osm-warp](osm-warp/README.md) | Local retained geometry and figures; follow-up deferred |
+| Admin bounds by machine | [admin-lines](admin-lines/README.md) | Colour, dash-chain and rhythm detectors; 1882 topographic plan and Tonkin 1:25k |
 
 Reference tools, point labels and traces are versioned. The images under `crops/`,
 modern-overlay outputs under `out/`, OSM-warp outputs and segmentation images are local
