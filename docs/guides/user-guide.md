@@ -1,7 +1,8 @@
 # VMA User Guide
 
-The Vietnam Map Archive is an open platform for exploring, georeferencing, and digitizing historical
-maps of Saigon / Ho Chi Minh City. This guide is organised by role.
+The Vietnam Map Archive puts old maps of Vietnam back in place, reads what is printed on them, and
+links each one to other maps and to the city today ([what VMA is](../CONCEPT.md)). Saigon is where
+the work goes deepest. This guide is organised by role.
 
 - **Explorer** — browse maps, stack overlays, play story tours.
 - **Volunteer** — review OCR, trace footprints, georeference.

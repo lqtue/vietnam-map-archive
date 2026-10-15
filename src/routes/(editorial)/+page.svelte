@@ -274,8 +274,8 @@
    * drifts the day a fortieth sheet publishes.
    */
   $: metaDescription =
-    `A small volunteer archive of historical maps of Vietnam — Saigon, Huế and Hanoi so far. ` +
-    `${mapCount} sheets are georeferenced and readable in a browser; tracing and label work have only just started.`;
+    `Old maps of Vietnam, put back in place: ${mapCount} sheets on real coordinates, readable in a browser. ` +
+    `A small volunteer project; reading the names off them and linking them to the city today have only just started.`;
 
   /**
    * Absolute, because a share card is read by a crawler with no page to resolve
@@ -390,7 +390,7 @@
      URL people actually paste — the root — rendered as a bare link everywhere,
      while `/catalog/[id]` posted a proper card. Same tags, same shape. -->
 <svelte:head>
-  <title>{$t('Vietnam Map Archive — historical maps of Vietnam, open and georeferenced')}</title>
+  <title>{$t('Vietnam Map Archive — old maps of Vietnam, put back in place')}</title>
   <meta name="description" content={metaDescription} />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Vietnam Map Archive" />
@@ -469,12 +469,9 @@
         Vietnam<br /><span class="text-highlight">Map Archive</span>
       </h1>
       <p class="hero-subtitle">
-        {$t(
-          '{N} sheets of Saigon, Huế and Hanoi — 1791 to 1984 — laid back over the ground they drew.',
-          {
-            N: mapCount,
-          }
-        )}
+        {$t('{N} sheets of Vietnam, 1791 to 1984, laid back over the ground they drew.', {
+          N: mapCount,
+        })}
       </p>
       <!-- The field is a paper plate sitting on the masthead's dark ground, so
            `on-light-plate` inside the component keeps it off the paper ink. -->
@@ -689,7 +686,7 @@
         <h2 class="band-title">{$t('About the project')}</h2>
         <p class="band-desc">
           {$t(
-            "Volunteers put those sheets on the ground they drew. Reading the names off them and tracing what they show is where the work goes next: the aim is to get the buildings and street names out of Vietnam's colonial-era maps and into open data, with a person checking the machine's work. The 1882 cadastral survey of Saigon is where it starts, and where most of the work so far sits. Everything published will be CC-BY / ODbL."
+            'Volunteers put those sheets back on the ground they drew. Next we read what is printed on them, names and shapes, and link each one to other maps, to its sources and to the city today. A machine proposes each link and a person decides, and we record how often they were right. The 1882 cadastral survey of Saigon is where it starts. Everything published will be CC-BY / ODbL.'
           )}
         </p>
         <a href="/about" class="info-link">{$t("What's actually done →")}</a>

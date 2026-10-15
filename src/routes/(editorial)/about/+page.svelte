@@ -32,14 +32,14 @@
   <title>About — Vietnam Map Archive</title>
   <meta
     name="description"
-    content="A small volunteer project putting historical maps of Vietnam on real coordinates and reading the names printed on them. {s.published} sheets are placed so far; this page says what is done and what is not."
+    content="A small volunteer project putting old maps of Vietnam back in place, reading what is printed on them and linking them to the city today. {s.published} sheets are placed so far; this page says what is done and what is not."
   />
 </svelte:head>
 
 <div class="page about-page">
   <PageHero
     eyebrow="About"
-    sub="A small volunteer project. We take scans of historical maps, pin them to real coordinates so they line up with the city as it is now, and read the names and shapes printed on them. Saigon in the French colonial period is where the work goes deepest — it is the city we live in and the one with the best archives."
+    sub="A small volunteer project. We put old maps of Vietnam back on the ground they drew, read what is printed on them, and link each one to other maps, to its sources and to the city today. A machine proposes each link and a person decides; we record who checked it and how often they were right. Saigon is where the work goes deepest: it is the city we live in and the one with the best archives."
   >
     <svelte:fragment slot="title">
       {heroTitle[0]}{#if heroTitle[1]}<br /><span class="text-highlight">{heroTitle[1]}</span
@@ -149,6 +149,11 @@
         <li>
           <strong>{$t('No published dataset.')}</strong>{$t(
             'Nothing traced has been reviewed and released. That is the next thing, and it needs people rather than code.'
+          )}
+        </li>
+        <li>
+          <strong>{$t('No public links yet.')}</strong>{$t(
+            'Linking a name on one map to the same place on another is being tested offline on the 1882 survey. Nothing is published.'
           )}
         </li>
         <li>

@@ -11,19 +11,23 @@ restructure changed).
 
 ## 0. Mission and product layers
 
-Build the spatial memory of colonial Saigon: ingest historical maps → process into geometry → enrich
-with knowledge → serve to users and researchers.
+What VMA is, and the words for it: `docs/CONCEPT.md`. In short: old maps of Vietnam, put back in
+place, read, linked and checked, and opened as records anyone can search, cite and download. The
+layers below are how the code is organised, not the product's description.
 
 ```
 6. PLATFORM        auth, nav, about, blog, profile
 5. RESEARCH SUITE  user publications combining maps + annotations + stories   [future]
 4. USAGE           explore, studio, stories, walking tours
 3. ENRICHMENT      knowledge graph, photos, 3D                                [future]
+2b. LINK + CHECK   place links, then-now blocks, admin units over time,
+                   review_events                                [offline test / planned]
 2. PROCESSING      pixel (triage / OCR / SAM2 / review) | georef (Allmaps)
 1. INGEST          upload map → IA / BnF / R2 / own server
 ```
 
-Layers 1, 2, 4 and 6 are built. Layer 3 and 5 are aspirations — no schema and no code. See
+Layers 1, 2, 4 and 6 are built. Layer 2b is being tested offline (bets 1a, 1c and 2 in
+`docs/NOW.md`). Layer 3 and 5 are aspirations — no schema and no code. See
 `docs/plans/theory.md` for the underlying data-stack model and `docs/plans/strategy.md` for what is funded or
 planned.
 

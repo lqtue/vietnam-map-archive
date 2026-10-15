@@ -20,7 +20,8 @@ The [workspace mapping](workspace-model.json) declares each area's primary respo
 | Prepare and read a scanned sheet         | [Reading a sheet](guides/digitalize-guide.md)                                                    |
 | Manage the catalog and review queues     | [Admin tooling](guides/admin-tooling.md)                                                         |
 | Understand how the archive fits together | [System graph](guides/system-graph.md)                                                           |
-| See what matters now, and why            | [Now](NOW.md) — the goal, three bets, the idea gate, who is on what                       |
+| Know what VMA is, and the words for it   | [Concept](CONCEPT.md) — the line, four verbs, the goal, the scope                         |
+| See what matters now, and why            | [Now](NOW.md) — three bets, the idea gate, who is on what                                 |
 | See what is being worked on              | [Roadmap](ROADMAP.md) — the single tracker for open work                                  |
 | Change the app                           | [Architecture](guides/architecture.md), [conventions](guides/conventions.md), then the references below |
 | Run OCR, segmentation or georeferencing  | [Pipelines](guides/pipelines.md) and [work directory guide](../work/README.md)                   |
