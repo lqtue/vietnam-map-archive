@@ -53,6 +53,8 @@ a proposed feature in a plan is not evidence that it is available in the app.
 | [Strategy](plans/strategy.md)                      | Product direction and funding narrative              |
 | [Theory](plans/theory.md)                          | Intellectual framework                               |
 | [Knowledge system](plans/knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
+| [Data model target](plans/data-model-target.md)    | No rebuild: places, feature-to-place links and activities, the tables bets 1a and 2 need |
+| [Model dedup](plans/model-dedup-plan.md)           | One fact, one writer: the duplicated series, edition and JSON columns, measured |
 | [Digest pipeline](plans/digest-pipeline-plan.md)   | How a map goes from found to linked: machine proposes, person decides, every decision timed (bet 1a) |
 | [Review page](plans/review-page-plan.md)           | The offline review pages moved into the app: one engine, one record, open to contributors later |
 | [Search](plans/search-plan.md)                     | Finding labels, shapes and period sources            |

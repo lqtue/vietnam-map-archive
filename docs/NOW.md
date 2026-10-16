@@ -3,7 +3,7 @@
 **Read this first, every session.** It holds the goal, the bets that serve it, what only Tue can
 do, and who is working on what. `ROADMAP.md` is the backlog behind it; nothing here repeats its
 detail. Keep this file under 70 lines: when a bet closes, replace it, and when an idea arrives, put
-it through the gate before it gets a branch. Updated 2026-10-14. Public repo: no application dates,
+it through the gate before it gets a branch. Updated 2026-10-16. Public repo: no application dates,
 referees or contacts here — those live in `docs/private/`.
 
 ## Goal
@@ -60,11 +60,11 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | Rebase onto main (#77), then PR: scripts and records only |
 | Review page in the app (bet 2, `review-events`) | Claude | `review-web`, worktree `vma-review-web`; plan #81 | PR 1: store + export (`docs/plans/review-page-plan.md` §8) |
+| Data model: places, links, activities (bets 1a, 2) | Claude | `model-dedup`, worktree `vma-model-dedup` | Plans only; Tue reviews, then `activities` after `review-store` lands |
 
 ## Parked
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
-- City reconstruction / 3D (`city-reconstruction-plan.md`), with 3D landmark models and the Favre
-  panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
-- Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs.
+- City reconstruction / 3D (`city-reconstruction-plan.md`), 3D landmarks, Favre panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
+- Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs · scout sheet profile (grid, units, datum, script; 20-sheet test).
