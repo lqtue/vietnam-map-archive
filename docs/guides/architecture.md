@@ -494,7 +494,7 @@ the only thing holding it back.
 `maps.collection` that is a survey, and `/explore` renders whatever it returns — so a new series is
 a matter of ingesting sheets, not of editing a file and deploying. Three rules decide what
 qualifies, all of them read off the data rather than declared: the sheets carry a
-**`extra_metadata.sheet_number`** (which is what separates a survey from `Vietnam Map Archive`, the
+**`maps.sheet_number`** (which is what separates a survey from `Vietnam Map Archive`, the
 archive's catch-all bucket of 36 unrelated sheets at every scale — stacking those on one another is
 noise, and on the corpus the test draws the line exactly right: 62/62 Cartomundi rows and 15/15
 L7014 rows carry a number, 0/36 in the bucket do); there is **more than one** of them georeferenced
