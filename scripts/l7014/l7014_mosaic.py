@@ -363,6 +363,15 @@ def xmp_fields(ds):
     return dict(re.findall(r"<pdfx:(\w+)>([^<]*)</pdfx:\w+>", raw[0]))
 
 
+def edition_label(meta):
+    """The XMP edition in house form: leading zeros off the number, the agency
+    suffix kept ("003" -> "3", "003-DMA" -> "3-DMA"). PCL pads to three digits;
+    `maps.edition` and migration 124 do not, so a padded value written here
+    would come back as a false disagreement between a sheet and its cell."""
+    ed = (meta.get("edition") or "").strip()
+    return re.sub(r"^0+(?=[0-9])", "", ed) or None
+
+
 def sheet_crs(ds, meta, force_epsg=None):
     """The sheet's projected CRS, and whether GDAL supplied it.
 
@@ -614,7 +623,7 @@ def warp_one(row, no_datum_shift=False):
         return "fail", f"{pdf.stem}: {res.stderr.strip()[-200:]}"
 
     row["year"] = (meta.get("pri_date") or "")[:4] or None
-    row["edition"] = meta.get("edition")
+    row["edition"] = edition_label(meta)
     row["crs_forced"] = not trusted
     row["crs_src"] = crs_src
     row["graticule_err"] = err
@@ -865,7 +874,7 @@ def meta_one(row):
         return "nogeo"
     srs, trusted = sheet_crs(ds, m)
     row["year"] = (m.get("pri_date") or "")[:4] or None
-    row["edition"] = m.get("edition")
+    row["edition"] = edition_label(m)
     row["crs_forced"] = not trusted
     row["graticule_err"] = graticule_error(ds, srs, m)
     return "ok"
