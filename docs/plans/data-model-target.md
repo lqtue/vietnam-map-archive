@@ -109,6 +109,78 @@ Migration numbers are assigned when each is written. 120–121 belong to Codex, 
 5. **Later:** sources, workspaces, the series technical profile (grid, units, datum on `series`,
    per-sheet override), `terms`.
 
+## 5. Where each fact lives: the full target
+
+At 1,562 maps, speed does not matter. "Optimised" here means one home per fact, on the level it
+belongs to, carrying its evidence. Existing table names stay.
+
+```text
+PEOPLE        profiles · workspaces ─ user_layers, stories, favorites
+
+SOURCE CHAIN  series        producer, scale, projection, datum, grid, prime meridian, script
+ (identity)    └ series_cells        the grid cell: label, footprint
+                  └ sheet_printings   edition, survey year, printed year, title/publisher as printed
+                     └ cell_printings  the copy: holder, shelfmark, rights, URL, provider ids
+                        └ maps          the scan workspace: status, slug, what it shows
+                           └ map_images   IIIF, size, hash
+              sources       decrees, books, archive files (non-map)
+
+DESCRIPTION   sheet_facts   kind · value · as printed · evidence (label or box) · status
+                            per-sheet scale, legend classes, admin levels drawn, grid, datum
+
+PLACEMENT     georef_versions (+ map_georef_current)
+
+FEATURES      ocr_labels (names, legend entries, title and scale text) · footprints (shapes)
+ (on a scan)  pixel geometry is the truth; ground geometry is derived and names its georef version
+
+PLACES        places · place_names · place_geometries · place_relations   (dated, cited)
+ (the world)  place_links (OSM, Wikidata, OHM) · feature_place (label → place)
+
+EVIDENCE      activities · review_tasks / review_items / review_events · terms (vocabularies)
+
+OPS           pipeline_jobs · worker_keys · map_views
+```
+
+**Six rules.**
+
+1. **A fact lives on its level** and the levels below inherit it: scale and datum on the series,
+   edition and printed year on the printing, holder and rights on the copy. A sheet overrides only
+   where it differs, as a `sheet_facts` row.
+2. **Printed and clean side by side**: "Échelle 1:25.000" next to `25000`, "Levé en 1898" next to
+   `1898` (MARC 255 next to 034). The gap between them is evidence.
+3. **Metadata cites features.** A thing printed on the sheet has two sides: where it is (a feature:
+   the scale bar, the legend box and its entries, the cartouche text) and what it means (a value).
+   The value points at the feature it was read from. Legend entries are features; the classes they
+   define become `terms` for the sheet's other features, and "this sheet draws commune boundaries"
+   is a `sheet_facts` row citing the legend entry.
+4. **Pixels are the truth.** Ground shapes are derived from one georef version and say which.
+5. **Every claim names its activity and status**; human decisions are `review_events` rows.
+6. **Typed tables, no graph.** Linked Places, IIIF Georeference and catalogue exports are views.
+
+**Today, measured 2026-10-16.** Scale has no column on `maps`; `series.scale_denominator` is empty on
+all 6 series; `extra_metadata.scale` is on 44 rows; the scout reads scale, title, year and publisher
+off the cartouche and keeps them only in `scout.json`. The legend lives in three places (§C 4 of the
+audit): `triage.regions`, `ocr_labels` entries with the number and point packed in `notes`, and
+`label_config.legend` (filled on one map).
+
+**`sheet_facts(map_id, kind, value, stated, evidence_label_id, evidence_bbox, status, activity_id)`.**
+`kind` comes from `terms` (`scale`, `legend_class`, `admin_level`, `grid`, `units`, `prime_meridian`,
+`datum_stated`, `script`). It holds the scout sheet profile once that is unparked. It is not a
+general fact store: series-wide facts go on `series`, and anything a page filters on gets a column.
+
+**Moves, by cost.**
+
+| Move | Bet | Cost |
+|---|---|---|
+| `activities` (§4 step 2) | 2 | ½ day |
+| places and `feature_place` (§4 step 3) | 1a | 1 day |
+| fill `series` scale (and datum where printed); the values are in the series names | none | 5 min – 1 h |
+| `sheet_facts`, and save the scout's cartouche reading into it | profile, parked | ½ day |
+| holder, rights, edition and printed year off `maps` onto copy and printing, behind views as 095 did | none | days: many readers |
+
+Only the first two are worth doing now. The last row is the deep reorganisation: right, expensive,
+and wanted by no bet yet.
+
 ## Idea gate
 
 1. **Bet:** step 2 → bet 2, step 3 → bet 1a. Steps 4–5 serve no bet now.
