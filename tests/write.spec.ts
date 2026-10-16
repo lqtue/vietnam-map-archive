@@ -1857,7 +1857,7 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
     name: string,
     collection: string,
     status: string,
-    extra: Record<string, unknown>,
+    sheetNumber: string | null,
     bbox: number[]
   ) => {
     const seriesKey = collection
@@ -1880,11 +1880,8 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
         is_georeferenced: true,
         year: 1910,
         bbox,
-        // map_series (mig 095) groups by the real column now, not
-        // extra_metadata->>'sheet_number' — write both so a fixture reads
-        // the same either way.
-        sheet_number: (extra as { sheet_number?: string }).sheet_number ?? null,
-        extra_metadata: extra,
+        // map_series (mig 095) groups by the real column; the JSON twin is gone (mig 123).
+        sheet_number: sheetNumber,
         allmaps_id: `se${Math.random().toString(16).slice(2, 16)}`.slice(0, 16),
       } as never)
       .select('id')
@@ -1897,27 +1894,27 @@ test('a sheet series is offered only to a reader who can see its sheets', async 
   const pubSeries = `ZZ Published Survey ${Date.now()}`;
   const bucket = `ZZ Bucket ${Date.now()}`;
 
-  await mk('draft a', draftSeries, 'draft', { sheet_number: '1' }, [105, 20, 105.5, 20.5]);
-  await mk('draft b', draftSeries, 'draft', { sheet_number: '2' }, [105.5, 20.5, 106, 21]);
-  await mk('pub a', pubSeries, 'public', { sheet_number: '1' }, [106, 10, 106.5, 10.5]);
-  await mk('pub b', pubSeries, 'featured', { sheet_number: '2' }, [106.5, 10.5, 107, 11]);
+  await mk('draft a', draftSeries, 'draft', '1', [105, 20, 105.5, 20.5]);
+  await mk('draft b', draftSeries, 'draft', '2', [105.5, 20.5, 106, 21]);
+  await mk('pub a', pubSeries, 'public', '1', [106, 10, 106.5, 10.5]);
+  await mk('pub b', pubSeries, 'featured', '2', [106.5, 10.5, 107, 11]);
   // A second printing of a cell the survey already has. It is a row, not a
   // sheet (mig 084) — the corpus has three of these in the Indochine 1:25,000
   // alone, and counting rows told /explore the survey was three sheets bigger
   // than it is. Its bbox sits inside the union so a miscount cannot hide here
   // as a bounds change.
-  await mk('pub a, 2nd ed', pubSeries, 'public', { sheet_number: '1' }, [106.1, 10.1, 106.2, 10.2]);
+  await mk('pub a, 2nd ed', pubSeries, 'public', '1', [106.1, 10.1, 106.2, 10.2]);
   // Numbered, but only one sheet: a map, not a series.
-  await mk('solo', `ZZ Solo ${Date.now()}`, 'public', { sheet_number: '1' }, [100, 5, 101, 6]);
+  await mk('solo', `ZZ Solo ${Date.now()}`, 'public', '1', [100, 5, 101, 6]);
   // The same trap one level down: two rows, one cell. Two printings of a single
   // sheet are a map printed twice, and `count(*) > 1` called it a survey.
   const twins = `ZZ Twins ${Date.now()}`;
-  await mk('twin a', twins, 'public', { sheet_number: '7' }, [101, 6, 102, 7]);
-  await mk('twin b', twins, 'public', { sheet_number: '7' }, [101, 6, 102, 7]);
+  await mk('twin a', twins, 'public', '7', [101, 6, 102, 7]);
+  await mk('twin b', twins, 'public', '7', [101, 6, 102, 7]);
   // Two published sheets with no sheet numbers: the archive's catch-all bucket,
   // which must never be offered as a survey to stack on itself.
-  await mk('bucket a', bucket, 'public', {}, [100, 5, 110, 23]);
-  await mk('bucket b', bucket, 'public', {}, [106, 10, 107, 11]);
+  await mk('bucket a', bucket, 'public', null, [100, 5, 110, 23]);
+  await mk('bucket b', bucket, 'public', null, [106, 10, 107, 11]);
 
   const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   const asUser = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
