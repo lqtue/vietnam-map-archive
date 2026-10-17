@@ -39,7 +39,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | [API](guides/api.md) | Server routes and their contracts |
 | [Database](guides/db-guidelines.md) | Schema decisions; also read [Supabase instructions](../supabase/CLAUDE.md) |
 | [Testing](guides/testing.md) | What each check protects; read before changing tests |
-| [Pipelines](guides/pipelines.md) | Operator commands and pipeline design |
+| [Pipelines](guides/pipelines.md) | Index: where each tool's commands and design now live |
 | [Lessons](guides/lessons.md) | Rules learned from failures; read before database writes, unattended runs or measurements |
 | [Ponytail debt](ponytail-debt.md) | Deliberate shortcuts and when to revisit them |
 

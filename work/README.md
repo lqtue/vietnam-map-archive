@@ -14,7 +14,7 @@ For product and engineering guidance use the [docs guide](../docs/README.md).
 | Entities and vocabularies | [Doling source and street-name pairs](research/doling/SOURCE.md)                                                                                        |
 | Assertions and studies    | [Analysis guide](analysis/README.md), [Zenodo preparation](research/zenodo/README.md), local generated reports                                          |
 | Surfaces                  | [Viewer prototypes](proto/), [copy and translations](copy/)                                                                                             |
-| Outside the model         | [Worker instructions](CLAUDE.md), [pipeline commands](../docs/guides/pipelines.md), local execution logs                                                       |
+| Outside the model         | [Worker guide](worker/README.md), [pipeline index](../docs/guides/pipelines.md), local execution logs                                                       |
 | Historical material       | [Archive](archive/README.md)                                                                                                                            |
 
 ## Image processing is consolidated

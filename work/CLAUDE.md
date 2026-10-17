@@ -9,7 +9,8 @@ fetching, georef maths, Supabase transport); the old `work/ocr/scripts/{iiif_til
 are re-export shims. Core imports nothing from `ocr`, segmentation or `worker` — see
 `work/core/README.md`. `ocr/outputs` and `ocr/logs` are temporary compatibility
 links pending the reference audit in `docs/plans/image-processing-1882-plan.md`.
-Full command reference and design rationale: `docs/guides/pipelines.md`.
+Full command reference and design rationale: `work/ocr/README.md` (OCR), `work/worker/README.md`,
+`work/MapSAM2/README.md`; the index of every tool is `docs/guides/pipelines.md`.
 §*Getting more out of OCR* there is the ranked list of what to do next and what not to re-attempt;
 `work/ocr/EVAL-BASELINE.md` is the measured gate behind it. `scripts/` holds the living operator
 scripts; `scripts/oneoff/` the backfills that have already run and stay only as a record.
