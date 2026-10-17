@@ -21,7 +21,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | Explore maps or contribute | [User guide](guides/user-guide.md) |
 | Prepare and read a scanned sheet | [Reading a sheet](guides/digitalize-guide.md) |
 | Manage the catalog and review queues | [Admin tooling](guides/admin-tooling.md) |
-| See how the archive fits together | [System graph](guides/system-graph.md), [knowledge system](plans/knowledge-system-plan.md) |
+| See how the archive fits together | [Ontology](ontology.md), [system graph](guides/system-graph.md), [knowledge system](plans/knowledge-system-plan.md) |
 | Change the app | [Architecture](guides/architecture.md), [conventions](guides/conventions.md), then the guides below |
 | Run OCR, segmentation or georeferencing | [Pipelines](guides/pipelines.md) and the [work directory guide](../work/README.md) |
 | Build or deploy | [Deployment](guides/deploy.md) |
@@ -32,6 +32,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 
 | Guide | Covers |
 | --- | --- |
+| [Ontology](ontology.md) | The terms for what VMA holds, by layer: built, and proposed |
 | [Architecture](guides/architecture.md) | Map runtime, shells, stores and page composition |
 | [System guidelines](guides/system-guidelines.md) | Layering, page structure and component patterns |
 | [Conventions](guides/conventions.md) | Fonts, naming, types and component conventions |
