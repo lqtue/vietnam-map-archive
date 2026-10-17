@@ -8,6 +8,40 @@ Two parts. **Built** is what the database holds today (production head: migratio
 **Proposed** is under discussion: nothing there is decided, and its names are placeholders.
 Names may still change after a standards crosswalk (PROV-O, LRMoo, Linked Places).
 
+## Where this page sits
+
+The ontology is the top of four levels. Each level implements the one above it:
+
+| Level | Says | In VMA |
+| --- | --- | --- |
+| **Ontology** (conceptual) | what kinds of things exist and how they relate | this page |
+| **Schema** (logical) | how they are stored: tables, columns, keys | `supabase/migrations/` |
+| **Storage** (physical) | where the bytes sit | Postgres, R2 tiles, annotation JSON |
+| **Data** (instances) | the actual rows: this sheet, this label | production |
+
+Below all four is the world: the paper sheet in a holder's drawer, the street it shows.
+The "Lives in" column on this page maps each term to its place in the schema. A term with
+no table, or a table with no term, means one of the two is wrong.
+
+VMA was built bottom-up: the data taught us the terms (`collection` turned out to mean three
+things). From here, new work goes top-down:
+
+1. **A new thing gets its term here first**, then its migration.
+2. **An old gap gets fixed when a bet touches it**, not in a redesign.
+3. **CI checks every table is named on this page** (`scripts/check_workspace_layout.py`).
+
+How a term becomes schema:
+
+| The ontology says | The schema does | Example |
+| --- | --- | --- |
+| X is a kind of thing | a table, with a stable key | series → `series` |
+| X has property P | a column | a map's status → `maps.status` |
+| every X has exactly one Y | a foreign key on X | a map's series → `maps.series_id` |
+| an X has many Y, and a Y many X | a join table | printings and holders |
+| P takes only these values | a check constraint or lookup table | the seven map types |
+| we must know who said so, and when | provenance columns | `georef_versions` origin and method |
+| this is proposed, not decided | a review state | `ocr_labels.review_status` |
+
 ## The layers
 
 Six layers, 0–5. Each rests on the one below, and an error low in the stack spreads upward
@@ -45,6 +79,7 @@ without any sign, so fix the lowest broken layer first. Two more groups sit outs
 | **map type** | One of seven primary types, with subjects and depicted state on separate axes | `maps.map_type` and friends (mig 116) |
 | **region** | Today's province(s) a map covers. A locator, not what the sheet's era called the place. | `maps.region`, `region_2025`, `regions` (mig 109, 111) |
 | **status** | draft, public, featured or archived. Archiving keeps identity and history. | `maps.status` (mig 107) |
+| **old address** | A slug a map once answered on; it 301s to the current one | `map_slug_aliases` (mig 088) |
 
 ### 2. Placement
 
@@ -85,7 +120,20 @@ Nothing built as a table yet. Studies cite figures from journals and the paper's
 | Term | What it is | Lives in |
 | --- | --- | --- |
 | **user layer** | A contributor's own set of annotations | `user_layers` |
+| **story** | A guided sequence of stops over the maps | `stories` |
 | **story point** | A located stop in a story | `story_points` |
+
+### Outside the model
+
+| Term | What it is | Lives in |
+| --- | --- | --- |
+| **job** | One queued pipeline task, claimed and run by a worker | `pipeline_jobs` (mig 053) |
+| **worker key** | The credential a worker claims jobs with | `worker_keys` |
+| **review mark** | A person saying a pipeline stage is done for a map. The seed of the proposed *decision* (below). | `map_review_marks` |
+| **profile** | A signed-in person and their role | `profiles` |
+| **quota** | How much a contributor may write per period | `contribution_quotas` (mig 097) |
+| **favorite** | A map a person saved | `favorites` |
+| **map view** | One anonymous open of a map, counted for usage | `map_views` |
 
 ## Words to avoid
 
@@ -103,6 +151,7 @@ Under discussion. Names are placeholders until reviewed.
 | --- | --- |
 | A **set**: a curated group of sheets (the Saigon city plans, a story's sheets) | knowledge plan §7 |
 | Place, name and feature as three separate things (evidence-chain calls the first a "subject") | [evidence chain](plans/evidence-chain-plan.md) |
+| A **decision** record for every review: who, what, verdict, seconds. `map_review_marks` is a first case. | `review-events` in ROADMAP, [review page](plans/review-page-plan.md) |
 | A **link** between two things, carrying who proposed it, who decided, the verdict, the seconds and the basis | [digest pipeline](plans/digest-pipeline-plan.md) |
 | A "derived from" edge between sources, so "independent check or echo" becomes a graph query | [digest pipeline](plans/digest-pipeline-plan.md), paper |
 | A **check** that lists its inputs | paper, `review-events` in ROADMAP |

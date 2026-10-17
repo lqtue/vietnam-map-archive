@@ -32,6 +32,9 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 `supabase migration list` is the truth, not this line. Each migration's own header is its record:
 what it does, why, and the deploy order it needs. Read the header, not a summary here.
 
+**A new table starts as a term in `docs/ontology.md`**: what it is, its layer, where it lives.
+Write the term first, then the migration; CI fails while a table has no term.
+
 Drop `supabase/migrations/NNN_*.sql` one past the head, `supabase db push`, then regenerate types:
 
 ```bash
