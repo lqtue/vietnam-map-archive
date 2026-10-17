@@ -32,7 +32,7 @@ Reusable image commands live in [scripts](scripts/README.md), while shared helpe
 Python environment remain in [OCR](../ocr/README.md). [SAM2](../MapSAM2/VMA_SETUP.md) retains
 its model code and GPU environment. Study-level work remains in
 [analysis](../analysis/README.md). Retired vectorize previews live in `../archive/vectorize/`.
-The [system model layout](../../docs/model-layout.md) explains the responsibility of each area.
+The [Atlas](../../docs/ATLAS.md) gives the layer of each area.
 
 The older river-pilot and segmentation-review paths in `work/analysis`, `work/ocr/outputs`,
 `work/ocr/logs`, and `work/vectorize` remain temporary compatibility symlinks until the

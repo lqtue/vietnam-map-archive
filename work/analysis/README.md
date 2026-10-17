@@ -1,6 +1,6 @@
 # Studies and placement analysis
 
-Study-level measurements and placement diagnostics. [Work guide](../README.md) · [System model](../../docs/model-layout.md).
+Study-level measurements and placement diagnostics. [Work guide](../README.md) · [Atlas](../../docs/ATLAS.md).
 
 | Location                                    | Purpose                                                   |
 | ------------------------------------------- | --------------------------------------------------------- |

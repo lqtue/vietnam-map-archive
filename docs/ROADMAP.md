@@ -5,7 +5,7 @@ the measurements and the defects each one turned up, is `docs/roadmap-record.md`
 2026-09-22), and the rules that keep getting re-learned are `docs/guides/lessons.md`. **Close an item by
 deleting it**, never by ticking it: the commit that deletes it carries the closing measurement, and
 anything worth re-learning goes into `docs/guides/lessons.md`. Remove its name from
-`docs/plans/knowledge-system-plan.md` §9 in the same commit.
+`docs/plans/knowledge-system-plan.md` §9 in the same commit (CI checks the two match).
 
 Ordered where order is claimed. Each item names the check that says it is finished.
 

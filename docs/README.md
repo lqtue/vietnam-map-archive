@@ -1,93 +1,84 @@
 # Vietnam Map Archive documentation
 
-Start here to find a guide, understand the system, or locate the evidence behind a result.
-For a folder-by-folder map of the workspace, with what each holds and what to read first, use the [Atlas](ATLAS.md).
-For scripts, datasets and local experiments, use the [work directory guide](../work/README.md).
-Guides (`guides/`) say how the system works and how to work on it; plans (`plans/`) say where it is going.
+The one index. Every doc is one of four kinds, and the kind says how far to trust it:
 
-[Page specs](guides/pages/README.md) — every web page in one template, with the bugs and house-rule gaps found on 2026-10-14.
+| Kind | Folder | Trust it as |
+| --- | --- | --- |
+| **Guide** | `guides/` | How things work now. Wrong means a bug in the doc. |
+| **Plan** | `plans/` | Where things are going. A plan is not proof a feature exists; [ROADMAP](ROADMAP.md) says what is open. |
+| **Record** | `research/`, `journals/`, `paper/` | True on its date, for its inputs. Read both before reusing a number. |
+| **Frozen** | `archive/`, `roadmap-record.md` | History. Never cite as current. |
 
-The [directory layout](model-layout.md) follows the same layers as the knowledge system.
-The [map-type audit](plans/catalog-map-type-audit.md) records the original-map review and pending classification questions.
-The [workspace mapping](workspace-model.json) declares each area's primary responsibility;
-[research records](research/README.md) now have a dedicated folder.
+Folder by folder, with the layer each belongs to: the [Atlas](ATLAS.md) (generated).
+Scripts, datasets and local experiments: the [work directory guide](../work/README.md).
 
 ## What do you want to do?
 
-| I want to…                               | Start here                                                                                |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Explore maps or contribute               | [User guide](guides/user-guide.md)                                                               |
-| Prepare and read a scanned sheet         | [Reading a sheet](guides/digitalize-guide.md)                                                    |
-| Manage the catalog and review queues     | [Admin tooling](guides/admin-tooling.md)                                                         |
-| Understand how the archive fits together | [System graph](guides/system-graph.md)                                                           |
-| See what matters now, and why            | [Now](NOW.md) — the goal, three bets, the idea gate, who is on what                       |
-| See what is being worked on              | [Roadmap](ROADMAP.md) — the single tracker for open work                                  |
-| Change the app                           | [Architecture](guides/architecture.md), [conventions](guides/conventions.md), then the references below |
-| Run OCR, segmentation or georeferencing  | [Pipelines](guides/pipelines.md) and [work directory guide](../work/README.md)                   |
-| Build or deploy                          | [Deployment](guides/deploy.md)                                                                   |
-| Find a research result                   | [Research records](#research-records) and [journal index](journals/README.md)             |
-| Read the manuscript                      | [Paper guide](paper/README.md)                                                            |
+| I want to… | Start here |
+| --- | --- |
+| See what matters now, and why | [Now](NOW.md): the goal, the bets, the idea gate, who is on what |
+| See what is open | [Roadmap](ROADMAP.md): the one backlog |
+| Explore maps or contribute | [User guide](guides/user-guide.md) |
+| Prepare and read a scanned sheet | [Reading a sheet](guides/digitalize-guide.md) |
+| Manage the catalog and review queues | [Admin tooling](guides/admin-tooling.md) |
+| See how the archive fits together | [System graph](guides/system-graph.md), [knowledge system](plans/knowledge-system-plan.md) |
+| Change the app | [Architecture](guides/architecture.md), [conventions](guides/conventions.md), then the guides below |
+| Run OCR, segmentation or georeferencing | [Pipelines](guides/pipelines.md) and the [work directory guide](../work/README.md) |
+| Build or deploy | [Deployment](guides/deploy.md) |
+| Find a research result | [Research records](research/README.md) and the [journal index](journals/README.md) |
+| Read the manuscript | [Paper guide](paper/README.md) |
 
-## Engineering references
+## Guides
 
-| Document                                  | Covers                                                                                          |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [Architecture](guides/architecture.md)           | Map runtime, shells, stores and page composition                                                |
-| [Conventions](guides/conventions.md)             | Fonts, naming, types and component conventions                                                  |
-| [Design system](guides/design-system.md)         | Visual language, tokens and styling                                                             |
-| [System guidelines](guides/system-guidelines.md) | Layering, page structure and component patterns                                                 |
-| [API](guides/api.md)                             | Server routes and their contracts                                                               |
-| [Database guidelines](guides/db-guidelines.md)   | Schema decisions; also read [Supabase instructions](../supabase/CLAUDE.md) before database work |
-| [Testing](guides/testing.md)                     | What the checks protect; read before changing tests                                             |
-| [Pipelines](guides/pipelines.md)                 | Operator commands and pipeline design                                                           |
-| [Lessons](guides/lessons.md)                     | Rules learned from failures; read before database writes, unattended runs or measurements       |
-| [Ponytail debt](ponytail-debt.md)         | Deliberate shortcuts and when to revisit them                                                   |
+| Guide | Covers |
+| --- | --- |
+| [Architecture](guides/architecture.md) | Map runtime, shells, stores and page composition |
+| [System guidelines](guides/system-guidelines.md) | Layering, page structure and component patterns |
+| [Conventions](guides/conventions.md) | Fonts, naming, types and component conventions |
+| [Design system](guides/design-system.md) | Visual language, tokens and styling |
+| [Page specs](guides/pages/README.md) | Every web page in one template, with known bugs and house-rule gaps |
+| [API](guides/api.md) | Server routes and their contracts |
+| [Database](guides/db-guidelines.md) | Schema decisions; also read [Supabase instructions](../supabase/CLAUDE.md) |
+| [Testing](guides/testing.md) | What each check protects; read before changing tests |
+| [Pipelines](guides/pipelines.md) | Operator commands and pipeline design |
+| [Lessons](guides/lessons.md) | Rules learned from failures; read before database writes, unattended runs or measurements |
+| [Ponytail debt](ponytail-debt.md) | Deliberate shortcuts and when to revisit them |
 
-## Product direction and plans
+## Plans
 
-Plans describe intended behavior. Use the [roadmap](ROADMAP.md) to determine what is still open;
-a proposed feature in a plan is not evidence that it is available in the app.
+| Plan | Covers |
+| --- | --- |
+| [Strategy](plans/strategy.md) | Product direction and funding |
+| [Theory](plans/theory.md) | The intellectual framework |
+| [Knowledge system](plans/knowledge-system-plan.md) | The object model, its gaps, and every ROADMAP item by layer (§9) |
+| [Digest pipeline](plans/digest-pipeline-plan.md) | Found to linked: machine proposes, person decides, every decision timed (bet 1a) |
+| [Review page](plans/review-page-plan.md) | The offline review pages moved into the app |
+| [1882 feature layer](plans/image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison (bet 1b) |
+| [Search](plans/search-plan.md) | Finding labels, shapes and period sources |
+| [Catalog](plans/catalog-plan.md) | The public list: columns, facets, speed, search |
+| [Map-type audit](plans/catalog-map-type-audit.md) | The original-map review and open classification questions |
+| [Evidence chain](plans/evidence-chain-plan.md) | Source-backed claims, review and reuse |
+| [Platform design](plans/platform-design.md) | Proposed shared platform architecture |
+| [Usage measurement](plans/usage-measurement-plan.md), [evidence sheet](plans/usage-evidence-template.md) | Study, grant and support evidence |
+| [Walk](plans/walk-plan.md) | Proposed district walks (parked); forks the separate HACW app |
 
-| Document                                     | Covers                                               |
-| -------------------------------------------- | ---------------------------------------------------- |
-| [Strategy](plans/strategy.md)                      | Product direction and funding narrative              |
-| [Theory](plans/theory.md)                          | Intellectual framework                               |
-| [Knowledge system](plans/knowledge-system-plan.md) | Object model, gaps and the roadmap index in §9       |
-| [Digest pipeline](plans/digest-pipeline-plan.md)   | How a map goes from found to linked: machine proposes, person decides, every decision timed (bet 1a) |
-| [Review page](plans/review-page-plan.md)           | The offline review pages moved into the app: one engine, one record, open to contributors later |
-| [Search](plans/search-plan.md)                     | Finding labels, shapes and period sources            |
-| [Usage measurement](plans/usage-measurement-plan.md) | Study, grant and support evidence; opt-in journeys and confirmed outcomes |
-| [Usage evidence sheet](plans/usage-evidence-template.md) | Monthly template for an aggregate usage report |
-| [Catalog](plans/catalog-plan.md)                   | The public list: columns, facets, speed, search       |
-| [Walk](plans/walk-plan.md)                         | Proposed district walks; forks the separate HACW app |
-| [Evidence chain](plans/evidence-chain-plan.md)     | Source-backed claims, review and reuse               |
-| [Platform design](plans/platform-design.md)        | Proposed shared platform architecture                |
+## Records
 
-## Research records
+| Record | Covers |
+| --- | --- |
+| [Research records](research/README.md) | Methods, comparisons and worked examples, each dated |
+| [Journals](journals/README.md) | Dated runs, audits and handoffs |
+| [Paper](paper/README.md) | Manuscript, claim evidence, figures and review records |
+| [Analysis folders](../work/analysis/README.md) | Scripts, figures and review packs behind experiments |
 
-These are dated findings and experiments. Read their dates, inputs and caveats before reusing a result.
+## Rules for this folder
 
-| Document                                                       | Covers                                                          |
-| -------------------------------------------------------------- | --------------------------------------------------------------- |
-| [Image processing record](research/image-processing-record.md) | Methods and recorded measurements, with links to their evidence |
-| [Field comparison](research/field-comparison.md)               | Comparison with published research and deployed systems         |
-| [Worked example: 1882](research/worked-example-1882.md)        | One sheet taken through the pipeline                            |
-| [1882 feature-layer plan](plans/image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison |
-| [River reconstruction](research/river-reconstruction.md)       | Exploratory 1882/1898 work; no river layer approved             |
-| [Allmaps series note](research/allmaps-series-note.md)         | Dated technical note on georeferencing two map series           |
-| [Journals](journals/README.md)                                 | Dated runs, audits and handoffs                                 |
-| [Paper](paper/README.md)                                       | Manuscript, claim evidence, figures and review records          |
-| [Analysis folders](../work/analysis/README.md)                 | Scripts, figures and review packs behind experiments            |
-
-## Historical and private material
-
-- [Archive](archive/README.md): frozen design and implementation records.
-- [Roadmap record](roadmap-record.md): frozen on 2026-09-22; use it for past decisions and costs.
-- `private/`: local, gitignored outreach and personal material. Never publish it or copy it into a public index.
-- `guides/system-graph*.svg` and `.png`: illustrations used by [System graph](guides/system-graph.md).
-
-## Keeping this directory useful
-
-Link a new guide from this index and describe its audience and purpose in its opening paragraph.
-Put dated investigations in `journals/`; keep frozen material in `archive/` and label it as historical.
-Keep open tasks in `ROADMAP.md` and update the matching item in `plans/knowledge-system-plan.md` §9 together.
+- **A new doc** goes in the folder for its kind and gets a line in this index. Its first paragraph
+  says who it is for.
+- **A journal** is `journals/YYMMDD-slug.md` and opens with Question → Answer → So what.
+- **ROADMAP** holds open items only. Close one by deleting it, and remove its name from
+  [knowledge system §9](plans/knowledge-system-plan.md#9-open-work-by-layer) in the same commit;
+  CI fails until the two match.
+- **`CHANGELOG.md` and `/changelog`** (`releases.ts`) are separate texts for separate readers;
+  add a release to both. The version moves on a structural change, not a build.
+- **`private/` is gitignored.** Never publish it or link it from a public page.

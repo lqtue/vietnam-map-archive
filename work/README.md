@@ -1,6 +1,6 @@
 # Work directory guide
 
-Working files follow the [system model](../docs/model-layout.md): source evidence feeds holdings,
+Working files follow the layers in the [Atlas](../docs/ATLAS.md): source evidence feeds holdings,
 placement, readings, entities and studies; surfaces display them and operations run the pipelines.
 For product and engineering guidance use the [docs guide](../docs/README.md).
 
@@ -43,7 +43,16 @@ Gitignored outputs, source scans, caches and environments are local and may be a
 checkout. Untracked files may also be new work; check [.gitignore](../.gitignore) before committing.
 Keep reproduction scripts, provenance, review decisions and source-pixel definitions with the
 experiment. Preserve UUIDs and run IDs used by database rows. Keep finished work in `archive/`.
+Name an experiment for its subject and an OCR run for its timestamp and method. A folder may span
+layers; its layer never replaces a run's input identity and coordinate frame. Never infer review
+approval from a filename.
 
 Declare a new working area in [workspace-model.json](../docs/workspace-model.json), add its purpose
-and entry command to a README, and link it from the appropriate guide. Record dated findings in
+and entry command to a README, and link it from the appropriate guide. Then refresh the Atlas and
+check the layout (CI runs the second):
+
+```sh
+python3 scripts/check_workspace_layout.py --write-atlas
+python3 scripts/check_workspace_layout.py
+``` Record dated findings in
 [journals](../docs/journals/README.md) and tasks in the [roadmap](../docs/ROADMAP.md).

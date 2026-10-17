@@ -21,7 +21,7 @@ follow the docs: 14 + 12 + 27 + 3 + 16 = 72, plus 9 for keeping it running, whic
 - **Containment is the link.** A tool or research strand sits in the row of the layer it acts on.
   The diagram placement was inferred from names and locations (2026-10-01).
   `docs/workspace-model.json` now declares the primary layer of working areas and references;
-  `docs/model-layout.md` is the directory guide for that mapping.
+  `docs/ATLAS.md` is generated from it.
 - **The one declared link** is the ROADMAP item name. ROADMAP → §9 files each item under a layer (the
   open-work column), and `items: [...]` on a `/changelog` release or `/blog` post is checked by
   `tests/work-items.spec.ts`.

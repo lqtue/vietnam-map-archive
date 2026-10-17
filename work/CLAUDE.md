@@ -1,6 +1,6 @@
 # work/ — the pipelines
 
-Root context: `/CLAUDE.md`. What every folder here is: `work/README.md`; model responsibilities: `docs/model-layout.md`.
+Root context: `/CLAUDE.md`. What every folder here is: `work/README.md`; which layer owns it: `docs/ATLAS.md`.
 Image commands live in `work/image-processing/scripts/`, experiments in
 `work/image-processing/experiments/` and local outputs in `work/image-processing/results/`. OCR
 commands remain in `work/ocr/scripts/`, with the shared environment at `work/ocr/.venv`. The code

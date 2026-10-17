@@ -3,13 +3,13 @@
 Vietnam Map Archive (VMA) — a SvelteKit app for exploring georeferenced historical maps of
 Saigon/Ho Chi Minh City. Integrates Allmaps with OpenLayers.
 
-**Start with `docs/NOW.md`** (imported below): the goal, the three current bets, the idea gate and
-who is working on what. A new idea goes through that gate before it gets a branch.
+**Start with `docs/NOW.md`** (imported below): the goal, the bets, the idea gate, who is on what.
+A new idea goes through that gate before it gets a branch.
 
 @docs/NOW.md
 
-This file loads every session; five others load when you open a file in their tree. Read the one
-for your tree first:
+Every other doc is found from `docs/README.md` (the one index). Five more instruction files load
+when you open a file in their tree:
 
 | File | Covers |
 |------|--------|
@@ -26,12 +26,11 @@ for your tree first:
 | **Vietnam Map Archive**, VMA | the product; use it in prose | a hostname |
 | `maparchive.vn` | the live site | the Pages project |
 | `vmabeta` | the Cloudflare Pages project id, nothing else | a product name — never in prose |
-| `lqtue/vietnam-map-archive` | the GitHub repo (was `svelte-beta`) | the `VietnamMapArchive` org, which exists but does not hold it |
+| `lqtue/vietnam-map-archive` | the GitHub repo (was `svelte-beta`) | the `VietnamMapArchive` org |
 | **HACW** | the Hội An event PWA that Walk forks | part of VMA |
-| **Shapes · Search · Walk · Debt** | the four lines of work in `ROADMAP.md` | Tracks C/E/F/D (retired names) |
+| **Shapes · Search · Walk · Debt** | the four lines of work in `ROADMAP.md` | Tracks C/E/F/D, "Time machine", "Time walk" (retired) |
 
-Roadmap items are named for their subject (`l7014-rebuild`, `hand-triage`), never a letter code.
-"Time machine" and "Time walk" are retired; say **Search** and **Walk**.
+Roadmap items are named for their subject (`l7014-rebuild`), never a letter code.
 
 ## Commands
 
@@ -48,8 +47,8 @@ npm run test:write     # Write-path tests against that local stack
 npm run deploy         # Build + wrangler deploy to Cloudflare Pages
 ```
 
-What each test pins, and why, is `docs/guides/testing.md` — read it before changing or adding a check.
-Most exist to catch a failure that looks like data rather than a bug.
+Read `docs/guides/testing.md` before changing or adding a check: most catch a failure that looks
+like data rather than a bug.
 
 ## Rules
 
@@ -64,39 +63,22 @@ Most exist to catch a failure that looks like data rather than a bug.
 - **One OpenLayers map per page**, owned by `MapShell` (`ImageShell` for pixel work). Never
   `new Map()` in a child.
 - **Never import a Node builtin bare** — use `node:path`, not `path`; the CF Functions bundle fails.
-- **A blank page right after deploy is edge propagation**, not a bug. Wait, hard-reload, then use
-  the `curl` check in `docs/guides/deploy.md`.
 - **Migrations:** production head is **119**. Local files past it may exist unpushed — run
   `supabase migration list` before assuming. How to add one: `supabase/CLAUDE.md`.
-- **A sheet's address is its slug** (`maps.slug`), not its uuid; old addresses 301 to it. Rule and
-  reasons: `088_map_slug.sql`.
+- **A sheet's address is its slug** (`maps.slug`), not its uuid; old addresses 301 to it
+  (`088_map_slug.sql`).
+- **Before a migration or any number-producing run**, read `docs/guides/db-guidelines.md` and
+  `docs/guides/lessons.md`.
+- **`docs/private/` is gitignored — never publish.** The repo is public.
+- **`.claude/handoff*.md`** — gitignored, one per stream, written by `/handoff <stream>`.
 
 ## Deployment
 
-Only `main` reaches production. Full story: `docs/guides/deploy.md`.
+Only `main` reaches production. Read `docs/guides/deploy.md` first.
 
 - **No root `wrangler.toml`** — it would replace the dashboard environment, secrets included.
   (`worker/wrangler.toml` is separate and fine.)
-- **Environment lives in the Cloudflare dashboard**, per environment, nothing inherited.
-- **Secrets resolve at build time** (`$env/static/private`; dynamic returns undefined in Pages
-  Functions), so every building environment needs them. CI copies `.env.test` to `.env`.
-- `vmabeta.pages.dev` 301s to `maparchive.vn` (exact host match in `hooks.server.ts`).
-
-## Docs
-
-`docs/ATLAS.md` (generated) maps every folder to its layer and the doc to read first.
-
-`docs/README.md` is the index. Before code: `docs/guides/architecture.md`, `docs/guides/conventions.md`,
-`docs/guides/system-guidelines.md`, `docs/guides/api.md`, `docs/guides/testing.md`. Before a migration or any number-producing run:
-`docs/guides/db-guidelines.md`, `docs/guides/lessons.md`. Before deploying: `docs/guides/deploy.md`.
-
-- **`ROADMAP.md`** is the one backlog, open items only. Close an item by deleting it, and move its
-  name in `docs/plans/knowledge-system-plan.md` §9 in the same commit.
-- **Journals** (`docs/journals/YYMMDD-slug.md`) open with Question → Answer → So what.
-- **`docs/private/` is gitignored — never publish.** The repo is public.
-- **Frozen, never cite as current:** `roadmap-record.md`, `docs/archive/`.
-- **`.claude/handoff*.md`** — gitignored, one per stream, written by `/handoff <stream>`.
-- **`CHANGELOG.md` and `/changelog`** (`releases.ts`) are separate texts for separate readers;
-  add a release to both. The version moves on a structural change, not a build.
-- `contracts/` — JSON Schemas shared with other apps. `ponytail-debt.md` — ledger of `ponytail:`
-  comments, kept by hand.
+- **Environment and secrets live in the Cloudflare dashboard**, per environment, nothing inherited.
+  Secrets resolve at build time (`$env/static/private`), so every building environment needs them.
+- **A blank page right after deploy is edge propagation**, not a bug. Wait, hard-reload, then use
+  the `curl` check in the deploy guide.
