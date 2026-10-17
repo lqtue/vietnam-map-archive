@@ -129,14 +129,14 @@ Layer `operations`. Operations, CI and shared engineering guidance.
 | [work/worker](../work/worker/) | Pipeline orchestration across layers | [work/CLAUDE.md](../work/CLAUDE.md) |
 | [work/image-processing/build_catalog.py](../work/image-processing/build_catalog.py) | Local result navigation | this file |
 | [work/image-processing/logs](../work/image-processing/logs/) *(local)* | Execution transcripts | [work/image-processing/README.md](../work/image-processing/README.md) |
-| [docs/guides/architecture.md](guides/architecture.md) | Map runtime reference | this file |
+| [docs/guides/architecture.md](guides/architecture.md) | The app guide: layering, routes, map runtime, data, components | this file |
 | [docs/guides/api.md](guides/api.md) | Server API reference | this file |
-| [docs/guides/conventions.md](guides/conventions.md) | Implementation conventions | this file |
+| [docs/guides/conventions.md](guides/conventions.md) | Moved: stub pointing into architecture.md | this file |
 | [docs/guides/db-guidelines.md](guides/db-guidelines.md) | Database rules | this file |
 | [docs/guides/deploy.md](guides/deploy.md) | Deployment guidance | this file |
 | [docs/guides/lessons.md](guides/lessons.md) | Operational and measurement lessons | this file |
 | [docs/guides/pipelines.md](guides/pipelines.md) | Commands spanning layers | this file |
-| [docs/guides/system-guidelines.md](guides/system-guidelines.md) | Code organization | this file |
+| [docs/guides/system-guidelines.md](guides/system-guidelines.md) | Moved: stub pointing into architecture.md | this file |
 | [docs/guides/testing.md](guides/testing.md) | Verification inventory | this file |
 | [docs/ponytail-debt.md](ponytail-debt.md) | Deliberate shortcuts | this file |
 | [docs/plans/strategy.md](plans/strategy.md) | Product strategy | this file |

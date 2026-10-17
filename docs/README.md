@@ -22,7 +22,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | Prepare and read a scanned sheet | [Reading a sheet](guides/digitalize-guide.md) |
 | Manage the catalog and review queues | [Admin tooling](guides/admin-tooling.md) |
 | See how the archive fits together | [Ontology](ontology.md), [system graph](guides/system-graph.md), [knowledge system](plans/knowledge-system-plan.md) |
-| Change the app | [Architecture](guides/architecture.md), [conventions](guides/conventions.md), then the guides below |
+| Change the app | [Architecture](guides/architecture.md), then the guides below |
 | Run OCR, segmentation or georeferencing | [Pipelines](guides/pipelines.md) and the [work directory guide](../work/README.md) |
 | Build or deploy | [Deployment](guides/deploy.md) |
 | Find a research result | [Research records](research/README.md) and the [journal index](journals/README.md) |
@@ -33,9 +33,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | Guide | Covers |
 | --- | --- |
 | [Ontology](ontology.md) | The terms for what VMA holds, by layer: built, and proposed |
-| [Architecture](guides/architecture.md) | Map runtime, shells, stores and page composition |
-| [System guidelines](guides/system-guidelines.md) | Layering, page structure and component patterns |
-| [Conventions](guides/conventions.md) | Fonts, naming, types and component conventions |
+| [Architecture](guides/architecture.md) | The app: layering, every route, the map runtime, data access, components and styling |
 | [Design system](guides/design-system.md) | Visual language, tokens and styling |
 | [Page specs](guides/pages/README.md) | Every web page in one template, with known bugs and house-rule gaps |
 | [API](guides/api.md) | Server routes and their contracts |

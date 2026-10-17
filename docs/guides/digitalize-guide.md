@@ -4,7 +4,7 @@ An operator guide to `/scan?mode=prepare` and `?mode=text` — where a scanned m
 text pinned to real ground.
 
 Audience: whoever is working through the corpus, one sheet at a time. It assumes no knowledge of the
-codebase. For the architecture behind it see [`system-guidelines.md`](system-guidelines.md); for the
+codebase. For the architecture behind it see [`architecture.md`](architecture.md); for the
 command-line side see [`pipelines.md`](pipelines.md).
 
 ---

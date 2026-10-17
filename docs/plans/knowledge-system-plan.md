@@ -226,7 +226,7 @@ Each gap is named for its subject. "Owner" points at the plan that already holds
    **Exit:** every label's and polygon's `geom_src` matches its map's current version. Update the
    pinned value in `evidence-chain-plan.md` step 1 at the same time.
 3. **`mask-names`: one name for each of the three masks** (§2c). Record the names in
-   `docs/guides/conventions.md`. Decide whether the neatline editor should keep writing the georef mask.
+   `docs/guides/architecture.md`. Decide whether the neatline editor should keep writing the georef mask.
    **Exit:** no code comment or document uses a bare "mask" for more than one of the three.
 4. **`series-identity`: make the series an explicit key, not a side effect of the display string.**
    Smallest step: a generated `maps.series_key` column, with `collection` treated as the display

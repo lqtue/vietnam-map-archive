@@ -355,7 +355,7 @@
         },
         {
           "path": "docs/guides/architecture.md",
-          "purpose": "Map runtime reference",
+          "purpose": "The app guide: layering, routes, map runtime, data, components",
           "availability": "repository"
         },
         {
@@ -365,7 +365,7 @@
         },
         {
           "path": "docs/guides/conventions.md",
-          "purpose": "Implementation conventions",
+          "purpose": "Moved: stub pointing into architecture.md",
           "availability": "repository"
         },
         {
@@ -390,7 +390,7 @@
         },
         {
           "path": "docs/guides/system-guidelines.md",
-          "purpose": "Code organization",
+          "purpose": "Moved: stub pointing into architecture.md",
           "availability": "repository"
         },
         {

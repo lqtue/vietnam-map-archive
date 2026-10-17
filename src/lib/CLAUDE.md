@@ -120,7 +120,7 @@ the favourites read (`favorites.ts`), several in `maps/service.ts`.
   2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
   changes only a default). Nothing
   regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
-  history and the `--local` trap: `docs/guides/conventions.md` §Supabase types.
+  history and the `--local` trap: `docs/guides/architecture.md` §Supabase types.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
   what forces most `as any` casts downstream.
 - **Realtime is stubbed out of the browser bundle** (`vite.config.ts` aliases
@@ -172,14 +172,14 @@ one tab strip; `.sb-search` the one search field; `$lib/ui/DataTable.svelte` + `
 `core/utils/tableSort.ts` the one table and one sort. All CSS in `src/styles/` via `$styles`;
 colours are `var(--token)`, canvas ink is `INK`/`inkAlpha` in `core/ink.ts`. Two themes, one value
 each — `light-dark()` in `tokens.css`, and four things deliberately do not flip. **Before adding any
-of these, read `docs/guides/conventions.md` §Component vocabulary** — it lists the twenty-seven selectors
+of these, read `docs/guides/architecture.md` §Component vocabulary** — it lists the twenty-seven selectors
 these eleven replaced, so a second one is a regression, not a new component. `tests/screens.spec.ts`
 fails if a retired name reappears.
 
 **The fonts are self-hosted** (`src/styles/fonts.css` + `static/fonts/`, latin · latin-ext ·
 vietnamese only, Inter variable). Do not reintroduce the Google Fonts link or the Translate widget —
-`docs/guides/conventions.md` §Fonts.
+`docs/guides/architecture.md` §Fonts.
 
 **One place, not one spelling.** The gazetteer (`place_names`) groups by `core_key`, and the rule
 exists twice — `place_core_key()` in Postgres and `placeCoreKey` in `$lib/core/utils/placeKey.ts`.
-The two must agree or a place page 404s. `docs/guides/conventions.md` §The gazetteer key.
+The two must agree or a place page 404s. `docs/guides/architecture.md` §The gazetteer key.

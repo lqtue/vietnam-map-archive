@@ -402,7 +402,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       Exit: each cites a figure together with the GCP set and named measure it was measured on.
 - [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
       neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
-      writes the first from the second. Name them in `docs/guides/conventions.md`. Exit: no doc or comment
+      writes the first from the second. Name them in `docs/guides/architecture.md`. Exit: no doc or comment
       uses a bare "mask" for more than one.
 
 ## Measured pipeline (planned 2026-10-12)

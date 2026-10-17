@@ -217,7 +217,7 @@ written for both people and coding agents. Then:
 | `docs/ROADMAP.md` | The one tracker, open work only: the foundations pass, the OCR drain, Shapes, Search, Walk, Debt |
 | `docs/roadmap-record.md` | Frozen record of closed passes — what each one measured and what it turned up |
 | `docs/guides/lessons.md` | The rules paid for more than once, each with the failure that taught it |
-| `docs/guides/system-guidelines.md` | Layering rule, page structure, component patterns, known debt (§11) |
+| `docs/guides/architecture.md` | The app: layering, every route, the map runtime, data, components, known debt |
 | `docs/guides/db-guidelines.md` | Schema conventions every migration follows, table by table |
 | `docs/guides/api.md` | Every server route, its auth class, its contract |
 | `docs/guides/deploy.md` | Cloudflare Pages, and the ten dead builds behind each rule |

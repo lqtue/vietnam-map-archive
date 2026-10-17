@@ -18,35 +18,8 @@ menu with the staff rows and `All pages → /directory`. Nav and footer come onc
 `(editorial)/+layout.svelte`; a new page needs a row in `NavBar.svelte`, `EditorialFooter.svelte`
 and `paletteDestinations.ts`.
 
-| Route | Purpose | Source |
-|-------|---------|--------|
-| `/explore` | MapShell dispatcher | `src/routes/(app)/explore/` |
-| `/explore?mode=browse` | Browse maps, play stories | `src/lib/features/explore/ExplorePage.svelte` |
-| `/explore?mode=studio` | Free-form annotation + timeline animation. `?mode=annotate` is the name it shipped under and is aliased, not redirected (`EXPLORE_MODE_ALIASES` in `core/routeModes.ts`, read by `resolveExploreMode()` in `(app)/explore/+page.svelte`) — the dispatcher only ever matches `studio` | `src/lib/features/annotate/` |
-| `/explore?mode=story` | Author stories | `src/lib/features/stories/editor/` |
-| `/scan` | ImageShell dispatcher | `src/routes/(app)/scan/` |
-| `/scan?mode=inspect` | IIIF viewer, unlisted — the plain look at a **draft** scan | `src/lib/features/contribute/inspect/` |
-| `/scan?mode=prepare` | Layout · neatline · tile grid · save · queue OCR | `src/lib/features/contribute/digitalize/` |
-| `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
-| `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
-| `/scan?mode=legend` | Staff: place the numbered legend on the scan in image pixels — select, click to place, accept a numeral, batch save | `src/lib/features/contribute/legend/` |
-| `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
-| `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
-| `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |
-| `/catalog/place/[name]` | The gazetteer: one page per attested place name | `src/routes/(editorial)/catalog/place/[name]/` |
-| `/catalog/area/[slug]` | Curated modern-province coverage pages, published maps only; links from catalog and sitemap | `src/routes/(editorial)/catalog/area/[slug]/` |
-| `/catalog/series/[key]` | One survey: its coverage and every sheet it contains, held or not | `src/routes/(editorial)/catalog/series/[key]/` |
-| `/catalog/series/[key]/[number]` | One sheet of a survey — including the ones the archive does not hold | `src/routes/(editorial)/catalog/series/[key]/[number]/` |
-| `/catalog/institutions` | Holding institutions and source platforms, with published maps and external source records | `src/routes/(editorial)/catalog/institutions/` |
-| `/catalog/institutions/cartomundi` | CartoMundi's Vietnam-related series and item-level Nakala rights evidence; `/catalog/cartomundi` redirects here | `src/routes/(editorial)/catalog/institutions/cartomundi/` |
-| `/catalog/institutions/[slug]` | One holding institution: its series, published maps and external source records | `src/routes/(editorial)/catalog/institutions/[slug]/` |
-| `/catalog/cartomundi/[id]` | One CartoMundi series: its sheets and item-level rights evidence | `src/routes/(editorial)/catalog/cartomundi/[id]/` |
-| `/changelog` | Every release, from `releases.ts` | `src/routes/(editorial)/changelog/` |
-| `/directory` | All pages, one list (the palette destinations) | `src/routes/(editorial)/directory/` |
-| `/screens` | Every design-system component on one page; for whoever builds the UI | `src/routes/(editorial)/screens/` |
-| `/login`, `/profile` | Sign in; the signed-in reader's own page (303 to `/login` without a session) | `src/routes/(editorial)/{login,profile}/` |
-| `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
-| `/admin?tab=` | Bulk upload · Scout · Status · Stories | `src/lib/features/admin/` |
+Every route, with its purpose, source folder and who can open it: `docs/guides/architecture.md`
+§2 (keep that table current when a route is added or retired).
 
 ## API routes (`src/routes/api/`)
 
