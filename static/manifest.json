@@ -1,7 +1,7 @@
 {
   "name": "Vietnam Map Archive",
   "short_name": "VN Map Archive",
-  "description": "Explore historical maps of Vietnam with interactive annotations and stories",
+  "description": "Old maps of Vietnam, put back in place.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -28,21 +28,35 @@
       "purpose": "maskable"
     }
   ],
-  "categories": ["education", "travel", "navigation"],
+  "categories": [
+    "education",
+    "travel",
+    "navigation"
+  ],
   "shortcuts": [
     {
-      "name": "View Maps",
-      "short_name": "View",
-      "description": "Browse and explore historical maps",
-      "url": "/view",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "name": "Catalog",
+      "short_name": "Catalog",
+      "description": "Every sheet in the archive",
+      "url": "/catalog",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Create Story",
-      "short_name": "Create",
-      "description": "Create a new map story",
-      "url": "/create",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "name": "Map viewer",
+      "short_name": "Map",
+      "description": "Lay old maps over the city today",
+      "url": "/explore",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

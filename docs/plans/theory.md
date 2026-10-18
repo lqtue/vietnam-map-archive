@@ -1,6 +1,9 @@
 # VMA Theoretical Framework
 _The intellectual foundation of the Vietnam Map Archive_
 
+_What VMA is today: [`docs/CONCEPT.md`](../CONCEPT.md). This file is the long view behind it; the
+six-layer city below is the horizon, not the current claim._
+
 ---
 
 ## The Core Claim
