@@ -51,6 +51,8 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | [Strategy](plans/strategy.md) | Product direction and funding |
 | [Theory](plans/theory.md) | The intellectual framework |
 | [Knowledge system](plans/knowledge-system-plan.md) | The object model, its gaps, and every ROADMAP item by layer (§9) |
+| [Data model target](plans/data-model-target.md) | No rebuild: places, feature-to-place links and activities, the tables bets 1a and 2 need |
+| [Model dedup](plans/model-dedup-plan.md) | One fact, one writer: the duplicated series, edition and JSON columns, measured |
 | [Digest pipeline](plans/digest-pipeline-plan.md) | Found to linked: machine proposes, person decides, every decision timed (bet 1a) |
 | [Review page](plans/review-page-plan.md) | The offline review pages moved into the app |
 | [1882 feature layer](plans/image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison (bet 1b) |

@@ -174,7 +174,7 @@ export const SERIES_NOTES: Record<string, SeriesNote> = {
       {
         label: 'Editions',
         value:
-          'Numbered from the first printing, with a suffix naming the issuing office: 001, 2-AMS, 3-TPC, 4-DMA. The suffix is the half that says which body issued it, so editions are never comparable as numbers alone.',
+          'Numbered from the first printing, with a suffix naming the issuing office: 1, 2-AMS, 3-TPC, 4-DMA. The suffix is the half that says which body issued it, so editions are never comparable as numbers alone.',
       },
       {
         label: 'Scans come from',
