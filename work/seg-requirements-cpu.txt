@@ -10,6 +10,7 @@
 # Built from the import statements in those folders (checked 2026-10-12). The
 # base set (numpy, pillow, requests, scipy, shapely, python-dotenv, pyogrio) comes
 # from the OCR file, because these scripts import work/core, which needs the same.
+# So pillow and requests resolve to the OCR file's fixed pins (12.3.0, 2.33.0).
 -r ocr/requirements.txt
 
 # The geo stack. Versions are the ones the Homebrew python3 (/opt/homebrew/bin)
