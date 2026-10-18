@@ -12,7 +12,8 @@
 # they sit at pillow 12.3.0 and requests 2.33.0. Every self-check under work/core,
 # work/ocr and work/worker (22 runs) was rerun on exactly these versions on
 # 2026-10-13; all passed, with the same output as on pillow 12.0.0 / requests
-# 2.32.5. Rerun them before moving any pin.
+# 2.32.5. Rerun them before moving any pin. Re-checked 2026-10-18: the open Dependabot
+# alerts for these two predate the bump in #72.
 #
 # Segmentation and analysis scripts need more (opencv, the geo stack): see
 # work/seg-requirements-cpu.txt, which includes this file.
