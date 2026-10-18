@@ -79,6 +79,7 @@ Layer `readings`. OCR labels, polygons, legends and layout regions with run prov
 | [docs/research/river-reconstruction.md](research/river-reconstruction.md) | Exploratory river reconstruction record | this file |
 | [work/review-kit](../work/review-kit/) | Review page and record writers for reading checks | [docs/plans/digest-pipeline-plan.md](plans/digest-pipeline-plan.md) |
 | [work/image-processing/experiments/osm-warp](../work/image-processing/experiments/osm-warp/) | OSM warp evidence for the 1882/1898 colour study | [README.md](../work/image-processing/experiments/osm-warp/README.md) |
+| [work/image-processing/experiments/admin-lines](../work/image-processing/experiments/admin-lines/) | Colour, dash-chain and rhythm detectors for admin bounds on 1882 and Tonkin 1:25k | [README.md](../work/image-processing/experiments/admin-lines/README.md) |
 
 ## 4. Entities and vocabularies
 

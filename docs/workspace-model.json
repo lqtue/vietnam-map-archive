@@ -203,6 +203,11 @@
           "path": "work/image-processing/experiments/osm-warp",
           "purpose": "OSM warp evidence for the 1882/1898 colour study",
           "availability": "repository"
+        },
+        {
+          "path": "work/image-processing/experiments/admin-lines",
+          "purpose": "Colour, dash-chain and rhythm detectors for admin bounds on 1882 and Tonkin 1:25k",
+          "availability": "repository"
         }
       ]
     },

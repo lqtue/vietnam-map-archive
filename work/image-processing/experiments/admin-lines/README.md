@@ -41,7 +41,7 @@ Dead ends, kept so nobody repeats them:
 
 Inputs are local (not versioned). Full-resolution scan:
 `work/core` `vma_core.iiif.fetch_crop(iiif_base, 0, 0, W, H, size=W)` from the `work/ocr/.venv`;
-OCR boxes: `ocr_extractions?map_id=eq.<id>` (`global_*` share the scan's pixel grid).
+OCR boxes: `ocr_labels?map_id=eq.<id>` (`global_*` share the scan's pixel grid).
 
     PY=work/ocr/.venv/bin/python; D=work/image-processing/experiments/admin-lines
     $PY -I $D/colour.py topo_4000.jpg out/                     # 4000 px wide copy is enough
