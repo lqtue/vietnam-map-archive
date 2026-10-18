@@ -439,6 +439,26 @@ exact thing it judged. Plan and rules: `docs/plans/digest-pipeline-plan.md`; the
       Do not close on local SQL checks. Exit: no series fact lives only in `extra_metadata` and the
       deployed readers use stable identity. Plan: `docs/plans/knowledge-system-plan.md` §1.
 
+- [ ] **`series-kinds`** — two different things are called "series". A *survey* is a lattice of
+      numbered cells (L7014, Indochine 100k, Tonkin): `series_cells` is its sheet index and the
+      frame-and-corner method applies. A *place group* is one place at many dates (the six Saigon
+      sheets, 1882 to 1968; city plans): no lattice, no index, linked by landmarks and measured
+      pair by pair. Meijers & Schoonman, "Mapping the Edge" (ICA Commission on Cartographic
+      Heritage, Bologna, 2024), cover only the first kind. Add `series.kind` (`survey` | `place`)
+      with the first place group, and show the cell index and coverage page for surveys only.
+      Exit: the Saigon six read as one place group, with no cell index. Serves bet 3.
+
+- [ ] **`series-georef-profile`** — set a series' georef settings once and let a sheet override
+      them, as MapEdge's "overwrite mode" does. The profile is a `jsonb` column on `series`: grid
+      type, units, prime meridian, datum or CRS, rim width, double-line gap, expected sheet size,
+      printed or manuscript. Overrides go in the decisions table keyed by map id that
+      `docs/journals/260930-series-georef-review-loop.md` §3.4 proposes, replacing the five
+      `SOURCE_REVIEWED_*` / `CALIBRATION_HOLDS` dicts in code. The OCR scout's per-sheet reading
+      then checks that a sheet matches its series profile and flags the sheets that differ.
+      Smallest test: 20 sheets from two or three series, profile written by hand, scout scored on
+      the sheets it flags against known answers; stop if it catches fewer than about 80%.
+      Serves bet 3. Wait for `series-kinds`: a place group has no shared profile.
+
 - [ ] **`multi-printing-cells`** — preserve `series_cells` as one index row per cell; do not widen
       its primary key and count printings as cells. Migration 106 (in production since 2026-10-04) adds independent
       `sheet_printings` rows linked by cell UUID, with optional reviewed links from source items and
