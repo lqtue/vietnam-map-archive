@@ -58,8 +58,8 @@ like data rather than a bug.
 - **One OpenLayers map per page**, owned by `MapShell` (`ImageShell` for pixel work). Never
   `new Map()` in a child.
 - **Never import a Node builtin bare** — use `node:path`, not `path`; the CF Functions bundle fails.
-- **Migrations:** production head is **119**. Local files past it may exist unpushed — run
-  `supabase migration list` before assuming. How to add one: `supabase/CLAUDE.md`.
+- **Migrations:** run `supabase migration list` before assuming the production head; local files
+  past it may be unpushed. How to add one: `supabase/CLAUDE.md`.
 - **A sheet's address is its slug** (`maps.slug`), not its uuid; old addresses 301 to it
   (`088_map_slug.sql`).
 - **Before a migration or any number-producing run**, read `docs/guides/db-guidelines.md` and

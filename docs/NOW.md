@@ -20,16 +20,16 @@ check, not an echo). That measured, linked record is the product (VMA) and the P
 |---|---|---|
 | **1a. Place links, 1882** (`place-links`, `then-now-blocks`) | One owner sitting gives a measured linkage result now. | Owner-confirmed links with measured accuracy and seconds per item. Plan: `plans/digest-pipeline-plan.md` |
 | **2. Measured gates** (`review-events`, `paper-audit-100k`) | Turns "it works" into numbers: error rate with an interval, seconds per item. The paper's contribution. | The baseline's "unmeasured" cells have numbers |
-| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md` |
+| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md`. Code parked on `1882-extraction` (one commit, unreviewed; mig 120–121 not applied) |
 | **3. Corpus to link against** — series georef, OCR drain | Serves the product, not the next weeks. | **Later**, after 1a and 2. ROADMAP *Do next* |
 
 ## Tue only — the bottleneck
 
 1. Place-links and then-now sittings (local pages on ports 8792 / 8793)
 2. G1: merge and deploy `ingest-auto-queue`
-3. 1971 series: credit line and scan date
-4. Look at the 15 placed L909 sheets
-5. 1882 river: ship the approved water, or park it
+3. 1971 series: credit line and scan date — `.claude/handoff-series-georef.md`
+4. Look at the 15 placed L909 sheets (merged in #59)
+5. 1882 river: ship the approved water, or park it — `feat/1882-1898-processing`; crops in `../vma-snapshots/261017-1882-river-crops/`
 
 ## The idea gate
 
@@ -44,19 +44,16 @@ No bet → it goes to *Parked* below, not into code. A finished experiment's jou
 
 ## Board
 
-One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
+One row per open stream. Owner is Tue or Claude. Prune when merged.
 
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
 | Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64); `work/image-processing/experiments/{place-links,then-now}/` | Tue's sittings, then Opus scores |
 | paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k` (pushed, no worktree) | Rebase onto main (scripts moved in #77), then Tue's sittings |
 | Paper: claim-audit R rows 23 and 99 | Claude | `paper-claim-rows` (1 commit), worktree `.claude/worktrees/agent-a3289…` | Rebase, review, merge |
-| 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
 | Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` (pushed, no worktree) | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
-| Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
-| 1882/1898 river | **Tue** | `feat/1882-1898-processing` (pushed, no worktree); crops in `../vma-snapshots/261017-1882-river-crops/` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
 | Review page in the app (bet 2, `review-events`) | Claude | PR #82 `review-store` (PR 1: store + endpoints); `review-web` pushed | Review and merge #82, then PR 2 (`docs/plans/review-page-plan.md` §8) |
@@ -68,6 +65,5 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
-- City reconstruction / 3D (`city-reconstruction-plan.md`, only on branch `docs/city-reconstruction-plan`), with 3D landmark models and the Favre
-  panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
+- City reconstruction / 3D (`city-reconstruction-plan.md`, only on branch `docs/city-reconstruction-plan`), with 3D landmark models and the Favre panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
 - Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs.
