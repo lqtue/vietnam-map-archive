@@ -28,8 +28,8 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-The production head is in the root `CLAUDE.md`. Local files past it may be unpushed —
-`supabase migration list` is the truth. Each migration's own header is its record:
+`supabase migration list` is the truth for the production head; local files past it may be
+unpushed. Each migration's own header is its record:
 what it does, why, and the deploy order it needs. Read the header, not a summary here.
 
 **A new table starts as a term in `docs/ontology.md`**: what it is, its layer, where it lives.
