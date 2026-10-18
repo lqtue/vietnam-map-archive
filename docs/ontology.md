@@ -4,7 +4,7 @@ For anyone naming a thing in code, a doc or the paper. Kind: guide. One line per
 is, and where it lives. Why each one exists, with counts and gaps, is in the
 [knowledge system plan](plans/knowledge-system-plan.md) §2–§7. Open work on each layer is in its §9.
 
-Two parts. **Built** is what the database holds today (production head: migration 119).
+Two parts. **Built** is what the database holds today (production head: migration 124).
 **Proposed** is under discussion: nothing there is decided, and its names are placeholders.
 Names may still change after a standards crosswalk (PROV-O, LRMoo, Linked Places).
 
@@ -114,9 +114,9 @@ without any sign, so fix the lowest broken layer first. Two more groups sit outs
 
 | Term | What it is | Lives in |
 | --- | --- | --- |
-| **review task** | One kind of review question, with the seed and blind share that decide who sees a proposal | `review_tasks` (mig 122, not yet in production) |
-| **review item** | What a reviewer judges: what both arms see, the machine's proposal, a hash of exactly what is judged | `review_items` (mig 122, not yet in production) |
-| **review event** | One verdict or undo: who, when shown, when decided, whether the proposal was shown. Insert-only. | `review_events` (mig 122, not yet in production) |
+| **review task** | One kind of review question, with the seed and blind share that decide who sees a proposal | `review_tasks` (mig 122) |
+| **review item** | What a reviewer judges: what both arms see, the machine's proposal, a hash of exactly what is judged | `review_items` (mig 122) |
+| **review event** | One verdict or undo: who, when shown, when decided, whether the proposal was shown. Insert-only. | `review_events` (mig 122) |
 
 Studies cite figures from journals and the paper's number ledger (`paper/CLAUDE.md`).
 

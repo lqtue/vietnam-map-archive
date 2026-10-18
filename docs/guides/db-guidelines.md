@@ -196,7 +196,7 @@ All tables must have `alter table ... enable row level security`.
 
 ---
 
-## 11. Current schema (production head 119; additive model migrations 105–108 applied 2026-10-04)
+## 11. Current schema (as of production head 119; 122–124, pushed 2026-10-18, are described in their own headers; additive model migrations 105–108 applied 2026-10-04)
 
 Table/column names below were renamed in mig 095 (`ocr_extractions`→`ocr_labels`,
 `footprint_submissions`→`footprints`, `series_sheets`→`series_cells`, `sheet_sources`→
@@ -315,6 +315,6 @@ and evidence, but cannot set the reviewer, timestamp or reviewed status.
 | Item | Location | Fix |
 |------|---------|-----|
 | `label_pins` outlives its feature | `label_tasks` was dropped in mig 038 but `label_pins` remains, now written only by `POST /api/admin/maps/[id]/ocr/apply` | Either fold into `ocr_labels` or document it as the OCR-applied point layer |
-| Generated types drift silently | `src/lib/data/supabase/types.ts` | Nothing regenerates them. Remote head is **119** (pushed 2026-10-08). The maps/map_images sections were reconciled against linked generated output on 2026-10-06; the remainder keeps the previously reconciled table/RPC types. Re-run after every push: `supabase gen types typescript --linked`. This row named head 075 for five migrations once, which is the drift it exists to warn about |
+| Generated types drift silently | `src/lib/data/supabase/types.ts` | Nothing regenerates them. Remote head is **124** (pushed 2026-10-18; 122's review tables are spliced in, 123–124 change no types). The maps/map_images sections were reconciled against linked generated output on 2026-10-06; the remainder keeps the previously reconciled table/RPC types. Re-run after every push: `supabase gen types typescript --linked`. This row named head 075 for five migrations once, which is the drift it exists to warn about |
 | Compat views for 095's table renames need dropping | `public.ocr_extractions`, `.footprint_submissions`, `.series_sheets`, `.sheet_sources`, `.map_iiif_sources`, `.map_opens`, `.user_favorites`, `.annotation_sets` | Drop once the deploy that reads the new names has shipped. `maps`/`stories`/`scout_candidates`'s renamed *columns* have no such bridge — see `supabase/CLAUDE.md` |
 | Production drifted from the migrations once | `pipeline_jobs_kind_check` allowed `warp` with no migration saying so; corrected in 070 | Nothing to fix now — but it means the migrations are not provably the whole schema. A `db pull` diff would settle it, and needs the direct DB password |
