@@ -31,6 +31,13 @@
 -- `maps.updated_at` is not moved: the sitemap's `lastmod` reads it, and a tidy-up that touched 1,463
 -- sheets would tell every crawler they had changed. The `maps_updated_at` trigger is switched off for
 -- this one statement and back on after, inside this migration's transaction.
+--
+-- Two other row triggers fire on this update and do nothing here. `maps_assign_slug` acts only on
+-- an empty or changed slug. `maps_normalize_taxonomy` (116) resets a human classification review
+-- whenever its own normalising (subjects sorted and de-duplicated, `plan` -> `city_plan`) changes
+-- a row, so a no-op update on an un-normalised row would wipe that review. Checked on production
+-- 2026-10-18 (read-only): of the 1,463 rows this touches, 0 differ from their normalised form and
+-- 0 carry a classification review.
 
 alter table public.maps disable trigger maps_updated_at;
 
