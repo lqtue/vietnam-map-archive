@@ -56,7 +56,7 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` (pushed, no worktree) | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
-| 1882/1898 river | **Tue** | worktree `vma-1882-river` removed; branch unclear, Tue to confirm | See Tue only 5 |
+| 1882/1898 river | **Tue** | `feat/1882-1898-processing` (pushed, no worktree); crops in `../vma-snapshots/261017-1882-river-crops/` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
 | Docs cleanup: one index, ontology, guides merged | Claude | `docs-cleanup`, worktree `vma-docs-cleanup` | Guides folded, pipelines split; PR after Tue reviews `docs/ontology.md` |
