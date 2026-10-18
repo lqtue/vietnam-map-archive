@@ -46,6 +46,12 @@ npm run check
 
 Rules these migrations paid for:
 
+- **Unpushed: 122 `review_events`** (PR 1 of `docs/plans/review-page-plan.md`) — `review_tasks`,
+  `review_items`, and the insert-only `review_events` (no UPDATE/DELETE/TRUNCATE grant for anyone,
+  `service_role` included; an item or task with events cannot be deleted, so write tests leave their
+  events behind). anon/authenticated have no grant on tasks or items (the blind arm's proposal must
+  not reach a client); a reviewer reads only their own events. Additive: push it before the app that
+  has the two `/api/pipeline/review-*` endpoints. 120–121 belong to another unpushed branch.
 - **Deploy order is part of the migration.** App code that reads a new column or table needs the
   push first (104: an app ahead of it answered 500 on every series page). A migration that removes a
   grant, column or name old code uses needs the app first, or both in one deploy (101, 095). Say
@@ -75,7 +81,7 @@ Dashboard SQL Editor instead. Repair with `supabase migration repair --status ap
 ## The local write-test stack
 
 `npm run db:test` runs `supabase start -x vector -x logflare` and seeds one staff user + one map via
-`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 38 tests) runs against it,
+`scripts/seed-test-db.mjs`. `npm run test:write` (`tests/write.spec.ts`, 41 tests) runs against it,
 never production: the suite throws unless `PUBLIC_SUPABASE_URL` is a loopback address, and deletes
 every row it writes. Credentials come from `.env.test` (the CLI's published demo keys, committed on
 purpose) which Vite loads for the `--mode test` dev server on port 5199. Server-route auth is done

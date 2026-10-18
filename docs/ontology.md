@@ -112,8 +112,13 @@ without any sign, so fix the lowest broken layer first. Two more groups sit outs
 
 ### 5. Assertions and studies
 
-Nothing built as a table yet. Studies cite figures from journals and the paper's number ledger
-(`paper/CLAUDE.md`).
+| Term | What it is | Lives in |
+| --- | --- | --- |
+| **review task** | One kind of review question, with the seed and blind share that decide who sees a proposal | `review_tasks` (mig 122, not yet in production) |
+| **review item** | What a reviewer judges: what both arms see, the machine's proposal, a hash of exactly what is judged | `review_items` (mig 122, not yet in production) |
+| **review event** | One verdict or undo: who, when shown, when decided, whether the proposal was shown. Insert-only. | `review_events` (mig 122, not yet in production) |
+
+Studies cite figures from journals and the paper's number ledger (`paper/CLAUDE.md`).
 
 ### Surfaces
 
@@ -151,7 +156,7 @@ Under discussion. Names are placeholders until reviewed.
 | --- | --- |
 | A **set**: a curated group of sheets (the Saigon city plans, a story's sheets) | knowledge plan §7 |
 | Place, name and feature as three separate things (evidence-chain calls the first a "subject") | [evidence chain](plans/evidence-chain-plan.md) |
-| A **decision** record for every review: who, what, verdict, seconds. `map_review_marks` is a first case. | `review-events` in ROADMAP, [review page](plans/review-page-plan.md) |
+| A **decision** record for every review: who, what, verdict, seconds. Review-page tasks have it (review event, §5); the in-app tools and `map_review_marks` do not yet. | `review-events` in ROADMAP, [review page](plans/review-page-plan.md) |
 | A **link** between two things, carrying who proposed it, who decided, the verdict, the seconds and the basis | [digest pipeline](plans/digest-pipeline-plan.md) |
 | A "derived from" edge between sources, so "independent check or echo" becomes a graph query | [digest pipeline](plans/digest-pipeline-plan.md), paper |
 | A **check** that lists its inputs | paper, `review-events` in ROADMAP |

@@ -126,6 +126,16 @@ def png(img) -> bytes:
 
 # --------------------------------------------------------------------------- the session
 
+def item_bound(it: dict, meta: dict) -> str:
+    """The `bound` of a verdict on this item: what was judged (label, radius, candidates) plus the method.
+
+    A module function so the web review page's item upload (review_items.py) signs items exactly as this
+    page does, and web and offline verdicts stay comparable."""
+    judged = {"label_id": it["id"], "label_px": it["px"], "radius_m": meta["radius_m"],
+              "cands": [{"id": c["id"], "name": c["name"], "lon": c["lon"], "lat": c["lat"]} for c in it["cands"]]}
+    return bound_hash(judged, meta["method"])
+
+
 class Session:
     def __init__(self, doc: dict, out: Path, reviewer: str = "tue", seed_arm: int = 20261012, seed_order: int = 20261013,
                  frac: float = 0.2, new: bool = False):
@@ -182,9 +192,7 @@ class Session:
                 "tasco_ids": c.get("tasco_ids", [])}
 
     def bound(self, it: dict) -> str:
-        judged = {"label_id": it["id"], "label_px": it["px"], "radius_m": self.meta["radius_m"],
-                  "cands": [{"id": c["id"], "name": c["name"], "lon": c["lon"], "lat": c["lat"]} for c in it["cands"]]}
-        return bound_hash(judged, self.meta["method"])
+        return item_bound(it, self.meta)
 
     def submit(self, b: dict, now: float | None = None) -> dict:
         with self.lock:
