@@ -59,7 +59,6 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | 1882/1898 river | **Tue** | `feat/1882-1898-processing` (pushed, no worktree); crops in `../vma-snapshots/261017-1882-river-crops/` | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
-| Docs cleanup: one index, ontology, guides merged | Claude | `docs-cleanup`, worktree `vma-docs-cleanup` | Guides folded, pipelines split; PR after Tue reviews `docs/ontology.md` |
 | Review page in the app (bet 2, `review-events`) | Claude | PR #82 `review-store` (PR 1: store + endpoints); `review-web` pushed | Review and merge #82, then PR 2 (`docs/plans/review-page-plan.md` §8) |
 | Admin bounds by machine (experiment) | Claude | PR #83 `admin-lines` | Review: idea gate, then merge or park |
 | Concept: one page on what VMA is | Claude | PR #84 `concept` | Review and merge |
