@@ -67,7 +67,7 @@ Layer `readings`. OCR labels, polygons, legends and layout regions with run prov
 | --- | --- | --- |
 | [work/image-processing/scripts](../work/image-processing/scripts/) | Feature extraction, polygon cleanup, registration and review commands | [README.md](../work/image-processing/scripts/README.md) |
 | [work/ocr](../work/ocr/) | OCR commands, shared processing helpers and Python environment | [README.md](../work/ocr/README.md) |
-| [work/MapSAM2](../work/MapSAM2/) | Learned segmentation code | [VMA_SETUP.md](../work/MapSAM2/VMA_SETUP.md) |
+| [work/MapSAM2](../work/MapSAM2/) | Learned segmentation code | [README.md](../work/MapSAM2/README.md), [VMA_SETUP.md](../work/MapSAM2/VMA_SETUP.md) |
 | [work/image-processing/experiments/river-1882](../work/image-processing/experiments/river-1882/) | 1882 river experiment | [README.md](../work/image-processing/experiments/river-1882/README.md) |
 | [work/image-processing/experiments/river-1882-1898](../work/image-processing/experiments/river-1882-1898/) | Paired river experiment | [README.md](../work/image-processing/experiments/river-1882-1898/README.md) |
 | [work/image-processing/experiments/segmentation-20260919](../work/image-processing/experiments/segmentation-20260919/) | Dated segmentation review pack; prose retained in repository | [docs/plans/image-processing-1882-plan.md](plans/image-processing-1882-plan.md) |

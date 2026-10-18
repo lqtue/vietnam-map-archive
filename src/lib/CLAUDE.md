@@ -5,9 +5,6 @@ before touching the OpenLayers layer; what follows is only the shape.
 
 ## Svelte dialect
 
-**Legacy, NOT runes.** Use `$:`, `export let`, `createEventDispatcher`, `$store`.
-Do not use `$state`, `$derived`, `$effect`.
-
 **House rules live in one place**: the `svelte-core-bestpractices` skill (`.agents/skills/`; a local symlink
 into the gitignored `.claude/skills/` makes Claude Code see it) — a project fork of the upstream `sveltejs/ai-tools` skill,
 rewritten for this dialect and merged with
@@ -31,29 +28,13 @@ cleanup, scoped-CSS and a11y findings, real bugs).
 
 ## Layering (enforced by `@typescript-eslint/no-restricted-imports` in `eslint.config.js`; type-only imports are exempt)
 
-> `core → data → map → features → routes`; `ui` is leaf primitives with zero domain imports;
-> `server` is `$lib/server` only.
-
-A directory may import only from directories to its **left**. Routes stay thin: load + wire, no
-business logic.
+The rule itself is in the root `CLAUDE.md`. Routes stay thin: load + wire, no business logic.
 
 **Feature isolation (also lint-enforced):** a feature may import another feature only through a
 declared seam — `src/lib/features/shared/` (cross-cutting UI: the layer panels, `SidebarCard`,
 `MapViewerSidebar`, `LabelHits`, and the `catalogSearch` client) or `src/lib/features/<x>/shared/`
 (that feature's public API — `stories/shared`, `contribute/shared`, `catalog/shared`). Everything
 else under another feature is private. Routes may import anything under `features/`.
-
-```
-src/lib/
-├─ core/      pure — no OL, no Supabase        geo/ georef/ i18n/ iiif/ review/ utils/ (+ utils/persistence/)
-├─ data/      DB/HTTP access + canonical types  supabase/ maps/ admin/
-├─ server/    $lib/server — SvelteKit blocks client import
-│             auth.ts supabaseAdmin.ts http.ts storage.ts ia.ts mapFields.ts
-│             facets.ts transformer.ts allmaps.ts ocrReview.ts
-├─ map/       the OpenLayers runtime, one home  shell/ stores/ annotations/ types.ts constants.ts
-├─ features/  one dir per product surface       explore/ catalog/ stories/ annotate/ contribute/ admin/ account/ shared/
-└─ ui/        generic primitives only           NavBar EditorialFooter PageHero MapCard Tabs SortHeader LocationSearch …
-```
 
 `$lib/server/*` is import-guarded by SvelteKit — a client-side import of the service key is a build
 error, not a code-review catch.
@@ -110,17 +91,16 @@ export async function fetchPublicStories(supabase: Client): Promise<Story[]> {
 ```
 
 Known helpers that still return `[]` on error (fix each when its page is next touched):
-`fetchPublicStories` (`stories.ts`), `fetchMapFootprints` and the label-maps read (`footprints.ts`),
-the favourites read (`favorites.ts`), several in `maps/service.ts`.
+`fetchPublicStories` (`data/supabase/stories.ts`), `fetchMapFootprints` and the label-maps read
+(`data/supabase/footprints.ts`), the favourites read (`data/supabase/favorites.ts`), several in
+`data/maps/service.ts`.
 
 **Supabase types:**
 
 - Insert/Update types: use `?:` optional fields — **not** `Partial<{...}>` (resolves as `never`).
-- `src/lib/data/supabase/types.ts` is generated and current against migration head **116**, plus 119's `legend_finds` block copied verbatim from a linked regenerate on 2026-10-08 (118's columns remain hand-added; 115 only replaces the `context_at` body, so it changes no type; the 116 `maps`/`map_images` columns and 112–114's text-group columns are present, verified 2026-10-06. `edition` and `region` / `region_2025` were added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified
-  2026-10-05: 106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108
-  changes only a default). Nothing
-  regenerates it automatically — do it after every push. Prefer real types over `as any`. Drift
-  history and the `--local` trap: `docs/guides/architecture.md` §Supabase types.
+- `src/lib/data/supabase/types.ts` is generated, but some sections were added by hand. Regenerate to
+  a temp file and reconcile, never over it (`supabase/CLAUDE.md` says how). Prefer real types over
+  `as any`.
 - The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
   what forces most `as any` casts downstream.
 - **Realtime is stubbed out of the browser bundle** (`vite.config.ts` aliases

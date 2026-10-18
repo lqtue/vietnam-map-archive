@@ -33,7 +33,7 @@ Every route, with its purpose, source folder and who can open it: `docs/guides/a
   `/api/context`, `/api/press`, `/api/maps/[id]/legend-points` are public and enforce
   `status IN ('public','featured')` server-side. `/api/search` takes
   `include=maps,scout,labels,places`; `places` searches the mig 067 gazetteer and is what the
-  command palette turns into `/place/<slug>` rows.
+  command palette turns into `/catalog/place/<slug>` rows (`placeHref`, `core/utils/placeKey.ts`).
 - Enqueue, never execute: routes that start pipeline work insert a `pipeline_jobs` row and return
   202 (409 if one is in flight). Nothing runs until a worker claims it. `/api/pipeline/execute` is
   the one exception, for kinds that need the service key.

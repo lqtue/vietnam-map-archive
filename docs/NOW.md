@@ -3,7 +3,7 @@
 **Read this first, every session.** It holds the goal, the bets that serve it, what only Tue can
 do, and who is working on what. `ROADMAP.md` is the backlog behind it; nothing here repeats its
 detail. Keep this file under 70 lines: when a bet closes, replace it, and when an idea arrives, put
-it through the gate before it gets a branch. Updated 2026-10-14. Public repo: no application dates,
+it through the gate before it gets a branch. Updated 2026-10-18. Public repo: no application dates,
 referees or contacts here — those live in `docs/private/`.
 
 ## Goal
@@ -49,23 +49,26 @@ One row per open stream. Owner is Tue, Claude or Codex. Prune when merged.
 | Stream | Owner | Where | Next step |
 |---|---|---|---|
 | Place links + then-now (offline, ports 8792/8793) | Claude | merged (#64); `work/image-processing/experiments/{place-links,then-now}/` | Tue's sittings, then Opus scores |
-| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k`, worktree `vma-audit` | Rebase onto main (scripts moved in #77), then Tue's sittings from `vma-audit` |
+| paper-audit-100k (§9 audit) | Claude/Sonnet | `paper-audit-100k` (pushed, no worktree) | Rebase onto main (scripts moved in #77), then Tue's sittings |
 | Paper: claim-audit R rows 23 and 99 | Claude | `paper-claim-rows` (1 commit), worktree `.claude/worktrees/agent-a3289…` | Rebase, review, merge |
 | 1882 extraction + Simplify (mig 120–121) | Codex | `1882-extraction` (one commit) | Codex checks the commit; 120/121 not applied |
 | Ingest auto-queue | Claude (Sonnet) | `ingest-auto-queue` @ a57c8746, `.claude/worktrees/agent-…` | Done and checked; waits on Tue (G1) and Gallica 403 |
 | Indochine 100k printed-tick audit | Claude | `indochine-printed-audit` (pushed, no worktree) | Two-sided reader check — `.claude/handoff-indochine100k.md` |
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Series georef (1971, L909) | **Tue** | merged (#59) | See Tue only 3–4 — `.claude/handoff-series-georef.md` |
-| 1882/1898 river | **Tue** | `vma-1882-river` | See Tue only 5 |
+| 1882/1898 river | **Tue** | worktree `vma-1882-river` removed; branch unclear, Tue to confirm | See Tue only 5 |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
-| L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources`, worktree `vma-l909-sources` | Rebase onto main (#77), then PR: scripts and records only |
-| Docs cleanup: one index, ontology, guides merged | Claude | `docs-cleanup`, worktree `vma-docs-cleanup` | Tue reviews `docs/ontology.md`; then fold guides, split pipelines |
-| Review page in the app (bet 2, `review-events`) | Claude | `review-web`, worktree `vma-review-web`; plan #81 | PR 1: store + export (`docs/plans/review-page-plan.md` §8) |
+| L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
+| Docs cleanup: one index, ontology, guides merged | Claude | `docs-cleanup`, worktree `vma-docs-cleanup` | Guides folded, pipelines split; PR after Tue reviews `docs/ontology.md` |
+| Review page in the app (bet 2, `review-events`) | Claude | PR #82 `review-store` (PR 1: store + endpoints); `review-web` pushed | Review and merge #82, then PR 2 (`docs/plans/review-page-plan.md` §8) |
+| Admin bounds by machine (experiment) | Claude | PR #83 `admin-lines` | Review: idea gate, then merge or park |
+| Concept: one page on what VMA is | Claude | PR #84 `concept` | Review and merge |
+| Data model plans + model dedup 1–2 (mig 123–124) | Claude | PR #85 `model-dedup` | Review; 123/124 not applied |
 
 ## Parked
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
-- City reconstruction / 3D (`city-reconstruction-plan.md`), with 3D landmark models and the Favre
+- City reconstruction / 3D (`city-reconstruction-plan.md`, only on branch `docs/city-reconstruction-plan`), with 3D landmark models and the Favre
   panorama (`panorama-match`, killed at 131 m) — after the 1882 layer ships.
 - Names over time / Vietnam admin gazetteer · Walk (`plans/walk-plan.md`) · Gallica text harvest · street-name pairs.

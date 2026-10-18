@@ -1,9 +1,7 @@
 # work/ — the pipelines
 
 Root context: `/CLAUDE.md`. What every folder here is: `work/README.md`; which layer owns it: `docs/ATLAS.md`.
-Image commands live in `work/image-processing/scripts/`, experiments in
-`work/image-processing/experiments/` and local outputs in `work/image-processing/results/`. OCR
-commands remain in `work/ocr/scripts/`, with the shared environment at `work/ocr/.venv`. The code
+The shared Python environment is `work/ocr/.venv`. The code
 OCR, segmentation and the worker share is the `vma_core` package in `work/core/` (PR #67: IIIF tile
 fetching, georef maths, Supabase transport); the old `work/ocr/scripts/{iiif_tiles,scale,supabase_client}.py`
 are re-export shims. Core imports nothing from `ocr`, segmentation or `worker` — see
@@ -12,8 +10,7 @@ links pending the reference audit in `docs/plans/image-processing-1882-plan.md`.
 Full command reference and design rationale: `work/ocr/README.md` (OCR), `work/worker/README.md`,
 `work/MapSAM2/README.md`; the index of every tool is `docs/guides/pipelines.md`.
 §*Getting more out of OCR* there is the ranked list of what to do next and what not to re-attempt;
-`work/ocr/EVAL-BASELINE.md` is the measured gate behind it. `scripts/` holds the living operator
-scripts; `scripts/oneoff/` the backfills that have already run and stay only as a record.
+`work/ocr/EVAL-BASELINE.md` is the measured gate behind it.
 
 ## The worker (`work/worker/vma_worker.py`)
 
@@ -55,6 +52,3 @@ there is no local venv for it.
 Its polygons and `ocr_labels.global_*` share **one full-image pixel grid** (both scale
 tile-render → source px and offset by the tile origin, off the same `info.json`), which is what
 makes the OCR ↔ shape join possible; tile sizes differ and do not matter.
-
-(The legacy `scripts/vectorize.py` colour-profile pipeline was removed — MapSAM2 supersedes it, and
-`work/archive/vectorize/` only holds local historical previews; it is not an active pipeline.)

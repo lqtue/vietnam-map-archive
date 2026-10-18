@@ -28,18 +28,15 @@ when you open a file in their tree:
 | `vmabeta` | the Cloudflare Pages project id, nothing else | a product name — never in prose |
 | `lqtue/vietnam-map-archive` | the GitHub repo (was `svelte-beta`) | the `VietnamMapArchive` org |
 | **HACW** | the Hội An event PWA that Walk forks | part of VMA |
-| **Shapes · Search · Walk · Debt** | the four lines of work in `ROADMAP.md` | Tracks C/E/F/D, "Time machine", "Time walk" (retired) |
+| **Shapes · Search · Walk · Debt** | the four lines of work in `docs/ROADMAP.md` | Tracks C/E/F/D, "Time machine", "Time walk" (retired) |
 
 Roadmap items are named for their subject (`l7014-rebuild`), never a letter code.
 
 ## Commands
 
 ```bash
-npm run dev            # Dev server
 npm run build          # Production build; also runs scripts/check-bundle.mjs
 npm run check          # Type-check — the primary verification; keep it at 0 errors / 0 warnings
-npm run lint           # prettier --check . && eslint .
-npm run format         # prettier --write .
 npm run test           # Playwright, read-only (hits real Supabase, never writes)
 npm run db:test        # Local Supabase stack + write-test fixtures
 npm run db:test:reset  # Replay every migration, then reseed
@@ -52,9 +49,7 @@ like data rather than a bug.
 
 ## Rules
 
-- **The main checkout stays on `main`, clean. One stream = one branch = one worktree.** Start with
-  `git worktree add ../vma-<stream> -b <stream> origin/main` and write only there; the NOW.md board
-  names the folder. Five sessions writing into one checkout left 114 mixed files (2026-10-13).
+- **Branch from `main`, open a PR, merge — never commit straight to `main`.**
 - **Svelte is legacy mode, not runes.** `$:`, `export let`, `createEventDispatcher`, `$store` —
   never `$state`/`$derived`/`$effect`. Load the `svelte-core-bestpractices` skill before any
   `.svelte` edit.
