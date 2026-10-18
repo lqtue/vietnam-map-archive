@@ -4,7 +4,7 @@ An operator guide to `/scan?mode=prepare` and `?mode=text` — where a scanned m
 text pinned to real ground.
 
 Audience: whoever is working through the corpus, one sheet at a time. It assumes no knowledge of the
-codebase. For the architecture behind it see [`system-guidelines.md`](system-guidelines.md); for the
+codebase. For the architecture behind it see [`architecture.md`](architecture.md); for the
 command-line side see [`pipelines.md`](pipelines.md).
 
 ---
@@ -380,7 +380,7 @@ sheets. Sheets already under ~1.5 km per call gain nothing.
 Budget: about **$31–63** for the whole corpus on `gemini-3.8-flash`, measured at 5,156 input / 1,810
 output tokens per call and 30–60 calls per sheet. (**Corrected 2026-09-19.** This line read $12–24,
 which is the same per-call token figures costed on the *visible* `output_tokens` field. Gemini bills
-`total_tokens − input_tokens`, thinking included, ~3.5–4× that — see `docs/guides/pipelines.md` §Cost.
+`total_tokens − input_tokens`, thinking included, ~3.5–4× that — see `work/ocr/README.md` §Cost.
 `docs/ROADMAP.md` already carried the corrected range; this file did not.) Cost is not the
 constraint; unattended quality is. Set `GEMINI_API_KEYS` with a second key before a long run — the
 client rotates when one hits its daily cap.

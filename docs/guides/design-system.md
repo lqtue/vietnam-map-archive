@@ -460,7 +460,7 @@ sections.
    `PageHero`, which is not optional.
 2. Add its stylesheet at `src/styles/pages/<page>.css` and import it in the page.
 3. Add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
-4. Add a row to the route map in `docs/guides/system-guidelines.md` §2.
+4. Add a row to the route table in `docs/guides/architecture.md` §2.
 5. Build content from `.editorial-main` + `.section-card`; don't invent new layout patterns.
 
 ---

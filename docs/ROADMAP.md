@@ -5,7 +5,7 @@ the measurements and the defects each one turned up, is `docs/roadmap-record.md`
 2026-09-22), and the rules that keep getting re-learned are `docs/guides/lessons.md`. **Close an item by
 deleting it**, never by ticking it: the commit that deletes it carries the closing measurement, and
 anything worth re-learning goes into `docs/guides/lessons.md`. Remove its name from
-`docs/plans/knowledge-system-plan.md` §9 in the same commit.
+`docs/plans/knowledge-system-plan.md` §9 in the same commit (CI checks the two match).
 
 Ordered where order is claimed. Each item names the check that says it is finished.
 
@@ -402,7 +402,7 @@ system — what a result must retain, and the two kinds of check — is in the r
       Exit: each cites a figure together with the GCP set and named measure it was measured on.
 - [ ] **`mask-names`** — "mask" names three things: the georef mask (annotation SvgSelector), the
       neatline (`triage.neatline`) and layout regions (`triage.regions`). The neatline editor
-      writes the first from the second. Name them in `docs/guides/conventions.md`. Exit: no doc or comment
+      writes the first from the second. Name them in `docs/guides/architecture.md`. Exit: no doc or comment
       uses a bare "mask" for more than one.
 
 ## Measured pipeline (planned 2026-10-12)

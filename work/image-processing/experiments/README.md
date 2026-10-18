@@ -1,6 +1,6 @@
 # Image processing experiments
 
-Layer 3 readings in the [system model](../../../docs/model-layout.md).
+Layer 3 readings in the [Atlas](../../../docs/ATLAS.md).
 [Image processing workspace](../README.md).
 
 | Experiment                    | Entry point                                             | Contents                                                              |

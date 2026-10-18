@@ -1,100 +1,103 @@
 # Architecture
 
-Moved out of `CLAUDE.md` (Sept 2026) so the session prompt stops carrying 66 kB of it on every
-load. Nothing is summarised: this is that section verbatim. Read it before touching MapShell, the
-map stores, a route group, the /explore rails, the contribute tools or the basemap.
+For anyone changing the app. Kind: guide. How the code is laid out, how a page is built, and why
+each part is the way it is. The agent-facing short form is `src/lib/CLAUDE.md` and
+`src/routes/CLAUDE.md`; the words for what the archive holds are [ontology.md](../ontology.md).
 
+This page absorbed `system-guidelines.md` and `conventions.md` on 2026-10-17. Their text is kept
+word for word below; only copies that had gone stale beside a newer one were dropped.
 
-### MapShell — central map pattern
+## Contents
 
-`src/lib/map/shell/MapShell.svelte` owns the single OpenLayers Map and is the entry point for all
-geo-map pages. It mounts basemap tile layers (`basemapLayers.ts`) and exposes everything via Svelte
-context (`src/lib/map/shell/context.ts`). Children call `getShellContext()` — never create a second
-OL map. Basemap *visibility* is owned by `LayerRenderer`, not MapShell.
+1. [Layering](#1-layering)
+2. [Routes and pages](#2-routes-and-pages)
+3. [The map runtime](#3-the-map-runtime)
+4. [Surfaces](#4-surfaces): /explore, the home page, the contribute tools
+5. [Data](#5-data)
+6. [Components and styling](#6-components-and-styling)
+7. [Roles and known debt](#7-roles-and-known-debt)
 
-`src/lib/map/shell/LayerRenderer.svelte` is the single component that renders **all** map layers —
-base (modern tile OR historical warped) and overlays — by subscribing to `layersStore`. In
-side-by-side mode it hides overlays past index 0 so the left pane shows only the topmost;
-`DualMapPane.svelte` independently renders overlays[1] in the right pane.
+## 1. Layering
 
-**One sync at a time, and only the newest one.** It holds two subscriptions, `layersStore` and
-`layerStore`, and both fire synchronously on subscribe — so two passes started in the same tick and
-both ran as far as the `await createWarpedLayer` inside, which is a dynamic import of 151 kB and
-therefore a very long window. Neither saw the other's entry in `overlayInstances`, so both created a
-layer, and the loser stayed attached to the OL map drawing forever. Measured on the 56-sheet
-Indochine series restored from localStorage: **every annotation fetched four times, 276 requests and
-712 kB** where 56 and 180 kB were wanted, plus three orphaned WebGL layers — and nothing in the
-console to say so, because both passes succeeded. `queueSync` is the fix: one pass runs, everything
-that arrives while it runs overwrites a single `pending` slot rather than queueing, so a slider
-dragged through twenty values costs the first pass and one more with the value it stopped on. Any
-new subscription that changes what is on the map goes through it, not straight to
-`syncBase`/`syncOverlays`.
+The rule, the folder tree and the lint seams are in `src/lib/CLAUDE.md`. What they mean in practice:
 
-**Exception — `ImageShell.svelte`** (same dir): IIIF-canvas counterpart to MapShell for
-pixel-coordinate work. Creates an OL map with a static image extent, exposes via
-`getImageShellStore()` (`imageContext.ts`), binds `imgWidth`/`imgHeight`. Used by
-`/scan?mode=prepare`, `?mode=text`, `?mode=shapes`, by `NeatlineEditor`, and by
-`features/catalog/SheetZoom.svelte` on `/catalog/[id]` — none of them use MapShell or the global
-stores. `SheetZoom` is the only one on an editorial page, so it **imports ImageShell dynamically on
-the reader's click**: the record page is server-rendered for crawlers and most visits never zoom, so
-OpenLayers stays out of its first paint. It is also the answer to "just link the full image" — a
-level0 sheet 404s every size it did not mirror, `/full/max/` included, so the tiles are the only way
-to see it whole.
+- `data/maps/types.ts` is the **only** home for `MapRecord` / `MapListItem` / `MapStatus`.
+  `map/types.ts` no longer re-exports them and holds UI-only types (`ViewMode`, `DrawingMode`,
+  `AnnotationSummary`, `SearchResult`, `AnnotationSet`).
+- `core/` must not import `@allmaps/openlayers` or `ol` — that is what keeps the OL bundle off
+  `/explore`'s data path.
+- `ui/` must not import from `features/`. When a primitive needs domain behaviour, the **route
+  page** wires it: `/catalog` renders `MapEditModal` itself, `CatalogUnifiedSearch` only dispatches
+  `edit`.
+- Routes are thin — load, wire, render. Business logic belongs in a `features/` module so it stays
+  importable and testable.
+- Features are isolated from each other. Cross-feature imports go through `features/shared/`
+  (cross-cutting UI) or `features/<x>/shared/` (a feature's public API); anything else under another
+  feature is private. Lint-enforced by the regex rule in `eslint.config.js` — `catalog/` had been a
+  shared layer by accident, imported by four features, before the seam was declared.
+- One Svelte component per file. No barrel `index.ts` re-exports for components.
 
-**IIIF canvas coords:** OL uses `ol_y = -image_y` (y-flip). Tool components store bboxes image-space
-(y-down) and flip when creating OL geometries. `src/lib/core/geo/rectUtils.ts` owns the flip helpers
-(in `core` because `ImageShell` needs them too); `bboxHandles.ts` builds the shared handle features
-and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line tools (`TraceTool`,
-`ReviewTool`) flip inline.
+## 2. Routes and pages
 
-### Map stores (`src/lib/map/stores/`)
+### Every route
 
-- **layersStore** — single source of truth for what the map renders.
-  `{ base: LayerRef, overlays: OverlayLayer[] }` where `base` is either `{ kind: 'basemap', key }`
-  (`'g-streets' | 'g-archive' | 'g-satellite' | 'g-custom' | 'none'`) or
-  `{ kind: 'historical', mapId, allmapsId, name?, thumbnail? }`. `overlays` is top-of-stack-first;
-  each item has its own `opacity`, `visible`, and stable local `id`. There is no fixed overlay count limit. Hold and drag the three-dot layer menu to reorder, with a floating card and insertion marker; tapping opens actions and keyboard arrows also reorder. Order commits on release, and opacity sliders remain separate. Layer menus use the browser top layer and flip above cards near the viewport bottom.
-  Persists to `localStorage` as `vma-layers-v1`. API: `setBase`, `addOverlay`, `removeOverlay`,
-  `removeOverlayByMapId`, `setOpacity`, `setVisible`, `reorderOverlay`, `clearOverlays`,
-  `isOverlay`; plus the free functions `toHistoricalRef(map)`, `toggleOverlayFor(map)`, `clamp01(n)`
-  and the derived `topOverlay`.
-- **mapStore** — `{ lng, lat, zoom, rotation, activeMapId, activeAllmapsId }`. Default: Saigon
-  (106.70098, 10.77653) zoom 14. `activeMapId` is `maps.id` UUID and **is** mirrored from
-  `layersStore.topOverlay` — the bridge is wired in `src/lib/map/shell/geoMapSetup.ts`
-  (`topOverlay.subscribe → setActiveMap`). Kept for legacy callers: story playback, share links.
-  `activeAllmapsId` holds the annotation source string — either a bare Allmaps image ID or a full
-  annotation URL; `annotationUrlForSource()` (`src/lib/core/iiif/annotationUrl.ts`) accepts both.
-- **layerStore** — per-shell view settings: `{ basemap, viewMode, lensRadius, customBaseUrl }`. View
-  modes: `'overlay' | 'spy' | 'dual'` (UI labels: Stacked / Lens / Side-by-side). The side-by-side
-  split is fixed at 50/50; `sideRatio` was removed.
-- **urlStore** — bidirectional URL ↔ store sync. The hash carries **camera + basemap only**:
-  `#@lat,lng,zoomz,rotationr&base=key`. The selected map lives in the **`?map=<id>` query param** —
-  that is what /catalog, /scan?mode=prepare and every share link point at
-  (`src/lib/features/explore/exploreUrl.ts`). A `map=` found in the hash is a legacy link and is
-  migrated into `?map=` on init.
+The group in parentheses is the SvelteKit layout group, not part of the URL. Both groups render
+`NavBar`; only `(editorial)` adds `EditorialFooter` (`src/routes/(editorial)/+layout.svelte`).
 
-Other persisted keys (there is no `vma-viewer-state-v1`): `vma-scout-view-v1`, `vma-catalog-view-v1`
-(list or grid), `vma-layers-v1`, `vma-story-player-v1`, `vma-story-library-v1`,
-`vma-annotation-projects-v1`, `vma-bounds-cache-v2`, `vma-custom-base-url`, `vma-thumb-cache-v1`,
-`vma-explore-{tour,welcome}-ack-v1`, `vma-create-saigon-seeded-v2`. Three are **gone** as of Sept
-2026 and should not come back: `vma-explore-sidebar-ratios-v2` (the left rail is tabs, not a
-splitter) and the two hero flags, `vma-hero-swept-v1` and `vma-hero-played-v1` — see the home-page
-section. Debounced persistence lives in `src/lib/core/utils/persistence/createPersistedStore.ts`;
-raw read/write in the sibling `storage.ts`.
+| Route | Purpose | Source |
+|-------|---------|--------|
+| `/explore` | MapShell dispatcher | `src/routes/(app)/explore/` |
+| `/explore?mode=browse` | Browse maps, play stories | `src/lib/features/explore/ExplorePage.svelte` |
+| `/explore?mode=studio` | Free-form annotation + timeline animation. `?mode=annotate` is the name it shipped under and is aliased, not redirected (`EXPLORE_MODE_ALIASES` in `core/routeModes.ts`, read by `resolveExploreMode()` in `(app)/explore/+page.svelte`) — the dispatcher only ever matches `studio` | `src/lib/features/annotate/` |
+| `/explore?mode=story` | Author stories | `src/lib/features/stories/editor/` |
+| `/scan` | ImageShell dispatcher | `src/routes/(app)/scan/` |
+| `/scan?mode=inspect` | IIIF viewer, unlisted — the plain look at a **draft** scan | `src/lib/features/contribute/inspect/` |
+| `/scan?mode=prepare` | Layout · neatline · tile grid · save · queue OCR | `src/lib/features/contribute/digitalize/` |
+| `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
+| `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
+| `/scan?mode=legend` | Staff: place the numbered legend on the scan in image pixels — select, click to place, accept a numeral, batch save | `src/lib/features/contribute/legend/` |
+| `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
+| `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
+| `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |
+| `/catalog/place/[name]` | The gazetteer: one page per attested place name | `src/routes/(editorial)/catalog/place/[name]/` |
+| `/catalog/area/[slug]` | Curated modern-province coverage pages, published maps only; links from catalog and sitemap | `src/routes/(editorial)/catalog/area/[slug]/` |
+| `/catalog/series/[key]` | One survey: its coverage and every sheet it contains, held or not | `src/routes/(editorial)/catalog/series/[key]/` |
+| `/catalog/series/[key]/[number]` | One sheet of a survey — including the ones the archive does not hold | `src/routes/(editorial)/catalog/series/[key]/[number]/` |
+| `/catalog/institutions` | Holding institutions and source platforms, with published maps and external source records | `src/routes/(editorial)/catalog/institutions/` |
+| `/catalog/institutions/cartomundi` | CartoMundi's Vietnam-related series and item-level Nakala rights evidence; `/catalog/cartomundi` redirects here | `src/routes/(editorial)/catalog/institutions/cartomundi/` |
+| `/catalog/institutions/[slug]` | One holding institution: its series, published maps and external source records | `src/routes/(editorial)/catalog/institutions/[slug]/` |
+| `/catalog/cartomundi/[id]` | One CartoMundi series: its sheets and item-level rights evidence | `src/routes/(editorial)/catalog/cartomundi/[id]/` |
+| `/changelog` | Every release, from `releases.ts` | `src/routes/(editorial)/changelog/` |
+| `/directory` | All pages, one list (the palette destinations) | `src/routes/(editorial)/directory/` |
+| `/screens` | Every design-system component on one page; for whoever builds the UI | `src/routes/(editorial)/screens/` |
+| `/login`, `/profile` | Sign in; the signed-in reader's own page (303 to `/login` without a session) | `src/routes/(editorial)/{login,profile}/` |
+| `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
+| `/admin?tab=` | Bulk upload · Scout · Status · Stories | `src/lib/features/admin/` |
 
-### Command palette — the one search
+**Who can open what.** Every page is public except: `/profile` (303 to `/login`); `/explore?mode=studio`
+and `?mode=story`, and every `/scan` mode, which need a session; the Validate tab of
+`?mode=shapes` and `/admin?tab=scout|status|stories`, which need mod; `/admin?tab=bulk`, admin only.
+**`/scan` has no default mode**: no mode, or one not in `$lib/core/scanModes.ts`, redirects to
+`/catalog`, carrying `?map=` as `/catalog/<id>`.
 
-`src/lib/features/shared/CommandPalette.svelte` is mounted once by the **root** layout, so it is on
-every page in both route groups. ⌘K / Ctrl+K anywhere, `/` outside a form field, or the Search
-button in `NavBar`. It searches four things through `/api/search`: **pages**
-(`paletteDestinations.ts`, role-gated), **maps**, **places** (the gazetteer) and **labels** (which
-open `/explore` at the spot).
+**Redirects** are a table, not stub pages. `LEGACY_REDIRECTS` in `src/hooks.server.ts` issues a 301
+with the query string preserved:
 
-Open state is `src/lib/core/utils/commandPalette.ts` — a bare boolean store in `core` rather than
-beside the component, because `NavBar` is in `ui` and the layering rule bars `ui` from importing
-`features`. `src/lib/core/utils/placeKey.ts` is the client-side twin of Postgres's `place_key()`
-(mig 067), so a label on screen links straight to `/place/<slug>`; `tests/palette.spec.ts` guards
-that the two agree.
+- `/view` → `/explore`
+- `/annotate`, `/studio` → `/explore?mode=studio`
+- `/create` → `/explore?mode=story`
+- `/image`, `/catalog/series` → `/catalog`
+- `/contribute/label`, `/contribute/digitalize` → `/scan?mode=prepare`
+- `/contribute/trace` → `/scan?mode=shapes`
+- `/contribute/review` → `/scan?mode=shapes&tab=validate`
+- `/admin/bulk|scout|status` → `/admin?tab=…` (`/admin/status` included)
+
+`LEGACY_PREFIXES` handles the two that carry an id rather than a fixed name:
+`/map/<id>` → `/catalog/<id>` and `/place/<name>` → `/catalog/place/<name>`.
+`withSearch()` joins an incoming query with `&`, since half the targets already
+carry a `?mode=`.
+
+There is no `/signup`, `/contribute/catalog`, `/hunt` or `/georef` route.
 
 ### Route groups
 
@@ -228,181 +231,314 @@ looks clickable before any handler is attached, and a click in that window is dr
 rarely wins that race; a Playwright test under parallel load loses it every time, so
 `tests/smoke.spec.ts` waits on `html[data-hydrated]` before it touches the nav or the hero field.
 
-**The home page's header is two still images with a slider between them, and the live map is a
-section further down** (Sept 2026). It used to be the header: every visitor paid for OpenLayers,
-ol-pmtiles, Allmaps and ~390 kB of basemap to look at scenery they had not asked for. Measured on
-the production build at 1440×900, the front page at rest is now **63 requests / ~0.9 MB**; scrolling
-to the demo adds **71 requests and 1.36 MB** on top, which is exactly what a reader who never
-scrolls no longer spends.
-
-`static/images/hero-now.webp` and `hero-1882.webp` (159 kB and 165 kB, both 1600×900) are the
-header: **Esri satellite imagery** underneath, the composed 1882 frame over it, and the Today/1882
-slider in the masthead column driving the top one's opacity. Two `<img>`s and a `bind:value` — no
-map, and the whole gesture the archive is about works with the page's first paint. The 1882 layer is
-the LCP element and takes `fetchpriority="high"`; the imagery underneath takes `low` and an empty
-`alt`, being the same picture in another state rather than a second picture. Because that imagery is
-on screen whenever the slider is off the 1882 end, `.hero-credit` carries its attribution in the
-corner — a still image has no OL attribution control to do it. Each still is served as a two-cut
-`srcset` at `sizes="100vw"` — the `-800.webp` twin beside it (72 kB and 54 kB) is what a phone
-takes, since the header is full-bleed and a 390px screen was being handed the whole 1600px frame for
-a third of the page's weight at rest. Both cuts come out of `gen-hero-still.mjs`; regenerate them
-together.
-
-**The base is satellite, not the vector streets** — `BASEMAP` in `HeroMap.svelte`, which is also
-what the live demo now draws. The streets style is deliberately quiet and at this zoom draws roads,
-water and nothing else, so the "today" end of the fade was a pale diagram beside a hand-coloured
-survey and the comparison the hero exists to make had one side missing. `HeroMap` mounts no
-`LayerRenderer` (that one is driven by the persisted `layersStore`, which a decorative map must not
-touch) and `createBasemapLayers` leaves visibility at its construction default, so the choice is
-applied by hand with `setVisibleBasemap` — moved out of `LayerRenderer` into `basemapLayers.ts` when
-the second caller appeared.
-
-**The header keeps showing what it does until someone takes the control.** `sweepHeroSlider()` on
-the page waits 1.1 s, then cycles `heroSheet` on rAF: 1.4 s down to 0.12, a 900 ms dwell on the
-imagery, 1.4 s back up, a 900 ms dwell on the sheet, repeat. The easing is `easeInOutCubic`, the
-curve the annotate-mode timeline already uses, so neither turn is a corner; `SWEEP_HOLD_MS` is the
-dwell, and without it the thing is a metronome and the two states it exists to compare never sit
-still long enough to be read.
-
-A slider nobody drags is a slider nobody knows is there, and this one is the archive's whole idea.
-It ran **once a tab** behind `vma-hero-swept-v1`, then **once per load**; both are gone (Sept 2026).
-The flag meant anyone who had already opened the front page in that tab never saw the gesture again
-— which is everyone testing it — and once-per-load meant anyone who looked away for four seconds
-missed it with no way to ask again. **Looping was requested explicitly, twice**, against the note
-that used to sit here saying not to; do not restore a single pass on the strength of a comment.
-
-Three parts are not up for simplification: it stops dead on the reader's first `pointerdown` or
-`keydown` on the slider and never restarts (a control that animates under a finger is fighting the
-person using it, and that first touch is the whole reason the loop exists); it never runs under
-`prefers-reduced-motion`; and `onMount(sweepHeroSlider)` returns the teardown that clears both the
-timer and the rAF, which matters more now the loop is unbounded. On WCAG 2.2.2 — moving content past
-five seconds needs a way to stop it — the slider *is* that mechanism: visible, obviously grabbable,
-and touching it ends the motion for good.
-
-Neither is a hand-made crop — `scripts/gen/gen-hero-still.mjs` drives the real demo section in
-Playwright and photographs it twice, so the two ends of the slider line up to the pixel (the 1882
-one doubles as the section's own poster while OL loads). They no longer match the live map below:
-the section was refitted to frame the whole sheet and **the header was deliberately left on the
-earlier pinned close-up**, so re-running the script replaces it with the wide view — a decision, not
-a repair. The two passes are separate page loads, and the `hero-now` one **aborts the annotation
-request on purpose**: `HeroSequence.start()` catches a failed overlay by parking at stage 0 and
-returning, so the sheet, footprints and labels never arrive and there is no 1.5-second window to
-race between "the basemap painted" and "the sheet starts fading in". **Re-run it whenever
-`HERO_SHEET` changes or the fabric is regenerated**, or the header advertises a frame the demo no
-longer opens on. Each shot is written twice, at 1600 and 800, and `HeroDemo` is handed the same
-`srcset` so a phone reuses the small cut rather than fetching the large one for the poster. It needs
-`vips` and `cwebp`, a dev server (or `HERO_BASE_URL`), and it hides the sticky `.top-nav` and OL's
-controls before shooting — the nav is sticky, so Playwright photographs it along with the map
-otherwise.
-
-`src/lib/features/explore/GpsDot.svelte` draws **where the reader is** — a headless OL point layer
-(halo at `inkAlpha(INK.blue, 0.18)` under a hard dot ringed in `INK.paper`, `zIndex` 55, static
-because a position is not an event). `GpsTracker` emitted fixes and `ExplorePage` moved the camera
-to the first one and worked out which sheets covered it, but nothing drew the spot, so "My location"
-answered *where am I* with a camera move and no marker. `FocusPulse` beside it (`zIndex` 60) now
-also fires on a **place pick**: `handlePickLocation` sets `focusPoint`, so a Nominatim hit and a
-legend row both get the ring instead of moving the camera and leaving the reader to guess which of
-the hundred things under the crosshair they asked for.
-
-`src/lib/features/explore/HeroDemo.svelte` is the section (`#how-it-works`, between the catalog and
-the band). **What plays by default is a clip, not the map** (Sept 2026).
-`scripts/gen/gen-hero-video.mjs` records the real section, so the clip is the same four beats — 699 kB
-at 1200px, 298 kB at 800px, against ~179 kB of JavaScript plus ~390 kB of basemap before OL draws a
-tile. It is cheaper than the thing it stands in for **and** it moves, which the frozen still did
-not: a reader who never got OpenLayers used to see one frame of the end state and none of the sheet
-arriving, which is the one thing the section exists to show. The live map is the **upgrade**, behind
-a *Try it yourself* button, because the clip cannot do the two things the copy promises — the
-Today/1882 slider and ⌘-scroll zoom. That button waits for the clip's `ended`, for the same reason
-the slider waits for `settled`: the clip burns its own captions along the bottom of the frame and
-the button sits in that slot, so offering it mid-clip put it on top of “46 plots and waterways,
-traced by hand”. A reader who never gets a clip at all — reduced motion, or metered — is offered it
-immediately instead, or the readers most likely to want a lighter page would lose the only route to
-the map. `tests/smoke.spec.ts` pins both: no canvas before the click, and the button hidden while
-the clip runs. Four gates now: the poster is the section's own content; `prefers-reduced-motion` or
-`isMeteredConnection()` (`$lib/core/utils/connection.ts`) stops there; otherwise an
-`IntersectionObserver` fetches the clip **400px** early; and `HeroMap.svelte` is dynamically
-imported only on the click. The clip is held at frame 0 until a second observer at the real viewport
-edge fires, and `play()` lives in a `$:` block rather than in that observer — both can fire in the
-same tick, and then `bind:this` has not run and the call reached `undefined`.
-
-The poster is **frame 0 of the clip**, written by the same script, so the still and the moving
-picture cannot disagree. It used to be `hero-1882.webp`, which is the header's pinned close-up while
-this section frames the whole sheet — and nothing ever took it down, so an enlarged 1882 sheet sat
-behind the live map, showing through every patch whose basemap tile had not landed. It now comes
-down on either `rolling` (the clip's own `playing` event) or `HeroMap`'s `painted` prop, which it
-sets from OpenLayers' `rendercomplete` — the first frame with every tile actually drawn.
-`rendercomplete` rather than a timer: a slow connection keeps its poster exactly as long as it needs
-one, and if neither event comes — no WebGL, tiles refused, a metered reader — the poster stays,
-which is right in all three cases. **Not a GIF:** the same nine seconds at 800px and 10 fps is 12.1
-MB as a GIF, 33× the H.264 of the same width. That margin is a fixed distance, not `100%` of the
-viewport: at one viewport of lead the section already intersected on load on a laptop, which is the
-entire cost the component exists to avoid. The stage is `aspect-ratio: 16/9` so nothing shifts when
-either the image or the map arrives.
-
-`HeroMap.svelte` mounts its own `MapShell` on an idle callback and plays four beats — the modern
-city, the 1882 Plan Cadastral warping over it, its traced footprints, its validated OCR labels. It
-creates **its own** map and layer stores rather than the persisted globals; one that wrote to
-`layersStore` would rearrange the reader's /explore layer stack. `HeroSequence.svelte` beside it
-drives the cues on `setTimeout` and the fades on rAF (they shared one rAF loop until a throttled tab
-delayed the last cue). `HERO_SHEET` on the page carries `id` and a `view` of `{ bbox, rotation }`,
-and `HeroMap.fitSheet` derives the zoom from the stage's own size — one number cannot be right on a
-phone and a 27-inch screen at once. The `bbox` is **not** `maps.bbox`: that column is the
-georeferenced *mask*, while the layer draws the whole scan (paper edges, shelfmark, legend), which
-for this sheet runs 830 m further east — fit the column and the bottom is cropped. These are the
-scan's corners `(0,0)…(width,height)` through the annotation's transform. `rotation` holds the sheet
-square: this scan's x-axis runs north, so it is essentially a quarter turn, and /explore is where to
-find it for another sheet (⌘/ctrl-drag, then read `r` off `#@<lat>,<lng>,<zoom>z,<rotation>r`).
-`FIT_PAD` leaves 6% of the sheet's own size as margin on each side. The annotation URL is derived
-from `id` inside `HeroMap`, so changing which sheet plays is one uuid; the sheet has to be
-georeferenced **and** mirrored, since the demo plays our own copy. The sheet is hardcoded because it
-is the only one carrying all three layers. The Today/1882 opacity slider is `HeroDemo`'s, which is
-why `overlayOpacity` and `settled` are bindable props of `HeroMap` rather than its own state;
-⌘/ctrl-wheel zooms, there are no zoom buttons.
-
-Three more things keep the live map cheap once it does load. `MapShell` takes a `pixelRatio` prop
-and the demo pins it to **1** (at a Retina screen's own ratio OL asks for about four times the
-tiles). **The four beats play on every visit** — a `vma-hero-played-v1` session flag used to compose
-the final frame at once on a reload, and it is gone (Sept 2026) for the same reason as the sweep's
-flag: it handed a returning reader the conclusion with the reasoning cut out. Removing it left
-`HeroMap`'s `immediate` dead, so that and the `HeroSequence` prop it fed are deleted too, their
-branches folded into the `reduced` check that was always the real one — `prefers-reduced-motion`
-still composes the frame at once, and `HeroSequence` owns that check itself. And **the fabric is
-frozen**: `heroFabric.ts` is generated by `scripts/gen/gen-hero-fabric.mjs` and carries the sheet's
-footprints and labels as a module (5.9 kB gzipped) instead of a `/api/export/footprints` call and a
-Supabase query on every visit — `FootprintsLayer` takes it through a `featureCollection` prop and
-skips both the fetch and the un-warped filter the generator already applied, and the third and
-fourth captions quote `HERO_FOOTPRINT_COUNT` / `HERO_LABEL_COUNT` so the copy cannot drift from what
-is drawn. `tests/hero-fabric.spec.ts` is what fails if a regeneration comes back empty or in pixel
-coordinates.
-
-`FeaturedSheet` asks IIIF for the picker tiles at `/full/400,/`, not the stored `thumbnail` column's
-800 — the tiles are 132px wide, and five 800s were 715 kB of front page for five thumbnails.
-`atWidth()` there is the one place a IIIF size is rewritten; the plate still takes 1200.
-
-Every route lives in one of those two groups. There are **no redirect stub pages**. There is no
-`/hunt` or `/georef` route.
-
-### Modes
-
-| Route | Purpose | Source |
-|-------|---------|--------|
-| `/explore` | MapShell dispatcher | `src/routes/(app)/explore/` |
-| `/explore?mode=browse` | Browse maps, play stories | `src/lib/features/explore/ExplorePage.svelte` |
-| `/explore?mode=annotate` | Free-form annotation + timeline animation | `src/lib/features/annotate/` |
-| `/explore?mode=story` | Author stories | `src/lib/features/stories/editor/` |
-| `/scan` | ImageShell dispatcher — staff modes only, no default (Sept 2026); a request with no mode, or an unknown one, is redirected to `/catalog` by `hooks.server.ts`, and `?map=` becomes `/catalog/<id>`. The mode vocabulary both files read is `$lib/core/scanModes.ts` | `src/routes/(app)/scan/` |
-| `/scan?mode=inspect` | IIIF viewer, unlisted — drafts only | `src/lib/features/contribute/inspect/` |
-| `/scan?mode=prepare` | Layout · neatline · tile grid · save · queue OCR | `src/lib/features/contribute/digitalize/` |
-| `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
-| `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
-| `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
-| `/catalog` | Faceted catalog + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
-| `/contribute/georef` | Georeference via Allmaps Editor | `src/routes/(editorial)/contribute/georef/` |
-| `/admin?tab=` | Bulk upload · Scout · Status | `src/lib/features/admin/` |
-
 Code shared across the story lifecycle (markers, playback state, point ops) lives in
 `src/lib/features/stories/shared/`. All app modes except the IIIF-canvas contribute tools share
 MapShell + the map stores.
+
+### Page registers
+
+Four registers. The register decides the shell and the CSS.
+
+#### Editorial
+
+`/`, `/about`, `/blog`, `/blog/[slug]`, `/catalog`, `/contribute`, `/contribute/georef`, `/login`,
+`/profile`, `/admin?tab=bulk`, `/admin?tab=scout`.
+
+Nav and footer come from the group layout, so a page renders only its own body:
+
+```svelte
+<div class="page my-page" class:mounted>
+  <header class="editorial-hero">
+    <div class="hero-inner">
+      <div class="label-chip">Context label</div>
+      <h1 class="hero-title">Headline<br /><span class="text-highlight">key word.</span></h1>
+      <p class="hero-sub">Supporting sentence.</p>
+    </div>
+  </header>
+  <main class="editorial-main"><!-- .section-card blocks --></main>
+</div>
+```
+
+The shared classes (`.editorial-hero`, `.editorial-main`, `.section-card`, `.label-chip`,
+`.text-highlight`, `.action-btn`, `.pill-btn`, `.badge-chip`, `.chip-*`) live in
+`src/styles/components/editorial.css`, imported globally. **Do not redefine them per component** —
+add a modifier class or extend the sheet. Page-specific CSS goes in `src/styles/pages/<page>.css`.
+
+#### Geo-map tool
+
+`/explore`, `/explore?mode=studio`, `/explore?mode=story`, `/trip/[id]`.
+
+`src/lib/map/shell/MapWorkspace.svelte` is the shared base (§5). It composes `ToolLayout` +
+`MapShell` + `LayerRenderer` + `MapModeOverlays`. Never create a second OL map outside `MapShell`.
+
+#### IIIF-canvas tool
+
+`/scan`, `/scan?mode=prepare`, `/scan?mode=text`, `/scan?mode=shapes`, plus `NeatlineEditor` inside
+the admin modal.
+
+These use `ImageShell` (static image extent, pixel coordinates) and the shared sidebar frame
+`ToolSidebarShell` + `ToolMapPicker`. They do **not** use MapShell or the global map stores. CSS:
+`src/styles/layouts/tool-page.css` + `src/styles/components/sidebar.css` — one sidebar vocabulary,
+`.sb-*`. `components/tool-sidebar.css` held a second one (`.tool-*`) until Sept 2026; its last
+speaker was `TriageSidebar` and the sheet is gone.
+
+#### Admin
+
+Admin work happens inside the editorial register. Map CRUD is a modal rendered by `/catalog`; bulk
+and scout are ordinary editorial pages using `src/styles/pages/admin-bulk.css` and
+`admin-scout.css`, with modal chrome in `src/styles/components/admin-modals.css`. The old
+`layouts/admin.css` dashboard sheet was deleted — there is no `.dashboard` / `.top-bar` register any
+more.
+
+## 3. The map runtime
+
+### MapShell — central map pattern
+
+`src/lib/map/shell/MapShell.svelte` owns the single OpenLayers Map and is the entry point for all
+geo-map pages. It mounts basemap tile layers (`basemapLayers.ts`) and exposes everything via Svelte
+context (`src/lib/map/shell/context.ts`). Children call `getShellContext()` — never create a second
+OL map. Basemap *visibility* is owned by `LayerRenderer`, not MapShell.
+
+`src/lib/map/shell/LayerRenderer.svelte` is the single component that renders **all** map layers —
+base (modern tile OR historical warped) and overlays — by subscribing to `layersStore`. In
+side-by-side mode it hides overlays past index 0 so the left pane shows only the topmost;
+`DualMapPane.svelte` independently renders overlays[1] in the right pane.
+
+**One sync at a time, and only the newest one.** It holds two subscriptions, `layersStore` and
+`layerStore`, and both fire synchronously on subscribe — so two passes started in the same tick and
+both ran as far as the `await createWarpedLayer` inside, which is a dynamic import of 151 kB and
+therefore a very long window. Neither saw the other's entry in `overlayInstances`, so both created a
+layer, and the loser stayed attached to the OL map drawing forever. Measured on the 56-sheet
+Indochine series restored from localStorage: **every annotation fetched four times, 276 requests and
+712 kB** where 56 and 180 kB were wanted, plus three orphaned WebGL layers — and nothing in the
+console to say so, because both passes succeeded. `queueSync` is the fix: one pass runs, everything
+that arrives while it runs overwrites a single `pending` slot rather than queueing, so a slider
+dragged through twenty values costs the first pass and one more with the value it stopped on. Any
+new subscription that changes what is on the map goes through it, not straight to
+`syncBase`/`syncOverlays`.
+
+**Exception — `ImageShell.svelte`** (same dir): IIIF-canvas counterpart to MapShell for
+pixel-coordinate work. Creates an OL map with a static image extent, exposes via
+`getImageShellStore()` (`imageContext.ts`), binds `imgWidth`/`imgHeight`. Used by
+`/scan?mode=prepare`, `?mode=text`, `?mode=shapes`, by `NeatlineEditor`, and by
+`features/catalog/SheetZoom.svelte` on `/catalog/[id]` — none of them use MapShell or the global
+stores. `SheetZoom` is the only one on an editorial page, so it **imports ImageShell dynamically on
+the reader's click**: the record page is server-rendered for crawlers and most visits never zoom, so
+OpenLayers stays out of its first paint. It is also the answer to "just link the full image" — a
+level0 sheet 404s every size it did not mirror, `/full/max/` included, so the tiles are the only way
+to see it whole.
+
+**IIIF canvas coords:** OL uses `ol_y = -image_y` (y-flip). Tool components store bboxes image-space
+(y-down) and flip when creating OL geometries. `src/lib/core/geo/rectUtils.ts` owns the flip helpers
+(in `core` because `ImageShell` needs them too); `bboxHandles.ts` builds the shared handle features
+and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line tools (`TraceTool`,
+`ReviewTool`) flip inline.
+
+### Map stores (`src/lib/map/stores/`)
+
+- **layersStore** — single source of truth for what the map renders.
+  `{ base: LayerRef, overlays: OverlayLayer[] }` where `base` is either `{ kind: 'basemap', key }`
+  (`'g-streets' | 'g-archive' | 'g-satellite' | 'g-custom' | 'none'`) or
+  `{ kind: 'historical', mapId, allmapsId, name?, thumbnail? }`. `overlays` is top-of-stack-first;
+  each item has its own `opacity`, `visible`, and stable local `id`. There is no fixed overlay count limit. Hold and drag the three-dot layer menu to reorder, with a floating card and insertion marker; tapping opens actions and keyboard arrows also reorder. Order commits on release, and opacity sliders remain separate. Layer menus use the browser top layer and flip above cards near the viewport bottom.
+  Persists to `localStorage` as `vma-layers-v1`. API: `setBase`, `addOverlay`, `removeOverlay`,
+  `removeOverlayByMapId`, `setOpacity`, `setVisible`, `reorderOverlay`, `clearOverlays`,
+  `isOverlay`; plus the free functions `toHistoricalRef(map)`, `toggleOverlayFor(map)`, `clamp01(n)`
+  and the derived `topOverlay`.
+- **mapStore** — `{ lng, lat, zoom, rotation, activeMapId, activeAllmapsId }`. Default: Saigon
+  (106.70098, 10.77653) zoom 14. `activeMapId` is `maps.id` UUID and **is** mirrored from
+  `layersStore.topOverlay` — the bridge is wired in `src/lib/map/shell/geoMapSetup.ts`
+  (`topOverlay.subscribe → setActiveMap`). Kept for legacy callers: story playback, share links.
+  `activeAllmapsId` holds the annotation source string — either a bare Allmaps image ID or a full
+  annotation URL; `annotationUrlForSource()` (`src/lib/core/iiif/annotationUrl.ts`) accepts both.
+- **layerStore** — per-shell view settings: `{ basemap, viewMode, lensRadius, customBaseUrl }`. View
+  modes: `'overlay' | 'spy' | 'dual'` (UI labels: Stacked / Lens / Side-by-side). The side-by-side
+  split is fixed at 50/50; `sideRatio` was removed.
+- **urlStore** — bidirectional URL ↔ store sync. The hash carries **camera + basemap only**:
+  `#@lat,lng,zoomz,rotationr&base=key`. The selected map lives in the **`?map=<id>` query param** —
+  that is what /catalog, /scan?mode=prepare and every share link point at
+  (`src/lib/features/explore/exploreUrl.ts`). A `map=` found in the hash is a legacy link and is
+  migrated into `?map=` on init.
+
+Other persisted keys (there is no `vma-viewer-state-v1`): `vma-scout-view-v1`, `vma-catalog-view-v1`
+(list or grid), `vma-layers-v1`, `vma-story-player-v1`, `vma-story-library-v1`,
+`vma-annotation-projects-v1`, `vma-bounds-cache-v2`, `vma-custom-base-url`, `vma-thumb-cache-v1`,
+`vma-explore-{tour,welcome}-ack-v1`, `vma-create-saigon-seeded-v2`. Three are **gone** as of Sept
+2026 and should not come back: `vma-explore-sidebar-ratios-v2` (the left rail is tabs, not a
+splitter) and the two hero flags, `vma-hero-swept-v1` and `vma-hero-played-v1` — see the home-page
+section. Debounced persistence lives in `src/lib/core/utils/persistence/createPersistedStore.ts`;
+raw read/write in the sibling `storage.ts`.
+
+### Command palette — the one search
+
+`src/lib/features/shared/CommandPalette.svelte` is mounted once by the **root** layout, so it is on
+every page in both route groups. ⌘K / Ctrl+K anywhere, `/` outside a form field, or the Search
+button in `NavBar`. It searches four things through `/api/search`: **pages**
+(`paletteDestinations.ts`, role-gated), **maps**, **places** (the gazetteer) and **labels** (which
+open `/explore` at the spot).
+
+Open state is `src/lib/core/utils/commandPalette.ts` — a bare boolean store in `core` rather than
+beside the component, because `NavBar` is in `ui` and the layering rule bars `ui` from importing
+`features`. `src/lib/core/utils/placeKey.ts` is the client-side twin of Postgres's `place_key()`
+(mig 067), so a label on screen links straight to `/place/<slug>`; `tests/palette.spec.ts` guards
+that the two agree.
+
+### MapWorkspace contract
+
+`src/lib/map/shell/MapWorkspace.svelte` is the unified base for geo-map modes. `/explore`,
+`AnnotateMode` (the Studio) and `CreateMode` all build on it; new geo-map surfaces must use it rather than mounting
+`MapShell` directly.
+
+**Owns:** `ToolLayout` chrome (responsive workspace, sidebar resize, mobile drawer stack) ·
+`MapShell` + `LayerRenderer` + `MapModeOverlays` · the map-list fetch and bounds backfill
+(`useMapList`) · deriving `selectedMap` · forwarding view-mode changes to `layerStore` · the "Zoom
+to Map" prompt.
+
+**Does NOT own:** auth gates (the route page decides whether to render it) · mode-specific stores
+(story player, annotation project, story library) · URL parameter parsing (the route page reads
+params and seeds the stores).
+
+**Props:** `mapStore` and `layerStore` (created by `createGeoMapStores()` in the route page — that
+helper also wires the `topOverlay → mapStore.activeMapId` bridge), `supabase` (pass `null` to skip
+auto-load), `dualPaneActive`, sidebar width/max props for both sidebars.
+
+**Bind targets:** `shellMap`, `sidebarCollapsed`, `isMobile`, `isCompact`.
+
+**Slots:** `sidebar`, `right-sidebar`, `map-children` (rendered inside MapShell's default slot —
+GpsTracker, StoryMarkers, DrawTool, MapClickCapture, LegendPointsLayer), `dual-pane`, `map-overlay`,
+`floating`, `mobile-layers`, `mobile-controls`, `mobile-browse`, `mobile-sidebar` (legacy
+single-drawer fallback).
+
+**Events:** `mapsloaded` only. Overlay load/error state is handled internally by `MapModeOverlays`;
+there are no `overlayload*` events to wire.
+
+**Z-index scale** (`src/styles/layouts/mode-shared.css`) — follow it:
+
+| z | Element |
+|---|---------|
+| 0 | `.dual-container` |
+| 5–30 | in-map elements; `.lens-overlay` is 30 |
+| 50 | `.top-controls`, `.floating-controls` |
+| 95 | `.explore-mode .resolving`, `.explore-mode .gps-error` |
+| 100 | `.mobile-sidebar` |
+
+### Map libraries
+
+**Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
+
+**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
+Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.0,8.5,108.5,22.0`, z0–15) in
+the `vma-tiles` R2 bucket at key `basemap/vietnam-20260913.pmtiles`, served straight off the bucket
+at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to
+cache and no longer invoke the worker (PMTiles is nothing but byte-range reads, and the worker could
+not cache them: `cache.put()` rejects a 206). **The key carries the Protomaps build date on
+purpose**: the domain sits behind a cache rule with a long edge TTL, so a rebuild written over the
+same key would strand every reader on stale bytes. A new build is a new name and a new
+`BASEMAP_PMTILES_URL`; delete the old object only after the new one is deployed and drawing. The
+worker still answers `iiif.maparchive.vn/basemap/*` as a fallback. No API key, no quota, no
+third-party usage policy. `src/lib/map/basemapStyle.ts` holds the source and a deliberately quiet
+OpenLayers style over the Protomaps v4 schema (`earth`, `landcover`, `landuse`, `water`, `roads`,
+`buildings`, `boundaries`, `places`); it carries the rebuild commands. Predecessors, both abandoned:
+CARTO's keyless raster endpoint began stamping "API KEY REQUIRED" over every tile, and the OSM
+Foundation's own tiles have a usage policy that does not cover a busy site. `PUBLIC_PROTOMAPS_KEY`
+is gone from `.env.example` too — nothing read it and nothing needs it. The Saigon-only extract it
+replaced (37 MB, bbox `106.3,10.3,107.1,11.2`) left 21 of 40 georeferenced maps — every Huế and
+Hanoi sheet — on bare `earth` fill; `basemap/saigon.pmtiles` is still in the bucket, unreferenced.
+Rebuild with `scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload`. **Two archives,
+one style, one handoff at z8.** That extract stops at its own bbox, so zoomed out the neighbours
+were simply missing and the tile edge around Vietnam read as a hole punched in the page.
+`basemap/seasia-20260912.pmtiles` (28 MB, bbox `90,-13,132,32`, **z0–8**) is the same Protomaps
+build clipped wide and shallow: 40° of neighbouring country costs gigabytes at z15 and nothing at
+z8. `REGION_PMTILES_URL` draws for `zoom <= 8` and `BASEMAP_PMTILES_URL` for `zoom > 8` — OL's rule
+is `minZoom < zoom <= maxZoom`, so exactly one is ever live; both drawing at once would declutter
+Vietnam's labels twice and print them twice. Rebuild it with
+`scripts/pmtiles_extract.sh seasia 90,-13,132,32 8 --upload`. Both layers also paint `C.water` as
+their OL layer `background`, so anywhere past *either* bbox (west of 105.0° at z12, say) reads as
+sea rather than as the page's own black.
+
+**The 1960s topographic sheet (Series L7014) is no longer a second PMTiles archive.** The
+pre-tiled mosaic, `map/rasterSeries.ts`, `L7014_PMTILES_URL` and the raster renderer were retired
+2026-10-03 in `598fbe1b`. All 510 sheets are `maps` rows now and L7014 is an ordinary IIIF series,
+offered and warped like any other (below). The mosaic's build and datum traps are recorded in
+`scripts/l7014/README.md`.
+
+**A series does not have to be a mosaic.** The Indochine 1:25,000 survey of Tonkin and Thanh Hóa is
+56 ordinary `maps` rows warped live by Allmaps, offered as **one** stack row — a `SeriesRef` whose
+single part is `{ kind: 'sheets', collection }`, the second thing `layersStore.overlays`
+holds that is not a sheet. The trick that makes it affordable is
+that a `WarpedMapLayer` is a *set* of georeferenced maps rather than one:
+`addGeoreferenceAnnotationByUrl` is additive, so 56 sheets cost one OL layer, one z-index and one
+opacity instead of 56 of each, and no pipeline, no 4 GB archive and no rebuild — which is what let
+L7014 stop being pre-tiled. `loadSeriesInView` (`warpedOverlay.ts`) is the
+loader; `fetchSeriesSheets` (`data/maps/service.ts`) resolves `maps.collection` to annotation
+sources at render time, so the stored row is four short fields and a series that gains a sheet needs
+no re-add. **It loads the sheets the reader can see, and only those.** The renderer already draws
+nothing else — `loadMissingImagesInViewport` is @allmaps/render's own rule — but it cannot know a
+sheet exists until the annotation has been fetched and parsed, so the layer used to pay 56 round
+trips to draw the four sheets on screen. `fetchSeriesSheets` brings `maps.bbox` along, which answers
+that for nothing: measured on this series, a stack row parked over Saigon costs **0** requests, the
+same row at Hanoi z13 costs **5**, and only zooming out until the whole survey is on screen costs
+56. `moveend` tops the layer up with whatever has newly come into view — additive by construction,
+and a source already in `loaded` is never asked for twice, so panning back over a sheet is free.
+**Counting what arrived is the part that lies**: `addGeoreferenceAnnotationByUrl` resolves with
+`(string | Error)[]`, one entry per map in the annotation, so a sheet that fails to parse comes back
+*inside a fulfilled promise* and only a failed fetch rejects — count rejections alone and a
+half-drawn series reports itself complete, which looks exactly like a survey with gaps in it.
+`tests/series-load.spec.ts` pins both halves. The row is gated on `canSeeDrafts` in
+`ExploreBrowsePanel` only because these 56 sheets are still `draft`: the annotations are public in
+Storage but the `maps` rows are not, so an anonymous reader would resolve the series to nothing and
+get an empty layer. Drop the `draft` flag on the `SERIES` entry when the series is published — it is
+the only thing holding it back.
+
+**The series list is a database view, not a constant** (migration 082). `map_series` is one row per
+`maps.collection` that is a survey, and `/explore` renders whatever it returns — so a new series is
+a matter of ingesting sheets, not of editing a file and deploying. Three rules decide what
+qualifies, all of them read off the data rather than declared: the sheets carry a
+**`extra_metadata.sheet_number`** (which is what separates a survey from `Vietnam Map Archive`, the
+archive's catch-all bucket of 36 unrelated sheets at every scale — stacking those on one another is
+noise, and on the corpus the test draws the line exactly right: 62/62 Cartomundi rows and 15/15
+L7014 rows carry a number, 0/36 in the bucket do); there is **more than one** of them georeferenced
+with a `bbox`; and **this reader may see them**. `bounds` is the union of the sheets' own boxes and
+`sheets` counts only the visible ones — **distinct cells, not rows** (migration 084): three of the
+Indochine 1:25,000's cells are held in two editions each, so counting rows offered "56 sheets" over
+53, and two printings of a single sheet could qualify as a series on their own. 084 also left-joins
+`series_cells` (083) for `survey_sheets`, so the row reads "9 of 627 sheets" — what the survey
+contains, which `maps` cannot say because it holds only successes. What the view deliberately does
+**not** expose is how many cells reach a reader by *any* route (L7014's mosaic pixels counted
+until they were retired): the /explore row is a control, and it must say what it draws, not what
+the archive holds. The gate is spelled out in the view body rather than left to `security_invoker` — 081's
+lesson repeated, since a service-client caller bypasses RLS. Two consequences worth knowing: a
+wholly-draft survey has **no row at all** for an anonymous reader, which is why there is no `draft`
+flag in the UI (that was a fact about the data kept in the code, and it went stale the moment a
+sheet was published); and because the count is of rows *this* reader can see, a survey with one
+published sheet is not offered publicly at all — it appears when a second is published.
+`fetchMapSeries` reads it, `tests/write.spec.ts` asserts both halves of the gate against real
+Postgres. Every series is a database series now: the L7014 mosaic that used
+to be hardcoded beside them was retired on 2026-10-03 (`598fbe1b`). `buildSeriesRows`
+(`features/explore/seriesRows.ts`, `tests/series-rows.spec.ts`) turns each `map_series` row into
+**one row that is one layer** — a `SeriesRef` whose single part is the live-warped sheets — with one
+name, one opacity slider, one eye, one × and one of the ten stack slots. A stack saved earlier
+still holds the old rows: `readOverlayRef` drops a saved `raster` part, and `foldLegacyOverlays`
+folds the rest back into one row per survey and renames the retired `l7014` key (both in
+`map/stores/overlayKind.ts`, pinned by `tests/layer-stack.spec.ts`).
+
+**OpenLayers is the only map engine** (MapShell + ImageShell); `@allmaps/openlayers` warps
+historical tiles. MapLibre GL was removed (Aug 2026) along with `@allmaps/maplibre`,
+`@protomaps/basemaps` and `ol-mapbox-style`.
+
+**`@allmaps/openlayers` is loaded on demand, and `createWarpedLayer` is `async` for that reason
+alone.** It has exactly one runtime importer in the tree — `createWarpedLayer` in
+`src/lib/map/shell/warpedOverlay.ts`; every other mention (`LayerRenderer`, `DualMapPane`,
+`HeroSequence`, `warp.ts`) takes the type, which erases. Behind that one import sit
+`@allmaps/render`, `@allmaps/transform` and proj4: **151 kB gzipped, more than OpenLayers itself**,
+which a static import put in front of /explore's basemap whether or not the visitor ever put a
+historical sheet on the map. It is an `await import()` now, so it arrives with the first sheet and
+/explore's first load is ~321 kB gzipped instead of ~472 kB. The cost is that every caller awaits,
+and `DualMapPane`'s `onMount` had to become `async` and re-check `secondaryMap` after the await —
+the pane can now be torn down inside a round trip that did not exist before. Keep any new importer
+type-only, or the chunk goes back to being eager.
+
+## 4. Surfaces
 
 ### /explore sidebar + mobile pattern
 
@@ -543,6 +679,159 @@ mobile) — hidden on the primary via CSS. Map-bounds resolution goes through `r
 `src/lib/core/geo/mapBounds.ts` (`bounds → bbox → annotation_url → allmaps_id`) so R2-mirrored maps
 and `?map=<id>` deep-links both zoom correctly.
 
+`src/lib/features/explore/GpsDot.svelte` draws **where the reader is** — a headless OL point layer
+(halo at `inkAlpha(INK.blue, 0.18)` under a hard dot ringed in `INK.paper`, `zIndex` 55, static
+because a position is not an event). `GpsTracker` emitted fixes and `ExplorePage` moved the camera
+to the first one and worked out which sheets covered it, but nothing drew the spot, so "My location"
+answered *where am I* with a camera move and no marker. `FocusPulse` beside it (`zIndex` 60) now
+also fires on a **place pick**: `handlePickLocation` sets `focusPoint`, so a Nominatim hit and a
+legend row both get the ring instead of moving the camera and leaving the reader to guess which of
+the hundred things under the crosshair they asked for.
+
+### The home page
+
+**The home page's header is two still images with a slider between them, and the live map is a
+section further down** (Sept 2026). It used to be the header: every visitor paid for OpenLayers,
+ol-pmtiles, Allmaps and ~390 kB of basemap to look at scenery they had not asked for. Measured on
+the production build at 1440×900, the front page at rest is now **63 requests / ~0.9 MB**; scrolling
+to the demo adds **71 requests and 1.36 MB** on top, which is exactly what a reader who never
+scrolls no longer spends.
+
+`static/images/hero-now.webp` and `hero-1882.webp` (159 kB and 165 kB, both 1600×900) are the
+header: **Esri satellite imagery** underneath, the composed 1882 frame over it, and the Today/1882
+slider in the masthead column driving the top one's opacity. Two `<img>`s and a `bind:value` — no
+map, and the whole gesture the archive is about works with the page's first paint. The 1882 layer is
+the LCP element and takes `fetchpriority="high"`; the imagery underneath takes `low` and an empty
+`alt`, being the same picture in another state rather than a second picture. Because that imagery is
+on screen whenever the slider is off the 1882 end, `.hero-credit` carries its attribution in the
+corner — a still image has no OL attribution control to do it. Each still is served as a two-cut
+`srcset` at `sizes="100vw"` — the `-800.webp` twin beside it (72 kB and 54 kB) is what a phone
+takes, since the header is full-bleed and a 390px screen was being handed the whole 1600px frame for
+a third of the page's weight at rest. Both cuts come out of `gen-hero-still.mjs`; regenerate them
+together.
+
+**The base is satellite, not the vector streets** — `BASEMAP` in `HeroMap.svelte`, which is also
+what the live demo now draws. The streets style is deliberately quiet and at this zoom draws roads,
+water and nothing else, so the "today" end of the fade was a pale diagram beside a hand-coloured
+survey and the comparison the hero exists to make had one side missing. `HeroMap` mounts no
+`LayerRenderer` (that one is driven by the persisted `layersStore`, which a decorative map must not
+touch) and `createBasemapLayers` leaves visibility at its construction default, so the choice is
+applied by hand with `setVisibleBasemap` — moved out of `LayerRenderer` into `basemapLayers.ts` when
+the second caller appeared.
+
+**The header keeps showing what it does until someone takes the control.** `sweepHeroSlider()` on
+the page waits 1.1 s, then cycles `heroSheet` on rAF: 1.4 s down to 0.12, a 900 ms dwell on the
+imagery, 1.4 s back up, a 900 ms dwell on the sheet, repeat. The easing is `easeInOutCubic`, the
+curve the annotate-mode timeline already uses, so neither turn is a corner; `SWEEP_HOLD_MS` is the
+dwell, and without it the thing is a metronome and the two states it exists to compare never sit
+still long enough to be read.
+
+A slider nobody drags is a slider nobody knows is there, and this one is the archive's whole idea.
+It ran **once a tab** behind `vma-hero-swept-v1`, then **once per load**; both are gone (Sept 2026).
+The flag meant anyone who had already opened the front page in that tab never saw the gesture again
+— which is everyone testing it — and once-per-load meant anyone who looked away for four seconds
+missed it with no way to ask again. **Looping was requested explicitly, twice**, against the note
+that used to sit here saying not to; do not restore a single pass on the strength of a comment.
+
+Three parts are not up for simplification: it stops dead on the reader's first `pointerdown` or
+`keydown` on the slider and never restarts (a control that animates under a finger is fighting the
+person using it, and that first touch is the whole reason the loop exists); it never runs under
+`prefers-reduced-motion`; and `onMount(sweepHeroSlider)` returns the teardown that clears both the
+timer and the rAF, which matters more now the loop is unbounded. On WCAG 2.2.2 — moving content past
+five seconds needs a way to stop it — the slider *is* that mechanism: visible, obviously grabbable,
+and touching it ends the motion for good.
+
+Neither is a hand-made crop — `scripts/gen/gen-hero-still.mjs` drives the real demo section in
+Playwright and photographs it twice, so the two ends of the slider line up to the pixel (the 1882
+one doubles as the section's own poster while OL loads). They no longer match the live map below:
+the section was refitted to frame the whole sheet and **the header was deliberately left on the
+earlier pinned close-up**, so re-running the script replaces it with the wide view — a decision, not
+a repair. The two passes are separate page loads, and the `hero-now` one **aborts the annotation
+request on purpose**: `HeroSequence.start()` catches a failed overlay by parking at stage 0 and
+returning, so the sheet, footprints and labels never arrive and there is no 1.5-second window to
+race between "the basemap painted" and "the sheet starts fading in". **Re-run it whenever
+`HERO_SHEET` changes or the fabric is regenerated**, or the header advertises a frame the demo no
+longer opens on. Each shot is written twice, at 1600 and 800, and `HeroDemo` is handed the same
+`srcset` so a phone reuses the small cut rather than fetching the large one for the poster. It needs
+`vips` and `cwebp`, a dev server (or `HERO_BASE_URL`), and it hides the sticky `.top-nav` and OL's
+controls before shooting — the nav is sticky, so Playwright photographs it along with the map
+otherwise.
+
+`src/lib/features/explore/HeroDemo.svelte` is the section (`#how-it-works`, between the catalog and
+the band). **What plays by default is a clip, not the map** (Sept 2026).
+`scripts/gen/gen-hero-video.mjs` records the real section, so the clip is the same four beats — 699 kB
+at 1200px, 298 kB at 800px, against ~179 kB of JavaScript plus ~390 kB of basemap before OL draws a
+tile. It is cheaper than the thing it stands in for **and** it moves, which the frozen still did
+not: a reader who never got OpenLayers used to see one frame of the end state and none of the sheet
+arriving, which is the one thing the section exists to show. The live map is the **upgrade**, behind
+a *Try it yourself* button, because the clip cannot do the two things the copy promises — the
+Today/1882 slider and ⌘-scroll zoom. That button waits for the clip's `ended`, for the same reason
+the slider waits for `settled`: the clip burns its own captions along the bottom of the frame and
+the button sits in that slot, so offering it mid-clip put it on top of “46 plots and waterways,
+traced by hand”. A reader who never gets a clip at all — reduced motion, or metered — is offered it
+immediately instead, or the readers most likely to want a lighter page would lose the only route to
+the map. `tests/smoke.spec.ts` pins both: no canvas before the click, and the button hidden while
+the clip runs. Four gates now: the poster is the section's own content; `prefers-reduced-motion` or
+`isMeteredConnection()` (`$lib/core/utils/connection.ts`) stops there; otherwise an
+`IntersectionObserver` fetches the clip **400px** early; and `HeroMap.svelte` is dynamically
+imported only on the click. The clip is held at frame 0 until a second observer at the real viewport
+edge fires, and `play()` lives in a `$:` block rather than in that observer — both can fire in the
+same tick, and then `bind:this` has not run and the call reached `undefined`.
+
+The poster is **frame 0 of the clip**, written by the same script, so the still and the moving
+picture cannot disagree. It used to be `hero-1882.webp`, which is the header's pinned close-up while
+this section frames the whole sheet — and nothing ever took it down, so an enlarged 1882 sheet sat
+behind the live map, showing through every patch whose basemap tile had not landed. It now comes
+down on either `rolling` (the clip's own `playing` event) or `HeroMap`'s `painted` prop, which it
+sets from OpenLayers' `rendercomplete` — the first frame with every tile actually drawn.
+`rendercomplete` rather than a timer: a slow connection keeps its poster exactly as long as it needs
+one, and if neither event comes — no WebGL, tiles refused, a metered reader — the poster stays,
+which is right in all three cases. **Not a GIF:** the same nine seconds at 800px and 10 fps is 12.1
+MB as a GIF, 33× the H.264 of the same width. That margin is a fixed distance, not `100%` of the
+viewport: at one viewport of lead the section already intersected on load on a laptop, which is the
+entire cost the component exists to avoid. The stage is `aspect-ratio: 16/9` so nothing shifts when
+either the image or the map arrives.
+
+`HeroMap.svelte` mounts its own `MapShell` on an idle callback and plays four beats — the modern
+city, the 1882 Plan Cadastral warping over it, its traced footprints, its validated OCR labels. It
+creates **its own** map and layer stores rather than the persisted globals; one that wrote to
+`layersStore` would rearrange the reader's /explore layer stack. `HeroSequence.svelte` beside it
+drives the cues on `setTimeout` and the fades on rAF (they shared one rAF loop until a throttled tab
+delayed the last cue). `HERO_SHEET` on the page carries `id` and a `view` of `{ bbox, rotation }`,
+and `HeroMap.fitSheet` derives the zoom from the stage's own size — one number cannot be right on a
+phone and a 27-inch screen at once. The `bbox` is **not** `maps.bbox`: that column is the
+georeferenced *mask*, while the layer draws the whole scan (paper edges, shelfmark, legend), which
+for this sheet runs 830 m further east — fit the column and the bottom is cropped. These are the
+scan's corners `(0,0)…(width,height)` through the annotation's transform. `rotation` holds the sheet
+square: this scan's x-axis runs north, so it is essentially a quarter turn, and /explore is where to
+find it for another sheet (⌘/ctrl-drag, then read `r` off `#@<lat>,<lng>,<zoom>z,<rotation>r`).
+`FIT_PAD` leaves 6% of the sheet's own size as margin on each side. The annotation URL is derived
+from `id` inside `HeroMap`, so changing which sheet plays is one uuid; the sheet has to be
+georeferenced **and** mirrored, since the demo plays our own copy. The sheet is hardcoded because it
+is the only one carrying all three layers. The Today/1882 opacity slider is `HeroDemo`'s, which is
+why `overlayOpacity` and `settled` are bindable props of `HeroMap` rather than its own state;
+⌘/ctrl-wheel zooms, there are no zoom buttons.
+
+Three more things keep the live map cheap once it does load. `MapShell` takes a `pixelRatio` prop
+and the demo pins it to **1** (at a Retina screen's own ratio OL asks for about four times the
+tiles). **The four beats play on every visit** — a `vma-hero-played-v1` session flag used to compose
+the final frame at once on a reload, and it is gone (Sept 2026) for the same reason as the sweep's
+flag: it handed a returning reader the conclusion with the reasoning cut out. Removing it left
+`HeroMap`'s `immediate` dead, so that and the `HeroSequence` prop it fed are deleted too, their
+branches folded into the `reduced` check that was always the real one — `prefers-reduced-motion`
+still composes the frame at once, and `HeroSequence` owns that check itself. And **the fabric is
+frozen**: `heroFabric.ts` is generated by `scripts/gen/gen-hero-fabric.mjs` and carries the sheet's
+footprints and labels as a module (5.9 kB gzipped) instead of a `/api/export/footprints` call and a
+Supabase query on every visit — `FootprintsLayer` takes it through a `featureCollection` prop and
+skips both the fetch and the un-warped filter the generator already applied, and the third and
+fourth captions quote `HERO_FOOTPRINT_COUNT` / `HERO_LABEL_COUNT` so the copy cannot drift from what
+is drawn. `tests/hero-fabric.spec.ts` is what fails if a regeneration comes back empty or in pixel
+coordinates.
+
+`FeaturedSheet` asks IIIF for the picker tiles at `/full/400,/`, not the stored `thumbnail` column's
+800 — the tiles are 132px wide, and five 800s were 715 kB of front page for five thumbnails.
+`atWidth()` there is the one place a IIIF size is rewritten; the plate still takes 1200.
+
 ### Contribute tools
 
 **Shared (`src/lib/features/contribute/shared/`):** `ScanLeftRail.svelte` — **the left rail every
@@ -646,6 +935,8 @@ a few by hand, let the model do the rest, check what it did. `TracePage.svelte` 
 (`features/admin/StoryReviewPanel.svelte`). A story has no sheet and no canvas; it had been riding
 inside a pixel-coordinate tool it shared nothing with. `?mode=review&kind=stories` redirects there.
 
+## 5. Data
+
 ### Maps domain
 
 Canonical types live in **`src/lib/data/maps/`**:
@@ -703,119 +994,333 @@ map-selector source for `/scan?mode=prepare` and `?mode=shapes`.
 - `allmapsId.ts` — `deriveAllmapsId(iiifImageUrl)`.
 - `annotationUrl.ts` — `annotationUrlForSource(source)`: bare ID or full URL → annotation URL.
 
-### Map libraries
+### API route conventions
 
-**Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
+All API routes live under `src/routes/api/`. Every handler is
+`requireRole → adminClient → query → json`, built from `$lib/server`:
 
-**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
-Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.0,8.5,108.5,22.0`, z0–15) in
-the `vma-tiles` R2 bucket at key `basemap/vietnam-20260913.pmtiles`, served straight off the bucket
-at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to
-cache and no longer invoke the worker (PMTiles is nothing but byte-range reads, and the worker could
-not cache them: `cache.put()` rejects a 206). **The key carries the Protomaps build date on
-purpose**: the domain sits behind a cache rule with a long edge TTL, so a rebuild written over the
-same key would strand every reader on stale bytes. A new build is a new name and a new
-`BASEMAP_PMTILES_URL`; delete the old object only after the new one is deployed and drawing. The
-worker still answers `iiif.maparchive.vn/basemap/*` as a fallback. No API key, no quota, no
-third-party usage policy. `src/lib/map/basemapStyle.ts` holds the source and a deliberately quiet
-OpenLayers style over the Protomaps v4 schema (`earth`, `landcover`, `landuse`, `water`, `roads`,
-`buildings`, `boundaries`, `places`); it carries the rebuild commands. Predecessors, both abandoned:
-CARTO's keyless raster endpoint began stamping "API KEY REQUIRED" over every tile, and the OSM
-Foundation's own tiles have a usage policy that does not cover a busy site. `PUBLIC_PROTOMAPS_KEY`
-is gone from `.env.example` too — nothing read it and nothing needs it. The Saigon-only extract it
-replaced (37 MB, bbox `106.3,10.3,107.1,11.2`) left 21 of 40 georeferenced maps — every Huế and
-Hanoi sheet — on bare `earth` fill; `basemap/saigon.pmtiles` is still in the bucket, unreferenced.
-Rebuild with `scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload`. **Two archives,
-one style, one handoff at z8.** That extract stops at its own bbox, so zoomed out the neighbours
-were simply missing and the tile edge around Vietnam read as a hole punched in the page.
-`basemap/seasia-20260912.pmtiles` (28 MB, bbox `90,-13,132,32`, **z0–8**) is the same Protomaps
-build clipped wide and shallow: 40° of neighbouring country costs gigabytes at z15 and nothing at
-z8. `REGION_PMTILES_URL` draws for `zoom <= 8` and `BASEMAP_PMTILES_URL` for `zoom > 8` — OL's rule
-is `minZoom < zoom <= maxZoom`, so exactly one is ever live; both drawing at once would declutter
-Vietnam's labels twice and print them twice. Rebuild it with
-`scripts/pmtiles_extract.sh seasia 90,-13,132,32 8 --upload`. Both layers also paint `C.water` as
-their OL layer `background`, so anywhere past *either* bbox (west of 105.0° at z12, say) reads as
-sea rather than as the page's own black.
+| Helper | File | Purpose |
+|---|---|---|
+| `requireRole`, `getRole` | `server/auth.ts` | role gate; never trust a client-supplied role |
+| `adminClient` | `server/supabaseAdmin.ts` | service-key client (bypasses RLS) |
+| `assertUuid`, `dbError` | `server/http.ts` | 400 on a malformed id; no raw Postgres message reaches the client |
+| `pickMapFields` | `server/mapFields.ts` | the one allow-list of writable `maps` columns |
+| `uploadJson`, `uploadToIA` | `server/storage.ts`, `server/ia.ts` | Supabase Storage / Internet Archive |
+| `tally` | `server/facets.ts` | declarative facet counting for `/api/search` |
+| `getTransformer`, `allmapsAnnotationUrl` | `server/transformer.ts` | Allmaps warping server-side |
+| `probeAllmapsAnnotation`, `lookupAllmapsId` | `server/allmaps.ts` | georef probe + id derivation |
+| `bulkSetStatus`, `revertRecentValidations` | `server/ocrReview.ts` | OCR review write paths |
 
-**The 1960s topographic sheet (Series L7014) is no longer a second PMTiles archive.** The
-pre-tiled mosaic, `map/rasterSeries.ts`, `L7014_PMTILES_URL` and the raster renderer were retired
-2026-10-03 in `598fbe1b`. All 510 sheets are `maps` rows now and L7014 is an ordinary IIIF series,
-offered and warped like any other (below). The mosaic's build and datum traps are recorded in
-`docs/guides/pipelines.md`.
+Rules: accept JSON, return JSON — no form data. Admin routes re-check `profiles.role` in the
+handler; do not rely on RLS alone. The service key is `$env/static/private` and must never reach a
+component. The current route inventory is in `src/routes/CLAUDE.md`.
 
-**A series does not have to be a mosaic.** The Indochine 1:25,000 survey of Tonkin and Thanh Hóa is
-56 ordinary `maps` rows warped live by Allmaps, offered as **one** stack row — a `SeriesRef` whose
-single part is `{ kind: 'sheets', collection }`, the second thing `layersStore.overlays`
-holds that is not a sheet. The trick that makes it affordable is
-that a `WarpedMapLayer` is a *set* of georeferenced maps rather than one:
-`addGeoreferenceAnnotationByUrl` is additive, so 56 sheets cost one OL layer, one z-index and one
-opacity instead of 56 of each, and no pipeline, no 4 GB archive and no rebuild — which is what let
-L7014 stop being pre-tiled. `loadSeriesInView` (`warpedOverlay.ts`) is the
-loader; `fetchSeriesSheets` (`data/maps/service.ts`) resolves `maps.collection` to annotation
-sources at render time, so the stored row is four short fields and a series that gains a sheet needs
-no re-add. **It loads the sheets the reader can see, and only those.** The renderer already draws
-nothing else — `loadMissingImagesInViewport` is @allmaps/render's own rule — but it cannot know a
-sheet exists until the annotation has been fetched and parsed, so the layer used to pay 56 round
-trips to draw the four sheets on screen. `fetchSeriesSheets` brings `maps.bbox` along, which answers
-that for nothing: measured on this series, a stack row parked over Saigon costs **0** requests, the
-same row at Hanoi z13 costs **5**, and only zooming out until the whole survey is on screen costs
-56. `moveend` tops the layer up with whatever has newly come into view — additive by construction,
-and a source already in `loaded` is never asked for twice, so panning back over a sheet is free.
-**Counting what arrived is the part that lies**: `addGeoreferenceAnnotationByUrl` resolves with
-`(string | Error)[]`, one entry per map in the annotation, so a sheet that fails to parse comes back
-*inside a fulfilled promise* and only a failed fetch rejects — count rejections alone and a
-half-drawn series reports itself complete, which looks exactly like a survey with gaps in it.
-`tests/series-load.spec.ts` pins both halves. The row is gated on `canSeeDrafts` in
-`ExploreBrowsePanel` only because these 56 sheets are still `draft`: the annotations are public in
-Storage but the `maps` rows are not, so an anonymous reader would resolve the series to nothing and
-get an empty layer. Drop the `draft` flag on the `SERIES` entry when the series is published — it is
-the only thing holding it back.
+---
 
-**The series list is a database view, not a constant** (migration 082). `map_series` is one row per
-`maps.collection` that is a survey, and `/explore` renders whatever it returns — so a new series is
-a matter of ingesting sheets, not of editing a file and deploying. Three rules decide what
-qualifies, all of them read off the data rather than declared: the sheets carry a
-**`extra_metadata.sheet_number`** (which is what separates a survey from `Vietnam Map Archive`, the
-archive's catch-all bucket of 36 unrelated sheets at every scale — stacking those on one another is
-noise, and on the corpus the test draws the line exactly right: 62/62 Cartomundi rows and 15/15
-L7014 rows carry a number, 0/36 in the bucket do); there is **more than one** of them georeferenced
-with a `bbox`; and **this reader may see them**. `bounds` is the union of the sheets' own boxes and
-`sheets` counts only the visible ones — **distinct cells, not rows** (migration 084): three of the
-Indochine 1:25,000's cells are held in two editions each, so counting rows offered "56 sheets" over
-53, and two printings of a single sheet could qualify as a series on their own. 084 also left-joins
-`series_cells` (083) for `survey_sheets`, so the row reads "9 of 627 sheets" — what the survey
-contains, which `maps` cannot say because it holds only successes. What the view deliberately does
-**not** expose is how many cells reach a reader by *any* route (L7014's mosaic pixels counted
-until they were retired): the /explore row is a control, and it must say what it draws, not what
-the archive holds. The gate is spelled out in the view body rather than left to `security_invoker` — 081's
-lesson repeated, since a service-client caller bypasses RLS. Two consequences worth knowing: a
-wholly-draft survey has **no row at all** for an anonymous reader, which is why there is no `draft`
-flag in the UI (that was a fact about the data kept in the code, and it went stale the moment a
-sheet was published); and because the count is of rows *this* reader can see, a survey with one
-published sheet is not offered publicly at all — it appears when a second is published.
-`fetchMapSeries` reads it, `tests/write.spec.ts` asserts both halves of the gate against real
-Postgres. Every series is a database series now: the L7014 mosaic that used
-to be hardcoded beside them was retired on 2026-10-03 (`598fbe1b`). `buildSeriesRows`
-(`features/explore/seriesRows.ts`, `tests/series-rows.spec.ts`) turns each `map_series` row into
-**one row that is one layer** — a `SeriesRef` whose single part is the live-warped sheets — with one
-name, one opacity slider, one eye, one × and one of the ten stack slots. A stack saved earlier
-still holds the old rows: `readOverlayRef` drops a saved `raster` part, and `foldLegacyOverlays`
-folds the rest back into one row per survey and renames the retired `l7014` key (both in
-`map/stores/overlayKind.ts`, pinned by `tests/layer-stack.spec.ts`).
+### Data layer conventions
 
-**OpenLayers is the only map engine** (MapShell + ImageShell); `@allmaps/openlayers` warps
-historical tiles. MapLibre GL was removed (Aug 2026) along with `@allmaps/maplibre`,
-`@protomaps/basemaps` and `ol-mapbox-style`.
+**Map identity.** `maps.id` (UUID) is the canonical identifier everywhere — FK columns, URL params,
+component props. `maps.allmaps_id` is used only when calling Allmaps (annotation URLs, warped tile
+layers) and is never a join key. `mapStore.activeMapId` now holds the UUID and is mirrored from
+`layersStore.topOverlay`; the old `&map=` hash writer is gone and the deep-link param is
+`?map=<slug>` (the readable address since mig 088; a uuid or alias still resolves via `resolveMapRef`).
 
-**`@allmaps/openlayers` is loaded on demand, and `createWarpedLayer` is `async` for that reason
-alone.** It has exactly one runtime importer in the tree — `createWarpedLayer` in
-`src/lib/map/shell/warpedOverlay.ts`; every other mention (`LayerRenderer`, `DualMapPane`,
-`HeroSequence`, `warp.ts`) takes the type, which erases. Behind that one import sit
-`@allmaps/render`, `@allmaps/transform` and proj4: **151 kB gzipped, more than OpenLayers itself**,
-which a static import put in front of /explore's basemap whether or not the visitor ever put a
-historical sheet on the map. It is an `await import()` now, so it arrives with the first sheet and
-/explore's first load is ~321 kB gzipped instead of ~472 kB. The cost is that every caller awaits,
-and `DualMapPane`'s `onMount` had to become `async` and re-check `secondaryMap` after the await —
-the pane can now be torn down inside a round trip that did not exist before. Keep any new importer
-type-only, or the chunk goes back to being eager.
+**Client usage.** Browser: `getSupabaseContext()` → `{ supabase, session }`. Server: `adminClient()`
+from `$lib/server/supabaseAdmin`. Always pass the generic — `createClient<Database>(...)`. A bare
+`createClient(...)` is what forces `as any` casts downstream; about 25 remain.
 
+### Supabase types
+
+- `src/lib/data/supabase/types.ts` is current against migration head **116** (verified 2026-10-06: every 116 `maps`/`map_images` column is present; 115 only replaces a function body, so it changes no type. `edition` and `region` / `region_2025` added by hand 2026-10-05; the generator emits a different, older shape for this file, so a raw regenerate is not a zero-line diff; verified 2026-10-05:
+  106's `printing_id` and 107's `duplicate_of_map_id` / `archive_reason` are present; 108 changes
+  only a column default, which the types do not carry). Regenerate from the linked project after
+  every push; a zero-line diff after a hand edit is the cheapest confirmation it was right.
+  One trap if you reach for `--local` instead: the local stack image emits an older template and
+  churns ~30 unrelated lines of scaffolding that have nothing to do with the schema. Nothing
+  regenerates the file automatically — before 075 it still declared four tables long dropped.
+  Prefer the real types over `as any`; ~25 casts remain, mostly in Svelte components.
+- The generic belongs on the client: `createClient<Database>(...)`. A bare `createClient(...)` is
+  what forces most `as any` casts downstream.
+- Insert/Update payloads use `?:` optional fields, not `Partial<{...}>` (which resolves as `never`).
+- **Realtime is stubbed out of the browser bundle.** Nothing in `src/` calls `.channel()` or
+  `.subscribe()`, but `SupabaseClient`'s constructor builds a `RealtimeClient` regardless, and the
+  root layout builds a client on every route — so the phoenix + websocket stack was riding along on
+  the front page, the catalogue and the blog. `vite.config.ts` aliases `@supabase/realtime-js` to
+  `src/lib/data/supabase/realtimeStub.ts`, which satisfies the constructor and throws on anything
+  else. The root layout chunk went 65.3 kB → 48.4 kB gzipped (238 kB → 181 kB raw) on **every**
+  page. The alias needs an absolute path (`fileURLToPath`): a `/src/...` string builds fine but the
+  dev server's esbuild dep-optimiser reads it off the filesystem and dies with `Cannot read file`.
+  The day a real `.channel()` appears, the alias and the stub both come out.
+
+### The gazetteer key
+
+**One place, not one spelling.** The gazetteer (`place_names`) groups by **`core_key`** — the proper
+name with the generic word in front of it stripped (migration 081). `Rue Catinat` / `R. Catinat` /
+`Catinat` are one place, and so are `Khánh Hội` / `Village de Khanh-Hoi` / `Vge de Khánh Hồi`, which
+the command palette offered as three. Measured on the corpus: **2554 entries → 1796**, and since
+`press.ts` bills Gallica and the NLV **once per place** (every attested spelling becomes an OR
+clause in one CQL query, capped at 8), that is the same 30% off the outside-lookup bill. `name_key`
+stays the most-attested *spelling's* key, so the URL is still `/catalog/place/boulevard-charner`
+rather than `/charner`, and the loader resolves any variant's slug through `core_key` and 301s to
+the canonical one — every link minted before 081 still lands. The rule exists twice, in
+`place_core_key()` and in `placeCoreKey` (`$lib/core/utils/placeKey.ts`), because a label on screen
+links to its place page without a round trip; `tests/palette.spec.ts` reads the migration to pin the
+word list and `tests/write.spec.ts` asks the database itself, which is what caught Postgres's
+`unaccent` expanding `œ`→`oe` where NFD does not (`Rue Schrœder` keyed two ways, and its place page
+404'd). Two guards are corpus-learned, not reasoned: a stripped core under four characters is
+rejected (`Chợ Lớn` would become `lon`), and `Grand`/`Ancienne`/`Ngã` are deliberately **not**
+generic. Known ceiling: 47 groups merge across categories, so `Rạch Lò Gốm`, `Quai de Lò Gốm` and
+`Đường Bến Lò Gốm` share one page — usually right in Saigon, where the quay is named for the canal.
+081 also makes the view's published-only gate explicit
+(`m.status in (...) or auth.uid() is not null`): `security_invoker` is no gate at all for
+`/catalog/place/[name]` and `/api/search`, which read it on the service client, so a draft sheet was
+moving a public page's `mentions` and `years`.
+
+## 6. Components and styling
+
+### Component rules
+
+**Legacy Svelte syntax. Do not use runes.**
+
+```svelte
+<!-- correct -->
+export let value: string;
+$: derived = value.toUpperCase();
+const dispatch = createEventDispatcher();
+
+<!-- forbidden -->
+let value = $state('');
+let derived = $derived(value.toUpperCase());
+```
+
+- Parent → child: props. Child → parent: `createEventDispatcher`. Never two-way bind complex data.
+- Deep sharing: `setContext`/`getContext` — `getShellContext()`, `getImageShellStore()`,
+  `getSupabaseContext()`, `getAnnotationContext()`. Never prop-drill more than two levels.
+- `$:` for derived values only, and keep it under ~3 lines — extract a function past that. Never use
+  `$:` for async side effects; use `onMount` or an explicit call.
+- Always return a cleanup function from `onMount` when you add listeners.
+- Any component past ~400 lines is a smell. The Aug-2026 pass split every file over that line; the
+  largest survivor is 575.
+
+### Styling
+
+Everything shared lives in `src/styles/`, reached via the `$styles` alias. `global.css` imports
+`tokens.css` plus the always-on component sheets; layout and page sheets are imported by whoever
+needs them. The full file map and the token list are in `docs/guides/design-system.md`.
+
+**Token rule.** Never hardcode a colour, border or shadow in a component `<style>` block. Component
+CSS carries layout and positioning; everything visual goes through `var(--token)`.
+
+```css
+/* wrong */ border: 3px solid #111;
+/* right */ border: var(--border-thick);
+```
+
+The Aug-2026 sweep took component hex literals from ~900 to 116. The Sept-2026 plate-tone pass took
+the rest: canvas colours moved to `INK` in `src/lib/core/ink.ts` (an OpenLayers style is a draw call
+and cannot read a CSS variable), stale `var(--token, #old-value)` fallbacks became
+`var(--token, var(--other-token))`, and ink-at-alpha scrims became `color-mix`. Four literals
+survive in the tree and each says why where it sits: `ink.ts` itself, the offscreen analysis canvas
+in `suggestTriage.ts`, the Google logo paths, and `ReviewSidebar`'s cadastral class swatches.
+
+**One button system.** Every button is in `components/buttons.css` except `.sb-btn` (token-scoped).
+A component that needs a near-`.chip` adds the class and overrides `--btn-*`; it never rebuilds the
+shape, and it never redefines a global button class in its own `<style>` block — Svelte scoping
+makes that win silently.
+
+**Scoping.** `<style>` is component-scoped by default — use it freely for layout. Never redefine a
+shared global class per component. Use `:global()` only for third-party DOM (OL controls). Inline
+`style=` is for dynamic values only (`style="--sidebar-width: {w}px"`).
+
+### Component vocabulary
+
+**Two button names, two card sizes, one modifier vocabulary.** `.btn` is an action and `.chip` is a
+choice (a tab, a facet, a filter; `.is-on` when picked); both are the same pill and differ only in
+their `--btn-*` values. The modifiers are the ones `.sb-btn` / `.sb-pill` already used, so the
+editorial and sidebar scopes are one thing to learn: sizes `.is-xs` `.is-sm` `.is-lg`, tones
+`.is-primary` `.is-danger` `.is-success` `.is-ghost`, states `.is-on` `.is-block` `.is-icon`
+`.is-disabled`. `.is-icon` is one round shape at three sizes (48px map control · `.is-sm` card
+corner · `.is-xs` row toggle). **Twenty-seven selectors across nine families became eleven** in Sept
+2026: four tones were each spelled three ways (`.btn-primary` · `.chip.primary` ·
+`.action-btn.primary-btn`), `.action-btn` was a size, `.pill-btn` was lighter chrome and nothing
+else, `.btn-outline` was already the default, `.tool-btn` was `.sb-btn.is-sm` in a bar running on
+`--sb-*` anyway, and `.ctrl-btn` / `.btn-icon-*` / `.cmp-btn` were one shape at three sizes. Three
+private badges in `admin-modals.css` were `.badge-chip.is-sm` plus a tint. **`.section-card`** is
+the one card, padded by `--card-pad`, with `.is-sm` (a column of them) and `.is-link` (the whole
+card is a link, so it lifts); `.post-card`, `.subscribe-card`, `.sidebar-card` and `.profile-card`
+were it re-typed in four files. The ledgers are the headers of `buttons.css` and `Tabs.svelte`, and
+`tests/screens.spec.ts` fails if a retired name reappears.
+
+**One tab strip, two tones.** `$lib/ui/Tabs.svelte`. There were **five** — `ChunkyTabs` (`.chip` at
+page scale), `.admin-tabs` (the same `.chip` as links), `.tabs` in `MapEditModal` (the same `.chip`
+again, hand-written per tab), `.sb-rail-tabs` (`.sb-pill`, hand-written in both /explore rails) and
+`.phase-tabs` (a private face invented for the /scan sidebars, which is the slot `.sb-rail-tabs`
+already owned). Only one of the five said anything to a screen reader. `tone` picks the design
+system — `page` is the editorial `.chip`, `rail` the sidebar `.sb-pill` — because those are two
+palettes on purpose; what is shared is the markup, the API and the semantics, which had no reason to
+differ. **A row with an `href` makes the whole strip links** (`aria-current`, no `tablist`, since a
+tab that changes the URL is a link); without one it is a real `role="tablist"` with `aria-selected`.
+`tests/screens.spec.ts` fails if any of the three retired class names reappears.
+
+**One search field, three sizes.** `.sb-search` in `components/sidebar.css`, worn by both /explore
+rails, both /scan rails, the two table toolbars and **/catalog**; `.is-compact` is the toolbar size,
+where the field shares its row with a status select and a count, and `.is-page` the full width of an
+editorial page — same border, radius, parts and palette, only the padding, the type and the drop
+grow (to `--shadow-solid-xs`, which is what the `.data-table.is-card` under it casts). It was four
+designs until Sept 2026: `.shapes-search` in `shapes-table.css`, `.mo-search` in `modal.css` (a
+modal class that outlived its modal — its last wearer was `CatalogSidebarPanel`, and both it and
+`.shapes-search` are **deleted**), and /catalog's own 2.5px pill in the route's `<style>`, which was
+styled twice and lost every conflicting property to the scoped copy, so what reached the screen was
+a box-shadow *inside* the box. Named like `.sb-pill.is-compact`, which is the same relationship.
+
+**One table, one sort.** Every table is `$lib/ui/DataTable.svelte` — the scroll container, the
+`<table>` and its density (`table.css`), the `<thead>` built from a column list, and the `<tbody>`.
+**Rows are the caller's**, through the default slot, because the rows are the only part that ever
+differed; anything under the table (an empty state, a paging button) is the `after` slot. A blank
+column — a status dot, a thumbnail, an actions cell — is a column with `sortable: false` and an
+`srLabel`, not a hand-written `<th>` beside the loop, so a table's header is one list read in one
+place, order included. A sortable column is `$lib/ui/SortHeader.svelte` and the state behind it
+`$lib/core/utils/tableSort.ts`; `bind:sort` lets DataTable toggle it, and a table sorted by the
+**server** (`ScoutTable`, whose page holds 60 of 1037 rows) passes `sort` unbound and listens to the
+`sort` event instead. One catch: a caller's scoped CSS reaches its own `<tr>`/`<td>` but **not** the
+`<table>`/`<thead>`/`<th>` — those are DataTable's, so a rule keyed on one needs `:global()` inside
+a wrapper the caller owns (`.ct` in `CatalogTable`) or, better, a class on the cells. There were
+four hand-rolled versions of this until Sept 2026 — /catalog wrote five lines of caret markup per
+column, the scout queue and the two contribute sidebars concatenated a text arrow into the header
+string, and the state came in three shapes (`{key, asc}`, `{key, dir}`, two loose props). The header
+became `SortHeader` first; the fifteen lines of scaffolding around it stayed copied four times until
+`DataTable` took them. **None of the four was reachable from a keyboard and none set `aria-sort`**:
+a `<th>` with `on:click` is a label someone attached a handler to. The header is a real `<button>`
+now, and the indicator draws both carets with one lit, so a header does not change width when the
+direction flips. `tableSort.ts` is in `core` because the four tables are in four different features
+and a feature may not import another; it sorts decorate-sort-undecorate (the value function runs
+once per row, not once per comparison — `OcrSidebar`'s parses a regex), keeps blanks last in
+**both** directions, and collates `numeric` so `Rue 100` follows `Rue 11`.
+
+The numbered legend is one too: `features/shared/LegendTable.svelte` is `DataTable` with the legend's
+columns (№ · Name · Grid, and State in the staff tool), used by `SheetLegendPanel` on /explore and
+`LegendSidebar` on `/scan?mode=legend`. It sorts itself; the caller filters and searches. Until
+Oct 2026 both were hand-built `<ul>`s, so the two rails of the legend tool looked unrelated. A
+`<table class="data-table">` written by hand (SeriesManage, NeatlineEditor, BulkUploadPage did)
+is the same mistake the four sort headers were: use `DataTable`.
+
+**Styling:** all CSS in `src/styles/`, imported via the `$styles` alias. **One sidebar design
+system.** `src/styles/components/sidebar.css` owns it (`.sb-card`, `.sb-btn`, `.sb-pill`,
+`.sb-input`, …) and its `--sb-*` block is now nothing but views onto `tokens.css` — it used to be a
+second palette (`#fafaf7` ground, `#111` ink, `#2563eb` blue) set before the plate-tone pass, which
+is why the map-shell sidebars read cool and bright against a warm app. `layouts/tool-page.css`
+(`.panel`, `.panel-header`, `.bottom-bar` — position and size only) defers to the same `--sb-*`
+scale, so a panel on `/scan` and one on `/explore` share one border weight, one radius, one hover
+colour and one type scale. Canvas colours that OL paints come from `INK` / `inkAlpha` in
+`src/lib/core/ink.ts`, never a literal. Root entry is `src/styles/global.css`, which imports
+`tokens.css` plus the always-on component sheets; layout and page sheets are imported by the
+component or route that needs them. **Two themes, one value each.** `tokens.css` writes every ink as
+`light-dark(light, dark)` and picks by the used `color-scheme` — there is no second `[data-theme]`
+palette to drift out of step. `:root` carries `color-scheme: light dark` (follow the OS);
+`:root[data-theme='light'|'dark']` pins it, and that attribute is the only thing the toggle writes.
+`src/lib/core/utils/theme.ts` owns the choice (`light | dark` — two states, not three; the button in
+`NavBar` flips between them, stored raw under `vma-theme`) and exports `isDarkTheme`, derived from
+that choice alone. The OS is read once, by `matchMedia`, for a reader who has never chosen; after
+that the choice is pinned and an OS flip mid-session no longer moves the page. `src/app.html`
+replays the stored value before first paint, so a reader on dark never sees a light flash. A new
+colour needs both faces; `tests/theme.spec.ts` asserts the contrast of each.
+
+Four things do not simply flip:
+
+- **`--color-text-on-yellow`** never changes. `--color-yellow` is the one surface that stays light
+  in both themes, so its ink is always the dark one.
+- **`--color-on-accent`** flips the *other way* from the page: blue, green, red and purple are dark
+  inks carrying paper-coloured text in light, and the dark theme lifts all four into light surfaces
+  that need dark text. `color: var(--color-white)` on an accent fill is the bug this replaces.
+- **`.on-ink-plate`** (`editorial.css`) is the mirror: the footers, the About CTA and the contact
+  card are painted with the text ink and carry paper type, and *both* halves of that pair flip — so
+  at night the slab inverted into a bright band and its ochre links sat on paper at 1.8:1. Pinned,
+  they keep the appearance they were designed with. A filled *state* (`.chip.active`,
+  `.sb-pill.is-on`, a hovered row) is the opposite case and should keep flipping: it only has to
+  read as filled.
+- **`.on-light-plate`** (`editorial.css`) pins the whole palette to its light face for a subtree,
+  and the yellow heroes use it. Without it a `.hero-sub` card inside a hero takes the dark card
+  stock while inheriting the plate's dark ink — a dark box on a bright yellow field. The light faces
+  are named `--light-ink` / `--light-paper` / … in `tokens.css` so pinning needs no hex.
+
+The OpenLayers basemap is painted, not styled, so `basemapStyle.ts` carries its own `LIGHT` and
+`DARK` palettes and subscribes to `isDarkTheme`; the same reason `core/ink.ts` exists for annotation
+colours. Warped historical sheets keep their own ink in both themes — they are photographs of paper.
+`.mirror-cmd`'s console and `--is-canvas-*` in `mode-shared.css` are pinned dark on purpose.
+Component `<style>` blocks carry layout/positioning; every colour, border and shadow goes through a
+`var(--token)`. New pages use the template in `docs/guides/design-system.md`; nav and footer come once from
+`src/routes/(editorial)/+layout.svelte`, so a new editorial page only needs the links added in
+`src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`.
+
+**The top bar is two tiers.** `Catalog · About · Blog` sit in the bar itself; every tool is behind
+one `Tools ▾` menu, which also carries the staff rows (`/scan?mode=shapes&tab=validate` and
+`/admin?tab=status` for mod, `/screens` for admin) and ends with `All pages → /directory`. The staff
+rows need a role, and `ui` may not import `data`, so `(editorial)/+layout.svelte` resolves it once
+with `fetchUserRole` and passes `role` to `NavBar` — the same reason `CommandPalette` gets it from
+the root layout.
+
+### Fonts
+
+**The fonts are self-hosted.** `src/styles/fonts.css` carries the `@font-face` rules and
+`static/fonts/` the twelve woff2 files (212 kB on disk; a page fetches the three or four subsets it
+actually uses). They came from `fonts.googleapis.com` until Sept 2026: a render-blocking stylesheet
+on one third-party origin pointing at files on another, so two DNS lookups, two TLS handshakes and
+an extra round trip stood between the HTML and the first painted word — which is what the two
+`preconnect` hints in `app.html` were paying for, and both are gone with them. Only **latin,
+latin-ext and vietnamese** are kept; Google served cyrillic and greek too, and no page has ever
+asked for them. `unicode-range` is verbatim from Google's CSS, so a browser still fetches only what
+a page needs, and `app.html` preloads the two that are on every page above the fold
+(`inter-400-800-latin`, `be-vietnam-pro-800-latin`). Regenerate by re-fetching that CSS with a
+modern user agent, keeping the three subsets and rewriting the URLs. Inter is still **a variable
+axis** (`wght@400..800`) — one file per subset rather than four static cuts; Be Vietnam Pro has no
+variable build, so it stays static at 600/700/800. The Google Translate widget that used to sit
+there is **gone**: ~100 kB of third-party script on every page for a control that never rendered
+(`autoDisplay: false`, hidden mount point). Do not reintroduce it without a visible language switch
+to justify it.
+
+### Navigation and page state
+
+Nav and footer render once from the group layout. To add a public page: create the route under
+`(editorial)/`, add the link to `src/lib/ui/NavBar.svelte` and `src/lib/ui/EditorialFooter.svelte`,
+add a row to `paletteDestinations.ts`, and add it to the route table in §2.
+
+Editorial pages use a mount fade-in:
+
+```svelte
+<script lang="ts">
+  let mounted = false;
+  onMount(() => { mounted = true; });
+</script>
+<div class="page" class:mounted>…</div>
+```
+
+Async data shows a skeleton or spinner **inside** the content area — the hero and nav are visible
+immediately.
+
+## 7. Roles and known debt
+
+### Roles and access
+
+| Role | Access |
+|------|--------|
+| logged out | public read: explore, catalog, blog, about, trip playback |
+| `user` | contribute: georeference, trace footprints, digitalize, author stories |
+| `mod` | + review/approve footprints, OCR review, map metadata, scout |
+| `admin` | + create/delete maps, publish, bulk upload, pipeline control |
+
+Role lives in `profiles.role`, read on the client via `fetchUserRole` (`data/supabase/role.ts`) and
+enforced server-side by `requireRole`. `/contribute` shows the review and admin cards only to `mod`
+/ `admin`.
+
+---
+
+### Known debt
+
+| Item | Location | Fix |
+|------|----------|-----|
+| 32 `as any` casts (counted 2026-10-06) | the export route, `map/shell` and the catalog components | pass `<Database>` to `createClient` at each call site |
+| `footprints.ts` mixes two concerns | `data/supabase/footprints.ts` holds both map-selector queries and footprint CRUD | split into `maps/labelMaps.ts` + a contribute-scoped module |
+| Mixed error conventions | throw vs `console` → `[]` vs `console` → `false` across `data/` | pick one |
+| Mobile gaps in contribute | `OcrSidebar` bind/`on:filter` and the Segmentation tab are desktop-only (carried from the Aug 2026 cleanup, not re-verified since) | decide whether these tools are desktop-only by design, then either say so or fix |
+| `/scan?mode=inspect` may be dead weight | `features/contribute/inspect/` duplicates what `/catalog/[id]` does since 7.3, drafts included | check whether the tool map picker is the only thing it still offers, then delete it and drop the mode from `core/scanModes.ts` — roadmap, *Open after 7.3* |
+| Fat page components | `ExplorePage.svelte` (**431** script lines, up from 336) and `DigitalizePage.svelte` (**434**, up from the 263 it was cut to when the layout job left in Sept 2026) are controllers, not wiring. Both grew back past the point the extraction bought, which is the argument for doing it as a controller module rather than as a one-off trim (recounted 2026-10-06 at HEAD, `<script>` block including its tags). The Sept 2026 route merge moved them out of `src/routes` into `features/`, which fixed where they live, not how big they are | pull into `features/<x>/<x>Controller.ts` when next touching them — the `ocrReviewController.ts` / `layoutJob.ts` pattern |

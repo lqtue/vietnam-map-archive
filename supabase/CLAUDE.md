@@ -28,14 +28,19 @@ Root context: `/CLAUDE.md`. Table-by-table reference and the rule behind each co
 
 ## Adding a migration
 
-**Production head is 119** (pushed 2026-10-08). Local files past it may be unpushed —
-`supabase migration list` is the truth, not this line. Each migration's own header is its record:
+The production head is in the root `CLAUDE.md`. Local files past it may be unpushed —
+`supabase migration list` is the truth. Each migration's own header is its record:
 what it does, why, and the deploy order it needs. Read the header, not a summary here.
 
-Drop `supabase/migrations/NNN_*.sql` one past the head, `supabase db push`, then regenerate types:
+**A new table starts as a term in `docs/ontology.md`**: what it is, its layer, where it lives.
+Write the term first, then the migration; CI fails while a table has no term.
+
+Drop `supabase/migrations/NNN_*.sql` one past the head, `supabase db push`, then regenerate types
+to a temp file and copy the new block into `src/lib/data/supabase/types.ts` by hand (see below):
 
 ```bash
-supabase gen types typescript --linked 2>/dev/null > src/lib/data/supabase/types.ts
+supabase gen types typescript --linked 2>/dev/null > /tmp/vma-types.ts
+diff /tmp/vma-types.ts src/lib/data/supabase/types.ts   # reconcile, then:
 npm run check
 ```
 
