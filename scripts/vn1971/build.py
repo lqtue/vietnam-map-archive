@@ -1,4 +1,5 @@
 """build.py TAG MAP_ID -> annotations/<MAP_ID>.json (thin-plate spline, neatline mask) + allmaps/maskTAG.png.
+PROVINCE=1 uses the mask in work/vn1971/province/NN.json (from province_mask.py) and writes <MAP_ID>.province.json instead.
 Store it with georef_write.mjs --method utm-grid (see store.sh); nothing is sent from here."""
 import sys,os,json,urllib.request,numpy as np
 from PIL import Image,ImageDraw
@@ -57,12 +58,15 @@ mask=[[L,T],[R,T],[R,B],[L,B]]
 POLY=os.environ.get('MASKPOLY',OVR.get('poly'))
 if POLY:  # vertices read off a preview of the scan; MASKSCALE = scan px per preview px
     k_=float(os.environ.get('MASKSCALE',OVR.get('scale',1)));mask=[[float(a)*k_,float(b)*k_] for a,b in (p.split(',') for p in POLY.split(';'))]
+PROV=os.environ.get('PROVINCE')  # province_mask.py output saved as work/vn1971/province/NN.json; written beside the stored annotation, never over it
+if PROV:mask=json.load(open(S+f'province/{tag}.json'))
 print(tag,W,H,'mask',mask,'grid',xs[0],xs[-1],ys[0],ys[-1])
 from lib.georef_annotation import annotation
 os.makedirs(S+'annotations',exist_ok=True)
 ann=annotation(base,W,H,[((q['px'][0],q['px'][1]),tuple(q['lonlat'])) for q in g],mask,{"type":"thinPlateSpline"},ndigits=1)
-json.dump(ann,open(S+f'annotations/{mid}.json','w'),indent=1)
+sfx='.province' if PROV else ''
+json.dump(ann,open(S+f'annotations/{mid}{sfx}.json','w'),indent=1)
 p=img.resize((1600,int(1600*H/W)));d=ImageDraw.Draw(p);k=1600/W
 d.polygon([(x*k,y*k) for x,y in mask],outline=(255,0,0),width=3)
 for q in g:d.ellipse([q['px'][0]*k-3,q['px'][1]*k-3,q['px'][0]*k+3,q['px'][1]*k+3],fill=(0,0,255))
-p.save(S+f'allmaps/mask{tag}.png')
+p.save(S+f'allmaps/mask{tag}{sfx}.png')
