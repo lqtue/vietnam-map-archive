@@ -13,12 +13,14 @@
   const { supabase } = getSupabaseContext();
   const dispatch = createEventDispatcher<{
     inspectMap: { mapId: string; tab: 'info' | 'legend' };
+    findHere: { lng: number; lat: number };
   }>();
   let position: { x: number; y: number; lng: number; lat: number } | null = null;
   let candidates: MapListItem[] = [];
   let loading = false;
   let failure = false;
   let request = 0;
+  let copyLabel = 'Copy lat, lon';
   let menu: HTMLElement;
   let previousFocus: HTMLElement | null = null;
   function close() {
@@ -31,6 +33,21 @@
     dispatch('inspectMap', { mapId, tab });
     close();
   }
+  // Same "lat, lng" order the search box reads back, so a copied spot can be pasted straight in.
+  async function copyCoordinates() {
+    if (!position) return;
+    try {
+      await navigator.clipboard.writeText(`${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`);
+      copyLabel = 'Copied';
+    } catch {
+      copyLabel = 'Could not copy';
+    }
+  }
+  function findHere() {
+    if (!position) return;
+    dispatch('findHere', { lng: position.lng, lat: position.lat });
+    close();
+  }
   async function open(event: MouseEvent) {
     const olMap = $map;
     if (!olMap) return;
@@ -40,6 +57,7 @@
     const [lng, lat] = toLonLat(coordinate);
     const current = ++request;
     previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    copyLabel = 'Copy lat, lon';
     position = { x: event.clientX, y: event.clientY, lng, lat };
     candidates = [];
     loading = true;
@@ -144,6 +162,10 @@
         </div>
       </div>
     {/each}
+    <div class="actions">
+      <button class="sb-btn" on:click={findHere}>Find all maps here</button>
+      <button class="sb-btn" on:click={copyCoordinates}>{copyLabel}</button>
+    </div>
   </section>
 {/if}
 
@@ -165,6 +187,7 @@
     background: var(--color-white);
   }
   .menu-heading,
+  .actions,
   .candidate > div {
     display: flex;
     gap: 0.5rem;
