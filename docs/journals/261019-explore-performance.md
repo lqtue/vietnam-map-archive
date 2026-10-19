@@ -49,7 +49,9 @@ shared desktop/mobile requests, sparse timeline alignment, and no full-catalog q
 The series loader's 23 checks include 250 distant pans, eviction/reload and late disposal.
 The retention limit was soft (every visible sheet stayed drawable), so a whole-series view
 could still load hundreds of scans. It is now hard: when a series has more sheets in view
-than its share of the budget (64, or 24 under 900 px, split across the series in view),
+than its share of the budget (64, or 24 under 900 px, split across the series in view), or
+when its sheets are under 20% of the viewport wide (so a 44-sheet series and a 5,000-sheet one
+both show outlines when zoomed out),
 `seriesRenderer.ts` draws sheet footprints as vectors, makes no scan requests and destroys
 the Allmaps renderer; zooming in brings it back (`seriesRenderPolicy.ts`). Three browser
 checks (`tests/browser/series-overview.spec.ts`: a 5,000-sheet series, four series, mobile)

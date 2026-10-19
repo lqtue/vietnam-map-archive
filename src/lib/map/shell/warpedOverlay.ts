@@ -40,12 +40,41 @@ export function loadedSheetEdges(map: Map, source: string): number[][][] {
  * basemap drew, whether or not they ever put a historical sheet on the map.
  * Now it arrives with the first sheet.
  */
+type ImageInfoLoader = { loadMissingImagesInViewport(): Promise<void>[] };
+
+/**
+ * Installed Allmaps WebGL2Renderer.render discards this method's promises.
+ * Observe those exact requests so map eviction's expected AbortError is handled;
+ * return the original promises so callers that await them retain failure semantics.
+ */
+export function observeImageInfoLoads(
+  renderer: ImageInfoLoader,
+  report: (error: unknown) => void = (error) =>
+    console.error('[Allmaps] Image information failed:', error)
+): void {
+  const load = renderer.loadMissingImagesInViewport.bind(renderer);
+  renderer.loadMissingImagesInViewport = () => {
+    const requests = load();
+    for (const request of requests) {
+      void request.catch((error: unknown) => {
+        if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError')
+          return;
+        report(error);
+      });
+    }
+    return requests;
+  };
+}
+
 export async function createWarpedLayer(
   map: Map,
   opts: { zIndex?: number; name?: string } = {}
 ): Promise<WarpedMapLayer> {
   const { WarpedMapLayer } = await import('@allmaps/openlayers');
   const layer = new WarpedMapLayer();
+  // Upstream marks this method protected, but its WebGL renderer drops the
+  // promises it creates. Keep the version-specific compatibility shim here.
+  observeImageInfoLoads(layer.renderer as unknown as ImageInfoLoader);
   layer.setZIndex(opts.zIndex ?? 10);
   layer.setProperties({ name: opts.name ?? 'allmaps-overlay' });
 
@@ -112,12 +141,27 @@ function clearBeforeEachFrame(layer: WarpedMapLayer): void {
  * Detaches a WarpedMapLayer from the map.
  */
 export function destroyWarpedLayer(layer: WarpedMapLayer): void {
+  if (destroyedLayers.has(layer)) return;
+  destroyedLayers.add(layer);
+  invalidateSeriesLoads(layer);
   const owner = ownerByLayer.get(layer);
   if (owner) layersByMap.get(owner)?.delete(layer);
   ownerByLayer.delete(layer);
-  idsBySource.delete(layer);
+  // Free every already-parsed map's GL textures/VAOs now. Annotation fetches
+  // cannot be aborted, so only their minimal parser/context survives until idle.
+  const ids = new Set([
+    ...(layer.getMapIds?.() ?? []),
+    ...[...(idsBySource.get(layer)?.values() ?? [])].flat(),
+  ]);
   const cast = layer as unknown as { setMap?: (m: unknown) => void };
   cast.setMap?.(null);
+  for (const id of ids) layer.removeGeoreferencedMapById(id);
+  idsBySource.delete(layer);
+  // Abort image fetches immediately while non-abortable annotation requests
+  // finish. The installed renderer destroy path omits its sprite tile cache.
+  layer.renderer?.tileCache?.clear();
+  layer.renderer?.spritesTileCache?.clear();
+  disposeIfIdle(layer);
 }
 
 // ── Load overlay ─────────────────────────────────────────────────
@@ -135,21 +179,26 @@ export async function loadOverlayByUrl(
   opacity = 0.8
 ): Promise<void> {
   // Clear any previous overlay
-  layer.clear();
+  invalidateSeriesLoads(layer);
+  clearLayerMaps(layer);
   idsBySource.get(layer)?.clear();
 
-  const url = annotationUrlForSource(source);
-  const added = await layer.addGeoreferenceAnnotationByUrl(url);
-  idsBySource.get(layer)?.set(
-    source,
-    added.filter((id): id is string => typeof id === 'string')
-  );
-
-  // Apply opacity directly on the layer (same as TripTracker)
-  (layer as any).setOpacity(opacity);
-
-  // Force repaint — without this the tiles won't appear
-  map.render();
+  const generation = layerGeneration.get(layer) ?? 0;
+  startLayerRequest(layer);
+  try {
+    const added = await layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(source));
+    const ids = added.filter((id): id is string => typeof id === 'string');
+    if (destroyedLayers.has(layer) || (layerGeneration.get(layer) ?? 0) !== generation) {
+      const retained = new Set([...(idsBySource.get(layer)?.values() ?? [])].flat());
+      for (const id of ids) if (!retained.has(id)) layer.removeGeoreferencedMapById(id);
+      return;
+    }
+    idsBySource.get(layer)?.set(source, ids);
+    layer.setOpacity(opacity);
+    map.render();
+  } finally {
+    finishLayerRequest(layer);
+  }
 }
 
 /**
@@ -180,7 +229,139 @@ export type SeriesSheetSource = {
 };
 
 /** Incremental loader state for one series layer. */
-export type SeriesLoad = { sheets: SeriesSheetSource[]; loaded: Set<string> };
+export type SeriesLoad = {
+  sheets: SeriesSheetSource[];
+  loaded: Set<string>;
+  /** When supplied by the overview/detail manager, this is a hard admission budget. */
+  admitted?: Set<string>;
+};
+
+// Shared across series and overlapping moveend calls, so adding another layer
+// cannot multiply the browser's annotation request budget.
+export const SERIES_REQUEST_LIMIT = 6;
+/** Soft source budget: every visible sheet is protected, even in a wide overview. */
+export const SERIES_CACHE_LIMIT = 64;
+const SERIES_RETRY_DELAY_MS = 30_000;
+type SeriesRuntime = {
+  pending: Set<string>;
+  retryAfter: globalThis.Map<string, number>;
+  box: [number, number, number, number] | null;
+  view: [number, number, number, number] | null;
+  recent: globalThis.Map<string, number>;
+  visible: Set<string>;
+  offscreen: Set<string>;
+  clock: number;
+  generation: number;
+};
+const seriesRuntime = new WeakMap<SeriesLoad, SeriesRuntime>();
+const layerGeneration = new WeakMap<WarpedMapLayer, number>();
+const destroyedLayers = new WeakSet<WarpedMapLayer>();
+const disposedLayers = new WeakSet<WarpedMapLayer>();
+const requestsByLayer = new WeakMap<WarpedMapLayer, number>();
+
+/** Replace a series admission set and immediately release no-longer-selected maps. */
+export function retainSeriesSources(
+  layer: WarpedMapLayer,
+  state: SeriesLoad,
+  sheets: SeriesSheetSource[]
+): void {
+  state.sheets = [...sheets];
+  state.admitted = new Set(sheets.map((sheet) => sheet.source));
+  const runtime = seriesRuntime.get(state);
+  const sources = idsBySource.get(layer);
+  const evictedIds = new Set<string>();
+  for (const source of state.loaded) {
+    if (state.admitted.has(source)) continue;
+    for (const id of sources?.get(source) ?? []) evictedIds.add(id);
+    sources?.delete(source);
+    state.loaded.delete(source);
+    runtime?.recent.delete(source);
+    runtime?.retryAfter.delete(source);
+    runtime?.visible.delete(source);
+    runtime?.offscreen.delete(source);
+  }
+  const retainedIds = new Set([...(sources?.values() ?? [])].flat());
+  for (const id of evictedIds) if (!retainedIds.has(id)) layer.removeGeoreferencedMapById(id);
+  // Pending work checks admission before it starts and after a fetch settles.
+  // Do not clear pending: re-admitting a source must share its existing request.
+}
+
+function disposeIfIdle(layer: WarpedMapLayer): void {
+  if (!destroyedLayers.has(layer) || disposedLayers.has(layer) || requestsByLayer.get(layer))
+    return;
+  disposedLayers.add(layer);
+  // Allmaps dispose destroys GPU resources, tile caches, its worker and ResizeObserver.
+  // Wait for non-abortable annotation fetches to settle before destroying their renderer.
+  layer.dispose?.();
+}
+
+function startLayerRequest(layer: WarpedMapLayer): void {
+  requestsByLayer.set(layer, (requestsByLayer.get(layer) ?? 0) + 1);
+}
+
+function finishLayerRequest(layer: WarpedMapLayer): void {
+  requestsByLayer.set(layer, (requestsByLayer.get(layer) ?? 1) - 1);
+  disposeIfIdle(layer);
+}
+
+/** Evict oldest offscreen sources; nearby padded sheets are refreshed on each pan. */
+function trimSeriesCache(
+  layer: WarpedMapLayer,
+  state: SeriesLoad,
+  runtime: SeriesRuntime
+): boolean {
+  if (state.loaded.size <= SERIES_CACHE_LIMIT) return false;
+  if (!runtime.offscreen.size) return false;
+  const sources = idsBySource.get(layer);
+  const candidates = [...runtime.offscreen].sort(
+    (a, b) => (runtime.recent.get(a) ?? 0) - (runtime.recent.get(b) ?? 0)
+  );
+  let removed = false;
+  for (const source of candidates) {
+    if (state.loaded.size <= SERIES_CACHE_LIMIT) break;
+    const ids = sources?.get(source) ?? [];
+    sources?.delete(source);
+    const retained = new Set([...(sources?.values() ?? [])].flat());
+    // The public removal path destroys the map's GL textures/VAOs and aborts image
+    // loads. Renderer viewport pruning separately bounds CPU tiles (100 delayed).
+    for (const id of ids) if (!retained.has(id)) layer.removeGeoreferencedMapById(id);
+    state.loaded.delete(source);
+    runtime.recent.delete(source);
+    runtime.offscreen.delete(source);
+    removed = true;
+  }
+  return removed;
+}
+let activeSeriesRequests = 0;
+const seriesQueue: (() => Promise<void>)[] = [];
+
+function invalidateSeriesLoads(layer: WarpedMapLayer): void {
+  layerGeneration.set(layer, (layerGeneration.get(layer) ?? 0) + 1);
+}
+
+function drainSeriesQueue(): void {
+  while (activeSeriesRequests < SERIES_REQUEST_LIMIT && seriesQueue.length) {
+    const job = seriesQueue.shift()!;
+    activeSeriesRequests += 1;
+    void job().finally(() => {
+      activeSeriesRequests -= 1;
+      drainSeriesQueue();
+    });
+  }
+}
+
+function scheduleSeriesRequest<T>(work: () => Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    seriesQueue.push(async () => {
+      try {
+        resolve(await work());
+      } catch (error) {
+        reject(error);
+      }
+    });
+    drainSeriesQueue();
+  });
+}
 
 function intersects(
   a: [number, number, number, number],
@@ -208,25 +389,16 @@ const SERIES_VIEWPORT_PAD = 1.5;
  * reason a live-warped series is affordable at all; the alternative is the
  * pre-tiled mosaic L7014 needs, which is 4 GB and a pipeline.
  *
- * Additive is also what makes this callable again on every `moveend`: `loaded`
- * is the set of sources already in the layer, so panning fetches only what has
- * newly come into view and nothing is ever fetched twice. Sheets are never
- * removed — an annotation already parsed costs nothing to keep, and the
- * renderer draws only what is on screen regardless.
+ * Successful sources and pending requests are tracked separately. A later pan
+ * retries failed sources after a cooldown, without a timer retrying indefinitely.
+ * Queued work checks the latest viewport before starting; requests already sent
+ * cannot be aborted by Allmaps. A missing bbox still loads unconditionally.
+ * Retain at most 64 sources after long pans, except currently visible sheets:
+ * overview rendering stays complete and may exceed this soft budget. Padded
+ * neighbors are favored over older offscreen sheets. Evicted sources can reload.
  *
- * A sheet with no bbox is loaded unconditionally: not knowing where something is
- * is not a reason to hide it, and it is the one case where the old behaviour was
- * the right one.
- *
- * Annotations are fetched together and failures counted rather than thrown: one
- * sheet whose annotation 404s should cost the reader that sheet, not the
- * series. The count comes back so the caller can say so.
- *
- * Counting them is less obvious than it looks. `addGeoreferenceAnnotationByUrl`
- * resolves with `(string | Error)[]` — one entry per georeferenced map in the
- * annotation — so a sheet that fails to parse comes back *inside* a fulfilled
- * promise rather than as a rejection. Only a fetch that throws rejects. Both
- * have to be counted, or a half-empty series reports itself complete.
+ * Counts include Error entries returned by Allmaps as well as rejected fetches.
+ * Partially parsed annotations retain their valid maps and are not re-added.
  */
 export async function loadSeriesInView(
   layer: WarpedMapLayer,
@@ -235,42 +407,103 @@ export async function loadSeriesInView(
   view: [number, number, number, number] | null,
   opacity = 0.8
 ): Promise<{ loaded: number; failed: number }> {
-  const box = view ? pad(view, SERIES_VIEWPORT_PAD) : null;
-  const wanted = state.sheets.filter(
-    (s) => !state.loaded.has(s.source) && (!box || !s.bbox || intersects(s.bbox, box))
-  );
-
-  (layer as any).setOpacity(opacity);
-  if (!wanted.length) return { loaded: 0, failed: 0 };
-
-  // Claimed before the await, so a second moveend inside the round trip does
-  // not ask for the same sheets again.
-  for (const s of wanted) state.loaded.add(s.source);
-
-  const results = await Promise.allSettled(
-    wanted.map(async (s) => {
-      const added = await layer.addGeoreferenceAnnotationByUrl(annotationUrlForSource(s.source));
-      idsBySource.get(layer)?.set(
-        s.source,
-        added.filter((id): id is string => typeof id === 'string')
-      );
-      return added;
-    })
-  );
-
-  let loaded = 0;
-  let failed = 0;
-  for (const r of results) {
-    if (r.status === 'rejected') failed += 1;
-    else
-      for (const entry of r.value) {
-        if (entry instanceof Error) failed += 1;
-        else loaded += 1;
-      }
+  if (destroyedLayers.has(layer)) return { loaded: 0, failed: 0 };
+  let runtime = seriesRuntime.get(state);
+  if (!runtime) {
+    runtime = {
+      pending: new Set(),
+      retryAfter: new globalThis.Map(),
+      box: null,
+      view: null,
+      recent: new globalThis.Map(),
+      visible: new Set(),
+      offscreen: new Set(),
+      clock: 0,
+      generation: layerGeneration.get(layer) ?? 0,
+    };
+    if (!idsBySource.has(layer)) idsBySource.set(layer, new globalThis.Map());
+    seriesRuntime.set(state, runtime);
   }
+  const current = runtime;
+  current.box = view ? pad(view, SERIES_VIEWPORT_PAD) : null;
+  current.view = view;
+  const generation = layerGeneration.get(layer) ?? 0;
+  if (current.generation !== generation) {
+    state.loaded.clear();
+    current.recent.clear();
+    current.retryAfter.clear();
+    current.generation = generation;
+  }
+  const valid = () =>
+    !destroyedLayers.has(layer) && (layerGeneration.get(layer) ?? 0) === generation;
+  const admitted = (s: SeriesSheetSource) => !state.admitted || state.admitted.has(s.source);
+  const inView = (s: SeriesSheetSource) =>
+    !current.box || !s.bbox || intersects(s.bbox, current.box);
 
-  map.render();
-  return { loaded, failed };
+  current.visible = new Set();
+  for (const sheet of state.sheets) {
+    if (!view || !sheet.bbox || intersects(sheet.bbox, view)) current.visible.add(sheet.source);
+    if (state.loaded.has(sheet.source) && inView(sheet))
+      current.recent.set(sheet.source, ++current.clock);
+  }
+  current.offscreen = new Set([...state.loaded].filter((source) => !current.visible.has(source)));
+  const evicted = trimSeriesCache(layer, state, current);
+  layer.setOpacity(opacity);
+  const jobs: Promise<{ loaded: number; failed: number }>[] = [];
+  for (const s of state.sheets) {
+    if (!admitted(s) || state.loaded.has(s.source) || current.pending.has(s.source) || !inView(s))
+      continue;
+    if ((current.retryAfter.get(s.source) ?? 0) > Date.now()) continue;
+    current.pending.add(s.source);
+    jobs.push(
+      scheduleSeriesRequest(async () => {
+        let started = false;
+        try {
+          if (!valid() || !admitted(s) || !inView(s)) return { loaded: 0, failed: 0 };
+          startLayerRequest(layer);
+          started = true;
+          const added = await layer.addGeoreferenceAnnotationByUrl(
+            annotationUrlForSource(s.source)
+          );
+          const ids = added.filter((id): id is string => typeof id === 'string');
+          if (!valid() || !admitted(s)) {
+            // The request cannot be aborted, but its late result must not restore
+            // a cleared/destroyed overlay. Keep any ID a newer load already owns.
+            const retained = new Set([...(idsBySource.get(layer)?.values() ?? [])].flat());
+            for (const id of ids) if (!retained.has(id)) layer.removeGeoreferencedMapById(id);
+            return { loaded: 0, failed: 0 };
+          }
+          if (ids.length) {
+            idsBySource.get(layer)?.set(s.source, ids);
+            state.loaded.add(s.source);
+            current.retryAfter.delete(s.source);
+            current.recent.set(s.source, ++current.clock);
+            if (!current.visible.has(s.source)) current.offscreen.add(s.source);
+            trimSeriesCache(layer, state, current);
+          } else {
+            current.retryAfter.set(s.source, Date.now() + SERIES_RETRY_DELAY_MS);
+          }
+          return { loaded: ids.length, failed: added.length - ids.length || (ids.length ? 0 : 1) };
+        } catch {
+          if (!valid() || !admitted(s)) return { loaded: 0, failed: 0 };
+          current.retryAfter.set(s.source, Date.now() + SERIES_RETRY_DELAY_MS);
+          return { loaded: 0, failed: 1 };
+        } finally {
+          current.pending.delete(s.source);
+          if (started) finishLayerRequest(layer);
+        }
+      })
+    );
+  }
+  const results = await Promise.all(jobs);
+  if ((jobs.length || evicted) && valid()) map.render();
+  return results.reduce(
+    (total, result) => ({
+      loaded: total.loaded + result.loaded,
+      failed: total.failed + result.failed,
+    }),
+    { loaded: 0, failed: 0 }
+  );
 }
 
 // ── Opacity ──────────────────────────────────────────────────────
@@ -284,9 +517,17 @@ export function setOverlayOpacity(layer: WarpedMapLayer, map: Map, opacity: numb
   map.render();
 }
 
-export function clearOverlay(layer: WarpedMapLayer, map?: Map): void {
-  idsBySource.get(layer)?.clear();
+/** The installed Allmaps clear drops its list without destroying each map's GL state. */
+function clearLayerMaps(layer: WarpedMapLayer): void {
+  const ids = layer.getMapIds?.() ?? [...(idsBySource.get(layer)?.values() ?? [])].flat();
+  for (const id of new Set(ids)) layer.removeGeoreferencedMapById(id);
   layer.clear();
+}
+
+export function clearOverlay(layer: WarpedMapLayer, map?: Map): void {
+  invalidateSeriesLoads(layer);
+  clearLayerMaps(layer);
+  idsBySource.get(layer)?.clear();
   map?.render();
 }
 
