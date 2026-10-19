@@ -473,7 +473,10 @@ migration is required for this rendering change.
 intersect the viewport: 24 for a map narrower than 900 CSS pixels, 64 otherwise. Every visible
 source, including ones with unknown bounds, must fit its allocation before detail is admitted.
 Otherwise the complete view stays in coverage mode; imagery is never silently truncated.
-Nearby padding fills only unused capacity. Hysteresis prevents repeated mode changes at the
+One size rule applies to every series, whatever its sheet count: when the median visible sheet
+is narrower than 20% of the viewport (`MIN_SHEET_VIEW_SHARE`, about 200 px on a 1000 px map), the
+series stays in coverage mode. A 44-sheet series and a 5,000-sheet one therefore both show
+outlines at a whole-series view. Nearby padding fills only unused capacity. Hysteresis prevents repeated mode changes at the
 boundary. Standalone explicitly selected sheets are separate from this series budget, and source
 count is not an exact RAM-byte budget.
 

@@ -11,6 +11,12 @@ export type SeriesRenderingChoice = {
   unknownCount: number;
 };
 
+/**
+ * A sheet narrower than this share of the viewport is too small to read, so every series
+ * shows footprints there, whatever its sheet count (about 200 px on a 1000 px map).
+ */
+export const MIN_SHEET_VIEW_SHARE = 0.2;
+
 export function seriesRenderingBudget(mobile: boolean): number {
   return mobile ? 24 : 64;
 }
@@ -83,7 +89,15 @@ export function chooseSeriesRendering(
   // Enter overview above capacity; leave only with spare room to avoid repeated transitions
   // around a sheet boundary. Small allocations keep their useful single-sheet capacity.
   const resumeLimit = previousMode === 'overview' && limit >= 5 ? Math.floor(limit * 0.8) : limit;
-  if (!limit || required.length > resumeLimit)
+  const widths = required
+    .flatMap((candidate) =>
+      candidate.priority === 1 ? [candidate.sheet.bbox![2] - candidate.sheet.bbox![0]] : []
+    )
+    .sort((a, b) => a - b);
+  const median = widths[Math.floor(widths.length / 2)];
+  const minShare = previousMode === 'overview' ? MIN_SHEET_VIEW_SHARE * 1.25 : MIN_SHEET_VIEW_SHARE;
+  const tooSmall = median !== undefined && median < minShare * width;
+  if (!limit || required.length > resumeLimit || tooSmall)
     return { mode: 'overview', sources: [], visibleCount, unknownCount };
   const nearby = values
     .filter((candidate) => candidate.priority === 2)

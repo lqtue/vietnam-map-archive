@@ -46,9 +46,9 @@ test('unknown or invalid bounds consume capacity rather than disappearing', () =
 });
 
 test('padding stays within allocation and favors the nearest sources', () => {
-  const near: SeriesSheetSource = { id: 'near', source: 'near', bbox: [10.1, 0, 10.2, 1] };
-  const far: SeriesSheetSource = { id: 'far', source: 'far', bbox: [12, 0, 12.1, 1] };
-  const result = chooseSeriesRendering([sheet(0), far, near], [0, 0, 10, 1], 2);
+  const near: SeriesSheetSource = { id: 'near', source: 'near', bbox: [4.5, 0, 5.5, 1] };
+  const far: SeriesSheetSource = { id: 'far', source: 'far', bbox: [9, 0, 9.1, 1] };
+  const result = chooseSeriesRendering([sheet(0), far, near], [0, 0, 4, 1], 2);
   expect(result.mode).toBe('detail');
   expect(result.sources.map((value) => value.source)).toEqual(['0', 'near']);
 });
@@ -82,10 +82,26 @@ test('multiple visible series share one desktop or mobile annotation budget', ()
 });
 
 test('hysteresis avoids alternating overview and detail at capacity', () => {
-  const local = sheets.slice(0, 10);
-  expect(chooseSeriesRendering(local, [0, 0, 20, 1], 10, 'detail').mode).toBe('detail');
-  expect(chooseSeriesRendering(local, [0, 0, 20, 1], 10, 'overview').mode).toBe('overview');
-  expect(chooseSeriesRendering(local, [0, 0, 14.5, 1], 10, 'overview').mode).toBe('detail');
+  // Stacked printings of one cell: many sources, each wide enough to read.
+  const stack = (n: number) =>
+    Array.from({ length: n }, (_, i): SeriesSheetSource => ({
+      id: `${i}`,
+      source: `${i}`,
+      bbox: [0, 0, 5, 1],
+    }));
+  expect(chooseSeriesRendering(stack(10), [0, 0, 20, 1], 10, 'detail').mode).toBe('detail');
+  expect(chooseSeriesRendering(stack(10), [0, 0, 20, 1], 10, 'overview').mode).toBe('overview');
+  expect(chooseSeriesRendering(stack(8), [0, 0, 20, 1], 10, 'overview').mode).toBe('detail');
+});
+
+test('sheets too small for the viewport show footprints whatever the series size', () => {
+  // The same rule for a 3-sheet series as for a 5000-sheet one.
+  const few = [sheet(0), sheet(2), sheet(4)];
+  expect(chooseSeriesRendering(few, [0, 0, 10, 1], 64).mode).toBe('overview');
+  expect(chooseSeriesRendering(few, [0, 0, 5, 1], 64).mode).toBe('detail');
+  // Leaving overview needs a little more than entering detail does.
+  expect(chooseSeriesRendering(few, [0, 0, 5, 1], 64, 'overview').mode).toBe('overview');
+  expect(chooseSeriesRendering(few, [0, 0, 4, 1], 64, 'overview').mode).toBe('detail');
 });
 
 test('duplicate annotation sources count once and retain their visible representative', () => {
