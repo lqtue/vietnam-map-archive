@@ -267,6 +267,12 @@
       tourOpen = true;
     }
   }
+  // Right-click "Find all maps here": the All tab's coverage list, pointed at the clicked spot.
+  function handleFindHere(e: CustomEvent<{ lng: number; lat: number }>) {
+    void runtime.locate([e.detail.lng, e.detail.lat]);
+    sidebarTab = 'all';
+    if (isMobile) openDrawer = 'browse';
+  }
   function requestTour() {
     if (shouldShowTour()) tourPending = true;
   }
@@ -626,7 +632,11 @@
     </svelte:fragment>
 
     <svelte:fragment slot="map-children">
-      <ExploreMapContextMenu {mapList} on:inspectMap={handleInspectMap} />
+      <ExploreMapContextMenu
+        {mapList}
+        on:inspectMap={handleInspectMap}
+        on:findHere={handleFindHere}
+      />
       <GpsTracker
         active={gpsActive && gpsAllowed}
         on:position={handleGpsPosition}
