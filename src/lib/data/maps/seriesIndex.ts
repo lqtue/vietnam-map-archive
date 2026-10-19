@@ -17,6 +17,7 @@ import type { Database } from '$lib/data/supabase/types';
 import { fetchMapSeries } from './service';
 import type { SeriesTally } from './seriesSheets';
 import { readAll } from '$lib/data/supabase/paged';
+import { queryError } from '$lib/data/supabase/queryError';
 
 export interface SeriesIndexEntry {
   key: string;
@@ -42,12 +43,7 @@ export interface SeriesIndexEntry {
    * country-sized layer is one corner of it.
    */
   bounds: [number, number, number, number];
-  /**
-   * The survey's own index, tallied: what it contains, and how each cell
-   * stands. The status rule is `sheetStatus`, called rather than re-spelled —
-   * a second copy of "held_by, else source, else nothing" is a signal that
-   * drifts silently, and the number it produces looks right either way.
-   */
+  /** Public availability tallied by the role-aware database summary. */
   index: SeriesTally;
 }
 
@@ -65,16 +61,24 @@ export async function fetchSeriesIndex(
     { data: coverage, error: coverageError },
     { data: availability, error: availabilityError },
   ] = await Promise.all([
-    supabase.from('series_cell_coverage').select('key,publicly_held_cell_count'),
-    supabase
-      .from('series_printing_availability')
-      .select('key,item_linked_printing_count,printing_count'),
+    readAll((from, to) =>
+      supabase
+        .from('series_index_summary')
+        .select('key,total,held,obtainable,no_scan')
+        .order('key')
+        .range(from, to)
+    ),
+    readAll((from, to) =>
+      supabase
+        .from('series_printing_availability')
+        .select('key,item_linked_printing_count,printing_count')
+        .order('key')
+        .range(from, to)
+    ),
   ]);
-  if (coverageError) console.error('series cell coverage:', coverageError);
-  if (availabilityError) console.error('series printing availability:', availabilityError);
-  const publicCellsByKey = new Map(
-    (coverage ?? []).map((row) => [row.key ?? '', row.publicly_held_cell_count ?? 0])
-  );
+  if (coverageError) throw queryError('Series index summary', coverageError);
+  if (availabilityError) throw queryError('Series printing availability', availabilityError);
+  const publicCellsByKey = new Map((coverage ?? []).map((row) => [row.key ?? '', row.held ?? 0]));
   const availabilityByKey = new Map(
     (availability ?? []).map((row) => [
       row.key ?? '',
@@ -85,29 +89,18 @@ export async function fetchSeriesIndex(
     ])
   );
 
-  // Per-cell counts come from the role-aware derived view. Legacy held_by and
-  // map_id snapshots are ignored; a source-item reference only makes a cell
-  // obtainable when the view confirms an institution item exists.
-  const { data: cells, error: cellError } = await readAll((from, to) =>
-    supabase
-      .from('series_cell_coverage_detail')
-      .select('key,sheet_number,publicly_held,known_source')
-      .order('key')
-      .order('sheet_number')
-      .range(from, to)
+  // The database returns one tally per series, never the complete cell index.
+  const held = new Map<string, SeriesTally>(
+    (coverage ?? []).map((row) => [
+      row.key ?? '',
+      {
+        total: row.total ?? 0,
+        held: row.held ?? 0,
+        obtainable: row.obtainable ?? 0,
+        no_scan: row.no_scan ?? 0,
+      },
+    ])
   );
-  if (cellError) console.error('series cell coverage detail:', cellError);
-  const held = new Map<string, SeriesTally>();
-  for (const c of cells ?? []) {
-    const k = c.key ?? '';
-    if (!k) continue;
-    const t = held.get(k) ?? { total: 0, held: 0, obtainable: 0, no_scan: 0 };
-    t.total += 1;
-    if (c.publicly_held) t.held += 1;
-    else if (c.known_source) t.obtainable += 1;
-    else t.no_scan += 1;
-    held.set(k, t);
-  }
 
   return series.map((s) => {
     const index = held.get(s.key) ?? { total: 0, held: 0, obtainable: 0, no_scan: 0 };

@@ -16,7 +16,7 @@ export default defineConfig({
   testDir: 'tests',
   // write.spec.ts has its own config: it needs a local Supabase and a seeded user.
   testIgnore: pureOnly
-    ? ['write.spec.ts', 'smoke.spec.ts', 'catalog-series.spec.ts']
+    ? ['write.spec.ts', 'smoke.spec.ts', 'catalog-series.spec.ts', 'browser/**']
     : 'write.spec.ts',
   timeout: 30_000,
   fullyParallel: true,
@@ -33,7 +33,7 @@ export default defineConfig({
       ? undefined
       : {
           command: 'npm run dev',
-          url: 'http://localhost:5173',
+          url: 'http://localhost:5173/explore',
           reuseExistingServer: true,
           timeout: 120_000,
         },

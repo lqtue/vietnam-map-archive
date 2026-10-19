@@ -462,33 +462,39 @@ pre-tiled mosaic, `map/rasterSeries.ts`, `L7014_PMTILES_URL` and the raster rend
 offered and warped like any other (below). The mosaic's build and datum traps are recorded in
 `scripts/l7014/README.md`.
 
-**A series does not have to be a mosaic.** The Indochine 1:25,000 survey of Tonkin and Thanh Hóa is
-56 ordinary `maps` rows warped live by Allmaps, offered as **one** stack row — a `SeriesRef` whose
-single part is `{ kind: 'sheets', collection }`, the second thing `layersStore.overlays`
-holds that is not a sheet. The trick that makes it affordable is
-that a `WarpedMapLayer` is a *set* of georeferenced maps rather than one:
-`addGeoreferenceAnnotationByUrl` is additive, so 56 sheets cost one OL layer, one z-index and one
-opacity instead of 56 of each, and no pipeline, no 4 GB archive and no rebuild — which is what let
-L7014 stop being pre-tiled. `loadSeriesInView` (`warpedOverlay.ts`) is the
-loader; `fetchSeriesSheets` (`data/maps/service.ts`) resolves `maps.collection` to annotation
-sources at render time, so the stored row is four short fields and a series that gains a sheet needs
-no re-add. **It loads the sheets the reader can see, and only those.** The renderer already draws
-nothing else — `loadMissingImagesInViewport` is @allmaps/render's own rule — but it cannot know a
-sheet exists until the annotation has been fetched and parsed, so the layer used to pay 56 round
-trips to draw the four sheets on screen. `fetchSeriesSheets` brings `maps.bbox` along, which answers
-that for nothing: measured on this series, a stack row parked over Saigon costs **0** requests, the
-same row at Hanoi z13 costs **5**, and only zooming out until the whole survey is on screen costs
-56. `moveend` tops the layer up with whatever has newly come into view — additive by construction,
-and a source already in `loaded` is never asked for twice, so panning back over a sheet is free.
+**A series uses coverage at overview scales and live warping up close.** One `SeriesRef` owns
+one renderer controller (`seriesRenderer.ts`), resolving its source identities and bounds through
+`fetchSeriesSheets`. A dense overview draws sheet bounds in one vector feature and creates no
+Allmaps renderer or image requests. The notice explains that scans appear on zoom-in; these
+rectangles are index bounds, not warped neatlines. No pre-tiled mosaic or additional database
+migration is required for this rendering change.
+
+`seriesRenderPolicy.ts` shares an annotation-source admission budget among enabled series that
+intersect the viewport: 24 for a map narrower than 900 CSS pixels, 64 otherwise. Every visible
+source, including ones with unknown bounds, must fit its allocation before detail is admitted.
+Otherwise the complete view stays in coverage mode; imagery is never silently truncated.
+One size rule applies to every series, whatever its sheet count: when the median visible sheet
+is narrower than 20% of the viewport (`MIN_SHEET_VIEW_SHARE`, about 200 px on a 1000 px map), the
+series stays in coverage mode. A 44-sheet series and a 5,000-sheet one therefore both show
+outlines at a whole-series view. Nearby padding fills only unused capacity. Hysteresis prevents repeated mode changes at the
+boundary. Standalone explicitly selected sheets are separate from this series budget, and source
+count is not an exact RAM-byte budget.
+
+On detail pans, `retainSeriesSources` removes previous sources outside the current allocation,
+including their GL resources, and rejects queued/late results no longer admitted. Annotation
+requests share a six-request queue across series. Zooming back out, hiding, or removing a series
+detaches its warped layer and clears loaded maps, tile caches and sprite caches immediately;
+renderer disposal waits only for non-abortable annotation requests to settle. A new detail view
+loads its nearby sheets again. `LayerRenderer` releases its map listeners on teardown, and the
+secondary comparison pane creates a warped layer only while it has a visible selected sheet.
 **Counting what arrived is the part that lies**: `addGeoreferenceAnnotationByUrl` resolves with
 `(string | Error)[]`, one entry per map in the annotation, so a sheet that fails to parse comes back
 *inside a fulfilled promise* and only a failed fetch rejects — count rejections alone and a
 half-drawn series reports itself complete, which looks exactly like a survey with gaps in it.
-`tests/series-load.spec.ts` pins both halves. The row is gated on `canSeeDrafts` in
-`ExploreBrowsePanel` only because these 56 sheets are still `draft`: the annotations are public in
-Storage but the `maps` rows are not, so an anonymous reader would resolve the series to nothing and
-get an empty layer. Drop the `draft` flag on the `SERIES` entry when the series is published — it is
-the only thing holding it back.
+`tests/series-load.spec.ts` pins both halves as well as admission, eviction and late disposal.
+`tests/series-render-policy.spec.ts` pins density, shared allocations and hysteresis. The real
+renderer browser fixture in `tests/browser/series-overview.spec.ts` uses 5,000 mocked sheets to
+check that overview requests no scans and repeated detail/overview transitions release canvases.
 
 **The series list is a database view, not a constant** (migration 082). `map_series` is one row per
 `maps.collection` that is a survey, and `/explore` renders whatever it returns — so a new series is

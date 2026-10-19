@@ -17,13 +17,13 @@ export type DbRow = Database['public']['Tables']['maps']['Row'];
  * long source fields no list ever renders; this is 9 KB. `fetchMapRow` still
  * takes the whole row — the admin editor writes back columns no list carries.
  */
-const LIST_COLUMNS = `${MAP_BASE_COLUMNS},description,date_label,series_id,printing_id,is_georeferenced`;
+export const LIST_COLUMNS = `${MAP_BASE_COLUMNS},description,date_label,series_id,printing_id,is_georeferenced`;
 
 // `MapListItem` keeps the pre-095 field names (`dc_description`, `year_label`,
 // `georef_done`) — it is also what `/api/search` hands the browser, under
 // those names, and that response shape is not changing here. Only the column
 // each is read from moved (mig 095).
-function toMapListItem(row: DbRow): MapListItem {
+export function toMapListItem(row: DbRow): MapListItem {
   return {
     id: row.id,
     slug: row.slug,

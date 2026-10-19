@@ -207,6 +207,13 @@ export const vi: Record<string, string> = {
   'Save in Allmaps. Nothing to send back: the archive checks Allmaps for finished maps and marks them georeferenced by itself.':
     'Lưu trên Allmaps. Hệ thống sẽ tự động cập nhật trạng thái bản đồ hoàn thành.',
   'Loading maps…': 'Đang tải bản đồ…',
+  'Could not load maps.': 'Không thể tải bản đồ.',
+  'Could not load maps covering this spot.': 'Không thể tải bản đồ bao phủ vị trí này.',
+  'First page': 'Trang đầu',
+  'Zoom in to view series scans': 'Phóng to để xem bản quét của bộ bản đồ',
+  Previous: 'Trước',
+  Next: 'Tiếp',
+  Page: 'Trang',
   'Needs georeferencing': 'Cần định vị tọa độ',
   'Every map is georeferenced. Check back later — new ones land every few weeks.':
     'Tất cả bản đồ đã được định vị. Vui lòng quay lại sau — bản đồ mới được cập nhật liên tục.',

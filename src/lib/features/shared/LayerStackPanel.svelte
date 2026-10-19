@@ -12,6 +12,7 @@
   import { layersStore } from '$lib/map/stores/layersStore';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
+  import type { Selected } from './catalogFilters';
 
   export let inspectionInRail = false;
   let draggedId: string | null = null;
@@ -30,6 +31,9 @@
    *  passes the sheets its shared search bar still matches. Null (the default)
    *  is the whole stack. Same name and meaning as `ArchiveBrowser.filterIds`. */
   export let filterIds: string[] | null = null;
+  export let searchQuery = '';
+  export let searchFilters: Selected | null = null;
+  export let matchingSeriesCounts: Record<string, number> | null = null;
 
   const { map: shellMap } = getShellContext();
   const layerFocus = createLayerFocus(
@@ -54,7 +58,14 @@
 
   // Stack indices are retained for the two pane badges.
   $: shown = filterIds ? new Set(filterIds) : null;
-  function matchesFilter(ref: OverlayRef, matchingIds: Set<string> | null, maps: MapListItem[]) {
+  function matchesFilter(
+    ref: OverlayRef,
+    matchingIds: Set<string> | null,
+    maps: MapListItem[],
+    matchingSeriesCounts: Record<string, number> | null
+  ) {
+    if (ref.kind === 'series' && matchingSeriesCounts !== null)
+      return ref.parts.some((part) => (matchingSeriesCounts?.[part.seriesKey ?? ref.key] ?? 0) > 0);
     if (!matchingIds || matchingIds.has(ref.mapId)) return true;
     if (ref.kind !== 'series') return false;
     return maps.some(
@@ -69,13 +80,22 @@
   }
   $: rows = state.overlays
     .map((o, i) => ({ o, i }))
-    .filter(({ o }) => matchesFilter(o.ref, shown, mapList));
+    .filter(({ o }) => matchesFilter(o.ref, shown, mapList, matchingSeriesCounts));
 
   $: yearByMapId = (() => {
     const m = new Map<string, number | string>();
     for (const item of mapList) if (item?.id && item.year != null) m.set(item.id, item.year);
     return m;
   })();
+
+  function seriesCount(ref: SeriesRef) {
+    return matchingSeriesCounts === null
+      ? null
+      : [...new Set(ref.parts.map((part) => part.seriesKey ?? ref.key))].reduce(
+          (sum, key) => sum + (matchingSeriesCounts?.[key] ?? 0),
+          0
+        );
+  }
 
   function moveLayer(id: string, targetId: string) {
     const from = state.overlays.findIndex((layer) => layer.id === id);
@@ -220,17 +240,22 @@
               <span class="lsp-pct">{Math.round(o.opacity * 100)}%</span>
             </div>
             {#if o.ref.kind === 'series'}
-              <SeriesLayerFolder
-                ref={o.ref}
-                {mapList}
-                {filterIds}
-                on:zoomToOverlay={(event) => void layerFocus.focus(event.detail)}
-                on:inspectMap={(event) =>
-                  inspect(
-                    { kind: 'historical', mapId: event.detail.mapId, allmapsId: '' },
-                    event.detail.tab
-                  )}
-              />
+              {#key JSON.stringify([o.ref, searchQuery, searchFilters, filterIds])}
+                <SeriesLayerFolder
+                  ref={o.ref}
+                  {mapList}
+                  {filterIds}
+                  {searchQuery}
+                  {searchFilters}
+                  matchingCount={seriesCount(o.ref)}
+                  on:zoomToOverlay={(event) => void layerFocus.focus(event.detail)}
+                  on:inspectMap={(event) =>
+                    inspect(
+                      { kind: 'historical', mapId: event.detail.mapId, allmapsId: '' },
+                      event.detail.tab
+                    )}
+                />
+              {/key}
             {/if}
           </div>
         </li>
