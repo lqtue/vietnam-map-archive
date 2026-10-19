@@ -56,10 +56,11 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
 | Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live 2026-10-18); `review-web` pushed | PR 2: the page (`docs/plans/review-page-plan.md` §8) |
 | Data model: activities (bets 1a, 2) | Claude | plans and dedup 1–2 merged (#85; mig 123–124 live 2026-10-18) | `activities` table, per `plans/data-model-target.md` |
+| Two map books as series (bet 3, feeds 1c) | Claude | `cochinchina-1889-atlas` (not pushed); 27 draft rows live 2026-10-19/20 (12 Cochinchina 1881–89, 15 Tonkin 1950), plus the 2 public 1882 sheets in the Cochinchina series | Georeference by chaining from the placed 1882 plans (idea gate first); only Tan An prints a graticule; Tan An year 1887 |
 
 ## Parked
 
 Ideas with a plan but no current bet. Reopen by moving one into a bet, not by starting it.
 
 - Walk (`plans/walk-plan.md`): first ask people for photo sets of standing buildings (place, date, CC BY); 3D later, from those sets. Test: one landmark, two weeks. Kill: under ~5 usable sets, or no clear licence.
-- The 4D city, behind Walk (`CONCEPT.md` §The horizon; `city-reconstruction-plan.md` only on branch `docs/city-reconstruction-plan`; `panorama-match` killed at 131 m) · admin units for all of Vietnam (after 1c; needs a line-type model for 1:25k bounds — test: trace one Sơn Tây tile per legend class, train, score a second tile; kill: commune dots unreadable at scan resolution; `experiments/admin-lines/`) · Gallica text harvest · street-name pairs.
+- The 4D city, behind Walk (`CONCEPT.md` §The horizon; `city-reconstruction-plan.md` only on branch `docs/city-reconstruction-plan`; `panorama-match` killed at 131 m) · admin units for all of Vietnam (after 1c; name key: the 1950 Tonkin book, Rumsey 14320, 1:100k, public domain, ingested as drafts 2026-10-20; Hà Nội patch, one reader: 23 of 50 names fully readable, 50 of 50 at least partly, the misses are tone marks, so match without them; a second reader would firm it up; also needs a line-type model for 1:25k bounds — test: trace one Sơn Tây tile per legend class, train, score a second tile; kill: commune dots unreadable at scan resolution; `experiments/admin-lines/`) · Gallica text harvest · street-name pairs.
