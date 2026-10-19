@@ -46,6 +46,8 @@
 
   /** Supabase client for the initial map-list fetch. Pass null to skip auto-load. */
   export let supabase: SupabaseClient | null = null;
+  /** Selected metadata is supplied by bounded consumers such as Explore. */
+  export let loadCatalog = true;
   /** When true, MapShell is wrapped in a half-width pane and the `dual-pane` slot is rendered alongside. */
   export let dualPaneActive: boolean = false;
 
@@ -105,10 +107,10 @@
 
   const listCtrl = createMapList();
   const { maps: mapsStore } = listCtrl;
-  $: mapList = $mapsStore;
+  $: if (loadCatalog) mapList = $mapsStore;
 
   onMount(() => {
-    if (supabase) {
+    if (supabase && loadCatalog) {
       listCtrl
         .loadMaps(supabase)
         .then((m) => dispatch('mapsloaded', { maps: m }))

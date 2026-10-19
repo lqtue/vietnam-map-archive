@@ -146,6 +146,8 @@
       {#each bins as b (b.decade)}
         <span
           class="bar"
+          style:left="{((b.decade - start) / span) * 100}%"
+          style:width="max(1px, calc({(10 / span) * 100}% - 1px))"
           style:height="{b.count ? Math.max(6, Math.sqrt(b.count / maxCount) * 100) : 1}%"
         ></span>
       {/each}
@@ -247,15 +249,13 @@
     background: color-mix(in srgb, var(--sb-accent) 45%, transparent);
   }
   .bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
+    position: relative;
     height: 2.8rem;
     border-bottom: var(--border-thin);
   }
   .bar {
-    flex: 1 1 0;
-    min-width: 2px;
+    position: absolute;
+    bottom: 0;
     background: var(--sb-accent);
   }
   .has-sel .bar {

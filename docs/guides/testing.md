@@ -1,5 +1,18 @@
 # Test inventory
 
+Explore scale (2026-10-19): `explore-search`, `explore-runtime`, `explore-api`, and
+`explore-inspection` pure specs cover bounded pages, full totals, selected-map hydration,
+stale requests, role gates, cache isolation and legacy references. `series-load` also
+checks a shared six-request budget, retry cooldown, 250 distant pans, offscreen eviction
+and disposal after pending loads. `tests/browser/explore-pagination.spec.ts` mocks
+10k/100k catalogs on desktop and mobile: 60 rendered results, correct total, next/back,
+search, sparse timeline positioning and no whole-catalog read. `PURE_ONLY=1` excludes
+`tests/browser/`; these fixtures need the local dev server but no database writes.
+`npm run test:explore-sql` requires the dedicated loopback `vma_explore_performance`
+database and checks migration 126 transactionally; `VMA_EXPLORE_BENCHMARK=1` adds
+10k/100k timings. Migration 125's public tally is checked by `test:model-sql`.
+Measurements and deployment order: `docs/journals/261019-explore-performance.md`.
+
 Usage measurement (2026-10-06): `measurement.spec.ts` verifies opt-in gating,
 role exclusion, parameter/route sanitization, page deduplication, revocation and
 best-effort failure handling using an injected adapter. These are privacy and

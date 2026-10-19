@@ -46,6 +46,8 @@
   /** `open` mode only: draw the overlay toggle. Off where there is no map to
    *  add a sheet to — /catalog's own sidebar on a page without one. */
   export let showLayerActions = true;
+  /** A paginated query owns ordering across pages; column sorting would reorder only one page. */
+  export let serverOrdered = false;
 
   const dispatch = createEventDispatcher<{
     pick: { map: any };
@@ -58,9 +60,11 @@
   // Year first, which is how the archive is read. The header is the catalog's,
   // so the reader can re-order a long list without leaving the rail.
   let sort: SortState<string> = { key: 'year', asc: true };
-  $: sorted = applySort(rows, sort, (m: any, key) =>
-    key === 'year' ? (m.year ?? null) : key === 'type' ? (m.map_type ?? null) : (m.name ?? null)
-  );
+  $: sorted = serverOrdered
+    ? rows
+    : applySort(rows, sort, (m: any, key) =>
+        key === 'year' ? (m.year ?? null) : key === 'type' ? (m.map_type ?? null) : (m.name ?? null)
+      );
 
   /** The line under a title: the sheet number (46 names repeat) and the survey it belongs to; a
    *  plan, which has neither, gets its province. */
@@ -72,8 +76,8 @@
   $: hasLast = Object.keys(badges).length > 0;
   $: columns = [
     { key: 'pick', label: '', klass: 'col-pick', srLabel: 'Sheet', sortable: false },
-    { key: 'year', label: 'Year', klass: 'col-year num' },
-    { key: 'name', label: 'Title', klass: 'col-name' },
+    { key: 'year', label: 'Year', klass: 'col-year num', sortable: !serverOrdered },
+    { key: 'name', label: 'Title', klass: 'col-name', sortable: !serverOrdered },
     ...(hasLast ? [{ key: 'type', label: '', klass: 'col-type' }] : []),
   ] satisfies TableColumn[];
 

@@ -17,7 +17,9 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { writable } from 'svelte/store';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import {
     createCatalogSearch,
     type CatalogSearchController,
@@ -54,14 +56,18 @@
   export let waiting = false;
 
   const engine = search ?? createCatalogSearch({ requireGeoref });
-  const { results, loading, labels } = engine;
+  const { results, loading, labels, total, mapsError } = engine;
+  const page = engine.pagination?.page ?? writable(1);
+  const hasNext = engine.pagination?.hasNext ?? writable(false);
   // Idempotent: a shared engine has already been started by its owner.
   onMount(() => engine.start());
+  onDestroy(() => {
+    if (!search) engine.destroy?.();
+  });
 
   $: allowed = filterIds ? new Set(filterIds) : null;
-  $: shownRows = (allowed ? $results.filter((r) => allowed.has(r.id)) : [...$results]).sort(
-    sortRows
-  );
+  $: matchingRows = allowed ? $results.filter((r) => allowed.has(r.id)) : [...$results];
+  $: shownRows = engine.pagination ? matchingRows : [...matchingRows].sort(sortRows);
 </script>
 
 {#if showFilters}
@@ -70,9 +76,11 @@
 
 <div class="count-row">
   <span class="count">
-    {shownRows.length} map{shownRows.length === 1 ? '' : 's'}{#if $loading}<span class="loading">
-        …</span
-      >{/if}
+    {engine.pagination ? $total.maps : shownRows.length} map{(engine.pagination
+      ? $total.maps
+      : shownRows.length) === 1
+      ? ''
+      : 's'}{#if $loading}<span class="loading"> …</span>{/if}
   </span>
 </div>
 
@@ -80,12 +88,39 @@
   <LabelHits hits={$labels} mode="pick" on:pick={(e) => dispatch('pickLabel', e.detail)} />
 {/if}
 
-{#if shownRows.length}
-  <ArchiveMapRows rows={shownRows} {activeIds} {badges} on:pick on:remove />
+{#if $mapsError}
+  <LoadError message={$t('Could not load maps.')} on:retry={() => engine.refresh()} />
+{:else if shownRows.length}
+  <ArchiveMapRows
+    rows={shownRows}
+    serverOrdered={!!engine.pagination}
+    {activeIds}
+    {badges}
+    on:pick
+    on:remove
+  />
 {:else if $loading || waiting}
   <p class="empty-state empty">{$t('Loading maps…')}</p>
 {:else if !showLabels || !$labels.length}
   <p class="empty-state empty">{$t('No maps match those filters.')}</p>
+{/if}
+
+{#if engine.pagination && ($page > 1 || $hasNext)}
+  <nav class="count-row" aria-label="Map result pages">
+    <button
+      type="button"
+      class="btn is-sm"
+      disabled={$loading || $page <= 1}
+      on:click={() => engine.pagination?.previous()}>{$t('Previous')}</button
+    >
+    <span class="count" aria-live="polite">{$t('Page')} {$page}</span>
+    <button
+      type="button"
+      class="btn is-sm"
+      disabled={$loading || !$hasNext}
+      on:click={() => engine.pagination?.next()}>{$t('Next')}</button
+    >
+  </nav>
 {/if}
 
 <style>

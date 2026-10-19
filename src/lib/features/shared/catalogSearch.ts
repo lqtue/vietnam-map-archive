@@ -54,6 +54,15 @@ export interface LabelHit {
 }
 
 export interface CatalogSearchController {
+  /** Present for bounded server-backed browsers. Totals describe every match. */
+  pagination?: {
+    page: Readable<number>;
+    hasNext: Readable<boolean>;
+    next: () => void;
+    previous: () => void;
+  };
+  seriesCounts?: Readable<Record<string, number>>;
+  destroy?: () => void;
   /** Labels found *on* maps for the current query (empty when the query is blank). */
   labels: Readable<LabelHit[]>;
   query: Writable<string>;

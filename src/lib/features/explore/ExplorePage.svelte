@@ -16,7 +16,6 @@
   import type Map from 'ol/Map';
 
   import { getSupabaseContext } from '$lib/data/supabase/context';
-  import { resolveMapRef } from '$lib/data/maps/resolveRef';
   import { mapRef } from '$lib/core/utils/mapSlug';
   import { createGeoMapStores } from '$lib/map/shell/geoMapSetup';
   import type { Bbox } from '$lib/core/geo/mapBounds';
@@ -60,7 +59,8 @@
     SAIGON_DEFAULT_ZOOM,
     type ResolvedMap,
   } from '$lib/features/explore/spatialLookup';
-  import { createExploreCoverage } from '$lib/features/explore/useExploreCoverage';
+  import { createExploreRuntime } from './exploreRuntime';
+  import { createExploreSearch } from '$lib/features/shared/exploreSearch';
   import { createExploreZoom } from '$lib/features/explore/exploreZoom';
   import {
     createExploreUrl,
@@ -69,7 +69,7 @@
     LABEL_ZOOM,
   } from '$lib/features/explore/exploreUrl';
   import type { LabelHit } from '$lib/features/shared/catalogSearch';
-  import { OPACITY_STEP, stepByYear } from '$lib/features/explore/exploreKeys';
+  import { OPACITY_STEP } from '$lib/features/explore/exploreKeys';
   import { isTypingTarget } from '$lib/core/utils/commandPalette';
   import '$styles/layouts/mode-shared.css';
 
@@ -114,6 +114,7 @@
    * `?map=`/`?at=` re-opens the guard.
    */
   let appliedUrl = '';
+  let mounted = false;
 
   const { addMapOverlay, setViewFromBounds, zoomToMap } = createExploreZoom(mapStore);
   const { syncMapParam, syncAtParam, tallyMapOpen } = createExploreUrl({
@@ -124,12 +125,24 @@
     // leaves $page.url alone — a real navigation is the only thing that moves it.
     markApplied: () => (appliedUrl = deeplinkKey),
   });
-  const coverage = createExploreCoverage({
-    getMapList: () => mapList,
-    setMapList: (list) => (mapList = list),
-    canSeeDrafts: () => canSeeDrafts,
-    setLoading: (v) => (loading = v),
-  });
+  const runtime = createExploreRuntime();
+  const search = createExploreSearch();
+  onDestroy(() => search.destroy?.());
+  const runtimeMaps = runtime.maps;
+  const runtimeError = runtime.error;
+  const coverage = runtime.coverage;
+  onDestroy(runtime.destroy);
+  $: mapList = $runtimeMaps;
+  $: matches = $coverage.matches;
+  $: loading = $coverage.loading;
+  $: if (mounted)
+    runtime.pin([
+      ...new Set([
+        ...sheetOverlays.map((layer) => layer.ref.mapId),
+        ...pairedSheets(inspectionMapId),
+      ]),
+    ]);
+  $: if (userPosition) void runtime.locate(userPosition);
 
   // ── Reactive derivations ───────────────────────────────────────
   $: viewMode = $layerStore.viewMode;
@@ -159,15 +172,15 @@
   });
   $: inspectionMapId = $inspection.mapId ?? ($inspection.series ? null : activeOverlayMapId);
   $: inspectionMap =
-    [...$inspection.maps, ...mapList].find((item) => item.id === inspectionMapId) ?? null;
+    [...mapList, ...$inspection.maps].find((item) => item.id === inspectionMapId) ?? null;
   // A sheet printed in two halves reads as one legend: both lists, both sets of pins.
   $: legendSheets = pairedSheets(inspectionMapId).map((id) => ({
     id,
     name: mapList.find((m) => m.id === id)?.name ?? id,
     onMap: $layersStore.overlays.some((o) => isSheetLayer(o) && o.ref.mapId === id),
   }));
-  function handleAddSheet(event: CustomEvent<{ mapId: string }>) {
-    const map = mapList.find((m) => m.id === event.detail.mapId);
+  async function handleAddSheet(event: CustomEvent<{ mapId: string }>) {
+    const map = await runtime.ensure(event.detail.mapId);
     if (map) addMapOverlay(map);
   }
   const handleInspectMap = (event: CustomEvent<{ mapId: string; tab: 'info' | 'legend' }>) =>
@@ -202,12 +215,15 @@
     mode = 'all';
   }
 
-  function applyDeeplink() {
+  async function applyDeeplink() {
+    const key = deeplinkKey;
+    const selected = paramMapId ? await runtime.ensure(paramMapId) : null;
+    if (key !== deeplinkKey) return;
     void applyExploreUrlParams({
       mapId: paramMapId,
       at: paramAt,
       storyId: paramStoryId,
-      maps: mapList,
+      maps: selected ? [selected] : [],
       stories,
       keepCamera: hasHashCamera(location.hash),
       addMapOverlay,
@@ -224,13 +240,11 @@
     });
   }
 
-  // Reactive deeplink application — both `mapList` (from MapWorkspace) and
-  // `stories` (from onMount fetch) arrive async, so a one-shot in onMount
-  // races with whichever finishes second. Run once when both are ready.
+  // Resolve only the requested sheet; stories can arrive independently.
   $: deeplinkKey = [paramMapId ?? '', paramAt ?? '', paramStoryId ?? ''].join('|');
   $: if (
+    mounted &&
     appliedUrl !== deeplinkKey &&
-    mapList.length > 0 &&
     (paramMapId || (paramStoryId && stories.length > 0))
   ) {
     appliedUrl = deeplinkKey;
@@ -241,31 +255,13 @@
     queueMicrotask(applyDeeplink);
   }
 
-  // Admins/mods get draft maps in coverage too (mirrors the browse panel).
-  $: canSeeDrafts = role === 'admin' || role === 'mod';
-
-  // Coverage match runs whenever the user moves OR new bounds land. Pure
-  // client-side filter — no Supabase round-trip.
-  $: if (userPosition && mapList.length > 0) {
-    matches = coverage.matchAt(userPosition[0], userPosition[1]);
-    loading = coverage.pendingBoundsIds().length > 0;
-  }
-
-  // Trigger bounds resolution as new entries arrive. Re-runs when canSeeDrafts
-  // flips (role lands after mount) so draft maps get their bounds backfilled
-  // too. The attemptedBounds guard inside prevents re-fetching the same ids.
-  $: if (mapList.length > 0) {
-    void canSeeDrafts;
-    void coverage.ensureBoundsResolved();
-  }
-
   // ── Guided tour ────────────────────────────────────────────────
   // Wait for coverage to resolve so step 1 (Browse) shows location-relevant
   // rows in location mode. In all-mode the catalogue is enough.
   let tourOpen = false;
   let tourPending = false;
   $: if (tourPending && !tourOpen) {
-    const ready = mode === 'all' ? mapList.length > 0 : userPosition !== null && !loading;
+    const ready = mode === 'all' || (userPosition !== null && !loading);
     if (ready) {
       tourPending = false;
       tourOpen = true;
@@ -332,7 +328,7 @@
   async function handlePickMap(e: CustomEvent<any>) {
     const item = e.detail?.map ?? e.detail;
     if (!item?.id) return;
-    const map = mapList.find((m) => m.id === item.id) ?? (item as MapListItem);
+    const map = runtime.remember(item as MapListItem);
     addMapOverlay(map);
     syncMapParam(mapRef(map));
     tallyMapOpen(map.id);
@@ -340,9 +336,9 @@
     await zoomToMap(map);
   }
   /** A label hit from the browse pane: stack its map, then land on the spot. */
-  function handlePickLabel(e: CustomEvent<LabelHit>) {
+  async function handlePickLabel(e: CustomEvent<LabelHit>) {
     const h = e.detail;
-    const map = mapList.find((m) => m.id === h.map_id);
+    const map = await runtime.ensure(h.map_id);
     if (!map) return;
     addMapOverlay(map);
     syncMapParam(mapRef(map));
@@ -363,7 +359,7 @@
    * ↑ / ↓ move its opacity. The camera deliberately stays put — holding one
    * spot still while the years change is the point.
    */
-  function handleKeydown(e: KeyboardEvent) {
+  async function handleKeydown(e: KeyboardEvent) {
     if (e.metaKey || e.ctrlKey || e.altKey || isTypingTarget(e.target)) return;
 
     // Escape puts out whatever is lit: the pulse and the legend row behind it.
@@ -377,9 +373,9 @@
     if (!top) return;
 
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      const next = stepByYear(mapList, top.ref.mapId, e.key === 'ArrowLeft' ? -1 : 1);
-      if (!next) return;
       e.preventDefault();
+      const next = await runtime.step(top.ref.mapId, e.key === 'ArrowLeft' ? -1 : 1);
+      if (!next || $layersStore.overlays.find(isSheetLayer)?.id !== top.id) return;
       // Add first, then drop the old one, so the map never renders bare. A
       // refused add (the map is already
       // on) must not remove anything: swapping a sheet for nothing is worse
@@ -420,25 +416,25 @@
     const topMap = top ? mapList.find((m) => m.id === top) : null;
     syncMapParam(topMap ? mapRef(topMap) : top);
   }
-  function handleZoomToOverlay(
+  async function handleZoomToOverlay(
     e: CustomEvent<{ mapId: string; bounds?: [number, number, number, number] }>
   ) {
     if (e.detail.bounds) {
       setViewFromBounds(e.detail.bounds);
       return;
     }
-    const m = mapList.find((x) => x.id === e.detail.mapId);
+    const m = await runtime.ensure(e.detail.mapId);
     if (m) void zoomToMap(m, { force: true });
   }
 
   // ── Stories ────────────────────────────────────────────────────
-  function handleNavigatePoint(e: CustomEvent<{ index: number; point: StoryPoint }>) {
+  async function handleNavigatePoint(e: CustomEvent<{ index: number; point: StoryPoint }>) {
     const { point } = e.detail;
     if (point.coordinates) {
       mapStore.setView({ lng: point.coordinates[0], lat: point.coordinates[1], zoom: 17 });
     }
     if (point.overlayMapId) {
-      const found = resolveMapRef(mapList, point.overlayMapId);
+      const found = await runtime.ensure(point.overlayMapId);
       if (found) addMapOverlay(found, { clear: true });
     }
   }
@@ -452,6 +448,7 @@
   }
 
   onMount(async () => {
+    mounted = true;
     // MapShell has already put the link's `#@lat,lng,zoomz` camera in the store
     // by now (child onMount runs first), so this default would throw it away.
     if (!hasHashCamera(location.hash)) {
@@ -483,7 +480,8 @@
     {layerStore}
     tabOrder={['browse', 'layers', 'controls']}
     {dualPaneActive}
-    bind:mapList
+    loadCatalog={false}
+    {mapList}
     bind:shellMap
     bind:sidebarCollapsed
     bind:rightSidebarCollapsed
@@ -492,9 +490,17 @@
   >
     <svelte:fragment slot="sidebar">
       <ExploreSidebar
+        {search}
         {viewMode}
         {mapList}
         {matches}
+        coverageTotal={$coverage.total}
+        coverageHasNext={$coverage.hasNext}
+        coverageLoading={$coverage.loading}
+        coverageError={$coverage.error}
+        coveragePage={$coverage.page}
+        on:nextCoverage={() => runtime.nextCoverage()}
+        on:retryCoverage={() => runtime.resetCoverage()}
         {role}
         bind:tab={sidebarTab}
         tourActive={tourOpen || tourPending}
@@ -522,6 +528,13 @@
         series={$inspection.series}
         seriesMaps={$inspection.maps}
         seriesLoading={$inspection.loading}
+        seriesTotal={$inspection.total}
+        seriesPage={$inspection.page}
+        seriesHasNext={$inspection.hasNext}
+        seriesError={$inspection.error}
+        on:nextSeriesPage={() => inspection.nextPage()}
+        on:previousSeriesPage={() => inspection.previousPage()}
+        on:retrySeriesPage={() => inspection.retry()}
         on:inspectMap={handleInspectMap}
         vectorsOn={!!inspectionMapId && vectorMapIds.includes(inspectionMapId)}
         on:changeViewMode={(e) => layerStore.setViewMode(e.detail.mode)}
@@ -569,6 +582,13 @@
           series={$inspection.series}
           seriesMaps={$inspection.maps}
           seriesLoading={$inspection.loading}
+          seriesTotal={$inspection.total}
+          seriesPage={$inspection.page}
+          seriesHasNext={$inspection.hasNext}
+          seriesError={$inspection.error}
+          on:nextSeriesPage={() => inspection.nextPage()}
+          on:previousSeriesPage={() => inspection.previousPage()}
+          on:retrySeriesPage={() => inspection.retry()}
           {showLegendPoints}
           vectorsOn={!!inspectionMapId && vectorMapIds.includes(inspectionMapId)}
           on:inspectMap={handleInspectMap}
@@ -586,7 +606,17 @@
     <svelte:fragment slot="mobile-browse">
       <div class="mobile-pane" data-tour="browse-mobile">
         <ExploreBrowsePanel
+          {search}
+          showFilters={true}
+          compact={false}
           {matches}
+          coverageTotal={$coverage.total}
+          coverageHasNext={$coverage.hasNext}
+          coverageLoading={$coverage.loading}
+          coverageError={$coverage.error}
+          coveragePage={$coverage.page}
+          on:nextCoverage={() => runtime.nextCoverage()}
+          on:retryCoverage={() => runtime.resetCoverage()}
           {role}
           on:pick={handlePickMap}
           on:pickLabel={handlePickLabel}
@@ -637,13 +667,24 @@
     </svelte:fragment>
 
     <svelte:fragment slot="map-overlay">
-      {#if choseMode && mode === 'location' && userPosition && !loading && matches.length === 0 && stackCount === 0}
+      {#if choseMode && mode === 'location' && userPosition && !loading && !$coverage.error && matches.length === 0 && stackCount === 0}
         <ExploreSheet userLocation={userPosition} on:jumpToSaigon={jumpToSaigon} />
       {/if}
       {#if tourPending || (loading && mode === 'location' && choseMode)}
         <div class="resolving" role="status">
           <span class="spinner" aria-hidden="true"></span>
           {mode === 'location' ? 'Looking up maps at your location…' : 'Loading archive…'}
+        </div>
+      {/if}
+      {#if $runtimeError}
+        <div class="gps-error" role="alert">
+          {$runtimeError}
+          <button
+            on:click={() => {
+              runtime.retry();
+              appliedUrl = '';
+            }}>Retry</button
+          >
         </div>
       {/if}
       {#if gpsError}

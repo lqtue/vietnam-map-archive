@@ -100,7 +100,9 @@ function decorate(row: SeriesSheet): SeriesSheetView {
 
 async function publicCoverageByCell(
   db: SupabaseClient,
-  seriesKey: string
+  seriesKey: string,
+  sheetNumber?: string,
+  sheetNumbers?: string[]
 ): Promise<Map<string, { publiclyHeld: boolean; mapId: string | null; knownSource: boolean }>> {
   const page = 1000;
   const result = new Map<
@@ -108,12 +110,13 @@ async function publicCoverageByCell(
     { publiclyHeld: boolean; mapId: string | null; knownSource: boolean }
   >();
   for (let from = 0; ; from += page) {
-    const { data, error } = await db
+    let query = db
       .from('series_cell_coverage_detail')
       .select('sheet_number,publicly_held,public_map_id,known_source')
-      .eq('key', seriesKey)
-      .order('sheet_number')
-      .range(from, from + page - 1);
+      .eq('key', seriesKey);
+    if (sheetNumber !== undefined) query = query.eq('sheet_number', sheetNumber);
+    if (sheetNumbers) query = query.in('sheet_number', sheetNumbers);
+    const { data, error } = await query.order('sheet_number').range(from, from + page - 1);
     if (error) throw queryError('Series coverage', error);
     for (const cell of data ?? []) {
       if (cell.sheet_number)
@@ -170,6 +173,41 @@ export async function fetchSeriesSheetIndex(
     .sort((a, b) => a.sheet_number.localeCompare(b.sheet_number, undefined, { numeric: true }));
 }
 
+/** A folder reads only its current index page and that page's public evidence. */
+export async function fetchSeriesSheetPage(
+  db: SupabaseClient,
+  seriesKey: string,
+  after: string | null = null,
+  limit = 60
+): Promise<{ sheets: SeriesSheetView[]; next: string | null }> {
+  const size = Math.max(1, Math.min(100, Math.floor(limit)));
+  let query = db.from('series_cells').select(COLUMNS).eq('series_key', seriesKey);
+  if (after !== null) query = query.gt('sheet_number', after);
+  const { data, error } = await query.order('sheet_number').limit(size + 1);
+  if (error) throw queryError('Series index page', error);
+  const rows = ((data ?? []) as SeriesSheet[]).slice(0, size);
+  const coverage = rows.length
+    ? await publicCoverageByCell(
+        db,
+        seriesKey,
+        undefined,
+        rows.map((row) => row.sheet_number)
+      )
+    : new Map();
+  return {
+    sheets: rows.map((row) => {
+      const cell = coverage.get(row.sheet_number);
+      return decorate({
+        ...row,
+        held_by: cell?.publiclyHeld ? 'map' : null,
+        map_id: cell?.mapId ?? null,
+        source: cell?.knownSource ? (row.source ?? 'Institutional source item') : row.source,
+      });
+    }),
+    next: (data?.length ?? 0) > size ? rows[rows.length - 1].sheet_number : null,
+  };
+}
+
 export async function fetchSeriesSheet(
   db: SupabaseClient,
   seriesKey: string,
@@ -183,7 +221,7 @@ export async function fetchSeriesSheet(
     .maybeSingle();
   if (error) throw queryError('Series sheet', error);
   if (!data) return null;
-  const coverage = await publicCoverageByCell(db, seriesKey);
+  const coverage = await publicCoverageByCell(db, seriesKey, sheetNumber);
   const cellCoverage = coverage.get(data.sheet_number);
   const isPubliclyHeld = cellCoverage?.publiclyHeld ?? false;
   return decorate({

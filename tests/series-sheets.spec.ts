@@ -6,6 +6,8 @@ import {
   hasDenominator,
   cellCamera,
   fetchSeriesSheetIndex,
+  fetchSeriesSheetPage,
+  fetchSeriesSheet,
   type SeriesSheet,
 } from '../src/lib/data/maps/seriesSheets';
 
@@ -146,4 +148,98 @@ test('the partial L909 index counts known records without claiming a survey deno
   expect(counts).toEqual({ total: 2, held: 1, obtainable: 1, no_scan: 0, partial: true });
   expect(hasDenominator(counts)).toBe(false);
   expect(hasDenominator({ total: 2, held: 1, obtainable: 1, no_scan: 0 })).toBe(true);
+});
+
+test('opening one sheet only requests that cell coverage', async () => {
+  const coverageFilters: [string, string][] = [];
+  const db = {
+    from(table: string) {
+      const q = {
+        select: () => q,
+        eq: (key: string, value: string) => {
+          if (table === 'series_cell_coverage_detail') coverageFilters.push([key, value]);
+          return q;
+        },
+        order: () => q,
+        maybeSingle: async () => ({ data: row(), error: null }),
+        range: async () => ({
+          data: [
+            {
+              sheet_number: '6330-4',
+              publicly_held: true,
+              public_map_id: 'public-map',
+              known_source: true,
+            },
+          ],
+          error: null,
+        }),
+      };
+      return q;
+    },
+  } as unknown as SupabaseClient;
+  const sheet = await fetchSeriesSheet(db, 's', '6330-4');
+  expect(coverageFilters).toEqual([
+    ['key', 's'],
+    ['sheet_number', '6330-4'],
+  ]);
+  expect(sheet?.status).toBe('held');
+  expect(sheet?.map_id).toBe('public-map');
+});
+
+test('folder index bounds rows and public evidence to one page', async () => {
+  let after: string | null = null;
+  let requestedLimit = 0;
+  let coverageIds: string[] = [];
+  const db = {
+    from(table: string) {
+      const query = {
+        select: () => query,
+        eq: () => query,
+        gt: (_column: string, value: string) => {
+          after = value;
+          return query;
+        },
+        order: () => query,
+        in: (_column: string, values: string[]) => {
+          coverageIds = values;
+          return query;
+        },
+        limit: async (limit: number) => {
+          requestedLimit = limit;
+          return {
+            data: Array.from({ length: limit }, (_, i) =>
+              row({
+                sheet_number: String(i + 100),
+                held_by: 'map',
+                map_id: 'private-map',
+              })
+            ),
+            error: null,
+          };
+        },
+        range: async () => ({
+          data: [
+            { sheet_number: '100', publicly_held: false, public_map_id: null, known_source: true },
+            {
+              sheet_number: '101',
+              publicly_held: true,
+              public_map_id: 'public-map',
+              known_source: true,
+            },
+          ],
+          error: null,
+        }),
+      };
+      expect(['series_cells', 'series_cell_coverage_detail']).toContain(table);
+      return query;
+    },
+  } as unknown as SupabaseClient;
+  const result = await fetchSeriesSheetPage(db, 's', '099', 2);
+  expect(after).toBe('099');
+  expect(requestedLimit).toBe(3);
+  expect(coverageIds).toEqual(['100', '101']);
+  expect(result.next).toBe('101');
+  expect(result.sheets).toHaveLength(2);
+  expect(result.sheets[0]).toMatchObject({ status: 'obtainable', map_id: null, held_by: null });
+  expect(result.sheets[1]).toMatchObject({ status: 'held', map_id: 'public-map' });
 });

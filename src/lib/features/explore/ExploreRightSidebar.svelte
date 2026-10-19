@@ -40,6 +40,9 @@
 
   const dispatch = createEventDispatcher<{
     toggleCollapse: void;
+    nextSeriesPage: void;
+    previousSeriesPage: void;
+    retrySeriesPage: void;
     addSheet: { mapId: string };
     changeViewMode: { mode: ViewMode };
     pickLocation: {
@@ -78,6 +81,10 @@
   export let series: SeriesRef | null = null;
   export let seriesMaps: MapListItem[] = [];
   export let seriesLoading = false;
+  export let seriesTotal: number | null = null;
+  export let seriesPage = 1;
+  export let seriesHasNext = false;
+  export let seriesError = '';
   export let embedded = false;
 
   /**
@@ -149,10 +156,15 @@
   {#if series}
     <div class="series-summary">
       <strong>{series.name}</strong>
-      <p>{seriesLoading ? 'Loading sheets…' : `${seriesMaps.length} displayable sheets`}</p>
+      <p>
+        {seriesLoading
+          ? 'Loading sheets…'
+          : `${seriesTotal ?? seriesMaps.length} displayable sheets`}
+      </p>
       <label
         >Inspect a sheet
         <select
+          disabled={seriesLoading}
           value={mapId ?? ''}
           on:change={(event) =>
             dispatch('inspectMap', {
@@ -165,6 +177,29 @@
             >{/each}
         </select>
       </label>
+      {#if seriesError}<p role="status">
+          {seriesError}
+          <button type="button" class="sb-btn is-sm" on:click={() => dispatch('retrySeriesPage')}
+            >Retry</button
+          >
+        </p>{/if}
+      {#if seriesPage > 1 || seriesHasNext}
+        <nav aria-label="Series inspection pages">
+          <button
+            type="button"
+            class="sb-btn is-sm"
+            disabled={seriesLoading || seriesPage <= 1}
+            on:click={() => dispatch('previousSeriesPage')}>Previous</button
+          >
+          <span>Page {seriesPage}</span>
+          <button
+            type="button"
+            class="sb-btn is-sm"
+            disabled={seriesLoading || !seriesHasNext}
+            on:click={() => dispatch('nextSeriesPage')}>Next</button
+          >
+        </nav>
+      {/if}
       <p>Info and legends belong to individual sheets.</p>
     </div>
   {/if}

@@ -14,7 +14,9 @@
   import type { CatalogSearchController } from '$lib/features/shared/catalogSearch';
   import ArchiveMapRows from '$lib/features/shared/ArchiveMapRows.svelte';
   import ArchiveBrowser from '$lib/features/shared/ArchiveBrowser.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
+  import { createExploreSearch } from '$lib/features/shared/exploreSearch';
+  import LoadError from '$lib/ui/LoadError.svelte';
   import { get, writable } from 'svelte/store';
   import { layersStore } from '$lib/map/stores/layersStore';
   import { fetchMapSeries } from '$lib/data/maps/service';
@@ -25,8 +27,14 @@
   import { replaceState } from '$app/navigation';
 
   const { supabase } = getSupabaseContext();
+  const dispatch = createEventDispatcher<{ nextCoverage: void; retryCoverage: void }>();
 
   export let matches: ResolvedMap[] = [];
+  export let coverageTotal = 0;
+  export let coverageHasNext = false;
+  export let coverageLoading = false;
+  export let coverageError = false;
+  export let coveragePage = 1;
   // Admins/mods may browse draft maps in the viewer; everyone else is
   // capped to public/featured (mirrors /catalog's role gating).
   export let role: 'user' | 'mod' | 'admin' = 'user';
@@ -34,6 +42,13 @@
   // engine down; the mobile drawer has no such bar, so null leaves the browser
   // to create and render its own.
   export let search: CatalogSearchController | null = null;
+  export let showFilters = search === null;
+  export let compact = search !== null;
+  const engine = search ?? createExploreSearch();
+  onMount(() => engine.start());
+  onDestroy(() => {
+    if (!search) engine.destroy?.();
+  });
 
   // Oldest → newest, matching /catalog's default sort. Undated maps sink
   // to the bottom; ties break by name so the order is stable.
@@ -138,19 +153,23 @@
 
   // While a query is typed the list answers the query, so the spot's maps step
   // aside — they would sit above results they may not match.
-  $: query = search ? search.query : writable('');
+  const query = engine.query;
   $: typing = !!$query.trim();
 
   // The series list answers the same query and facets as the rows below it: a
   // series with no matching sheet steps aside and the rest show "N of M". Only
   // with the rail's shared engine — the mobile drawer's browser owns its own,
   // out of reach here, so there the list keeps its full counts.
-  $: results = search ? search.results : writable<Record<string, any>[]>([]);
-  $: selected = search ? search.selected : writable<Record<string, string[]>>({});
-  $: mapsReady = search ? search.mapsReady : writable(false);
-  $: filtering =
-    !!search && $mapsReady && (typing || Object.values($selected).some((v) => v?.length));
-  $: matchCount = filtering ? countBySeries($results) : new Map<string, number>();
+  const results = engine.results;
+  const selected = engine.selected;
+  const mapsReady = engine.mapsReady;
+  const seriesCounts = engine.seriesCounts ?? writable<Record<string, number>>({});
+  $: filtering = $mapsReady && (typing || Object.values($selected).some((v) => v?.some(Boolean)));
+  $: matchCount = filtering
+    ? engine.seriesCounts
+      ? new Map(Object.entries($seriesCounts))
+      : countBySeries($results)
+    : new Map<string, number>();
 
   function countBySeries(rows: Record<string, any>[]) {
     const out = new Map<string, number>();
@@ -159,7 +178,6 @@
   }
 
   // The rail is 300px: one line per series there, the dates and drafts on hover.
-  $: compact = search !== null;
 
   $: allSeries = loaded ? buildSeriesRows(dbSeries, canSeeDrafts) : [];
   $: visibleSeries = filtering ? allSeries.filter((r) => matchCount.has(r.key)) : allSeries;
@@ -219,18 +237,37 @@
   {#if visibleMatches.length && !typing}
     <div class="head">
       <strong class="title">
-        {visibleMatches.length === 1
+        {coverageTotal === 1
           ? $t('1 map covers this spot')
-          : $t('{N} maps cover this spot', { N: visibleMatches.length })}
+          : $t('{N} maps cover this spot', { N: coverageTotal || visibleMatches.length })}
       </strong>
     </div>
     <ArchiveMapRows rows={visibleMatches} on:pick on:remove />
+    {#if coveragePage > 1}
+      <button
+        type="button"
+        class="btn is-sm"
+        disabled={coverageLoading}
+        on:click={() => dispatch('retryCoverage')}>{$t('First page')}</button
+      >
+    {/if}
+    {#if coverageHasNext}<button
+        type="button"
+        class="btn is-sm"
+        disabled={coverageLoading}
+        on:click={() => dispatch('nextCoverage')}>{$t('Next')}</button
+      >{/if}
   {/if}
+
+  {#if coverageError}<LoadError
+      message={$t('Could not load maps covering this spot.')}
+      on:retry={() => dispatch('retryCoverage')}
+    />{/if}
 
   <ArchiveBrowser
     sortRows={byYear}
-    {search}
-    showFilters={search === null}
+    search={engine}
+    {showFilters}
     showLabels={false}
     on:pick
     on:remove
