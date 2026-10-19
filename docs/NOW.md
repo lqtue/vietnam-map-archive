@@ -56,7 +56,7 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
 | Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live 2026-10-18); `review-web` pushed | PR 2: the page (`docs/plans/review-page-plan.md` §8) |
 | Data model: activities (bets 1a, 2) | Claude | plans and dedup 1–2 merged (#85; mig 123–124 live 2026-10-18) | `activities` table, per `plans/data-model-target.md` |
-| Explore at scale (bet 3, corpus to link against) | Claude | `perf/explore-paging` (mig 125–126, not applied), `perf/large-series-browsing` stacked on it | Review, apply 125–126, merge; then measure `/explore` on real series |
+| Explore at scale (bet 3, corpus to link against) | Claude | `perf/explore-paging` (#92; mig 125–126 live 2026-10-19), `perf/large-series-browsing` stacked on it | Check `/explore` on L7014, merge #92 then #93; then measure `/explore` on real series |
 
 ## Parked
 
