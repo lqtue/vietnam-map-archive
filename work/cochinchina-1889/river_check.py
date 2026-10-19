@@ -160,7 +160,7 @@ def main():
                    calibration_window=CAL, calibration_residual_m=[cal["dx"], cal["dy"]])
     print(json.dumps(summary, indent=1))
     with open(out / "points" / "p-013-tan-an-check.csv", "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["role", "id", "px", "py", "lon", "lat", "residual_total_m", "residual_cross_river_m",
                     "residual_along_river_m", "n_osm_points", "note"])
         for r in rows:

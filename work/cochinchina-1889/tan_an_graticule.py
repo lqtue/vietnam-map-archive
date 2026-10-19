@@ -9,8 +9,9 @@ Nothing here touches the database, R2 or Allmaps.
 What the plate prints: a full lat/long grid, every 10 minutes, ruled across the whole sheet.
 Latitude labels (11°00' ... 10°30') run north-up and are true latitude. Longitude labels
 (1°10' ... 0°10') FALL from left to right: they count WEST of a meridian that lies just east
-of the sheet. That is neither Paris nor Greenwich; solved against rivers it is ~106.693 E
-Greenwich (Saigon meridian). See README.md.
+of the sheet. That is neither Paris nor Greenwich. The plate does not name it. The value that
+puts this sheet on modern rivers is ~106.693 E (WGS84); that is consistent with a meridian through
+Saigon and includes any datum offset of the 1880s survey. See README.md.
 
 Method (graticule only; no landmark enters this script):
   1. vertical lines: trace each in 120-row windows, robust line fit.
@@ -54,7 +55,8 @@ H_NOM = {"11d00": 952, "10d50": 3160, "10d40": 5385, "10d30": 7612}
 SLOPE = {"L": (0.0045, 0.0080), "R": (-0.0085, -0.0050)}  # the spread's two pages tilt opposite ways
 HALF_X = {"L": (1100, 7900), "R": (8500, 15800)}
 
-# From river_check.py (calibration window A only): printed coordinates minus true.
+# From river_check.py (calibration window A only): printed coordinates minus true. These include
+# any survey datum offset; they are what makes this sheet land on WGS84 rivers, nothing more.
 L0_SHIFT_M = 800.0   # east: printed longitude = true + this, so the reference meridian is 106.6927 E
 LAT_SHIFT_M = 100.0  # north
 KX = 111320 * np.cos(np.radians(10.7))
@@ -181,13 +183,13 @@ def main():
     (out / "points").mkdir(parents=True, exist_ok=True)
     gcps = []
     with open(out / "points" / "p-013-tan-an-fit.csv", "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["role", "id", "px", "py", "lon", "lat", "printed_west_deg", "printed_lat_deg", "note"])
         for p in pts:
             lon, lat = true_lonlat(p["west_deg"], p["lat_deg"])
             gcps.append(((p["px"], p["py"]), (lon, lat)))
             w.writerow(["fit", f"{p['v']}x{p['h']}", f"{p['px']:.1f}", f"{p['py']:.1f}", f"{lon:.6f}", f"{lat:.6f}",
-                        f"{p['west_deg']:.5f}", f"{p['lat_deg']:.5f}", f"graticule intersection, {p['half']} page"])
+                        f"{p['west_deg']:.5f}", f"{p['lat_deg']:.5f}", f"graticule intersection, {p['half']} page; lon/lat include the meridian and latitude shift set on calibration window 12600-14400 x 6400-7800"])
     # neatline: the inner frame, a little inside it
     mask = [(960, 750), (15700, 750), (15700, 9260), (960, 9260)]
     ann = G.annotation(IIIF, W, H, gcps, mask, transformation={"type": "thinPlateSpline"}, ndigits=1)

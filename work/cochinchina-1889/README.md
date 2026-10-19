@@ -37,9 +37,12 @@ landmark-only fit to get around that.
 * Longitude labels 1°10', 1°00', 0°50', 0°40', 0°30', 0°20', 0°10' **fall from left to right**. They count
   west of a meridian just east of the sheet. Paris (2°20'14" E of Greenwich) and Greenwich are both
   impossible readings: Tan An is at about 106.41 E, 104.07 E of Paris.
-* Solved against modern river banks, the reference meridian is **about 106.693 E Greenwich**
-  (106°41.6'), the Saigon meridian. Its uncertainty is about +-100 m (+-0.001 degrees), from how flat the
-  calibration score is. Latitude carries a small offset of about 100 m (printed is north of true).
+* The plate never names its meridian. The labels count west from a meridian east of the sheet. The value
+  that makes this sheet land on modern (WGS84) river banks is **about 106.693 E**, which is consistent with a
+  meridian through Saigon. That number includes any datum offset of the 1880s survey, so it is the
+  effective value for this sheet on WGS84, not a measured historical longitude; do not reuse it on another
+  plate. Its uncertainty is about +-100 m (+-0.001 degrees), from how flat the calibration score is.
+  Latitude carries a small offset of about 100 m (printed is north of true), with the same caveat.
 * The grid is straight lines per page but the spread is two pages: the lines tilt one way on the left page
   and the other on the right (about 0.4 degrees each), and the 0°40' line sits in the gutter. 24 intersections
   (6 meridians x 4 parallels) are the control points.
@@ -50,7 +53,7 @@ landmark-only fit to get around that.
 
 | Plate | Projection / meridian | Fit pts | Check | Check residual (m) | px/m | Verdict |
 |---|---|---|---|---|---|---|
-| p-013 Tan An | plain lat/long grid, thin-plate spline; meridian 106.6927 E (Saigon), west-counting | 24 graticule intersections | 6 river windows, right page only | cross-river median **69**, max **408**; unsplit shift median **194**, max **416** | 0.119 | **Not shown to pass.** Passes the 150 m line only on the cross-river measure, from six windows; fails it unsplit. |
+| p-013 Tan An | plain lat/long grid, thin-plate spline; longitudes west-counting from an effective 106.6927 E (WGS84) | 24 graticule intersections | 6 river windows, right page only | cross-river median **69**, max **408**; unsplit shift median **194**, max **416** | 0.119 | **Not shown to pass.** Passes the 150 m line only on the cross-river measure, from six windows; fails it unsplit. |
 | p-002 to p-012 | none possible from a graticule | 0 | 0 | not measured | n/a | blocked: no graticule |
 
 What each number is:
@@ -77,6 +80,9 @@ What each number is:
   900-2400 reads 408 m across, but by eye the bank there is within about 100 m). A different calibration
   shift moved two windows in or out of the set.
 * A modern river is not an 1887 river; some of the difference is the river.
+* Selection of the check set: a rule (`best score < 0.5`, which marks a degenerate optimum) was added after
+  the first run. It dropped one window, 9900-11400 x 900-2400 (295 m cross-river, 481 m unsplit). With it the
+  medians are 69 m and 194 m; without it, 69 m and about 200 m.
 * Nothing below the 10°30' parallel (y > 7600 px) was checked: the model extrapolates there (the lower
   Vàm Cỏ meanders sit 20-40 px off by eye).
 * No point features (junctions, towns) were matched. That needs a person at the map.
@@ -105,11 +111,11 @@ in `/explore` against the modern map: the check above is thin.
 
 ```bash
 node --env-file=.env scripts/georef_write.mjs --method printed-corners \
-  --datum "Saigon meridian 106.6927E, west-counting longitudes; shift set on OSM rivers" \
+  --datum "west-counting longitudes, effective meridian 106.6927E on WGS84 (includes survey datum offset); shift set on OSM rivers" \
   work/cochinchina-1889/annotations/bfc043c5-9023-4182-aa4e-807f4bffe762.json
 # if the dry run is clean:
 node --env-file=.env scripts/georef_write.mjs --apply --method printed-corners \
-  --datum "Saigon meridian 106.6927E, west-counting longitudes; shift set on OSM rivers" \
+  --datum "west-counting longitudes, effective meridian 106.6927E on WGS84 (includes survey datum offset); shift set on OSM rivers" \
   work/cochinchina-1889/annotations/bfc043c5-9023-4182-aa4e-807f4bffe762.json
 ```
 
