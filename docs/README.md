@@ -55,6 +55,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | [Model dedup](plans/model-dedup-plan.md) | One fact, one writer: the duplicated series, edition and JSON columns, measured |
 | [Digest pipeline](plans/digest-pipeline-plan.md) | Found to linked: machine proposes, person decides, every decision timed (bet 1a) |
 | [Review page](plans/review-page-plan.md) | The offline review pages moved into the app |
+| [Series-led admin units](plans/series-admin-saigon-plan.md) | Admin units and Saigon's states traced through the map series; the pilot area, link types, phases (bet 1c) |
 | [1882 feature layer](plans/image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison (bet 1b) |
 | [Search](plans/search-plan.md) | Finding labels, shapes and period sources |
 | [Catalog](plans/catalog-plan.md) | The public list: columns, facets, speed, search |
