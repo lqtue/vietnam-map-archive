@@ -210,6 +210,7 @@ export const vi: Record<string, string> = {
   'Could not load maps.': 'Không thể tải bản đồ.',
   'Could not load maps covering this spot.': 'Không thể tải bản đồ bao phủ vị trí này.',
   'First page': 'Trang đầu',
+  'Zoom in to view series scans': 'Phóng to để xem bản quét của bộ bản đồ',
   Previous: 'Trước',
   Next: 'Tiếp',
   Page: 'Trang',

@@ -17,6 +17,8 @@
   import type { WarpedMapLayer } from '@allmaps/openlayers';
   import type OlMap from 'ol/Map';
   import { transformExtent } from 'ol/proj';
+  import { unByKey } from 'ol/Observable';
+  import type { EventsKey } from 'ol/events';
   import type { Unsubscriber } from 'svelte/store';
 
   import { getShellContext } from './context';
@@ -25,12 +27,16 @@
     createWarpedLayer,
     destroyWarpedLayer,
     loadOverlayByUrl,
-    loadSeriesInView,
-    clearOverlay,
     setOverlayOpacity,
     applyClipMask,
-    type SeriesLoad,
   } from './warpedOverlay';
+  import {
+    createSeriesRenderer,
+    type SeriesRenderer,
+    type SeriesRenderStatus,
+  } from './seriesRenderer';
+  import { allocateSeriesBudgets } from './seriesRenderPolicy';
+  import { t } from '$lib/core/i18n';
   import { layersStore, type OverlayLayer, type LayerRef } from '$lib/map/stores/layersStore';
   import { fetchSeriesSheets } from '$lib/data/maps/service';
   import { getSupabaseContext } from '$lib/data/supabase/context';
@@ -42,7 +48,11 @@
 
   let olMap: OlMap | null = null;
   let initialized = false;
+  let destroyed = false;
   let unsubs: Unsubscriber[] = [];
+  let mapEvents: EventsKey[] = [];
+  let overviewNotices: { id: string; name: string }[] = [];
+  const seriesStatus = new Map<string, SeriesRenderStatus>();
 
   // Base historical layer (only when base.kind === 'historical')
   let baseWarped: WarpedMapLayer | null = null;
@@ -53,8 +63,24 @@
   // top the layer up with what has newly come into view.
   const overlayInstances = new Map<
     string,
-    { layer: WarpedMapLayer; loadedAllmapsId: string | null; series?: SeriesLoad }
+    { layer: WarpedMapLayer | null; loadedAllmapsId: string | null; series?: SeriesRenderer }
   >();
+
+  function updateNotices() {
+    overviewNotices = get(layersStore).overlays.flatMap((overlay) =>
+      seriesStatus.get(overlay.id)?.mode === 'overview'
+        ? [{ id: overlay.id, name: overlay.ref.name ?? '' }]
+        : []
+    );
+  }
+
+  function removeInstance(id: string) {
+    const inst = overlayInstances.get(id);
+    if (inst?.layer) destroyWarpedLayer(inst.layer);
+    inst?.series?.destroy();
+    overlayInstances.delete(id);
+    seriesStatus.delete(id);
+  }
 
   function hideAllBasemaps(map: OlMap) {
     map.getLayers().forEach((layer) => {
@@ -92,11 +118,17 @@
   let pending: { base: LayerRef; overlays: OverlayLayer[] } | null = null;
 
   async function queueSync(base: LayerRef, overlays: OverlayLayer[]) {
+    if (destroyed) return;
     pending = { base, overlays };
+    // Release removed/hidden series immediately, even during another layer's dynamic import.
+    const wanted = new Set(overlays.map((overlay) => overlay.id));
+    for (const id of overlayInstances.keys()) if (!wanted.has(id)) removeInstance(id);
+    topUpSeries();
+    updateNotices();
     if (syncing) return;
     syncing = true;
     try {
-      while (pending) {
+      while (pending && !destroyed) {
         const next = pending;
         pending = null;
         await syncBase(next.base);
@@ -124,7 +156,11 @@
     if (!baseWarped) {
       baseWarped = await createWarpedLayer(olMap, { zIndex: 5, name: 'allmaps-base' });
     }
-    if (!olMap) return; // torn down inside the dynamic import
+    if (!olMap || destroyed) {
+      if (baseWarped) destroyWarpedLayer(baseWarped);
+      baseWarped = null;
+      return;
+    }
     if (ref.allmapsId !== baseLoadedId) {
       baseLoadedId = ref.allmapsId;
       try {
@@ -147,9 +183,7 @@
     // Remove dropped overlays
     for (const id of existingIds) {
       if (!wantedIds.has(id)) {
-        const inst = overlayInstances.get(id);
-        if (inst) destroyWarpedLayer(inst.layer);
-        overlayInstances.delete(id);
+        removeInstance(id);
       }
     }
 
@@ -163,87 +197,99 @@
       // Side-by-side: the left pane shows ONLY the topmost overlay; the right
       // pane (DualMapPane) handles the second overlay independently.
       const visible = o.visible && !(sideBySide && i > 0);
-      const parts = o.ref.kind === 'series' ? o.ref.parts : [];
-
-      // One WarpedMapLayer holding either a single sheet's annotation or a whole series' worth.
-      const sheets = parts.find((p) => p.kind === 'sheets');
-      if (o.ref.kind === 'series' && !sheets) {
-        const stale = overlayInstances.get(o.id);
-        if (stale) {
-          destroyWarpedLayer(stale.layer);
-          overlayInstances.delete(o.id);
+      let inst = overlayInstances.get(o.id);
+      if (!inst) {
+        inst = { layer: null, loadedAllmapsId: null };
+        overlayInstances.set(o.id, inst);
+      }
+      if (o.ref.kind === 'series') {
+        const ref = o.ref;
+        const wanted = `sheets:${JSON.stringify(ref.parts)}`;
+        if (inst.loadedAllmapsId !== wanted) {
+          inst.series?.destroy();
+          if (inst.layer) destroyWarpedLayer(inst.layer);
+          inst.layer = null;
+          inst.series = undefined;
+          inst.loadedAllmapsId = wanted;
+          const instance = inst;
+          // Metadata is small; scans and the WebGL renderer stay absent in overview.
+          // Do not hold the synchronization queue while a remote index is read.
+          void Promise.all(
+            ref.parts.map((part) =>
+              fetchSeriesSheets(
+                supabase,
+                part.seriesKey ?? ref.key,
+                part.seriesKey ? undefined : part.collection
+              )
+            )
+          )
+            .then((parts) => {
+              if (
+                destroyed ||
+                !olMap ||
+                overlayInstances.get(o.id) !== instance ||
+                instance.loadedAllmapsId !== wanted
+              )
+                return;
+              const found = [
+                ...new Map(parts.flat().map((sheet) => [sheet.source, sheet])).values(),
+              ];
+              if (!found.length) return;
+              instance.series = createSeriesRenderer(olMap, found, {
+                name: ref.name,
+                bounds: ref.bounds,
+                onStatus: (status) => {
+                  seriesStatus.set(o.id, status);
+                  updateNotices();
+                },
+              });
+              topUpSeries();
+            })
+            .catch((error) => {
+              if (!destroyed && overlayInstances.get(o.id) === instance) {
+                instance.loadedAllmapsId = null;
+                console.warn('[LayerRenderer] Series index failed', error);
+              }
+            });
         }
         continue;
       }
-
-      let inst = overlayInstances.get(o.id);
-      if (!inst) {
+      if (inst.series) {
+        inst.series.destroy();
+        inst.series = undefined;
+        seriesStatus.delete(o.id);
+      }
+      if (!visible) {
+        if (inst.layer) destroyWarpedLayer(inst.layer);
+        inst.layer = null;
+        inst.loadedAllmapsId = null;
+        continue;
+      }
+      if (!inst.layer) {
         const layer = await createWarpedLayer(olMap, {
           zIndex: z + 1,
           name: `allmaps-overlay-${o.id}`,
         });
-        inst = { layer, loadedAllmapsId: null };
-        overlayInstances.set(o.id, inst);
-      } else {
-        try {
-          (inst.layer as any).setZIndex(z + 1);
-        } catch {}
-      }
-
-      // A series and a single sheet are the same layer with a different number
-      // of annotations in it. `loadedAllmapsId` is the sentinel for "what is in
-      // this layer already" either way — the collection name stands in for it,
-      // so a series reloads only when the row itself changes.
-      const seriesKey = o.ref.kind === 'series' ? (sheets?.seriesKey ?? o.ref.key) : '';
-      const wanted = sheets
-        ? `sheets:${seriesKey}`
-        : o.ref.kind === 'historical'
-          ? o.ref.allmapsId
-          : '';
-
-      if (inst.loadedAllmapsId !== wanted) {
-        inst.loadedAllmapsId = wanted;
-        try {
-          if (sheets) {
-            const found = await fetchSeriesSheets(
-              supabase,
-              seriesKey,
-              sheets.seriesKey ? undefined : sheets.collection
-            );
-            if (!found.length) {
-              // Every sheet in the series is a draft this reader may not read,
-              // or the collection name has drifted. Either way an empty layer
-              // explains nothing, so say it once.
-              console.warn('[LayerRenderer] series resolved to no sheets', seriesKey);
-            }
-            // The loader is purely additive, so whatever the previous series
-            // left in this layer has to come out by hand.
-            clearOverlay(inst.layer);
-            inst.series = { sheets: found, loaded: new Set<string>() };
-            const { failed } = await loadSeriesInView(
-              inst.layer,
-              olMap,
-              inst.series,
-              lonLatViewport(),
-              o.opacity
-            );
-            if (failed)
-              console.warn(
-                `[LayerRenderer] series ${seriesKey}: ${failed} sheet(s) failed to load`
-              );
-          } else {
-            await loadOverlayByUrl(inst.layer, olMap, wanted, o.opacity);
-          }
-        } catch (err) {
-          console.warn('[LayerRenderer] overlay load failed', o, err);
+        if (
+          destroyed ||
+          !olMap ||
+          !get(layersStore).overlays.some((row) => row.id === o.id && row.visible)
+        ) {
+          destroyWarpedLayer(layer);
+          continue;
         }
-      } else {
-        setOverlayOpacity(inst.layer, olMap, o.opacity);
+        inst.layer = layer;
       }
-
-      const canvas = inst.layer.canvas;
-      if (canvas) canvas.style.display = visible ? '' : 'none';
+      inst.layer.setZIndex(z + 1);
+      if (inst.loadedAllmapsId !== o.ref.allmapsId) {
+        inst.loadedAllmapsId = o.ref.allmapsId;
+        void loadOverlayByUrl(inst.layer, olMap, o.ref.allmapsId, o.opacity).catch((error) =>
+          console.warn('[LayerRenderer] Overlay load failed', error)
+        );
+      } else setOverlayOpacity(inst.layer, olMap, o.opacity);
     }
+    topUpSeries();
+    updateNotices();
   }
 
   // ── Clip mask (Lens / Side-by-side) ──────────────────────────────
@@ -252,7 +298,7 @@
     const ls = get(layerStore);
     if (baseWarped) applyClipMask(baseWarped, olMap, ls.viewMode, ls.lensRadius);
     for (const { layer } of overlayInstances.values()) {
-      applyClipMask(layer, olMap, ls.viewMode, ls.lensRadius);
+      if (layer) applyClipMask(layer, olMap, ls.viewMode, ls.lensRadius);
     }
   }
 
@@ -268,13 +314,29 @@
   function topUpSeries() {
     if (!olMap) return;
     const view = lonLatViewport();
+    const ls = get(layerStore);
     const overlays = get(layersStore).overlays;
-    for (const o of overlays) {
+    const active = overlays.filter(
+      (o, i) =>
+        o.ref.kind === 'series' &&
+        o.visible &&
+        !(ls.viewMode === 'dual' && i > 0) &&
+        overlayInstances.get(o.id)?.series?.intersectsView(view)
+    );
+    const allocations = allocateSeriesBudgets(active.length, (olMap.getSize()?.[0] ?? 0) < 900);
+    const budgetById = new Map(active.map((o, i) => [o.id, allocations[i]]));
+    for (let i = 0; i < overlays.length; i++) {
+      const o = overlays[i];
       const inst = overlayInstances.get(o.id);
-      if (!inst?.series || !o.visible) continue;
-      loadSeriesInView(inst.layer, olMap, inst.series, view, o.opacity).catch((err) =>
-        console.warn('[LayerRenderer] series top-up failed', err)
-      );
+      inst?.series?.update({
+        view,
+        allocation: budgetById.get(o.id) ?? 0,
+        visible: budgetById.has(o.id),
+        opacity: o.opacity,
+        zIndex: 11 + 2 * (overlays.length - 1 - i),
+        clip: ls.viewMode,
+        lensRadius: ls.lensRadius,
+      });
     }
   }
 
@@ -301,21 +363,60 @@
           })
         );
 
-        $map.on('moveend', refreshClips);
-        $map.on('moveend', topUpSeries);
-        $map.on('change:size', refreshClips);
+        mapEvents = [
+          $map.on('moveend', refreshClips),
+          $map.on('moveend', topUpSeries),
+          $map.on('change:size', () => {
+            refreshClips();
+            topUpSeries();
+          }),
+        ];
       })
     );
   });
 
   onDestroy(() => {
+    destroyed = true;
+    pending = null;
+    unByKey(mapEvents);
+    mapEvents = [];
     unsubs.forEach((u) => u());
     unsubs = [];
     if (baseWarped) {
       destroyWarpedLayer(baseWarped);
       baseWarped = null;
     }
-    for (const inst of overlayInstances.values()) destroyWarpedLayer(inst.layer);
-    overlayInstances.clear();
+    for (const id of overlayInstances.keys()) removeInstance(id);
+    olMap = null;
   });
 </script>
+
+{#if overviewNotices.length}
+  <div class="series-overview-notice" data-series-overview-notice role="status">
+    <strong>{$t('Zoom in to view series scans')}</strong>
+    {#each overviewNotices as notice (notice.id)}<span>{notice.name}</span>{/each}
+  </div>
+{/if}
+
+<style>
+  .series-overview-notice {
+    position: absolute;
+    top: var(--space-3);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    padding: var(--space-2) var(--space-3);
+    max-width: 80%;
+    background: var(--sb-card-bg);
+    color: var(--sb-text);
+    border: var(--border-thin);
+    border-radius: var(--sb-radius);
+    font-size: 0.75rem;
+    pointer-events: none;
+    text-align: center;
+  }
+  .series-overview-notice span {
+    display: block;
+    color: var(--sb-text-muted);
+  }
+</style>

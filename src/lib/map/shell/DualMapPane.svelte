@@ -16,7 +16,6 @@
     destroyWarpedLayer,
     loadOverlayByUrl,
     setOverlayOpacity,
-    clearOverlay,
   } from './warpedOverlay';
   import type { WarpedMapLayer } from '@allmaps/openlayers';
 
@@ -49,43 +48,90 @@
   // Expose to parent
   $: map = secondaryMap;
 
-  // React to overlay visibility
-  $: if (warpedLayer) {
-    const canvas = warpedLayer.canvas;
-    if (canvas) {
-      canvas.style.display = showOverlay ? '' : 'none';
+  let destroyed = false;
+  let generation = 0;
+  let creating: Promise<WarpedMapLayer> | null = null;
+  const animationFrames = new Set<number>();
+
+  function releaseOverlay() {
+    generation++;
+    const layer = warpedLayer;
+    warpedLayer = null;
+    currentOverlayId = null;
+    if (layer) destroyWarpedLayer(layer);
+  }
+
+  // A hidden/empty secondary pane owns no renderer, workers or WebGL context.
+  $: if (secondaryMap) void syncOverlay(activeAllmapsId, showOverlay, overlayOpacity);
+
+  async function syncOverlay(id: string, visible: boolean, opacity: number) {
+    const target = secondaryMap;
+    if (destroyed || !target) return;
+    if (!id || !visible) {
+      releaseOverlay();
+      return;
     }
-  }
-
-  // React to opacity changes
-  $: if (warpedLayer && secondaryMap) {
-    setOverlayOpacity(warpedLayer, secondaryMap, overlayOpacity);
-  }
-
-  // React to activeAllmapsId changes (must be Allmaps hex ID, not UUID)
-  $: if (secondaryMap && warpedLayer) {
-    if (activeAllmapsId && activeAllmapsId !== currentOverlayId) {
-      loadOverlay(activeAllmapsId);
-    } else if (!activeAllmapsId && currentOverlayId) {
-      clearOverlay(warpedLayer, secondaryMap ?? undefined);
-      currentOverlayId = null;
+    if (!warpedLayer) {
+      if (creating) return;
+      const ticket = ++generation;
+      const pending = createWarpedLayer(target);
+      creating = pending;
+      try {
+        const layer = await pending;
+        if (
+          destroyed ||
+          target !== secondaryMap ||
+          ticket !== generation ||
+          !activeAllmapsId ||
+          !showOverlay
+        ) {
+          destroyWarpedLayer(layer);
+        } else {
+          warpedLayer = layer;
+        }
+      } catch (err) {
+        if (!destroyed) console.warn('[DualMapPane] Failed to create overlay:', err);
+        return;
+      } finally {
+        if (creating === pending) creating = null;
+      }
+      if (!destroyed && secondaryMap && activeAllmapsId && showOverlay)
+        void syncOverlay(activeAllmapsId, showOverlay, overlayOpacity);
+      return;
     }
-  }
-
-  async function loadOverlay(id: string) {
-    if (!warpedLayer || !secondaryMap) return;
+    const layer = warpedLayer;
+    setOverlayOpacity(layer, target, opacity);
+    if (id === currentOverlayId) return;
     currentOverlayId = id;
+    const ticket = generation;
     try {
-      await loadOverlayByUrl(warpedLayer, secondaryMap, id, overlayOpacity);
-      const canvas = warpedLayer.canvas;
-      if (canvas) canvas.style.display = showOverlay ? '' : 'none';
-      secondaryMap.render();
+      await loadOverlayByUrl(layer, target, id, opacity);
+      if (
+        destroyed ||
+        ticket !== generation ||
+        warpedLayer !== layer ||
+        secondaryMap !== target ||
+        currentOverlayId !== id
+      )
+        return;
+      setOverlayOpacity(layer, target, overlayOpacity);
     } catch (err) {
-      console.warn('[DualMapPane] Failed to load overlay:', err);
+      if (!destroyed && ticket === generation && warpedLayer === layer && currentOverlayId === id) {
+        currentOverlayId = null;
+        console.warn('[DualMapPane] Failed to load overlay:', err);
+      }
     }
   }
 
-  onMount(async () => {
+  function nextFrame(callback: () => void) {
+    const id = requestAnimationFrame(() => {
+      animationFrames.delete(id);
+      if (!destroyed) callback();
+    });
+    animationFrames.add(id);
+  }
+
+  onMount(() => {
     // Create basemap layers
     basemapLayers = createBasemapLayers();
 
@@ -110,39 +156,24 @@
 
     // OL needs a valid size — force updateSize after layout settles
     // Double-RAF ensures the browser has completed layout
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    nextFrame(() => {
+      nextFrame(() => {
         secondaryMap?.updateSize();
         secondaryMap?.render();
       });
     });
-
-    // Create warped layer for overlay. The @allmaps bundle is imported on
-    // demand, so this is a round trip; the pane may be torn down inside it.
-    const layer = await createWarpedLayer(secondaryMap);
-    if (!secondaryMap) {
-      destroyWarpedLayer(layer);
-      return;
-    }
-    warpedLayer = layer;
-
-    // Load initial overlay if present
-    if (activeAllmapsId) {
-      loadOverlay(activeAllmapsId);
-    }
   });
 
   onDestroy(() => {
-    if (warpedLayer) {
-      destroyWarpedLayer(warpedLayer);
-      warpedLayer = null;
-    }
-    if (secondaryMap) {
-      secondaryMap.setTarget(undefined);
-      secondaryMap = null;
-    }
+    destroyed = true;
+    for (const frame of animationFrames) cancelAnimationFrame(frame);
+    animationFrames.clear();
+    releaseOverlay();
+    const target = secondaryMap;
+    secondaryMap = null;
+    target?.setTarget(undefined);
+    target?.dispose();
     basemapLayers.clear();
-    currentOverlayId = null;
   });
 </script>
 
