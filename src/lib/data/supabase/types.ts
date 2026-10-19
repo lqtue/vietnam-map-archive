@@ -1659,6 +1659,10 @@ export type Database = {
       }
     }
     Views: {
+      series_index_summary: {
+        Row: { key: string | null; total: number | null; held: number | null; obtainable: number | null; no_scan: number | null }
+        Relationships: []
+      }
       series_cell_coverage: {
         Row: { series_id: string | null; key: string | null; name: string | null; cell_count: number | null; publicly_held_cell_count: number | null; held_cell_count: number | null }
         Relationships: []

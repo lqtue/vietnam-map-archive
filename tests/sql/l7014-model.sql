@@ -69,6 +69,7 @@ values('11111111-1111-4111-8111-111111111111','https://images.example/legacy');
 \ir ../../supabase/migrations/106_sheet_printings.sql
 \ir ../../supabase/migrations/107_map_archiving.sql
 \ir ../../supabase/migrations/108_maps_status_default.sql
+\ir ../../supabase/migrations/125_series_index_summary.sql
 
 -- Stable series survives label changes; one index cell can have several printings.
 do $$
@@ -191,6 +192,18 @@ set role anon;
 select set_config('request.jwt.claim.role','anon',false);
 select set_config('request.jwt.claim.sub','',false);
 do $$ begin
+ if exists (
+   select 1 from series_index_summary a
+   where (a.total,a.held,a.obtainable,a.no_scan) is distinct from (
+     select row(count(*),count(*) filter(where publicly_held),
+       count(*) filter(where not publicly_held and known_source),
+       count(*) filter(where not publicly_held and not known_source))
+     from series_cell_coverage_detail d where d.key=a.key
+   )
+ ) then raise exception 'series summary differs from visible cell tally'; end if;
+ if (select held from series_index_summary where key='l7014-test')<>1 then
+   raise exception 'series summary counted draft or archived holdings'; end if;
+
  if exists(select 1 from maps where name in ('Draft only','Draft only other cell','Archived only cell')) then raise exception 'anonymous map gate exposed draft/archive'; end if;
  if exists(select 1 from maps where name='Scan B') then raise exception 'anonymous map gate exposed archived duplicate'; end if;
  if not exists(select 1 from maps where name='Legacy L7014 scan') then raise exception 'public legacy scan missing'; end if;
@@ -208,6 +221,18 @@ set role authenticated;
 select set_config('request.jwt.claim.role','authenticated',false);
 select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',false);
 do $$ begin
+ if exists (
+   select 1 from series_index_summary a
+   where (a.total,a.held,a.obtainable,a.no_scan) is distinct from (
+     select row(count(*),count(*) filter(where publicly_held),
+       count(*) filter(where not publicly_held and known_source),
+       count(*) filter(where not publicly_held and not known_source))
+     from series_cell_coverage_detail d where d.key=a.key
+   )
+ ) then raise exception 'series summary differs from visible cell tally'; end if;
+ if (select held from series_index_summary where key='l7014-test')<>1 then
+   raise exception 'series summary counted draft or archived holdings'; end if;
+
  if (select held_cell_count from series_cell_coverage where key='l7014-test')<>2 then raise exception 'authenticated coverage did not include draft cell'; end if;
  if not (select held from series_cell_coverage_detail where key='l7014-test' and sheet_number='draft-only-other') then raise exception 'authenticated detail hid draft cell'; end if;
  if (select held from series_cell_coverage_detail where key='l7014-test' and sheet_number='archived-only') then raise exception 'authenticated detail counted archived cell'; end if;
@@ -229,6 +254,18 @@ set role service_role;
 select set_config('request.jwt.claim.role','service_role',false);
 select set_config('request.jwt.claim.sub','',false);
 do $$ begin
+ if exists (
+   select 1 from series_index_summary a
+   where (a.total,a.held,a.obtainable,a.no_scan) is distinct from (
+     select row(count(*),count(*) filter(where publicly_held),
+       count(*) filter(where not publicly_held and known_source),
+       count(*) filter(where not publicly_held and not known_source))
+     from series_cell_coverage_detail d where d.key=a.key
+   )
+ ) then raise exception 'series summary differs from visible cell tally'; end if;
+ if (select held from series_index_summary where key='l7014-test')<>1 then
+   raise exception 'series summary counted draft or archived holdings'; end if;
+
  if (select held_cell_count from series_cell_coverage where key='l7014-test')<>1 then raise exception 'service coverage counted draft cell'; end if;
  if exists(select 1 from series_cell_coverage_detail where key='l7014-test' and sheet_number in ('draft-only-other','archived-only') and held) then raise exception 'service detail leaked non-public held flag'; end if;
  if not (select known_source from series_cell_coverage_detail where key='l7014-test' and sheet_number='6330-4') then raise exception 'service lost public institution URL'; end if;

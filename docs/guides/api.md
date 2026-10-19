@@ -119,6 +119,21 @@ and only the sha256 is stored. Revoke by setting `worker_keys.revoked_at`.
 
 Public / other:
 
+- `/api/explore/maps/` — GET bounded georeferenced map pages (default 60, maximum 100),
+  full-query totals/facets/choices/year bins and matched series counts. `q` folds accents;
+  `filters` is JSON with `area`, `region`, `type`, `institution`, `series_key`, `kind`,
+  `status` and a two-value `year` range. `cursor` is the returned year/name/ID JSON cursor;
+  `point=[lng,lat]` uses persisted coverage bounds; `ids` restricts selected map identities.
+  `sources=1` excludes composites with complete visible original replacements. Public
+  readers get public/featured rows; only admin/mod get drafts. The service-only RPC owns
+  filtering/counting. Anonymous first pages use a deployment-versioned 300-second edge
+  cache; staff, signed-in readers, point/ID/cursor reads bypass it. Browser responses are
+  private/no-store. Requires migrations 125–126 before the application deployment.
+- `/api/explore/map/` — GET one map by `ref` (slug, UUID or legacy Allmaps ID), with
+  optional `direction=-1|1` for the adjacent overlay in year/name/ID order. Same explicit
+  visibility gate, no archived rows, no shared cache. Supplies selected-map details
+  independently of archive result pages.
+
 - `/api/maps/[id]/open/` — **public** POST. Records one published-map view through the bounded
   `record_map_view` RPC and returns `{ recorded }`; direct table inserts are closed.
 - `/api/maps/[id]/annotation/` — **public for published maps** GET; drafts require a signed-in

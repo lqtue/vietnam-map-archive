@@ -23,8 +23,10 @@
 -->
 <script lang="ts">
   import { t } from '$lib/core/i18n';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
+  import { writable } from 'svelte/store';
+  import { debounce } from '$lib/core/utils/debounce';
   import type { ViewMode } from '$lib/map/types';
   import type { MapListItem } from '$lib/data/maps/types';
   import type { SeriesRef } from '$lib/map/stores/layersStore';
@@ -34,7 +36,8 @@
   import LayerStackPanel from '$lib/features/shared/LayerStackPanel.svelte';
   import SidebarCard from '$lib/features/shared/SidebarCard.svelte';
   import ExploreBrowsePanel from './ExploreBrowsePanel.svelte';
-  import { createCatalogSearch, type LabelHit } from '$lib/features/shared/catalogSearch';
+  import type { LabelHit, CatalogSearchController } from '$lib/features/shared/catalogSearch';
+  import { createExplorePickedFilter } from '$lib/features/shared/exploreSearch';
   import type { ResolvedMap } from './spatialLookup';
 
   const dispatch = createEventDispatcher<{
@@ -45,12 +48,20 @@
     zoomToOverlay: { mapId: string; bounds?: [number, number, number, number] };
     inspectMap: { mapId: string; tab: 'info' | 'legend' };
     inspectSeries: { ref: SeriesRef; tab: 'info' | 'legend' };
+    nextCoverage: void;
+    retryCoverage: void;
   }>();
 
   export let viewMode: ViewMode = 'overlay';
+  export let search: CatalogSearchController;
   export let mapList: MapListItem[] = [];
   /** Map ids whose traced fabric is drawn; owned by the page. */
   export let matches: ResolvedMap[] = [];
+  export let coverageTotal = 0;
+  export let coverageHasNext = false;
+  export let coverageLoading = false;
+  export let coverageError = false;
+  export let coveragePage = 1;
   export let role: 'user' | 'mod' | 'admin' = 'user';
   /** True while the product tour is pending or open. It sets `tab` itself, per
    *  step, so the auto-switch below must stand aside for it. */
@@ -109,20 +120,32 @@
 
   // Only maps that can be laid on the world — the viewer can overlay nothing
   // else. `requireGeoref` therefore lives here rather than on the browser.
-  const search = createCatalogSearch({ requireGeoref: true });
-  const { query, results, selected } = search;
+  const { query, selected } = search;
+  const seriesCounts = search.seriesCounts ?? writable<Record<string, number>>({});
+  const picked = createExplorePickedFilter();
+  const { ids: pickedFilterIds } = picked;
+  const schedulePicked = debounce((signature: string) => {
+    const [query, filters, ids] = JSON.parse(signature);
+    void picked.update(query, filters, ids);
+  }, 150);
   onMount(() => search.start());
+  onDestroy(() => {
+    picked.destroy();
+    schedulePicked.cancel();
+  });
 
   $: filterActive =
     !!$query.trim() ||
     ($selected.area?.length ?? 0) > 0 ||
     ($selected.type?.length ?? 0) > 0 ||
-    ($selected.year?.length ?? 0) > 0;
+    Object.values($selected).some((values) => values.some(Boolean));
 
   $: stackedMapIds = $layersStore.overlays.map((o) => o.ref.mapId);
-  $: matchedIds = new Set($results.map((r) => r.id));
-  /** Null while nothing is filtered, so Picked shows the whole stack. */
-  $: pickedFilterIds = filterActive ? [...matchedIds] : null;
+  $: pickedMapIds = $layersStore.overlays
+    .filter((o) => o.ref.kind === 'historical')
+    .map((o) => o.ref.mapId);
+  $: pickedSignature = JSON.stringify([$query, $selected, [...pickedMapIds].sort()]);
+  $: schedulePicked(pickedSignature);
 
   // Deliberately does not read `tab`, so assigning it cannot re-trigger this.
   $: if (!tabSettled && !tourActive && stackedMapIds.length) {
@@ -176,6 +199,13 @@
           {matches}
           {role}
           {search}
+          {coverageTotal}
+          {coverageHasNext}
+          {coverageLoading}
+          {coverageError}
+          {coveragePage}
+          on:nextCoverage
+          on:retryCoverage
           on:pick={(e) => pickMap(e.detail)}
           on:pickLabel={(e) => dispatch('pickLabel', e.detail)}
           on:remove={(e) => dispatch('removeOverlay', e.detail)}
@@ -185,7 +215,10 @@
           inspectionInRail={true}
           {viewMode}
           {mapList}
-          filterIds={pickedFilterIds}
+          filterIds={$pickedFilterIds}
+          searchQuery={filterActive ? $query : ''}
+          searchFilters={filterActive ? $selected : null}
+          matchingSeriesCounts={filterActive ? $seriesCounts : null}
           on:zoomToOverlay={(e) => dispatch('zoomToOverlay', e.detail)}
           on:inspectMap
           on:inspectSeries

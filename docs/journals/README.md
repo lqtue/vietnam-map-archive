@@ -7,6 +7,7 @@ use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../REA
 
 | Record | Subject |
 |---|---|
+| [261019](261019-explore-performance.md) | Explore pagination, series resource limits and synthetic 10k/100k SQL measurements |
 | [261012](261012-manual-baseline.md) | Manual baseline: human latency, correction rates and one-off effort per pipeline stage, from existing data |
 | [261006](261006-1898-ocr-prep.md) | 1898 Saigon Plan OCR prep: no road numbers printed, `Rue` split from names, review the existing run |
 | [261006](261006-1882-ocr-review-patterns.md) | 1882 OCR review: what 212 validated rows say about the other District 4 sheets |

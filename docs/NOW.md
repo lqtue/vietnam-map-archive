@@ -18,7 +18,7 @@ referees or contacts here — those live in `docs/private/`.
 | **1a. Place links, 1882** (`place-links`, `then-now-blocks`) | One owner sitting gives a measured linkage result now. | Owner-confirmed links with measured accuracy and seconds per item. Plan: `plans/digest-pipeline-plan.md` |
 | **2. Measured gates** (`review-events`, `paper-audit-100k`) | Turns "it works" into numbers: error rate with an interval, seconds per item. The paper's contribution. | The baseline's "unmeasured" cells have numbers |
 | **1c. Admin units over time, Saigon** (test) | The link applied to units, and the 2025 reform made into data: the first record beyond the 1882 sheet (`CONCEPT.md` §What it makes). | Test: trace Xuân Hòa ward from 2025 to the 1882 topographic plan (`plan-topographique-du-20e-arrondissement-et-ses-environs`; villages and cantons, not the cadastral city plan), each step a typed link with its source; count the steps with an independent source. Kill: 1975–2004 rests on one printed book → Saigon only, nation parked. Groundwork: `experiments/admin-lines/` (#83) |
-| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md`. Code parked on `1882-extraction` (one commit, unreviewed; mig 120–121 not applied; renumber past 124 before it merges) |
+| **1b. 1882 full extraction** — parcels → roads → lots | The worked example every claim points to. Needs owner reference tracing and a GPU run. | **Later**, after 1a and 2. Plan: `plans/image-processing-1882-plan.md`. Code parked on `1882-extraction` (one commit, unreviewed; mig 120–121 not applied; renumber past 126 before it merges) |
 | **3. Corpus to link against** — series georef, OCR drain | Serves the product, not the next weeks. | **Later**, after 1a and 2. ROADMAP *Do next* |
 
 ## Tue only — the bottleneck
@@ -56,6 +56,7 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
 | Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live 2026-10-18); `review-web` pushed | PR 2: the page (`docs/plans/review-page-plan.md` §8) |
 | Data model: activities (bets 1a, 2) | Claude | plans and dedup 1–2 merged (#85; mig 123–124 live 2026-10-18) | `activities` table, per `plans/data-model-target.md` |
+| Explore at scale (bet 3, corpus to link against) | Claude | `perf/explore-paging` (mig 125–126, not applied), `perf/large-series-browsing` stacked on it | Review, apply 125–126, merge; then measure `/explore` on real series |
 
 ## Parked
 
