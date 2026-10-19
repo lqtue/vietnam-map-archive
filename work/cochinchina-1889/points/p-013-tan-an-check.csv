@@ -1,0 +1,7 @@
+role,id,px,py,lon,lat,residual_total_m,residual_cross_river_m,residual_along_river_m,n_osm_points,note
+check,win_9900_3900,10650,4650,106.221113,10.722388,204,33,201,3864,"river-registration window (9900, 3900, 11400, 5400); river anisotropy 0.23"
+check,win_9900_5400,10650,6150,106.220314,10.609513,117,69,94,1683,"river-registration window (9900, 5400, 11400, 6900); river anisotropy 0.11"
+check,win_11400_900,12150,1650,106.339769,10.949643,416,408,82,2629,"river-registration window (11400, 900, 12900, 2400); river anisotropy 0.18"
+check,win_11400_2400,12150,3150,106.338804,10.835502,189,177,65,3000,"river-registration window (11400, 2400, 12900, 3900); river anisotropy 0.24"
+check,win_12900_2400,13650,3150,106.455658,10.834659,0,0,0,1191,"river-registration window (12900, 2400, 14400, 3900); river anisotropy 0.58"
+check,win_12900_3900,13650,4650,106.454935,10.721327,200,69,188,2041,"river-registration window (12900, 3900, 14400, 5400); river anisotropy 0.52"

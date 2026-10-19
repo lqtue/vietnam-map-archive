@@ -1,0 +1,17 @@
+{
+ "n_windows": 6,
+ "cross_median_m": 68.90208748178522,
+ "cross_max_m": 407.99474176112744,
+ "total_median_m": 194.33981132056604,
+ "total_max_m": 416.17304093369626,
+ "calibration_window": [
+  12600,
+  6400,
+  14400,
+  7800
+ ],
+ "calibration_residual_m": [
+  70.0,
+  -90.0
+ ]
+}
