@@ -8,7 +8,7 @@ full-summary query cost and overview rendering still need measurement as the cor
 
 Implemented bounded Explore pages (60 rows by default, maximum 100), stable year/name/ID cursors, full-query counts/facets/choices, accent-folded indexed search, and source-only paging that respects visible replacement halves. Full map metadata is read only for the selected page. Filtering and summaries use a narrow projection.
 
-Deploy migrations **125 and 126 before the application**. Migration 126 adds a stored search vector and GIN index, which rewrite/index existing maps during deployment. These changes have not been applied to production.
+Deploy migrations **125 and 126 before the application**. Migration 126 adds a stored search vector and GIN index, which rewrite/index existing maps during deployment. Applied to production on 19 October 2026.
 
 ## Reproduce
 
