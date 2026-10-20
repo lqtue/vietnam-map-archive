@@ -105,6 +105,71 @@
       </dl>
     </section>
 
+    <!-- HOW A LINK IS MADE — the four verbs of docs/CONCEPT.md, and what each one has today -->
+    <section class="section-card">
+      <h2 class="section-title-sm">How a link is made</h2>
+      <p class="section-desc">
+        Old maps of one city disagree: each was drawn by someone, for a purpose. So we do not try to
+        merge them. We tie a thing on one map to a thing on another map, in a document, or in the
+        city today, and write down how the two relate. A machine proposes each link and a person
+        decides. Four steps, each needing the one before.
+      </p>
+      <ul class="plain-list">
+        <li>
+          <strong>Place.</strong>
+          Pin a scan to real coordinates, so it lies over the modern map. Done for the sheets counted
+          above.
+        </li>
+        <li>
+          <strong>Read.</strong>
+          Turn what is printed into data: place names, read by a machine and checked by a person, and
+          building and street shapes, traced by hand so far. A sheet that is not yet in place cannot be
+          read for names that mean anything today.
+        </li>
+        <li>
+          <strong>Link.</strong>
+          Say how a name on an old sheet relates to a place today: the same building, the same site with
+          a new building, moved, gone, or none of these. A reused name is not the same place, and the
+          relation is where we say so. This is being tested offline on the 1882 survey of Saigon; nothing
+          is published.
+        </li>
+        <li>
+          <strong>Check.</strong>
+          A person decides, and we record who, when, what the machine had suggested and whether they saw
+          it. On about one item in five the suggestion is hidden first, so a person who checks can be
+          told from one who only agrees. For now this runs offline, on one reviewer’s machine; a web version
+          for more reviewers is being built.
+        </li>
+      </ul>
+    </section>
+
+    <!-- THE RULE -->
+    <section class="section-card">
+      <h2 class="section-title-sm">A check counts only if it could have failed</h2>
+      <p class="section-desc">
+        Three things look like a check and are not. We try not to count them, and we say so when we
+        cannot tell.
+      </p>
+      <ul class="plain-list">
+        <li>
+          A machine test that shares the error it tests for: if the same mistake is in both, the
+          test cannot find it.
+        </li>
+        <li>
+          A person who only agrees with the machine. People tend to accept what a machine suggests,
+          which is why some suggestions are hidden.
+        </li>
+        <li>
+          A second source copied from the first. Two maps redrawn from one survey agree for free,
+          and so does a summary of the catalogue it was written from.
+        </li>
+      </ul>
+      <p class="section-desc">
+        The aim is a measured record: how often a link is right, how many seconds a check takes, and
+        which checks were independent of what they checked. We have no such number yet.
+      </p>
+    </section>
+
     <!-- WHAT WORKS -->
     <section class="section-card">
       <h2 class="section-title-sm">{$t('What you can do today')}</h2>
@@ -155,6 +220,11 @@
           <strong>{$t('No public links yet.')}</strong>{$t(
             'Linking a name on one map to the same place on another is being tested offline on the 1882 survey. Nothing is published.'
           )}
+        </li>
+        <li>
+          <strong>No measured accuracy yet.</strong>We do not yet know how often a link is right or
+          how long a check takes. The tools that count this are built and run offline; the first
+          reviewer’s sitting is still to come.
         </li>
         <li>
           <strong>{$t('No building histories.')}</strong>{$t(
