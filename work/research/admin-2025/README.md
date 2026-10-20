@@ -19,8 +19,8 @@ tags (below), the rules settle 2 names wrongly without a check; the published ta
 the decision is logged) now runs on a national dataset, with a queue a person can clear in an
 afternoon. The crosswalk check found one wrong hand-typed code (Tân Ninh, Tây Ninh was given
 Phường 4 of Tân An, Long An), a one-row slip among the Kiên Giang islands (Kiên Hải, Tiên Hải and
-Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), 15 units whose sources name the
-wrong commune or leave one out (below), and 211 old communes that land in no new unit.
+Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), 16 units whose sources name the
+wrong commune or leave one out (below), and 210 old communes that land in no new unit.
 
 **Two more checks that could have failed (2026-10-20).**
 
@@ -53,9 +53,11 @@ wrong commune or leave one out (below), and 211 old communes that land in no new
   real communes and the sheet's source list took the wrong one or left the right one out; three more such picks sat in the
   same rows (Song Phượng for Song Phương, Thiệu Vận for Thiệu Vân, Hoằng Đồng for Hoằng Đông). The
   name is kept whole either way, so family does not move, but the crosswalk does: 18 old communes
-  that sat in no new unit now have one. Six are the same commune spelled differently (Cỗ/Cổ Đạm,
+  that sat in no new unit now have one. A random check of 20 of the other 149 judged rows against
+  the resolutions found one more (Quyết Thắng, Hải Phòng: Tứ Cường for Tự Cường), so the 21 are not the
+  only ones. Six are the same commune spelled differently (Cỗ/Cổ Đạm,
   Quán/Quan Triều). Sáng Nhè is a compound of Phình Sáng and Xá Nhè, which the sheet left out.
-  The 15 code fixes are in `CODE_FIXES` with the resolution item. Where the two sides agree they are taken
+  The 16 code fixes are in `CODE_FIXES` with the resolution item. Where the two sides agree they are taken
   as right, so both rates are floors.
 - *Witness C, geometry, Hồ Chí Minh City.* `overlay.py` lays OSM's communes from 1 Jan 2025 over
   OSM's from 13 Oct 2026. All 441 old and 168 new communes match a GSO code or a new name. The code
@@ -133,8 +135,8 @@ counts include it. Never edit `out/` by hand.
 
 ## Limits
 
-- The crosswalk lists the communes a new unit was built from, not the share of each. 598 old
-  communes sit in two or more new units, and 211 in none (66 of them in Hồ Chí Minh City, mostly
+- The crosswalk lists the communes a new unit was built from, not the share of each. 597 old
+  communes sit in two or more new units, and 210 in none (66 of them in Hồ Chí Minh City, mostly
   numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
   run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
 - Witness C trusts OSM: its 1 Jan 2025 boundaries are what mappers had drawn by then, and a share

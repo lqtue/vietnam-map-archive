@@ -50,6 +50,7 @@ CODE_FIXES = {    # the 2025 sheet slipped one row among the Kiên Giang islands
     ('Vĩnh Long', 'Đông Thành'): '29813;29812;29809;29818',  # 1687 item 109: the sheet left out Đông Thành
     ('Tây Ninh', 'Thạnh Phước'): '27880;27877;27874',        # 1682 item 17
     ('Điện Biên', 'Sáng Nhè'): '3247;3259;3244',             # 1661 item 20: the sheet left out Xá Nhè
+    ('Hải Phòng', 'Quyết Thắng'): '11758;11761;11764',       # 1669 item 56: Tự Cường (Tiên Lãng), not Tứ Cường
 }
 NAME_FIXES = {'3244': 'Xá Nhè'}   # the old list already carries the new name for Xá Nhè (1661 item 20)
 
