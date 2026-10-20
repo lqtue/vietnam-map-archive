@@ -89,6 +89,7 @@ Layer `entities`. Place-name groups, attested names and classification terms.
 | Folder | What it is | Read first |
 | --- | --- | --- |
 | [work/research/doling](../work/research/doling/) | Source-derived street-name pairs and provenance | [SOURCE.md](../work/research/doling/SOURCE.md) |
+| [work/research/admin-2025](../work/research/admin-2025/) | Where each 2025 commune name came from: two witnesses, a review queue, logged decisions | [README.md](../work/research/admin-2025/README.md) |
 | [work/image-processing/experiments/place-links](../work/image-processing/experiments/place-links/) | Machine-proposed 1882 label-to-today place links, confirmed by a person | [README.md](../work/image-processing/experiments/place-links/README.md) |
 | [work/image-processing/experiments/then-now](../work/image-processing/experiments/then-now/) | Review page where the owner judges 1882 then-now block differences | [docs/plans/digest-pipeline-plan.md](plans/digest-pipeline-plan.md) |
 
