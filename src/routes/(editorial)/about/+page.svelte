@@ -232,6 +232,56 @@
       </ul>
     </section>
 
+    <!-- ONE LABEL — a real item from the 1882 place-link set (work/image-processing/experiments/place-links,
+         item 92c05a79). No person has judged it, and the page says so; do not add a verdict that does
+         not exist. The crop is the offline review page's own screen. -->
+    <section class="section-card">
+      <h2 class="section-title-sm">Follow one label</h2>
+      <p class="section-desc">
+        A label printed on the 1882 plan of Saigon, from the first step to the last. Nobody has
+        judged this one yet, so you see the machine’s proposal and the choices a person would have.
+      </p>
+      <figure class="label-fig">
+        <img
+          src="/images/about/jardin-botanique-1882.webp"
+          width="1600"
+          height="800"
+          loading="lazy"
+          alt="Two views of the 1882 plan of Saigon. On the left, the label JARDIN BOTANIQUE in a yellow box over a park with ponds and paths, with numbered markers 1 to 3. On the right, the same label on the wider plan, among the arsenal and barracks."
+        />
+        <figcaption>
+          Left: the label in a yellow box, with the machine’s three proposals as numbered markers.
+          Right: the same place on the wider plan. The 1882 plan of Saigon is in the public domain.
+        </figcaption>
+      </figure>
+      <ol class="walk">
+        <li>
+          <strong>The sheet says</strong> <em>JARDIN BOTANIQUE</em>. A machine read it, and found
+          where it sits on the ground.
+        </li>
+        <li>
+          <strong>The machine proposes three places today.</strong> Marker 1: Thảo Cầm Viên Sài Gòn, the
+          Saigon Zoo and Botanical Gardens, with the label inside its outline. Marker 2: Vườn bướm, a
+          butterfly garden, 147 m away. Marker 3: Cây Di Sản Việt Nam – Cây Tung, a heritage tree, 54
+          m away. Each comes with its distance and its source.
+        </li>
+        <li>
+          <strong>A person chooses.</strong> A candidate, or search for another place, and then how the
+          two relate: same building, same site with a new building, moved, gone, none, or unsure. On about
+          one item in five the three proposals are hidden first.
+        </li>
+        <li>
+          <strong>The record keeps</strong> who chose, when, what the machine had suggested, whether they
+          saw it, and the exact version of the item. It is never edited afterwards.
+        </li>
+      </ol>
+      <p class="section-desc">
+        The machine is not always this clear. For the label <em>POSTE DE POLICE</em> its three
+        proposals are a health department, a Buddhist monastery and a park. None of the three is a
+        police post, which is why <em>none</em> and <em>unsure</em> are choices, and why a person decides.
+      </p>
+    </section>
+
     <!-- THE RULE -->
     <section class="section-card">
       <h2 class="section-title-sm">A check counts only if it could have failed</h2>
