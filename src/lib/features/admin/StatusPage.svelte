@@ -33,6 +33,7 @@
     };
     words: { total: number; placed: number; placeNames: number };
     footprints: { total: number; byMachine: number; approved: number; awaitingReview: number };
+    reviews: { tasksOpen: number; items: number; verdicts: number; blind: number };
     jobs: {
       queued: number;
       running: number;
@@ -84,6 +85,7 @@
     const w = d.words;
     const f = d.footprints;
     const j = d.jobs;
+    const r = d.reviews;
 
     const unread = m.georeferenced - m.read;
     const unplaced = w.total - w.placed;
@@ -231,6 +233,45 @@
             detail:
               'Shapes a person needs to approve or reject, in /scan?mode=shapes&tab=validate.',
             tone: f.awaitingReview > 0 ? 'warn' : 'good',
+          },
+        ],
+      },
+      {
+        title: 'Checking the machine',
+        blurb:
+          'A check only counts if a person could have disagreed. Here a person judges the machine’s proposal, and on some items the proposal is hidden first.',
+        rows: [
+          {
+            label: 'Check tasks open',
+            value: num(r.tasksOpen),
+            detail:
+              r.tasksOpen > 0
+                ? 'Tasks that people can sit and judge.'
+                : 'No task is open, so the web review page shows nothing. The offline pages (ports 8792 and 8793) work without one.',
+            tone: 'idle',
+          },
+          {
+            label: 'Items on the open tasks',
+            value: num(r.items),
+            detail:
+              'Each item is one question for a person, such as which place a sheet label points to.',
+            tone: 'idle',
+          },
+          {
+            label: 'Verdicts recorded',
+            value: num(r.verdicts),
+            detail:
+              r.verdicts === 0
+                ? 'None yet. Every error rate and seconds-per-item figure still comes from the offline sittings.'
+                : 'Judgements people have given on the web page, after undos.',
+            tone: r.verdicts === 0 ? 'warn' : 'good',
+          },
+          {
+            label: 'Judged with the machine’s answer hidden',
+            value: of(r.blind, r.verdicts),
+            detail:
+              'Without these, agreement with the machine can only echo it. About one item in five has the answer hidden.',
+            tone: 'idle',
           },
         ],
       },

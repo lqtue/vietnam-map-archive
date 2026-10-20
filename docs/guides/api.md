@@ -198,7 +198,8 @@ Public / other:
   links or unlinks one institution source item to a printing (`{ printing_id }`, `null` clears).
 - `/api/admin/scout/`, `/api/admin/scout/[id]/` — see `docs/guides/admin-tooling.md`.
 - `/api/admin/status/` — GET the tallies behind `/admin?tab=status` (`head: true` counts, plus the
-  small failed-job list). Admin or mod.
+  small failed-job list, and the `reviews` block: open tasks, items, verdicts after undos, and
+  blind-arm verdicts). Admin or mod.
 - `/api/context/` — **public** GET `?lng=&lat=&radius=&year_from=&year_to=&limit=`: everything the
   archive knows about a spot — covering maps, nearby OCR labels and reviewed footprints, story
   points — via the `context_at` RPC (mig 066). Every item carries `distance_m` and `geom_rmse`;
