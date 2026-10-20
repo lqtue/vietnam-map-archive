@@ -60,6 +60,7 @@ export const vi: Record<string, string> = {
   'Check the text': 'Kiểm tra văn bản',
   'Draw shapes': 'Vẽ hình khối',
   'Review queue': 'Hàng chờ kiểm duyệt',
+  'Review tasks': 'Việc cần kiểm duyệt',
   'Admin console': 'Quản trị',
   'Design system': 'Hệ thống thiết kế',
   'All pages': 'Tất cả trang',

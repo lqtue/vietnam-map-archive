@@ -2,10 +2,18 @@
 """Place-link items for the web review page: items.json -> review_items rows + the review_tasks row.
 
   review_items.py                 read build.py's items.json, write review-task.json and review-items.json beside it
-  review_items.py --items F --out D --key place-link --seed 20261012 --blind-frac 0.2
+  review_items.py --items F --out D --key place-link --seed 20261012 --blind-frac 0.2 --status open
+  review_items.py --crops         also write the plain crops to D/crops/<item id>/{close,context}.png
   review_items.py --self-check    no network, no data files
 
-Then send them:  python3 work/review-kit/review_sync.py push review-task.json review-items.json
+The web page shows each view as an image at payload.views.<name>.url and draws the label box, markers, north
+arrow and scale bar over it (src/lib/features/review). So the crops are plain: nothing the machine made is on
+them, one image serves both arms. They have to be where the URLs point (--img-base, default IMG_BASE below):
+
+  python3 review_items.py --crops
+  rclone copy D/crops r2:vma-tiles/review/place-link --s3-no-check-bucket      # a production write: Tue runs it
+
+Then send the items:  python3 work/review-kit/review_sync.py push review-task.json review-items.json
 and read the web verdicts back:  python3 work/review-kit/review_sync.py pull place-link out/verdicts.jsonl
 
 One row per label (docs/plans/review-page-plan.md section 3):
@@ -13,12 +21,13 @@ One row per label (docs/plans/review-page-plan.md section 3):
   bound     confirm.py's `item_bound` (what was judged: label, radius, the candidate list, plus the method), so a
             web verdict and an offline verdict on the same item are comparable and neither can approve new candidates
   payload   what BOTH arms see: the label as printed (text, px, box, lon/lat, names), the 300 m pool the
-            reviewer searches, and the sheet's scale and north (to draw the scale bar and arrow)
+            reviewer searches, the sheet's scale and north (to draw the scale bar and arrow), and `views`: where
+            each plain crop is (url) and where it sits on the sheet (x0, y0, side in source px, out in image px)
   proposal  the machine's up-to-3 candidates, in rank order (only the shown arm gets them); null when there are
             none, which is also what keeps such an item out of the blind arm
   gold      null (no practice answers yet)
-The plain crops (close and context views) are not made here; the page draws the label box, markers and outlines
-over them from payload and proposal.
+The plain crops are made by --crops (write_crops); the page draws the label box, markers and outlines over them
+from payload and proposal.
 """
 from __future__ import annotations
 
@@ -32,12 +41,14 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(ROOT / "work" / "review-kit"))
-from confirm import MAP, OUT, Session, item_bound  # noqa: E402
+from confirm import MAP, OUT, VIEWS, Session, crop_box, item_bound, open_native, plain_crop  # noqa: E402
 
 TASK_KEY = "place-link"
 QUESTION = "What is this 1882 place today?"
 QUESTION_VI = "Địa điểm năm 1882 này ngày nay là gì?"
 PAYLOAD_KEYS = ("text", "category", "names", "px", "box", "pos_from", "lon", "lat")
+# The plain crops are uploaded to the vma-tiles R2 bucket, which tiles.maparchive.vn serves (docs/guides/architecture.md).
+IMG_BASE = "https://tiles.maparchive.vn/review/place-link"
 
 
 def task_row(meta: dict, key: str = TASK_KEY, seed: int = 20261012, blind_frac: float = 0.2, status: str = "draft") -> dict:
@@ -45,17 +56,39 @@ def task_row(meta: dict, key: str = TASK_KEY, seed: int = 20261012, blind_frac: 
             "method": meta["method"], "seed": seed, "blind_frac": blind_frac, "audience": "staff", "status": status}
 
 
-def item_row(it: dict, meta: dict) -> dict:
+def views_of(it: dict, img_base: str) -> dict:
+    """Where each plain crop is and where it sits on the sheet (see confirm.crop_box); the page draws over it."""
+    out = {}
+    for name, (half, px, bar_m) in VIEWS.items():
+        x0, y0, side = crop_box(it, name)
+        out[name] = {"url": f"{img_base}/{it['id']}/{name}.png", "x0": x0, "y0": y0, "side": side, "out": px, "bar_m": bar_m}
+    return out
+
+
+def item_row(it: dict, meta: dict, img_base: str = IMG_BASE) -> dict:
     payload = {k: it.get(k) for k in PAYLOAD_KEYS}
     payload["pool"] = it["pool300"]
     payload["sheet"] = {"map_id": meta.get("map_id", MAP), "m_per_px": meta["m_per_px"], "north_px": meta["north_px"],
                         "size": meta.get("size"), "radius_m": meta["radius_m"]}
+    payload["views"] = views_of(it, img_base)
     return {"item_id": it["id"], "bound": item_bound(it, meta), "payload": payload,
             "proposal": it["cands"] or None, "gold": None, "active": True}
 
 
-def convert(doc: dict, **task_kw) -> tuple[dict, list[dict]]:
-    return task_row(doc["meta"], **task_kw), [item_row(it, doc["meta"]) for it in doc["items"]]
+def convert(doc: dict, img_base: str = IMG_BASE, **task_kw) -> tuple[dict, list[dict]]:
+    return task_row(doc["meta"], **task_kw), [item_row(it, doc["meta"], img_base) for it in doc["items"]]
+
+
+def write_crops(doc: dict, im, out: Path) -> int:
+    """One plain PNG per item and view: out/<item id>/close.png, context.png. Nothing machine-made is on them."""
+    n = 0
+    for it in doc["items"]:
+        d = out / it["id"]
+        d.mkdir(parents=True, exist_ok=True)
+        for name in VIEWS:
+            plain_crop(im, it, name).save(d / f"{name}.png", optimize=True)
+            n += 1
+    return n
 
 
 def main() -> int:
@@ -66,6 +99,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=20261012)
     ap.add_argument("--blind-frac", type=float, default=0.2)
     ap.add_argument("--status", default="draft", choices=["draft", "open", "closed"])
+    ap.add_argument("--img-base", default=IMG_BASE, help="where the crops will be served from")
+    ap.add_argument("--crops", action="store_true", help="also render the plain crops (reads native.png)")
     ap.add_argument("--self-check", action="store_true")
     a = ap.parse_args()
     if a.self_check:
@@ -74,8 +109,11 @@ def main() -> int:
     if not src.exists():
         sys.exit(f"{src} missing: run build.py first")
     out = Path(a.out) if a.out else src.parent
-    task, items = convert(json.loads(src.read_text()), key=a.key, seed=a.seed, blind_frac=a.blind_frac, status=a.status)
+    doc = json.loads(src.read_text())
+    task, items = convert(doc, img_base=a.img_base, key=a.key, seed=a.seed, blind_frac=a.blind_frac, status=a.status)
     out.mkdir(parents=True, exist_ok=True)
+    if a.crops:
+        print(f"{write_crops(doc, open_native(), out / 'crops')} crops -> {out / 'crops'}")
     (out / "review-task.json").write_text(json.dumps(task, ensure_ascii=False, indent=1))
     (out / "review-items.json").write_text(json.dumps(items, ensure_ascii=False))
     print(f"{len(items)} items ({sum(1 for i in items if i['proposal']) } with a proposal) -> {out}\n"
@@ -128,6 +166,27 @@ def self_check() -> int:
     assert rows[1]["proposal"] is None, "an item without candidates has no proposal, so it is never blind"
     assert all(r["gold"] is None and r["active"] is True for r in rows)
     json.dumps(rows, ensure_ascii=False)
+
+    # the views tell the page where each plain crop sits, in the numbers render() uses
+    v = rows[0]["payload"]["views"]
+    assert v["close"] == {"url": f"{IMG_BASE}/id0/close.png", "x0": 400 - 520, "y0": 300 - 520, "side": 1040, "out": 800, "bar_m": 50}
+    assert v["context"]["side"] == 3600 and v["context"]["out"] == 900 and v["context"]["bar_m"] == 200
+    assert convert(doc, img_base="https://x.test/c")[1][0]["payload"]["views"]["close"]["url"] == "https://x.test/c/id0/close.png"
+    assert rows[0]["bound"] == item_bound(doc["items"][0], doc["meta"]), "views are not part of what was judged"
+
+    # a plain crop is the sheet's own pixels at that box: nothing drawn, so the page's overlay is the only overlay
+    from PIL import Image
+
+    im = Image.new("RGB", (4000, 4000))
+    im.putdata([((i % 4000) // 16 % 256, 0, 0) for i in range(4000 * 4000)])
+    with tempfile.TemporaryDirectory() as td:
+        small = {"items": [{**doc["items"][0], "px": [2000.0, 2000.0]}]}
+        assert write_crops(small, im, Path(td)) == 2
+        close = Image.open(Path(td) / "id0" / "close.png")
+        assert close.size == (800, 800)
+        x0 = 2000 - 520
+        assert abs(close.getpixel((400, 400))[0] - (2000 // 16 % 256)) <= 2, "the crop is centred on the label"
+        assert abs(close.getpixel((0, 400))[0] - ((x0 + 1) // 16 % 256)) <= 3, "and starts at x0"
     print("review_items self-check OK")
     return 0
 

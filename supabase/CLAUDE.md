@@ -46,12 +46,13 @@ npm run check
 
 Rules these migrations paid for:
 
-- **Unpushed: 122 `review_events`** (PR 1 of `docs/plans/review-page-plan.md`) — `review_tasks`,
+- **122 `review_events`, live** (confirmed with `supabase migration list` on 2026-10-20: local and remote both show 122–126; the migration's own header still says "Not pushed", left as written) (PR 1 of `docs/plans/review-page-plan.md`) — `review_tasks`,
   `review_items`, and the insert-only `review_events` (no UPDATE/DELETE/TRUNCATE grant for anyone,
   `service_role` included; an item or task with events cannot be deleted, so write tests leave their
   events behind). anon/authenticated have no grant on tasks or items (the blind arm's proposal must
-  not reach a client); a reviewer reads only their own events. Additive: push it before the app that
-  has the two `/api/pipeline/review-*` endpoints. 120–121 belong to another unpushed branch.
+  not reach a client); a reviewer reads only their own events. Additive. The app routes that read it
+  are `/api/pipeline/review-*` (worker) and `/api/review/*` (staff session). 120–121 belong to another
+  unpushed branch.
 - **Deploy order is part of the migration.** App code that reads a new column or table needs the
   push first (104: an app ahead of it answered 500 on every series page). A migration that removes a
   grant, column or name old code uses needs the app first, or both in one deploy (101, 095). Say
