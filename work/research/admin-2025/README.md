@@ -139,6 +139,10 @@ counts include it. Never edit `out/` by hand.
   communes sit in two or more new units, and 210 in none (66 of them in Hồ Chí Minh City, mostly
   numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
   run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
+- The baseline is the state just before and just after 1 July 2025: `old_units.csv` and the 2025
+  sheet. A name counts as kept only if a unit on the old list bore it. A name lost in an earlier
+  round counts as new, even over the same ground: Đông Sơn district went into Thanh Hoá city in
+  late 2024, so phường Đông Sơn is new (Tue, 2026-10-20).
 - Witness C trusts OSM: its 1 Jan 2025 boundaries are what mappers had drawn by then, and a share
   under 5 % is read as the two surveys' edges disagreeing.
 - Witness B shares A's folding, so the two are not fully independent.
