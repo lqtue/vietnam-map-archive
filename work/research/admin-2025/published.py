@@ -60,6 +60,17 @@ def main(path, show):
         for (a, b), v in sorted(c.items()):
             if a != b:
                 print(f'  published {a or "-"} -> ours {b or "-"}: {v}')
+    judged = {unit(r['province'], r['name']): r for r in csv.DictReader(open(HERE / 'judged.csv'))
+              if r['confidence'] != 'unsure'}
+    if judged:     # where the two agree both are taken as right; judged.csv rules where they differ
+        print(f'\nJudged {len(judged)} disagreements (judged.csv); errors over all {len(both)} joined units:')
+        for side, tags in (('published', {k: (FAMILY[p['Phân loại chung']], ORIGIN[p['Nguồn gốc']]) for k, p in pub.items()}),
+                           ('ours', {k: (o['family'], o['origin']) for k, o in ours.items()})):
+            fam = sum(tags[k][0] != j['family'] for k, j in judged.items())
+            org = sum(tags[k][1] != j['origin'] for k, j in judged.items() if j['family'] != 'new')
+            low = sum(tags[k][0] != j['family'] for k, j in judged.items() if j['confidence'] == 'low')
+            print(f'  {side:<10} family {fam:>3} ({100 * fam / len(both):.1f} %, {low} of them low-confidence)'
+                  f' · origin of kept names {org:>3}')
     if show:
         for k in sorted(pub.keys() - ours.keys()):
             print('  published only:', pub[k]['new_prov'], '·', pub[k]['new_ward'])

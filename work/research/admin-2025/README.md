@@ -32,8 +32,20 @@ Phường 4 of Tân An, Long An) and 233 old communes that land in no new unit.
   (Cam Ly - Đà Lạt), and a source's syllables reordered (Thư Vũ ← Vũ Thư) or taken from the
   province (Tuyên Bình). With those rules added, family agrees on 3,206 (96.6 %) and origin on 3,217
   (96.9 %); the queue grows from 168 to 181. Two such misses remain on the auto side (Đông Tiên
-  Hưng, Thành Vinh: a syllable from no source). Neither side is the truth; a person settles the 113,
-  and that gives an error rate for each.
+  Hưng, Thành Vinh: a syllable from no source).
+- *Judged.* `judged.csv` rules on all 170 units where the two differ in family or origin (Claude,
+  2026-10-20; 149 high confidence, 20 low, 1 unsure; Tue to confirm). Taking agreement as right,
+  the published tags get family wrong for 35 of 3,319 units (1.1 %) and ours for 78 (2.4 %), but the
+  causes differ. Ours: 57 are `variant`, which this run maps to partial while the article (and the
+  judgment) keep a name spelled differently as kept whole; 17 are one-letter cases already in the
+  queue; 4 are real misses (two syllables from no source, two units whose codes the 2025 sheet
+  swapped, Sơn Hải and Tiên Hải). Published: 22 compounds, kept names and old district names tagged
+  new, and a one-row slip in two blocks (Cà Mau; the old Nam Định communes, Đồng Thịnh to Minh Thái)
+  that gives each unit its neighbour's sources and tag. On origin ours errs 19 times, all compounds
+  credited to a district that only shares a syllable a commune already supplies; the published tags
+  err 50 times, mostly on which level bore a kept name. The 20 low-confidence rows are one mark
+  apart in a Vietnamese name (Lưỡng/Lượng Minh, Thạnh/Thanh An): judged the same place, but only the
+  resolution text can say whether a side mistyped or the name changed.
 - *Witness C, geometry, Hồ Chí Minh City.* `overlay.py` lays OSM's communes from 1 Jan 2025 over
   OSM's from 13 Oct 2026. All 441 old and 168 new communes match a GSO code or a new name. The code
   list agrees with the geometry for 349 old communes. The 66 the list left out each land in exactly
@@ -98,6 +110,7 @@ counts include it. Never edit `out/` by hand.
 | `data/old_units.csv` | the 10,035 pre-merger communes with GSO codes, districts, provinces |
 | `data/new_units.csv` | the 3,321 new communes, the old codes they were built from (`old_codes`), and codes added by hand in 2025 (`hand_codes`, `hand_note`) |
 | `decisions.csv` | human decisions, applied on every run |
+| `judged.csv` | verdicts on every unit where ours and the published tags differ (`published.py` scores both) |
 | `out/names.csv` | one row per new commune: kind, origin, sources, witness B, status |
 | `out/queue.csv` | the rows a person must decide |
 | `out/crosswalk_flags.csv` | old communes in no new unit; hand codes from another province |
