@@ -1,0 +1,505 @@
+code,old,district,province,new,share
+25741,Hiệp Thành,Thủ Dầu Một,Bình Dương,Phú Lợi,0.730
+25741,Hiệp Thành,Thủ Dầu Một,Bình Dương,Thủ Dầu Một,0.269
+25744,Phú Lợi,Thủ Dầu Một,Bình Dương,Phú Lợi,1.000
+25747,Phú Cường,Thủ Dầu Một,Bình Dương,Thủ Dầu Một,1.000
+25750,Phú Hoà,Thủ Dầu Một,Bình Dương,Phú Lợi,1.000
+25753,Phú Thọ,Thủ Dầu Một,Bình Dương,Thủ Dầu Một,0.997
+25756,Chánh Nghĩa,Thủ Dầu Một,Bình Dương,Thủ Dầu Một,1.000
+25759,Định Hoà,Thủ Dầu Một,Bình Dương,Chánh Hiệp,0.996
+25760,Hoà Phú,Thủ Dầu Một,Bình Dương,Bình Dương,0.998
+25762,Phú Mỹ,Thủ Dầu Một,Bình Dương,Bình Dương,0.998
+25763,Phú Tân,Thủ Dầu Một,Bình Dương,Bình Dương,1.000
+25765,Tân An,Thủ Dầu Một,Bình Dương,Phú An,1.000
+25768,Hiệp An,Thủ Dầu Một,Bình Dương,Phú An,0.748
+25768,Hiệp An,Thủ Dầu Một,Bình Dương,Chánh Hiệp,0.252
+25771,Tương Bình Hiệp,Thủ Dầu Một,Bình Dương,Chánh Hiệp,1.000
+25774,Chánh Mỹ,Thủ Dầu Một,Bình Dương,Chánh Hiệp,0.728
+25774,Chánh Mỹ,Thủ Dầu Một,Bình Dương,Thủ Dầu Một,0.272
+25777,Dầu Tiếng,Dầu Tiếng,Bình Dương,Dầu Tiếng,1.000
+25780,Minh Hoà,Dầu Tiếng,Bình Dương,Minh Thạnh,1.000
+25783,Minh Thạnh,Dầu Tiếng,Bình Dương,Minh Thạnh,0.814
+25783,Minh Thạnh,Dầu Tiếng,Bình Dương,Long Hoà,0.186
+25786,Minh Tân,Dầu Tiếng,Bình Dương,Long Hoà,0.610
+25786,Minh Tân,Dầu Tiếng,Bình Dương,Minh Thạnh,0.390
+25789,Định An,Dầu Tiếng,Bình Dương,Dầu Tiếng,1.000
+25792,Long Hoà,Dầu Tiếng,Bình Dương,Long Hoà,1.000
+25795,Định Thành,Dầu Tiếng,Bình Dương,Dầu Tiếng,0.999
+25798,Định Hiệp,Dầu Tiếng,Bình Dương,Dầu Tiếng,0.511
+25798,Định Hiệp,Dầu Tiếng,Bình Dương,Thanh An,0.489
+25801,An Lập,Dầu Tiếng,Bình Dương,Thanh An,0.607
+25801,An Lập,Dầu Tiếng,Bình Dương,Tây Nam,0.393
+25804,Long Tân,Dầu Tiếng,Bình Dương,Long Hoà,1.000
+25807,Thanh An,Dầu Tiếng,Bình Dương,Thanh An,1.000
+25810,Thanh Tuyền,Dầu Tiếng,Bình Dương,Tây Nam,0.758
+25810,Thanh Tuyền,Dầu Tiếng,Bình Dương,Thanh An,0.242
+25813,Mỹ Phước,Bến Cát,Bình Dương,Bến Cát,0.936
+25813,Mỹ Phước,Bến Cát,Bình Dương,Long Nguyên,0.064
+25816,Trừ Văn Thố,Bàu Bàng,Bình Dương,Trừ Văn Thố,1.000
+25819,Cây Trường II,Bàu Bàng,Bình Dương,Trừ Văn Thố,0.999
+25822,Lai Uyên,Bàu Bàng,Bình Dương,Bàu Bàng,0.949
+25822,Lai Uyên,Bàu Bàng,Bình Dương,Trừ Văn Thố,0.048
+25825,Tân Hưng,Bàu Bàng,Bình Dương,Bến Cát,1.000
+25828,Long Nguyên,Bàu Bàng,Bình Dương,Long Nguyên,1.000
+25831,Hưng Hoà,Bàu Bàng,Bình Dương,Chánh Phú Hoà,1.000
+25834,Lai Hưng,Bàu Bàng,Bình Dương,Bến Cát,1.000
+25837,Chánh Phú Hoà,Bến Cát,Bình Dương,Chánh Phú Hoà,1.000
+25840,An Điền,Bến Cát,Bình Dương,Long Nguyên,1.000
+25843,An Tây,Bến Cát,Bình Dương,Tây Nam,1.000
+25846,Thới Hoà,Bến Cát,Bình Dương,Thới Hoà,1.000
+25849,Hoà Lợi,Bến Cát,Bình Dương,Hoà Lợi,0.999
+25852,Tân Định,Bến Cát,Bình Dương,Hoà Lợi,1.000
+25855,Phú An,Bến Cát,Bình Dương,Phú An,1.000
+25858,Phước Vĩnh,Phú Giáo,Bình Dương,Phú Giáo,1.000
+25861,An Linh,Phú Giáo,Bình Dương,An Long,1.000
+25864,Phước Sang,Phú Giáo,Bình Dương,Phước Thành,1.000
+25865,An Thái,Phú Giáo,Bình Dương,Phước Thành,1.000
+25867,An Long,Phú Giáo,Bình Dương,An Long,1.000
+25870,An Bình,Phú Giáo,Bình Dương,Phú Giáo,1.000
+25873,Tân Hiệp,Phú Giáo,Bình Dương,Phước Thành,1.000
+25876,Tam Lập,Phú Giáo,Bình Dương,Phú Giáo,0.849
+25876,Tam Lập,Phú Giáo,Bình Dương,Phước Hoà,0.151
+25879,Tân Long,Phú Giáo,Bình Dương,An Long,0.997
+25882,Vĩnh Hoà,Phú Giáo,Bình Dương,Phước Hoà,1.000
+25885,Phước Hoà,Phú Giáo,Bình Dương,Phước Hoà,1.000
+25888,Uyên Hưng,Tân Uyên,Bình Dương,Tân Uyên,0.999
+25891,Tân Phước Khánh,Tân Uyên,Bình Dương,Tân Khánh,0.998
+25894,Tân Định,Bắc Tân Uyên,Bình Dương,Bắc Tân Uyên,1.000
+25897,Bình Mỹ,Bắc Tân Uyên,Bình Dương,Bình Cơ,1.000
+25900,Tân Bình,Bắc Tân Uyên,Bình Dương,Vĩnh Tân,1.000
+25903,Tân Lập,Bắc Tân Uyên,Bình Dương,Tân Uyên,1.000
+25906,Tân Thành,Bắc Tân Uyên,Bình Dương,Bắc Tân Uyên,1.000
+25907,Đất Cuốc,Bắc Tân Uyên,Bình Dương,Bắc Tân Uyên,1.000
+25908,Hiếu Liêm,Bắc Tân Uyên,Bình Dương,Thường Tân,1.000
+25909,Lạc An,Bắc Tân Uyên,Bình Dương,Thường Tân,1.000
+25912,Vĩnh Tân,Tân Uyên,Bình Dương,Vĩnh Tân,1.000
+25915,Hội Nghĩa,Tân Uyên,Bình Dương,Bình Cơ,0.995
+25918,Tân Mỹ,Bắc Tân Uyên,Bình Dương,Tân Uyên,0.517
+25918,Tân Mỹ,Bắc Tân Uyên,Bình Dương,Thường Tân,0.482
+25920,Tân Hiệp,Tân Uyên,Bình Dương,Tân Hiệp,1.000
+25921,Khánh Bình,Tân Uyên,Bình Dương,Tân Hiệp,0.989
+25921,Khánh Bình,Tân Uyên,Bình Dương,Tân Uyên,0.011
+25924,Phú Chánh,Tân Uyên,Bình Dương,Bình Dương,1.000
+25927,Thường Tân,Bắc Tân Uyên,Bình Dương,Thường Tân,0.999
+25930,Bạch Đằng,Tân Uyên,Bình Dương,Tân Uyên,0.995
+25933,Tân Vĩnh Hiệp,Tân Uyên,Bình Dương,Tân Khánh,1.000
+25936,Thạnh Phước,Tân Uyên,Bình Dương,Tân Khánh,0.999
+25937,Thạnh Hội,Tân Uyên,Bình Dương,Tân Khánh,0.997
+25939,Thái Hoà,Tân Uyên,Bình Dương,Tân Khánh,0.595
+25939,Thái Hoà,Tân Uyên,Bình Dương,Tân Đông Hiệp,0.405
+25942,Dĩ An,Dĩ An,Bình Dương,Dĩ An,1.000
+25945,Tân Bình,Dĩ An,Bình Dương,Tân Đông Hiệp,1.000
+25948,Tân Đông Hiệp,Dĩ An,Bình Dương,Dĩ An,0.539
+25948,Tân Đông Hiệp,Dĩ An,Bình Dương,Tân Đông Hiệp,0.461
+25951,Bình An,Dĩ An,Bình Dương,Đông Hoà,1.000
+25954,Bình Thắng,Dĩ An,Bình Dương,Đông Hoà,1.000
+25957,Đông Hoà,Dĩ An,Bình Dương,Đông Hoà,1.000
+25960,An Bình,Dĩ An,Bình Dương,Dĩ An,0.998
+25963,An Thạnh,Thuận An,Bình Dương,Thuận An,0.983
+25963,An Thạnh,Thuận An,Bình Dương,Thủ Dầu Một,0.017
+25966,Lái Thiêu,Thuận An,Bình Dương,Lái Thiêu,0.999
+25969,Bình Chuẩn,Thuận An,Bình Dương,An Phú,0.517
+25969,Bình Chuẩn,Thuận An,Bình Dương,Thuận Giao,0.481
+25972,Thuận Giao,Thuận An,Bình Dương,Thuận Giao,1.000
+25975,An Phú,Thuận An,Bình Dương,An Phú,1.000
+25978,Hưng Định,Thuận An,Bình Dương,Thuận An,1.000
+25981,An Sơn,Thuận An,Bình Dương,Thuận An,1.000
+25984,Bình Nhâm,Thuận An,Bình Dương,Lái Thiêu,1.000
+25987,Bình Hoà,Thuận An,Bình Dương,Bình Hoà,0.999
+25990,Vĩnh Phú,Thuận An,Bình Dương,Bình Hoà,0.680
+25990,Vĩnh Phú,Thuận An,Bình Dương,Lái Thiêu,0.318
+26506,1,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,1.000
+26508,Thắng Tam,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,0.998
+26509,2,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,0.994
+26512,3,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,0.999
+26515,4,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,1.000
+26518,5,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,1.000
+26521,Thắng Nhì,Vũng Tàu,Bà Rịa - Vũng Tàu,Vũng Tàu,0.969
+26521,Thắng Nhì,Vũng Tàu,Bà Rịa - Vũng Tàu,Rạch Dừa,0.025
+26524,7,Vũng Tàu,Bà Rịa - Vũng Tàu,Tam Thắng,0.991
+26526,Nguyễn An Ninh,Vũng Tàu,Bà Rịa - Vũng Tàu,Tam Thắng,0.995
+26527,8,Vũng Tàu,Bà Rịa - Vũng Tàu,Tam Thắng,1.000
+26530,9,Vũng Tàu,Bà Rịa - Vũng Tàu,Tam Thắng,0.997
+26533,Thắng Nhất,Vũng Tàu,Bà Rịa - Vũng Tàu,Rạch Dừa,0.999
+26535,Rạch Dừa,Vũng Tàu,Bà Rịa - Vũng Tàu,Rạch Dừa,0.999
+26536,10,Vũng Tàu,Bà Rịa - Vũng Tàu,Rạch Dừa,0.998
+26539,11,Vũng Tàu,Bà Rịa - Vũng Tàu,Phước Thắng,0.994
+26542,12,Vũng Tàu,Bà Rịa - Vũng Tàu,Phước Thắng,1.000
+26545,Long Sơn,Vũng Tàu,Bà Rịa - Vũng Tàu,Long Sơn,0.987
+26548,Phước Hưng,Bà Rịa,Bà Rịa - Vũng Tàu,Bà Rịa,1.000
+26554,Phước Nguyên,Bà Rịa,Bà Rịa - Vũng Tàu,Bà Rịa,1.000
+26557,Long Toàn,Bà Rịa,Bà Rịa - Vũng Tàu,Bà Rịa,1.000
+26558,Long Tâm,Bà Rịa,Bà Rịa - Vũng Tàu,Tam Long,1.000
+26560,Phước Trung,Bà Rịa,Bà Rịa - Vũng Tàu,Bà Rịa,1.000
+26563,Long Hương,Bà Rịa,Bà Rịa - Vũng Tàu,Long Hương,1.000
+26566,Kim Dinh,Bà Rịa,Bà Rịa - Vũng Tàu,Long Hương,1.000
+26567,Tân Hưng,Bà Rịa,Bà Rịa - Vũng Tàu,Long Hương,1.000
+26569,Long Phước,Bà Rịa,Bà Rịa - Vũng Tàu,Tam Long,1.000
+26572,Hoà Long,Bà Rịa,Bà Rịa - Vũng Tàu,Tam Long,1.000
+26574,Bàu Chinh,Châu Đức,Bà Rịa - Vũng Tàu,Kim Long,1.000
+26575,Ngãi Giao,Châu Đức,Bà Rịa - Vũng Tàu,Ngãi Giao,1.000
+26578,Bình Ba,Châu Đức,Bà Rịa - Vũng Tàu,Ngãi Giao,1.000
+26581,Suối Nghệ,Châu Đức,Bà Rịa - Vũng Tàu,Ngãi Giao,1.000
+26584,Xuân Sơn,Châu Đức,Bà Rịa - Vũng Tàu,Xuân Sơn,1.000
+26587,Sơn Bình,Châu Đức,Bà Rịa - Vũng Tàu,Xuân Sơn,1.000
+26590,Bình Giã,Châu Đức,Bà Rịa - Vũng Tàu,Bình Giã,1.000
+26593,Bình Trung,Châu Đức,Bà Rịa - Vũng Tàu,Bình Giã,1.000
+26596,Xà Bang,Châu Đức,Bà Rịa - Vũng Tàu,Châu Đức,1.000
+26599,Cù Bị,Châu Đức,Bà Rịa - Vũng Tàu,Châu Đức,1.000
+26602,Láng Lớn,Châu Đức,Bà Rịa - Vũng Tàu,Kim Long,1.000
+26605,Quảng Thành,Châu Đức,Bà Rịa - Vũng Tàu,Bình Giã,1.000
+26608,Kim Long,Châu Đức,Bà Rịa - Vũng Tàu,Kim Long,1.000
+26611,Suối Rao,Châu Đức,Bà Rịa - Vũng Tàu,Xuân Sơn,1.000
+26614,Đá Bạc,Châu Đức,Bà Rịa - Vũng Tàu,Nghĩa Thành,1.000
+26617,Nghĩa Thành,Châu Đức,Bà Rịa - Vũng Tàu,Nghĩa Thành,1.000
+26620,Phước Bửu,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hồ Tràm,1.000
+26623,Phước Thuận,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hồ Tràm,0.999
+26626,Phước Tân,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hồ Tràm,1.000
+26629,Xuyên Mộc,Xuyên Mộc,Bà Rịa - Vũng Tàu,Xuyên Mộc,1.000
+26632,Bông Trang,Xuyên Mộc,Bà Rịa - Vũng Tàu,Xuyên Mộc,1.000
+26635,Tân Lâm,Xuyên Mộc,Bà Rịa - Vũng Tàu,Bàu Lâm,1.000
+26638,Bàu Lâm,Xuyên Mộc,Bà Rịa - Vũng Tàu,Bàu Lâm,1.000
+26641,Hoà Bình,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hoà Hội,1.000
+26644,Hoà Hưng,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hoà Hội,1.000
+26647,Hoà Hiệp,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hoà Hiệp,1.000
+26650,Hoà Hội,Xuyên Mộc,Bà Rịa - Vũng Tàu,Hoà Hội,1.000
+26653,Bưng Riềng,Xuyên Mộc,Bà Rịa - Vũng Tàu,Xuyên Mộc,1.000
+26656,Bình Châu,Xuyên Mộc,Bà Rịa - Vũng Tàu,Bình Châu,1.000
+26659,Long Điền,Long Đất,Bà Rịa - Vũng Tàu,Long Điền,1.000
+26662,Long Hải,Long Đất,Bà Rịa - Vũng Tàu,Long Hải,1.000
+26668,Tam An,Long Đất,Bà Rịa - Vũng Tàu,Long Điền,1.000
+26674,Phước Tỉnh,Long Đất,Bà Rịa - Vũng Tàu,Long Hải,1.000
+26677,Phước Hưng,Long Đất,Bà Rịa - Vũng Tàu,Long Hải,1.000
+26680,Đất Đỏ,Long Đất,Bà Rịa - Vũng Tàu,Đất Đỏ,1.000
+26683,Phước Long Thọ,Long Đất,Bà Rịa - Vũng Tàu,Đất Đỏ,1.000
+26686,Phước Hội,Long Đất,Bà Rịa - Vũng Tàu,Phước Hải,0.996
+26689,Phước Hải,Long Đất,Bà Rịa - Vũng Tàu,Phước Hải,1.000
+26695,Long Tân,Long Đất,Bà Rịa - Vũng Tàu,Đất Đỏ,1.000
+26698,Láng Dài,Long Đất,Bà Rịa - Vũng Tàu,Đất Đỏ,1.000
+26704,Phú Mỹ,Phú Mỹ,Bà Rịa - Vũng Tàu,Phú Mỹ,1.000
+26707,Tân Hoà,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Hải,0.999
+26710,Tân Hải,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Hải,1.000
+26713,Phước Hoà,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Phước,0.980
+26716,Tân Phước,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Phước,0.999
+26719,Mỹ Xuân,Phú Mỹ,Bà Rịa - Vũng Tàu,Phú Mỹ,1.000
+26722,Sông Xoài,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Thành,1.000
+26725,Hắc Dịch,Phú Mỹ,Bà Rịa - Vũng Tàu,Tân Thành,1.000
+26728,Châu Pha,Phú Mỹ,Bà Rịa - Vũng Tàu,Châu Pha,1.000
+26731,Tóc Tiên,Phú Mỹ,Bà Rịa - Vũng Tàu,Châu Pha,1.000
+26734,Tân Định,1,TP HCM,Tân Định,0.997
+26737,Đa Kao,1,TP HCM,Tân Định,0.607
+26737,Đa Kao,1,TP HCM,Sài Gòn,0.388
+26740,Bến Nghé,1,TP HCM,Sài Gòn,0.998
+26743,Bến Thành,1,TP HCM,Bến Thành,0.998
+26746,Nguyễn Thái Bình,1,TP HCM,Bến Thành,0.658
+26746,Nguyễn Thái Bình,1,TP HCM,Sài Gòn,0.334
+26749,Phạm Ngũ Lão,1,TP HCM,Bến Thành,0.997
+26752,Cầu Ông Lãnh,1,TP HCM,Cầu Ông Lãnh,0.559
+26752,Cầu Ông Lãnh,1,TP HCM,Bến Thành,0.441
+26755,Cô Giang,1,TP HCM,Cầu Ông Lãnh,0.999
+26758,Nguyễn Cư Trinh,1,TP HCM,Cầu Ông Lãnh,0.990
+26761,Cầu Kho,1,TP HCM,Cầu Ông Lãnh,0.988
+26761,Cầu Kho,1,TP HCM,Chợ Quán,0.011
+26764,Thạnh Xuân,12,TP HCM,Thới An,0.999
+26767,Thạnh Lộc,12,TP HCM,An Phú Đông,0.991
+26770,Hiệp Thành,12,TP HCM,Tân Thới Hiệp,0.999
+26773,Thới An,12,TP HCM,Thới An,0.999
+26776,Tân Chánh Hiệp,12,TP HCM,Trung Mỹ Tây,0.998
+26779,An Phú Đông,12,TP HCM,An Phú Đông,0.996
+26782,Tân Thới Hiệp,12,TP HCM,Tân Thới Hiệp,0.990
+26785,Trung Mỹ Tây,12,TP HCM,Trung Mỹ Tây,0.999
+26787,Tân Hưng Thuận,12,TP HCM,Đông Hưng Thuận,1.000
+26788,Đông Hưng Thuận,12,TP HCM,Đông Hưng Thuận,0.995
+26791,Tân Thới Nhất,12,TP HCM,Đông Hưng Thuận,0.999
+26794,Linh Xuân,Thủ Đức,TP HCM,Linh Xuân,0.998
+26797,Bình Chiểu,Thủ Đức,TP HCM,Tam Bình,0.999
+26800,Linh Trung,Thủ Đức,TP HCM,Linh Xuân,0.999
+26803,Tam Bình,Thủ Đức,TP HCM,Tam Bình,0.998
+26806,Tam Phú,Thủ Đức,TP HCM,Tam Bình,0.995
+26809,Hiệp Bình Phước,Thủ Đức,TP HCM,Hiệp Bình,0.999
+26812,Hiệp Bình Chánh,Thủ Đức,TP HCM,Hiệp Bình,1.000
+26815,Linh Chiểu,Thủ Đức,TP HCM,Thủ Đức,0.997
+26818,Linh Tây,Thủ Đức,TP HCM,Linh Xuân,0.988
+26821,Linh Đông,Thủ Đức,TP HCM,Hiệp Bình,0.623
+26821,Linh Đông,Thủ Đức,TP HCM,Thủ Đức,0.375
+26824,Bình Thọ,Thủ Đức,TP HCM,Thủ Đức,0.997
+26827,Trường Thọ,Thủ Đức,TP HCM,Thủ Đức,0.999
+26830,Long Bình,Thủ Đức,TP HCM,Long Bình,0.999
+26833,Long Thạnh Mỹ,Thủ Đức,TP HCM,Long Bình,0.716
+26833,Long Thạnh Mỹ,Thủ Đức,TP HCM,Tăng Nhơn Phú,0.284
+26836,Tân Phú,Thủ Đức,TP HCM,Tăng Nhơn Phú,1.000
+26839,Hiệp Phú,Thủ Đức,TP HCM,Tăng Nhơn Phú,0.998
+26842,Tăng Nhơn Phú A,Thủ Đức,TP HCM,Tăng Nhơn Phú,1.000
+26845,Tăng Nhơn Phú B,Thủ Đức,TP HCM,Tăng Nhơn Phú,0.997
+26848,Phước Long B,Thủ Đức,TP HCM,Phước Long,0.993
+26851,Phước Long A,Thủ Đức,TP HCM,Phước Long,0.998
+26854,Trường Thạnh,Thủ Đức,TP HCM,Long Phước,0.996
+26857,Long Phước,Thủ Đức,TP HCM,Long Phước,0.998
+26860,Long Trường,Thủ Đức,TP HCM,Long Trường,0.940
+26860,Long Trường,Thủ Đức,TP HCM,Long Phước,0.060
+26863,Phước Bình,Thủ Đức,TP HCM,Phước Long,0.994
+26866,Phú Hữu,Thủ Đức,TP HCM,Long Trường,0.999
+26872,15,Gò Vấp,TP HCM,An Hội Đông,0.999
+26875,17,Gò Vấp,TP HCM,Gò Vấp,0.998
+26876,6,Gò Vấp,TP HCM,An Nhơn,0.994
+26878,16,Gò Vấp,TP HCM,An Hội Đông,1.000
+26881,12,Gò Vấp,TP HCM,An Hội Tây,0.999
+26882,14,Gò Vấp,TP HCM,An Hội Tây,0.997
+26884,10,Gò Vấp,TP HCM,Gò Vấp,0.997
+26887,5,Gò Vấp,TP HCM,An Nhơn,0.994
+26890,1,Gò Vấp,TP HCM,Hạnh Thông,0.996
+26898,8,Gò Vấp,TP HCM,Thông Tây Hội,0.996
+26899,11,Gò Vấp,TP HCM,Thông Tây Hội,0.994
+26902,3,Gò Vấp,TP HCM,Hạnh Thông,0.993
+26905,13,Bình Thạnh,TP HCM,Bình Lợi Trung,0.994
+26908,11,Bình Thạnh,TP HCM,Bình Lợi Trung,0.997
+26911,27,Bình Thạnh,TP HCM,Bình Quới,0.999
+26914,26,Bình Thạnh,TP HCM,Bình Thạnh,0.995
+26917,12,Bình Thạnh,TP HCM,Bình Thạnh,0.997
+26920,25,Bình Thạnh,TP HCM,Thạnh Mỹ Tây,0.998
+26923,5,Bình Thạnh,TP HCM,Bình Lợi Trung,0.998
+26926,7,Bình Thạnh,TP HCM,Gia Định,0.999
+26929,14,Bình Thạnh,TP HCM,Bình Thạnh,0.998
+26941,2,Bình Thạnh,TP HCM,Gia Định,0.997
+26944,1,Bình Thạnh,TP HCM,Gia Định,0.996
+26950,17,Bình Thạnh,TP HCM,Gia Định,1.000
+26953,19,Bình Thạnh,TP HCM,Thạnh Mỹ Tây,1.000
+26956,22,Bình Thạnh,TP HCM,Thạnh Mỹ Tây,0.997
+26962,28,Bình Thạnh,TP HCM,Bình Quới,1.000
+26965,2,Tân Bình,TP HCM,Tân Sơn Hoà,0.988
+26968,4,Tân Bình,TP HCM,Tân Sơn Nhất,0.990
+26971,12,Tân Bình,TP HCM,Bảy Hiền,0.998
+26974,13,Tân Bình,TP HCM,Tân Bình,0.995
+26977,1,Tân Bình,TP HCM,Tân Sơn Hoà,0.999
+26980,3,Tân Bình,TP HCM,Tân Sơn Hoà,0.994
+26983,11,Tân Bình,TP HCM,Bảy Hiền,1.000
+26986,7,Tân Bình,TP HCM,Tân Sơn Nhất,1.000
+26989,5,Tân Bình,TP HCM,Tân Sơn Nhất,0.988
+26992,10,Tân Bình,TP HCM,Bảy Hiền,1.000
+26995,6,Tân Bình,TP HCM,Tân Hoà,0.998
+26998,8,Tân Bình,TP HCM,Tân Hoà,1.000
+27001,9,Tân Bình,TP HCM,Tân Hoà,0.995
+27004,14,Tân Bình,TP HCM,Tân Bình,0.991
+27007,15,Tân Bình,TP HCM,Tân Sơn,0.988
+27010,Tân Sơn Nhì,Tân Phú,TP HCM,Tân Sơn Nhì,0.999
+27013,Tây Thạnh,Tân Phú,TP HCM,Tây Thạnh,0.993
+27016,Sơn Kỳ,Tân Phú,TP HCM,Tân Sơn Nhì,0.778
+27016,Sơn Kỳ,Tân Phú,TP HCM,Tây Thạnh,0.205
+27016,Sơn Kỳ,Tân Phú,TP HCM,Bình Hưng Hoà,0.017
+27019,Tân Quý,Tân Phú,TP HCM,Phú Thọ Hoà,0.665
+27019,Tân Quý,Tân Phú,TP HCM,Tân Sơn Nhì,0.335
+27022,Tân Thành,Tân Phú,TP HCM,Phú Thọ Hoà,0.677
+27022,Tân Thành,Tân Phú,TP HCM,Tân Phú,0.235
+27022,Tân Thành,Tân Phú,TP HCM,Tân Sơn Nhì,0.088
+27025,Phú Thọ Hoà,Tân Phú,TP HCM,Phú Thọ Hoà,0.999
+27028,Phú Thạnh,Tân Phú,TP HCM,Phú Thạnh,0.999
+27031,Phú Trung,Tân Phú,TP HCM,Tân Phú,0.999
+27034,Hoà Thạnh,Tân Phú,TP HCM,Tân Phú,1.000
+27037,Hiệp Tân,Tân Phú,TP HCM,Phú Thạnh,0.999
+27040,Tân Thới Hoà,Tân Phú,TP HCM,Phú Thạnh,0.638
+27040,Tân Thới Hoà,Tân Phú,TP HCM,Tân Phú,0.361
+27043,4,Phú Nhuận,TP HCM,Đức Nhuận,0.999
+27046,5,Phú Nhuận,TP HCM,Đức Nhuận,0.992
+27049,9,Phú Nhuận,TP HCM,Đức Nhuận,0.980
+27049,9,Phú Nhuận,TP HCM,Tân Sơn Hoà,0.019
+27052,7,Phú Nhuận,TP HCM,Cầu Kiệu,0.999
+27058,1,Phú Nhuận,TP HCM,Cầu Kiệu,0.995
+27061,2,Phú Nhuận,TP HCM,Cầu Kiệu,0.996
+27064,8,Phú Nhuận,TP HCM,Phú Nhuận,0.998
+27070,10,Phú Nhuận,TP HCM,Phú Nhuận,0.996
+27073,11,Phú Nhuận,TP HCM,Phú Nhuận,0.996
+27076,15,Phú Nhuận,TP HCM,Cầu Kiệu,0.617
+27076,15,Phú Nhuận,TP HCM,Phú Nhuận,0.383
+27085,13,Phú Nhuận,TP HCM,Phú Nhuận,0.997
+27088,Thảo Điền,Thủ Đức,TP HCM,An Khánh,1.000
+27091,An Phú,Thủ Đức,TP HCM,Bình Trưng,0.921
+27091,An Phú,Thủ Đức,TP HCM,An Khánh,0.077
+27094,An Khánh,Thủ Đức,TP HCM,An Khánh,0.995
+27097,Bình Trưng Đông,Thủ Đức,TP HCM,Bình Trưng,0.994
+27100,Bình Trưng Tây,Thủ Đức,TP HCM,Bình Trưng,0.998
+27109,Cát Lái,Thủ Đức,TP HCM,Cát Lái,0.999
+27112,Thạnh Mỹ Lợi,Thủ Đức,TP HCM,Cát Lái,1.000
+27115,An Lợi Đông,Thủ Đức,TP HCM,An Khánh,1.000
+27118,Thủ Thiêm,Thủ Đức,TP HCM,An Khánh,1.000
+27127,14,3,TP HCM,Nhiêu Lộc,0.992
+27130,12,3,TP HCM,Nhiêu Lộc,0.997
+27133,11,3,TP HCM,Nhiêu Lộc,0.991
+27139,Võ Thị Sáu,3,TP HCM,Xuân Hoà,0.998
+27142,9,3,TP HCM,Nhiêu Lộc,0.990
+27142,9,3,TP HCM,Hòa Hưng,0.010
+27148,4,3,TP HCM,Bàn Cờ,0.936
+27148,4,3,TP HCM,Xuân Hoà,0.055
+27151,5,3,TP HCM,Bàn Cờ,1.000
+27154,3,3,TP HCM,Bàn Cờ,0.995
+27157,2,3,TP HCM,Bàn Cờ,1.000
+27160,1,3,TP HCM,Bàn Cờ,0.989
+27160,1,3,TP HCM,Vườn Lài,0.011
+27163,15,10,TP HCM,Hòa Hưng,0.999
+27166,13,10,TP HCM,Hòa Hưng,1.000
+27169,14,10,TP HCM,Diên Hồng,0.965
+27169,14,10,TP HCM,Hòa Hưng,0.030
+27172,12,10,TP HCM,Hòa Hưng,0.997
+27178,10,10,TP HCM,Vườn Lài,0.990
+27181,9,10,TP HCM,Vườn Lài,0.996
+27184,1,10,TP HCM,Vườn Lài,0.997
+27187,8,10,TP HCM,Diên Hồng,0.999
+27190,2,10,TP HCM,Vườn Lài,0.996
+27193,4,10,TP HCM,Vườn Lài,0.988
+27193,4,10,TP HCM,Diên Hồng,0.012
+27202,6,10,TP HCM,Diên Hồng,0.996
+27208,15,11,TP HCM,Phú Thọ,0.996
+27211,5,11,TP HCM,Hoà Bình,0.994
+27214,14,11,TP HCM,Hoà Bình,1.000
+27220,3,11,TP HCM,Bình Thới,0.998
+27226,11,11,TP HCM,Phú Thọ,0.996
+27229,8,11,TP HCM,Bình Thới,0.715
+27229,8,11,TP HCM,Phú Thọ,0.283
+27232,10,11,TP HCM,Bình Thới,0.998
+27238,7,11,TP HCM,Minh Phụng,0.994
+27247,1,11,TP HCM,Minh Phụng,0.996
+27253,16,11,TP HCM,Minh Phụng,0.998
+27259,13,4,TP HCM,Xóm Chiếu,0.998
+27265,9,4,TP HCM,Khánh Hội,0.983
+27265,9,4,TP HCM,Xóm Chiếu,0.012
+27271,8,4,TP HCM,Khánh Hội,1.000
+27277,18,4,TP HCM,Xóm Chiếu,1.000
+27283,4,4,TP HCM,Vĩnh Hội,0.552
+27283,4,4,TP HCM,Khánh Hội,0.448
+27286,3,4,TP HCM,Vĩnh Hội,1.000
+27289,16,4,TP HCM,Xóm Chiếu,0.998
+27292,2,4,TP HCM,Vĩnh Hội,0.944
+27292,2,4,TP HCM,Khánh Hội,0.048
+27295,15,4,TP HCM,Khánh Hội,0.833
+27295,15,4,TP HCM,Xóm Chiếu,0.163
+27298,1,4,TP HCM,Vĩnh Hội,0.996
+27301,4,5,TP HCM,Chợ Quán,0.998
+27304,9,5,TP HCM,An Đông,0.997
+27307,2,5,TP HCM,Chợ Quán,0.999
+27310,12,5,TP HCM,Chợ Lớn,0.998
+27316,7,5,TP HCM,An Đông,0.999
+27325,1,5,TP HCM,Chợ Quán,0.994
+27328,11,5,TP HCM,Chợ Lớn,0.999
+27331,14,5,TP HCM,Chợ Lớn,1.000
+27334,5,5,TP HCM,An Đông,0.989
+27343,13,5,TP HCM,Chợ Lớn,0.995
+27346,14,6,TP HCM,Phú Lâm,0.999
+27349,13,6,TP HCM,Phú Lâm,0.997
+27352,9,6,TP HCM,Bình Tây,0.986
+27358,12,6,TP HCM,Phú Lâm,0.998
+27364,11,6,TP HCM,Bình Phú,0.999
+27367,2,6,TP HCM,Bình Tây,0.999
+27373,1,6,TP HCM,Bình Tiên,0.998
+27376,8,6,TP HCM,Bình Tiên,0.994
+27382,7,6,TP HCM,Bình Tiên,0.978
+27382,7,6,TP HCM,Phú Định,0.017
+27385,10,6,TP HCM,Bình Phú,0.998
+27397,Rạch Ông,8,TP HCM,Chánh Hưng,0.996
+27403,Hưng Phú,8,TP HCM,Chánh Hưng,0.992
+27409,4,8,TP HCM,Chánh Hưng,0.998
+27415,Xóm Củi,8,TP HCM,Phú Định,0.981
+27418,5,8,TP HCM,Bình Đông,0.557
+27418,5,8,TP HCM,Chánh Hưng,0.439
+27421,14,8,TP HCM,Phú Định,0.998
+27424,6,8,TP HCM,Bình Đông,0.991
+27427,15,8,TP HCM,Phú Định,0.997
+27430,16,8,TP HCM,Phú Định,0.820
+27430,16,8,TP HCM,Bình Phú,0.112
+27430,16,8,TP HCM,Tân Nhựt,0.064
+27433,7,8,TP HCM,Bình Đông,0.958
+27433,7,8,TP HCM,Bình Hưng,0.040
+27436,Bình Hưng Hoà,Bình Tân,TP HCM,Bình Hưng Hoà,1.000
+27439,Bình Hưng Hoà A,Bình Tân,TP HCM,Bình Hưng Hoà,0.837
+27439,Bình Hưng Hoà A,Bình Tân,TP HCM,Bình Trị Đông,0.163
+27442,Bình Hưng Hoà B,Bình Tân,TP HCM,Bình Tân,0.998
+27445,Bình Trị Đông,Bình Tân,TP HCM,Bình Trị Đông,1.000
+27448,Bình Trị Đông A,Bình Tân,TP HCM,Bình Trị Đông,0.756
+27448,Bình Trị Đông A,Bình Tân,TP HCM,Bình Tân,0.240
+27451,Bình Trị Đông B,Bình Tân,TP HCM,An Lạc,0.997
+27454,Tân Tạo,Bình Tân,TP HCM,Bình Tân,0.494
+27454,Tân Tạo,Bình Tân,TP HCM,Tân Tạo,0.477
+27454,Tân Tạo,Bình Tân,TP HCM,An Lạc,0.019
+27457,Tân Tạo A,Bình Tân,TP HCM,Tân Tạo,0.993
+27460,An Lạc,Bình Tân,TP HCM,An Lạc,0.999
+27463,An Lạc A,Bình Tân,TP HCM,An Lạc,1.000
+27466,Tân Thuận Đông,7,TP HCM,Tân Thuận,0.998
+27469,Tân Thuận Tây,7,TP HCM,Tân Thuận,0.998
+27472,Tân Kiểng,7,TP HCM,Tân Hưng,1.000
+27475,Tân Hưng,7,TP HCM,Tân Hưng,0.994
+27478,Bình Thuận,7,TP HCM,Tân Thuận,1.000
+27481,Tân Quy,7,TP HCM,Tân Hưng,1.000
+27484,Phú Thuận,7,TP HCM,Phú Thuận,1.000
+27487,Tân Phú,7,TP HCM,Tân Mỹ,0.993
+27490,Tân Phong,7,TP HCM,Tân Hưng,0.991
+27493,Phú Mỹ,7,TP HCM,Tân Mỹ,0.557
+27493,Phú Mỹ,7,TP HCM,Phú Thuận,0.417
+27493,Phú Mỹ,7,TP HCM,Nhà Bè,0.026
+27496,Củ Chi,Củ Chi,TP HCM,Tân An Hội,0.991
+27499,Phú Mỹ Hưng,Củ Chi,TP HCM,An Nhơn Tây,1.000
+27502,An Phú,Củ Chi,TP HCM,An Nhơn Tây,1.000
+27505,Trung Lập Thượng,Củ Chi,TP HCM,Thái Mỹ,0.999
+27508,An Nhơn Tây,Củ Chi,TP HCM,An Nhơn Tây,0.995
+27511,Nhuận Đức,Củ Chi,TP HCM,Nhuận Đức,0.991
+27514,Phạm Văn Cội,Củ Chi,TP HCM,Nhuận Đức,0.997
+27517,Phú Hoà Đông,Củ Chi,TP HCM,Phú Hoà Đông,0.997
+27520,Trung Lập Hạ,Củ Chi,TP HCM,Nhuận Đức,0.990
+27523,Trung An,Củ Chi,TP HCM,Bình Mỹ,1.000
+27526,Phước Thạnh,Củ Chi,TP HCM,Thái Mỹ,0.991
+27529,Phước Hiệp,Củ Chi,TP HCM,Tân An Hội,0.962
+27529,Phước Hiệp,Củ Chi,TP HCM,Thái Mỹ,0.036
+27532,Tân An Hội,Củ Chi,TP HCM,Tân An Hội,0.989
+27535,Phước Vĩnh An,Củ Chi,TP HCM,Củ Chi,0.999
+27538,Thái Mỹ,Củ Chi,TP HCM,Thái Mỹ,1.000
+27541,Tân Thạnh Tây,Củ Chi,TP HCM,Phú Hoà Đông,0.999
+27544,Hoà Phú,Củ Chi,TP HCM,Bình Mỹ,0.997
+27547,Tân Thạnh Đông,Củ Chi,TP HCM,Phú Hoà Đông,0.998
+27550,Bình Mỹ,Củ Chi,TP HCM,Bình Mỹ,0.998
+27553,Tân Phú Trung,Củ Chi,TP HCM,Củ Chi,0.991
+27556,Tân Thông Hội,Củ Chi,TP HCM,Củ Chi,0.996
+27559,Hóc Môn,Hóc Môn,TP HCM,Hóc Môn,1.000
+27562,Tân Hiệp,Hóc Môn,TP HCM,Hóc Môn,0.999
+27565,Nhị Bình,Hóc Môn,TP HCM,Đông Thạnh,0.987
+27568,Đông Thạnh,Hóc Môn,TP HCM,Đông Thạnh,0.998
+27571,Tân Thới Nhì,Hóc Môn,TP HCM,Xuân Thới Sơn,0.994
+27574,Thới Tam Thôn,Hóc Môn,TP HCM,Đông Thạnh,1.000
+27577,Xuân Thới Sơn,Hóc Môn,TP HCM,Xuân Thới Sơn,1.000
+27580,Tân Xuân,Hóc Môn,TP HCM,Hóc Môn,1.000
+27583,Xuân Thới Đông,Hóc Môn,TP HCM,Xuân Thới Sơn,1.000
+27586,Trung Chánh,Hóc Môn,TP HCM,Bà Điểm,0.999
+27589,Xuân Thới Thượng,Hóc Môn,TP HCM,Bà Điểm,0.989
+27589,Xuân Thới Thượng,Hóc Môn,TP HCM,Vĩnh Lộc,0.011
+27592,Bà Điểm,Hóc Môn,TP HCM,Bà Điểm,0.998
+27595,Tân Túc,Bình Chánh,TP HCM,Tân Nhựt,0.998
+27598,Phạm Văn Hai,Bình Chánh,TP HCM,Tân Vĩnh Lộc,0.599
+27598,Phạm Văn Hai,Bình Chánh,TP HCM,Vĩnh Lộc,0.400
+27601,Vĩnh Lộc A,Bình Chánh,TP HCM,Vĩnh Lộc,0.995
+27604,Vĩnh Lộc B,Bình Chánh,TP HCM,Tân Vĩnh Lộc,0.998
+27607,Bình Lợi,Bình Chánh,TP HCM,Bình Lợi,0.999
+27610,Lê Minh Xuân,Bình Chánh,TP HCM,Bình Lợi,1.000
+27613,Tân Nhựt,Bình Chánh,TP HCM,Tân Nhựt,0.999
+27616,Tân Kiên,Bình Chánh,TP HCM,Tân Nhựt,0.989
+27616,Tân Kiên,Bình Chánh,TP HCM,Tân Tạo,0.010
+27619,Bình Hưng,Bình Chánh,TP HCM,Bình Hưng,0.998
+27622,Phong Phú,Bình Chánh,TP HCM,Bình Hưng,0.998
+27625,An Phú Tây,Bình Chánh,TP HCM,Bình Chánh,0.821
+27625,An Phú Tây,Bình Chánh,TP HCM,Bình Đông,0.179
+27628,Hưng Long,Bình Chánh,TP HCM,Hưng Long,1.000
+27631,Đa Phước,Bình Chánh,TP HCM,Hưng Long,0.996
+27634,Tân Quý Tây,Bình Chánh,TP HCM,Bình Chánh,1.000
+27637,Bình Chánh,Bình Chánh,TP HCM,Bình Chánh,0.999
+27640,Quy Đức,Bình Chánh,TP HCM,Hưng Long,1.000
+27643,Nhà Bè,Nhà Bè,TP HCM,Nhà Bè,0.998
+27646,Phước Kiển,Nhà Bè,TP HCM,Nhà Bè,0.997
+27649,Phước Lộc,Nhà Bè,TP HCM,Nhà Bè,0.956
+27649,Phước Lộc,Nhà Bè,TP HCM,Hiệp Phước,0.036
+27652,Nhơn Đức,Nhà Bè,TP HCM,Hiệp Phước,0.994
+27655,Phú Xuân,Nhà Bè,TP HCM,Nhà Bè,0.987
+27658,Long Thới,Nhà Bè,TP HCM,Hiệp Phước,0.989
+27661,Hiệp Phước,Nhà Bè,TP HCM,Hiệp Phước,0.995
+27664,Cần Thạnh,Cần Giờ,TP HCM,Cần Giờ,1.000
+27667,Bình Khánh,Cần Giờ,TP HCM,Bình Khánh,0.985
+27670,Tam Thôn Hiệp,Cần Giờ,TP HCM,Bình Khánh,0.998
+27673,An Thới Đông,Cần Giờ,TP HCM,An Thới Đông,0.944
+27673,An Thới Đông,Cần Giờ,TP HCM,Bình Khánh,0.052
+27676,Thạnh An,Cần Giờ,TP HCM,Thạnh An,0.993
+27679,Long Hoà,Cần Giờ,TP HCM,Cần Giờ,0.996
+27682,Lý Nhơn,Cần Giờ,TP HCM,An Thới Đông,0.992
