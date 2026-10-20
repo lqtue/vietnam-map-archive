@@ -1,0 +1,68 @@
+[
+ {
+  "sheet": "viet-tri",
+  "map_id": "3d1abe3b-4f8b-4b52-ac3c-f940ad96406b",
+  "gcps": 6,
+  "how": "6 graticule crossings"
+ },
+ {
+  "sheet": "ha-noi",
+  "map_id": "ac95a63b-8a3c-4cde-8814-4431ac319e5c",
+  "gcps": 9,
+  "how": "9 graticule crossings"
+ },
+ {
+  "sheet": "bac-giang",
+  "map_id": "58e70e52-8de0-46ff-904a-739e9cca7749",
+  "gcps": 6,
+  "how": "6 graticule crossings"
+ },
+ {
+  "sheet": "an-chau",
+  "map_id": "e40584a2-08d7-4ffe-b718-3d2fea6f34bf",
+  "gcps": 9,
+  "how": "9 graticule crossings"
+ },
+ {
+  "sheet": "hoa-binh",
+  "map_id": "f35a6a76-c520-497e-9a57-204699185118",
+  "gcps": 5,
+  "how": "5 graticule crossings"
+ },
+ {
+  "sheet": "hung-yen",
+  "map_id": "3e37c90d-67f0-47d6-a734-f5fb42016e4e",
+  "gcps": 9,
+  "how": "9 graticule crossings"
+ },
+ {
+  "sheet": "hai-phong",
+  "map_id": "1b8f2e92-c73b-43e9-9978-c9b913fbe0ed",
+  "gcps": 6,
+  "how": "6 graticule crossings"
+ },
+ {
+  "sheet": "quang-yen",
+  "map_id": "f0153ae6-4b5d-4f62-985b-c973aa7fdbac",
+  "gcps": 9,
+  "how": "9 graticule crossings"
+ },
+ {
+  "sheet": "ninh-binh",
+  "map_id": "8f5c901a-1b74-4107-a0cf-d48f9aea53dd",
+  "gcps": 8,
+  "how": "8 graticule crossings"
+ },
+ {
+  "sheet": "bui-chu",
+  "map_id": "5c0eb469-7fa3-4666-8816-75da6a852c27",
+  "gcps": 6,
+  "how": "6 graticule crossings"
+ },
+ {
+  "sheet": "vinh-bac-viet",
+  "map_id": "fc85abf6-f8e6-4025-97da-63e7ccc59ef2",
+  "gcps": 9,
+  "how": "9 graticule crossings"
+ }
+]

@@ -1,0 +1,38 @@
+{
+ "type": "AnnotationPage",
+ "@context": "http://www.w3.org/ns/anno.jsonld",
+ "items": [
+  {
+   "id": "https://iiif.maparchive.vn/iiif/2594e8c4-279f-4492-910d-be93f3bdbbf7/annotation",
+   "type": "Annotation",
+   "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+   ],
+   "motivation": "georeferencing",
+   "target": {
+    "type": "SpecificResource",
+    "source": {
+     "id": "https://iiif.maparchive.vn/iiif/2594e8c4-279f-4492-910d-be93f3bdbbf7",
+     "type": "ImageService3",
+     "width": 12752,
+     "height": 9136
+    },
+    "selector": {
+     "type": "SvgSelector",
+     "value": "<svg width=\"12752\" height=\"9136\"><polygon points=\"804,712 11924,712 11924,8452 804,8452\" /></svg>"
+    }
+   },
+   "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+     "type": "polynomial",
+     "options": {
+      "order": 1
+     }
+    },
+    "features": []
+   }
+  }
+ ]
+}
