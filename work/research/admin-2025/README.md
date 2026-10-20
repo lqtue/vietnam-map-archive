@@ -19,15 +19,40 @@ the decision is logged) now runs on a national dataset, with a queue a person ca
 afternoon. The crosswalk check found one wrong hand-typed code (Tân Ninh, Tây Ninh was given
 Phường 4 of Tân An, Long An) and 233 old communes that land in no new unit.
 
+**Two more checks that could have failed (2026-10-20).**
+
+- *Against the published tags.* `published.py` reads the article's saved Flourish page and joins its
+  3,321 units to ours: 3,319 join (the other two carry "Mới hoàn toàn" as their name, an error in the
+  published data). Family agrees on 3,185 (96.0 %), origin on 3,205 (96.6 %). The 134 family
+  disagreements cut both ways: the published tags call Bến Cát, Bỉm Sơn, Mộc Hoá and Giao Thủy new,
+  though each is an old district's name; our rules settle about 22 compounds as `new` without a check
+  (Cam Ly - Đà Lạt, Chân Mây - Lăng Cô, Thư Vũ ← Vũ Thư, Láng ← Láng Thượng). Neither side is the
+  truth; a person settles the 134, and that gives an error rate for each.
+- *Witness C, geometry, Hồ Chí Minh City.* `overlay.py` lays OSM's communes from 1 Jan 2025 over
+  OSM's from 13 Oct 2026. All 441 old and 168 new communes match a GSO code or a new name. The code
+  list agrees with the geometry for 349 old communes. The 66 the list left out each land in exactly
+  one new commune, and 65 of them are numbered wards: the 2025 sheet joined numbered wards by name
+  across the whole merged city, so Phường 1 of Vũng Tàu sits in 11 new units' lists but lies wholly
+  in the new Vũng Tàu. That collision explains 18 of the 25 cases where the list names a unit the
+  geometry does not reach; 7 named cases remain, plus one 6 % sliver, for a person. 40 old communes
+  are truly cut, each piece at least 5 %. Of 99 names kept from an old commune, 93 lie inside the
+  unit that bears the name, 3 lie partly inside (the source was split nearly in half), and the 3
+  that lie elsewhere are `reused` names, which the rules already said came from another unit.
+
 ## Run
 
 ```sh
 python3 work/research/admin-2025/names.py --check   # self-test: folding and rules
 python3 work/research/admin-2025/names.py           # writes out/, prints the counts
+python3 work/research/admin-2025/published.py ~/Downloads/embed            # agreement with the article
+python3 work/research/admin-2025/overlay.py before.geojson after.geojson   # witness C, HCMC
 ```
 
-Stdlib only. To rebuild `data/` from the Drive sheet "Tên ĐVHC thay đổi" (export as .xlsx):
-`python3 work/research/admin-2025/extract.py export.xlsx`.
+`names.py` and `published.py` are stdlib only; `published.py` reads the article's Flourish story
+saved as a page and writes nothing. `overlay.py` needs shapely and two OSM extracts cut with
+`ogr2ogr` (commands in its docstring) from Geofabrik's `vietnam-250101.osm.pbf` and a current
+extract; the boundaries stay outside the repo. To rebuild `data/` from the Drive sheet "Tên ĐVHC
+thay đổi" (export as .xlsx): `python3 work/research/admin-2025/extract.py export.xlsx`.
 
 ## Method
 
@@ -69,12 +94,18 @@ counts include it. Never edit `out/` by hand.
 | `out/names.csv` | one row per new commune: kind, origin, sources, witness B, status |
 | `out/queue.csv` | the rows a person must decide |
 | `out/crosswalk_flags.csv` | old communes in no new unit; hand codes from another province |
+| `out/hcmc_overlay.csv` | witness C: share of each old HCMC-area commune in each new commune (≥ 1 %) |
+| `out/hcmc_checks.csv` | one row per old commune: the code list against the geometry |
+| `out/hcmc_names.csv` | names kept from an old commune: does that commune lie in the unit? |
 
 ## Limits
 
 - The crosswalk lists the communes a new unit was built from, not the share of each. 612 old
   communes sit in two or more new units, and 233 in none (66 of them in Hồ Chí Minh City, mostly
-  numbered wards, where the 2025 sheet records only whole merges). Geometry would settle both.
+  numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
+  run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
+- Witness C trusts OSM: its 1 Jan 2025 boundaries are what mappers had drawn by then, and a share
+  under 5 % is read as the two surveys' edges disagreeing.
 - Witness B shares A's folding, so the two are not fully independent.
 - *reused* only looks inside the unit's own old provinces, and *new* cannot yet say a name is
   historical: Xuân Hòa came from a village on the 1882 plan, which only the gazetteer knows.

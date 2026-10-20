@@ -1,0 +1,100 @@
+name,kind,source,share,verdict
+Hưng Long,whole,Hưng Long,1.00,inside
+Bình Châu,whole,Bình Châu,1.00,inside
+Hoà Hiệp,whole,Hoà Hiệp,1.00,inside
+Long Sơn,whole,Long Sơn,0.99,inside
+Thới Hoà,whole,Thới Hoà,1.00,inside
+Thạnh An,whole,Thạnh An,0.99,inside
+Tân Hoà,reused,Tân Hoà,0.00,elsewhere
+Hòa Hưng,reused,Hoà Hưng,0.00,elsewhere
+Hoà Bình,reused,Hoà Bình,0.00,elsewhere
+An Khánh,whole,An Khánh,1.00,inside
+An Lạc,whole,An Lạc,1.00,inside
+An Long,whole,An Long,1.00,inside
+An Nhơn Tây,whole,An Nhơn Tây,1.00,inside
+An Phú,whole,An Phú,1.00,inside
+An Phú Đông,whole,An Phú Đông,1.00,inside
+An Thới Đông,whole,An Thới Đông,0.94,inside
+Bà Điểm,whole,Bà Điểm,1.00,inside
+Bàu Lâm,whole,Bàu Lâm,1.00,inside
+Bến Thành,whole,Bến Thành,1.00,inside
+Bình Giã,whole,Bình Giã,1.00,inside
+Bình Hoà,whole,Bình Hoà,1.00,inside
+Bình Hưng,whole,Bình Hưng,1.00,inside
+Bình Hưng Hoà,whole,Bình Hưng Hoà,1.00,inside
+Bình Khánh,whole,Bình Khánh,0.98,inside
+Bình Lợi,whole,Bình Lợi,1.00,inside
+Bình Mỹ,whole,Bình Mỹ,1.00,inside
+Bình Trị Đông,whole,Bình Trị Đông,1.00,inside
+Bình Trưng,affix,Bình Trưng Tây,1.00,inside
+Bình Trưng,affix,Bình Trưng Đông,0.99,inside
+Cát Lái,whole,Cát Lái,1.00,inside
+Cầu Ông Lãnh,whole,Cầu Ông Lãnh,0.56,inside
+Chánh Hiệp,compound,Chánh Mỹ,0.73,inside
+Chánh Hiệp,compound,Hiệp An,0.25,partly
+Chánh Hiệp,compound,Tương Bình Hiệp,1.00,inside
+Chánh Phú Hoà,whole,Chánh Phú Hoà,1.00,inside
+Châu Pha,whole,Châu Pha,1.00,inside
+Đất Đỏ,whole,Đất Đỏ,1.00,inside
+Đông Hoà,whole,Đông Hoà,1.00,inside
+Đông Hưng Thuận,whole,Đông Hưng Thuận,1.00,inside
+Đông Thạnh,whole,Đông Thạnh,1.00,inside
+Hiệp Phước,whole,Hiệp Phước,0.99,inside
+Hoà Hội,whole,Hoà Hội,1.00,inside
+Hoà Lợi,whole,Hoà Lợi,1.00,inside
+Kim Long,whole,Kim Long,1.00,inside
+Lái Thiêu,whole,Lái Thiêu,1.00,inside
+Linh Xuân,whole,Linh Xuân,1.00,inside
+Long Bình,whole,Long Bình,1.00,inside
+Long Điền,whole,Long Điền,1.00,inside
+Long Hải,whole,Long Hải,1.00,inside
+Long Hoà,whole,Long Hoà,1.00,inside
+Long Hương,whole,Long Hương,1.00,inside
+Long Nguyên,whole,Long Nguyên,1.00,inside
+Long Phước,whole,Long Phước,1.00,inside
+Long Trường,whole,Long Trường,0.94,inside
+Minh Thạnh,whole,Minh Thạnh,0.81,inside
+Ngãi Giao,whole,Ngãi Giao,1.00,inside
+Nghĩa Thành,whole,Nghĩa Thành,1.00,inside
+Nhuận Đức,whole,Nhuận Đức,0.99,inside
+Phú An,whole,Phú An,1.00,inside
+Phú Hoà Đông,whole,Phú Hoà Đông,1.00,inside
+Phú Lợi,whole,Phú Lợi,1.00,inside
+Phú Thạnh,whole,Phú Thạnh,1.00,inside
+Phú Thọ Hoà,whole,Phú Thọ Hoà,1.00,inside
+Phú Thuận,whole,Phú Thuận,1.00,inside
+Phước Hải,whole,Phước Hải,1.00,inside
+Phước Hoà,whole,Phước Hoà,1.00,inside
+Phước Long,affix,Phước Long A,1.00,inside
+Phước Long,affix,Phước Long B,0.99,inside
+Rạch Dừa,whole,Rạch Dừa,1.00,inside
+Tam Bình,whole,Tam Bình,1.00,inside
+Tăng Nhơn Phú,affix,Tăng Nhơn Phú A,1.00,inside
+Tăng Nhơn Phú,affix,Tăng Nhơn Phú B,1.00,inside
+Tân An Hội,whole,Tân An Hội,0.99,inside
+Tân Định,whole,Tân Định,1.00,inside
+Tân Đông Hiệp,whole,Tân Đông Hiệp,0.46,partly
+Tân Hải,whole,Tân Hải,1.00,inside
+Tân Hiệp,whole,Tân Hiệp,1.00,inside
+Tân Hưng,whole,Tân Hưng,0.99,inside
+Tân Mỹ,compound,Phú Mỹ,0.56,inside
+Tân Mỹ,compound,Tân Phú,0.99,inside
+Tân Nhựt,whole,Tân Nhựt,1.00,inside
+Tân Phước,whole,Tân Phước,1.00,inside
+Tân Sơn Nhì,whole,Tân Sơn Nhì,1.00,inside
+Tân Tạo,whole,Tân Tạo,0.48,partly
+Tân Thới Hiệp,whole,Tân Thới Hiệp,0.99,inside
+Tân Thuận,affix,Tân Thuận Tây,1.00,inside
+Tân Thuận,affix,Tân Thuận Đông,1.00,inside
+Tây Thạnh,whole,Tây Thạnh,0.99,inside
+Thái Mỹ,whole,Thái Mỹ,1.00,inside
+Thanh An,whole,Thanh An,1.00,inside
+Thới An,whole,Thới An,1.00,inside
+Thuận Giao,whole,Thuận Giao,1.00,inside
+Thường Tân,whole,Thường Tân,1.00,inside
+Trung Mỹ Tây,whole,Trung Mỹ Tây,1.00,inside
+Trừ Văn Thố,whole,Trừ Văn Thố,1.00,inside
+Vĩnh Lộc,affix,Vĩnh Lộc A,1.00,inside
+Vĩnh Tân,whole,Vĩnh Tân,1.00,inside
+Xuân Sơn,whole,Xuân Sơn,1.00,inside
+Xuân Thới Sơn,whole,Xuân Thới Sơn,1.00,inside
