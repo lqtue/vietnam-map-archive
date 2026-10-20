@@ -117,14 +117,15 @@ def core(k):
 
 # --- the two witnesses -------------------------------------------------------------------------
 
-def cover(ws, cands):
+def cover(ws, cands, every=False):
     """Each syllable's sources at the lowest level that bore it: Quế Phước rests on the communes
-    Quế Lâm and Phước Ninh, not on the district Quế Sơn. A syllable no source bore is skipped."""
+    Quế Lâm and Phước Ninh, not on the district Quế Sơn. A syllable no source bore is skipped.
+    every=True keeps every level that bore it, for the `levels` column."""
     out = []
     for t in ws:
         has = [c for c in cands if t in c[1]]
         low = max((LEVELS.index(c[0]) for c in has), default=None)
-        out += [c for c in has if LEVELS.index(c[0]) == low and c not in out]
+        out += [c for c in has if (every or LEVELS.index(c[0]) == low) and c not in out]
     return out
 
 
@@ -272,8 +273,11 @@ def main():
         status, reason = settle(kind, src, best, ratio)
         levels = {c[0] for c in src}
         origin = next((lvl for lvl in LEVELS if lvl in levels), '')
+        if kind == 'compound':      # a higher unit may bear a syllable too: Quế Sơn for Quế Phước
+            levels |= {c[0] for c in cover(nk, cands, every=True)}
         row = {'province': u['province'], 'name': u['name'], 'kind': kind, 'origin': origin,
                'sources': ' + '.join(sorted({f'{c[2]} ({c[0]})' for c in src})),
+               'levels': '+'.join(lvl for lvl in LEVELS if lvl in levels),
                'b_nearest': ' + '.join(sorted({c[2] for c in best})), 'b_distance': d,
                'status': status, 'reason': reason, 'decided_by': ''}
         if (u['province'], u['name']) in decided:
@@ -282,7 +286,7 @@ def main():
         row['family'] = FAMILY[row['kind']]
         rows.append(row)
 
-    cols = ['province', 'name', 'family', 'kind', 'origin', 'sources', 'b_nearest', 'b_distance',
+    cols = ['province', 'name', 'family', 'kind', 'origin', 'levels', 'sources', 'b_nearest', 'b_distance',
             'status', 'reason', 'decided_by']
     write('out/names.csv', rows, cols)
     write('out/queue.csv', [r for r in rows if r['status'] == 'check'], cols)
@@ -301,6 +305,8 @@ def main():
     for f in ('whole', 'partial', 'new'):
         print(f'  {f:<8}{pct(fam[f])}   {ARTICLE[f]:>5}')
     print('\nOrigin of kept names:', dict(Counter(r['origin'] for r in rows if r['family'] != 'new')))
+    print('Kept names more than one level could explain:',
+          sum('+' in r['levels'] for r in rows if r['family'] != 'new'))
     print('Status:', dict(Counter(r['status'] for r in rows)))
     print('Queue by kind:', dict(Counter(r['kind'] for r in rows if r['status'] == 'check')))
 
@@ -321,6 +327,8 @@ def selftest():
     assert a('Chân Mây - Lăng Cô', 'Lăng Cô', 'Lộc Tiến') == 'kept'
     k, src = witness_a(key('Quế Phước'), c('Quế Lâm', 'Phước Ninh') + [('district', key('Quế Sơn'), 'Quế Sơn')], [])
     assert k == 'compound' and {s[0] for s in src} == {'ward'}
+    assert {s[0] for s in cover(key('Quế Phước'), c('Quế Lâm') + [('district', key('Quế Sơn'), 'Quế Sơn')], every=True)} \
+        == {'ward', 'district'}
     assert {s[0] for s in witness_a(key('Liên Sơn Lắk'), c('Liên Sơn') + [('district', key('Lắk'), 'Lắk')], [])[1]} \
         == {'ward', 'district'}
     assert a('Thư Vũ', 'Vũ Thư') == 'compound' and a('Tân Khánh', 'Tân Phước Khánh') == 'compound'

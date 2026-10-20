@@ -110,7 +110,10 @@ and the share of the name that must change. It audits only what the rules cannot
 it is worse than the rules (it puts Vĩnh Bình nearer Bình Minh than Vĩnh Bình Bắc). A kept name is
 credited to the highest unit that bore it (province, then district, then commune), as the article
 counted, and a compound to the lowest unit that bore each syllable: 36 province, 724 district,
-2,151 commune here, against 30, 712 and 2,144.
+2,151 commune here, against 30, 712 and 2,144. That choice matters for 317 kept names (10.9 %),
+which more than one level could explain: 286 a district or a commune, 21 a province or a district,
+10 all three or a province and a commune. The `levels` column lists every level that bore the name
+or one of its syllables, so a reader can take another rule without rerunning anything.
 
 ## Decide
 
@@ -126,7 +129,7 @@ counts include it. Never edit `out/` by hand.
 | `data/new_units.csv` | the 3,321 new communes, the old codes they were built from (`old_codes`), and codes added by hand in 2025 (`hand_codes`, `hand_note`) |
 | `decisions.csv` | human decisions, applied on every run |
 | `judged.csv` | verdicts on every unit where ours and the published tags differ (`published.py` scores both) |
-| `out/names.csv` | one row per new commune: kind, origin, sources, witness B, status |
+| `out/names.csv` | one row per new commune: kind, origin, every level that could explain it, sources, witness B, status |
 | `out/queue.csv` | the rows a person must decide |
 | `out/crosswalk_flags.csv` | old communes in no new unit; hand codes from another province |
 | `out/hcmc_overlay.csv` | witness C: share of each old HCMC-area commune in each new commune (≥ 1 %) |
