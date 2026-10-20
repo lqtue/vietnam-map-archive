@@ -33,7 +33,26 @@ CODE_FIXES = {    # the 2025 sheet slipped one row among the Kiên Giang islands
     ('An Giang', 'Kiên Hải'): '31108;31111;31114;31115',
     ('An Giang', 'Tiên Hải'): '30781',
     ('An Giang', 'Sơn Hải'): '30811',
+    # The sheet took a commune one mark away from the one the resolution names (Lộc Thạnh for Lộc
+    # Thành). Codes per the 2025 UBTVQH15 resolutions 1654-1687 (checked 2026-10-20).
+    ('Nghệ An', 'Châu Bình'): '16804',                       # 1678: not merged; Châu Bính went to Châu Tiến
+    ('Đồng Nai', 'Lộc Thành'): '25305;25294',                # 1662 item 43
+    ('Đồng Tháp', 'Thanh Hoà'): '28436;28462;28480',         # 1663 item 100
+    ('Đồng Tháp', 'Thanh Mỹ'): '30067;30073',                # 1663 item 19
+    ('Hà Nội', 'Sơn Đồng'): '9868;9859;9871;9877;9874;9883;9880;9862',  # 1656 item 104; also Song Phương
+    ('Lào Cai', 'Nậm Chày'): '3088;3076',                    # 1673 item 59
+    ('Sơn La', 'Chiềng Hặc'): '4093;4081;4078',              # 1681 item 39
+    ('Thái Nguyên', 'Văn Lăng'): '5671;5665',                # 1683 item 27
+    ('Phú Thọ', 'Liên Hoà'): '8789;8833;8812',               # 1676 item 65
+    ('Thanh Hoá', 'Đông Tiến'): '16396;15856;16402;15850;15847;15853;16405',  # 1686 item 131; also Thiệu Vân
+    ('Thanh Hoá', 'Hoằng Thanh'): '15997;15994;16003;16000', # 1686 item 21; also Hoằng Đông, Hoằng Phụ
+    ('Tuyên Quang', 'Tân Thanh'): '2575;2578;2590',          # 1684 item 38
+    ('Vĩnh Long', 'Đông Thành'): '29813;29812;29809;29818',  # 1687 item 109: the sheet left out Đông Thành
+    ('Tây Ninh', 'Thạnh Phước'): '27880;27877;27874',        # 1682 item 17
+    ('Điện Biên', 'Sáng Nhè'): '3247;3259;3244',             # 1661 item 20: the sheet left out Xá Nhè
+    ('Hải Phòng', 'Quyết Thắng'): '11758;11761;11764',       # 1669 item 56: Tự Cường (Tiên Lãng), not Tứ Cường
 }
+NAME_FIXES = {'3244': 'Xá Nhè'}   # the old list already carries the new name for Xá Nhè (1661 item 20)
 
 
 # --- folding: one key per spelling, whatever the tone placement or i/y habit -----------------
@@ -98,14 +117,15 @@ def core(k):
 
 # --- the two witnesses -------------------------------------------------------------------------
 
-def cover(ws, cands):
+def cover(ws, cands, every=False):
     """Each syllable's sources at the lowest level that bore it: Quế Phước rests on the communes
-    Quế Lâm and Phước Ninh, not on the district Quế Sơn. A syllable no source bore is skipped."""
+    Quế Lâm and Phước Ninh, not on the district Quế Sơn. A syllable no source bore is skipped.
+    every=True keeps every level that bore it, for the `levels` column."""
     out = []
     for t in ws:
         has = [c for c in cands if t in c[1]]
         low = max((LEVELS.index(c[0]) for c in has), default=None)
-        out += [c for c in has if LEVELS.index(c[0]) == low and c not in out]
+        out += [c for c in has if (every or LEVELS.index(c[0]) == low) and c not in out]
     return out
 
 
@@ -218,6 +238,8 @@ def crosswalk(old, new):
 
 def main():
     old = {r['code']: r for r in read('data/old_units.csv')}
+    for c, nm in NAME_FIXES.items():
+        old[c]['name'] = nm
     new = read('data/new_units.csv')
     for u in new:
         u['old_codes'] = CODE_FIXES.get((u['province'], u['name']), u['old_codes'])
@@ -251,8 +273,11 @@ def main():
         status, reason = settle(kind, src, best, ratio)
         levels = {c[0] for c in src}
         origin = next((lvl for lvl in LEVELS if lvl in levels), '')
+        if kind == 'compound':      # a higher unit may bear a syllable too: Quế Sơn for Quế Phước
+            levels |= {c[0] for c in cover(nk, cands, every=True)}
         row = {'province': u['province'], 'name': u['name'], 'kind': kind, 'origin': origin,
                'sources': ' + '.join(sorted({f'{c[2]} ({c[0]})' for c in src})),
+               'levels': '+'.join(lvl for lvl in LEVELS if lvl in levels),
                'b_nearest': ' + '.join(sorted({c[2] for c in best})), 'b_distance': d,
                'status': status, 'reason': reason, 'decided_by': ''}
         if (u['province'], u['name']) in decided:
@@ -261,7 +286,7 @@ def main():
         row['family'] = FAMILY[row['kind']]
         rows.append(row)
 
-    cols = ['province', 'name', 'family', 'kind', 'origin', 'sources', 'b_nearest', 'b_distance',
+    cols = ['province', 'name', 'family', 'kind', 'origin', 'levels', 'sources', 'b_nearest', 'b_distance',
             'status', 'reason', 'decided_by']
     write('out/names.csv', rows, cols)
     write('out/queue.csv', [r for r in rows if r['status'] == 'check'], cols)
@@ -280,6 +305,8 @@ def main():
     for f in ('whole', 'partial', 'new'):
         print(f'  {f:<8}{pct(fam[f])}   {ARTICLE[f]:>5}')
     print('\nOrigin of kept names:', dict(Counter(r['origin'] for r in rows if r['family'] != 'new')))
+    print('Kept names more than one level could explain:',
+          sum('+' in r['levels'] for r in rows if r['family'] != 'new'))
     print('Status:', dict(Counter(r['status'] for r in rows)))
     print('Queue by kind:', dict(Counter(r['kind'] for r in rows if r['status'] == 'check')))
 
@@ -300,6 +327,8 @@ def selftest():
     assert a('Chân Mây - Lăng Cô', 'Lăng Cô', 'Lộc Tiến') == 'kept'
     k, src = witness_a(key('Quế Phước'), c('Quế Lâm', 'Phước Ninh') + [('district', key('Quế Sơn'), 'Quế Sơn')], [])
     assert k == 'compound' and {s[0] for s in src} == {'ward'}
+    assert {s[0] for s in cover(key('Quế Phước'), c('Quế Lâm') + [('district', key('Quế Sơn'), 'Quế Sơn')], every=True)} \
+        == {'ward', 'district'}
     assert {s[0] for s in witness_a(key('Liên Sơn Lắk'), c('Liên Sơn') + [('district', key('Lắk'), 'Lắk')], [])[1]} \
         == {'ward', 'district'}
     assert a('Thư Vũ', 'Vũ Thư') == 'compound' and a('Tân Khánh', 'Tân Phước Khánh') == 'compound'

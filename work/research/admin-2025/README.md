@@ -7,10 +7,10 @@ Serves bet 1c (`docs/NOW.md`): the 2025 reform as data, the last step of every c
 **Question.** Can the 2025 tagging be rebuilt so a machine settles what it can prove, a person sees
 only what it cannot, and every human decision is kept?
 
-**Answer (2026-10-20).** Yes. 3,140 of 3,321 names (94.5 %) settle on syllable rules; 181 go to
-a person (21 one-letter differences, 103 compounds, 17 sources kept inside a longer name, 40 "new"
+**Answer (2026-10-20).** Yes. 3,139 of 3,321 names (94.5 %) settle on syllable rules; 182 go to
+a person (21 one-letter differences, 104 compounds, 17 sources kept inside a longer name, 40 "new"
 names that edit distance finds close to a source). In 2025 the same step sent 362 names to a person
-and kept none of their answers. Family comes out at 2,600 whole, 311 partial and 410 new, against
+and kept none of their answers. Family comes out at 2,599 whole, 312 partial and 410 new, against
 the article's 2,596, 290 and 435; most of the gap in `new` is names the rules read as compounds or
 one-letter differences and send to a person. Judged against every disagreement with the published
 tags (below), the rules settle 2 names wrongly without a check; the published tags have 35 wrong.
@@ -19,8 +19,8 @@ tags (below), the rules settle 2 names wrongly without a check; the published ta
 the decision is logged) now runs on a national dataset, with a queue a person can clear in an
 afternoon. The crosswalk check found one wrong hand-typed code (Tân Ninh, Tây Ninh was given
 Phường 4 of Tân An, Long An), a one-row slip among the Kiên Giang islands (Kiên Hải, Tiên Hải and
-Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), and 229 old communes that land in
-no new unit.
+Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), 16 units whose sources name the
+wrong commune or leave one out (below), and 210 old communes that land in no new unit.
 
 **Two more checks that could have failed (2026-10-20).**
 
@@ -36,7 +36,7 @@ no new unit.
   (96.9 %); the queue grows from 168 to 181. Two such misses remain on the auto side (Đông Tiên
   Hưng, Thành Vinh: a syllable from no source).
 - *Judged.* `judged.csv` rules on all 170 units where the two differed in family or origin (Claude,
-  2026-10-20; 149 high confidence, 20 low, 1 unsure; Tue to confirm). Before the judgment, ours got
+  2026-10-20; all 170 high confidence once the resolutions were read; Tue to confirm). Before the judgment, ours got
   family wrong for 78 of 3,319 units: 57 were `variant`, mapped to partial while the article keeps a
   name spelled differently as whole; 17 were one-letter cases already in the queue; 4 were real.
   Origin was wrong 19 times, every time a compound credited to a district that only shares a
@@ -47,9 +47,17 @@ no new unit.
   published tags err on family 35 times (1.1 %): 22 compounds, kept names and old district names
   tagged new, and a one-row slip in two blocks (Cà Mau; the old Nam Định communes, Đồng Thịnh to
   Minh Thái) that gives each unit its neighbour's sources and tag. They err on origin 50 times,
-  mostly on which level bore a kept name. The 20 low-confidence rows are one mark apart in a
-  Vietnamese name (Lưỡng/Lượng Minh, Thạnh/Thanh An): judged the same place, but only the resolution
-  text can say whether a side mistyped or the name changed. Where the two sides agree they are taken
+  mostly on which level bore a kept name. The 21 rows left open were one mark apart in a
+  Vietnamese name (Lộc Thạnh/Lộc Thành) or a name the old list had already changed (Sáng Nhè). The
+  2025 resolutions (UBTVQH15 1654-1687, one per province) settle all 21. In 14 both spellings are
+  real communes and the sheet's source list took the wrong one or left the right one out; three more such picks sat in the
+  same rows (Song Phượng for Song Phương, Thiệu Vận for Thiệu Vân, Hoằng Đồng for Hoằng Đông). The
+  name is kept whole either way, so family does not move, but the crosswalk does: 18 old communes
+  that sat in no new unit now have one. A random check of 20 of the other 149 judged rows against
+  the resolutions found one more (Quyết Thắng, Hải Phòng: Tứ Cường for Tự Cường), so the 21 are not the
+  only ones. Six are the same commune spelled differently (Cỗ/Cổ Đạm,
+  Quán/Quan Triều). Sáng Nhè is a compound of Phình Sáng and Xá Nhè, which the sheet left out.
+  The 16 code fixes are in `CODE_FIXES` with the resolution item. Where the two sides agree they are taken
   as right, so both rates are floors.
 - *Witness C, geometry, Hồ Chí Minh City.* `overlay.py` lays OSM's communes from 1 Jan 2025 over
   OSM's from 13 Oct 2026. All 441 old and 168 new communes match a GSO code or a new name. The code
@@ -102,7 +110,10 @@ and the share of the name that must change. It audits only what the rules cannot
 it is worse than the rules (it puts Vĩnh Bình nearer Bình Minh than Vĩnh Bình Bắc). A kept name is
 credited to the highest unit that bore it (province, then district, then commune), as the article
 counted, and a compound to the lowest unit that bore each syllable: 36 province, 724 district,
-2,151 commune here, against 30, 712 and 2,144.
+2,151 commune here, against 30, 712 and 2,144. That choice matters for 317 kept names (10.9 %),
+which more than one level could explain: 286 a district or a commune, 21 a province or a district,
+10 all three or a province and a commune. The `levels` column lists every level that bore the name
+or one of its syllables, so a reader can take another rule without rerunning anything.
 
 ## Decide
 
@@ -118,7 +129,7 @@ counts include it. Never edit `out/` by hand.
 | `data/new_units.csv` | the 3,321 new communes, the old codes they were built from (`old_codes`), and codes added by hand in 2025 (`hand_codes`, `hand_note`) |
 | `decisions.csv` | human decisions, applied on every run |
 | `judged.csv` | verdicts on every unit where ours and the published tags differ (`published.py` scores both) |
-| `out/names.csv` | one row per new commune: kind, origin, sources, witness B, status |
+| `out/names.csv` | one row per new commune: kind, origin, every level that could explain it, sources, witness B, status |
 | `out/queue.csv` | the rows a person must decide |
 | `out/crosswalk_flags.csv` | old communes in no new unit; hand codes from another province |
 | `out/hcmc_overlay.csv` | witness C: share of each old HCMC-area commune in each new commune (≥ 1 %) |
@@ -127,10 +138,14 @@ counts include it. Never edit `out/` by hand.
 
 ## Limits
 
-- The crosswalk lists the communes a new unit was built from, not the share of each. 612 old
-  communes sit in two or more new units, and 229 in none (66 of them in Hồ Chí Minh City, mostly
+- The crosswalk lists the communes a new unit was built from, not the share of each. 597 old
+  communes sit in two or more new units, and 210 in none (66 of them in Hồ Chí Minh City, mostly
   numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
   run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
+- The baseline is the state just before and just after 1 July 2025: `old_units.csv` and the 2025
+  sheet. A name counts as kept only if a unit on the old list bore it. A name lost in an earlier
+  round counts as new, even over the same ground: Đông Sơn district went into Thanh Hoá city in
+  late 2024, so phường Đông Sơn is new (Tue, 2026-10-20).
 - Witness C trusts OSM: its 1 Jan 2025 boundaries are what mappers had drawn by then, and a share
   under 5 % is read as the two surveys' edges disagreeing.
 - Witness B shares A's folding, so the two are not fully independent.
