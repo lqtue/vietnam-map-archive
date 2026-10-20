@@ -80,57 +80,260 @@
   margin-top: 1.75rem;
 }
 
-.about-page .flow {
+/* The system diagram: a lane for the machine, a box for the person, arrows between. State is a
+   marker plus a border style plus a word, never colour alone. */
+.about-page .flow-fig {
   margin: 1.75rem 0 0;
+}
+
+.about-page .flow,
+.about-page .steps {
+  --gap: 1.75rem;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.75rem;
+  gap: var(--gap);
 }
 
-.about-page .flow li {
-  padding: 0.75rem 1rem;
-  border: var(--border-thin);
-  border-left-width: 6px;
-  border-radius: var(--radius-sm, 4px);
+.about-page .steps {
+  --gap: 1.25rem;
+  margin-top: 0.75rem;
 }
 
-.about-page .flow li.tone-good {
-  border-left-color: var(--color-green);
+.about-page .step,
+.about-page .lane {
+  position: relative;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
-.about-page .flow li.tone-warn {
-  border-left-color: var(--color-orange);
+.about-page .step {
+  padding: 0.8rem 1rem 0.9rem;
+  background: var(--color-white);
 }
 
-.about-page .flow li.tone-bad {
-  border-left-color: var(--color-gray-300);
+.about-page .lane {
+  padding: 0.9rem 1rem 1rem;
+  background: var(--color-bg);
 }
 
-.about-page .flow-head {
+.about-page .step.is-planned {
+  border-style: dashed;
+  background: transparent;
+}
+
+.about-page .step h3,
+.about-page .lane-title {
+  margin: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
+  color: var(--color-text);
 }
 
-.about-page .flow-state {
-  font-size: 0.75rem;
+.about-page .lane-title {
+  font-size: 0.95rem;
+}
+
+.about-page .state {
+  margin-left: auto;
+  font-size: 0.85rem;
   font-weight: var(--font-extrabold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-gray-500);
+  white-space: nowrap;
 }
 
-.about-page .flow p {
-  margin: 0.25rem 0 0;
+.about-page .step p {
+  margin: 0.4rem 0 0;
   font-weight: var(--font-medium);
   line-height: 1.5;
   color: var(--color-gray-500);
 }
 
+.about-page .mark {
+  flex: none;
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  vertical-align: -0.1rem;
+}
+
+.about-page .is-built > h3 .mark,
+.about-page .mark.is-built {
+  background: var(--color-text);
+}
+
+.about-page .is-part > h3 .mark,
+.about-page .mark.is-part {
+  background: linear-gradient(90deg, var(--color-text) 50%, transparent 50%);
+}
+
+/* The person is where a check happens, so it is the one filled box. */
+.about-page .step.person {
+  background: var(--color-yellow);
+}
+
+.about-page .step.person h3,
+.about-page .step.person p,
+.about-page .step.person .odds-row {
+  color: var(--color-text-on-yellow);
+}
+
+.about-page .odds-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.9rem 0 0;
+  font-weight: var(--font-medium);
+  line-height: 1.4;
+}
+
+.about-page .odds {
+  flex: none;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.about-page .odds i {
+  width: 1rem;
+  height: 1.4rem;
+  background: var(--color-text-on-yellow);
+  border: 2px solid var(--color-text-on-yellow);
+}
+
+.about-page .odds i.hidden {
+  background: transparent;
+  border-style: dashed;
+}
+
+/* Arrows. A down arrow leaves the box above it; an across arrow leaves the box to its left. A
+   planned step is reached by a dashed line. */
+.about-page .down::before,
+.about-page .down::after,
+.about-page .across::before,
+.about-page .across::after {
+  content: '';
+  position: absolute;
+}
+
+.about-page .down::before {
+  left: 50%;
+  top: calc(-1 * var(--gap));
+  height: calc(var(--gap) - 8px);
+  border-left: 2px solid var(--color-border);
+}
+
+.about-page .down::after {
+  left: calc(50% - 6px);
+  top: -8px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--color-border);
+}
+
+.about-page .is-planned.down::before {
+  border-left-style: dashed;
+}
+
+@media (min-width: 760px) {
+  .about-page .flow {
+    --col-gap: 3.5rem;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--col-gap);
+  }
+
+  .about-page .span {
+    grid-column: 1 / -1;
+  }
+
+  .about-page .lane {
+    grid-column: 1;
+  }
+
+  .about-page .person {
+    grid-column: 2;
+  }
+
+  .about-page .measure {
+    grid-column: 1;
+  }
+
+  .about-page .back {
+    grid-column: 2;
+  }
+
+  /* The record is fed by the person, which sits in the right column. */
+  .about-page .record::before {
+    left: 75%;
+  }
+
+  .about-page .record::after {
+    left: calc(75% - 6px);
+  }
+
+  .about-page .across::before {
+    left: calc(-1 * var(--col-gap));
+    top: 50%;
+    width: calc(var(--col-gap) - 8px);
+    height: 0;
+    border-left: 0;
+    border-top: 2px solid var(--color-border);
+  }
+
+  .about-page .across::after {
+    left: -8px;
+    top: calc(50% - 6px);
+    border: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid var(--color-border);
+  }
+
+  .about-page .is-planned.across::before {
+    border-top-style: dashed;
+  }
+}
+
+/* One column: every box is reached from above. */
+@media (max-width: 759px) {
+  .about-page .across {
+    margin-top: 0;
+  }
+
+  .about-page .across::before {
+    left: 50%;
+    top: calc(-1 * var(--gap));
+    height: calc(var(--gap) - 8px);
+    border-left: 2px solid var(--color-border);
+  }
+
+  .about-page .across::after {
+    left: calc(50% - 6px);
+    top: -8px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--color-border);
+  }
+
+  .about-page .is-planned.across::before {
+    border-left-style: dashed;
+  }
+}
+
 .about-page .flow-key {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 0.4rem;
+  font-weight: var(--font-medium);
+  line-height: 1.5;
+  color: var(--color-gray-500);
+}
+
+.about-page .flow-key .mark {
+  margin-right: 0.5rem;
 }
 
 @media (max-width: 600px) {
