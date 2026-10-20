@@ -80,6 +80,59 @@
   margin-top: 1.75rem;
 }
 
+.about-page .flow {
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.about-page .flow li {
+  padding: 0.75rem 1rem;
+  border: var(--border-thin);
+  border-left-width: 6px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.about-page .flow li.tone-good {
+  border-left-color: var(--color-green);
+}
+
+.about-page .flow li.tone-warn {
+  border-left-color: var(--color-orange);
+}
+
+.about-page .flow li.tone-bad {
+  border-left-color: var(--color-gray-300);
+}
+
+.about-page .flow-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.about-page .flow-state {
+  font-size: 0.75rem;
+  font-weight: var(--font-extrabold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-gray-500);
+}
+
+.about-page .flow p {
+  margin: 0.25rem 0 0;
+  font-weight: var(--font-medium);
+  line-height: 1.5;
+  color: var(--color-gray-500);
+}
+
+.about-page .flow-key {
+  margin-top: 1.25rem;
+}
+
 @media (max-width: 600px) {
   .about-page .stat {
     flex-direction: column;

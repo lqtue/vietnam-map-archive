@@ -105,6 +105,107 @@
       </dl>
     </section>
 
+    <!-- WHY, AND THE WHOLE SYSTEM — docs/CONCEPT.md §Why; status as of the PR date, update with it -->
+    <section class="section-card">
+      <h2 class="section-title-sm">Why we do it, and how</h2>
+      <p class="section-desc">
+        Three things make old Vietnamese sources hard to use. They are scattered: maps sit in
+        archives in France, the United States and Vietnam, and the documents and photos about the
+        same streets sit somewhere else. They never agree, because every map is a claim by someone
+        for a purpose, and agreement is cheap now: a map redrawn from another, or a summary of a
+        catalogue, agrees with its source for free. And the places are going: the 2025 merge of
+        provinces and communes put old names on new ground, and buildings that come down leave only
+        what recorded them.
+      </p>
+      <p class="section-desc">
+        So we do not try to make the sources agree. We tie each one to a place and a time, say how
+        the links relate, and keep who checked every link. A machine can propose thousands; only a
+        person can decide. The aim is a record anyone can search, cite and download, plus honest
+        numbers on how often it is right. The picture below is the whole system, and what each part
+        is today.
+      </p>
+      <ol class="flow">
+        <li class="tone-good">
+          <div class="flow-head"><strong>Sources</strong><span class="flow-state">Built</span></div>
+          <p>
+            Old maps from archives in France, the United States and Vietnam, and later documents,
+            photos and writings. Each is kept with its scan and a link back to the holder.
+          </p>
+        </li>
+        <li class="tone-good">
+          <div class="flow-head">
+            <strong>Look over each sheet</strong><span class="flow-state">Built</span>
+          </div>
+          <p>
+            A machine finds the title, the legend, the map itself and its border, so a person
+            corrects boxes instead of drawing them. Reading scale, year and colour is not part of
+            this yet.
+          </p>
+        </li>
+        <li class="tone-warn">
+          <div class="flow-head">
+            <strong>Machines propose</strong><span class="flow-state">Partly</span>
+          </div>
+          <p>
+            Where a sheet sits on the ground, what is printed on it, and which place today a name
+            might mean. Each proposal carries a confidence. These are separate tools, one per kind
+            of map, and can be swapped.
+          </p>
+        </li>
+        <li class="tone-bad">
+          <div class="flow-head">
+            <strong>Sort by confidence</strong><span class="flow-state">Not yet</span>
+          </div>
+          <p>
+            Sure, unsure, or no. Today nothing is accepted without a person, and every proposal goes
+            to one.
+          </p>
+        </li>
+        <li class="tone-warn">
+          <div class="flow-head">
+            <strong>A person decides</strong><span class="flow-state">Offline only</span>
+          </div>
+          <p>
+            Same building, same site with a new building, moved, gone, none, or unsure. On about one
+            item in five the machine’s suggestion is hidden first. A web page for more reviewers is
+            being built.
+          </p>
+        </li>
+        <li class="tone-good">
+          <div class="flow-head">
+            <strong>The record</strong><span class="flow-state">Built</span>
+          </div>
+          <p>
+            Who decided, when, what the machine had suggested, whether they saw it, and the exact
+            version of the item. Entries are added and never edited.
+          </p>
+        </li>
+        <li class="tone-warn">
+          <div class="flow-head">
+            <strong>Measure</strong><span class="flow-state">Offline only</span>
+          </div>
+          <p>
+            How often a link is right, how many seconds a check takes, and which checks were
+            independent of what they checked.
+          </p>
+        </li>
+        <li class="tone-bad">
+          <div class="flow-head">
+            <strong>Back to the machines</strong><span class="flow-state">Not yet</span>
+          </div>
+          <p>
+            Past decisions used to improve the proposals, with whole sheets held out so the test
+            stays honest.
+          </p>
+        </li>
+      </ol>
+      <p class="section-desc flow-key">
+        <strong>Built</strong> works now. <strong>Partly</strong> and <strong>Offline only</strong>
+        run on one person’s machine or for some kinds of map. <strong>Not yet</strong> is a design. Status
+        as of October 2026.
+      </p>
+    </section>
+
     <!-- HOW A LINK IS MADE — the four verbs of docs/CONCEPT.md, and what each one has today -->
     <section class="section-card">
       <h2 class="section-title-sm">How a link is made</h2>
