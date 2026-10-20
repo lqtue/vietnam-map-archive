@@ -56,6 +56,19 @@ the 1870s (25) and 1920s (35). Many are regional maps where Vietnam is one count
 The scorer files 210 of 243 as `unknown`, because it reads Gallica's subject words, not Rumsey's
 `Type` field.
 
+Two sets matter most, and neither is in VMA:
+
+- **Bigrel, *Carte générale de la Cochinchine française*, c. 1873**, 1:127,000, 19 sheets, compiled
+  by the Navy "from the most recent documents" for Admiral Dupré. On Tue's screenshot of the
+  composite it prints Khánh hội, Xóm chiếu, Tam hội and Vĩnh hội, the bet 1c pilot area, seven years
+  before the 1880 decree. Saigon itself is on sheet 12. It is compiled, so whether it is independent of
+  the 1882 plate is still open.
+- **Yves Henry, *Cartes rizicoles des provinces*, 1928**, 1:250,000: 18 provinces of Tonkin and North
+  Annam (Sơn Tây, Hà Đông, Bắc Ninh, Nam Định, Thanh Hóa, Nghệ An, …) plus overview maps. Tue's
+  screenshot of Vĩnh Yên shows province and huyện borders with huyện names: a dated state of the admin
+  units across the North. Rumsey titles Vĩnh Yên and Phú Thọ "Annam", but both were Tonkin provinces;
+  check the printed title before copying the catalogue's.
+
 The 15 Rumsey maps VMA holds came through Wikimedia Commons and carry no Rumsey id, so dedup cannot
 see them: they are the 15 plates of Rumsey publication 14320 (*Bản Đồ Hành-Chính Các Tỉnh Trung-Châu
 Bắc-Việt*, 1950) and are dropped before load.
@@ -104,6 +117,17 @@ Not looked at yet: Old Maps Online (a union index, which may answer the kill lin
 `review_status` answers "will VMA host this?" A rejection today can mean "not Vietnam" or "Vietnam,
 but not worth a scan". Only the first leaves the corpus. Until the corpus page needs the split, the
 reviewer writes which one in `review_note`; nothing is deleted.
+
+## Plates and copies
+
+One plate printed many times, held in many libraries, is one survey. The corpus counts both: copies
+show where a map survives, but in 1c a plate counts once, because copies agree by construction.
+
+First case, 2026-10-21: Brun's *Plan de la ville de Saigon*, surveyed 1795 and reduced by Dayot in 1799.
+VMA holds one BnF copy (`plan-de-la-ville-de-saigon-1799`, `btv1b525055501`). The queue holds two more
+BnF copies (`btv1b532253098`, `btv1b53225310n`) and Rumsey's, bound in *Hydrographie Française*. Tue
+compared Rumsey's with VMA's by eye: the same plate, or nearly. The copies differ in where the library
+stamp sits. Four copies, one witness.
 
 ## The corpus page — later
 
