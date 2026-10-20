@@ -10,15 +10,17 @@ only what it cannot, and every human decision is kept?
 **Answer (2026-10-20).** Yes. 3,140 of 3,321 names (94.5 %) settle on syllable rules; 181 go to
 a person (21 one-letter differences, 103 compounds, 17 sources kept inside a longer name, 40 "new"
 names that edit distance finds close to a source). In 2025 the same step sent 362 names to a person
-and kept none of their answers. `new` comes out at 412 against the article's 435; most of the gap is
-names the rules read as compounds or one-letter differences and send to a person. `whole` is 2,537
-against 2,596, because 61 names that differ from their source only in marks or spacing (Sà/Xà Phìn,
-Ea Ly/Ealy) count here as `variant`, the article's own rule for Nà Hang.
+and kept none of their answers. Family comes out at 2,600 whole, 311 partial and 410 new, against
+the article's 2,596, 290 and 435; most of the gap in `new` is names the rules read as compounds or
+one-letter differences and send to a person. Judged against every disagreement with the published
+tags (below), the rules settle 2 names wrongly without a check; the published tags have 35 wrong.
 
 **So what.** The method the paper claims (machine proposes, flags its own doubt, a person decides,
 the decision is logged) now runs on a national dataset, with a queue a person can clear in an
 afternoon. The crosswalk check found one wrong hand-typed code (Tân Ninh, Tây Ninh was given
-Phường 4 of Tân An, Long An) and 233 old communes that land in no new unit.
+Phường 4 of Tân An, Long An), a one-row slip among the Kiên Giang islands (Kiên Hải, Tiên Hải and
+Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), and 229 old communes that land in
+no new unit.
 
 **Two more checks that could have failed (2026-10-20).**
 
@@ -33,19 +35,22 @@ Phường 4 of Tân An, Long An) and 233 old communes that land in no new unit.
   province (Tuyên Bình). With those rules added, family agrees on 3,206 (96.6 %) and origin on 3,217
   (96.9 %); the queue grows from 168 to 181. Two such misses remain on the auto side (Đông Tiên
   Hưng, Thành Vinh: a syllable from no source).
-- *Judged.* `judged.csv` rules on all 170 units where the two differ in family or origin (Claude,
-  2026-10-20; 149 high confidence, 20 low, 1 unsure; Tue to confirm). Taking agreement as right,
-  the published tags get family wrong for 35 of 3,319 units (1.1 %) and ours for 78 (2.4 %), but the
-  causes differ. Ours: 57 are `variant`, which this run maps to partial while the article (and the
-  judgment) keep a name spelled differently as kept whole; 17 are one-letter cases already in the
-  queue; 4 are real misses (two syllables from no source, two units whose codes the 2025 sheet
-  swapped, Sơn Hải and Tiên Hải). Published: 22 compounds, kept names and old district names tagged
-  new, and a one-row slip in two blocks (Cà Mau; the old Nam Định communes, Đồng Thịnh to Minh Thái)
-  that gives each unit its neighbour's sources and tag. On origin ours errs 19 times, all compounds
-  credited to a district that only shares a syllable a commune already supplies; the published tags
-  err 50 times, mostly on which level bore a kept name. The 20 low-confidence rows are one mark
-  apart in a Vietnamese name (Lưỡng/Lượng Minh, Thạnh/Thanh An): judged the same place, but only the
-  resolution text can say whether a side mistyped or the name changed.
+- *Judged.* `judged.csv` rules on all 170 units where the two differed in family or origin (Claude,
+  2026-10-20; 149 high confidence, 20 low, 1 unsure; Tue to confirm). Before the judgment, ours got
+  family wrong for 78 of 3,319 units: 57 were `variant`, mapped to partial while the article keeps a
+  name spelled differently as whole; 17 were one-letter cases already in the queue; 4 were real.
+  Origin was wrong 19 times, every time a compound credited to a district that only shares a
+  syllable a commune already supplies. Three fixes followed: `variant` counts as whole, each
+  syllable of a compound rests on the lowest unit that bore it, and the island codes are corrected.
+  Now ours errs on family 19 times (0.6 %; 17 in the queue, 2 settled wrongly: Đông Tiên Hưng and
+  Thành Vinh, each with a syllable from no source) and on origin 4 times (2 in the queue). The
+  published tags err on family 35 times (1.1 %): 22 compounds, kept names and old district names
+  tagged new, and a one-row slip in two blocks (Cà Mau; the old Nam Định communes, Đồng Thịnh to
+  Minh Thái) that gives each unit its neighbour's sources and tag. They err on origin 50 times,
+  mostly on which level bore a kept name. The 20 low-confidence rows are one mark apart in a
+  Vietnamese name (Lưỡng/Lượng Minh, Thạnh/Thanh An): judged the same place, but only the resolution
+  text can say whether a side mistyped or the name changed. Where the two sides agree they are taken
+  as right, so both rates are floors.
 - *Witness C, geometry, Hồ Chí Minh City.* `overlay.py` lays OSM's communes from 1 Jan 2025 over
   OSM's from 13 Oct 2026. All 441 old and 168 new communes match a GSO code or a new name. The code
   list agrees with the geometry for 349 old communes. The 66 the list left out each land in exactly
@@ -53,9 +58,10 @@ Phường 4 of Tân An, Long An) and 233 old communes that land in no new unit.
   across the whole merged city, so Phường 1 of Vũng Tàu sits in 11 new units' lists but lies wholly
   in the new Vũng Tàu. That collision explains 18 of the 25 cases where the list names a unit the
   geometry does not reach; 7 named cases remain, plus one 6 % sliver, for a person. 40 old communes
-  are truly cut, each piece at least 5 %. Of 101 names kept from an old commune, 95 lie inside the
-  unit that bears the name, 3 lie partly inside (the source was split nearly in half), and the 3
-  that lie elsewhere are `reused` names, which the rules already said came from another unit.
+  are truly cut, each piece at least 5 %. Of 105 names kept from an old commune, 98 lie inside the
+  unit that bears the name and 3 partly (the source was split nearly in half). Of the 4 that lie
+  elsewhere, 3 are `reused` names, which the rules already said came from another unit; the fourth,
+  Tân Vĩnh Lộc, credits its Tân to Tân Tạo, which the geometry puts in Bình Tân and Tân Tạo only.
 
 ## Run
 
@@ -82,7 +88,7 @@ code list, that commune's district, and its province.
 | Kind | Rule | Example | Settles |
 |---|---|---|---|
 | whole | same folded name | An Phú ← An Phú | itself |
-| variant | same letters, marks or spacing differ | Avương ← A Vương | itself |
+| variant | same letters, marks or spacing differ; counted as kept whole | Avương ← A Vương | itself |
 | affix | a direction word, number or A/B added or dropped | Hội An Tây ← Hội An, Láng ← Láng Hạ | itself |
 | part | a run of a longer source name | Phan Rang ← Phan Rang-Tháp Chàm, Hiệp Bình ← Hiệp Bình Chánh | itself |
 | near | one letter differs | Tân Ninh ← Tây Ninh? | person |
@@ -95,7 +101,8 @@ Witness B is the edit distance Duy Khánh used in 2025, run on the folded names:
 and the share of the name that must change. It audits only what the rules cannot prove; on affixes
 it is worse than the rules (it puts Vĩnh Bình nearer Bình Minh than Vĩnh Bình Bắc). A kept name is
 credited to the highest unit that bore it (province, then district, then commune), as the article
-counted: 35 province, 743 district, 2,131 commune here, against 30, 712 and 2,144.
+counted, and a compound to the lowest unit that bore each syllable: 36 province, 724 district,
+2,151 commune here, against 30, 712 and 2,144.
 
 ## Decide
 
@@ -121,7 +128,7 @@ counts include it. Never edit `out/` by hand.
 ## Limits
 
 - The crosswalk lists the communes a new unit was built from, not the share of each. 612 old
-  communes sit in two or more new units, and 233 in none (66 of them in Hồ Chí Minh City, mostly
+  communes sit in two or more new units, and 229 in none (66 of them in Hồ Chí Minh City, mostly
   numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
   run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
 - Witness C trusts OSM: its 1 Jan 2025 boundaries are what mappers had drawn by then, and a share

@@ -22,13 +22,18 @@ TONES = '̣̀́̃̉'          # huyền sắc ngã hỏi nặng
 VOWELS = set('aăâeêioôơuưy')
 ROMAN = {'i': '1', 'ii': '2', 'iii': '3', 'iv': '4', 'v': '5', 'vi': '6', 'vii': '7', 'viii': '8', 'ix': '9', 'x': '10'}
 PREFIX = re.compile(r'^(phường|xã|thị trấn|thị xã|thành phố|tp\.?|quận|huyện|tỉnh|đặc khu)\s+', re.I)
-FAMILY = {'whole': 'whole', 'variant': 'partial', 'affix': 'partial', 'part': 'partial', 'near': 'partial',
-          'kept': 'partial', 'compound': 'partial',
+FAMILY = {'whole': 'whole', 'variant': 'whole',          # a name spelled differently is kept, as the article had it
+          'affix': 'partial', 'part': 'partial', 'near': 'partial', 'kept': 'partial', 'compound': 'partial',
           'reused': 'new', 'new': 'new'}
 LEVELS = ('province', 'district', 'ward')               # a kept name is credited to the highest unit
                                                         # that bore it, as the article counted
 ARTICLE = {'whole': 2596, 'partial': 290, 'new': 435}   # VnExpress, 1 Aug 2025, after hand review
 NEAR = 0.34                                               # B: share of characters that must change
+CODE_FIXES = {    # the 2025 sheet slipped one row among the Kiên Giang islands (found judging, 2026-10-20)
+    ('An Giang', 'Kiên Hải'): '31108;31111;31114;31115',
+    ('An Giang', 'Tiên Hải'): '30781',
+    ('An Giang', 'Sơn Hải'): '30811',
+}
 
 
 # --- folding: one key per spelling, whatever the tone placement or i/y habit -----------------
@@ -93,6 +98,17 @@ def core(k):
 
 # --- the two witnesses -------------------------------------------------------------------------
 
+def cover(ws, cands):
+    """Each syllable's sources at the lowest level that bore it: Quế Phước rests on the communes
+    Quế Lâm and Phước Ninh, not on the district Quế Sơn. A syllable no source bore is skipped."""
+    out = []
+    for t in ws:
+        has = [c for c in cands if t in c[1]]
+        low = max((LEVELS.index(c[0]) for c in has), default=None)
+        out += [c for c in has if LEVELS.index(c[0]) == low and c not in out]
+    return out
+
+
 def witness_a(nk, cands, nearby):
     """cands and nearby are (level, key, name). Returns (kind, the candidates it rests on)."""
     hit = [c for c in cands if c[1] == nk]
@@ -119,13 +135,13 @@ def witness_a(nk, cands, nearby):
     if hit:       # one letter: Châu Bình/Châu Bính is a correction, Tân Ninh/Tây Ninh is another name
         return 'near', hit
     hit = [c for c in cands if 1 < len(c[1]) < n and c[1] in runs(nk, len(c[1]))]
+    ws = words(nk)
     if hit:       # a source kept whole in a longer name: Chân Mây - Lăng Cô, but also Chu Văn An
-        return 'kept', hit
-    ws = words(nk)    # syllables from sources in any order: Thư Vũ <- Vũ Thư; the province only when
-    for pool in ([c for c in cands if c[0] != 'province'], cands):   # nothing lower covers: Tuyên Bình
-        parts = [c for c in pool if set(ws) & set(c[1])]
-        if len(ws) > 1 and all(any(t in c[1] for c in parts) for t in ws):
-            return 'compound', parts
+        return 'kept', hit + [c for c in cover([t for t in ws if not any(t in h[1] for h in hit)], cands)
+                              if c not in hit]                       # Liên Sơn Lắk: Lắk is the district's
+    parts = cover(ws, cands)    # syllables from sources in any order: Thư Vũ <- Vũ Thư, Tuyên Bình
+    if len(ws) > 1 and all(any(t in c[1] for c in parts) for t in ws):
+        return 'compound', parts
     hit = [c for c in nearby if c[1] == nk]
     if hit:
         return 'reused', hit
@@ -203,6 +219,8 @@ def crosswalk(old, new):
 def main():
     old = {r['code']: r for r in read('data/old_units.csv')}
     new = read('data/new_units.csv')
+    for u in new:
+        u['old_codes'] = CODE_FIXES.get((u['province'], u['name']), u['old_codes'])
     decided = {(d['province'], d['name']): d for d in read('decisions.csv')}
     flags, bad, shared = crosswalk(old, new)
 
@@ -280,6 +298,10 @@ def selftest():
     assert a('Phan Rang', 'Phan Rang-Tháp Chàm') == 'part' and a('Hiệp Bình', 'Hiệp Bình Chánh') == 'part'
     assert a('Láng', 'Láng Thượng', 'Láng Hạ') == 'affix' and a('Đông Hải', 'Đông Hải 1', 'Nam Hải') == 'affix' == a('Đông Hưng', 'Đông Hưng A')
     assert a('Chân Mây - Lăng Cô', 'Lăng Cô', 'Lộc Tiến') == 'kept'
+    k, src = witness_a(key('Quế Phước'), c('Quế Lâm', 'Phước Ninh') + [('district', key('Quế Sơn'), 'Quế Sơn')], [])
+    assert k == 'compound' and {s[0] for s in src} == {'ward'}
+    assert {s[0] for s in witness_a(key('Liên Sơn Lắk'), c('Liên Sơn') + [('district', key('Lắk'), 'Lắk')], [])[1]} \
+        == {'ward', 'district'}
     assert a('Thư Vũ', 'Vũ Thư') == 'compound' and a('Tân Khánh', 'Tân Phước Khánh') == 'compound'
     assert a('Chợ Lớn', '11', '12', '13') == 'new'
     assert a('Hà Nam', 'Hà') == 'new'
