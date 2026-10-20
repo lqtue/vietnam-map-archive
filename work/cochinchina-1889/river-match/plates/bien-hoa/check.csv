@@ -1,0 +1,3 @@
+role,id,px,py,lon,lat,note
+check,bien-hoa,3888,8456,106.8047174,10.9364123,"Citadelle by the BIEN HOA label, OSM place=suburb; placed by eye before any fit"
+check,long-thanh,5852,10580,106.952321,10.7805184,"Long Thành symbol, OSM place=town; placed by eye before any fit"

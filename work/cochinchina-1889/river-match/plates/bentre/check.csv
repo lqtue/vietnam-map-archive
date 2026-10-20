@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,ben-tre,6152,2496,106.3763684,10.2361217,"hatched town block, OSM place=city; placed by eye before any fit"
+check,mo-cay,5504,3904,106.3344463,10.1301335,"Mo Cay settlement, OSM place=town; placed by eye before any fit"
+check,giong-trom,7572,3624,106.5035598,10.1589389,"Chợ Giồng Trôm market symbol, OSM place=town; placed by eye before any fit"
+check,ba-tri,8688,5148,106.5934959,10.0421451,"Chợ Ba Tri market symbol, OSM place=town; placed by eye before any fit"

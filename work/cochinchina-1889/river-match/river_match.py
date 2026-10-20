@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Place the Mỹ Tho plate (1885) by matching its rivers to OpenStreetMap, with no graticule.
+"""Place a Cochinchina plate (1881-89) by matching its rivers to OpenStreetMap, with no graticule.
 
     work/ocr/.venv/bin/python work/cochinchina-1889/river-match/river_match.py \
-        --med <quarter-res plate JPEG> --osm <osm_water.json> [--places <places.json>]
+        --config <plate config.json> --med <quarter-res plate JPEG> --osm <osm_water.json> [--out DIR]
+
+The config holds what is read off the plate before any fit: map id, full size, the printed 20 km bar
+in quarter-res pixels, the arrondissement's centre (a gazetteer prior), the OSM box, and the path of
+the held-out checks. Every plate runs the same search; nothing is tuned per plate.
 
 Reads only. One cached Overpass response (water=river polygons, ways and relations).
 
@@ -31,13 +35,22 @@ from shapely.geometry import LineString, Polygon
 from shapely.ops import polygonize, unary_union
 
 HERE = Path(__file__).resolve().parent
-MAP_ID = "ff6489cd-b5fe-4dea-9513-5468f5972eb3"
-IIIF = f"https://iiif.maparchive.vn/iiif/{MAP_ID}"
-FULL = (15196, 9168)                 # info.json
-M_PER_PX = 20000 / 2329              # printed scale bar, full-res pixels
-LON0, LAT0 = 106.36, 10.36           # Mỹ Tho; the metric frame's origin
-KX, KY = 111320 * np.cos(np.radians(LAT0)), 110574.0
-BBOX = (9.9, 105.5, 11.0, 107.0)     # S W N E of the OSM query
+# Set by configure(): the plate's map id, size, scale and the metric frame (origin = the prior centre).
+MAP_ID = IIIF = FULL = M_PER_PX = LON0 = LAT0 = KX = KY = BBOX = NORTH = None
+REF = None                           # "image" or "mask": which plate point the 30 km prior binds
+
+
+def configure(cfg):
+    global MAP_ID, IIIF, FULL, M_PER_PX, LON0, LAT0, KX, KY, BBOX, NORTH, REF
+    MAP_ID = cfg["map_id"]
+    IIIF = f"https://iiif.maparchive.vn/iiif/{MAP_ID}"
+    FULL = tuple(cfg["full"])                       # info.json
+    M_PER_PX = 20000 / (cfg["bar_med_px"] * 4)      # printed scale bar: 20 km, full-res pixels
+    LAT0, LON0 = cfg["prior"]                       # the metric frame's origin
+    KX, KY = 111320 * np.cos(np.radians(LAT0)), 110574.0
+    BBOX = tuple(cfg["bbox"])                       # S W N E of the OSM query
+    REF = cfg.get("prior_on", "image")
+    NORTH = cfg.get("north_deg", 0.0)               # sheet turned clockwise this far, read off the north arrow / side labels
 
 
 def to_m(lon, lat):
@@ -51,11 +64,27 @@ def to_ll(x, y):
 # ---------------------------------------------------------------- OSM water raster
 def osm_lines(path):
     """waterway=river centrelines (lon, lat arrays)."""
+    if str(path).endswith(".geojsonseq"):
+        out = []
+        for ln in open(path):
+            f = json.loads(ln)
+            if f["geometry"]["type"] == "LineString" and f["properties"].get("waterway") == "river":
+                out.append(np.array(f["geometry"]["coordinates"]))
+        return out
     return [np.array([(p["lon"], p["lat"]) for p in e["geometry"]]) for e in json.load(open(path))["elements"]
             if e["type"] == "way" and e.get("tags", {}).get("waterway") == "river"]
 
 
 def osm_polygons(path):
+    if str(path).endswith(".geojsonseq"):       # `osmium export` of a Geofabrik extract: areas already assembled
+        from shapely.geometry import shape
+        polys = []
+        for ln in open(path):
+            f = json.loads(ln)
+            t = f["properties"]
+            if t.get("natural") == "water" and f["geometry"]["type"] in ("Polygon", "MultiPolygon"):
+                polys.append(shape(f["geometry"]).buffer(0))
+        return unary_union(polys)
     els = json.load(open(path))["elements"]
     polys = []
     for e in els:
@@ -142,7 +171,7 @@ def warp(P, ps, theta, G):
     return out.astype(np.float32), (-xmin / G, ymax / G)   # (col, row) of plate px (0,0)
 
 
-def search(P, Wr, worg, G, f, thetas, scales, centre_km=30):
+def search(P, Wr, worg, G, f, thetas, scales, ref, centre_km=30):
     ps0 = M_PER_PX * f
     h, w = P.shape
     res = []
@@ -157,7 +186,7 @@ def search(P, Wr, worg, G, f, thetas, scales, centre_km=30):
             ox = worg[0] + (b - (Qw - 1) + qc) * G          # metric x of plate px (0,0)
             oy = worg[1] - (a - (Qh - 1) + qr) * G
             t = np.radians(th)
-            cu, cv = w / 2, h / 2
+            cu, cv = ref
             cx = ox + ps * (np.cos(t) * cu + np.sin(t) * cv)
             cy = oy + ps * (np.sin(t) * cu - np.cos(t) * cv)
             ok = np.hypot(cx, cy) < centre_km * 1000
@@ -170,6 +199,14 @@ def search(P, Wr, worg, G, f, thetas, scales, centre_km=30):
             res.append(dict(theta=th, scale=sc, ps=ps, score=float(C[i]), ox=float(ox[i]), oy=float(oy[i]),
                             cx=float(cx[i]), cy=float(cy[i]), peaks=peaks))
     return res
+
+
+def refpt(P, m):
+    """The plate point the 30 km prior binds, in P pixels: the image centre, or the mask centroid."""
+    if REF == "mask":
+        ys, xs = np.nonzero(m)
+        return float(xs.mean()), float(ys.mean())
+    return P.shape[1] / 2, P.shape[0] / 2
 
 
 def model(r, f):
@@ -185,7 +222,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--med", required=True)
     ap.add_argument("--osm", required=True)
+    ap.add_argument("--config", required=True)
+    ap.add_argument("--out", help="output folder; default the config's folder")
     args = ap.parse_args()
+    cfgp = Path(args.config).resolve()
+    cfg = json.load(open(cfgp))
+    configure(cfg)
+    OUT = Path(args.out) if args.out else cfgp.parent
+    (OUT / "points").mkdir(parents=True, exist_ok=True)
     mask_full = outline(HERE.parent / "allmaps-drafts" / f"{MAP_ID}.json")
     geom = osm_polygons(args.osm)
     rivers = osm_lines(args.osm)
@@ -193,8 +237,8 @@ def main():
     # coarse: 150 m cells, plate at 1/16
     G, f = 150.0, 16
     Wr, worg = rasterise(geom, G, rivers)
-    P, _, _ = plate_water(args.med, mask_full, f)
-    coarse = search(P, Wr, worg, G, f, np.arange(-10, 10.01, 1.0), np.arange(0.90, 1.101, 0.02))
+    P, _, m = plate_water(args.med, mask_full, f)
+    coarse = search(P, Wr, worg, G, f, NORTH + np.arange(-10, 10.01, 1.0), np.arange(0.90, 1.101, 0.02), refpt(P, m))
     best = max(coarse, key=lambda r: r["score"])
     # second peak: best placement whose plate centre is > 5 km from the best's, any theta/scale
     second = -np.inf
@@ -211,13 +255,13 @@ def main():
     Wr2, worg2 = rasterise(geom, G2, rivers)
     P2, water2, m2 = plate_water(args.med, mask_full, f2)
     fine = search(P2, Wr2, worg2, G2, f2, np.arange(best["theta"] - 1.5, best["theta"] + 1.51, 0.25),
-                  np.arange(best["scale"] - 0.03, best["scale"] + 0.0301, 0.005))
+                  np.arange(best["scale"] - 0.03, best["scale"] + 0.0301, 0.005), refpt(P2, m2))
     fb = max(fine, key=lambda r: r["score"])
     print(f"fine best theta {fb['theta']:.2f} scale {fb['scale']:.3f} ({fb['ps'] / f2:.3f} m/px full) score {fb['score']:.1f}")
     fwd = model(fb, f2)
 
     # held-out checks
-    rows = list(csv.DictReader(open(HERE / "points" / "check.csv")))
+    rows = list(csv.DictReader(open((cfgp.parent / cfg["checks"]).resolve())))
     errs = []
     for r in rows:
         x, y = fwd(float(r["px"]), float(r["py"]))
@@ -242,7 +286,7 @@ def main():
             X, Y = xs[i] * f2 + f2 / 2, ys[i] * f2 + f2 / 2
             lon, lat = to_ll(*fwd(X, Y))
             gcps.append(((round(X), round(Y)), (round(float(lon), 6), round(float(lat), 6))))
-    with open(HERE / "points" / "fit.csv", "w", newline="") as fh:
+    with open(OUT / "points" / "fit.csv", "w", newline="") as fh:
         w = csv.writer(fh, lineterminator="\n")
         w.writerow(["role", "id", "px", "py", "lon", "lat", "note"])
         for k, ((X, Y), (lon, lat)) in enumerate(gcps):
@@ -253,15 +297,15 @@ def main():
     sys.path.insert(0, str(HERE.parents[2] / "scripts" / "lib"))
     from georef_annotation import annotation
     ann = annotation(IIIF, FULL[0], FULL[1], gcps, mask_full)
-    (HERE / f"{MAP_ID}.json").write_text(json.dumps(ann, indent=1))
+    (OUT / f"{MAP_ID}.json").write_text(json.dumps(ann, indent=1))
 
-    summary = dict(coarse=dict(theta=best["theta"], scale=round(best["scale"], 3), score=round(best["score"], 1),
+    summary = dict(water_frac_in_mask=round(float(water2[m2].mean()), 4), coarse=dict(theta=best["theta"], scale=round(best["scale"], 3), score=round(best["score"], 1),
                                second_peak=round(second, 1), ratio=round(second / best["score"], 3)),
                    fine=dict(theta=round(fb["theta"], 2), scale=round(fb["scale"], 4),
                              m_per_px_full=round(fb["ps"] / f2, 4), score=round(fb["score"], 1)),
                    checks={r["id"]: round(e) for r, e in zip(rows, errs)},
                    check_median_m=round(float(np.median(errs))), check_max_m=round(max(errs)))
-    (HERE / "points" / "summary.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False))
+    (OUT / "points" / "summary.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False))
 
     # overlay for a look: OSM river outlines drawn on the plate
     im = Image.open(args.med).convert("RGB")
@@ -284,7 +328,7 @@ def main():
         X, Y = float(r["px"]) / 4, float(r["py"]) / 4
         d.line((X - 10, Y, X + 10, Y), fill=(0, 0, 0), width=3)
         d.line((X, Y - 10, X, Y + 10), fill=(0, 0, 0), width=3)
-    im.save(HERE / "overlay.jpg", quality=85)
+    im.save(OUT / "overlay.jpg", quality=85)
 
 
 if __name__ == "__main__":

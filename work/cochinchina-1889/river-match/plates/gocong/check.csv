@@ -1,0 +1,4 @@
+role,id,px,py,lon,lat,note
+check,go-cong,3540,4752,106.6749555,10.359067,"walled block by the GOCONG label, OSM place=city; placed by eye before any fit"
+check,vinh-binh,2304,5036,106.5796995,10.3425892,"Marché at Vĩnh Lợi, OSM place=town (Vĩnh Bình); placed by eye before any fit"
+check,tan-hoa,4012,5292,106.7156414,10.318803,Dong Ben Xe cluster; the Tăng Hòa label is 1.5 km south; OSM place=town; ambiguous; placed by eye before any fit

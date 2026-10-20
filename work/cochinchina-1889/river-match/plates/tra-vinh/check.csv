@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,tra-vinh,4720,2732,106.3416458,9.9357041,"junction by the TRA VINH label, OSM place=city; placed by eye before any fit"
+check,tieu-can,4412,5344,106.1923012,9.8176711,"Tiểu Cần cluster at the road crossing, OSM place=town; placed by eye before any fit"
+check,cau-ngang,7016,3112,106.4515348,9.7946667,"Chợ Cầu Ngang market symbol, OSM place=town; placed by eye before any fit"
+check,tra-cu,6040,5980,106.2597044,9.6864538,"Marché Trà Cú cluster, OSM place=town; placed by eye before any fit"
