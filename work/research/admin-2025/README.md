@@ -20,7 +20,9 @@ the decision is logged) now runs on a national dataset, with a queue a person ca
 afternoon. The crosswalk check found one wrong hand-typed code (Tân Ninh, Tây Ninh was given
 Phường 4 of Tân An, Long An), a one-row slip among the Kiên Giang islands (Kiên Hải, Tiên Hải and
 Sơn Hải each held the next unit's codes; fixed in `CODE_FIXES`), 16 units whose sources name the
-wrong commune or leave one out (below), and 210 old communes that land in no new unit.
+wrong commune or leave one out (below), and 210 old communes that landed in no new unit. Reading
+every item of the 2025 resolutions (witness D, below) then found 196 more wrong source lists:
+215 of 3,309 units in all, 6.5 %. With them fixed, no old commune lands in no new unit.
 
 **Two more checks that could have failed (2026-10-20).**
 
@@ -70,6 +72,34 @@ wrong commune or leave one out (below), and 210 old communes that land in no new
   unit that bears the name and 3 partly (the source was split nearly in half). Of the 4 that lie
   elsewhere, 3 are `reused` names, which the rules already said came from another unit; the fourth,
   Tân Vĩnh Lộc, credits its Tân to Tân Tạo, which the geometry puts in Bình Tân and Tân Tạo only.
+- *Witness D, the resolutions.* `resolutions.py` reads the 34 provincial resolutions (UBTVQH15
+  1654-1687), one per new province. Each item names the old communes a new commune came from. The
+  script parses all 3,321 items (3,192 merges, 127 communes kept as they were, 2 renames), finds
+  each old name among the new province's old communes, and compares the set with the sheet's. It
+  could settle 3,309 units, and 215 disagree: **6.5 % (Wilson 95 %: 5.7 to 7.4 %)**. It could not
+  settle 12: 7 name a source that is no commune on the old list (a firing range, a state farm, a
+  mud flat) or spell one in a way no rule matches, and 5 are island districts the sheet records by
+  name only. Of the 215, 182 swap one commune for another, 25 add a commune the item does not name,
+  and 8 leave one out. The swaps are mostly one mark apart (Hoằng Quý and Hoằng Quỳ are two
+  communes) or a commune of the same name in another district (Phường 1 of Vũng Tàu for Phường 1
+  of Quận 3; Đông Sơn of Thanh Hoá city for Đông Sơn of Bỉm Sơn). 21 of the 25 added communes are
+  in Hà Nội. In the cases traced (Giảng Võ, Phúc Lợi, Tiến Thắng) the extra is the unit the item
+  points to with "sau khi sắp xếp theo khoản N". Where only a unique name settles the match, with
+  no pick by qualifier, district, spelling or the sheet, the rate is 4.1 % (124 of 3,043; 3.4 to
+  4.8 %). The picks add 91 disagreements among 266 units.
+  *The parser's own error.* Run on the sheet without `CODE_FIXES`, it reaches the same codes as all
+  19 earlier fixes (16 from the resolutions, 3 island slips). Claude read 20 random units it called
+  agree (seed 20261020): all 20 agree. Claude read every disagreement in Thanh Hoá (15) and Hà Nội
+  (33) against the item: all real. Reading the rest found 3 parser errors among about 215, and one
+  agreement the parser got wrong by taking the sheet's own pick (Tân Long, Cần Thơ). All four are
+  fixed. The reader also wrote the parser, and the text is a copy (hoatieu.vn), not the gazette,
+  so a typo in the copy would show as a disagreement.
+  *Fixed.* 196 new entries went into `CODE_FIXES` (215 in all), each read against its item. One
+  disagreement cannot be fixed there: Nhựt Tảo carries a hand code (Thủ Thừa) the item does not
+  name. No old commune now sits in no new unit (210 before), and 444 sit in two or more (597
+  before). Family (2,599 whole, 312 partial, 410 new) and origin do not move. Three judged Hồ Chí
+  Minh City rows (Tân Hoà, Hòa Hưng, Hoà Bình) now read `new` where they read `reused`; the verdict
+  stands. Agreement with the published origin tags goes from 3,223 to 3,226 of 3,319.
 
 ## Run
 
@@ -78,9 +108,11 @@ python3 work/research/admin-2025/names.py --check   # self-test: folding and rul
 python3 work/research/admin-2025/names.py           # writes out/, prints the counts
 python3 work/research/admin-2025/published.py ~/Downloads/embed            # agreement with the article
 python3 work/research/admin-2025/overlay.py before.geojson after.geojson   # witness C, HCMC
+python3 -I work/research/admin-2025/resolutions.py ~/Work/Data/resolutions-2025   # witness D (--check: self-test; --fetch DIR: download)
 ```
 
-`names.py` and `published.py` are stdlib only; `published.py` reads the article's Flourish story
+`names.py`, `published.py` and `resolutions.py` are stdlib only; `resolutions.py` reads the 34
+resolution pages saved outside the repo (untrusted, so run it with `-I`); `published.py` reads the article's Flourish story
 saved as a page and writes nothing. `overlay.py` needs shapely and two OSM extracts cut with
 `ogr2ogr` (commands in its docstring) from Geofabrik's `vietnam-250101.osm.pbf` and a current
 extract; the boundaries stay outside the repo. To rebuild `data/` from the Drive sheet "Tên ĐVHC
@@ -110,8 +142,8 @@ and the share of the name that must change. It audits only what the rules cannot
 it is worse than the rules (it puts Vĩnh Bình nearer Bình Minh than Vĩnh Bình Bắc). A kept name is
 credited to the highest unit that bore it (province, then district, then commune), as the article
 counted, and a compound to the lowest unit that bore each syllable: 36 province, 724 district,
-2,151 commune here, against 30, 712 and 2,144. That choice matters for 317 kept names (10.9 %),
-which more than one level could explain: 286 a district or a commune, 21 a province or a district,
+2,151 commune here, against 30, 712 and 2,144. That choice matters for 316 kept names (10.9 %),
+which more than one level could explain: 285 a district or a commune, 21 a province or a district,
 10 all three or a province and a commune. The `levels` column lists every level that bore the name
 or one of its syllables, so a reader can take another rule without rerunning anything.
 
@@ -127,21 +159,23 @@ counts include it. Never edit `out/` by hand.
 |---|---|
 | `data/old_units.csv` | the 10,035 pre-merger communes with GSO codes, districts, provinces |
 | `data/new_units.csv` | the 3,321 new communes, the old codes they were built from (`old_codes`), and codes added by hand in 2025 (`hand_codes`, `hand_note`) |
+| `data/resolution_items.csv` | witness D: one row per item of the 34 resolutions, with each old name it lists and the codes they resolve to (the legal text is free of copyright, IP Law Art. 15) |
 | `decisions.csv` | human decisions, applied on every run |
 | `judged.csv` | verdicts on every unit where ours and the published tags differ (`published.py` scores both) |
 | `out/names.csv` | one row per new commune: kind, origin, every level that could explain it, sources, witness B, status |
 | `out/queue.csv` | the rows a person must decide |
 | `out/crosswalk_flags.csv` | old communes in no new unit; hand codes from another province |
+| `out/resolution_check.csv` | witness D: one row per new commune, the sheet's codes against the item's, the class, and whether `CODE_FIXES` has the fix |
 | `out/hcmc_overlay.csv` | witness C: share of each old HCMC-area commune in each new commune (≥ 1 %) |
 | `out/hcmc_checks.csv` | one row per old commune: the code list against the geometry |
 | `out/hcmc_names.csv` | names kept from an old commune: does that commune lie in the unit? |
 
 ## Limits
 
-- The crosswalk lists the communes a new unit was built from, not the share of each. 597 old
-  communes sit in two or more new units, and 210 in none (66 of them in Hồ Chí Minh City, mostly
-  numbered wards, where the 2025 sheet records only whole merges). Geometry settles both; it is
-  run for Hồ Chí Minh City only, where it shows most of the gap is numbered wards joined by name.
+- The crosswalk lists the communes a new unit was built from, not the share of each. 444 old
+  communes sit in two or more new units. Before the resolution fixes 597 did, and 210 sat in none
+  (66 of them in Hồ Chí Minh City, mostly numbered wards joined by name across the merged city).
+  Geometry settles the shares; it is run for Hồ Chí Minh City only.
 - The baseline is the state just before and just after 1 July 2025: `old_units.csv` and the 2025
   sheet. A name counts as kept only if a unit on the old list bore it. A name lost in an earlier
   round counts as new, even over the same ground: Đông Sơn district went into Thanh Hoá city in
