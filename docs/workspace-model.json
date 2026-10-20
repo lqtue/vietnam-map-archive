@@ -123,6 +123,12 @@
           "path": "work/l909",
           "purpose": "L909 city index, ingested scans and annotations",
           "availability": "repository"
+        },
+        {
+          "path": "work/cochinchina-1889",
+          "purpose": "Cochinchina arrondissement plans: Tan An graticule georeference and river check",
+          "availability": "repository",
+          "read": "work/cochinchina-1889/README.md"
         }
       ]
     },
