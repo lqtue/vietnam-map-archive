@@ -162,6 +162,7 @@
         <a href="/scan?mode=shapes&amp;tab=validate" class="dropdown-item" on:click={closeDrawer}>
           {$t('Review queue')}
         </a>
+        <a href="/review" class="dropdown-item" on:click={closeDrawer}>{$t('Review tasks')}</a>
         <a href="/admin?tab=status" class="dropdown-item" on:click={closeDrawer}
           >{$t('Admin console')}</a
         >
@@ -338,6 +339,7 @@
         <a href="/scan?mode=shapes&amp;tab=validate" class="drawer-link" on:click={closeDrawer}>
           {$t('Review queue')}
         </a>
+        <a href="/review" class="drawer-link" on:click={closeDrawer}>{$t('Review tasks')}</a>
         <a href="/admin?tab=status" class="drawer-link" on:click={closeDrawer}
           >{$t('Admin console')}</a
         >

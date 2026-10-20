@@ -1,7 +1,7 @@
 /**
  * GET /api/review/[task]/next — the next item for this reviewer.
  *
- * Reply: { done, total, item: null | { item_id, bound, payload, proposal } }. `proposal` is the
+ * Reply: { task: { key, title, question }, done, total, item: null | { item_id, bound, payload, proposal } }. `proposal` is the
  * machine's candidates on this reviewer's shown arm and [] otherwise, and `payload.pool` (what
  * search reads) is never sent: the blind arm must not see the machine's answer (plan §2.3). The
  * reply never says which arm the reviewer is on. Staff only in v1.

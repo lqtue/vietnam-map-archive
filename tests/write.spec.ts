@@ -47,6 +47,7 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: 
 let session: Session;
 let mapId: string;
 let staffRequest: APIRequestContext;
+let staffState: Awaited<ReturnType<APIRequestContext['storageState']>>;
 
 function totpCode(secret: string): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -140,6 +141,7 @@ test.beforeAll(async () => {
       origins: [],
     },
   });
+  staffState = await staffRequest.storageState();
 });
 
 test.afterAll(async () => {
@@ -2682,4 +2684,132 @@ test('review routes: closed tasks, anonymous callers and unknown items are refus
 
   const list = await (await staffRequest.get('/api/review/tasks')).json();
   expect(list.tasks.map((t: { key: string }) => t.key)).not.toContain(key);
+});
+
+// A real browser on the page: the keys, the overlay, the progress and the undo. The crops are
+// answered by the test (a 1x1 PNG), so it needs no R2.
+const PNG_1X1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64'
+);
+
+test('review page: keys pick and send, the overlay is drawn, undo brings the item back', async ({
+  browser,
+}) => {
+  const key = `place-link-ws-${Date.now()}`;
+  await admin.from('review_tasks').insert(reviewTask(key, { blind_frac: 0, status: 'open' }));
+  const view = (id: string, name: string, out: number, side: number, bar: number) => ({
+    url: `https://crops.test/${id}/${name}.png`,
+    x0: 1000,
+    y0: 1000,
+    side,
+    out,
+    bar_m: bar,
+  });
+  const items = ['u0', 'u1', 'u2'].map((id, i) => ({
+    task: key,
+    item_id: id,
+    bound: `b-${id}`,
+    payload: {
+      text: `LABEL ${i}`,
+      px: [1500, 1500],
+      box: [1450, 1480, 100, 30],
+      pos_from: 'box',
+      lon: 106.7,
+      lat: 10.77,
+      sheet: { map_id: mapId, m_per_px: 0.341, north_px: [1, 0] },
+      views: {
+        close: view(id, 'close', 800, 1040, 50),
+        context: view(id, 'context', 900, 3600, 200),
+      },
+      pool: [
+        { id: 'osm:way/1', name: 'Chợ', source: 'osm', osm: 'way/1', lon: 1, lat: 1, dist_m: 5 },
+      ],
+    },
+    proposal: [
+      {
+        id: 'osm:way/1',
+        name: 'Chợ',
+        source: 'osm',
+        osm: 'way/1',
+        lon: 1,
+        lat: 1,
+        dist_m: 5,
+        px: [1500, 1500],
+        outline_px: [
+          [1450, 1450],
+          [1550, 1450],
+          [1550, 1550],
+        ],
+      },
+      {
+        id: 'osm:way/2',
+        name: 'Ga',
+        source: 'osm',
+        osm: 'way/2',
+        lon: 1,
+        lat: 1,
+        dist_m: 9,
+        px: [1600, 1400],
+      },
+    ],
+  }));
+  expect((await admin.from('review_items').insert(items)).error).toBeNull();
+
+  // bypassCSP: the page reads the role from the local stack over http, which the production
+  // policy (connect-src 'self' https:) refuses; production talks to an https Supabase.
+  const ctx = await browser.newContext({
+    storageState: staffState,
+    baseURL: 'http://localhost:5199',
+    bypassCSP: true,
+  });
+  await ctx.route('https://crops.test/**', (route) =>
+    route.fulfill({ contentType: 'image/png', body: PNG_1X1 })
+  );
+  const page = await ctx.newPage();
+  const loaded = () =>
+    page.waitForFunction(() => {
+      const imgs = [...document.querySelectorAll<HTMLImageElement>('.frame img')];
+      return imgs.length === 2 && imgs.every((i) => i.complete && i.naturalWidth > 0);
+    });
+
+  await page.goto(`/review/${key}`);
+  // The first visit makes Vite compile the page, so it gets a longer wait than the rest.
+  await expect(page.locator('.review-page h1')).toHaveText('Write smoke', { timeout: 25_000 });
+  await expect(page.locator('.count')).toHaveText('0 / 3');
+  await loaded();
+  // Both views carry the label box and the two candidates; each candidate is a button.
+  await expect(page.locator('.frame .label-box')).toHaveCount(2);
+  await expect(page.locator('.frame .marker')).toHaveCount(4);
+  await expect(page.locator('.cand')).toHaveCount(2);
+  const first = await page.locator('.label').innerText();
+  await page.screenshot({ path: 'test-results/review-page.png' });
+
+  // `m` needs a place: refused with a message until a candidate is picked.
+  await page.keyboard.press('m');
+  await expect(page.locator('.message')).toContainText('Pick a place first');
+  await page.keyboard.press('1');
+  await expect(page.locator('.cand.selected')).toHaveCount(1);
+  await page.keyboard.press('m');
+  await expect(page.locator('.count')).toHaveText('1 / 3');
+
+  const { data: ev } = await admin.from('review_events').select('*').eq('task', key);
+  expect(ev).toHaveLength(1);
+  expect(ev![0].verdicts).toMatchObject({ arm: 'shown', pick: 1, relation: 'moved' });
+  expect(ev![0].proposal_shown).toBe(true);
+
+  // Undo puts the same item back at its place in the order.
+  await loaded();
+  await page.keyboard.press('u');
+  await expect(page.locator('.count')).toHaveText('0 / 3');
+  await expect(page.locator('.label')).toHaveText(first);
+
+  for (let i = 0; i < 3; i++) {
+    await loaded();
+    await page.keyboard.press('g');
+    await expect(page.locator('.count')).toHaveText(`${i + 1} / 3`);
+  }
+  await expect(page.locator('.done h2')).toHaveText('All 3 done');
+  await expect(page.locator('.done')).toContainText('seconds per item');
+  await ctx.close();
 });

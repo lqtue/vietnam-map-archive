@@ -134,6 +134,15 @@ export const DESTINATIONS: Destination[] = [
   },
 
   {
+    href: '/review',
+    label: 'Review tasks',
+    hint: 'Judge links and readings, and be timed',
+    group: 'Contribute',
+    role: 'mod',
+    keywords: 'review place links verdict blind sitting check staff audit',
+  },
+
+  {
     href: '/scan?mode=legend',
     label: 'Place the legend',
     hint: 'Pin numbered legend entries on the scan',

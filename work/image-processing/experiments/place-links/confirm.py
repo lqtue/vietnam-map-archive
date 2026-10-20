@@ -72,18 +72,33 @@ def fold(s: str) -> str:
 
 # --------------------------------------------------------------------------- crops
 
+def crop_box(item: dict, view: str) -> tuple[int, int, int]:
+    """Where the crop sits on the sheet: its top-left corner in source px and its side. The web page
+    draws its overlay from these numbers, so they are written into the item (review_items.py)."""
+    half = VIEWS[view][0]
+    return round(item["px"][0] - half), round(item["px"][1] - half), 2 * half
+
+
+def plain_crop(im, item: dict, view: str):
+    """The crop as printed, with nothing drawn on it: the same pixels `render` starts from."""
+    from PIL import Image
+
+    out = VIEWS[view][1]
+    x0, y0, side = crop_box(item, view)
+    return im.crop((x0, y0, x0 + side, y0 + side)).resize((out, out), Image.LANCZOS)
+
+
 def render(im, item: dict, view: str, show_cands: bool, mpp: float, north: tuple[float, float]):
     """The crop, as printed (no rotation). Blind arm: show_cands False draws nothing of the machine's."""
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import ImageDraw, ImageFont
 
     half, out, bar_m = VIEWS[view]
-    cx, cy = item["px"]
-    x0, y0 = cx - half, cy - half
+    x0, y0, _ = crop_box(item, view)
     z = out / (2 * half)
-    c = im.crop((round(x0), round(y0), round(x0) + 2 * half, round(y0) + 2 * half)).resize((out, out), Image.LANCZOS)
+    c = plain_crop(im, item, view)
     d = ImageDraw.Draw(c)
     big = ImageFont.load_default(size=22)
-    to = lambda p: ((p[0] - round(x0)) * z, (p[1] - round(y0)) * z)
+    to = lambda p: ((p[0] - x0) * z, (p[1] - y0) * z)
     if item.get("box"):
         bx, by, bw, bh = item["box"]
         (a, b), (e, f) = to((bx, by)), to((bx + bw, by + bh))

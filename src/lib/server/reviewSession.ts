@@ -107,8 +107,9 @@ export async function nextItem(sb: Client, task: Task, reviewer: string) {
     reviewerState(sb, task.key, reviewer),
   ]);
   const doneCount = ids.filter((id) => live.has(id)).length;
+  const head = { key: task.key, title: task.title, question: task.question };
   const next = orderItems(task.seed, reviewer, ids).find((id) => !live.has(id));
-  if (!next) return { done: doneCount, total: ids.length, item: null };
+  if (!next) return { task: head, done: doneCount, total: ids.length, item: null };
 
   const { data, error: err } = await sb
     .from('review_items')
@@ -120,6 +121,7 @@ export async function nextItem(sb: Client, task: Task, reviewer: string) {
   const arm = armFor(task.seed, reviewer, next, task.blind_frac, hasProposal.has(next));
   const { pool: _pool, ...payload } = data.payload as { pool?: unknown };
   return {
+    task: head,
     done: doneCount,
     total: ids.length,
     item: {
