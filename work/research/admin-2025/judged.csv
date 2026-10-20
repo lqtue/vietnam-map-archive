@@ -8,7 +8,7 @@ Lai Châu,Hua Bum,whole,ward,"one letter, same commune: spelling of a minority-l
 Nghệ An,Yên Trung,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Quảng Ngãi,Măng Bút,whole,ward,"one letter, same commune: spelling of a minority-language name",high,,claude 2026-10-20
 Quảng Ngãi,Rờ Kơi,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
-Điện Biên,Sáng Nhè,,,"GSO has Sáng Nhè, the 2025 sheet Xá Nhè: needs the resolution",unsure,,claude 2026-10-20
+Điện Biên,Sáng Nhè,partial,ward,compound: Phình Sáng + Xá Nhè; the old list already names Xá Nhè Sáng Nhè,high,resolution 1661 item 20,claude 2026-10-20 (resolution)
 Lào Cai,Tà Xi Láng,whole,ward,"one letter, same commune: spelling of a minority-language name",high,,claude 2026-10-20
 Tuyên Quang,Sà Phìn,whole,ward,"one letter, same commune: spelling of a minority-language name",high,,claude 2026-10-20
 Điện Biên,Sín Chải,whole,ward,"one letter, same commune: spelling of a minority-language name",high,,claude 2026-10-20
@@ -18,15 +18,15 @@ An Giang,Tiên Hải,whole,ward,"unit not merged, keeps its name; the 2025 sheet
 Quảng Ngãi,Đăk Long,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
 Đắk Lắk,Ea H’Leo,whole,district,"kept whole; the district bore the name too, and the highest unit is credited",high,,claude 2026-10-20
 Đồng Nai,Đak Lua,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
-Nghệ An,Châu Bình,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
-Nghệ An,Lượng Minh,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Nghệ An,Châu Bình,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1678,claude 2026-10-20 (resolution)
+Nghệ An,Lượng Minh,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1678: not merged,claude 2026-10-20 (resolution)
 Cà Mau,Năm Căn,whole,district,an old district name kept whole,high,,claude 2026-10-20
 Cà Mau,Nguyễn Phích,whole,ward,kept whole from a commune,high,,claude 2026-10-20
 Cà Mau,Vĩnh Phước,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 TP HCM,Tân Hoà,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Cần Thơ,Mỹ Xuyên,whole,district,"kept whole; the district bore the name too, and the highest unit is credited",high,,claude 2026-10-20
 Cần Thơ,Tân An,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Cần Thơ,Thạnh An,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Cần Thơ,Thạnh An,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1668 item 42,claude 2026-10-20 (resolution)
 Đà Nẵng,An Thắng,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Đà Nẵng,Avương,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
 Đà Nẵng,La Êê,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
@@ -48,11 +48,11 @@ Cần Thơ,Thạnh An,whole,ward,"one mark differs in a Vietnamese name: same pl
 Điện Biên,Pu Nhi,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
 Điện Biên,Sam Mứn,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Đồng Nai,An Lộc,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Đồng Nai,Lộc Thành,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Đồng Nai,Lộc Thành,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1662 item 43,claude 2026-10-20 (resolution)
 Đồng Tháp,Hồng Ngự,whole,district,an old district name kept whole,high,,claude 2026-10-20
 Đồng Tháp,Phú Thành,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 TP HCM,Hòa Hưng,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Đồng Tháp,Thanh Hoà,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Đồng Tháp,Thanh Hoà,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1663 item 100,claude 2026-10-20 (resolution)
 Đồng Tháp,Thanh Hưng,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Gia Lai,Chơ Long,whole,ward,same as the GSO name; the 2025 sheet spelled the source differently,high,,claude 2026-10-20
 Gia Lai,Chư Krey,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
@@ -65,9 +65,9 @@ Gia Lai,Kbang,whole,district,"kept whole; the district bore the name too, and th
 Gia Lai,KDang,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
 Gia Lai,Ngô Mây,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Hà Nội,Hồng Hà,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Hà Nội,Sơn Đồng,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Hà Nội,Sơn Đồng,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1656 item 104,claude 2026-10-20 (resolution)
 Hà Nội,Thư Lâm,new,,"a syllable from no source: new, not a misspelling",high,,claude 2026-10-20
-Hà Tĩnh,Cổ Đạm,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Hà Tĩnh,Cổ Đạm,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1665 item 35,claude 2026-10-20 (resolution)
 Hà Tĩnh,Hà Huy Tập,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Hà Tĩnh,Trần Phú,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Hải Phòng,An Hưng,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
@@ -89,7 +89,7 @@ Hưng Yên,Thái Ninh,new,,"a syllable from no source: new, not a misspelling",h
 Khánh Hoà,Phan Rang,partial,district,"part of, or affix to, a district name",high,,claude 2026-10-20
 Lai Châu,Mường Than,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Lào Cai,Mù Cang Chải,whole,district,spelling only; the district bore the name,high,,claude 2026-10-20
-Lào Cai,Nậm Chày,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Lào Cai,Nậm Chày,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1673 item 59,claude 2026-10-20 (resolution)
 Lâm Đồng,2 Bảo Lộc,partial,district,"part of, or affix to, a district name",high,,claude 2026-10-20
 Lâm Đồng,Lang Biang - Đà Lạt,partial,district,"part of, or affix to, a district name",high,,claude 2026-10-20
 Nghệ An,Đông Thành,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
@@ -141,31 +141,31 @@ Quảng Trị,Cam Hồng,partial,ward,compound; every syllable from a commune,hi
 Quảng Trị,Đakrông,whole,district,spelling only; the district bore the name,high,,claude 2026-10-20
 Quảng Trị,Hoà Trạch,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
 Quảng Trị,Nam Trạch,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
-Sơn La,Chiềng Hặc,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Sơn La,Chiềng Hặc,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1681 item 39,claude 2026-10-20 (resolution)
 Tây Ninh,Bến Lức,whole,district,"kept whole; the district bore the name too, and the highest unit is credited",high,,claude 2026-10-20
 Tây Ninh,Bình Thành,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Thái Nguyên,Văn Lăng,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Thái Nguyên,Văn Lăng,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1683 item 27,claude 2026-10-20 (resolution)
 Đắk Lắk,Ea Knuếc,whole,ward,"spelling only, minority-language name",high,,claude 2026-10-20
-Phú Thọ,Liên Hoà,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Phú Thọ,Liên Hoà,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1676 item 65,claude 2026-10-20 (resolution)
 Tây Ninh,Vĩnh Thạnh,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Thái Nguyên,Đại Phúc,partial,district,compound; a syllable only a district bore,high,,claude 2026-10-20
-Thái Nguyên,Quan Triều,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Thái Nguyên,Quan Triều,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1683 item 81,claude 2026-10-20 (resolution)
 Thanh Hoá,Bỉm Sơn,whole,district,an old district name kept whole,high,,claude 2026-10-20
 Thanh Hoá,Đông Sơn,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Thanh Hoá,Đông Tiến,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
-Thanh Hoá,Hoằng Thanh,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Thanh Hoá,Đông Tiến,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1686 item 131,claude 2026-10-20 (resolution)
+Thanh Hoá,Hoằng Thanh,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1686 item 21,claude 2026-10-20 (resolution)
 Thanh Hoá,Ngọc Sơn,new,,reused: a name from elsewhere is new here,high,,claude 2026-10-20
-Tuyên Quang,Tân Thanh,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Tuyên Quang,Tân Thanh,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1684 item 38,claude 2026-10-20 (resolution)
 TP HCM,Bà Rịa,whole,district,the city bore exactly this name; the province bore a longer one,high,,claude 2026-10-20
 TP HCM,Bến Cát,whole,district,an old district name kept whole,high,,claude 2026-10-20
-Đồng Tháp,Thanh Mỹ,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Đồng Tháp,Thanh Mỹ,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1663 item 19,claude 2026-10-20 (resolution)
 Hải Phòng,Kiến Hải,partial,province,compound; a syllable only the province bore,high,,claude 2026-10-20
 TP HCM,Tân Khánh,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 Tây Ninh,Mộc Hoá,whole,district,an old district name kept whole,high,,claude 2026-10-20
 TP HCM,Tân Vĩnh Lộc,partial,ward,compound; every syllable from a commune,high,,claude 2026-10-20
 TP HCM,Vũng Tàu,whole,district,the city bore exactly this name; the province bore a longer one,high,,claude 2026-10-20
-Tuyên Quang,Phố Bảng,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
-Vĩnh Long,Đông Thành,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
-Tây Ninh,Thạnh Phước,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Tuyên Quang,Phố Bảng,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1684 item 47,claude 2026-10-20 (resolution)
+Vĩnh Long,Đông Thành,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1687 item 109,claude 2026-10-20 (resolution)
+Tây Ninh,Thạnh Phước,whole,ward,kept whole from a commune one mark from the one the sheet named; the sheet took the wrong commune,high,resolution 1682 item 17,claude 2026-10-20 (resolution)
 Vĩnh Long,Mỏ Cày,whole,ward,"kept whole from the commune; the districts bore a longer name (Bắc Trà My, Mỏ Cày Nam)",high,,claude 2026-10-20
-Vĩnh Long,Vinh Kim,whole,ward,"one mark differs in a Vietnamese name: same place, one side mistyped",low,could be a deliberate rename; the resolution text would settle it,claude 2026-10-20
+Vĩnh Long,Vinh Kim,whole,ward,the same commune spelled one mark apart in the old list and the resolution,high,resolution 1687 item 47,claude 2026-10-20 (resolution)

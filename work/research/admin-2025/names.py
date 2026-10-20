@@ -33,7 +33,25 @@ CODE_FIXES = {    # the 2025 sheet slipped one row among the Kiên Giang islands
     ('An Giang', 'Kiên Hải'): '31108;31111;31114;31115',
     ('An Giang', 'Tiên Hải'): '30781',
     ('An Giang', 'Sơn Hải'): '30811',
+    # The sheet took a commune one mark away from the one the resolution names (Lộc Thạnh for Lộc
+    # Thành). Codes per the 2025 UBTVQH15 resolutions 1654-1687 (checked 2026-10-20).
+    ('Nghệ An', 'Châu Bình'): '16804',                       # 1678: not merged; Châu Bính went to Châu Tiến
+    ('Đồng Nai', 'Lộc Thành'): '25305;25294',                # 1662 item 43
+    ('Đồng Tháp', 'Thanh Hoà'): '28436;28462;28480',         # 1663 item 100
+    ('Đồng Tháp', 'Thanh Mỹ'): '30067;30073',                # 1663 item 19
+    ('Hà Nội', 'Sơn Đồng'): '9868;9859;9871;9877;9874;9883;9880;9862',  # 1656 item 104; also Song Phương
+    ('Lào Cai', 'Nậm Chày'): '3088;3076',                    # 1673 item 59
+    ('Sơn La', 'Chiềng Hặc'): '4093;4081;4078',              # 1681 item 39
+    ('Thái Nguyên', 'Văn Lăng'): '5671;5665',                # 1683 item 27
+    ('Phú Thọ', 'Liên Hoà'): '8789;8833;8812',               # 1676 item 65
+    ('Thanh Hoá', 'Đông Tiến'): '16396;15856;16402;15850;15847;15853;16405',  # 1686 item 131; also Thiệu Vân
+    ('Thanh Hoá', 'Hoằng Thanh'): '15997;15994;16003;16000', # 1686 item 21; also Hoằng Đông, Hoằng Phụ
+    ('Tuyên Quang', 'Tân Thanh'): '2575;2578;2590',          # 1684 item 38
+    ('Vĩnh Long', 'Đông Thành'): '29813;29812;29809;29818',  # 1687 item 109: the sheet left out Đông Thành
+    ('Tây Ninh', 'Thạnh Phước'): '27880;27877;27874',        # 1682 item 17
+    ('Điện Biên', 'Sáng Nhè'): '3247;3259;3244',             # 1661 item 20: the sheet left out Xá Nhè
 }
+NAME_FIXES = {'3244': 'Xá Nhè'}   # the old list already carries the new name for Xá Nhè (1661 item 20)
 
 
 # --- folding: one key per spelling, whatever the tone placement or i/y habit -----------------
@@ -218,6 +236,8 @@ def crosswalk(old, new):
 
 def main():
     old = {r['code']: r for r in read('data/old_units.csv')}
+    for c, nm in NAME_FIXES.items():
+        old[c]['name'] = nm
     new = read('data/new_units.csv')
     for u in new:
         u['old_codes'] = CODE_FIXES.get((u['province'], u['name']), u['old_codes'])
