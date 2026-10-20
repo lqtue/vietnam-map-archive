@@ -350,6 +350,44 @@
   margin-right: 0.15rem;
 }
 
+.about-page .label-fig {
+  margin: 1.75rem 0 0;
+}
+
+.about-page .label-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.about-page .label-fig figcaption {
+  margin-top: 0.6rem;
+  font-weight: var(--font-medium);
+  line-height: 1.5;
+  color: var(--color-gray-500);
+}
+
+.about-page .walk {
+  margin: 1.75rem 0 0;
+  padding: 0 0 0 1.4rem;
+  display: grid;
+  gap: 1rem;
+  font-weight: var(--font-medium);
+  line-height: 1.6;
+  color: var(--color-gray-500);
+}
+
+.about-page .walk strong {
+  color: var(--color-text);
+  font-weight: var(--font-extrabold);
+}
+
+.about-page .walk + .section-desc {
+  margin-top: 1.5rem;
+}
+
 .about-page .flow-key {
   margin-top: 1.5rem;
   display: grid;
