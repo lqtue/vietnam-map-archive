@@ -13,6 +13,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { keys, type KeyMap } from '$lib/core/utils/keys';
+  import { isTypingTarget } from '$lib/core/utils/commandPalette';
   import LoadError from '$lib/ui/LoadError.svelte';
   import { reviewApi } from './reviewApi';
   import { createReviewSession } from './reviewSession';
@@ -36,6 +37,18 @@
 
   const search = (q: string) => reviewApi.search(taskKey, item?.item_id ?? '', q);
 
+  /**
+   * `/` is search here, but the root layout opens the command palette on it. Both listen on the
+   * window and the layout's came first, so this runs in the capture phase and stops the event
+   * before the palette sees it. Typing in a field is left alone (the layout skips it too).
+   */
+  function onSlash(e: KeyboardEvent) {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    decision?.focusSearch();
+  }
+
   function seeToday(i: number) {
     const links = document.querySelectorAll<HTMLAnchorElement>('.see-today a');
     const href = links[i]?.href;
@@ -45,7 +58,6 @@
   $: keyMap = ((): KeyMap => {
     const map: KeyMap = {
       u: () => void session.undo(),
-      '/': () => decision?.focusSearch(),
       t: () => decision?.focusNote(),
       o: () => seeToday(0),
       v: () => seeToday(1),
@@ -61,6 +73,7 @@
   <title>{s.title || 'Review'} — Vietnam Map Archive</title>
 </svelte:head>
 
+<svelte:window on:keydown|capture={onSlash} />
 <svelte:document on:visibilitychange={() => session.setHidden(document.hidden)} />
 
 <div class="review-page" use:keys={keyMap}>
@@ -71,9 +84,7 @@
     <a class="back" href="/review">All tasks</a>
   </header>
 
-  {#if s.phase === 'failed'}
-    <div class="center"><LoadError message={s.failure} on:retry={() => session.retry()} /></div>
-  {:else if s.phase === 'done'}
+  {#if s.phase === 'done'}
     <div class="center done">
       <h2>All {s.total} done</h2>
       {#if s.medianSeconds !== null}
@@ -90,16 +101,22 @@
   {:else if item}
     <div class="body">
       <div class="views">
-        {#key item.item_id}
+        {#key s.loadId}
           <ReviewViews {session} {item} picked={s.pick} overlay={task.overlay} />
         {/key}
       </div>
       <aside class="side">
-        {#key item.item_id}
+        <!-- A failed send keeps the item and the verdict on screen; Retry sends the same one. -->
+        {#if s.phase === 'failed'}
+          <LoadError message={s.failure} on:retry={() => session.retry()} />
+        {/if}
+        {#key s.loadId}
           <PlaceLinkDecision bind:this={decision} {task} {session} state={s} {search} />
         {/key}
       </aside>
     </div>
+  {:else if s.phase === 'failed'}
+    <div class="center"><LoadError message={s.failure} on:retry={() => session.retry()} /></div>
   {:else}
     <p class="center" aria-busy="true">Loading…</p>
   {/if}

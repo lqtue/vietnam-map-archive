@@ -26,6 +26,9 @@ export type Phase = 'loading' | 'ready' | 'saving' | 'failed' | 'done';
 
 export type SessionState = {
   phase: Phase;
+  /** Counts loads. The page keys its views on it: a stale 409 can bring back the same item with a
+   * new bound, and the `<img>`s must load again so the clock can start. */
+  loadId: number;
   /** The task's own title and question, from the task row. */
   title: string;
   question: string;
@@ -64,6 +67,7 @@ const defaultDeps: SessionDeps = {
 
 const blank = (phase: Phase): SessionState => ({
   phase,
+  loadId: 0,
   title: '',
   question: '',
   item: null,
@@ -97,12 +101,14 @@ export function createReviewSession(task: string, deps: Partial<SessionDeps> = {
   let hiddenSince = 0;
   let tabHidden = false;
   let pending: VerdictBody | null = null;
+  let loads = 0;
   const seconds: number[] = [];
 
   async function load() {
     set({ phase: 'loading', failure: '' });
     try {
       const next = await api.next(task);
+      loads += 1;
       viewsLoaded = 0;
       shownAt = 0;
       hiddenMs = 0;
@@ -111,6 +117,7 @@ export function createReviewSession(task: string, deps: Partial<SessionDeps> = {
       if (!next.item) {
         set({
           ...blank('done'),
+          loadId: loads,
           title: next.task.title,
           question: next.task.question,
           done: next.done,
@@ -121,6 +128,7 @@ export function createReviewSession(task: string, deps: Partial<SessionDeps> = {
       }
       set({
         ...blank('ready'),
+        loadId: loads,
         title: next.task.title,
         question: next.task.question,
         item: next.item,

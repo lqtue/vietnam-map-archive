@@ -40,11 +40,17 @@
     noteInput?.focus();
   }
 
+  /** A reply is kept only if its query is still the one in the box: a late answer to an older
+   * query must not replace the hits for what was typed since. */
   async function runSearch() {
+    const asked = query;
     try {
-      hits = await search(query);
+      const found = await search(asked);
+      if (asked !== query) return;
+      hits = found;
       searchFailed = false;
     } catch {
+      if (asked !== query) return;
       hits = [];
       searchFailed = true;
     }
@@ -58,10 +64,18 @@
     hits = [];
   }
 
-  function onSearchKey(e: KeyboardEvent) {
-    if (e.key === 'Enter' && hits[0]) {
+  /**
+   * Enter picks the first hit for what is in the box *now*. Typing is debounced, so the hits on
+   * screen can be for an older query (or the empty one `/` ran); a fast typist who pressed Enter
+   * would otherwise save the nearest place instead of the one typed. So search again first.
+   */
+  async function onSearchKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      choose(hits[0]);
+      onQuery.cancel();
+      const asked = query;
+      await runSearch();
+      if (asked === query && hits[0]) choose(hits[0]);
     } else if (e.key === 'Escape') searchInput.blur();
   }
 

@@ -2724,6 +2724,7 @@ test('review page: keys pick and send, the overlay is drawn, undo brings the ite
       },
       pool: [
         { id: 'osm:way/1', name: 'Chợ', source: 'osm', osm: 'way/1', lon: 1, lat: 1, dist_m: 5 },
+        { id: 'osm:way/2', name: 'Ga', source: 'osm', osm: 'way/2', lon: 1, lat: 1, dist_m: 9 },
       ],
     },
     proposal: [
@@ -2804,11 +2805,44 @@ test('review page: keys pick and send, the overlay is drawn, undo brings the ite
   await expect(page.locator('.count')).toHaveText('0 / 3');
   await expect(page.locator('.label')).toHaveText(first);
 
-  for (let i = 0; i < 3; i++) {
-    await loaded();
-    await page.keyboard.press('g');
-    await expect(page.locator('.count')).toHaveText(`${i + 1} / 3`);
-  }
+  // `/` is search here, not the command palette; Enter picks what was typed, even when it is
+  // pressed before the debounced search has answered (the empty query would give the nearest place).
+  await loaded();
+  await page.keyboard.press('/');
+  await expect(page.locator('input[type=search]').first()).toBeFocused();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.type('Ga');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.picked b')).toHaveText('Ga');
+  await page.keyboard.press('s');
+  await expect(page.locator('.count')).toHaveText('1 / 3');
+  const { data: found } = await admin
+    .from('review_events')
+    .select('verdicts')
+    .eq('task', key)
+    .order('id', { ascending: false })
+    .limit(1);
+  expect(found![0].verdicts).toMatchObject({
+    pick_via: 'search',
+    relation: 'same_building',
+    target: { name: 'Ga' },
+  });
+
+  // `?` is "unsure" here and needs no place.
+  await loaded();
+  await page.keyboard.press('?');
+  await expect(page.locator('.count')).toHaveText('2 / 3');
+
+  // A stale item: the same item comes back with a new bound, and the page must start its clock again.
+  await loaded();
+  const id = `u${(await page.locator('.label').innerText()).slice(-3, -2)}`;
+  await admin.from('review_items').update({ bound: 'changed' }).eq('task', key).eq('item_id', id);
+  await page.keyboard.press('g');
+  await expect(page.locator('.message')).toContainText('changed');
+  await expect(page.locator('.count')).toHaveText('2 / 3');
+  await loaded();
+  await page.keyboard.press('g');
+  await expect(page.locator('.count')).toHaveText('3 / 3');
   await expect(page.locator('.done h2')).toHaveText('All 3 done');
   await expect(page.locator('.done')).toContainText('seconds per item');
   await ctx.close();
