@@ -58,6 +58,7 @@ Layer `placement`. Georeferences, GCPs, transformations, masks and fit.
 | [docs/journals/260930-series-georef-review-loop.md](journals/260930-series-georef-review-loop.md) | Placement review procedure | this file |
 | [work/vn1971](../work/vn1971/) | 1971 provincial maps: grid georeferences and Allmaps annotations | [docs/guides/pipelines.md](guides/pipelines.md) |
 | [work/l909](../work/l909/) | L909 city index, ingested scans and annotations | [README.md](../work/l909/README.md) |
+| [work/cochinchina-1889](../work/cochinchina-1889/) | Cochinchina arrondissement plans: Tan An graticule georeference and river check | [README.md](../work/cochinchina-1889/README.md) |
 
 ## 3. Readings
 
