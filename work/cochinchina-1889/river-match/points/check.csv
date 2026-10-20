@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,my-tho,8150,4018,106.3642994,10.3585287,"town centre between citadel and market, placed by eye before the fit; OSM place=city node; centre ambiguity ~0.5 km"
+check,cho-gao,9470,4005,106.4628035,10.3524416,"Chợ Gạo market symbol, placed before the fit; OSM place=town node"
+check,cai-lay,4920,3555,106.1187885,10.407781,"Marché Cai Lậy / fort, placed before the fit; OSM place=city node"
+check,cai-be,3965,4555,106.0336205,10.3348473,"Marché de Cái Bè, placed before the fit; OSM place=town node"

@@ -1,0 +1,23 @@
+{
+ "coarse": {
+  "theta": -4.0,
+  "scale": 1.0,
+  "score": 1471.7,
+  "second_peak": 893.4,
+  "ratio": 0.607
+ },
+ "fine": {
+  "theta": -4.0,
+  "scale": 1.0,
+  "m_per_px_full": 8.5874,
+  "score": 2887.6
+ },
+ "checks": {
+  "my-tho": 499,
+  "cho-gao": 968,
+  "cai-lay": 183,
+  "cai-be": 467
+ },
+ "check_median_m": 483,
+ "check_max_m": 968
+}
