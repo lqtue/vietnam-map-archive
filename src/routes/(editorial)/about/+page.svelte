@@ -8,6 +8,7 @@
 
   export let data: PageData;
   $: s = data.stats;
+  const num = (n: number) => n.toLocaleString('en-US');
 
   /** `maps.location` holds the catalog key; the page says the short name. */
   const CITY_NAMES: Record<string, string> = { 'Saigon-HCMC': 'Saigon' };
@@ -48,67 +49,9 @@
   </PageHero>
 
   <main class="editorial-main">
-    <!-- WHERE THIS STANDS — counted on render, not typed in -->
+    <!-- WHY — docs/CONCEPT.md §Why -->
     <section class="section-card">
-      <h2 class="section-title-sm">{$t('Where this stands')}</h2>
-      <p class="section-desc">{$t('Counted from the database when this page loaded.')}</p>
-      <dl class="stats">
-        <div class="stat">
-          <dt>{s.published}</dt>
-          <dd>
-            {$t('sheets placed on the map — {city}, {from} to {to}', {
-              city: cityLine,
-              from: s.yearFrom,
-              to: s.yearTo,
-            })}
-          </dd>
-        </div>
-        <div class="stat">
-          <dt>{s.drafts}</dt>
-          <dd>
-            {$t(
-              'more georeferenced but not published, so nobody outside the project sees them yet'
-            )}
-          </dd>
-        </div>
-        <!-- Not addable to the number above, and the copy has to say so: a
-             sheet with a catalogue record is counted in both, and 452 mosaic
-             cells are counted only here. -->
-        {#if s.surveys > 0}
-          <div class="stat">
-            <dt>{s.surveySheetsHeld}</dt>
-            <dd>
-              {$t(
-                'of {T} sheets in {N} complete surveys, each on the map as a single layer — most are cells of a pre-tiled mosaic and have no catalogue record of their own, which is why the count above is smaller',
-                { T: s.surveySheets, N: s.surveys }
-              )}
-            </dd>
-          </div>
-        {/if}
-        <div class="stat">
-          <dt>{s.labels}</dt>
-          <dd>
-            {$t('place names read off the sheets by the OCR pass — {M} checked by a person', {
-              M: s.labelsChecked,
-            })}
-          </dd>
-        </div>
-        <div class="stat">
-          <dt>{s.shapes}</dt>
-          <dd>
-            {$t(
-              'building and street shapes traced by hand — {M} approved, so there is no dataset to download yet',
-              { M: s.shapesApproved }
-            )}
-          </dd>
-        </div>
-      </dl>
-    </section>
-
-    <!-- WHY, AND THE WHOLE SYSTEM — docs/CONCEPT.md §Why. The marks and "Status as of" are true on the
-         date written; update them when the review page or the status page change. -->
-    <section class="section-card">
-      <h2 class="section-title-sm">Why we do it, and how</h2>
+      <h2 class="section-title-sm">Why we do it</h2>
       <p class="section-desc">Three things make old Vietnamese sources hard to use.</p>
       <ul class="plain-list">
         <li>
@@ -125,11 +68,22 @@
           that comes down leaves only what recorded it.
         </li>
       </ul>
-      <p class="section-desc">
+      <p class="section-desc flow-lead">
         So we do not try to make the sources agree. We tie each one to a place and a time, say how
-        the links relate, and keep who checked every link. A machine can propose thousands; only a
+        the two relate, and keep who checked every link. A machine can propose thousands; only a
         person can decide. The aim is a record anyone can search, cite and download, and honest
-        numbers on how often it is right. This is the whole system, and what each part is today.
+        numbers on how often it is right.
+      </p>
+    </section>
+
+    <!-- HOW IT WORKS, AND WHERE IT STANDS — the diagram carries the live counts; the marks and the
+         "Status as of" line are true on the date written, so update them when the review page or the
+         status page change. The numbers are counted on render, not typed in. -->
+    <section class="section-card">
+      <h2 class="section-title-sm">How it works, and where it stands</h2>
+      <p class="section-desc">
+        Four steps make a link: place, read, link, check. Each needs the one before. The figures are
+        counted from the database when this page loaded.
       </p>
 
       <figure class="flow-fig">
@@ -149,44 +103,59 @@
             <ol class="steps">
               <li class="step is-built">
                 <h3>
-                  <span class="mark" aria-hidden="true"></span>Look over each sheet<span
-                    class="state">Built</span
+                  <span class="mark" aria-hidden="true"></span>1. Place<span class="state"
+                    >Built</span
                   >
                 </h3>
+                <p class="figure">
+                  <b>{num(s.published)}</b> sheets on the map, {s.yearFrom} to {s.yearTo}
+                </p>
                 <p>
-                  Finds the title, legend, map and border, so a person corrects boxes instead of
-                  drawing them.
+                  Pin a scan to real coordinates. A machine first finds the title, legend, map and
+                  border.
                 </p>
               </li>
               <li class="step down is-part">
                 <h3>
-                  <span class="mark" aria-hidden="true"></span>Propose<span class="state"
+                  <span class="mark" aria-hidden="true"></span>2. Read<span class="state"
                     >Partly</span
                   >
                 </h3>
-                <p>
-                  Where the sheet sits, what is printed on it, which place today a name may mean.
-                  Each with a confidence.
+                <p class="figure">
+                  <b>{num(s.labels)}</b> place names read, {num(s.labelsChecked)} checked
                 </p>
+                <p class="figure">
+                  <b>{num(s.shapes)}</b> shapes traced by hand, {num(s.shapesApproved)} approved
+                </p>
+                <p>Names are read by a machine. Shapes are not yet.</p>
               </li>
-              <li class="step down is-planned">
+              <li class="step down is-part">
                 <h3>
-                  <span class="mark" aria-hidden="true"></span>Sort by confidence<span class="state"
-                    >Not yet</span
+                  <span class="mark" aria-hidden="true"></span>3. Link<span class="state"
+                    >Offline only</span
                   >
                 </h3>
-                <p>Sure, unsure or no. Today every proposal goes to a person.</p>
+                <p class="figure"><b>None</b> published yet</p>
+                <p>
+                  Which place today a name on an old sheet may mean, and how the two relate. Tested
+                  on the 1882 survey of Saigon.
+                </p>
               </li>
             </ol>
           </li>
 
           <li class="step person across is-part">
             <h3>
-              <span class="mark" aria-hidden="true"></span>A person decides<span class="state"
+              <span class="mark" aria-hidden="true"></span>4. Check<span class="state"
                 >Offline only</span
               >
             </h3>
-            <p>Same building, same site with a new building, moved, gone, none or unsure.</p>
+            <p class="figure"><b>No</b> measured accuracy yet</p>
+            <p>
+              A person decides: same building, same site with a new building, moved, gone, none or
+              unsure. Today every proposal goes to a person; sorting the sure from the unsure is not
+              built.
+            </p>
             <div class="odds-row">
               <span
                 class="odds"
@@ -244,42 +213,21 @@
           <span>Status as of October 2026.</span>
         </figcaption>
       </figure>
-    </section>
 
-    <!-- HOW A LINK IS MADE — the four verbs of docs/CONCEPT.md, and what each one has today -->
-    <section class="section-card">
-      <h2 class="section-title-sm">How a link is made</h2>
-      <p class="section-desc">
-        Old maps of one city disagree: each was drawn by someone, for a purpose. So we do not try to
-        merge them. We tie a thing on one map to a thing on another map, in a document, or in the
-        city today, and write down how the two relate. A machine proposes each link and a person
-        decides. Four steps, each needing the one before.
-      </p>
+      <h3 class="subhead">About the numbers</h3>
       <ul class="plain-list">
         <li>
-          <strong>Place.</strong>
-          Pin a scan to real coordinates, so it lies over the modern map. Done for the sheets counted
-          above.
+          The sheets on the map are {cityLine}. A further {num(s.drafts)} are placed but not published,
+          so nobody outside the project sees them yet.
         </li>
         <li>
-          <strong>Read.</strong>
-          Turn what is printed into data: place names, read by a machine and checked by a person, and
-          building and street shapes, traced by hand so far. A sheet that is not yet in place cannot be
-          read for names that mean anything today.
+          {num(s.surveySheetsHeld)} of {num(s.surveySheets)} sheets in {s.surveys} complete surveys are
+          each on the map as a single layer. Most are cells of a pre-tiled mosaic with no catalogue record
+          of their own, which is why the first figure is smaller.
         </li>
         <li>
-          <strong>Link.</strong>
-          Say how a name on an old sheet relates to a place today: the same building, the same site with
-          a new building, moved, gone, or none of these. A reused name is not the same place, and the
-          relation is where we say so. This is being tested offline on the 1882 survey of Saigon; nothing
-          is published.
-        </li>
-        <li>
-          <strong>Check.</strong>
-          A person decides, and we record who, when, what the machine had suggested and whether they saw
-          it. On about one item in five the suggestion is hidden first, so a person who checks can be
-          told from one who only agrees. For now this runs offline, on one reviewer’s machine; a web version
-          for more reviewers is being built.
+          {num(s.shapesApproved)} approved shapes is too few to release, so there is no dataset to download
+          yet.
         </li>
       </ul>
     </section>
@@ -293,22 +241,18 @@
       </p>
       <ul class="plain-list">
         <li>
-          A machine test that shares the error it tests for: if the same mistake is in both, the
-          test cannot find it.
+          <strong>A test that shares the error it tests for.</strong> If the same mistake is in both,
+          the test cannot find it.
         </li>
         <li>
-          A person who only agrees with the machine. People tend to accept what a machine suggests,
-          which is why some suggestions are hidden.
+          <strong>A person who only agrees with the machine.</strong> People tend to accept what a machine
+          suggests, which is why some suggestions are hidden.
         </li>
         <li>
-          A second source copied from the first. Two maps redrawn from one survey agree for free,
-          and so does a summary of the catalogue it was written from.
+          <strong>A second source copied from the first.</strong> Two maps redrawn from one survey agree
+          for free, and so does a summary of the catalogue it was written from.
         </li>
       </ul>
-      <p class="section-desc">
-        The aim is a measured record: how often a link is right, how many seconds a check takes, and
-        which checks were independent of what they checked. We have no such number yet.
-      </p>
     </section>
 
     <!-- WHAT WORKS -->
@@ -353,32 +297,27 @@
       </p>
       <ul class="plain-list">
         <li>
-          <strong>{$t('No published dataset.')}</strong>{$t(
+          <strong>{$t('No published dataset.')}</strong>
+          {$t(
             'Nothing traced has been reviewed and released. That is the next thing, and it needs people rather than code.'
           )}
         </li>
+
         <li>
-          <strong>{$t('No public links yet.')}</strong>{$t(
-            'Linking a name on one map to the same place on another is being tested offline on the 1882 survey. Nothing is published.'
-          )}
-        </li>
-        <li>
-          <strong>No measured accuracy yet.</strong>We do not yet know how often a link is right or
-          how long a check takes. The tools that count this are built and run offline; the first
-          reviewer’s sitting is still to come.
-        </li>
-        <li>
-          <strong>{$t('No building histories.')}</strong>{$t(
+          <strong>{$t('No building histories.')}</strong>
+          {$t(
             'Who built a place, who owned it, what replaced it — there is no database for any of that, only a design.'
           )}
         </li>
         <li>
-          <strong>{$t('No 3D.')}</strong>{$t(
+          <strong>{$t('No 3D.')}</strong>
+          {$t(
             'Heights and roof shapes would come from two rare painted views of the city and a published reconstruction method. Nothing has been run.'
           )}
         </li>
         <li>
-          <strong>{$t('Barely any contributors.')}</strong>{$t(
+          <strong>{$t('Barely any contributors.')}</strong>
+          {$t(
             'Single figures, and the review queues are nearly empty because almost nobody has filled them.'
           )}
         </li>

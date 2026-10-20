@@ -173,6 +173,8 @@
 
 /* The person is where a check happens, so it is the one filled box. */
 .about-page .step.person {
+  display: flex;
+  flex-direction: column;
   background: var(--color-yellow);
 }
 
@@ -183,10 +185,11 @@
 }
 
 .about-page .odds-row {
+  margin-top: auto;
+  padding-top: 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 0.9rem 0 0;
   font-weight: var(--font-medium);
   line-height: 1.4;
 }
@@ -321,6 +324,30 @@
   .about-page .is-planned.across::before {
     border-left-style: dashed;
   }
+}
+
+.about-page .flow-lead {
+  margin-top: 1.5rem;
+}
+
+.about-page .subhead {
+  margin: 2rem 0 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+/* The number a step has produced so far, inside its box. */
+.about-page .step p.figure {
+  margin-top: 0.6rem;
+  color: var(--color-text);
+}
+
+.about-page .figure b {
+  font-family: var(--font-family-display);
+  font-size: 1.6rem;
+  font-weight: var(--font-extrabold);
+  line-height: 1;
+  margin-right: 0.15rem;
 }
 
 .about-page .flow-key {

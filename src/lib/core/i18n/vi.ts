@@ -145,9 +145,6 @@ export const vi: Record<string, string> = {
   'The 1882 cadastral survey of Saigon laid over the modern city around the Charner canal':
     'Bản đồ địa chính Sài Gòn năm 1882 chồng lên thành phố hiện đại khu vực kênh Charner',
   'Open this sheet in the viewer': 'Mở bản đồ này trong trình xem',
-  'Where this stands': 'Trạng thái hiện tại',
-  'Counted from the database when this page loaded.':
-    'Dữ liệu được trích xuất trực tiếp từ hệ thống.',
   'What you can do today': 'Tính năng khả dụng',
   'What is not built': 'Các tính năng chưa phát triển',
   'The plan is larger than the archive. Written out so nobody has to guess which parts exist.':
@@ -155,9 +152,6 @@ export const vi: Record<string, string> = {
   'No published dataset.': 'Chưa có tập dữ liệu phát hành công khai.',
   'Nothing traced has been reviewed and released. That is the next thing, and it needs people rather than code.':
     'Dữ liệu số hóa chưa được kiểm duyệt hoàn tất và phát hành.',
-  'No public links yet.': 'Chưa có liên kết công khai.',
-  'Linking a name on one map to the same place on another is being tested offline on the 1882 survey. Nothing is published.':
-    'Việc liên kết một địa danh trên bản đồ này với cùng địa điểm trên bản đồ khác đang được thử nghiệm ngoại tuyến trên bản đồ năm 1882. Chưa có gì được công bố.',
   'No building histories.': 'Chưa có lịch sử công trình chi tiết.',
   'Who built a place, who owned it, what replaced it — there is no database for any of that, only a design.':
     'Chưa có cơ sở dữ liệu về quyền sở hữu hay quá trình thay đổi kiến trúc.',
@@ -172,19 +166,9 @@ export const vi: Record<string, string> = {
     'Dự án hoạt động phi lợi nhuận, không có tổ chức tài trợ đằng sau.',
   'How it is kept': 'Cơ chế vận hành',
   'Get in touch': 'Liên hệ',
-  'sheets placed on the map — {city}, {from} to {to}':
-    'bản đồ đã được định vị — {city}, từ năm {from} đến {to}',
   'and {N} other places': 'và {N} địa phương khác',
-  'of {T} sheets in {N} complete surveys, each on the map as a single layer — most are cells of a pre-tiled mosaic and have no catalogue record of their own, which is why the count above is smaller':
-    'trong tổng số {T} mảnh thuộc {N} bộ bản đồ hoàn chỉnh, mỗi bộ là một lớp duy nhất trên bản đồ — phần lớn là ô của một khảm ảnh dựng sẵn, không có bản ghi riêng trong kho, nên con số phía trên nhỏ hơn',
   'Five things work, and they work in an ordinary browser. No account is needed for the first two.':
     'Năm việc đã dùng được, ngay trên trình duyệt thông thường. Hai việc đầu không cần tài khoản.',
-  'more georeferenced but not published, so nobody outside the project sees them yet':
-    'bản đồ đã định vị nhưng chưa xuất bản',
-  'place names read off the sheets by the OCR pass — {M} checked by a person':
-    'địa danh được đọc tự động qua OCR — {M} đã được kiểm duyệt thủ công',
-  'building and street shapes traced by hand — {M} approved, so there is no dataset to download yet':
-    'công trình và tuyến đường được vẽ thủ công — {M} đã phê duyệt, chưa có tập dữ liệu tải xuống',
   'Start preparing': 'Bắt đầu chuẩn bị',
   'Outline buildings, roads, and waterways on a georeferenced map. 46 shapes have been traced so far, all on the 1882 cadastral survey.':
     'Khoanh vẽ tòa nhà, đường sá và sông ngòi trên bản đồ đã định vị. 46 hình khối đã được số hóa trên bản đồ địa chính 1882.',
