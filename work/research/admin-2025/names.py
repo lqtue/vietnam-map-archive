@@ -1,7 +1,7 @@
 """Where did each 2025 commune name come from?
 
 Two witnesses read every new name against the old units it was built from:
-  A, syllable rules: whole · variant · affix · part · near · compound · reused · new
+  A, syllable rules: whole · variant · affix · part · near · kept · compound · reused · new
   B, edit distance:  the nearest source name and how far it is
 A syllable match settles itself. A one-letter difference, a compound, and a 'new' name that B
 finds close to a source go to out/queue.csv, and a person's answer goes in decisions.csv, which is
@@ -23,7 +23,7 @@ VOWELS = set('aăâeêioôơuưy')
 ROMAN = {'i': '1', 'ii': '2', 'iii': '3', 'iv': '4', 'v': '5', 'vi': '6', 'vii': '7', 'viii': '8', 'ix': '9', 'x': '10'}
 PREFIX = re.compile(r'^(phường|xã|thị trấn|thị xã|thành phố|tp\.?|quận|huyện|tỉnh|đặc khu)\s+', re.I)
 FAMILY = {'whole': 'whole', 'variant': 'partial', 'affix': 'partial', 'part': 'partial', 'near': 'partial',
-          'compound': 'partial',
+          'kept': 'partial', 'compound': 'partial',
           'reused': 'new', 'new': 'new'}
 LEVELS = ('province', 'district', 'ward')               # a kept name is credited to the highest unit
                                                         # that bore it, as the article counted
@@ -103,21 +103,29 @@ def witness_a(nk, cands, nearby):
     hit = [c for c in same if squash(nk) and squash(c[1]) == squash(nk)]
     if hit:
         return 'variant', hit
-    hit = [c for c in cands if core(nk) == core(c[1]) and core(nk) != nk or core(c[1]) != c[1] and core(c[1]) == nk]
+    words = lambda k: tuple(t for i, t in enumerate(k) if not t[0].isdigit()        # drop numbers, and a
+                            and not (i == len(k) - 1 > 1 and t[0] in ('a', 'b', 'c')))  # trailing A/B/C
+    hit = [c for c in cands if core(nk) == core(c[1]) and core(nk) != nk or core(c[1]) != c[1] and core(c[1]) == nk
+           or words(c[1]) == words(nk)                                              # Đông Hải <- Đông Hải 1, Đông Hưng A
+           or len(nk) == 1 and len(c[1]) == 2 and nk[0] in c[1] and (set(c[1]) - set(nk)) <= AFFIX]  # Láng <- Láng Hạ
     if hit:
         return 'affix', hit
+    runs = lambda k, n: {k[i:i + n] for i in range(len(k) - n + 1)}
     n = len(nk)       # a run of a longer name: Phan Rang from Phan Rang-Tháp Chàm
-    hit = [c for c in cands if n > 1 and len(c[1]) >= n + 2 and nk in {c[1][i:i + n] for i in range(len(c[1]) - n + 1)}]
+    hit = [c for c in cands if n > 1 and len(c[1]) > n and nk in runs(c[1], n)]
     if hit:
         return 'part', hit
     hit = [c for c in same if len(squash(nk)) >= 5 and lev(squash(nk), squash(c[1])) == 1]
     if hit:       # one letter: Châu Bình/Châu Bính is a correction, Tân Ninh/Tây Ninh is another name
         return 'near', hit
-    words = [t for t in nk if not t[0].isdigit()]
-    parts = [c for c in cands if c[0] != 'province' and set(words) & set(c[1])]
-    if len(words) > 1 and all(any(t in c[1] for c in parts) for t in words) \
-            and not any(set(words) <= set(c[1]) for c in parts):
-        return 'compound', parts
+    hit = [c for c in cands if 1 < len(c[1]) < n and c[1] in runs(nk, len(c[1]))]
+    if hit:       # a source kept whole in a longer name: Chân Mây - Lăng Cô, but also Chu Văn An
+        return 'kept', hit
+    ws = words(nk)    # syllables from sources in any order: Thư Vũ <- Vũ Thư; the province only when
+    for pool in ([c for c in cands if c[0] != 'province'], cands):   # nothing lower covers: Tuyên Bình
+        parts = [c for c in pool if set(ws) & set(c[1])]
+        if len(ws) > 1 and all(any(t in c[1] for c in parts) for t in ws):
+            return 'compound', parts
     hit = [c for c in nearby if c[1] == nk]
     if hit:
         return 'reused', hit
@@ -142,6 +150,8 @@ def settle(kind, src, best, ratio):
         return 'check', f'one letter from {names(src)}: correction or another name?'
     if kind == 'compound':
         return 'check', f'built from {len(src)} names: coincidence or intent?'
+    if kind == 'kept':
+        return 'check', f'keeps {names(src)} and adds to it: intent or another name?'
     if kind == 'new' and ratio <= NEAR:
         return 'check', f'B finds {names(best)} close ({ratio:.2f})'
     return 'auto', ''
@@ -267,7 +277,10 @@ def selftest():
     assert a('Hội An Tây', 'Hội An', 'Cẩm Phô') == 'affix'
     assert a('Thường Phước', 'Thường Phước 1', 'Thường Phước 2') == 'affix'
     assert a('Nà Hang', 'Na Hang') == 'variant' and a('Avương', 'A Vương') == 'variant'
-    assert a('Phan Rang', 'Phan Rang-Tháp Chàm') == 'part'
+    assert a('Phan Rang', 'Phan Rang-Tháp Chàm') == 'part' and a('Hiệp Bình', 'Hiệp Bình Chánh') == 'part'
+    assert a('Láng', 'Láng Thượng', 'Láng Hạ') == 'affix' and a('Đông Hải', 'Đông Hải 1', 'Nam Hải') == 'affix' == a('Đông Hưng', 'Đông Hưng A')
+    assert a('Chân Mây - Lăng Cô', 'Lăng Cô', 'Lộc Tiến') == 'kept'
+    assert a('Thư Vũ', 'Vũ Thư') == 'compound' and a('Tân Khánh', 'Tân Phước Khánh') == 'compound'
     assert a('Chợ Lớn', '11', '12', '13') == 'new'
     assert a('Hà Nam', 'Hà') == 'new'
     assert witness_a(key('Tân An'), [], [('district', key('Tân An'), 'Tân An')])[0] == 'reused'
