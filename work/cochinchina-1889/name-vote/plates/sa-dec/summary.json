@@ -1,0 +1,34 @@
+{
+ "labels_used": 101,
+ "labels_with_node": 38,
+ "coarse": {
+  "theta": 83.0,
+  "scale": 0.94,
+  "score": 5.7,
+  "second_peak": 3.5,
+  "ratio": 0.614
+ },
+ "fine": {
+  "theta": 83.0,
+  "scale": 0.94,
+  "m_per_px_full": 7.9661,
+  "score": 5.7,
+  "shift_m": [
+   -45373,
+   -25890
+  ]
+ },
+ "names_agreeing": 2,
+ "agreeing": [
+  "Phú Nhuận",
+  "Hòa Thuận"
+ ],
+ "check_errors_m": [
+  280,
+  1492,
+  2153,
+  2373
+ ],
+ "check_median_m": 1822,
+ "verdict": "fail"
+}

@@ -63,3 +63,22 @@ counts and a few lines only. Added to the rule:
 * OSM places: `osm-places-261021.csv`, from `ogr2ogr -f GeoJSONSeq … vietnam-261021.osm.pbf points
   -spat 104.5 8.5 107.6 11.7 -where "place IN ('city','town','suburb','village','hamlet','locality')"`
   (Geofabrik Vietnam extract downloaded 2026-10-21); `name_vi` is `name:vi` where tagged.
+
+## Result: Sa Đéc, run once — **fail**, name-vote parked
+
+101 labels voted (115 `place` less fragments and the check zones); 38 of them have a same-name OSM node.
+
+| Number | Value | Rule |
+|---|---|---|
+| Coarse ratio (second / best) | 0.614 (3.5 / 5.7) | < 0.70: met, but on a best score of 5.7 |
+| Distinct labels agreeing within 1 km | **2** | ≥ 8: **failed** |
+| Held-out median (4 checks) | **1822 m** (280, 1492, 2153, 2373) | ≤ 1000 m: **failed** |
+
+So the kill result applies: **name-vote is parked**; the seven failed plates go to hand points in the
+Allmaps editor (or the chaining test with a person picking the tie points).
+
+What the number says: the old village names on this plate mostly have no same-name node in OSM
+(63 of 101 labels have none), and the common names (Tân Hòa, Phú Thạnh…) have many nodes that spread
+the vote. Fuzzy matching, or a 1880s name list instead of OSM, were not tried: the rule said exact
+match, and changing it after this result would be tuning to pass. If name-vote is reopened, that is a
+new test with its own rule, not a rerun of this one.
