@@ -93,3 +93,28 @@ Written as run, rule unchanged.
 
 So the kill result applies: Bến Tre's scale error is **not** a plain affine one that river ink can
 find. Next for the placement is hand points (Test A not run on the other three plates).
+
+## Result, test B: mask along the printed line, half resolution — run once, **fail**
+
+Written as run, rule unchanged. Plates: `plates/masks/` (new outline files, overlays, `summary.json`).
+
+| | Old mask | New mask | Rule |
+|---|---|---|---|
+| Summed neighbour overlap (km²) | 684.7 | 667.0 | down by a third: **failed** (−3 %) |
+| Line support, share of edge vertices (Mỹ Tho / Vĩnh Long / Gò Công / Bến Tre) | 0.032 / 0.029 / 0.000 / 0.013 | 0.023 / 0.012 / 0.007 / 0.207 | not lower on any plate: **failed** on Mỹ Tho and Vĩnh Long |
+
+The new masks are almost the old ones (area ratio 0.99–1.00). The wash detector found little to cut:
+on Gò Công the wash is a thin band, not a thick strip, and nothing was removed.
+
+**What the overlay shows, which the rule did not foresee:** the pushed masks are far looser than "a
+wash fringe". `cc_mask.py` does not take the inside of the wash (its header comment says so; the code
+takes the largest blank-free region of **ink density**, and the pink wash counts as ink). On
+Gò Công the mask reaches out to include the neighbours' arc titles ("ARRONDISSEMENT DE CHỢ LỚN",
+"DE MỸ THO", "DE SAIGON") and the margin between them and the true boundary. The true boundary is the
+printed dotted/crossed line, well inside. So the line-support numbers are near zero for the old masks
+because the old edge is tens of pixels away from the line, not because the line is hard to find.
+
+So the kill result applies: the pushed masks stay as they are. What this test did settle is what is
+wrong with them: they include text outside the boundary. A new test needs a new rule: trace the
+printed line itself (thin pink wash with relaxed colour limits, closed and filled, or a hand polygon
+where the wash is absent on a side), and score it against hand-read points on the line.

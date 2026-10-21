@@ -1,0 +1,91 @@
+{
+ "plates": {
+  "mytho": {
+   "vertices": {
+    "old": 187,
+    "new": 746
+   },
+   "area_ratio": 0.999,
+   "wash_px_removed": 9337,
+   "support_vertices": {
+    "old": 0.032,
+    "new": 0.023
+   },
+   "support_every_100px": {
+    "old": 0.015,
+    "new": 0.008
+   }
+  },
+  "vl": {
+   "vertices": {
+    "old": 102,
+    "new": 431
+   },
+   "area_ratio": 1.0,
+   "wash_px_removed": 1365,
+   "support_vertices": {
+    "old": 0.029,
+    "new": 0.012
+   },
+   "support_every_100px": {
+    "old": 0.019,
+    "new": 0.0
+   }
+  },
+  "gc": {
+   "vertices": {
+    "old": 122,
+    "new": 269
+   },
+   "area_ratio": 1.0,
+   "wash_px_removed": 0,
+   "support_vertices": {
+    "old": 0.0,
+    "new": 0.007
+   },
+   "support_every_100px": {
+    "old": 0.009,
+    "new": 0.013
+   }
+  },
+  "bt": {
+   "vertices": {
+    "old": 155,
+    "new": 1081
+   },
+   "area_ratio": 0.99,
+   "wash_px_removed": 61823,
+   "support_vertices": {
+    "old": 0.013,
+    "new": 0.207
+   },
+   "support_every_100px": {
+    "old": 0.003,
+    "new": 0.12
+   }
+  }
+ },
+ "overlap_km2": {
+  "old": 684.7,
+  "new": 667.0,
+  "old_pairs": {
+   "mytho/vl": 112.8,
+   "mytho/gc": 201.3,
+   "mytho/bt": 259.4,
+   "vl/gc": 0.0,
+   "vl/bt": 111.1,
+   "gc/bt": 0.0
+  },
+  "new_pairs": {
+   "mytho/vl": 113.0,
+   "mytho/gc": 202.5,
+   "mytho/bt": 260.1,
+   "vl/gc": 0.0,
+   "vl/bt": 91.3,
+   "gc/bt": 0.0
+  },
+  "drop": 0.026
+ },
+ "line_support_not_lower_anywhere": false,
+ "verdict": "fail"
+}
