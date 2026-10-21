@@ -57,6 +57,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | [Review page](plans/review-page-plan.md) | The offline review pages moved into the app |
 | [Series-led admin units](plans/series-admin-saigon-plan.md) | Admin units and Saigon's states traced through the map series; the pilot area, link types, phases (bet 1c) |
 | [1882 feature layer](plans/image-processing-1882-plan.md) | Repo consolidation, frozen water and the block comparison (bet 1b) |
+| [Corpus](plans/corpus-plan.md) | Every map of Vietnam we know of: one row per source, measured (bet 3) |
 | [Search](plans/search-plan.md) | Finding labels, shapes and period sources |
 | [Catalog](plans/catalog-plan.md) | The public list: columns, facets, speed, search |
 | [Map-type audit](plans/catalog-map-type-audit.md) | The original-map review and open classification questions |
