@@ -56,7 +56,17 @@ Run: `SERIES_WORK=<dir with thumbs/, med/, rows.json> work/ocr/.venv/bin/python 
 
 The town coordinates are from memory, not a gazetteer. Read these as a sanity check, not as accuracy.
 
-## Allmaps
+## Seams (2026-10-21, `seams.py`)
+
+**Question.** With every mask on its printed edge, do neighbouring sheets meet on the ground?
+**Answer.** No. Placed through each sheet's own order-1 fit, neighbouring edges miss by 0-560 m (gap or overlap) and
+slide 0-300 m along the seam. A single atlas-wide scale (one x and y scale, per-sheet rotation and shift) did
+not help: control-point residuals rose to 337 m (own fit: 129 m), leave-one-out error rose (median 137 m against
+96 m), seam rms 354 m against 322 m. Printed frames differ in size by up to 2 per cent (49.2-50.7 km wide), so
+no uniform scale tiles them; paper distortion or unequal frames, not told apart.
+**So what.** Each sheet is right on its own to about 0.1-0.3 km; the mosaic is not seamless. More grid points are not
+available (two vertical grid lines per sheet). Only ties between neighbours (hand-placed points at the same
+road or river on both sides of a seam) add information.
 
 `push.mjs` pushes annotations to live.allmaps.org only (no VMA write), skipping an image Allmaps
 already holds; `--update` PATCHes pushed maps and overwrites any editor edits, so compare first with
