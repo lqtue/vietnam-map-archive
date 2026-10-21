@@ -51,3 +51,15 @@ placement and are not independent evidence. Only the held-out checks are.
 * OCR on Vietnamese tone marks is imperfect; tones are stripped, but a wrong base letter loses the name.
 * Rule 1 reuses the river-match ratio; with name votes it measures how much better one shift is than
   the best far-away shift.
+
+## Amendments made after reading the OCR counts, before any fit
+
+The Sa Đéc OCR (`ocr/sa-dec.all_extractions.json`, one run, `name-vote-sadec-1`, 200 labels after dedup:
+115 `place`, 45 `hydrology`, 21 `legend`, 9 `title`, 6 `institution`, 4 `other`) was read for category
+counts and a few lines only. Added to the rule:
+
+* Only labels with `category == "place"` vote. Drop any whose text ends in `...`, or contains
+  ARRONDISSEMENT or ARR (the OCR gave fragments of the arc titles as `place`).
+* OSM places: `osm-places-261021.csv`, from `ogr2ogr -f GeoJSONSeq … vietnam-261021.osm.pbf points
+  -spat 104.5 8.5 107.6 11.7 -where "place IN ('city','town','suburb','village','hamlet','locality')"`
+  (Geofabrik Vietnam extract downloaded 2026-10-21); `name_vi` is `name:vi` where tagged.
