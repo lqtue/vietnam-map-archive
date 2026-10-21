@@ -26,8 +26,11 @@ parameters run on the other six, no per-plate tuning.
   into 1 km bins. A label counts once per bin. A name that has k nodes in the bbox weighs 1/k, so
   "Tân Hưng" (dozens of nodes) cannot outvote a rare name. Score = best bin, summed over its
   3 × 3 neighbours.
-* **Held-out checks:** `river-match/plates/<slug>/check.csv`, unchanged. Any label or node whose
-  normalised name equals a check town's name is removed before voting, so the checks stay held out.
+* **Held-out checks:** `river-match/plates/<slug>/check.csv`, unchanged. Held out by place, not by
+  name (some checks sit on a different label than the town's name, e.g. Cao Lãnh on the Mỹ Trà
+  market): every OCR label whose centre lies within 2 km of a check's plate pixel (2000 m /
+  m-per-px, about 230 full-res px), and every OSM node within 2 km of a check's ground point, is
+  removed before voting. Amended before the OCR was read; it was first written as exclusion by name.
 
 ## Pass rule (fixed now)
 
