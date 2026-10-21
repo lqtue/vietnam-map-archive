@@ -30,6 +30,18 @@ name key parked behind bet 1c (admin units for all of Vietnam).
 6. `build_tk.py`: GCPs = the crossings; mask = one shared series frame (columns at 114.36 / 114.90 /
    115.44 / 115.978 / 116.524 gr, rows at 23.941 / 23.307 / 22.677 / 22.046 gr) projected through each
    sheet's own fit, so neighbouring masks meet exactly. Transformation: first-order polynomial.
+   **The mask itself was wrong** (30-320 px off the printed edge: the affine extrapolates, and each
+   fold-out's halves lie at different angles). The masks of record are Tue's hand edits of all 11
+   sheets in Allmaps (2026-10-21), saved in `annotations-live/`.
+7. `neatline.py`: the printed edge found by machine, for sheets nobody has edited. Thin dark line with
+   paper on both sides (a ridge), tilted, innermost strong line (a black bar or an outer frame can sit
+   outside the neatline), each fold-out half on its own: a 6-point mask in `masks.json`; an edge
+   below `MIN_COVER` goes to a person. The red, blue and brown plates print their own corner marks
+   10-26 px outside the black neatline (misregistered plates); the black line is the edge.
+   `score.py` scores it against the hand edits. Against Tue's 10 edits of those sheets, 9 are within 15 px
+   at all four corners; Hưng Yên bottom-right is 19 px off (the detector is the worse by eye). It
+   sits about 6 px above Tue's bottom edge on average. Vĩnh Bắc Việt: no mask (blank sea).
+   The edge of 4 of the 10 was tuned on (`INNER_MIN` after An Châu); 6 were unseen.
 
 Run: `SERIES_WORK=<dir with thumbs/, med/, rows.json> work/ocr/.venv/bin/python work/tonkin-1950/build_tk.py`.
 `snap.py` and `extents.py` regenerate `crossings.json` and `extents.json` the same way.
