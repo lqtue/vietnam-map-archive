@@ -1,0 +1,24 @@
+{
+ "water_frac_in_mask": 0.0124,
+ "coarse": {
+  "theta": 3.0,
+  "scale": 1.1,
+  "score": 1283.0,
+  "second_peak": 1253.3,
+  "ratio": 0.977
+ },
+ "fine": {
+  "theta": 3.25,
+  "scale": 1.12,
+  "m_per_px_full": 9.2715,
+  "score": 2541.9
+ },
+ "checks": {
+  "ben-luc": 21563,
+  "can-giuoc": 25327,
+  "can-duoc": 24437,
+  "tan-tuc": 21484
+ },
+ "check_median_m": 23000,
+ "check_max_m": 25327
+}

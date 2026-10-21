@@ -1,0 +1,4 @@
+role,id,px,py,lon,lat,note
+check,long-xuyen,5000,5372,105.4344389,10.3903537,"dark square (fort / Marché) at the river junction by the LONGXUYEN label, OSM place=city; placed by eye before any fit"
+check,phu-hoa,4628,4632,105.3757115,10.3586587,"Phú Hòa village label, OSM place=town; label only; placed by eye before any fit"
+check,cho-moi,7040,4764,105.3994876,10.5501031,"lower of two Marché symbols by An Long, OSM place=town; two markets 1 km apart, ambiguous; placed by eye before any fit"

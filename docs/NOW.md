@@ -57,7 +57,7 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live 2026-10-18); `review-web` pushed | PR 2: the page (`docs/plans/review-page-plan.md` §8) |
 | Data model: activities (bets 1a, 2) | Claude | plans and dedup 1–2 merged (#85; mig 123–124 live 2026-10-18) | `activities` table, per `plans/data-model-target.md` |
 | Corpus: every map of Vietnam we know of (bet 3, feeds 1c) | Claude | PR #108 (`corpus-sources`, worktree `.claude/worktrees/corpus-sources`); Rumsey 52 → 243 in the queue 2026-10-21 | Step 2 of `plans/corpus-plan.md`: check each scout reads all its pages |
-| Two map books as series (bet 3, feeds 1c) | Claude | `cochinchina-1889-atlas` (PR #99); 27 draft rows live 2026-10-19/20 (12 Cochinchina 1881–89, 15 Tonkin 1950), plus the 2 public 1882 sheets in the Cochinchina series | Georeference by chaining from the placed 1882 plans (idea gate first); only Tan An prints a graticule; Tan An year 1887 |
+| Two map books as series (bet 3, feeds 1c) | Claude | `tonkin-1950-georef`; `work/tonkin-1950/`, `work/cochinchina-1889/` | Tonkin 1950: 11 sheets placed from the printed graticule and public 2026-10-21 (15 rows). Cochinchina: river-match (rivers vs OpenStreetMap, no graticule) placed 4 of 11 plates that pass a rule fixed beforehand (Mỹ Tho, Vĩnh Long, Bến Tre, Gò Công; pushed to Allmaps); the other 7 fail or lack checks, so the series still needs hand points or chaining from placed plates. `work/cochinchina-1889/river-match/plates/README.md` |
 
 ## Parked
 

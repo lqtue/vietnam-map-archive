@@ -1,0 +1,24 @@
+{
+ "water_frac_in_mask": 0.0424,
+ "coarse": {
+  "theta": 85.0,
+  "scale": 1.0,
+  "score": 906.4,
+  "second_peak": 858.1,
+  "ratio": 0.947
+ },
+ "fine": {
+  "theta": 85.0,
+  "scale": 1.01,
+  "m_per_px_full": 8.5593,
+  "score": 1882.8
+ },
+ "checks": {
+  "sa-dec": 313,
+  "lai-vung": 1306,
+  "cao-lanh": 543,
+  "my-hiep": 2351
+ },
+ "check_median_m": 924,
+ "check_max_m": 2351
+}

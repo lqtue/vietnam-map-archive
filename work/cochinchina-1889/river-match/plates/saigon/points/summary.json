@@ -1,0 +1,23 @@
+{
+ "water_frac_in_mask": 0.0097,
+ "coarse": {
+  "theta": -26.0,
+  "scale": 0.98,
+  "score": 1399.5,
+  "second_peak": 1136.6,
+  "ratio": 0.812
+ },
+ "fine": {
+  "theta": -26.25,
+  "scale": 0.985,
+  "m_per_px_full": 8.3901,
+  "score": 2430.3
+ },
+ "checks": {
+  "cho-lon": 222,
+  "hoc-mon": 628,
+  "nha-be": 379
+ },
+ "check_median_m": 379,
+ "check_max_m": 628
+}

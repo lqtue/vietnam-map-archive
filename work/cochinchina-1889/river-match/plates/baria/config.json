@@ -1,0 +1,22 @@
+{
+ "map_id": "d3ddd9b3-9276-4212-b51e-3f09606ec387",
+ "full": [
+  12764,
+  9112
+ ],
+ "bar_med_px": 588,
+ "prior": [
+  10.55,
+  107.2
+ ],
+ "prior_on": "mask",
+ "bbox": [
+  9.93,
+  106.45,
+  11.17,
+  107.95
+ ],
+ "north_deg": 0,
+ "mask": "outline",
+ "checks": "check.csv"
+}

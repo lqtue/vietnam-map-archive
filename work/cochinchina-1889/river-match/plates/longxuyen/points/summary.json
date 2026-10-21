@@ -1,0 +1,23 @@
+{
+ "water_frac_in_mask": 0.018,
+ "coarse": {
+  "theta": 87.0,
+  "scale": 1.0,
+  "score": 1329.9,
+  "second_peak": 1080.0,
+  "ratio": 0.812
+ },
+ "fine": {
+  "theta": 87.0,
+  "scale": 1.005,
+  "m_per_px_full": 8.5025,
+  "score": 2405.8
+ },
+ "checks": {
+  "long-xuyen": 1027,
+  "phu-hoa": 695,
+  "cho-moi": 863
+ },
+ "check_median_m": 863,
+ "check_max_m": 1027
+}

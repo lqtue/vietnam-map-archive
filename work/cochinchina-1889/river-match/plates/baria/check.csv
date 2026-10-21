@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,ba-ria,5980,4680,107.1789121,10.4933475,"town block right of the BARIA label, OSM place=suburb; placed by eye before any fit"
+check,dat-do,7224,4800,107.2696605,10.4899209,"dense cluster by Plateau / Chợ Cây Sung, OSM place=town; ±1 km; placed by eye before any fit"
+check,phuoc-hai,7572,5608,107.2921241,10.4257988,"Chợ Lưới Rê / Phước Hải market symbol, OSM place=town; placed by eye before any fit"
+check,long-hai,6648,6020,107.2307547,10.4039451,"Long Hải label, OSM place=town; label only, ±1 km; placed by eye before any fit"

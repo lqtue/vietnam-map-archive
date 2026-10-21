@@ -1,0 +1,12 @@
+role,id,px,py,lon,lat,note
+fit,gcp00,1188,444,105.842704,10.670219,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp01,6084,2420,106.214903,10.49061,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp02,8780,2372,106.42607,10.479723,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp03,1892,4476,105.875721,10.354036,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp04,5740,4716,106.175432,10.314596,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp05,9492,4540,106.469909,10.307905,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp06,12988,5188,106.739853,10.238764,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp07,1892,5668,105.8692,10.261689,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp08,5444,5196,106.149651,10.279013,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp09,10156,5732,106.515333,10.211961,plate water pixel; ground from the fitted similarity (not an independent point)
+fit,gcp10,13164,7484,106.741061,10.059933,plate water pixel; ground from the fitted similarity (not an independent point)

@@ -1,0 +1,23 @@
+{
+ "water_frac_in_mask": 0.2026,
+ "coarse": {
+  "theta": -1.0,
+  "scale": 0.98,
+  "score": 1150.5,
+  "second_peak": 712.1,
+  "ratio": 0.619
+ },
+ "fine": {
+  "theta": -1.0,
+  "scale": 0.98,
+  "m_per_px_full": 8.3333,
+  "score": 2577.5
+ },
+ "checks": {
+  "go-cong": 440,
+  "vinh-binh": 232,
+  "tan-hoa": 557
+ },
+ "check_median_m": 440,
+ "check_max_m": 557
+}

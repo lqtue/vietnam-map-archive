@@ -1,0 +1,22 @@
+{
+ "water_frac_in_mask": 0.022,
+ "coarse": {
+  "theta": -4.0,
+  "scale": 1.02,
+  "score": 1682.8,
+  "second_peak": 1180.7,
+  "ratio": 0.702
+ },
+ "fine": {
+  "theta": -4.0,
+  "scale": 1.025,
+  "m_per_px_full": 8.4992,
+  "score": 3036.4
+ },
+ "checks": {
+  "bien-hoa": 2305,
+  "long-thanh": 395
+ },
+ "check_median_m": 1350,
+ "check_max_m": 2305
+}

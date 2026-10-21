@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,ben-luc,4504,7364,106.4847592,10.641631,"Marché de Bến Lức symbol, OSM place=town; placed by eye before any fit"
+check,can-giuoc,7036,7612,106.6711044,10.6080487,"dense cluster by the Cần Giuộc label, OSM place=town; placed by eye before any fit"
+check,can-duoc,6120,9036,106.6039551,10.5033076,"Marché de Cần Đước, between symbol and cluster, OSM place=town; ±1 km; placed by eye before any fit"
+check,tan-tuc,5652,6696,106.5826774,10.6901149,"Tân Túc village label, OSM place=town; label only; placed by eye before any fit"

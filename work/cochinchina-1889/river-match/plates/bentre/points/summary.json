@@ -1,0 +1,24 @@
+{
+ "water_frac_in_mask": 0.0534,
+ "coarse": {
+  "theta": 1.0,
+  "scale": 1.02,
+  "score": 1078.3,
+  "second_peak": 594.8,
+  "ratio": 0.552
+ },
+ "fine": {
+  "theta": 1.25,
+  "scale": 1.025,
+  "m_per_px_full": 8.7012,
+  "score": 1970.2
+ },
+ "checks": {
+  "ben-tre": 1488,
+  "mo-cay": 894,
+  "giong-trom": 910,
+  "ba-tri": 1066
+ },
+ "check_median_m": 988,
+ "check_max_m": 1488
+}

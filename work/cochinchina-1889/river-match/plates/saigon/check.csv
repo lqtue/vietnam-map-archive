@@ -1,0 +1,4 @@
+role,id,px,py,lon,lat,note
+check,cho-lon,6392,4580,106.658971,10.7518172,"centre of the dense street grid of Chợ Lớn, OSM place=suburb; placed by eye before any fit"
+check,hoc-mon,4840,3280,106.5927134,10.8860463,"Hóc Môn settlement, OSM place=town; placed by eye before any fit"
+check,nha-be,7620,4792,106.7395591,10.6956953,"Phú Xuân Đông label (Nhà Bè), OSM place=town; label only; placed by eye before any fit"

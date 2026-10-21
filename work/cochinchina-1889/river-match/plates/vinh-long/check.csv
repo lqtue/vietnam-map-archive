@@ -1,0 +1,4 @@
+role,id,px,py,lon,lat,note
+check,vinh-long,5620,3148,105.9714673,10.254809,"walled town block at the river, OSM place=city; placed by eye before any fit"
+check,cai-nhum,7472,4132,106.1102869,10.1750683,"Chợ Cái Nhum market at the canal mouth, OSM place=town; placed by eye before any fit"
+check,cho-lach,7528,3004,106.1210175,10.2605519,"Chợ Lách market symbol, OSM place=town; placed by eye before any fit"

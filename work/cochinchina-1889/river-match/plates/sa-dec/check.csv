@@ -1,0 +1,5 @@
+role,id,px,py,lon,lat,note
+check,sa-dec,4592,5412,105.7667373,10.2991955,"town block on the river bank left of the SA DEC label, OSM place=city; placed by eye before any fit"
+check,lai-vung,3936,3100,105.5932863,10.256645,"Chợ Lai Vung market symbol, OSM place=town; placed by eye before any fit"
+check,cao-lanh,6488,3564,105.6314,10.4529,"Marché at Mỹ Trà (Cao Lãnh), OSM place=city; placed by eye before any fit"
+check,my-hiep,5100,5968,105.7937964,10.3401297,"Mỹ Hiệp village label, OSM place=town; no market symbol, weakest; placed by eye before any fit"

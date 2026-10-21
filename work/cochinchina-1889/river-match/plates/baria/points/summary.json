@@ -1,0 +1,24 @@
+{
+ "water_frac_in_mask": 0.1235,
+ "coarse": {
+  "theta": 9.0,
+  "scale": 1.1,
+  "score": 1965.9,
+  "second_peak": 1910.1,
+  "ratio": 0.972
+ },
+ "fine": {
+  "theta": 9.75,
+  "scale": 1.13,
+  "m_per_px_full": 9.6088,
+  "score": 4080.7
+ },
+ "checks": {
+  "ba-ria": 29673,
+  "dat-do": 28974,
+  "phuoc-hai": 27460,
+  "long-hai": 26395
+ },
+ "check_median_m": 28217,
+ "check_max_m": 29673
+}
