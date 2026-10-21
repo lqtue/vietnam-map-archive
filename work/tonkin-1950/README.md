@@ -68,6 +68,37 @@ no uniform scale tiles them; paper distortion or unequal frames, not told apart.
 available (two vertical grid lines per sheet). Only ties between neighbours (hand-placed points at the same
 road or river on both sides of a seam) add information.
 
+## Modern railway as a witness (2026-10-21, `railoff.py`)
+
+**Question.** Is the seam gap a placement error or an error in the 1950 map?
+**Answer (one sheet, not yet a seam).** The Hà Nội - Hải Phòng railway (OpenStreetMap, via the public Overpass servers) lies
+wholly inside the Hải Phòng sheet. Placed through that sheet's own control points, the printed line sits south of the
+modern one by about 440 m at the west end, about 0 in the middle, and 150-280 m in the east, with 100-250 m of jitter over
+a few km that this test cannot split into map error and detector error. The railway is a thick grainy black band; a
+thin-line detector latches onto the "+" boundary lines, a black-density detector does not.
+**So what.** One sheet cannot separate placement error from map error; both show as an offset from modern ground. A line
+that crosses a seam can. Fit on part of a modern witness and score on points held back.
+
+## The frame in grade (2026-10-21, `grid2.py`, `frame2.py`, `overlap.py`)
+
+**Question.** Do neighbouring sheets share a frame in grade, measured from the printed grid?
+**Grid tracking, fixed.** The grid is cyan, so it shows on the red channel (strength 40-70 against 6 for the next peak),
+not on blue minus red. `grid2.py` finds the lines over the whole sheet with a tilt search, traces each fold-out half on its
+own, and gates each sheet (lines straight to 60 m, equal spacing). 9 of 10 sheets pass; Ninh Bình's left half is marginal
+(74 m). An earlier tracker used seeds up to 35 px off and a +-25 px window, and its numbers, including a "top row 0.3-1.0
+km off its neighbours" claim, were wrong.
+**Measured frames.** From the nearest line, the top-row sheets end 0.3-1.9 km north of the sheets below them, and rows 1-2
+overlap by about 0.7 km (Hưng Yên over Ninh Bình, Hưng Yên beside Hải Phòng).
+**The check that could fail, failed.** An overlap of 0.7 km means the same ground is printed on both sheets. Matching
+Hưng Yên's last 32 rows inside Ninh Bình's top, over +-3 km, found nothing (best 0.40, scattered offsets, 0 of 9 strips). So
+the frames as measured are not right to better than about 0.7 km.
+**So what.** Do not use frame gaps or overlaps from the grid. The distance from a grid line out to the frame edge (10-14 km,
+extrapolated with the inner spacing) carries an error of at least 0.7 km; the cause is open (local stretch near the margin,
+or the grid origin differs from sheet to sheet). The grid places a sheet's middle well. Seams and edges need a witness that
+is not the grid: hand-placed ties across a seam, or a modern line that crosses it.
+
+## Allmaps
+
 `push.mjs` pushes annotations to live.allmaps.org only (no VMA write), skipping an image Allmaps
 already holds; `--update` PATCHes pushed maps and overwrites any editor edits, so compare first with
 `allmaps.mjs`'s `differences()`. Map ids: `allmaps-ids.json`. `serve.py` is the CORS static server
