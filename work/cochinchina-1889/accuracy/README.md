@@ -56,3 +56,13 @@ on the wash and shows a pink fringe.
 * Overlap between neighbours is not zero even for a perfect mask: both plates draw the shared river,
   and the placements carry 200–1000 m of error. The test asks only whether it falls.
 * 8 checks give a wide interval; the paired comparison, not the median alone, is the evidence.
+
+## Clarification written before the Bến Tre OCR was read or any fit
+
+A name check also needs its name to be **unique on the plate** (one `place` label with that normalised
+name). Two labels of one name would map to one node, and one of them is a wrong village by
+construction. Labels filter as in `name-vote/README.md` (category `place`, confidence ≥ 0.5, no `...`,
+no ARR, no line words). The Bến Tre run is `accuracy-bentre-1`, one pass, default settings. Scratch
+(quarter-res JPEG, OSM rivers) is rebuilt as in `river-match/plates/README.md`; the OSM rivers for
+this test come from the Geofabrik extract of 2026-10-21, not the 2026-10-19 one used for the pushed
+placement, so the baseline must reproduce within a few metres or the test stops.
