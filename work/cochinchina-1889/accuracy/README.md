@@ -66,3 +66,30 @@ no ARR, no line words). The Bến Tre run is `accuracy-bentre-1`, one pass, defa
 (quarter-res JPEG, OSM rivers) is rebuilt as in `river-match/plates/README.md`; the OSM rivers for
 this test come from the Geofabrik extract of 2026-10-21, not the 2026-10-19 one used for the pushed
 placement, so the baseline must reproduce within a few metres or the test stops.
+
+## Result, test A: Bến Tre, run once — **fail**, placement stays a similarity
+
+Written as run, rule unchanged.
+
+| | Similarity | Affine | Rule |
+|---|---|---|---|
+| Median error, all 32 checks | 61547 m | 61444 m | affine ≤ 700 m: **failed** |
+| Affine lower than similarity | – | 19 of 32 (59 %) | ≥ 70 %: **failed** |
+| Entries at the ±5 % bound | – | none (changes −2.9 % … +4.2 %) | met |
+
+* **The name checks are mostly wrong villages.** 23 of the 28 sit 30–97 km from where the plate puts
+  them: a name unique among OSM places in the bbox is often a different village from the one printed
+  (names moved and were reused). Only 5 of 28 are within 5 km. So the median over 32 is meaningless as
+  an accuracy number, and the rule's "same noise for both models" holds but hides the signal. The
+  mechanical choice of checks was a flaw of the rule, not of the data.
+* **The baseline reproduced only approximately** (ratio 0.550 against 0.552, scale 1.030 against
+  1.025, eye-check median 1058 m against 988 m): the 2026-10-21 OSM extract differs from the 2026-10-19
+  one. The rule said "within a few metres or stop"; a 70 m gap is outside that. This test is therefore
+  doubly short of its own rule.
+* **After the fact, and labelled as such (not part of the rule):** on the 9 checks that are within 5 km
+  (the 4 by eye and 5 names), the affine is lower on 4 of 9, and the medians are 1529 m (similarity)
+  and 1470 m (affine). The affine raised the river score by 18 % (2116 → 2505) with no matching gain at
+  the checks: the extra freedom fits ink, not ground.
+
+So the kill result applies: Bến Tre's scale error is **not** a plain affine one that river ink can
+find. Next for the placement is hand points (Test A not run on the other three plates).

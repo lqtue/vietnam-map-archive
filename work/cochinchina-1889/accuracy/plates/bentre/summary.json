@@ -1,0 +1,180 @@
+{
+ "n": 32,
+ "median_similarity": 61547,
+ "median_affine": 61444,
+ "share_better": 0.594,
+ "at_bound": [],
+ "matrix_change": [
+  0.0213,
+  -0.0293,
+  -0.0274,
+  0.0418
+ ],
+ "shift_m": [
+  -459,
+  406
+ ],
+ "errors": [
+  {
+   "id": "ben-tre",
+   "similarity": 1529,
+   "affine": 1571
+  },
+  {
+   "id": "mo-cay",
+   "similarity": 917,
+   "affine": 292
+  },
+  {
+   "id": "giong-trom",
+   "similarity": 937,
+   "affine": 1025
+  },
+  {
+   "id": "ba-tri",
+   "similarity": 1179,
+   "affine": 936
+  },
+  {
+   "id": "name:Tân Qui",
+   "similarity": 61930,
+   "affine": 62094
+  },
+  {
+   "id": "name:Khánh Hội",
+   "similarity": 83276,
+   "affine": 83145
+  },
+  {
+   "id": "name:Tân Ngãi",
+   "similarity": 41731,
+   "affine": 41505
+  },
+  {
+   "id": "name:Thạnh Sơn",
+   "similarity": 61497,
+   "affine": 61439
+  },
+  {
+   "id": "name:Long Sơn",
+   "similarity": 47401,
+   "affine": 47323
+  },
+  {
+   "id": "name:Long Hưng",
+   "similarity": 84712,
+   "affine": 84667
+  },
+  {
+   "id": "name:Thạnh Bình",
+   "similarity": 61596,
+   "affine": 61449
+  },
+  {
+   "id": "name:Mo Cày",
+   "similarity": 1637,
+   "affine": 1079
+  },
+  {
+   "id": "name:Phước Khánh",
+   "similarity": 76503,
+   "affine": 76363
+  },
+  {
+   "id": "name:Phong Điền",
+   "similarity": 90225,
+   "affine": 90291
+  },
+  {
+   "id": "name:Bình Tiên",
+   "similarity": 65418,
+   "affine": 65602
+  },
+  {
+   "id": "name:Bình Chánh",
+   "similarity": 53899,
+   "affine": 54070
+  },
+  {
+   "id": "name:Hưng Phú",
+   "similarity": 70228,
+   "affine": 70066
+  },
+  {
+   "id": "name:BÌNH HOÀ",
+   "similarity": 37202,
+   "affine": 37442
+  },
+  {
+   "id": "name:Bình Khương",
+   "similarity": 33560,
+   "affine": 33863
+  },
+  {
+   "id": "name:Mỹ Hòa",
+   "similarity": 63109,
+   "affine": 63232
+  },
+  {
+   "id": "name:Tân Hùng",
+   "similarity": 85997,
+   "affine": 85634
+  },
+  {
+   "id": "name:Mỹ Nhơn",
+   "similarity": 65059,
+   "affine": 65066
+  },
+  {
+   "id": "name:Tân Tập",
+   "similarity": 59931,
+   "affine": 59726
+  },
+  {
+   "id": "name:An Ngãi Trung",
+   "similarity": 1646,
+   "affine": 1779
+  },
+  {
+   "id": "name:Hưng Nhơn",
+   "similarity": 96907,
+   "affine": 96408
+  },
+  {
+   "id": "name:Đông Phú",
+   "similarity": 69058,
+   "affine": 68628
+  },
+  {
+   "id": "name:Đại Điền",
+   "similarity": 565,
+   "affine": 1470
+  },
+  {
+   "id": "name:An Phú",
+   "similarity": 77679,
+   "affine": 76590
+  },
+  {
+   "id": "name:An Qui",
+   "similarity": 2895,
+   "affine": 3148
+  },
+  {
+   "id": "name:An Thuận",
+   "similarity": 78728,
+   "affine": 77667
+  },
+  {
+   "id": "name:An Nhơn",
+   "similarity": 92571,
+   "affine": 91436
+  },
+  {
+   "id": "name:Giao Thạnh",
+   "similarity": 4000,
+   "affine": 3916
+  }
+ ],
+ "verdict": "fail"
+}
