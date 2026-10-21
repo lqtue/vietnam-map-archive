@@ -1,0 +1,221 @@
+{
+ "id": "https://annotations.allmaps.org/maps/504f0e30f6d92c87",
+ "type": "Annotation",
+ "@context": [
+  "http://iiif.io/api/extension/georef/1/context.json",
+  "http://iiif.io/api/presentation/3/context.json"
+ ],
+ "created": "2026-10-20T17:07:21.527Z",
+ "modified": "2026-10-20T17:07:21.527Z",
+ "motivation": "georeferencing",
+ "target": {
+  "type": "SpecificResource",
+  "source": {
+   "id": "https://iiif.maparchive.vn/iiif/f0153ae6-4b5d-4f62-985b-c973aa7fdbac",
+   "type": "ImageService3",
+   "height": 11597,
+   "width": 9129,
+   "partOf": [
+    {
+     "id": "https://sales-discs-thanksgiving-lands.trycloudflare.com/tonkin-1950.json/canvas/7",
+     "type": "Canvas",
+     "label": {
+      "none": [
+       "Qu\u1ea3ng Y\u00ean"
+      ]
+     },
+     "partOf": [
+      {
+       "id": "https://sales-discs-thanksgiving-lands.trycloudflare.com/tonkin-1950.json",
+       "type": "Manifest",
+       "label": {
+        "none": [
+         "B\u1ea3n \u0111\u1ed3 h\u00e0nh ch\u00ednh c\u00e1c t\u1ec9nh Trung Ch\u00e2u B\u1eafc Vi\u1ec7t (1950)"
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "selector": {
+   "type": "SvgSelector",
+   "value": "<svg width=\"9129\" height=\"11597\"><polygon points=\"384,657 8676,682 8685,10790 393,10764\" /></svg>"
+  }
+ },
+ "body": {
+  "type": "FeatureCollection",
+  "transformation": {
+   "type": "polynomial",
+   "options": {
+    "order": 1
+   }
+  },
+  "features": [
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      740,
+      8796
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.741456,
+      20.520459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      716,
+      2368
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.741456,
+      20.880459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      3748,
+      5592
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.921456,
+      20.700459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      3744,
+      8804
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.921456,
+      20.520459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      728,
+      5584
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.741456,
+      20.700459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      3756,
+      2384
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      106.921456,
+      20.880459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      6800,
+      2400
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      107.101456,
+      20.880459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      6804,
+      8804
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      107.101456,
+      20.520459
+     ]
+    }
+   },
+   {
+    "type": "Feature",
+    "properties": {
+     "resourceCoords": [
+      6804,
+      5600
+     ]
+    },
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      107.101456,
+      20.700459
+     ]
+    }
+   }
+  ],
+  "_allmaps": {
+   "id": "https://annotations.allmaps.org/maps/504f0e30f6d92c87",
+   "version": "https://annotations.allmaps.org/maps/504f0e30f6d92c87@38b73a612aa503a9",
+   "image": {
+    "id": "https://annotations.allmaps.org/images/24ff358592615889",
+    "version": "https://annotations.allmaps.org/images/24ff358592615889@a9d35bb78198f944",
+    "canvases": [
+     {
+      "id": "https://annotations.allmaps.org/canvases/d877fe8bdc76cef4",
+      "manifests": [
+       {
+        "id": "https://annotations.allmaps.org/manifests/38cf461427c6c368"
+       }
+      ]
+     }
+    ]
+   },
+   "scale": 0.161486,
+   "area": 3213899235.93
+  }
+ }
+}
