@@ -1,0 +1,10230 @@
+{
+  "map_id": "e9fc1c66-a004-414e-8e17-4599445662fd",
+  "run_id": "accuracy-bentre-1",
+  "model": "gemini-3.8-flash",
+  "prompt": "seq-v1",
+  "n_tiles_total": 30,
+  "n_tiles_processed": 30,
+  "n_raw": 543,
+  "n_deduped": 387,
+  "extractions": [
+    {
+      "text": "ARRO",
+      "category": "place",
+      "language": "fr",
+      "bbox_px": [
+        288.0,
+        843.0,
+        85.0,
+        157.0
+      ],
+      "rotation_deg": -68,
+      "confidence": 0.85,
+      "notes": "continues outside bottom-left edge",
+      "frame_idx": 1,
+      "global_bbox": [
+        2791.2,
+        2023.2,
+        204.0,
+        376.8
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Poste de Tram",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        587.0,
+        716.0,
+        84.0,
+        16.0
+      ],
+      "rotation_deg": -13,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3508.8,
+        1718.4,
+        201.6,
+        38.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rte Tấn de Thủy Vĩnh",
+      "category": "street",
+      "language": "mixed",
+      "bbox_px": [
+        444.0,
+        752.0,
+        185.0,
+        62.0
+      ],
+      "rotation_deg": -17,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3165.6,
+        1804.8,
+        444.0,
+        148.8
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Lợi",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        632.0,
+        740.0,
+        120.0,
+        60.0
+      ],
+      "rotation_deg": -15,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3616.8,
+        1776.0,
+        288.0,
+        144.0
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông à Bentre",
+      "category": "hydrology",
+      "language": "mixed",
+      "bbox_px": [
+        733.0,
+        737.0,
+        107.0,
+        36.0
+      ],
+      "rotation_deg": 5,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3859.2,
+        1768.8,
+        256.8,
+        86.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Eglise",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        808.0,
+        750.0,
+        36.0,
+        14.0
+      ],
+      "rotation_deg": 25,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4039.2,
+        1800.0,
+        86.4,
+        33.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Kè",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        627.0,
+        799.0,
+        39.0,
+        13.0
+      ],
+      "rotation_deg": -12,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3604.8,
+        1917.6,
+        93.6,
+        31.2
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Qui",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        542.0,
+        814.0,
+        82.0,
+        20.0
+      ],
+      "rotation_deg": -5,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3400.8,
+        1953.6,
+        196.8,
+        48.0
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Khoán Lệ",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        565.0,
+        801.0,
+        53.0,
+        14.0
+      ],
+      "rotation_deg": -20,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3456.0,
+        1922.4,
+        127.2,
+        33.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông Hàm Long",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        454.0,
+        824.0,
+        115.0,
+        126.0
+      ],
+      "rotation_deg": -48,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3189.6,
+        1977.6,
+        276.0,
+        302.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        557.0,
+        858.0,
+        65.0,
+        30.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3436.8,
+        2059.2,
+        156.0,
+        72.0
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thủy Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        688.0,
+        825.0,
+        115.0,
+        59.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3751.2,
+        1980.0,
+        276.0,
+        141.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Bến Rớ",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        703.0,
+        868.0,
+        87.0,
+        34.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3787.2,
+        2083.2,
+        208.8,
+        81.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Kè",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        619.0,
+        870.0,
+        13.0,
+        37.0
+      ],
+      "rotation_deg": -80,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3585.6,
+        2088.0,
+        31.2,
+        88.8
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Lương",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        612.0,
+        921.0,
+        100.0,
+        19.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3568.8,
+        2210.4,
+        240.0,
+        45.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Long Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        650.0,
+        959.0,
+        98.0,
+        41.0
+      ],
+      "rotation_deg": -15,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3660.0,
+        2301.6,
+        235.2,
+        98.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ông Quản",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        713.0,
+        915.0,
+        18.0,
+        43.0
+      ],
+      "rotation_deg": -80,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3811.2,
+        2196.0,
+        43.2,
+        103.2
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Quới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        814.0,
+        790.0,
+        115.0,
+        29.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4053.6,
+        1896.0,
+        276.0,
+        69.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Lộc",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        790.0,
+        911.0,
+        48.0,
+        17.0
+      ],
+      "rotation_deg": -15,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3996.0,
+        2186.4,
+        115.2,
+        40.8
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Hựu Nước",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        826.0,
+        944.0,
+        44.0,
+        30.0
+      ],
+      "rotation_deg": -60,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4082.4,
+        2265.6,
+        105.6,
+        72.0
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Trước Bạt",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        945.0,
+        782.0,
+        55.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.75,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4368.0,
+        1876.8,
+        132.0,
+        55.2
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Route",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        904.0,
+        831.0,
+        37.0,
+        16.0
+      ],
+      "rotation_deg": -10,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4269.6,
+        1994.4,
+        88.8,
+        38.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mon cne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        934.0,
+        847.0,
+        43.0,
+        14.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4341.6,
+        2032.8,
+        103.2,
+        33.6
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Sóc Sải",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        899.0,
+        856.0,
+        56.0,
+        38.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4257.6,
+        2054.4,
+        134.4,
+        91.2
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tiền",
+      "category": "other",
+      "language": "vi",
+      "bbox_px": [
+        887.0,
+        911.0,
+        65.0,
+        46.0
+      ],
+      "rotation_deg": -20,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4228.8,
+        2186.4,
+        156.0,
+        110.4
+      ],
+      "_tile_origin": [
+        2100,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "NORD",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        891.0,
+        366.0,
+        44.0,
+        15.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6338.4,
+        878.4,
+        105.6,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Phước Xép",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        139.0,
+        667.0,
+        78.0,
+        25.0
+      ],
+      "rotation_deg": -18,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4533.6,
+        1600.8,
+        187.2,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Triệu An",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        223.0,
+        656.0,
+        68.0,
+        18.0
+      ],
+      "rotation_deg": -10,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4735.2,
+        1574.4,
+        163.2,
+        43.2
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        175.0,
+        680.0,
+        48.0,
+        14.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4620.0,
+        1632.0,
+        115.2,
+        33.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        73.0,
+        700.0,
+        172.0,
+        28.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4375.2,
+        1680.0,
+        412.8,
+        67.2
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Trầu",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        143.0,
+        719.0,
+        16.0,
+        45.0
+      ],
+      "rotation_deg": -85,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4543.2,
+        1725.6,
+        38.4,
+        108.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Quảng Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        188.0,
+        766.0,
+        113.0,
+        25.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4651.2,
+        1838.4,
+        271.2,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        356.0,
+        649.0,
+        44.0,
+        12.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5054.4,
+        1557.6,
+        105.6,
+        28.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ba Lai",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        410.0,
+        645.0,
+        113.0,
+        26.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5184.0,
+        1548.0,
+        271.2,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Đa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        348.0,
+        663.0,
+        98.0,
+        25.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5035.2,
+        1591.2,
+        235.2,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bờ Kiệu",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        437.0,
+        684.0,
+        16.0,
+        43.0
+      ],
+      "rotation_deg": -80,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5248.8,
+        1641.6,
+        38.4,
+        103.2
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Gấm",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        411.0,
+        715.0,
+        19.0,
+        37.0
+      ],
+      "rotation_deg": -70,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5186.4,
+        1716.0,
+        45.6,
+        88.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Tường",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        307.0,
+        743.0,
+        149.0,
+        27.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4936.8,
+        1783.2,
+        357.6,
+        64.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Hựu",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        504.0,
+        677.0,
+        137.0,
+        37.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5409.6,
+        1624.8,
+        328.8,
+        88.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Xếp",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        487.0,
+        698.0,
+        47.0,
+        17.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5368.8,
+        1675.2,
+        112.8,
+        40.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Cát",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        542.0,
+        717.0,
+        41.0,
+        15.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5500.8,
+        1720.8,
+        98.4,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Trang",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        637.0,
+        731.0,
+        56.0,
+        16.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5728.8,
+        1754.4,
+        134.4,
+        38.4
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Hậu",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        463.0,
+        762.0,
+        107.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5311.2,
+        1828.8,
+        256.8,
+        57.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        562.0,
+        746.0,
+        128.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5548.8,
+        1790.4,
+        307.2,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Canal Turc",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        493.0,
+        727.0,
+        30.0,
+        218.0
+      ],
+      "rotation_deg": -80,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5383.2,
+        1744.8,
+        72.0,
+        523.2
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Route de Vĩnh Long à Bentre",
+      "category": "street",
+      "language": "mixed",
+      "bbox_px": [
+        183.0,
+        800.0,
+        260.0,
+        27.0
+      ],
+      "rotation_deg": 2,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4639.2,
+        1920.0,
+        624.0,
+        64.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sơn Thuận",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        409.0,
+        829.0,
+        129.0,
+        26.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5181.6,
+        1989.6,
+        309.6,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sơn Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        359.0,
+        868.0,
+        83.0,
+        41.0
+      ],
+      "rotation_deg": 25,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5061.6,
+        2083.2,
+        199.2,
+        98.4
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        336.0,
+        846.0,
+        48.0,
+        16.0
+      ],
+      "rotation_deg": 20,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5006.4,
+        2030.4,
+        115.2,
+        38.4
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        408.0,
+        859.0,
+        44.0,
+        15.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5179.2,
+        2061.6,
+        105.6,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        450.0,
+        905.0,
+        46.0,
+        14.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5280.0,
+        2172.0,
+        110.4,
+        33.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thanh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        561.0,
+        835.0,
+        116.0,
+        47.0
+      ],
+      "rotation_deg": 18,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5546.4,
+        2004.0,
+        278.4,
+        112.8
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ancne Rte de Mỹ Tho",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        606.0,
+        804.0,
+        25.0,
+        48.0
+      ],
+      "rotation_deg": 80,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5654.4,
+        1929.6,
+        60.0,
+        115.2
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Nouvelle Route",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        638.0,
+        788.0,
+        44.0,
+        80.0
+      ],
+      "rotation_deg": 65,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5731.2,
+        1891.2,
+        105.6,
+        192.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Hữu",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        759.0,
+        831.0,
+        123.0,
+        39.0
+      ],
+      "rotation_deg": 18,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6021.6,
+        1994.4,
+        295.2,
+        93.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        473.0,
+        925.0,
+        83.0,
+        74.0
+      ],
+      "rotation_deg": -45,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5335.2,
+        2220.0,
+        199.2,
+        177.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Khương",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        687.0,
+        924.0,
+        144.0,
+        34.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5848.8,
+        2217.6,
+        345.6,
+        81.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        738.0,
+        893.0,
+        46.0,
+        14.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5971.2,
+        2143.2,
+        110.4,
+        33.6
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tư Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        799.0,
+        897.0,
+        88.0,
+        45.0
+      ],
+      "rotation_deg": 40,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6117.6,
+        2152.8,
+        211.2,
+        108.0
+      ],
+      "_tile_origin": [
+        4200,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Trường",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        92.0,
+        887.0,
+        56.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6520.8,
+        2128.8,
+        134.4,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đại Định",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        67.0,
+        938.0,
+        77.0,
+        26.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6460.8,
+        2251.2,
+        184.8,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ancne Canal",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        234.0,
+        938.0,
+        41.0,
+        14.0
+      ],
+      "rotation_deg": -20,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6861.6,
+        2251.2,
+        98.4,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mon cne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        235.0,
+        974.0,
+        38.0,
+        14.0
+      ],
+      "rotation_deg": -20,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6864.0,
+        2337.6,
+        91.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Quới Sơn",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        136.0,
+        904.0,
+        30.0,
+        47.0
+      ],
+      "rotation_deg": 70,
+      "confidence": 0.8,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6626.4,
+        2169.6,
+        72.0,
+        112.8
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "K M E N T D E",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        0.0,
+        608.0,
+        695.0,
+        372.0
+      ],
+      "rotation_deg": 28.0,
+      "confidence": 0.9,
+      "notes": "assembled from edge fragments (spatial)",
+      "frame_idx": 0,
+      "global_bbox": [
+        6300.0,
+        1459.2,
+        1668.0,
+        892.8
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Anct Canal",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        232.0,
+        956.0,
+        40.0,
+        32.0
+      ],
+      "rotation_deg": 35.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        6856.8,
+        2294.4,
+        96.0,
+        76.8
+      ],
+      "_tile_origin": [
+        6300,
+        0
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "ARRONDISSEMENT DE VINH LON",
+      "category": "place",
+      "language": "fr",
+      "bbox_px": [
+        305.0,
+        5.0,
+        545.0,
+        995.0
+      ],
+      "rotation_deg": -56,
+      "confidence": 0.95,
+      "notes": "continues outside top and bottom edges; [A]RRONDISSEMENT DE VINH LON[G]",
+      "frame_idx": 1,
+      "global_bbox": [
+        2832.0,
+        2112.0,
+        1308.0,
+        2388.0
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        458.0,
+        0.0,
+        93.0,
+        80.0
+      ],
+      "rotation_deg": -45,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3199.2,
+        2100.0,
+        223.2,
+        192.0
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Hiệp",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        779.0,
+        182.0,
+        140.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3969.6,
+        2536.8,
+        336.0,
+        57.6
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vĩnh Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        808.0,
+        332.0,
+        97.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4039.2,
+        2896.8,
+        232.8,
+        50.4
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Khánh Hội",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        735.0,
+        440.0,
+        93.0,
+        20.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3864.0,
+        3156.0,
+        223.2,
+        48.0
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Long",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        855.0,
+        511.0,
+        75.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4152.0,
+        3326.4,
+        180.0,
+        55.2
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thành Trung",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        754.0,
+        571.0,
+        91.0,
+        16.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        3909.6,
+        3470.4,
+        218.4,
+        38.4
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Hựu",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        857.0,
+        642.0,
+        80.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 1,
+      "global_bbox": [
+        4156.8,
+        3640.8,
+        192.0,
+        50.4
+      ],
+      "_tile_origin": [
+        2100,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "BENTRE",
+      "category": "place",
+      "language": "fr",
+      "bbox_px": [
+        744.0,
+        172.0,
+        101.0,
+        28.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5985.6,
+        2512.8,
+        242.4,
+        67.2
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đức",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        787.0,
+        197.0,
+        45.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6088.8,
+        2572.8,
+        108.0,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "MINH THIỆN",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        119.0,
+        333.0,
+        207.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4485.6,
+        2899.2,
+        496.8,
+        57.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "MINH HÓA",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        428.0,
+        568.0,
+        186.0,
+        26.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5227.2,
+        3463.2,
+        446.4,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        225.0,
+        80.0,
+        89.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4740.0,
+        2292.0,
+        213.6,
+        57.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Trường Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        158.0,
+        124.0,
+        113.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4579.2,
+        2397.6,
+        271.2,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Mỹ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        126.0,
+        209.0,
+        94.0,
+        25.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4502.4,
+        2601.6,
+        225.6,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Ngãi",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        249.0,
+        198.0,
+        86.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4797.6,
+        2575.2,
+        206.4,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thạnh Sơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        482.0,
+        175.0,
+        87.0,
+        85.0
+      ],
+      "rotation_deg": -55,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5356.8,
+        2520.0,
+        208.8,
+        204.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Nguyên",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        596.0,
+        116.0,
+        109.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5630.4,
+        2378.4,
+        261.6,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Mới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        662.0,
+        137.0,
+        68.0,
+        19.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5788.8,
+        2428.8,
+        163.2,
+        45.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Giữa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        918.0,
+        169.0,
+        74.0,
+        20.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6403.2,
+        2505.6,
+        177.6,
+        48.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lương Thanh Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        838.0,
+        241.0,
+        102.0,
+        43.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6211.2,
+        2678.4,
+        244.8,
+        103.2
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Nhon Sơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        827.0,
+        321.0,
+        104.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6184.8,
+        2870.4,
+        249.6,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Long Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        735.0,
+        397.0,
+        98.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5964.0,
+        3052.8,
+        235.2,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Long Sơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        779.0,
+        502.0,
+        94.0,
+        26.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6069.6,
+        3304.8,
+        225.6,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Long Hưng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        825.0,
+        584.0,
+        108.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6180.0,
+        3501.6,
+        259.2,
+        57.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bến Tranh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        772.0,
+        616.0,
+        85.0,
+        20.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6052.8,
+        3578.4,
+        204.0,
+        48.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Ốc",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        774.0,
+        659.0,
+        126.0,
+        127.0
+      ],
+      "rotation_deg": -55,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6057.6,
+        3681.6,
+        302.4,
+        304.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Hạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        166.0,
+        390.0,
+        119.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4598.4,
+        3036.0,
+        285.6,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Gia Phước",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        73.0,
+        402.0,
+        91.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4375.2,
+        3064.8,
+        218.4,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Gia Khánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        109.0,
+        469.0,
+        93.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4461.6,
+        3225.6,
+        223.2,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Ba Vát",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        237.0,
+        431.0,
+        95.0,
+        19.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4768.8,
+        3134.4,
+        228.0,
+        45.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đông Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        286.0,
+        461.0,
+        104.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4886.4,
+        3206.4,
+        249.6,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hòa Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        430.0,
+        452.0,
+        79.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5232.0,
+        3184.8,
+        189.6,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thành Hóa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        508.0,
+        372.0,
+        93.0,
+        110.0
+      ],
+      "rotation_deg": -45,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5419.2,
+        2992.8,
+        223.2,
+        264.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thạnh Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        552.0,
+        353.0,
+        103.0,
+        126.0
+      ],
+      "rotation_deg": -55,
+      "confidence": 0.85,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5524.8,
+        2947.2,
+        247.2,
+        302.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thạnh Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        209.0,
+        617.0,
+        95.0,
+        47.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4701.6,
+        3580.8,
+        228.0,
+        112.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Giồng Kèo",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        297.0,
+        575.0,
+        117.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4912.8,
+        3480.0,
+        280.8,
+        57.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Lộc",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        457.0,
+        608.0,
+        67.0,
+        19.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5296.8,
+        3559.2,
+        160.8,
+        45.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hội Phước",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        528.0,
+        644.0,
+        82.0,
+        19.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5467.2,
+        3645.6,
+        196.8,
+        45.6
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đình Phước",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        620.0,
+        666.0,
+        95.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5688.0,
+        3698.4,
+        228.0,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Hội",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        425.0,
+        686.0,
+        88.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5220.0,
+        3746.4,
+        211.2,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mo Cày",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        548.0,
+        747.0,
+        63.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5515.2,
+        3892.8,
+        151.2,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Quới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        139.0,
+        715.0,
+        78.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4533.6,
+        3816.0,
+        187.2,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        221.0,
+        746.0,
+        108.0,
+        25.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4730.4,
+        3890.4,
+        259.2,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tịch Khánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        180.0,
+        807.0,
+        85.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4632.0,
+        4036.8,
+        204.0,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vĩnh Khánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        317.0,
+        820.0,
+        99.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        4960.8,
+        4068.0,
+        237.6,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        636.0,
+        810.0,
+        78.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5726.4,
+        4044.0,
+        187.2,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đa Phước",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        535.0,
+        851.0,
+        87.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5484.0,
+        4142.4,
+        208.8,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Khánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        757.0,
+        827.0,
+        110.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        6016.8,
+        4084.8,
+        264.0,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hiệp Phước",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        515.0,
+        912.0,
+        94.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5436.0,
+        4288.8,
+        225.6,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        699.0,
+        914.0,
+        69.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 2,
+      "global_bbox": [
+        5877.6,
+        4293.6,
+        165.6,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        705.0,
+        312.0,
+        79.0,
+        64.0
+      ],
+      "rotation_deg": -30,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7992.0,
+        2848.8,
+        189.6,
+        153.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Vung",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        528.0,
+        222.0,
+        73.0,
+        62.0
+      ],
+      "rotation_deg": -30,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7567.2,
+        2632.8,
+        175.2,
+        148.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phong Mỹ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        311.0,
+        169.0,
+        92.0,
+        27.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7046.4,
+        2505.6,
+        220.8,
+        64.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phong Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        250.0,
+        266.0,
+        109.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6900.0,
+        2738.4,
+        261.6,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Mỹ Lồng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        176.0,
+        239.0,
+        100.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6722.4,
+        2673.6,
+        240.0,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Châu Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        381.0,
+        276.0,
+        83.0,
+        21.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7214.4,
+        2762.4,
+        199.2,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Châu Thới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        478.0,
+        345.0,
+        131.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7447.2,
+        2928.0,
+        314.4,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Châu Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        713.0,
+        444.0,
+        99.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        8011.2,
+        3165.6,
+        237.6,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Tiên",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        615.0,
+        567.0,
+        92.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7776.0,
+        3460.8,
+        220.8,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lương Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        109.0,
+        452.0,
+        99.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6561.6,
+        3184.8,
+        237.6,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lương Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        258.0,
+        461.0,
+        99.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6919.2,
+        3206.4,
+        237.6,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Chánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        402.0,
+        451.0,
+        88.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7264.8,
+        3182.4,
+        211.2,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Long",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        289.0,
+        587.0,
+        84.0,
+        23.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6993.6,
+        3508.8,
+        201.6,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        164.0,
+        620.0,
+        77.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6693.6,
+        3588.0,
+        184.8,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        110.0,
+        726.0,
+        85.0,
+        24.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        6564.0,
+        3842.4,
+        204.0,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hương Điềm",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        333.0,
+        712.0,
+        60.0,
+        37.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7099.2,
+        3808.8,
+        144.0,
+        88.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Giồng Trôm",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        549.0,
+        622.0,
+        110.0,
+        22.0
+      ],
+      "rotation_deg": 0,
+      "confidence": 0.95,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7617.6,
+        3592.8,
+        264.0,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thanh Đông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        512.0,
+        786.0,
+        137.0,
+        84.0
+      ],
+      "rotation_deg": -30,
+      "confidence": 0.9,
+      "notes": "",
+      "frame_idx": 3,
+      "global_bbox": [
+        7528.8,
+        3986.4,
+        328.8,
+        201.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "H",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        82.0,
+        39.0,
+        31.0,
+        41.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6496.8,
+        2193.6,
+        74.4,
+        98.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "A",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        179.0,
+        78.0,
+        33.0,
+        42.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        6729.6,
+        2287.2,
+        79.2,
+        100.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "N",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        277.0,
+        126.0,
+        31.0,
+        40.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        6964.8,
+        2402.4,
+        74.4,
+        96.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "H",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        374.0,
+        169.0,
+        31.0,
+        42.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7197.6,
+        2505.6,
+        74.4,
+        100.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Tứ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        47.0,
+        122.0,
+        69.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6412.8,
+        2392.8,
+        165.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chùa",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        63.0,
+        194.0,
+        23.0,
+        11.0
+      ],
+      "rotation_deg": 22.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        6451.2,
+        2565.6,
+        55.2,
+        26.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thế Hội",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        82.0,
+        187.0,
+        30.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        6496.8,
+        2548.8,
+        72.0,
+        48.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lương Mỹ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        100.0,
+        203.0,
+        91.0,
+        30.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6540.0,
+        2587.2,
+        218.4,
+        72.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Nouveau",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        174.0,
+        183.0,
+        39.0,
+        17.0
+      ],
+      "rotation_deg": -65.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        6717.6,
+        2539.2,
+        93.6,
+        40.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        181.0,
+        236.0,
+        32.0,
+        12.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6734.4,
+        2666.4,
+        76.8,
+        28.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phong Nam",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        186.0,
+        37.0,
+        95.0,
+        200.0
+      ],
+      "rotation_deg": -66.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6746.4,
+        2188.8,
+        228.0,
+        480.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Thon",
+      "category": "hydrology",
+      "language": "mixed",
+      "bbox_px": [
+        284.0,
+        114.0,
+        15.0,
+        78.0
+      ],
+      "rotation_deg": -78.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6981.6,
+        2373.6,
+        36.0,
+        187.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Plat",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        308.0,
+        118.0,
+        12.0,
+        43.0
+      ],
+      "rotation_deg": -80.0,
+      "confidence": 0.7,
+      "frame_idx": 0,
+      "global_bbox": [
+        7039.2,
+        2383.2,
+        28.8,
+        103.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bàu Qui",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        323.0,
+        107.0,
+        19.0,
+        58.0
+      ],
+      "rotation_deg": 71.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7075.2,
+        2356.8,
+        45.6,
+        139.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Linh",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        403.0,
+        201.0,
+        38.0,
+        24.0
+      ],
+      "rotation_deg": -31.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7267.2,
+        2582.4,
+        91.2,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Moncne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        484.0,
+        191.0,
+        33.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7461.6,
+        2558.4,
+        79.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        476.0,
+        222.0,
+        29.0,
+        14.0
+      ],
+      "rotation_deg": 21.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7442.4,
+        2632.8,
+        69.6,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Khanh",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        435.0,
+        269.0,
+        39.0,
+        21.0
+      ],
+      "rotation_deg": -32.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7344.0,
+        2745.6,
+        93.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Cne",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        486.0,
+        267.0,
+        44.0,
+        12.0
+      ],
+      "rotation_deg": 25.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7466.4,
+        2740.8,
+        105.6,
+        28.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Commune",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        538.0,
+        307.0,
+        65.0,
+        14.0
+      ],
+      "rotation_deg": 3.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7591.2,
+        2836.8,
+        156.0,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Moncne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        479.0,
+        329.0,
+        31.0,
+        14.0
+      ],
+      "rotation_deg": 28.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7449.6,
+        2889.6,
+        74.4,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        504.0,
+        344.0,
+        38.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7509.6,
+        2925.6,
+        91.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Xẻo Mẹt",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        600.0,
+        365.0,
+        41.0,
+        28.0
+      ],
+      "rotation_deg": -37.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7740.0,
+        2976.0,
+        98.4,
+        67.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Moncne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        684.0,
+        389.0,
+        37.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7941.6,
+        3033.6,
+        88.8,
+        36.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Tri-Kôm",
+      "category": "hydrology",
+      "language": "mixed",
+      "bbox_px": [
+        706.0,
+        399.0,
+        69.0,
+        18.0
+      ],
+      "rotation_deg": 13.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7994.4,
+        3057.6,
+        165.6,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        713.0,
+        421.0,
+        46.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8011.2,
+        3110.4,
+        110.4,
+        40.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Trường",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        773.0,
+        439.0,
+        12.0,
+        38.0
+      ],
+      "rotation_deg": -87.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        8155.2,
+        3153.6,
+        28.8,
+        91.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Ba Tri",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        719.0,
+        488.0,
+        16.0,
+        75.0
+      ],
+      "rotation_deg": -79.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8025.6,
+        3271.2,
+        38.4,
+        180.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Kôm",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        735.0,
+        604.0,
+        9.0,
+        27.0
+      ],
+      "rotation_deg": -87.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        8064.0,
+        3549.6,
+        21.6,
+        64.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ông Chú",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        956.0,
+        597.0,
+        18.0,
+        55.0
+      ],
+      "rotation_deg": -83.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        8594.4,
+        3532.8,
+        43.2,
+        132.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ba Tri",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        478.0,
+        403.0,
+        33.0,
+        32.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7447.2,
+        3067.2,
+        79.2,
+        76.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        499.0,
+        427.0,
+        43.0,
+        14.0
+      ],
+      "rotation_deg": -16.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7497.6,
+        3124.8,
+        103.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "A Bte Sớn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        0.0,
+        319.0,
+        32.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.7,
+      "notes": "continues outside left edge",
+      "frame_idx": 0,
+      "global_bbox": [
+        6300.0,
+        2865.6,
+        76.8,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cái Cối Tắc",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        151.0,
+        381.0,
+        30.0,
+        77.0
+      ],
+      "rotation_deg": -64.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6662.4,
+        3014.4,
+        72.0,
+        184.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Bà Vông",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        228.0,
+        411.0,
+        57.0,
+        18.0
+      ],
+      "rotation_deg": -11.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6847.2,
+        3086.4,
+        136.8,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lương Quới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        323.0,
+        401.0,
+        89.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        7075.2,
+        3062.4,
+        213.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "BÌNH HOÀ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        525.0,
+        486.0,
+        126.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7560.0,
+        3266.4,
+        302.4,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "B Ả O L Ộ C",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        515.0,
+        508.0,
+        383.0,
+        40.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7536.0,
+        3319.2,
+        919.2,
+        96.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Khương",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        777.0,
+        569.0,
+        133.0,
+        29.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8164.8,
+        3465.6,
+        319.2,
+        69.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bến Tre",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        474.0,
+        624.0,
+        47.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7437.6,
+        3597.6,
+        112.8,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        478.0,
+        642.0,
+        42.0,
+        12.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7447.2,
+        3640.8,
+        100.8,
+        28.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Cne",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        475.0,
+        659.0,
+        53.0,
+        11.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7440.0,
+        3681.6,
+        127.2,
+        26.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bình Thành",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        550.0,
+        727.0,
+        128.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7620.0,
+        3844.8,
+        307.2,
+        60.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Tân Thanh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        486.0,
+        755.0,
+        107.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        7466.4,
+        3912.0,
+        256.8,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Route de Bao Thạnh",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        587.0,
+        672.0,
+        105.0,
+        30.0
+      ],
+      "rotation_deg": 13.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7708.8,
+        3712.8,
+        252.0,
+        72.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hòa Bình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        717.0,
+        728.0,
+        67.0,
+        19.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8020.8,
+        3847.2,
+        160.8,
+        45.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Bình Thạnh",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        873.0,
+        672.0,
+        79.0,
+        39.0
+      ],
+      "rotation_deg": 23.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8395.2,
+        3712.8,
+        189.6,
+        93.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        874.0,
+        827.0,
+        68.0,
+        59.0
+      ],
+      "rotation_deg": 40.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        8397.6,
+        4084.8,
+        163.2,
+        141.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        949.0,
+        747.0,
+        51.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        8577.6,
+        3892.8,
+        122.4,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ B...",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        957.0,
+        893.0,
+        40.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.7,
+      "notes": "continues outside right edge",
+      "frame_idx": 0,
+      "global_bbox": [
+        8596.8,
+        4243.2,
+        96.0,
+        48.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "B Ả O",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        834.0,
+        810.0,
+        89.0,
+        35.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        8301.6,
+        4044.0,
+        213.6,
+        84.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        457.0,
+        936.0,
+        43.0,
+        14.0
+      ],
+      "rotation_deg": 13.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7396.8,
+        4346.4,
+        103.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mon Cne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        410.0,
+        928.0,
+        38.0,
+        12.0
+      ],
+      "rotation_deg": -16.0,
+      "confidence": 0.7,
+      "frame_idx": 0,
+      "global_bbox": [
+        7284.0,
+        4327.2,
+        91.2,
+        28.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "P",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        376.0,
+        934.0,
+        28.0,
+        37.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7202.4,
+        4341.6,
+        67.2,
+        88.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Thanh Trung",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        390.0,
+        804.0,
+        53.0,
+        58.0
+      ],
+      "rotation_deg": 57.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7236.0,
+        4029.6,
+        127.2,
+        139.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        428.0,
+        725.0,
+        34.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7327.2,
+        3840.0,
+        81.6,
+        36.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mon Cne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        435.0,
+        737.0,
+        36.0,
+        12.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        7344.0,
+        3868.8,
+        86.4,
+        28.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "O",
+      "category": "other",
+      "language": "other",
+      "bbox_px": [
+        271.0,
+        824.0,
+        25.0,
+        35.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6950.4,
+        4077.6,
+        60.0,
+        84.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Canal Saotière ?",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        318.0,
+        642.0,
+        33.0,
+        19.0
+      ],
+      "rotation_deg": 23.0,
+      "confidence": 0.7,
+      "frame_idx": 0,
+      "global_bbox": [
+        7063.2,
+        3640.8,
+        79.2,
+        45.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        321.0,
+        674.0,
+        34.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        7070.4,
+        3717.6,
+        81.6,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bentre",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        238.0,
+        649.0,
+        39.0,
+        21.0
+      ],
+      "rotation_deg": 41.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6871.2,
+        3657.6,
+        93.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "B Ả O",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        140.0,
+        701.0,
+        88.0,
+        38.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        6636.0,
+        3782.4,
+        211.2,
+        91.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Mỹ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        18.0,
+        657.0,
+        98.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6343.2,
+        3676.8,
+        235.2,
+        60.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        93.0,
+        811.0,
+        107.0,
+        30.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6523.2,
+        4046.4,
+        256.8,
+        72.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "hánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        0.0,
+        888.0,
+        38.0,
+        22.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "notes": "continues outside left edge",
+      "frame_idx": 0,
+      "global_bbox": [
+        6300.0,
+        4231.2,
+        91.2,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        86.0,
+        885.0,
+        52.0,
+        33.0
+      ],
+      "rotation_deg": -43.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        6506.4,
+        4224.0,
+        124.8,
+        79.2
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Thủ Cửu",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        31.0,
+        702.0,
+        79.0,
+        24.0
+      ],
+      "rotation_deg": -20.0,
+      "confidence": 0.8,
+      "frame_idx": 0,
+      "global_bbox": [
+        6374.4,
+        3784.8,
+        189.6,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Thuận",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        0.0,
+        392.0,
+        70.0,
+        75.0
+      ],
+      "rotation_deg": -64.0,
+      "confidence": 0.85,
+      "notes": "continues outside left edge",
+      "frame_idx": 0,
+      "global_bbox": [
+        6300.0,
+        3040.8,
+        168.0,
+        180.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "de",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        77.0,
+        552.0,
+        23.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.7,
+      "frame_idx": 0,
+      "global_bbox": [
+        6484.8,
+        3424.8,
+        55.2,
+        38.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        67.0,
+        571.0,
+        74.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6460.8,
+        3470.4,
+        177.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        0.0,
+        582.0,
+        36.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "notes": "continues outside left edge",
+      "frame_idx": 0,
+      "global_bbox": [
+        6300.0,
+        3496.8,
+        86.4,
+        60.0
+      ],
+      "_tile_origin": [
+        6300,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "M Y T H O",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        63.0,
+        232.0,
+        545.0,
+        458.0
+      ],
+      "rotation_deg": -39.0,
+      "confidence": 0.95,
+      "notes": "spans frames 0-1",
+      "frame_idx": 1,
+      "global_bbox": [
+        8551.2,
+        2656.8,
+        1308.0,
+        1099.2
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ba - Lai",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        306.0,
+        659.0,
+        105.0,
+        30.0
+      ],
+      "rotation_deg": 37.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9134.4,
+        3681.6,
+        252.0,
+        72.0
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "TÂN THUẬN",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        140.0,
+        762.0,
+        114.0,
+        38.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8736.0,
+        3928.8,
+        273.6,
+        91.2
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        278.0,
+        731.0,
+        57.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9067.2,
+        3854.4,
+        136.8,
+        55.2
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Giồng Trôm Đông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        323.0,
+        804.0,
+        137.0,
+        30.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9175.2,
+        4029.6,
+        328.8,
+        72.0
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Xuân",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        304.0,
+        868.0,
+        51.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9129.6,
+        4183.2,
+        122.4,
+        48.0
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Bến Đình",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        78.0,
+        897.0,
+        101.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8587.2,
+        4252.8,
+        242.4,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        139.0,
+        938.0,
+        60.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8733.6,
+        4351.2,
+        144.0,
+        48.0
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Kiên",
+      "category": "other",
+      "language": "vi",
+      "bbox_px": [
+        451.0,
+        848.0,
+        25.0,
+        12.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 1,
+      "global_bbox": [
+        9482.4,
+        4135.2,
+        60.0,
+        28.8
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Xóm Bồn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        471.0,
+        856.0,
+        31.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 1,
+      "global_bbox": [
+        9530.4,
+        4154.4,
+        74.4,
+        33.6
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Gòn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        138.0,
+        864.0,
+        69.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 1,
+      "global_bbox": [
+        8731.2,
+        4173.6,
+        165.6,
+        43.2
+      ],
+      "_tile_origin": [
+        8400,
+        2100
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "OUEST",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        452.0,
+        178.0,
+        20.0,
+        68.0
+      ],
+      "rotation_deg": 90.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        1084.8,
+        4627.2,
+        48.0,
+        163.2
+      ],
+      "_tile_origin": [
+        0,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "COCHINCHINE FRANÇAISE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        116.0,
+        762.0,
+        563.0,
+        44.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "frame_idx": 1,
+      "global_bbox": [
+        2378.4,
+        6028.8,
+        1351.2,
+        105.6
+      ],
+      "_tile_origin": [
+        2100,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "PLAN TOPOGRAPHIQUE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        180.0,
+        853.0,
+        437.0,
+        43.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "frame_idx": 1,
+      "global_bbox": [
+        2532.0,
+        6247.2,
+        1048.8,
+        103.2
+      ],
+      "_tile_origin": [
+        2100,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "DE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        381.0,
+        911.0,
+        35.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "frame_idx": 1,
+      "global_bbox": [
+        3014.4,
+        6386.4,
+        84.0,
+        55.2
+      ],
+      "_tile_origin": [
+        2100,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "L'ARRONDISSEMENT DE BENTRE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        0.0,
+        966.0,
+        955.0,
+        34.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "notes": "spans frames 0-1",
+      "frame_idx": 1,
+      "global_bbox": [
+        2100.0,
+        6518.4,
+        2292.0,
+        81.6
+      ],
+      "_tile_origin": [
+        2100,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "LONG",
+      "category": "place",
+      "language": "fr",
+      "bbox_px": [
+        757.0,
+        21.0,
+        116.0,
+        145.0
+      ],
+      "rotation_deg": -49.0,
+      "confidence": 0.85,
+      "notes": "continues outside top edge, likely [VINH] LONG",
+      "frame_idx": 1,
+      "global_bbox": [
+        3916.8,
+        4250.4,
+        278.4,
+        348.0
+      ],
+      "_tile_origin": [
+        2100,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Branche",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        81.0,
+        0.0,
+        89.0,
+        93.0
+      ],
+      "rotation_deg": -48.0,
+      "confidence": 0.85,
+      "notes": "continues outside top edge",
+      "frame_idx": 2,
+      "global_bbox": [
+        4394.4,
+        4200.0,
+        213.6,
+        223.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        203.0,
+        61.0,
+        46.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        4687.2,
+        4346.4,
+        110.4,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Hùng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        225.0,
+        76.0,
+        52.0,
+        49.0
+      ],
+      "rotation_deg": -50.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        4740.0,
+        4382.4,
+        124.8,
+        117.6
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        239.0,
+        102.0,
+        33.0,
+        23.0
+      ],
+      "rotation_deg": -55.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        4773.6,
+        4444.8,
+        79.2,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ligne",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        329.0,
+        29.0,
+        36.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        4989.6,
+        4269.6,
+        86.4,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Télégraphe",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        418.0,
+        0.0,
+        52.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.7,
+      "notes": "continues outside top edge",
+      "frame_idx": 2,
+      "global_bbox": [
+        5203.2,
+        4200.0,
+        124.8,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Route de Khanh Thanh",
+      "category": "street",
+      "language": "mixed",
+      "bbox_px": [
+        383.0,
+        61.0,
+        178.0,
+        145.0
+      ],
+      "rotation_deg": -35.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5119.2,
+        4346.4,
+        427.2,
+        348.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Cimetière",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        318.0,
+        51.0,
+        51.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        4963.2,
+        4322.4,
+        122.4,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thanh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        361.0,
+        31.0,
+        129.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5066.4,
+        4274.4,
+        309.6,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tập",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        782.0,
+        25.0,
+        38.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        6076.8,
+        4260.0,
+        91.2,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Ông Tưng",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        754.0,
+        0.0,
+        46.0,
+        55.0
+      ],
+      "rotation_deg": -50.0,
+      "confidence": 0.75,
+      "frame_idx": 2,
+      "global_bbox": [
+        6009.6,
+        4200.0,
+        110.4,
+        132.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Canal",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        753.0,
+        61.0,
+        35.0,
+        23.0
+      ],
+      "rotation_deg": 25.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        6007.2,
+        4346.4,
+        84.0,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Eglise",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        720.0,
+        77.0,
+        43.0,
+        16.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        5928.0,
+        4384.8,
+        103.2,
+        38.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Xeo",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        825.0,
+        41.0,
+        30.0,
+        39.0
+      ],
+      "rotation_deg": -60.0,
+      "confidence": 0.75,
+      "frame_idx": 2,
+      "global_bbox": [
+        6180.0,
+        4298.4,
+        72.0,
+        93.6
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Khánh Hưng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        863.0,
+        10.0,
+        160.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "notes": "spans frames 2-3",
+      "frame_idx": 2,
+      "global_bbox": [
+        6271.2,
+        4224.0,
+        384.0,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tan Trung",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        841.0,
+        178.0,
+        93.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "notes": "spans frames 2-3",
+      "frame_idx": 2,
+      "global_bbox": [
+        6218.4,
+        4627.2,
+        223.2,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Định",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        707.0,
+        148.0,
+        80.0,
+        22.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5896.8,
+        4555.2,
+        192.0,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Cái Quao",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        669.0,
+        168.0,
+        126.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5805.6,
+        4603.2,
+        302.4,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thới",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        564.0,
+        218.0,
+        93.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5553.6,
+        4723.2,
+        223.2,
+        50.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ancien Fort",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        457.0,
+        157.0,
+        68.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        5296.8,
+        4576.8,
+        163.2,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Eglise",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        289.0,
+        134.0,
+        32.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        4893.6,
+        4521.6,
+        76.8,
+        36.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thành Thới Thạch",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        335.0,
+        229.0,
+        189.0,
+        131.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        5004.0,
+        4749.6,
+        453.6,
+        314.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Cá Chat",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        374.0,
+        238.0,
+        48.0,
+        44.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        5097.6,
+        4771.2,
+        115.2,
+        105.6
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Nậy",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        378.0,
+        332.0,
+        85.0,
+        59.0
+      ],
+      "rotation_deg": -35.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        5107.2,
+        4996.8,
+        204.0,
+        141.6
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ngãi Đăng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        602.0,
+        355.0,
+        107.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5644.8,
+        5052.0,
+        256.8,
+        62.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mo - Cày",
+      "category": "street",
+      "language": "vi",
+      "bbox_px": [
+        810.0,
+        370.0,
+        54.0,
+        53.0
+      ],
+      "rotation_deg": -60.0,
+      "confidence": 0.85,
+      "frame_idx": 2,
+      "global_bbox": [
+        6144.0,
+        5088.0,
+        129.6,
+        127.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tú Sơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        699.0,
+        403.0,
+        85.0,
+        22.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5877.6,
+        5167.2,
+        204.0,
+        52.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Comne",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        679.0,
+        379.0,
+        69.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        5829.6,
+        5109.6,
+        165.6,
+        40.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "du",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        595.0,
+        520.0,
+        42.0,
+        42.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5628.0,
+        5448.0,
+        100.8,
+        100.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "A R R O N D I S S E M E N T",
+      "category": "place",
+      "language": "fr",
+      "bbox_px": [
+        79.0,
+        317.0,
+        693.0,
+        626.0
+      ],
+      "rotation_deg": -49.0,
+      "confidence": 0.95,
+      "frame_idx": 2,
+      "global_bbox": [
+        4389.6,
+        4960.8,
+        1663.2,
+        1502.4
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vàm R. Ba Pho",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        674.0,
+        487.0,
+        79.0,
+        48.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        5817.6,
+        5368.8,
+        189.6,
+        115.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Trạch",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        682.0,
+        508.0,
+        108.0,
+        99.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.9,
+      "frame_idx": 2,
+      "global_bbox": [
+        5836.8,
+        5419.2,
+        259.2,
+        237.6
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thom",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        754.0,
+        552.0,
+        38.0,
+        23.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 2,
+      "global_bbox": [
+        6009.6,
+        5524.8,
+        91.2,
+        55.2
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Muong",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        737.0,
+        538.0,
+        48.0,
+        42.0
+      ],
+      "rotation_deg": -60.0,
+      "confidence": 0.75,
+      "frame_idx": 2,
+      "global_bbox": [
+        5968.8,
+        5491.2,
+        115.2,
+        100.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "K. Ba Liêu",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        701.0,
+        499.0,
+        58.0,
+        47.0
+      ],
+      "rotation_deg": -65.0,
+      "confidence": 0.75,
+      "frame_idx": 2,
+      "global_bbox": [
+        5882.4,
+        5397.6,
+        139.2,
+        112.8
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hòa Mí",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        864.0,
+        626.0,
+        81.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "notes": "spans frames 2-3",
+      "frame_idx": 2,
+      "global_bbox": [
+        6273.6,
+        5702.4,
+        194.4,
+        60.0
+      ],
+      "_tile_origin": [
+        4200,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Thi He",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        329.0,
+        244.0,
+        57.0,
+        24.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.8,
+      "frame_idx": 3,
+      "global_bbox": [
+        7089.6,
+        4785.6,
+        136.8,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thanh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        581.0,
+        168.0,
+        77.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        7694.4,
+        4603.2,
+        184.8,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Cái Bông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        708.0,
+        237.0,
+        72.0,
+        22.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        7999.2,
+        4768.8,
+        172.8,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Cimetière chrétien",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        726.0,
+        182.0,
+        101.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 3,
+      "global_bbox": [
+        8042.4,
+        4636.8,
+        242.4,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Chàm",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        848.0,
+        101.0,
+        84.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 3,
+      "global_bbox": [
+        8335.2,
+        4442.4,
+        201.6,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Cát",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        813.0,
+        137.0,
+        73.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 3,
+      "global_bbox": [
+        8251.2,
+        4528.8,
+        175.2,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Nhơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        913.0,
+        116.0,
+        87.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        8491.2,
+        4478.4,
+        208.8,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông Hàm Luông",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        409.0,
+        404.0,
+        591.0,
+        357.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.98,
+      "frame_idx": 3,
+      "global_bbox": [
+        7281.6,
+        5169.6,
+        1418.4,
+        856.8
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Xeo Ong Tranh",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        257.0,
+        451.0,
+        76.0,
+        22.0
+      ],
+      "rotation_deg": 15.0,
+      "confidence": 0.8,
+      "frame_idx": 3,
+      "global_bbox": [
+        6916.8,
+        5282.4,
+        182.4,
+        52.8
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "M I N H P H Ú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        27.0,
+        553.0,
+        403.0,
+        40.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        6364.8,
+        5527.2,
+        967.2,
+        96.0
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Linh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        63.0,
+        19.0,
+        78.0,
+        86.0
+      ],
+      "rotation_deg": -57.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6451.2,
+        4245.6,
+        187.2,
+        206.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Phong",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        82.0,
+        3.0,
+        155.0,
+        148.0
+      ],
+      "rotation_deg": -57.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6496.8,
+        4207.2,
+        372.0,
+        355.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Heo",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        165.0,
+        122.0,
+        85.0,
+        106.0
+      ],
+      "rotation_deg": -57.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6696.0,
+        4492.8,
+        204.0,
+        254.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Tập",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        80.0,
+        131.0,
+        57.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6492.0,
+        4514.4,
+        136.8,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hương",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        82.0,
+        184.0,
+        76.0,
+        59.0
+      ],
+      "rotation_deg": -47.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6496.8,
+        4641.6,
+        182.4,
+        141.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Lễ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        278.0,
+        76.0,
+        82.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6967.2,
+        4382.4,
+        196.8,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "P H Ư Ớ C",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        376.0,
+        61.0,
+        237.0,
+        269.0
+      ],
+      "rotation_deg": -50.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7202.4,
+        4346.4,
+        568.8,
+        645.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Nhượng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        421.0,
+        108.0,
+        147.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7310.4,
+        4459.2,
+        352.8,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sơn Đốc",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        467.0,
+        78.0,
+        71.0,
+        19.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7420.8,
+        4387.2,
+        170.4,
+        45.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Ngãi Trung",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        626.0,
+        88.0,
+        150.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7802.4,
+        4411.2,
+        360.0,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mỹ Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        802.0,
+        69.0,
+        102.0,
+        24.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8224.8,
+        4365.6,
+        244.8,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Chàm",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        856.0,
+        103.0,
+        933.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8354.4,
+        4447.2,
+        2239.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Các",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        813.0,
+        140.0,
+        883.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8251.2,
+        4536.0,
+        2119.2,
+        38.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Khai",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        402.0,
+        233.0,
+        107.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7264.8,
+        4759.2,
+        256.8,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Hưng Nhơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        386.0,
+        321.0,
+        100.0,
+        24.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7226.4,
+        4970.4,
+        240.0,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Ngãi Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        504.0,
+        343.0,
+        150.0,
+        24.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7509.6,
+        5023.2,
+        360.0,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "B A O",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        701.0,
+        318.0,
+        142.0,
+        38.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7982.4,
+        4963.2,
+        340.8,
+        91.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        722.0,
+        292.0,
+        79.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8032.8,
+        4900.8,
+        189.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Bình Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        839.0,
+        263.0,
+        137.0,
+        24.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8313.6,
+        4831.2,
+        328.8,
+        57.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Khánh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        116.0,
+        265.0,
+        33.0,
+        128.0
+      ],
+      "rotation_deg": -90.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6578.4,
+        4836.0,
+        79.2,
+        307.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đông Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        183.0,
+        365.0,
+        52.0,
+        43.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6739.2,
+        5076.0,
+        124.8,
+        103.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Quới Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        334.0,
+        437.0,
+        95.0,
+        68.0
+      ],
+      "rotation_deg": 35.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7101.6,
+        5248.8,
+        228.0,
+        163.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C. Lao Đất",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        576.0,
+        528.0,
+        88.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7682.4,
+        5467.2,
+        211.2,
+        48.0
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Lai",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        676.0,
+        438.0,
+        77.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7922.4,
+        5251.2,
+        184.8,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vĩnh Đức Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        823.0,
+        483.0,
+        126.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8275.2,
+        5359.2,
+        302.4,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Ba Tri",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        917.0,
+        388.0,
+        93.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8500.8,
+        5131.2,
+        223.2,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chợ Cũ",
+      "category": "institution",
+      "language": "vi",
+      "bbox_px": [
+        889.0,
+        517.0,
+        65.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8433.6,
+        5440.8,
+        156.0,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Đại Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        133.0,
+        492.0,
+        109.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6619.2,
+        5380.8,
+        261.6,
+        50.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thới Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        106.0,
+        698.0,
+        129.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6554.4,
+        5875.2,
+        309.6,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Quới Điền",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        288.0,
+        762.0,
+        117.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        6991.2,
+        6028.8,
+        280.8,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thạnh Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        486.0,
+        797.0,
+        142.0,
+        26.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        7466.4,
+        6112.8,
+        340.8,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        743.0,
+        807.0,
+        155.0,
+        29.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 0,
+      "global_bbox": [
+        8083.2,
+        6136.8,
+        372.0,
+        69.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sông",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        128.0,
+        839.0,
+        79.0,
+        31.0
+      ],
+      "rotation_deg": 28.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        6607.2,
+        6213.6,
+        189.6,
+        74.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Route de Bentre à Ba-Tri",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        629.0,
+        124.0,
+        239.0,
+        130.0
+      ],
+      "rotation_deg": 31.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        7809.6,
+        4497.6,
+        573.6,
+        312.0
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Cne",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        374.0,
+        198.0,
+        442.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7197.6,
+        4675.2,
+        1060.8,
+        38.4
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Sentier",
+      "category": "street",
+      "language": "fr",
+      "bbox_px": [
+        956.0,
+        237.0,
+        43.0,
+        44.0
+      ],
+      "rotation_deg": 48.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8594.4,
+        4768.8,
+        103.2,
+        105.6
+      ],
+      "_tile_origin": [
+        6300,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Bông Rang",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        207.0,
+        44.0,
+        98.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8896.8,
+        4305.6,
+        235.2,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Tuy",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        196.0,
+        106.0,
+        104.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8870.4,
+        4454.4,
+        249.6,
+        55.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phước Lễ",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        155.0,
+        199.0,
+        93.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8772.0,
+        4677.6,
+        223.2,
+        55.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Phú Ngãi",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        277.0,
+        167.0,
+        95.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9064.8,
+        4600.8,
+        228.0,
+        55.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bảo Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        408.0,
+        195.0,
+        142.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9379.2,
+        4668.0,
+        340.8,
+        55.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Xóm Trai",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        476.0,
+        50.0,
+        60.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9542.4,
+        4320.0,
+        144.0,
+        36.0
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tombeau de Phan Thanh Giang",
+      "category": "building",
+      "language": "vi",
+      "bbox_px": [
+        414.0,
+        159.0,
+        103.0,
+        19.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9393.6,
+        4581.6,
+        247.2,
+        45.6
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Salines",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        534.0,
+        175.0,
+        41.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9681.6,
+        4620.0,
+        98.4,
+        36.0
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "A N T R I",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        51.0,
+        240.0,
+        412.0,
+        337.0
+      ],
+      "rotation_deg": -57.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8522.4,
+        4776.0,
+        988.8,
+        808.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Bình Đông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        68.0,
+        353.0,
+        147.0,
+        19.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8563.2,
+        5047.2,
+        352.8,
+        45.6
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Bao Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        235.0,
+        344.0,
+        87.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8964.0,
+        5025.6,
+        208.8,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vĩnh Đức Trung",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        105.0,
+        391.0,
+        126.0,
+        68.0
+      ],
+      "rotation_deg": 35.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8652.0,
+        5138.4,
+        302.4,
+        163.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Vĩnh Đức Đông",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        223.0,
+        390.0,
+        84.0,
+        58.0
+      ],
+      "rotation_deg": 35.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8935.2,
+        5136.0,
+        201.6,
+        139.2
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tân Hòa",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        278.0,
+        474.0,
+        81.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9067.2,
+        5337.6,
+        194.4,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Sao",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        261.0,
+        501.0,
+        70.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9026.4,
+        5402.4,
+        168.0,
+        36.0
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Bà Trường",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        88.0,
+        532.0,
+        91.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8611.2,
+        5476.8,
+        218.4,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Quéo",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        183.0,
+        529.0,
+        67.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8839.2,
+        5469.6,
+        160.8,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Bà Quí",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        136.0,
+        562.0,
+        88.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8726.4,
+        5548.8,
+        211.2,
+        40.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rạch Ông Thuôn",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        217.0,
+        591.0,
+        105.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8920.8,
+        5618.4,
+        252.0,
+        40.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Hòa Tây",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        51.0,
+        603.0,
+        142.0,
+        27.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8522.4,
+        5647.2,
+        340.8,
+        64.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thủy",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        245.0,
+        622.0,
+        103.0,
+        56.0
+      ],
+      "rotation_deg": -64.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8988.0,
+        5692.8,
+        247.2,
+        134.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giồng Ông Đụng",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        38.0,
+        645.0,
+        109.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8491.2,
+        5748.0,
+        261.6,
+        40.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Xóm Đáy",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        268.0,
+        688.0,
+        60.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9043.2,
+        5851.2,
+        144.0,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Xóm Ray",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        39.0,
+        575.0,
+        61.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8493.6,
+        5580.0,
+        146.4,
+        36.0
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "C H I N E",
+      "category": "hydrology",
+      "language": "fr",
+      "bbox_px": [
+        662.0,
+        388.0,
+        107.0,
+        547.0
+      ],
+      "rotation_deg": 65.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9988.8,
+        5131.2,
+        256.8,
+        1312.8
+      ],
+      "_tile_origin": [
+        8400,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "EST",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        516.0,
+        192.0,
+        16.0,
+        36.0
+      ],
+      "rotation_deg": -90.0,
+      "confidence": 0.95,
+      "frame_idx": 2,
+      "global_bbox": [
+        11703.312,
+        4660.8,
+        37.312,
+        86.4
+      ],
+      "_tile_origin": [
+        10500,
+        4200
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "L'ARRONDISSEMENT DE BENTRE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        727.0,
+        96.0,
+        273.0,
+        52.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "notes": "spans frames 0, 1, 2",
+      "frame_idx": 0,
+      "global_bbox": [
+        1744.8,
+        6530.4,
+        655.2,
+        124.8
+      ],
+      "_tile_origin": [
+        0,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "DE",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        379.0,
+        41.0,
+        413.0,
+        20.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        3009.6,
+        6398.4,
+        991.2,
+        48.0
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "publié sous la direction de Mr. Boilloux S. Inspecteur des Domaines",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        6.0,
+        175.0,
+        796.0,
+        21.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "notes": "starts in frame 0",
+      "frame_idx": 1,
+      "global_bbox": [
+        2114.4,
+        6720.0,
+        1910.4,
+        50.4
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chef du Service du Cadastre d'après les ordres de",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        104.0,
+        226.0,
+        696.0,
+        25.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        2349.6,
+        6842.4,
+        1670.4,
+        60.0
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Mr. LE MYRE de VILERS",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        236.0,
+        290.0,
+        566.0,
+        314.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        2666.4,
+        6996.0,
+        1358.4,
+        753.6
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Gouverneur",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        323.0,
+        344.0,
+        477.0,
+        368.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        2875.2,
+        7125.6,
+        1144.8,
+        883.2
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "1882.",
+      "category": "title",
+      "language": "fr",
+      "bbox_px": [
+        375.0,
+        408.0,
+        439.0,
+        433.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        3000.0,
+        7279.2,
+        1053.6,
+        1039.2
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Echelle de 1/100,000.",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        295.0,
+        497.0,
+        502.0,
+        532.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        2808.0,
+        7492.8,
+        1204.8,
+        1276.8
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Echelle de 20 Kilomètres.",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        274.0,
+        650.0,
+        532.0,
+        667.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        2757.6,
+        7860.0,
+        1276.8,
+        1600.8
+      ],
+      "_tile_origin": [
+        2100,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "NT DE TRA VINH",
+      "category": "place",
+      "language": "mixed",
+      "bbox_px": [
+        684.0,
+        0.0,
+        316.0,
+        180.0
+      ],
+      "rotation_deg": -37.0,
+      "confidence": 0.9,
+      "notes": "spans frames 2-3; [ARRONDISSEME]NT DE TRA VINH continues outside top-left edge",
+      "frame_idx": 2,
+      "global_bbox": [
+        5841.6,
+        6300.0,
+        758.4,
+        432.0
+      ],
+      "_tile_origin": [
+        4200,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "SUD",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        28.0,
+        880.0,
+        56.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        6367.2,
+        8412.0,
+        134.4,
+        36.0
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "ng",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        168.0,
+        0.0,
+        48.0,
+        26.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.6,
+      "notes": "continues outside top-left edge",
+      "frame_idx": 3,
+      "global_bbox": [
+        6703.2,
+        6300.0,
+        115.2,
+        62.4
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "uncertain",
+      "requires_review": true
+    },
+    {
+      "text": "Cổ - Chiên",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        546.0,
+        237.0,
+        161.0,
+        187.0
+      ],
+      "rotation_deg": -48.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        7610.4,
+        6868.8,
+        386.4,
+        448.8
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Minh",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        637.0,
+        49.0,
+        23.0,
+        38.0
+      ],
+      "rotation_deg": 70.0,
+      "confidence": 0.85,
+      "frame_idx": 3,
+      "global_bbox": [
+        7828.8,
+        6417.6,
+        55.2,
+        91.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Phú",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        530.0,
+        153.0,
+        116.0,
+        96.0
+      ],
+      "rotation_deg": -33.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        7572.0,
+        6667.2,
+        278.4,
+        230.4
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "M I N H",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        631.0,
+        189.0,
+        310.0,
+        43.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        7814.4,
+        6753.6,
+        744.0,
+        103.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Commune",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        753.0,
+        203.0,
+        49.0,
+        23.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        8107.2,
+        6787.2,
+        117.6,
+        55.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        817.0,
+        174.0,
+        38.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        8260.8,
+        6717.6,
+        91.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Qui",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        826.0,
+        116.0,
+        103.0,
+        41.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        8282.4,
+        6578.4,
+        247.2,
+        98.4
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "ach",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        867.0,
+        0.0,
+        31.0,
+        18.0
+      ],
+      "rotation_deg": -45.0,
+      "confidence": 0.7,
+      "notes": "part of Rạch, continues outside top-right edge",
+      "frame_idx": 3,
+      "global_bbox": [
+        8380.8,
+        6300.0,
+        74.4,
+        43.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Tri",
+      "category": "other",
+      "language": "vi",
+      "bbox_px": [
+        938.0,
+        244.0,
+        21.0,
+        20.0
+      ],
+      "rotation_deg": 30.0,
+      "confidence": 0.8,
+      "frame_idx": 3,
+      "global_bbox": [
+        8551.2,
+        6885.6,
+        50.4,
+        48.0
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        784.0,
+        301.0,
+        38.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        8181.6,
+        7022.4,
+        91.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Thuận",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        734.0,
+        326.0,
+        126.0,
+        48.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 3,
+      "global_bbox": [
+        8061.6,
+        7082.4,
+        302.4,
+        115.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        801.0,
+        444.0,
+        43.0,
+        14.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 3,
+      "global_bbox": [
+        8222.4,
+        7365.6,
+        103.2,
+        33.6
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach Cai Bai",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        851.0,
+        376.0,
+        50.0,
+        131.0
+      ],
+      "rotation_deg": -70.0,
+      "confidence": 0.85,
+      "frame_idx": 3,
+      "global_bbox": [
+        8342.4,
+        7202.4,
+        120.0,
+        314.4
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "M E R   D E   C...",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        986.0,
+        597.0,
+        14.0,
+        13.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "notes": "assembled from fragments",
+      "frame_idx": 3,
+      "global_bbox": [
+        8666.4,
+        6360.0,
+        1540.800000000001,
+        1540.8000000000002
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cai Túng Sau",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        453.0,
+        98.0,
+        62.0,
+        50.0
+      ],
+      "rotation_deg": -38.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7387.2,
+        6535.2,
+        148.8,
+        120.0
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bến Gan",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        628.0,
+        273.0,
+        62.0,
+        29.0
+      ],
+      "rotation_deg": 13.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7807.2,
+        6955.2,
+        148.8,
+        69.6
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Cai Cát",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        689.0,
+        311.0,
+        74.0,
+        80.0
+      ],
+      "rotation_deg": -47.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        7953.6,
+        7046.4,
+        177.6,
+        192.0
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Bến Gia",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        864.0,
+        48.0,
+        26.0,
+        68.0
+      ],
+      "rotation_deg": 71.0,
+      "confidence": 0.85,
+      "frame_idx": 0,
+      "global_bbox": [
+        8373.6,
+        6415.2,
+        62.4,
+        163.2
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Commune",
+      "category": "building",
+      "language": "fr",
+      "bbox_px": [
+        858.0,
+        219.0,
+        93.0,
+        19.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 0,
+      "global_bbox": [
+        8359.2,
+        6825.6,
+        223.2,
+        45.6
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R.",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        984.0,
+        600.0,
+        14.0,
+        15.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.75,
+      "frame_idx": 0,
+      "global_bbox": [
+        8661.6,
+        7740.0,
+        33.6,
+        36.0
+      ],
+      "_tile_origin": [
+        6300,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "An Nhơn",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        39.0,
+        424.0,
+        110.0,
+        39.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8493.6,
+        7317.6,
+        264.0,
+        93.6
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Maison Commune",
+      "category": "building",
+      "language": "fr",
+      "bbox_px": [
+        222.0,
+        170.0,
+        93.0,
+        18.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8932.8,
+        6708.0,
+        223.2,
+        43.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        221.0,
+        182.0,
+        45.0,
+        17.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8930.4,
+        6736.8,
+        108.0,
+        40.8
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Ban",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        154.0,
+        133.0,
+        28.0,
+        22.0
+      ],
+      "rotation_deg": 25.0,
+      "confidence": 0.8,
+      "frame_idx": 1,
+      "global_bbox": [
+        8769.6,
+        6619.2,
+        67.2,
+        52.8
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Cung",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        321.0,
+        98.0,
+        29.0,
+        28.0
+      ],
+      "rotation_deg": -43.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9170.4,
+        6535.2,
+        69.6,
+        67.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        337.0,
+        145.0,
+        32.0,
+        22.0
+      ],
+      "rotation_deg": 30.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9208.8,
+        6648.0,
+        76.8,
+        52.8
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Con",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        394.0,
+        185.0,
+        23.0,
+        21.0
+      ],
+      "rotation_deg": 48.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9345.6,
+        6744.0,
+        55.2,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Giao Thạnh",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        278.0,
+        231.0,
+        151.0,
+        38.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        9067.2,
+        6854.4,
+        362.4,
+        91.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "gr.",
+      "category": "other",
+      "language": "fr",
+      "bbox_px": [
+        435.0,
+        246.0,
+        19.0,
+        13.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.7,
+      "frame_idx": 1,
+      "global_bbox": [
+        9444.0,
+        6890.4,
+        45.6,
+        31.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Pagode",
+      "category": "institution",
+      "language": "fr",
+      "bbox_px": [
+        266.0,
+        325.0,
+        40.0,
+        16.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        9038.4,
+        7080.0,
+        96.0,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Con Hưu",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        277.0,
+        271.0,
+        69.0,
+        39.0
+      ],
+      "rotation_deg": -32.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9064.8,
+        6950.4,
+        165.6,
+        93.6
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "R. Om Bung",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        438.0,
+        291.0,
+        33.0,
+        46.0
+      ],
+      "rotation_deg": 65.0,
+      "confidence": 0.8,
+      "frame_idx": 1,
+      "global_bbox": [
+        9451.2,
+        6998.4,
+        79.2,
+        110.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Lôi",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        195.0,
+        260.0,
+        22.0,
+        25.0
+      ],
+      "rotation_deg": 75.0,
+      "confidence": 0.8,
+      "frame_idx": 1,
+      "global_bbox": [
+        8868.0,
+        6924.0,
+        52.8,
+        60.0
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Eo",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        203.0,
+        428.0,
+        14.0,
+        16.0
+      ],
+      "rotation_deg": 70.0,
+      "confidence": 0.8,
+      "frame_idx": 1,
+      "global_bbox": [
+        8887.2,
+        7327.2,
+        33.6,
+        38.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Chét",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        265.0,
+        411.0,
+        23.0,
+        27.0
+      ],
+      "rotation_deg": 75.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9036.0,
+        7286.4,
+        55.2,
+        64.8
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Khém",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        204.0,
+        501.0,
+        36.0,
+        27.0
+      ],
+      "rotation_deg": -36.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        8889.6,
+        7502.4,
+        86.4,
+        64.8
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thuyền",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        323.0,
+        464.0,
+        40.0,
+        36.0
+      ],
+      "rotation_deg": -50.0,
+      "confidence": 0.85,
+      "frame_idx": 1,
+      "global_bbox": [
+        9175.2,
+        7413.6,
+        96.0,
+        86.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Thạnh Phong",
+      "category": "place",
+      "language": "vi",
+      "bbox_px": [
+        178.0,
+        452.0,
+        161.0,
+        168.0
+      ],
+      "rotation_deg": -40.0,
+      "confidence": 0.95,
+      "frame_idx": 1,
+      "global_bbox": [
+        8827.2,
+        7384.8,
+        386.4,
+        403.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        78.0,
+        551.0,
+        37.0,
+        21.0
+      ],
+      "rotation_deg": -22.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8587.2,
+        7622.4,
+        88.8,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Rach",
+      "category": "hydrology",
+      "language": "vi",
+      "bbox_px": [
+        179.0,
+        638.0,
+        34.0,
+        21.0
+      ],
+      "rotation_deg": -32.0,
+      "confidence": 0.9,
+      "frame_idx": 1,
+      "global_bbox": [
+        8829.6,
+        7831.2,
+        81.6,
+        50.4
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Nota: Ce plan est la réduction des levés à la planchette à l'échelle de 1/20,000 par M.M. Bertaux, Carmouze, Silhol, Landeau et Vidart Géomètres.",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        793.0,
+        719.0,
+        207.0,
+        78.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "notes": "spans frames 1-2",
+      "frame_idx": 1,
+      "global_bbox": [
+        10303.2,
+        8025.6,
+        496.8,
+        187.2
+      ],
+      "_tile_origin": [
+        8400,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Dessiné par A. Ng. V. Dinh, Piqueur du Cadastre.",
+      "category": "legend",
+      "language": "mixed",
+      "bbox_px": [
+        33.0,
+        800.0,
+        367.0,
+        32.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.95,
+      "frame_idx": 2,
+      "global_bbox": [
+        10576.956,
+        8220.0,
+        855.844,
+        76.8
+      ],
+      "_tile_origin": [
+        10500,
+        6300
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Gravé par J. Geisendörfer.",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        437.0,
+        270.0,
+        162.0,
+        32.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "notes": "engraver credit below neatline",
+      "frame_idx": 0,
+      "global_bbox": [
+        1048.8,
+        8606.28,
+        388.8,
+        24.448
+      ],
+      "_tile_origin": [
+        0,
+        8400
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    },
+    {
+      "text": "Imp. Lemercier et Cie",
+      "category": "legend",
+      "language": "fr",
+      "bbox_px": [
+        412.0,
+        298.0,
+        140.0,
+        46.0
+      ],
+      "rotation_deg": 0.0,
+      "confidence": 0.98,
+      "notes": "printer credit in bottom border margin",
+      "frame_idx": 2,
+      "global_bbox": [
+        11460.784,
+        8627.672,
+        326.48,
+        35.144
+      ],
+      "_tile_origin": [
+        10500,
+        8400
+      ],
+      "tier": "confirmed",
+      "requires_review": false
+    }
+  ]
+}
