@@ -28,8 +28,8 @@ in the plan's N of M. Most of the text here comes from one wiki page, which coun
   French official publications, map holdings, yearbooks and street-name books). `verified` is the
   search's own word; `my_check` is set where I re-read the source, including one claim rejected
   (D02).
-- `transfer-test.md`: the next test, drafted 2026-10-27 and not run: how many Quận 4 changes
-  national sources alone still witness.
+- `transfer-test.md`: how many Quận 4 changes national sources alone still witness. Part 2
+  (the four national sheets alone, `sheet_crops.py` → `snapshots.csv`): 2 of 17. Part 1 (texts) not run.
 - `map-leads.csv`: sheets VMA does not hold publicly, found 2026-10-26, each listed with the changes
   it could check. Mostly 1955–1993, the years with fewest sheets. `status` says whether I opened the
   record or saw it only in search results.
