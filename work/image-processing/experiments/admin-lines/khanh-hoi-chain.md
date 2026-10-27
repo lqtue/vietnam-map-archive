@@ -5,7 +5,8 @@ Bet 1c in `docs/NOW.md`. Draft of 2026-10-19; nothing here is final until the vi
 **Question.** Can one area be traced from the 2025 reform back to the 1882 topographic plan, each step a
 typed link with a source, and how many steps have a source that is independent of the others?
 
-**Answer so far.** 3 of 6 steps firm, 1 weak, 2 not independent. Table below.
+**Answer so far.** 3 of 7 steps count (4, 5, 6); 2 is weak, 5b a conflict, 1 and 3 not independent.
+Counted by the rule in `docs/plans/series-admin-saigon-plan.md` §Counting N of M. Table below.
 
 **So what.** The kill test for bet 1c turns on 1976–2004: that stretch still rests on one wiki. Pre-1945 and
 1959 are well covered; the plate itself is placed (3 control points, affine, no residuals).
@@ -41,7 +42,8 @@ source with the 1882 plate: not counted as independent until that is checked.
   with my first draft (IoU 0.88); the two differ mostly on the north-east edge.
 - Overlap with the 2025 wards: Khánh Hội 60.9%, Xóm Chiếu 33.5%, Vĩnh Hội 5.6%. By the old numbered wards:
   P8 25%, P9 23%, P4 18%, P13 33%.
-- **Land from river (phase 0b step 1), 2026-10-19.** `land_from_water.py`: water is the blurred b* channel
+- **Land from river (phase 0b step 1), 2026-10-19.** `land_from_water.py` (never committed; lost,
+  checked 2026-10-26, so the numbers below are a recorded run, not reproduced): water is the blurred b* channel
   below the paper's by 5 (the plain `colour.py` blue catches only the bank lines and the flood leaks across
   the river), land is the region reached from a seed in Khánh Hội, closed in the south by a straight line
   (modern; Kênh Tẻ is not on the plate). One crop (2400 × 1500 px at native size; 3.34 m/px by the plate's

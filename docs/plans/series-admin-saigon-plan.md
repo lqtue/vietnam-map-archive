@@ -18,7 +18,9 @@ check that could fail; a chain of agreeing sources that copy each other is an ec
 1. **Bet:** 1c (admin units over time, Saigon).
 2. **Smallest test:** one area (Khánh Hội, Vĩnh Hội, Tạm Hội), one plate, one number (steps with an
    independent source).
-3. **Kill:** 1976–2004 rests on one wiki or one printed book → Saigon only, nation parked.
+3. **Kill:** no primary text found for 301/UB, 67-HĐBT, 147-HĐBT and 258-HĐBT (vbpl.vn, Công báo,
+   printed gazettes) by 2026-11-30 → publish N of M with that gap stated, and Phases 1–3 do not start.
+   Today's evidence already points this way: step 3 rests on vi.wiki alone.
 
 ## What it joins
 
@@ -30,6 +32,21 @@ check that could fail; a chain of agreeing sources that copy each other is an ec
 **The rule.** Past names must come from sources independent of the maps, or a match proves nothing. A
 source family is a set of sources that may copy each other (the NAC2 captions and the TTLTQG II archive
 guide are one family). A family counts once.
+
+**Counting N of M.** Fixed before counting, so the count cannot be recut until it passes:
+
+- A step is one dated act or one typed link between two dated units. M is the rows of the working note's
+  table as of 2026-10-26 (1, 2, 3, 4, 5, 5b, 6: M = 7). A later find joins M only by a dated edit here.
+- A step counts in N when two source families agree that it happened. A map may be one of the two for a
+  step it prints; it never adds a step.
+- Two sources are one family if they share, or may share, an input. Same family is the default unless a
+  reason is cited. In phase 0 the plate is one family, and Bigrel (c. 1873) stays out of N until its
+  derivation is checked.
+- "Weak" (act text unread) and "conflict" (sources disagree that it happened) are recorded and not
+  counted. A date conflict alone is recorded beside the step and does not remove it.
+
+Under this rule the note's table gives **3 of 7**: steps 4, 5 and 6 count; 2 is weak; 5b is a conflict;
+1 and 3 are not independent.
 
 ## The pilot area
 
@@ -59,12 +76,13 @@ units. The link is the overlap, and only geometry shows it.
 
 - *0a, text chain.* Done in draft: acts and sources per step.
 - *0b, map link.* Four steps, in this order:
-  1. **Land from river.** Extract the land from the water on the plate by colour (water comes out by colour
-     alone; `experiments/admin-lines/README.md`). Keep the land between the Bến Nghé canal (Arroyo Chinois)
-     and the Saigon River: the "Quận 4 island". On the 1882 plate it is not an island, because Kênh Tẻ was
-     dug in 1904–07, so close the south at today's Quận 4 edge and label that closure as a modern line.
-     *Smallest test:* one crop, compare the land outline with the OSM Quận 4 outline. *Kill:* the two
-     differ by more than a village width along the canal → trace the edge by hand.
+  1. **Land from river.** Done 2026-10-19, but not reproducible. Water was the blurred b* channel 5 below
+     the paper's; plain `colour.py` blue leaks across the river. Land is the region reached from a seed
+     in Khánh Hội, closed in the south by a straight line labelled modern (Kênh Tẻ was dug in 1904–07,
+     after the plate). Against the 2025 OSM wards, river sides only: median 120 m, maximum 345 m, area
+     IoU 0.74; the kill (more than a village width) was not hit. The script, `land_from_water.py`, was
+     never committed and is lost (checked 2026-10-26), so the result is a recorded run, not reproduced.
+     Rewrite and commit it before any number from this step is published.
   2. **Split by the village limits.** Cut the land along the black dash-dot lines into Khánh Hội, Vĩnh Hội and
      Tạm Hội. Hand-traced now (Khánh Hội is drawn: footprint `60b21abf…`, 0.97 km²); the machine reads these
      lines poorly near the city. With land first, only the inner lines remain to draw.
@@ -72,8 +90,7 @@ units. The link is the overlap, and only geometry shows it.
      (OSM, 2025-08). The 2025 match is partly an echo, since OSM was likely drawn from the act.
   4. **Measure the placement.** The plate has 3 control points, none near Quận 4. Add 2 or 3 near
      Khánh Hội so the overlap carries an error in metres.
-- *Kill for 0:* if 1976–2004 stays wiki-only (301/UB 1976, 147-HĐBT 1982, 258-HĐBT 1985), the stretch is
-  no better than Xuân Hòa's, and the area wins only on 1880–1959.
+- *Kill for 0:* the gate's kill above.
 
 **1. Derivation edges for the sheets that cover the area.** Which map is drawn from which. Use printed
 statements first (the 1882 plan states a reduction of 1:20,000 surveys; the Olivier plan states 1795

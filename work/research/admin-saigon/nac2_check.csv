@@ -1,0 +1,28 @@
+event,nac2_maps,nac2_date,nac2_act,agrees,difference
+E02,4,1861-04-11,Charner,y,
+E03,10,1865-06-06,arrêté,y,Cholon split into 5 khu
+E04,7,1865-10-03,arrêté,y,adjusted again 1865-12-06 (E04b)
+E07,11,1876-02-24,decision,n,"wiki: renamed 24/8/1876; archive: 24/2/1876 the seat moved to Bình Hòa Xã, so the hạt was ""commonly called"" Bình Hòa"
+E08,15,1880-12-13,arrêté,y,
+E10,15,1888-01-12,"arrêté, Governor-General",partial,"date agrees (the wiki 1988 is a typo); archive: the villages return to their original hạt; caption 19 still names tổng Bình Chánh Thượng, hạt Gia Định, in 1894"
+E10b,"18, 24",1888-05-02,"arrêté, Governor of Cochinchina",conflict,"caption 18: Tam Hội and Vĩnh Hội into Khánh Hội; caption 24 and Baudrit: the 1895 annexation takes part of Khánh Hội and Tam Hội. Map 18 (villages under the Saigon courts, 1:20,000) shows the merged Khánh Hội"
+E12,19,1894-11-12,arrêté,partial,"Hòa Mỹ, Phú Hòa, Nam Chơn, Tân Định and part of Xuân Hòa; Baudrit reads Huan-Hoà"
+E12b,"23, 24, 25",1895-03-15,arrêté,y,city then 865 ha
+E16,23,1904-03-21,arrêté,y,"parts of Tân Hòa and Phú Thạnh split: 217 + 100 ha to Saigon, 193 + 47 ha to Cholon (E16b)"
+E17,24,1907-08-16,"arrêté, Governor-General",y,"city then 17 km²; Baudrit 1,674 ha"
+E21,"32, 37",1931-04-27,décret,partial,"area 56.16 km² (wiki 51 km²); 18 hộ by arrêté of 1935-09-18, approved 1942-05-12 (wiki: from 1932)"
+E22,36,1944-05-11,"arrêté, Governor-General",y,in force from 1944-04-01
+E24,37,1951-06-30,311-Cab/SG,y,
+E25,37,1952-12-27,Bảo Đại,y,7 quận
+E26,"37, 44",1956-10-22,143/NV,y,
+E30,"38, 39",1959-03-27,110-NV,y,
+E31,"38, 39",1959-04-22,504-BNV/HC/NĐ,y,act number as the note and the 1963 manual (the wiki: NC/8); the manual dates it 23-4
+E32,39,1960-10-31,1434-BNV/HC/NĐ,y,the wiki says 1962 with no act
+E35,42,1966-06-15,100-SL/NV,y,"map 42 is the act's annex; phường An Khánh, Thủ Thiêm by 243/ĐUHC/NC/NĐ of 1966-12-05"
+E36,42,1967-01-17,9-SL/NV,partial,the wiki: 9-SL/ĐUHC
+E37,43,1969-07-01,073-SL/NV,y,map 43 is the act's annex and draws old and new quận lines
+E38,46,1975-04-30,,partial,the wiki: city formed 1975-05-03
+E41,46,1978-12-29,National Assembly resolution,y,
+E42,47,1981-09-12,67-HĐBT,y,caption gives no Quận 4 content either
+E45,48,1997-01-06,03/CP,y,
+E46,50,2020-12-09,NQ 1111,y,
