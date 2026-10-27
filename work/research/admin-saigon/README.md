@@ -78,8 +78,8 @@ in the plan's N of M. Most of the text here comes from one wiki page, which coun
   text (read 2026-10-27) settles the note's P16/P18 conflict for the wiki.
 - 67-HĐBT, 147-HĐBT and 258-HĐBT: full texts read 2026-10-27, copies in `docs/private/acts/`. Scripts
   cannot fetch them (thuvienphapluat answers 403; vbpl.vn loads text by script), so Tuệ opened them.
-  The two from 1982 and 1985 print no phường limits ("Không in địa giới cụ thể") or, for 258, only
-  the neighbours. 301/UB (1976) is still not found.
+  67 and 147 print no phường limits ("Không in địa giới cụ thể"); 258 names each phường's
+  neighbours. 301/UB (1976) is still not found.
 
 ## Limits
 
