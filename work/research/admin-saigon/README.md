@@ -72,11 +72,14 @@ in the plan's N of M. Most of the text here comes from one wiki page, which coun
 - E10: the wiki prints Hạt 20's end as 12/01/1988, a typo for 1888.
 - E31: the wiki gives the act as 504-BNV/NC/8; the note has 504-BNV/HC/NĐ. The wiki also lists
   Quận Tư's four phường of 1959, which answers the note's open item 5.
-- E42: the wiki gives 67-HĐBT no Quận 4 content; the note lists it in the Quận 4 chain.
-- E43: on the wiki, 147-HĐBT's "P16, P18" are Quận 3 wards; for Quận 4 it merges only P11 into
-  P8. The note's P16/P18 conflict may come from reading the Quận 3 line.
-- 67-HĐBT, 147-HĐBT and 258-HĐBT are cited to full texts on thuvienphapluat.vn. A script cannot
-  fetch them (blocked by Cloudflare), so open them in a browser.
+- E42: the wiki gives 67-HĐBT no Quận 4 content, and the act's text (read 2026-10-27) agrees; the
+  note was wrong to list it in the Quận 4 chain.
+- E43: 147-HĐBT's "P16, P18" are Quận 3 wards; for Quận 4 it merges only P11 into P8. The act's
+  text (read 2026-10-27) settles the note's P16/P18 conflict for the wiki.
+- 67-HĐBT, 147-HĐBT and 258-HĐBT: full texts read 2026-10-27, copies in `docs/private/acts/`. Scripts
+  cannot fetch them (thuvienphapluat answers 403; vbpl.vn loads text by script), so Tuệ opened them.
+  The two from 1982 and 1985 print no phường limits ("Không in địa giới cụ thể") or, for 258, only
+  the neighbours. 301/UB (1976) is still not found.
 
 ## Limits
 

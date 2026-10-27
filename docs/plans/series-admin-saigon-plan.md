@@ -20,8 +20,7 @@ check that could fail; a chain of agreeing sources that copy each other is an ec
    independent source).
 3. **Kill:** no primary text found for 301/UB, 67-HĐBT, 147-HĐBT and 258-HĐBT (vbpl.vn, Công báo,
    printed gazettes) by 2026-11-30 → publish N of M with that gap stated, and Phases 1–3 do not start.
-   Found so far: 258-HĐBT (full text, 2026-10-27); 67-HĐBT and 147-HĐBT are on vbpl.vn but not yet read;
-   301/UB not found.
+   Found 2026-10-27: 67-HĐBT, 147-HĐBT and 258-HĐBT in full (67 has no Quận 4 content); 301/UB not found.
 
 ## What it joins
 
