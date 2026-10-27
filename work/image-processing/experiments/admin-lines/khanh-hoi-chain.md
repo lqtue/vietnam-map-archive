@@ -5,7 +5,8 @@ Bet 1c in `docs/NOW.md`. Draft of 2026-10-19; nothing here is final until the vi
 **Question.** Can one area be traced from the 2025 reform back to the 1882 topographic plan, each step a
 typed link with a source, and how many steps have a source that is independent of the others?
 
-**Answer so far.** 3 of 6 steps firm, 1 weak, 2 not independent. Table below.
+**Answer so far.** 3 of 7 steps count (4, 5, 6); 2 is weak, 5b a conflict, 1 and 3 not independent.
+Counted by the rule in `docs/plans/series-admin-saigon-plan.md` §Counting N of M. Table below.
 
 **So what.** The kill test for bet 1c turns on 1976–2004: that stretch still rests on one wiki. Pre-1945 and
 1959 are well covered; the plate itself is placed (3 control points, affine, no residuals).
@@ -19,7 +20,7 @@ guide come from one archive, so they count as one family; Baudrit (1943) and the
 |---|---|---|---|---|---|
 | 1 | Phường Khánh Hội, Vĩnh Hội, Xóm Chiếu (2025) ← old wards P1, 2, 3, 4, 8, 9, 13, 15, 16, 18 | `built_from` | NQ 1685/NQ-UBTVQH15, 16/6/2025 | act text via luatvietnam (digest); OSM polygons (overlap matches the act for Khánh Hội and Vĩnh Hội) | **No.** OSM was likely drawn from the act, so it is an echo, not a witness |
 | 2 | P5 → P2, P12 → P13 (2021); P6 → P9, P10 → P8, P14 → P15 (2025) | `merged_into` | NQ 1111/NQ-UBTVQH14, 9/12/2020; NQ 1278/NQ-UBTVQH15, 14/11/2024 | vi.wiki footnotes, press snippets; OSM snapshots 2020-12, 2021-02, 2025-06 are consistent | **Weak.** Act texts unread for Quận 4 |
-| 3 | numbered wards, 1976–2004 | `renumbered`, `merged_into` | 301/UB 20/5/1976; 67-HĐBT 1981; 147-HĐBT 1982; 258-HĐBT 1985 | vi.wiki only; NAC2 #47 names 67-HĐBT but gives no Quận 4 content | **No** |
+| 3 | numbered wards, 1976–2004 | `renumbered`, `merged_into` | 301/UB 20/5/1976; 147-HĐBT 1982; 258-HĐBT 1985 | vi.wiki; full texts read 2026-10-27: 147-HĐBT (P11 → P8), 258-HĐBT (P7 → P6, P9; P17 → P18, P16), both agree with the wiki. 67-HĐBT (1981) is read too and has no Quận 4 content, so it leaves the chain | **No.** The act and the wiki that cites it are one family |
 | 4 | Quận Tư (1959) = all of today's Quận 4; 41 phường for the city | `defined_by` | 110-NV, 27/3/1959; 504-BNV/HC/NĐ, 22/4/1959; 1434-BNV/HC/NĐ, 31/10/1960 | NAC2 #38, #39 and the archive-site page; the 1959 book (Trần Văn Đĩnh) prints the same boundary | **Yes**, with a date conflict: the book prints 27-2-59 |
 | 5 | Khánh Hội village → Saigon city (part 1895, rest 1907) | `annexed_to` | 15/3/1895; 16/8/1907 | NAC2 #23–25; guide A; Baudrit (1943) for 1895 | **Yes.** Saigoneer gives 31/12/1907 for the formal step: conflict |
 | 5b | Tam Hội, Vĩnh Hội → Khánh Hội | `merged_into` | 2/5/1888 | NAC2 #18, #24 | **Conflict.** The 1895 and 1907 texts still name Tam Hội as a village |
@@ -41,7 +42,8 @@ source with the 1882 plate: not counted as independent until that is checked.
   with my first draft (IoU 0.88); the two differ mostly on the north-east edge.
 - Overlap with the 2025 wards: Khánh Hội 60.9%, Xóm Chiếu 33.5%, Vĩnh Hội 5.6%. By the old numbered wards:
   P8 25%, P9 23%, P4 18%, P13 33%.
-- **Land from river (phase 0b step 1), 2026-10-19.** `land_from_water.py`: water is the blurred b* channel
+- **Land from river (phase 0b step 1), 2026-10-19.** `land_from_water.py` (never committed; lost,
+  checked 2026-10-26, so the numbers below are a recorded run, not reproduced): water is the blurred b* channel
   below the paper's by 5 (the plain `colour.py` blue catches only the bank lines and the flood leaks across
   the river), land is the region reached from a seed in Khánh Hội, closed in the south by a straight line
   (modern; Kênh Tẻ is not on the plate). One crop (2400 × 1500 px at native size; 3.34 m/px by the plate's
