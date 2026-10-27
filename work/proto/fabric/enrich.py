@@ -7,7 +7,7 @@ import json, math, pathlib, re, unicodedata
 import requests
 
 HERE = pathlib.Path(__file__).parent
-UA = {"User-Agent": "vma-fabric-proto/0.1 (lequangtuevn@gmail.com)"}
+UA = {"User-Agent": "vma-fabric-proto/0.1 (+https://maparchive.vn)"}
 BBOX = "10.69,106.60,10.83,106.74"
 NEAR_M, NEAR_SAME_KIND_M = 40.0, 25.0  # a different or unknown kind must be this close
 
