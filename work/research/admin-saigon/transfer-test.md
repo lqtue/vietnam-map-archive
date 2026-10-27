@@ -47,6 +47,15 @@ Not allowed: vi.wiki (the reference is built from it, so agreement would be an e
 captions (a Saigon exhibition), Baudrit, Saigoneer, blogs, the *Gia Định – Sài Gòn – TP HCM* volumes,
 and the city plans (1862–1968).
 
+## Echo guard
+
+Most allowed text sources are Nguyễn Đình Tư's (S01's notes, S02, S04, S05; `nguyen-dinh-tu.md`), and
+others copy him. For 15 of the 19 Quận 4 rows the wiki cites a primary (Gallica, the act texts, NAC2,
+Baudrit's council registers), so his agreement there is a real check. Four rows rest on no cite or a
+weak one: **E25, E30, E32, E39**. Where he agrees on those, count it apart as a possible echo, not as
+coverage. His dates are signing dates (S02 rule 8): compare them with the act's date, not the date it
+took effect.
+
 ## The check
 
 For each of the 17 rows and each allowed source, write one row in `witness.csv`: `event, source,

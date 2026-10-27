@@ -30,6 +30,8 @@ in the plan's N of M. Most of the text here comes from one wiki page, which coun
   (D02).
 - `transfer-test.md`: how many Quận 4 changes national sources alone still witness. Part 2
   (the four national sheets alone, `sheet_crops.py` → `snapshots.csv`): 2 of 17. Part 1 (texts) not run.
+- `nguyen-dinh-tu.md`: how Nguyễn Đình Tư's books were made and where they slip, with the cases
+  found against the acts (review by a second session, 2026-10-27, one reader).
 - `map-leads.csv`: sheets VMA does not hold publicly, found 2026-10-26, each listed with the changes
   it could check. Mostly 1955–1993, the years with fewest sheets. `status` says whether I opened the
   record or saw it only in search results.
