@@ -29,7 +29,9 @@ python3 scripts/l7014/l7014_mosaic.py fit             # where every warped sheet
 python3 scripts/l7014/l7014_mosaic.py check           # prove the datum check can fail
 ```
 
-> **The live archive `l7014-20260913` is wrong and a rebuild is pending.** 285 of
+> **Deleted from R2 2026-10-29, never rebuilt** (not served since 2026-10-03; the exact bytes are
+> kept offline in `../vma-snapshots/261029-l7014-overlay/`). What follows is its state when served.
+> **The archive `l7014-20260913` is wrong.** 285 of
 > its 437 GeoPDF sheets shipped without the Indian 1960 datum shift and sit
 > ~470 m northwest of where they belong; `fit` reports 341 of 452 sheets more
 > than 150 m off their cell. The cause and the fix are trap 1 below. The fix is
