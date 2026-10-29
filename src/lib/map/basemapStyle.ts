@@ -1,12 +1,12 @@
 /**
  * The self-hosted vector basemap.
  *
- * One ~421 MB PMTiles archive (Protomaps' daily OpenStreetMap build, bbox
- * 105.0,8.5 → 108.5,22.0, z0–15) living in our own R2 bucket and served by
- * `worker/` at `iiif.maparchive.vn/basemap/`. No API key, no quota, no
- * third-party usage policy — the same independence the map imagery already has.
+ * One ~510 MB PMTiles archive (Protomaps' daily OpenStreetMap build, bbox
+ * 101.4,7.4 → 109.7,23.6, z0–14) living in our own R2 bucket and served at
+ * `tiles.maparchive.vn/basemap/`. No API key, no quota, no third-party usage
+ * policy — the same independence the map imagery already has.
  *
- * The bbox spans Hanoi to the Mekong because the archive does. Its Saigon-only
+ * The bbox spans the whole collection, because it has to. Its Saigon-only
  * predecessor (37 MB, 106.3,10.3 → 107.1,11.2) left 21 of 40 georeferenced
  * maps — every Huế and Hanoi sheet, two of them featured — floating on the
  * bare `earth` fill with no roads or water beneath them.
@@ -17,13 +17,24 @@
  * eight sheets — Quảng Oai and Việt Trì furthest out — sat on ground the
  * basemap did not cover, and above z8 that is not a thin edge but bare
  * background, because the regional archive below hands over at z8 and stops.
- * Widened to 105.0,8.5 → 108.5,22.0 on 2026-09-14. Before adding a collection,
- * check its extent against this bbox: `maps.bbox` already knows the answer.
+ * Widened to 105.0,8.5 → 108.5,22.0 on 2026-09-14, and outgrown again: by
+ * 2026-10-29, 368 of 1,246 placed maps lay wholly outside it (the north-west,
+ * the Lao border, the coast from Quảng Ngãi to Nha Trang). Widened that day to
+ * the union of `maps.bbox` plus a margin. Before adding a collection, check its
+ * extent against this bbox: `maps.bbox` already knows the answer.
+ *
+ * **z14, not z15, and that is a cache limit, not a taste.** Cloudflare does not
+ * edge-cache an object over 512 MB: the z15 extract of this bbox is 967 MB and
+ * answers `cf-cache-status: BYPASS`, so every byte-range read would go to R2.
+ * The z14 extract is 509.7 MB and caches. Protomaps tiles overzoom, so z15+
+ * still draws. If a rebuild crosses 512 MB, narrow the bbox or split it; do
+ * not go back to z15. Cloudflare also remembers a BYPASS for a URL, so an
+ * oversized upload burns its key: rebuild under a new name.
  *
  * Rebuild when OSM has moved on enough to matter, or when a collection reaches
  * past the bbox:
  *
- *   scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload
+ *   scripts/pmtiles_extract.sh vietnam-z14 101.4,7.4,109.7,23.6 14 --upload
  *
  * Builds are retained for about a week; the script walks back from today, and
  * names the uploaded key after the build date it found. The date is not
@@ -51,7 +62,7 @@ import Text from 'ol/style/Text';
 import type { FeatureLike } from 'ol/Feature';
 import { isDarkTheme } from '$lib/core/utils/theme';
 
-export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-20260913.pmtiles';
+export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-z14-20261028.pmtiles';
 
 /**
  * The surroundings, thinly: the same Protomaps build clipped to

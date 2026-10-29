@@ -426,9 +426,9 @@ there are no `overlayload*` events to wire.
 
 **Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
 
-**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
-Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.0,8.5,108.5,22.0`, z0–15) in
-the `vma-tiles` R2 bucket at key `basemap/vietnam-20260913.pmtiles`, served straight off the bucket
+**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~510 MB PMTiles archive spanning
+the whole collection (Protomaps' daily OpenStreetMap build, bbox `101.4,7.4,109.7,23.6`, z0–14) in
+the `vma-tiles` R2 bucket at key `basemap/vietnam-z14-20261028.pmtiles`, served straight off the bucket
 at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to
 cache and no longer invoke the worker (PMTiles is nothing but byte-range reads, and the worker could
 not cache them: `cache.put()` rejects a 206). **The key carries the Protomaps build date on
@@ -443,8 +443,11 @@ CARTO's keyless raster endpoint began stamping "API KEY REQUIRED" over every til
 Foundation's own tiles have a usage policy that does not cover a busy site. `PUBLIC_PROTOMAPS_KEY`
 is gone from `.env.example` too — nothing read it and nothing needs it. The Saigon-only extract it
 replaced (37 MB, bbox `106.3,10.3,107.1,11.2`) left 21 of 40 georeferenced maps — every Huế and
-Hanoi sheet — on bare `earth` fill; `basemap/saigon.pmtiles` is still in the bucket, unreferenced.
-Rebuild with `scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload`. **Two archives,
+Hanoi sheet — on bare `earth` fill (deleted 2026-10-29). Its successor, `105.0,8.5,108.5,22.0`, left
+368 of 1,246 placed maps off it by 2026-10-29. **Keep the archive under 512 MB**: Cloudflare will
+not edge-cache a larger object (`cf-cache-status: BYPASS`), which is why it is z14, and why
+`basemapStyle.ts` says what to do when a rebuild outgrows it.
+Rebuild with `scripts/pmtiles_extract.sh vietnam-z14 101.4,7.4,109.7,23.6 14 --upload`. **Two archives,
 one style, one handoff at z8.** That extract stops at its own bbox, so zoomed out the neighbours
 were simply missing and the tile edge around Vietnam read as a hole punched in the page.
 `basemap/seasia-20260912.pmtiles` (28 MB, bbox `90,-13,132,32`, **z0–8**) is the same Protomaps
