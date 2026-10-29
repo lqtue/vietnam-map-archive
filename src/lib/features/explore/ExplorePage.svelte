@@ -116,7 +116,10 @@
   let appliedUrl = '';
   let mounted = false;
 
-  const { addMapOverlay, setViewFromBounds, zoomToMap } = createExploreZoom(mapStore);
+  const { addMapOverlay, setViewFromBounds, reveal, zoomToMap } = createExploreZoom(
+    mapStore,
+    () => shellMap
+  );
   const { syncMapParam, syncAtParam, tallyMapOpen } = createExploreUrl({
     supabase,
     role: () => role,
@@ -324,8 +327,10 @@
     e: CustomEvent<{ lat: number; lng: number; bbox?: Bbox; zoom?: number }>
   ) {
     const { lat, lng, bbox, zoom } = e.detail;
-    if (bbox) setViewFromBounds(bbox);
-    else mapStore.setView({ lng, lat, zoom: zoom ?? 15 });
+    if (!reveal(bbox ?? [lng, lat, lng, lat])) {
+      if (bbox) setViewFromBounds(bbox);
+      else mapStore.setView({ lng, lat, zoom: zoom ?? 15 });
+    }
     // The camera alone leaves the reader guessing which of the hundred things
     // under the crosshair they searched for — the same reason a label hit
     // pulses. A bbox pick pulses at its centre, which is where it centred.
@@ -354,7 +359,9 @@
     tallyMapOpen(map.id);
     trackMeasurement('map_open', { surface: 'explore', map_id: map.id, action: 'open' });
     if (h.lng != null && h.lat != null) {
-      mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
+      if (!reveal([h.lng, h.lat, h.lng, h.lat])) {
+        mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
+      }
       focusPoint = { lng: h.lng, lat: h.lat };
       syncAtParam(focusPoint);
       // The label names the place, the sheet it came from dates it.
