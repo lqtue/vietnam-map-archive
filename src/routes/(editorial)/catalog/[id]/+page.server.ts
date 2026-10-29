@@ -40,7 +40,43 @@ import { verifiedEditorSourceId } from '$lib/core/iiif/annotationUrl';
 // (`map_images`, aliased back to `map_iiif_sources` below), and nothing
 // replaces the subject field.
 const MAP_COLUMNS =
-  'id, slug, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, map_subjects, depicted_state, classification_status, classification_note, classification_source_url, location, region, regions, regions_2025, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, duplicate_of_map_id, archive_reason, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type, content_role)';
+  'id, slug, series_key, sheet_number, name, dc_description:description, year, year_label:date_label, creator, dc_publisher:publisher, holding_institution, collection, map_type, map_subjects, depicted_state, classification_status, classification_note, classification_source_url, location, region, regions, regions_2025, thumbnail, iiif_image, allmaps_id, annotation_url, georef_done:is_georeferenced, status, bbox, source_url, shelfmark, rights, original_title, physical_description, duplicate_of_map_id, archive_reason, map_iiif_sources:map_images(iiif_image, iiif_manifest, source_type, content_role)';
+
+/**
+ * Where an archived sheet's addresses go, or a 404. Only when staff recorded a
+ * reason: to the duplicate it gave way to, if that is a settled public record;
+ * otherwise to its survey cell, which lists every record still held for it —
+ * how a third party's join of two half-sheets hands its addresses to both
+ * halves at once (`scripts/oneoff/archive_25k_composites.mjs`).
+ */
+async function archivedRedirect(
+  supabase: ReturnType<typeof adminClient>,
+  map: {
+    duplicate_of_map_id: string | null;
+    archive_reason: string | null;
+    series_key: string | null;
+    sheet_number: string | null;
+  },
+  url: URL
+): Promise<never> {
+  if (!map.archive_reason?.trim()) throw error(404, 'No published map at that address');
+  const prefix = localeFromPath(url.pathname) ? '/vi' : '';
+  if (map.duplicate_of_map_id) {
+    const { data: survivor } = await supabase
+      .from('maps')
+      .select('slug')
+      .eq('id', map.duplicate_of_map_id)
+      .in('status', ['public', 'featured'])
+      .maybeSingle();
+    if (!survivor?.slug) throw error(404, 'No published map at that address');
+    throw redirect(301, `${prefix}/catalog/${survivor.slug}`);
+  }
+  if (map.series_key && map.sheet_number) {
+    const cell = `${encodeURIComponent(map.series_key)}/${encodeURIComponent(map.sheet_number)}`;
+    throw redirect(301, `${prefix}/catalog/series/${cell}`);
+  }
+  throw error(404, 'No published map at that address');
+}
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
   const ref = decodeURIComponent(params.id);
@@ -68,20 +104,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     ({ data: map } = await anyStatus().eq('id', id).maybeSingle());
     if (!map) throw error(404, 'No published map at that address');
 
-    if (map.status === 'archived') {
-      if (!map.duplicate_of_map_id || !map.archive_reason?.trim()) {
-        throw error(404, 'No published map at that address');
-      }
-      const { data: survivor } = await supabase
-        .from('maps')
-        .select('slug')
-        .eq('id', map.duplicate_of_map_id)
-        .in('status', ['public', 'featured'])
-        .maybeSingle();
-      if (!survivor?.slug) throw error(404, 'No published map at that address');
-      const prefix = localeFromPath(url.pathname) ? '/vi' : '';
-      throw redirect(301, `${prefix}/catalog/${survivor.slug}`);
-    }
+    if (map.status === 'archived') await archivedRedirect(supabase, map, url);
 
     // Check visibility before revealing the canonical address of a draft.
     if (map.status !== 'public' && map.status !== 'featured') {
@@ -96,22 +119,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
     throw redirect(301, `${prefix}/catalog/${map.slug}`);
   }
 
-  if (map.status === 'archived') {
-    // Old addresses redirect only when staff explicitly recorded a duplicate
-    // target and that target is a settled public record.
-    if (!map.duplicate_of_map_id || !map.archive_reason?.trim()) {
-      throw error(404, 'No published map at that address');
-    }
-    const { data: survivor } = await supabase
-      .from('maps')
-      .select('slug,status')
-      .eq('id', map.duplicate_of_map_id)
-      .in('status', ['public', 'featured'])
-      .maybeSingle();
-    if (!survivor?.slug) throw error(404, 'No published map at that address');
-    const prefix = localeFromPath(url.pathname) ? '/vi' : '';
-    throw redirect(301, `${prefix}/catalog/${survivor.slug}`);
-  }
+  if (map.status === 'archived') await archivedRedirect(supabase, map, url);
 
   const published = map.status === 'public' || map.status === 'featured';
   if (!published) {
