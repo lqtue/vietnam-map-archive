@@ -14,7 +14,7 @@
 // only), Cửa Trà Lý 1926 and An Thi 1904 (no halves) stay.
 //
 // Tiles go only when the image prefix is the row's own uuid and no other row
-// points at it.
+// points at it. The same run archives `my-tho-e` (see below).
 import { execFileSync } from 'node:child_process';
 import { serviceClient } from '../lib/db.mjs';
 
@@ -45,15 +45,46 @@ const go = composites.filter(
     halves.has(`${r.sheet_number}|${r.year}|E`)
 );
 const stay = composites.filter((r) => !go.includes(r));
+for (const r of go) r.reason = REASON;
 
 console.log(`${composites.length} composites: ${go.length} to archive, ${stay.length} stay`);
 for (const r of stay) console.log(`  stays: ${r.slug} (${r.sheet_number}, ${r.year})`);
+
+// Also: Indochine 1:100,000 sheet 229 E. IGN's Nakala deposit for it
+// (nkl.710d1rim, "409_56366") holds 229W_27.jpg, byte-identical to the west
+// half's deposit, so `my-tho-e` shows the west half. No east-half scan is on
+// Nakala; its address opens cell 229, which honestly lists the west half alone.
+const { data: myThoE, error: mtErr } = await db
+  .from('maps')
+  .select('id,slug,status,series_key,sheet_number,sheet_half,year,iiif_image')
+  .eq('slug', 'my-tho-e')
+  .neq('status', 'archived');
+if (mtErr) throw mtErr;
+for (const r of myThoE) {
+  r.reason =
+    "IGN's Nakala deposit for sheet 229 East (nkl.710d1rim) holds the West half's file " +
+    '(229W_27.jpg, same SHA-1), so this record showed the wrong half. No East scan is known.';
+  go.push(r);
+}
+
 for (const r of go) console.log(`  ${r.slug} → /catalog/series/${r.series_key}/${r.sheet_number}`);
 
+// Tiles go only when no other row's image lives under the same prefix.
 const prefixOf = (r) => r.iiif_image?.match(/\/iiif\/([0-9a-f-]{36})(?:\/|$)/)?.[1];
+const others = [];
+for (let from = 0; ; from += 1000) {
+  const { data, error: e } = await db
+    .from('maps')
+    .select('id,iiif_image')
+    .range(from, from + 999);
+  if (e) throw e;
+  others.push(...data);
+  if (data.length < 1000) break;
+}
+const goIds = new Set(go.map((r) => r.id));
 const shared = new Set(
-  rows
-    .filter((r) => !go.includes(r))
+  others
+    .filter((r) => !goIds.has(r.id))
     .map(prefixOf)
     .filter(Boolean)
 );
@@ -65,18 +96,21 @@ if (!APPLY) {
   process.exit(0);
 }
 
-const { data: done, error: upErr } = await db
-  .from('maps')
-  .update({ status: 'archived', archive_reason: REASON })
-  .in(
-    'id',
-    go.map((r) => r.id)
-  )
-  .select('id');
-if (upErr) throw upErr;
-console.log(`archived ${done.length} rows`);
+const archived = new Set();
+for (const reason of new Set(go.map((r) => r.reason))) {
+  const { data: done, error: upErr } = await db
+    .from('maps')
+    .update({ status: 'archived', archive_reason: reason })
+    .in(
+      'id',
+      go.filter((r) => r.reason === reason).map((r) => r.id)
+    )
+    .select('id');
+  if (upErr) throw upErr;
+  for (const r of done) archived.add(r.id);
+}
+console.log(`archived ${archived.size} rows`);
 
-const archived = new Set(done.map((r) => r.id));
 for (const r of purge.filter((r) => archived.has(r.id))) {
   execFileSync('rclone', ['purge', `r2:vma-tiles/tiles/${r.id}`], { stdio: 'inherit' });
   console.log(`  tiles deleted: ${r.slug}`);
