@@ -98,6 +98,12 @@ MAP_ID="${1:?Usage: tile_map.sh <map-uuid> <source-image-url-or-path> [original-
 
 BUCKET="vma-tiles"
 WORKER_BASE="https://iiif.maparchive.vn/iiif"
+# Every reader takes the tile size from info.json (worker, vma_core, OpenLayers,
+# Allmaps), so this is the only place it is chosen. 512, not 256: about a
+# quarter of the objects for the same bytes, and R2 bills writes per object
+# (566 → 152 on L7014 6150-4; docs/journals/261029-tile-512.md). Maps tiled
+# at 256 stay as they are.
+TILE_SIZE="${TILE_SIZE:-512}"
 
 # ── Settle the version before anything expensive happens ────────────────────
 # A wrong version is only cheap to fix before the download, and it is the one
@@ -180,7 +186,7 @@ if (( DRY_RUN )); then
   echo "── dry run — nothing downloaded, tiled or uploaded ──"
   echo "   R2 prefix:    r2:$BUCKET/$DEST_PREFIX/"
   echo "   info.json:    $DEST_PREFIX/info.json"
-  echo "   tile:         $DEST_PREFIX/0,0,1024,1024/256,/0/default.jpg"
+  echo "   tile:         $DEST_PREFIX/0,0,$((TILE_SIZE * 4)),$((TILE_SIZE * 4))/$TILE_SIZE,$TILE_SIZE/0/default.jpg"
   echo "   thumbnails:   $DEST_PREFIX/full/200,/0/default.jpg  (and 400, 800)"
   if [[ -n "$ORIGINAL_IIIF" ]]; then
     echo "   proxy source: sources/$MAP_ID  (one per map, never versioned)"
@@ -210,10 +216,10 @@ fi
 OUTPUT_DIR="$TMPDIR/tiles"
 mkdir -p "$OUTPUT_DIR"
 
-echo "→ Tiling with vips (IIIF layout, 256px tiles, Q=85)..."
+echo "→ Tiling with vips (IIIF layout, ${TILE_SIZE}px tiles, Q=85)..."
 vips dzsave "$TMPDIR/source.jpg" "$OUTPUT_DIR/source" \
   --layout iiif3 \
-  --tile-size 256 \
+  --tile-size "$TILE_SIZE" \
   --suffix ".jpg[Q=85]"
 
 # dzsave with --layout iiif3 creates a subfolder named after the input file (source).
@@ -248,7 +254,7 @@ if [[ -f "$MAP_DIR/info.json" ]]; then
   W=$(jq -r '.width' "$MAP_DIR/info.json")
   H=$(jq -r '.height' "$MAP_DIR/info.json")
   KEPT=$(for sf in $(jq -r '.tiles[0].scaleFactors[]' "$MAP_DIR/info.json"); do
-           span=$((256 * sf))
+           span=$((TILE_SIZE * sf))
            tw=$(( span < W ? span : W )); th=$(( span < H ? span : H ))
            # Sizes round up, per axis, independently — same rule the worker's
            # `widthOnlySizeToExplicit` has to reproduce.
