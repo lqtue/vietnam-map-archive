@@ -62,7 +62,8 @@ import Text from 'ol/style/Text';
 import type { FeatureLike } from 'ol/Feature';
 import { isDarkTheme } from '$lib/core/utils/theme';
 
-export const BASEMAP_PMTILES_URL = 'https://tiles.maparchive.vn/basemap/vietnam-z14-20261028.pmtiles';
+export const BASEMAP_PMTILES_URL =
+  'https://tiles.maparchive.vn/basemap/vietnam-z14-20261028.pmtiles';
 
 /**
  * The surroundings, thinly: the same Protomaps build clipped to
