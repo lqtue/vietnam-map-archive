@@ -1,5 +1,10 @@
 # L7014 rebuild checklist
 
+> **Closed 2026-10-29, never executed.** The mosaic stopped being served on 2026-10-03 (`598fbe1b`:
+> the series is one IIIF map per sheet now), and `overlay/l7014-20260913.pmtiles` was deleted from
+> R2 on 2026-10-29. The exact bytes are kept offline in `../vma-snapshots/261029-l7014-overlay/`.
+> Kept for the record of the build and its datum traps.
+
 > **Naming:** the ROADMAP item this checklist executes is **N1**; it was called **I3** when this
 > file was written, and both names appear below. The I-series entry now lives in
 > `docs/roadmap-record.md`.

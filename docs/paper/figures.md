@@ -172,8 +172,10 @@ sheet numbers 0 rows out of order
 | ArcGIS index, shifted correctly | agrees with the GeoPDFs' own `NEATLINE` to **4–17 m** | `guides/architecture.md` |
 | hand-georeferenced sheets | 2.3–19.0 m rms, unaffected | ibid |
 
-**State to report, not hide:** the live archive `l7014-20260913` is **not rebuilt**. `fit` fails on
-it. This is the paper's exhibit, and it must be labelled as current state.
+**State to report, not hide:** the archive `l7014-20260913` was **never rebuilt**. `fit` fails on
+it. It stopped being served on 2026-10-03 and was deleted from R2 on 2026-10-29; the exact bytes are
+kept offline (`../vma-snapshots/261029-l7014-overlay/`). This is the paper's exhibit, and it must be
+labelled as a past serving state.
 
 ### 3.4 `Ha Noi` — the sheet every per-sheet check passes
 

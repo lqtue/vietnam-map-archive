@@ -854,15 +854,17 @@ sheets outside the fault: their control-point residuals remain 2.3–19.0 m RMS.
 validate the proposed interpretation and correction; they do not describe a rebuilt public mosaic.
 
 <!--block:B0108-->
-That distinction is deliberate, and the live state is worse than "uncorrected". At the time of
-writing the `l7014-20260913` archive has not been re-warped or re-uploaded, and its sheet manifest
-returns 404: the build shipped pixels without the accompanying `.geojson`, so `fit` cannot be run
-against the serving layer at all and the 452 constant quoted in §3 cannot be checked against it. What
-readers currently receive is therefore not merely displaced but unmeasurable from outside — itself an
-instance of §7.7's point that a serving layer needs its own instrument. The published fault is
-therefore part of the result, not a historical problem retrospectively erased from the evidence. A
-rebuild is an operational next step; reporting the dry run separately prevents it from being mistaken
-for a measurement of the current serving layer.
+That distinction is deliberate. The `l7014-20260913` archive was never re-warped or re-uploaded,
+and while it was served its state was worse than "uncorrected": its sheet manifest returned 404,
+because the build shipped pixels without the accompanying `.geojson`, so `fit` could not be run
+against the serving layer at all and the 452 constant quoted in §3 could not be checked against it.
+What readers received was therefore not merely displaced but unmeasurable from outside — itself an
+instance of §7.7's point that a serving layer needs its own instrument. The archive stopped being
+served on 2026-10-03, when the series moved to one IIIF image per sheet, each placed by its own
+georeference annotation; that layer is not measured here. Its bytes were removed from public storage
+on 2026-10-29 and are kept offline by the author. The published fault is therefore part of the
+result, not a historical problem retrospectively erased from the evidence. Reporting the dry run
+separately prevents it from being mistaken for a measurement of any serving layer.
 
 <!--block:B0109-->
 **Figure 7 — the correction recovers cell placement in the local reproduction.** Bars use a
