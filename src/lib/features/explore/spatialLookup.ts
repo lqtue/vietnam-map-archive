@@ -36,6 +36,22 @@ export function bboxContainsPoint(bbox: Bbox, lon: number, lat: number): boolean
   return lon >= bbox[0] && lon <= bbox[2] && lat >= bbox[1] && lat <= bbox[3];
 }
 
+/**
+ * Whether `target` (a box, or a point as a zero-size box) shows in `viewport`,
+ * not counting a margin round the edge: something hugging the frame, or under
+ * a panel, reads as off screen.
+ */
+export function bboxOnScreen(viewport: Bbox, target: Bbox, inset = 0.1): boolean {
+  const dx = (viewport[2] - viewport[0]) * inset;
+  const dy = (viewport[3] - viewport[1]) * inset;
+  return (
+    target[0] <= viewport[2] - dx &&
+    target[2] >= viewport[0] + dx &&
+    target[1] <= viewport[3] - dy &&
+    target[3] >= viewport[1] + dy
+  );
+}
+
 function bboxArea(bbox: Bbox): number {
   return Math.max(0, bbox[2] - bbox[0]) * Math.max(0, bbox[3] - bbox[1]);
 }
