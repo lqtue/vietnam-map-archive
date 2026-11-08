@@ -23,7 +23,7 @@ Copyright: facts and page numbers only. The PDFs stay in `_archive/bookcrawl/`.
 | S01 | *Nam Kỳ địa hạt tổng thôn danh hiệu mục lục* (1892 list; NĐT translation and notes, 2017) | The only copy, a Hán manuscript at Thư viện KHXH Hà Nội (A 975), photographed via Nguyễn Quang Ân; facsimile printed alongside (pp. 3–6) | yes |
 | S04 | *Địa chí hành chánh các tỉnh Nam Kỳ thời Pháp thuộc* (2017) | Acts left over from S05, by province, each footnoted to a BOCF/BACF year and shelf mark (J.xxxx), about 1,047 footnotes (pp. 5–9) | yes |
 | S05 | *Chế độ thực dân Pháp trên đất Nam Kỳ (1859–1954)*, 2 vols | The parent work of S04 | no, images only |
-| S03 | *Gia Định – Sài Gòn – TP HCM: dặm dài lịch sử (1698–2020)*, 2 vols (2022) | A 1998 manuscript of about 1,500 pages, commissioned for the city's 300th year and never printed, revised in 2020–22 (vol. 2, p. 5–6) | vol. 2 mostly; vol. 1 images only |
+| S03 | *Gia Định – Sài Gòn – TP HCM: dặm dài lịch sử (1698–2020)*, 2 vols (2022) | A 1998 manuscript of about 1,500 pages, commissioned for the city's 300th year and never printed, revised in 2020–22 (vol. 2, p. 5–6) | yes, both volumes (vol. 1 OCR layer read 2026-11-09) |
 
 ## Errors to watch, with the cases found
 
@@ -32,9 +32,19 @@ Copyright: facts and page numbers only. The PDFs stay in `_archive/bookcrawl/`.
      - S02 (PDF p. 328): all of Khánh Hội, 21-3-1904;
      - S01 note (p. 43): 31-12-1907;
      - Baudrit, from the council registers (E12b, E17): part on 15-3-1895 and the rest on 16-8-1907.
-     - Neither of his versions has the 1895 step. 21-3-1904 is the date of the Tân Hòa–Phú Thạnh act
-       (E16b), and 31-12-1907 is when tổng Dương Minh was dissolved. He seems to have attached the
-       village to a neighbouring act.
+     - **Corrected 2026-11-09 (text layers, one reader; page images not yet checked):** two of his texts
+       *do* have the 1895 step. S02's entry for làng Khánh Hội (PDF p. 506–507) gives 15-3-1895 (a strip),
+       21-8-1907 (a part) and "1930 nhập cả" (the whole). S03 vol. 1 (PDF p. 344) gives 15-3-1895 (a
+       strip along the river, limits to the Messageries Maritimes) and 21-8-1907 (a part, with a 300 m
+       strip south of Kênh Tẻ left out), and puts 21-3-1904 on Tân Hòa and Phú Thạnh, correctly. So his
+       work gives four answers: 1904 (S02 p. 328), 31-12-1907 (S01), 1895 + 1907 + 1930 (S02 p. 506–507),
+       1895 + 1907 (S03).
+     - 21-3-1904 is the date of the Tân Hòa–Phú Thạnh act (E16b), and 31-12-1907 is when tổng Dương Minh
+       was dissolved. In S02 p. 328 he seems to have attached the village to a neighbouring act.
+     - 16-8 against 21-8-1907: Baudrit, Nguyễn Quang Ân (vol. 1 p. 276, citing Dương Kinh Quốc, not Tư)
+       and TTLTQG II's *50 dấu ấn* (2025, p. 147–149, HS 16753, "the whole village") give 16-8; Tư gives
+       21-8 (he dates by signing: rule 8 below). The archive's book cuts the land south of kinh Tẻ from
+       Saigon in 1918 (HS 16759, 16797), which conflicts with Tư's 1930. 1930 needs its own act.
    - Where Chánh Hưng went in 1907: Chợ Lớn city (S01 p. 43) or tổng Tân Phong Hạ (S02 p. 328).
    - When tổng Dương Minh was created:
      - with hạt 20 on 13-12-1880 (S01 p. 43, S02 p. 327);
