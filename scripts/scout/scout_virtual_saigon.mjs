@@ -12,7 +12,7 @@
 // link, never a scan. The date is the site's, not ours; `raw.dateNote` says so.
 
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 const unwrap = (u) => u.replace(/^https?:\/\/web\.archive\.org\/web\/\d+[a-z_]*\//, '');
 const text = (h) =>
@@ -100,7 +100,9 @@ export function toScoutRow(f) {
 }
 
 const [mode, dir] = [process.argv[2], process.argv[3]];
-const files = (re) => (dir ? readdirSync(dir).filter((n) => re.test(n)) : []);
+// <dir> may hold the pages flat or in subfolders (the saved snapshot has lists/ and records/).
+const files = (re) =>
+  dir ? readdirSync(dir, { recursive: true }).filter((n) => re.test(basename(n))) : [];
 
 if (mode === '--ids') {
   const ids = new Set();
