@@ -95,6 +95,8 @@ measured yet. Update the row whenever a harvest runs.
 | Wikimedia Commons | re-hosts (Rumsey, others) | | 1 + 15 | | | |
 | Internet Archive | | ~3,500 noisy hits | | | | Skipped: no clean filter |
 | NLV press | newspapers, not maps | 2,921 articles | | | `scout/scout_nlv_press.mjs` | Period sources, not the map corpus |
+| Virtual Saigon (IAO, Lyon; site down) | Saigon and Hồ Chí Minh City maps, 1790–2016 | 532 titles | | 154 full + 378 title only | `scout/scout_virtual_saigon.mjs`, from saved Wayback pages | The other 378 records exist only at the site's owners. Holders (Texas Tech, IAO) are the route to scans. Not loaded into the queue |
+| IVCE, Thang Tran collection (`ivce.org/map`) | Asia and world maps of the East Sea, 1618–2008 | 162 captioned pages | | | crawled once, 2026-11-08 | Checked and parked: no caption names Saigon or Cochinchina; no licence stated |
 
 Not looked at yet: Old Maps Online (a union index, which may answer the kill line), EFEO, Leiden
 (KITLV), the British Library, Stanford EarthWorks.
