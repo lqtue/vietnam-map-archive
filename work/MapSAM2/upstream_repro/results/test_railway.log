@@ -1,0 +1,7 @@
+best checkpoint: logs/HM2D_railway_2026_11_16_06_05_59/Model/epoch_193.pth
+/content/MapSAM2/sam2_train/modeling/sam/transformer.py:22: UserWarning: Flash Attention is disabled as it requires a GPU with Ampere (8.0) CUDA capability.
+Total trainable parameter count: 11809718
+Running in test-only mode...
+✅ Test Results -- Total: 0.0956, IOU: 0.7369, DICE: 0.8298
+test exit 0
+ALLDONE

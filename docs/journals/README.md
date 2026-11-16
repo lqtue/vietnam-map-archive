@@ -7,6 +7,7 @@ use the [roadmap](../ROADMAP.md) for current tasks. [Documentation guide](../REA
 
 | Record | Subject |
 |---|---|
+| [261116](261116-mapsam2-upstream-repro.md) | MapSAM2 step 0: upstream code on its own railway data, on a Colab T4, reproduces the paper (73.69 against 73.0 IoU, 10-shot); vineyard not run |
 | [261019](261019-explore-performance.md) | Explore pagination, series resource limits and synthetic 10k/100k SQL measurements |
 | [261019](261019-1971-province-mask.md) | 1971 provincial sheets: cutting each sheet to its own province by colour — what works, five error types |
 | [261012](261012-manual-baseline.md) | Manual baseline: human latency, correction rates and one-off effort per pipeline stage, from existing data |
