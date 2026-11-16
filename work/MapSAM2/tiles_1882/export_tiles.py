@@ -13,8 +13,9 @@ rebuilds every tile's mask, and writes upstream's layout, once per image variant
 
 Run with a Python that has numpy, pillow, shapely, requests, opencv-python-headless:
 
-    python export_tiles.py                      # all tiles
-    python export_tiles.py --strict-only        # drop tiles that overlap a calibrate window
+    python export_tiles.py                      # strict tiles only: none touches any window in windows.json
+    python export_tiles.py --include-relaxed    # also the provisional tiles (overlap calibrate windows);
+                                                # written to out_with_relaxed/, never into out/
     python export_tiles.py --require-reviewed   # exit 1 while any needs_review building touches a tile
     python export_tiles.py --self-check         # synthetic case, no network
     python export_tiles.py --update-tiles-json  # also copy today's counts into tiles.json
@@ -263,7 +264,20 @@ def fetch_tile_image(map_id: str, box) -> np.ndarray:
     im = iiif.fetch_crop(base, box[0], box[1], box[2], box[3], size=box[2])
     if im.size != (box[2], box[3]):
         raise SystemExit(f"crop came back {im.size}, expected {(box[2], box[3])}")
-    return np.array(im.convert("RGB"))
+    arr = np.array(im.convert("RGB"))
+    assert_no_holes(arr, box)
+    return arr
+
+
+def assert_no_holes(arr: np.ndarray, box, block: int = 256) -> None:
+    """fetch_crop may return a level-0 assembly with up to 10% of its tiles missing (white) and does
+    not cache it, so a later run could differ. Scan paper is cream, never pure white: fail on any
+    256 px block that is."""
+    h, w = arr.shape[:2]
+    for y in range(0, h, block):
+        for x in range(0, w, block):
+            if (arr[y:y + block, x:x + block] >= 254).all():
+                raise SystemExit(f"crop {list(box)} has an all-white {block} px block at ({x},{y}): missing tile, run again")
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -296,7 +310,7 @@ def locator(cfg, wins, tiles, out: Path, scale: int = 8) -> None:
 def run(args) -> int:
     cfg = json.loads(TILES_JSON.read_text())
     wins = load_windows()
-    tiles = [t for t in cfg["tiles"] if not (args.strict_only and t["relaxed"])]
+    tiles = [t for t in cfg["tiles"] if args.include_relaxed or not t["relaxed"]]
     if args.only:
         tiles = [t for t in tiles if t["id"] in args.only]
     # rules: never a held-out, reference or furniture window; calibrate only when marked relaxed
@@ -314,7 +328,7 @@ def run(args) -> int:
         for t in tiles:
             if boxes_hit(r["box"], t["box"]):
                 raise SystemExit(f"reserved {r['id']} overlaps tile {t['id']}")
-    out = Path(args.out)
+    out = Path(args.out) if args.out else (HERE / "out_with_relaxed" if args.include_relaxed else DEFAULT_OUT)
     rows = fetch_footprints(cfg["map_id"])
     ocr_rows = fetch_ocr(cfg["map_id"], cfg["ocr_run"])
     print(f"{len(rows)} footprint rows, {len(ocr_rows)} OCR rows ({cfg['ocr_run']})")
@@ -415,6 +429,14 @@ def self_check() -> None:
     om[95:115, 95:165] = 255
     out = inpaint(img, om)
     assert out[100:110, 100:160].min() > 150 and (out[500:600, 500:600] == img[500:600, 500:600]).all()
+    holes = np.full((1024, 1024, 3), (235, 220, 190), np.uint8)
+    assert_no_holes(holes, (0, 0, 1024, 1024))
+    holes[256:512, 512:768] = 255
+    try:
+        assert_no_holes(holes, (0, 0, 1024, 1024))
+        raise AssertionError("white block not caught")
+    except SystemExit:
+        pass
     # windows: a tile on the heldout box is refused, one beside it is not
     wins = load_windows()
     assert check_tile((3500, 2600, 1024, 1024), wins)["heldout"]                      # creek_nw
@@ -433,9 +455,9 @@ def self_check() -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--out", default=str(DEFAULT_OUT))
+    ap.add_argument("--out", default=None, help="default: out/, or out_with_relaxed/ with --include-relaxed")
     ap.add_argument("--only", nargs="*")
-    ap.add_argument("--strict-only", action="store_true", help="skip tiles marked relaxed")
+    ap.add_argument("--include-relaxed", action="store_true", help="also export tiles marked relaxed (they overlap calibrate windows)")
     ap.add_argument("--require-reviewed", action="store_true")
     ap.add_argument("--update-tiles-json", action="store_true")
     ap.add_argument("--self-check", action="store_true")

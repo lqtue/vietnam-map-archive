@@ -6,6 +6,7 @@
   ],
   "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
   "ocr_run": "post0910",
+  "exposure": "R2 was seen on a 1/3 scale crop with colour-pass building outlines drawn; R1 only on 1/6 and 1/8 whole-sheet overviews, also with outlines; neither at native size. No held-out unseen window was drawn (view.blank on every preview).",
   "building_rule": "mask = union of building rows with review_status != rejected, clipped to the tile",
   "exclusion_sources": [
     "river-reference/windows.json: every 1882 window, heldout and calibrate, both layers",
