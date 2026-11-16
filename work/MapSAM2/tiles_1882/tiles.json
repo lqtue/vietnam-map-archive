@@ -1,0 +1,232 @@
+{
+  "map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+  "image": [
+    12102,
+    8982
+  ],
+  "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
+  "ocr_run": "post0910",
+  "building_rule": "mask = union of building rows with review_status != rejected, clipped to the tile",
+  "exclusion_sources": [
+    "river-reference/windows.json: every 1882 window, heldout and calibrate, both layers",
+    "river-1882/river-windows.json binary_controls (all inside windows.json boxes)",
+    "docs/ROADMAP.md shape-precision window 4420,3800,650,550 (the only parcel reference window recorded; plan phase 2 shapes_ref_1/_2 were never written to windows.json, on any branch)",
+    "windows.json furniture boxes (title, scale, legend)"
+  ],
+  "reserved_test": [
+    {
+      "id": "R1",
+      "box": [
+        4760,
+        4790,
+        600,
+        600
+      ],
+      "note": "dense shophouse blocks near Rue Pellerin; 21 colour-pass building rows; clear of every window; no volunteer trace",
+      "volunteer_traces": 0
+    },
+    {
+      "id": "R2",
+      "box": [
+        8500,
+        2590,
+        600,
+        600
+      ],
+      "note": "pink blocks round the Poste de Police, Rue Larclauze; clear of every window and of every volunteer trace (moved up from y 2680, which a large volunteer land_plot reached)",
+      "volunteer_traces": 0
+    }
+  ],
+  "tiles": [
+    {
+      "id": "t01",
+      "box": [
+        6300,
+        2610,
+        1024,
+        1024
+      ],
+      "split": "val",
+      "relaxed": false,
+      "note": "Eveche and Camp des Lettres: pink blocks with small buildings beside blue military compounds",
+      "stats": {
+        "buildings": 11,
+        "needs_review": 11,
+        "rejected": 0,
+        "pct_building": 9.06,
+        "ocr_boxes": 14
+      }
+    },
+    {
+      "id": "t02",
+      "box": [
+        6420,
+        3776,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": false,
+      "note": "Hopital Maritime north, Imprimerie Nationale: large blue compounds and pink plots",
+      "stats": {
+        "buildings": 1,
+        "needs_review": 1,
+        "rejected": 0,
+        "pct_building": 0.06,
+        "ocr_boxes": 13
+      }
+    },
+    {
+      "id": "t03",
+      "box": [
+        8728,
+        4720,
+        1024,
+        1024
+      ],
+      "split": "val",
+      "relaxed": false,
+      "note": "Magasins de la Marine, Rue Tay Ninh: long blue sheds",
+      "stats": {
+        "buildings": 5,
+        "needs_review": 5,
+        "rejected": 0,
+        "pct_building": 0.5,
+        "ocr_boxes": 4
+      }
+    },
+    {
+      "id": "t04",
+      "box": [
+        7512,
+        3312,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": false,
+      "note": "Camp des Indigenes and Hotel du General: mixed",
+      "stats": {
+        "buildings": 15,
+        "needs_review": 15,
+        "rejected": 0,
+        "pct_building": 1.12,
+        "ocr_boxes": 4
+      }
+    },
+    {
+      "id": "t05",
+      "box": [
+        5000,
+        2000,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": false,
+      "note": "Palais du Gouverneur in the Jardin: sparse, 1 to 3 buildings, hard negative (tree hatching)",
+      "stats": {
+        "buildings": 1,
+        "needs_review": 0,
+        "rejected": 0,
+        "pct_building": 2.57,
+        "ocr_boxes": 2
+      }
+    },
+    {
+      "id": "t06",
+      "box": [
+        2520,
+        3760,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": true,
+      "note": "Rue Lefebvre, Dayot: shophouse rows. Overlaps calibrate window west_dense (road layer) only",
+      "stats": {
+        "buildings": 29,
+        "needs_review": 29,
+        "rejected": 0,
+        "pct_building": 8.46,
+        "ocr_boxes": 6
+      }
+    },
+    {
+      "id": "t07",
+      "box": [
+        1176,
+        2864,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": true,
+      "note": "Marche de Cau Ong Lanh, Poste de Police: small shophouse blocks on the arroyo. Overlaps calibrate windows western_creek and abattoir_creeks (water layer) only",
+      "stats": {
+        "buildings": 22,
+        "needs_review": 22,
+        "rejected": 0,
+        "pct_building": 12.01,
+        "ocr_boxes": 7
+      }
+    },
+    {
+      "id": "t08",
+      "box": [
+        3864,
+        1520,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": true,
+      "note": "Jardin edge, Rue de la Grandiere: loose house rows. Overlaps calibrate window creek_crossing (road layer) only",
+      "stats": {
+        "buildings": 22,
+        "needs_review": 22,
+        "rejected": 0,
+        "pct_building": 2.4,
+        "ocr_boxes": 3
+      }
+    },
+    {
+      "id": "t09",
+      "box": [
+        7448,
+        5552,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": true,
+      "note": "Sainte-Enfance: one large compound. Overlaps calibrate windows dry_blue_parcels, arsenal_quay, garden_pond (water layer) only",
+      "stats": {
+        "buildings": 15,
+        "needs_review": 14,
+        "rejected": 0,
+        "pct_building": 6.88,
+        "ocr_boxes": 8
+      }
+    },
+    {
+      "id": "t10",
+      "box": [
+        6424,
+        5168,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "relaxed": true,
+      "note": "Artillerie and Cite Ouvriere: blue sheds. Overlaps calibrate windows dry_blue_parcels, arsenal_quay, quay_primauguet (water layer) only",
+      "stats": {
+        "buildings": 7,
+        "needs_review": 7,
+        "rejected": 0,
+        "pct_building": 4.27,
+        "ocr_boxes": 11
+      }
+    }
+  ]
+}
