@@ -85,9 +85,13 @@
     if (!ctx || !source || !id) return;
     const geom = source.getFeatureById(id)?.getGeometry();
     if (!geom) return;
+    // Cap the zoom by resolution, not zoom level. ImageShell's view keeps the default
+    // web-map zoom ladder, where zoom 6 is ~2,446 units per screen pixel; in image
+    // pixels that shrank a whole sheet to a few pixels, so every row "flew to nothing".
+    // 0.5 = at most two screen pixels per source pixel.
     ctx.map
       .getView()
-      .fit(geom.getExtent(), { padding: [80, 80, 80, 80], duration: 350, maxZoom: 6 });
+      .fit(geom.getExtent(), { padding: [80, 80, 80, 80], duration: 350, minResolution: 0.5 });
   }
 
   /** Modify only ever targets the selected polygon. */
