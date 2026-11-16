@@ -8,17 +8,19 @@ every tile's mask for the chosen target, and writes upstream's layout, once per 
     <out>/<target>/raw/annotation/{train,val}/<id>.png   0 / 255 mask
     <out>/<target>/inpainted/...                         same, with OCR text inpainted (cv2 TELEA)
     <out>/ocr/<id>.png                                   text mask (oriented rectangles)
-    <out>/review/<id>_overlay.png, <id>_plot_overlay.png, locator.png   for the eye
+    <out>/review/<id>_overlay.png, <id>_block_overlay.png, <id>_plot_overlay.png, locator.png   for the eye
     <out>/stats.json                                     per tile: counts, % foreground, OCR boxes
 
-Targets (--target, default plot-boundary):
+Targets (--target, default block-boundary; `all` writes the three):
+    block-boundary outline of each street block: the land_plot rows that are not rejected, dissolved
+                   (lots sharing an edge or closer than 10 px merge), outer ring only, 5 px wide
     plot-boundary  outline of every land_plot row that is not rejected, 5 px wide, 255 on 0
     building       filled union of building rows that are not rejected
 
 Run with a Python that has numpy, pillow, shapely, requests, opencv-python-headless:
 
-    python export_tiles.py                          # plot-boundary, all 10 tiles
-    python export_tiles.py --target building        # or both
+    python export_tiles.py                          # block-boundary, all 10 tiles
+    python export_tiles.py --target all             # block, plot and building
     python export_tiles.py --require-reviewed       # exit 1 while any needs_review row of the target touches a tile
     python export_tiles.py --self-check             # synthetic case, both targets, no network
     python export_tiles.py --update-tiles-json      # also copy today's counts into tiles.json
@@ -46,6 +48,7 @@ TILES_JSON = HERE / "tiles.json"
 DEFAULT_OUT = HERE / "out"
 SHAPE_PRECISION = (4420, 3800, 650, 550)  # docs/ROADMAP.md, the only parcel reference window
 PLOT_LINE_PX = 5  # see plot_boundary_mask
+BLOCK_GAP_PX = 10  # merge lots closer than this into one block; see block_boundary_mask and the README
 MAX_PLOT_PX2 = 500_000  # larger land_plot rows are whole domains, not lots (about 30 times the median block)
 
 # ── geometry helpers (pure) ──────────────────────────────────────────────────
@@ -170,6 +173,90 @@ def plot_boundary_mask(rows: list[dict], box, width: int = PLOT_LINE_PX) -> tupl
         cv2.polylines(mask, [pts], True, 255, width)
     counts["by_status"] = by_status
     return mask, counts
+
+
+def dissolve_blocks(polys: list, gap: float = BLOCK_GAP_PX) -> list:
+    """Merge polygons that share an edge, overlap, or sit closer than `gap` px into street blocks.
+
+    A closing: grow every polygon by gap/2 with mitred corners, union, shrink by gap/2. Corners stay
+    square and a block keeps its size. Two blocks end up merged only if the street between them is
+    narrower than `gap`."""
+    from shapely.ops import unary_union
+
+    if not polys:
+        return []
+    u = unary_union([p.buffer(gap / 2, join_style=2) for p in polys]).buffer(-gap / 2, join_style=2)
+    return [g for g in (u.geoms if u.geom_type == "MultiPolygon" else [u]) if not g.is_empty]
+
+
+def block_boundary_mask(rows: list[dict], box, width: int = PLOT_LINE_PX, gap: float = BLOCK_GAP_PX) -> tuple[np.ndarray, dict]:
+    """Outline of each street block: the land_plot rows touching the tile, not rejected, dissolved.
+
+    Lots stay in the table as they are; here they only decide where a block is. Only each block's
+    outer ring is drawn, so no line sits inside a block. The ring is drawn whole in tile coordinates
+    and cv2 cuts it at the tile edge (no line along the tile border).
+
+    Gap: see BLOCK_GAP_PX. Rejecting a lot removes it from its block, so a correct lot should be
+    approved, not rejected.
+    """
+    import cv2
+    from shapely.geometry import Polygon, box as sbox
+
+    x0, y0, w, h = box
+    tile = sbox(x0, y0, x0 + w, y0 + h)
+    mask = np.zeros((h, w), np.uint8)
+    counts = {"plots": 0, "needs_review": 0, "rejected": 0, "skipped_domain": 0}
+    by_status: dict[str, int] = {}
+    polys = []
+    for r in rows:
+        if r["feature_type"] != "land_plot" or len(r["pixel_polygon"]) < 3:
+            continue
+        poly = Polygon(r["pixel_polygon"])
+        if not poly.is_valid:
+            poly = poly.buffer(0)
+        if poly.is_empty or not poly.intersects(tile):
+            continue
+        if poly.area > MAX_PLOT_PX2 and r.get("source", "volunteer") != "import":
+            counts["skipped_domain"] += 1
+            continue
+        st = r["review_status"]
+        by_status[st] = by_status.get(st, 0) + 1
+        if st == "rejected":
+            counts["rejected"] += 1
+            continue
+        counts["plots"] += 1
+        if st == "needs_review":
+            counts["needs_review"] += 1
+        polys.append(poly)
+    blocks = [b for b in dissolve_blocks(polys, gap) if b.intersects(tile)]
+    for b in blocks:
+        ring = np.round(np.array(b.exterior.coords) - [x0, y0]).astype(np.int32)
+        cv2.polylines(mask, [ring], True, 255, width)
+    counts["blocks"] = len(blocks)
+    counts["by_status"] = by_status
+    counts["block_polys"] = blocks
+    return mask, counts
+
+
+def block_overlay(img_rgb: np.ndarray, mask: np.ndarray, blocks: list, box, title: str) -> Image.Image:
+    arr = img_rgb.copy()
+    arr[mask > 0] = (255, 0, 255)
+    im = Image.fromarray(arr)
+    d = ImageDraw.Draw(im)
+    try:
+        from PIL import ImageFont
+        font = ImageFont.load_default(size=22)
+    except Exception:  # older Pillow: default bitmap font
+        font = None
+    for i, b in enumerate(blocks):
+        p = b.representative_point()
+        x, y = p.x - box[0], p.y - box[1]
+        if 0 <= x < box[2] and 0 <= y < box[3]:
+            d.rectangle([x - 4, y - 2, x + 11 * len(str(i)) + 2, y + 24], fill=(255, 255, 200))
+            d.text((x, y), str(i), fill=(0, 0, 0), font=font)
+    d.rectangle([0, 0, 400, 16], fill=(255, 255, 255))
+    d.text((3, 2), title + f"  magenta = block-boundary mask (5 px, gap {BLOCK_GAP_PX} px), numbers = block ids", fill=(0, 0, 0))
+    return im
 
 
 def plot_overlay(img_rgb: np.ndarray, mask: np.ndarray, title: str) -> Image.Image:
@@ -378,7 +465,7 @@ def run(args) -> int:
     tiles = cfg["tiles"]
     if args.only:
         tiles = [t for t in tiles if t["id"] in args.only]
-    targets = ["plot-boundary", "building"] if args.target == "both" else [args.target]
+    targets = ["block-boundary", "plot-boundary", "building"] if args.target == "all" else [args.target]
     # rules: never a held-out, reference or furniture window; calibrate windows are allowed
     for t in tiles:
         hit = check_tile(t["box"], wins)
@@ -422,26 +509,30 @@ def run(args) -> int:
              and box[0] <= r["global_x"] + r["global_w"] / 2 < box[0] + box[2] and box[1] <= r["global_y"] + r["global_h"] / 2 < box[1] + box[3]}
         )[:6]
         for tg in targets:
-            mask, c = building_mask(rows, box) if tg == "building" else plot_boundary_mask(rows, box)
+            mask, c = {"building": building_mask, "plot-boundary": plot_boundary_mask, "block-boundary": block_boundary_mask}[tg](rows, box)
             for variant, im in (("raw", img), ("inpainted", clean)):
                 write_tile(out / tg / variant, t["split"], t["id"], im, mask)
             s[tg] = {"rows": c["building"] if tg == "building" else c["plots"], "needs_review": c["needs_review"], "rejected": c["rejected"],
                      "by_status": c["by_status"], "pct_foreground": round(100 * float((mask > 0).mean()), 2)}
+            if tg == "block-boundary":
+                s[tg]["blocks"] = c["blocks"]
             todo[tg] += c["needs_review"]
             if tg == "building":
                 overlay(img, rows, ocr_rows, box, t["id"]).save(out / "review" / f"{t['id']}_overlay.png")
-            else:
+            elif tg == "plot-boundary":
                 plot_overlay(img, mask, t["id"]).save(out / "review" / f"{t['id']}_plot_overlay.png")
+            else:
+                block_overlay(img, mask, c["block_polys"], box, t["id"]).save(out / "review" / f"{t['id']}_block_overlay.png")
         print(t["id"], box, t["split"], {tg: (s[tg]["rows"], s[tg]["needs_review"], s[tg]["pct_foreground"]) for tg in targets}, "ocr", on["all"])
     locator(cfg, wins, tiles, out)
     (out / "stats.json").write_text(json.dumps({"reserved_test": cfg["reserved_test"], "tiles": stats}, indent=1))
     if args.update_tiles_json:
         for t in cfg["tiles"]:
             if t["id"] in stats:
-                t["stats"] = {**t.get("stats", {}), **{tg: {k: stats[t["id"]][tg][k] for k in ("rows", "needs_review", "rejected", "pct_foreground")} for tg in targets}}
+                t["stats"] = {**t.get("stats", {}), **{tg: {k: stats[t["id"]][tg][k] for k in ("rows", "needs_review", "rejected", "pct_foreground", "blocks") if k in stats[t["id"]][tg]} for tg in targets}}
         TILES_JSON.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n")
     for tg in targets:
-        print(f"needs_review {'land_plot' if tg == 'plot-boundary' else 'building'} rows still touching these tiles: {todo[tg]}")
+        print(f"needs_review {'building' if tg == 'building' else 'land_plot'} rows still touching these tiles ({tg}): {todo[tg]}")
     if args.require_reviewed and any(todo.values()):
         print("NOT READY: approve or reject every needs_review row of the target first")
         return 1
@@ -493,6 +584,18 @@ def self_check() -> None:
     assert pm[400, 5:100].min() == 255                                 # but its top edge is drawn inside the tile
     fg = float((pm > 0).mean())
     assert 0.003 < fg < 0.02, fg                                       # a few thin lines, not a fill
+    # block-boundary target: three lots 4 px apart, one lot 30 px away across a "street", one far block
+    L = lambda x, y, w, h, st="needs_review": P(st, [[x, y], [x + w, y], [x + w, y + h], [x, y + h]])
+    lots = [L(1100, 2100, 100, 100), L(1204, 2100, 100, 100), L(1100, 2204, 204, 80), L(1100, 2314, 204, 100),
+            L(1100, 2100, 100, 100, "rejected"),                      # rejected: ignored
+            L(1500, 2100, 100, 100)]                                  # a separate block
+    bm, bc = block_boundary_mask(lots, pbox)
+    assert bc["plots"] == 5 and bc["rejected"] == 1 and bc["blocks"] == 3, bc
+    assert bm[150, 150] == 0 and bm[150, 202] == 0 and bm[240, 150] == 0   # nothing inside a block, not on the 4 px lot gap either
+    assert bm[150, 98:103].min() == 255 and bm[150, 95] == 0 and bm[150, 105] == 0   # outer edge, 5 px
+    assert bm[290:310, 200].max() == 0                                # the 30 px street is not bridged
+    # rejecting a lot takes it out of its block: the lot beside it is then a block of its own
+    assert block_boundary_mask([x for x in lots if x is not lots[2]], pbox)[1]["blocks"] == 3
     # oriented text box: a 400 x 40 label at 45 deg must stay thin, not become its 296 x 296 bounding box
     L, T, th = 400.0, 40.0, 45.0
     cs = math.cos(math.radians(th))
@@ -545,7 +648,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default=None, help="default: out/")
     ap.add_argument("--only", nargs="*")
-    ap.add_argument("--target", choices=("plot-boundary", "building", "both"), default="plot-boundary")
+    ap.add_argument("--target", choices=("block-boundary", "plot-boundary", "building", "all"), default="block-boundary")
     ap.add_argument("--require-reviewed", action="store_true")
     ap.add_argument("--update-tiles-json", action="store_true")
     ap.add_argument("--self-check", action="store_true")

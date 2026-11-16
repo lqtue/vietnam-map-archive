@@ -93,7 +93,21 @@
           "needs_review": 11,
           "rejected": 0,
           "pct_foreground": 9.06
+        },
+        "block-boundary": {
+          "rows": 23,
+          "needs_review": 22,
+          "rejected": 0,
+          "pct_foreground": 4.95,
+          "blocks": 13
         }
+      },
+      "block_work_estimate": {
+        "rows": 22,
+        "approve_as_is": 21,
+        "fix": 1,
+        "reject": 0,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -119,7 +133,21 @@
           "needs_review": 1,
           "rejected": 0,
           "pct_foreground": 0.06
+        },
+        "block-boundary": {
+          "rows": 8,
+          "needs_review": 8,
+          "rejected": 0,
+          "pct_foreground": 4.02,
+          "blocks": 8
         }
+      },
+      "block_work_estimate": {
+        "rows": 8,
+        "approve_as_is": 7,
+        "fix": 1,
+        "reject": 0,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -145,7 +173,21 @@
           "needs_review": 5,
           "rejected": 0,
           "pct_foreground": 0.5
+        },
+        "block-boundary": {
+          "rows": 20,
+          "needs_review": 20,
+          "rejected": 0,
+          "pct_foreground": 4.67,
+          "blocks": 7
         }
+      },
+      "block_work_estimate": {
+        "rows": 20,
+        "approve_as_is": 12,
+        "fix": 2,
+        "reject": 6,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -171,7 +213,21 @@
           "needs_review": 15,
           "rejected": 0,
           "pct_foreground": 1.12
+        },
+        "block-boundary": {
+          "rows": 10,
+          "needs_review": 10,
+          "rejected": 0,
+          "pct_foreground": 4.57,
+          "blocks": 6
         }
+      },
+      "block_work_estimate": {
+        "rows": 10,
+        "approve_as_is": 6,
+        "fix": 2,
+        "reject": 2,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -197,7 +253,21 @@
           "needs_review": 0,
           "rejected": 0,
           "pct_foreground": 2.57
+        },
+        "block-boundary": {
+          "rows": 28,
+          "needs_review": 28,
+          "rejected": 0,
+          "pct_foreground": 8.66,
+          "blocks": 19
         }
+      },
+      "block_work_estimate": {
+        "rows": 28,
+        "approve_as_is": 0,
+        "fix": 0,
+        "reject": 28,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -223,7 +293,21 @@
           "needs_review": 29,
           "rejected": 0,
           "pct_foreground": 8.46
+        },
+        "block-boundary": {
+          "rows": 60,
+          "needs_review": 60,
+          "rejected": 0,
+          "pct_foreground": 5.57,
+          "blocks": 11
         }
+      },
+      "block_work_estimate": {
+        "rows": 60,
+        "approve_as_is": 52,
+        "fix": 7,
+        "reject": 1,
+        "blocks_to_draw": 2
       }
     },
     {
@@ -249,7 +333,21 @@
           "needs_review": 22,
           "rejected": 0,
           "pct_foreground": 12.01
+        },
+        "block-boundary": {
+          "rows": 25,
+          "needs_review": 25,
+          "rejected": 0,
+          "pct_foreground": 4.86,
+          "blocks": 9
         }
+      },
+      "block_work_estimate": {
+        "rows": 25,
+        "approve_as_is": 15,
+        "fix": 2,
+        "reject": 8,
+        "blocks_to_draw": 2
       }
     },
     {
@@ -275,7 +373,21 @@
           "needs_review": 22,
           "rejected": 0,
           "pct_foreground": 2.4
+        },
+        "block-boundary": {
+          "rows": 32,
+          "needs_review": 32,
+          "rejected": 0,
+          "pct_foreground": 7.99,
+          "blocks": 16
         }
+      },
+      "block_work_estimate": {
+        "rows": 32,
+        "approve_as_is": 13,
+        "fix": 3,
+        "reject": 16,
+        "blocks_to_draw": 2
       }
     },
     {
@@ -301,7 +413,21 @@
           "needs_review": 14,
           "rejected": 0,
           "pct_foreground": 6.88
+        },
+        "block-boundary": {
+          "rows": 15,
+          "needs_review": 14,
+          "rejected": 0,
+          "pct_foreground": 4.49,
+          "blocks": 12
         }
+      },
+      "block_work_estimate": {
+        "rows": 14,
+        "approve_as_is": 4,
+        "fix": 2,
+        "reject": 8,
+        "blocks_to_draw": 1
       }
     },
     {
@@ -327,12 +453,36 @@
           "needs_review": 7,
           "rejected": 0,
           "pct_foreground": 4.27
+        },
+        "block-boundary": {
+          "rows": 14,
+          "needs_review": 13,
+          "rejected": 0,
+          "pct_foreground": 3.92,
+          "blocks": 10
         }
+      },
+      "block_work_estimate": {
+        "rows": 13,
+        "approve_as_is": 11,
+        "fix": 2,
+        "reject": 0,
+        "blocks_to_draw": 2
       }
     }
   ],
-  "target": "plot-boundary (owner decision 2026-11-16: plots first); building masks stay available with --target building",
+  "target": "block-boundary (owner decision 2026-11-17: whole blocks first, lots later); plot-boundary and building stay available",
   "calibrate_rule": "Calibrate windows may be touched, held-out windows never. The calibrate windows were tuned on for the water and road layers; a plot or building model scores nothing in them, and no number in the plan is read from them. Held-out and reference windows (and the legend, title and scale) are still refused by export_tiles.py.",
   "splits": "8 train, 2 val. Val are t01 (pink blocks beside blue compounds) and t06 (shophouse rows), the two most typical land; t05 (park) stays in train.",
-  "plot_rule": "plot-boundary target: outline of every land_plot row with review_status != rejected, drawn 5 px wide in tile coordinates (cv2 cuts it at the tile edge, no line along the tile border)"
+  "plot_rule": "plot-boundary target: outline of every land_plot row with review_status != rejected, drawn 5 px wide in tile coordinates (cv2 cuts it at the tile edge, no line along the tile border)",
+  "block_rule": "block-boundary target: land_plot rows with review_status != rejected are dissolved into street blocks (a closing: grow 5 px, union, shrink 5 px, mitred), the outer ring of each block is drawn 5 px wide, nothing inside. Gap 10 px: lots inside blocks are 2 to 9 px apart, the narrowest lane seen (Rue de Tay, t03) is 12 px across, lettered streets are wider.",
+  "block_work_total": {
+    "rows": 232,
+    "distinct_rows": 221,
+    "approve_as_is": 141,
+    "fix": 22,
+    "reject": 69,
+    "blocks_to_draw": 14,
+    "blocks_today": 111
+  }
 }
