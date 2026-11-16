@@ -77,6 +77,44 @@ Rue Pellerin) and **R2** `8500,2590,600,600` (pink blocks round the Poste de Pol
 every window and of every volunteer trace. Do not trace them. I looked at R2 at 1/3 scale with the
 colour-pass outlines drawn, and R1 only on 1/6 overviews, also with outlines; neither at native size.
 
+## Existing hand labels: not usable as is (checked 2026-11-16, `hand_labels.py`)
+
+| source | type | review_status | rows |
+|---|---|---|---|
+| import (colour-20260919) | land_plot | needs_review | 814 |
+| import (colour-20260919) | building | needs_review | 496 |
+| volunteer | land_plot | approved | 24 |
+| volunteer | building | approved 17, submitted 1 | 18 |
+| volunteer | road, waterway | approved | 3, 2 |
+
+No `sam-corrected` row exists. No import row has been edited: all 1,310 are `needs_review` with no
+`reviewed_at` (`updated_at` cannot show edits, a bulk update stamped every row). Against the local
+colour output (`segmentation-20260919/1882/normalized/blocks.normalized.geojson`), 1,277 of 1,310 match at
+IoU 0.97 or better; the other 33 differ by normalisation, not by a person. `footprint_submissions` is a
+view of the same 1,357 rows. No `parcel` type is live (migration 120 is only on `1882-extraction`).
+
+The 47 volunteer rows (`out/review/hand_labels.png`): 40 touch a window (16 an unseen held-out one,
+14 a seen held-out one, 17 a calibrate one, some touch two kinds), 7 touch none. R1 and R2: none. Tiles: t01, t02, t04, t08, t10 one plot each;
+t03 two plots and a road; t05 two plots and the Palais; t09 two plots, a building, a road; t06 a road;
+t07 a waterway. **No area is exhaustive.** I judged by eye (zoom of the best cluster, the
+Pellerin block: five plots in one block, one coarse outline for the whole Magasins des Travaux
+Publics, the blocks around unlabelled) and by size (24 plots, median 30,714 px²; one is 2.9 million px²,
+the military domain). A tile is usable only if every building or plot in it has a row, since an
+unlabelled one becomes background; none is.
+
+## Plot tiles (proposal, not started)
+
+The colour pass proposes plots well (blocks are rectangles; median 14,894 px², 10 to 60 per tile), so
+plots can be corrected in the same Validate loop. Two strict tiles of regular blocks, easy to trace
+exhaustively: **P1** `8024,1264` (gridded empty blocks, first cemetery blocks) and **P2** `9240,1456`
+(Cimetière Européen and Indigène, about 35 plots). t01 to t05 would serve as plot tiles too.
+The exporter does not write plot masks yet.
+
+Mask shape matters. Drawn from the colour proposals as a stand-in, a plot-*interior* mask is 46 to 92%
+foreground and a few large blobs (5 to 13 per tile; t06 has 44), with neighbours merging once the owner
+traces every block. The boundary lines drawn 5 px wide are 4 to 13% foreground, close to upstream's
+railway (5.6%). I would train on boundaries, and polygonise the lines afterwards.
+
 ## Re-export after editing
 
 ```bash

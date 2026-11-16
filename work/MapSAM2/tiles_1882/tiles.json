@@ -7,6 +7,17 @@
   "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
   "ocr_run": "post0910",
   "exposure": "R2 was seen on a 1/3 scale crop with colour-pass building outlines drawn; R1 only on 1/6 and 1/8 whole-sheet overviews, also with outlines; neither at native size. No held-out unseen window was drawn (view.blank on every preview).",
+  "hand_labels_2026_11_16": {
+    "rows": "47 volunteer rows (24 land_plot, 18 building, 3 road, 2 waterway); no sam-corrected row, no edited import row (all 1310 colour-20260919 rows are still needs_review, none has reviewed_at)",
+    "exhaustive_tile": "none. The densest cluster is one block of about 5 plots plus one coarse outline of the Magasins des Travaux Publics; the blocks beside it are unlabelled. Median hand plot 30,714 px2 is institutional blocks, one is 2.9 million px2 (the military domain)",
+    "outside_all_windows": 7,
+    "parcel_type": "not live: no row has feature_type parcel (migration 120 is only on 1882-extraction)",
+    "footprint_submissions": "a view of the same 1357 rows, not a second table"
+  },
+  "plot_tiles_proposed": [
+    {"id": "P1", "box": [8024, 1264, 1024, 1024], "relaxed": false, "note": "empty gridded blocks at left (Xuan Hoa / An Hoa) and the first cemetery blocks; clear of every window; 33 colour-pass plot rows, some residue along the city-limit dashes"},
+    {"id": "P2", "box": [9240, 1456, 1024, 1024], "relaxed": false, "note": "Cimetiere Europeen and Cimetiere Indigene blocks, regular rectangles, about 35 plots; clear of every window; 22 colour-pass plot rows"}
+  ],
   "building_rule": "mask = union of building rows with review_status != rejected, clipped to the tile",
   "exclusion_sources": [
     "river-reference/windows.json: every 1882 window, heldout and calibrate, both layers",
