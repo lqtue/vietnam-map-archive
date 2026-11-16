@@ -1,154 +1,125 @@
-# 1882 training tiles — owner checklist
+# 1882 training tiles — plots first
 
-Step 1 of the buildings-only MapSAM2 test (train on 1882, score on 1898). Upstream 2D training
-needs every building in a tile labelled, so each tile below must be complete when you finish.
-Boxes and counts: `tiles.json`. Images and masks are data and stay out of git (`out/`).
+The model will learn to draw plot boundaries on the 1882 sheet from ten small squares of the map
+(tiles). It can only learn from what you draw, so **in each tile every plot must have its outline**.
+A plot you leave out teaches it that plots do not exist there. Buildings are a second pass on the same
+tiles (see the end).
 
-**Under the rule (no tile touches any window in `windows.json`, heldout or calibrate) only five
-tiles exist: t01 and t03 as val, t02, t04, t05 as train, and t05 is nearly empty.** Dense building
-area is almost all inside those windows. t06 to t10 overlap *calibrate* windows only (water or road
-layers, never buildings). They are a proposal waiting for a yes: `export_tiles.py` leaves them out
-unless you pass `--include-relaxed`, and then writes to `out_with_relaxed/`. Do not edit them until
-you decide.
+Ten tiles: eight to train on, two (t01, t06) to check it on. Two more areas, **R1** and **R2**, are kept
+untouched for the final test. Do not draw in them or in the black boxes on `out/review/locator.png`.
 
-## How to edit (read from the code, not clicked through)
+## How to work
 
-Sign in as admin or mod. One sheet, two tabs:
-
+Sign in, then open the sheet in the Validate tab:
 `/scan?mode=shapes&tab=validate&map=0e02b9d9-9d40-4cca-8e41-8c8373d54d3b`
-`/scan?mode=shapes&tab=draw&map=0e02b9d9-9d40-4cca-8e41-8c8373d54d3b`
 
-| Job | Where | How |
-|---|---|---|
-| Fix an outline | Validate | click the polygon, drag its green vertices, then **Approve** (an edit is held until the verdict and is lost if you switch sheet) |
-| Delete residue (a plot, a dash, a stripe) | Validate | **Reject**. The row stays in the database as `rejected`; the export skips it |
-| Add a missed building | Draw | bottom bar **Polygon**, click the corners, double-click to finish. It saves at once as a `building`, status `submitted`. Limit 300 per hour |
-| Split a merged row | both | there is no split tool: Reject the merged row, then redraw the parts in Draw |
+| To do this | Do this |
+|---|---|
+| Keep an outline that is right | **Approve** |
+| Fix an outline | click it, drag the green dots, then **Approve** |
+| Remove one that is wrong | **Reject** |
+| Add a missing plot | open the Draw tab (`tab=draw` in the link), press **Polygon**, click the corners, double-click to finish |
+| Split a plot that holds two or more | Reject it, draw each part in the Draw tab |
 
-Things that bite:
-- **After every Approve or Reject the view jumps.** The Validate list is in import order (all 1,311
-  rows were created within one second, so order is by random id), and a verdict selects the next row
-  and zooms to it. A tile's rows sit at scattered positions (t06: 29 rows spread over positions
-  764 to 1,274), so you lose your place each time. There is no way round it in the app today. Do the
-  additions in Draw first (no jump), then walk the Validate rows, using the overlay image to find
-  your way back. That is about 32 verdicts across the five tiles (t05 has none).
-- **Approve last.** Once approved, an imported row leaves the Validate list, and Draw only edits
-  rows you drew yourself, so you cannot reopen it. Rows you add in Draw stay editable (Edit tool,
-  drag, Delete key).
-- Volunteer rows already approved (t05 Palais, one in t09) cannot be edited unless you drew them.
-  Leave them; the export counts them as they are.
-- The canvas has no position in the URL and no coordinate readout. To reach a tile, open
-  `out/review/locator.png` (magenta = tile, black = test area, do not touch; the held-out windows
-  are blacked out there and not marked in the app, so do not trace inside those boxes), pan to
-  it, and match the lettering below. A tile is 1024 px, about 8.5% of the sheet width.
-- Rule I used for "building": any roofed structure drawn as a solid or hatched footprint (sheds,
-  houses, compounds, the Palais). Plot lines, courts and gardens are not. Tell me if you want a
-  different rule before you start.
-- Training sees the mask at 256 px (upstream `out_size`), so a building under about 8 source px
-  across may vanish. Trace it anyway; it costs nothing.
+Know this before you start:
+- **After every Approve or Reject the screen jumps** to some other row, anywhere on the sheet. The list
+  is in import order, so there is no way round it. Draw the missing plots first (no jump), then go
+  through the Validate rows, and use the picture of the tile to find your way back.
+- **Approve last.** An approved outline cannot be opened again. Your own drawings stay editable
+  (Edit button, drag, Delete key).
+- Four big outlines drawn earlier by volunteers (whole military lands) cannot be edited. The export
+  ignores them, so you can ignore them too.
+- The app has no coordinates. Find a tile with `out/review/locator.png` and the street names below.
+  A tile is about 8.5% of the sheet's width.
 
-## The tiles
+## Your drawing rules (as you gave them)
 
-Colour-pass rows today are all `needs_review`, none rejected. "Missed" is my count by eye from
-`out/review/<id>_overlay.png`; the pass finds the pink houses and almost none of the blue and grey
-military sheds.
+- The line follows the printed block or lot line.
+- Pavement counts as land. The road side of a plot is the kerb line.
+- Draw only lines that are plot edges. Where a plot edge runs along a street edge, that line is drawn
+  and nothing else; do not add street lines.
 
-| Tile | Box x,y | Split | Rows | Lettering to find it | Fix |
-|---|---|---|---|---|---|
-| t01 | 6300,2610 | val | 11 | ÉVÊCHÉ, Ancien Camp des Lettres | reject the big outline round the lower plot; add Évêché's 3 buildings and about 8 brown sheds in the lower plot |
-| t02 | 6420,3776 | train | 1 | Imprimerie Nationale, Rue de Kerlan, Hôpital Maritime | nearly empty: add about 30 (brown houses, grey print works, blue hospital blocks) |
-| t03 | 8728,4720 | val | 5 | Magasins de la Marine, Rue Tay Ninh | reject the red dashes on the city limit (top right); add about 12 sheds |
-| t04 | 7512,3312 | train | 15 | Camp des Indigènes, Rue Laubat | tidy the loose pink houses; add about 12 grey sheds |
-| t05 | 5000,2000 | train | 1 | Palais du Gouverneur | nothing to do (volunteer row; hard negative: tree hatching) |
+A garden or park (Jardin de la Ville, Jardin Botanique) is **one question for you**: the colour pass
+cut it into 15 to 30 lawn and tree shapes. I think the park should be one plot and the shapes should
+be rejected. Tell me if you want it otherwise.
 
-About 65 buildings to add and 30 outlines to fix or reject in these five. Provisional, not exported
-by default (rows today, then what I saw):
+## The faults you will meet again and again
 
-| Tile | Box x,y | Rows | Lettering | Fix |
-|---|---|---|---|---|
-| t06 | 2520,3760 | 29 | Rue Lefebvre, Rue Dayot | reject the thin stripe at the lower left; split merged blobs; add about 12 |
-| t07 | 1176,2864 | 22 | Marché de Cau Ong Lanh, Poste de Police | reject the irregular blobs in the pale lot; add about 15 small houses |
-| t08 | 3864,1520 | 22 | Jardin, Rue de la Grandière | reject the specks in the garden hatch; add about 8 |
-| t09 | 7448,5552 | 15 | Sainte-Enfance, Rue Shang-Hai | unmerge the main building and chapel; add about 8 small sheds |
-| t10 | 6424,5168 | 7 | Cité Ouvrière de l'Arsenal, Rue d'Espagne | reject the pale polygons in the empty lot; add about 35 grey sheds |
+I looked at today's outlines on the tiles. In order of how often:
+1. **Missing inner lines.** A whole block is one outline, but the map prints thinner lines between
+   its lots (Imprimerie Nationale block in t02, the Évêché block in t01, the Sainte-Enfance block
+   in t09, the shophouse rows in t06 and t07). Draw each lot.
+2. **Doubled outlines.** Two outlines on the same plot, a few pixels apart. Reject one.
+3. **Lines that are not on the map.** Straight chords across an empty plot (t10, t01), and strips along
+   the red dashes of the city limit (t03, t07). Reject them.
+4. **Water and moat.** Outlines round creeks and the hatched moat (t04, t06, t07). Reject.
+5. **Tangles.** Several overlapping outlines in the shophouse clusters (t06 lower left, t07 left):
+   reject them and draw the lots again.
+6. **Bumps at lettering.** The line wobbles or pinches where a street name is printed (t03 by Rue de
+   Tay, t09 by Shang-Hai). Drag the dots back to the printed line.
+7. **Line on the wrong side of the kerb.** A few outlines sit a little inside or outside the printed
+   line. Check the thick ones.
 
-Reserved for the 1882 test window, untouched: **R1** `4760,4790,600,600` (dense shophouse blocks,
-Rue Pellerin) and **R2** `8500,2590,600,600` (pink blocks round the Poste de Police). Both are clear of
-every window and of every volunteer trace. Do not trace them. I looked at R2 at 1/3 scale with the
-colour-pass outlines drawn, and R1 only on 1/6 overviews, also with outlines; neither at native size.
+## Tile by tile
 
-## Existing hand labels: not usable as is (checked 2026-11-16, `hand_labels.py`)
+"Rows" is how many outlines are waiting for you in the tile (a few sit in two tiles). My rough split by
+eye and by rule: fine as they are / fix / reject / merged (reject and redraw), and how many plots are
+missing. Counts are estimates, good to about a quarter.
 
-| source | type | review_status | rows |
-|---|---|---|---|
-| import (colour-20260919) | land_plot | needs_review | 814 |
-| import (colour-20260919) | building | needs_review | 496 |
-| volunteer | land_plot | approved | 24 |
-| volunteer | building | approved 17, submitted 1 | 18 |
-| volunteer | road, waterway | approved | 3, 2 |
+| Tile | Split | Find it by | Rows | Fine | Fix | Reject | Merged | Missing |
+|---|---|---|---|---|---|---|---|---|
+| t01 | check | ÉVÊCHÉ, Rue Catinat, Ancien Camp des Lettres | 22 | 9 | 5 | 8 | 0 | 8 |
+| t02 | train | Imprimerie Nationale, Rue de Kerlan, Hôpital Maritime | 8 | 6 | 2 | 0 | 0 | 6 |
+| t03 | train | Magasins de la Marine, Rue Tay Ninh | 20 | 8 | 4 | 7 | 1 | 5 |
+| t04 | train | Camp des Indigènes, Rue Laubat | 10 | 3 | 2 | 5 | 0 | 6 |
+| t05 | train | Palais du Gouverneur, in the Jardin | 28 | 5 | 6 | 14 | 3 | 2 |
+| t06 | check | Rue Lefebvre, Rue Dayot, Rue Némésis | 60 | 36 | 8 | 8 | 8 | 15 |
+| t07 | train | Marché de Cau Ong Lanh, Poste de Police | 25 | 8 | 6 | 5 | 6 | 20 |
+| t08 | train | Jardin, Rue de la Grandière | 32 | 8 | 3 | 20 | 1 | 6 |
+| t09 | train | Sainte-Enfance, Rue Shang-Hai | 14 | 8 | 3 | 2 | 1 | 6 |
+| t10 | train | Cité Ouvrière de l'Arsenal, Rue d'Espagne | 13 | 5 | 3 | 2 | 3 | 5 |
+| **All** | | | **232** (221 different outlines) | 96 | 42 | 71 | 23 | 79 |
 
-No `sam-corrected` row exists. No import row has been edited: all 1,310 are `needs_review` with no
-`reviewed_at` (`updated_at` cannot show edits, a bulk update stamped every row). Against the local
-colour output (`segmentation-20260919/1882/normalized/blocks.normalized.geojson`), 1,277 of 1,310 match at
-IoU 0.97 or better; the other 33 differ by normalisation, not by a person. `footprint_submissions` is a
-view of the same 1,357 rows. No `parcel` type is live (migration 120 is only on `1882-extraction`).
+So about 220 Approve or Reject clicks, about 40 outlines to drag, and about 100 plots to draw
+(79 missing plus about 23 from merged ones). The park tiles t05 and t08 shrink a lot if you decide the
+park is one plot. Hand drawing by volunteers is not an option: the 24 plots they drew are whole
+institutional blocks and none of them covers a tile.
 
-The 47 volunteer rows (`out/review/hand_labels.png`): 40 touch a window (16 an unseen held-out one,
-14 a seen held-out one, 17 a calibrate one, some touch two kinds), 7 touch none. R1 and R2: none. Tiles: t01, t02, t04, t08, t10 one plot each;
-t03 two plots and a road; t05 two plots and the Palais; t09 two plots, a building, a road; t06 a road;
-t07 a waterway. **No area is exhaustive.** I judged by eye (zoom of the best cluster, the
-Pellerin block: five plots in one block, one coarse outline for the whole Magasins des Travaux
-Publics, the blocks around unlabelled) and by size (24 plots, median 30,714 px²; one is 2.9 million px²,
-the military domain). A tile is usable only if every building or plot in it has a row, since an
-unlabelled one becomes background; none is.
+What today's outlines look like as the model's target: `out/review/<tile>_plot_overlay.png` (the
+mask in magenta over the map). The lines follow block outlines well; they miss the inner lots and
+add the faults above.
 
-## Plot tiles (proposal, not started)
-
-The colour pass proposes plots well (blocks are rectangles; median 14,894 px², 10 to 60 per tile), so
-plots can be corrected in the same Validate loop. Two strict tiles of regular blocks, easy to trace
-exhaustively: **P1** `8024,1264` (gridded empty blocks, first cemetery blocks) and **P2** `9240,1456`
-(Cimetière Européen and Indigène, about 35 plots). t01 to t05 would serve as plot tiles too.
-The exporter does not write plot masks yet.
-
-Mask shape matters. Drawn from the colour proposals as a stand-in, a plot-*interior* mask is 46 to 92%
-foreground and a few large blobs (5 to 13 per tile; t06 has 44), with neighbours merging once the owner
-traces every block. The boundary lines drawn 5 px wide are 4 to 13% foreground, close to upstream's
-railway (5.6%). I would train on boundaries, and polygonise the lines afterwards.
-
-## Re-export after editing
+## When you are done
 
 ```bash
-python work/MapSAM2/tiles_1882/export_tiles.py --require-reviewed   # exit 1 while any needs_review building touches a tile
-python work/MapSAM2/tiles_1882/export_tiles.py --include-relaxed    # only after you approve t06 to t10
-python work/MapSAM2/tiles_1882/export_tiles.py --self-check         # synthetic case, no network
+python work/MapSAM2/tiles_1882/export_tiles.py --require-reviewed
 ```
+It stops and says so while any outline in the tiles is still waiting. When it passes, the tiles are
+written to `out/plot-boundary/` in the layout the trainer reads. `--target building` writes the
+building masks instead (`--target both` for both).
 
-It reads the current geometry (read-only GETs), so what you saved in the app is what it exports.
-Mask = union of `building` rows that are not `rejected`, clipped to the tile, 255 on 0.
-A tile is done when its `needs_review` count in `out/stats.json` is 0.
+## For whoever runs the trainer
 
-Output, upstream's layout, once per variant (`out/raw` and `out/inpainted` share the masks):
+- Target `plot-boundary`: the outline of every plot that is not rejected, 5 px wide. 5 px because the
+  trainer shrinks masks to 256 px by sampling about every fourth pixel; a thinner line breaks.
+  4 to 13% of pixels are line, close to the railway set (5.6%). Rows over 500,000 px² (whole
+  military lands) are skipped. The line is drawn only from plot edges, cut at the tile edge.
+- Calibrate windows may be touched, held-out windows never. The calibrate windows are the water and
+  road layers' tuning boxes; a plot or building model scores nothing in them. `export_tiles.py` refuses
+  any tile that touches a held-out window, the shape-precision window, the legend, title or scale.
+  Tiles t06 to t10 touch calibrate windows only (`calibrate_overlap` in `tiles.json`).
+- Layout: `out/<target>/<raw|inpainted>/{train,val}/<tile>.png` and `.../annotation/{train,val}/<tile>.png`.
+  Checked against upstream `func_2d/dataset.py` at `30110f0`. The inpainted images take out street
+  names only (OCR run `post0910`), with faint smears.
+- Python: `work/ocr/.venv` has no `cv2`. A scratch venv (`uv venv --python 3.12`; opencv-python-headless,
+  numpy, pillow, shapely, requests, scipy, python-dotenv) and a link to the repo `.env` did the work;
+  both live outside git.
+- `hand_labels.py` reproduces the hand-label counts (47 volunteer rows, none edited from the colour
+  pass, no area exhaustive).
 
-```
-out/<variant>/{train,val}/<id>.png   out/<variant>/annotation/{train,val}/<id>.png
-out/ocr/<id>.png   out/review/<id>_overlay.png   out/review/locator.png   out/stats.json
-```
+## Second pass: buildings
 
-Checked against upstream `func_2d/dataset.py` at `30110f0`: it lists `.png`, pairs the mask by the
-same filename under `annotation/<mode>/`, opens it as grey, and binarises at 0.5 after scaling, so
-0/255 PNGs are right. Each crop is checked for white holes (a missing level-0 tile) before it is written.
-
-Python: `work/ocr/.venv` has no `cv2`. I used a scratch venv (`uv venv --python 3.12`;
-`opencv-python-headless`, numpy, pillow, shapely, requests, scipy, python-dotenv) and linked the
-repo `.env` into the worktree. Both live outside git; the output folders regenerate with one command.
-
-## What the OCR mask is
-
-Run `post0910` (EVAL-BASELINE names it the seed run for 1882; 304 rows, validated, pending and
-rejected all used, since the text is on the sheet whatever the transcription). It holds street and
-institution names only, no lot numbers, so the inpainted variant removes names, not every digit.
-`global_w/h` is the axis-aligned box of rotated text, so each row is drawn as an oriented rectangle
-(`label_w` x `label_h` where kept, else solved from the box; `rotation_deg` is counter-clockwise).
-Rows longer than 1500 px or taller than 250 px are group boxes spanning a street and are skipped.
-`cv2.inpaint` (Telea) leaves faint smears along street bands: the inpainted set is a comparison
-variant, not a clean map.
+Same tiles, `<tile>_overlay.png`. Add the missing ones in the Draw tab, Reject residue, Approve the
+rest. About 65 are missing in t01 to t05 and about 80 in t06 to t10; the colour pass finds the pink
+houses and almost none of the grey and blue sheds. Rule: any roofed building drawn solid or hatched.
+Tile list and building counts: `tiles.json`.

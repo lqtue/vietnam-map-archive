@@ -1,26 +1,30 @@
 #!/usr/bin/env python
 """Training tiles for upstream MapSAM2 2D mode, from the 1882 Saigon cadastral (map 0e02b9d9).
 
-Reads the CURRENT building geometry from Supabase (read-only: GET requests, nothing is written),
-rebuilds every tile's mask, and writes upstream's layout, once per image variant:
+Reads the CURRENT geometry from Supabase (read-only: GET requests, nothing is written), rebuilds
+every tile's mask for the chosen target, and writes upstream's layout, once per image variant:
 
-    <out>/raw/{train,val}/<id>.png                  1024 px crop, native resolution
-    <out>/raw/annotation/{train,val}/<id>.png       0 / 255 building mask
-    <out>/inpainted/...                             same, with OCR text inpainted (cv2 TELEA)
-    <out>/ocr/<id>.png                              text mask (oriented rectangles)
-    <out>/review/<id>_overlay.png, locator.png      for the eye (locator has blind windows blanked)
-    <out>/stats.json                                per tile: counts, % building, OCR boxes
+    <out>/<target>/raw/{train,val}/<id>.png              1024 px crop, native resolution
+    <out>/<target>/raw/annotation/{train,val}/<id>.png   0 / 255 mask
+    <out>/<target>/inpainted/...                         same, with OCR text inpainted (cv2 TELEA)
+    <out>/ocr/<id>.png                                   text mask (oriented rectangles)
+    <out>/review/<id>_overlay.png, <id>_plot_overlay.png, locator.png   for the eye
+    <out>/stats.json                                     per tile: counts, % foreground, OCR boxes
+
+Targets (--target, default plot-boundary):
+    plot-boundary  outline of every land_plot row that is not rejected, 5 px wide, 255 on 0
+    building       filled union of building rows that are not rejected
 
 Run with a Python that has numpy, pillow, shapely, requests, opencv-python-headless:
 
-    python export_tiles.py                      # strict tiles only: none touches any window in windows.json
-    python export_tiles.py --include-relaxed    # also the provisional tiles (overlap calibrate windows);
-                                                # written to out_with_relaxed/, never into out/
-    python export_tiles.py --require-reviewed   # exit 1 while any needs_review building touches a tile
-    python export_tiles.py --self-check         # synthetic case, no network
-    python export_tiles.py --update-tiles-json  # also copy today's counts into tiles.json
+    python export_tiles.py                          # plot-boundary, all 10 tiles
+    python export_tiles.py --target building        # or both
+    python export_tiles.py --require-reviewed       # exit 1 while any needs_review row of the target touches a tile
+    python export_tiles.py --self-check             # synthetic case, both targets, no network
+    python export_tiles.py --update-tiles-json      # also copy today's counts into tiles.json
 
-Held-out windows are never fetched or drawn: a tile that touches one is refused.
+Held-out windows are never fetched or drawn: a tile that touches one is refused. Calibrate windows
+(water and road layers) may be touched: a plot or building model scores nothing in them.
 """
 from __future__ import annotations
 
@@ -41,6 +45,8 @@ REF = REPO / "work" / "image-processing" / "experiments" / "river-reference"
 TILES_JSON = HERE / "tiles.json"
 DEFAULT_OUT = HERE / "out"
 SHAPE_PRECISION = (4420, 3800, 650, 550)  # docs/ROADMAP.md, the only parcel reference window
+PLOT_LINE_PX = 5  # see plot_boundary_mask
+MAX_PLOT_PX2 = 500_000  # larger land_plot rows are whole domains, not lots (about 30 times the median block)
 
 # ── geometry helpers (pure) ──────────────────────────────────────────────────
 
@@ -115,6 +121,65 @@ def building_mask(rows: list[dict], box) -> tuple[np.ndarray, dict]:
         cv2.fillPoly(mask, [np.round(np.array(clip_ring(ring, box))).astype(np.int32)], 255)
     counts["by_status"] = by_status
     return mask, counts
+
+
+def plot_boundary_mask(rows: list[dict], box, width: int = PLOT_LINE_PX) -> tuple[np.ndarray, dict]:
+    """Outline of every land_plot row that is not rejected, `width` px wide, 255 on 0.
+
+    Each ring is drawn whole in tile coordinates and cv2 cuts it at the tile edge, so a plot that
+    runs off the tile leaves no line along the tile border (clipping the polygon first would invent
+    one). Only plot edges are drawn: where a plot edge follows a kerb it shows, where no plot edge
+    exists nothing is drawn. Two rows sharing an edge draw it once.
+
+    Why 5 px: upstream resamples the mask to out_size 256 with bilinear interpolation and no
+    smoothing, i.e. it looks at about every 4th pixel, so a line thinner than 4 px can vanish from
+    the target and 3 px breaks it. 5 px survives and gives 4 to 13% foreground on these tiles, around
+    upstream's railway (5.6%).
+    """
+    import cv2
+    from shapely.geometry import Polygon, box as sbox
+
+    x0, y0, w, h = box
+    tile = sbox(x0, y0, x0 + w, y0 + h)
+    mask = np.zeros((h, w), np.uint8)
+    counts = {"plots": 0, "needs_review": 0, "rejected": 0, "skipped_domain": 0}
+    by_status: dict[str, int] = {}
+    for r in rows:
+        if r["feature_type"] != "land_plot" or len(r["pixel_polygon"]) < 3:
+            continue
+        poly = Polygon(r["pixel_polygon"])
+        if not poly.is_valid:
+            poly = poly.buffer(0)
+        if poly.is_empty or not poly.intersects(tile):
+            continue
+        if poly.area > MAX_PLOT_PX2 and r.get("source", "volunteer") != "import":
+            # a volunteer outline of a whole domain (the military land is 2.9 million px2), approved,
+            # so the owner cannot edit it, and it is not a lot: its edges would cut across blocks.
+            # A large colour-pass row stays: the owner can still approve it (a park as one plot) or reject it.
+            counts["skipped_domain"] += 1
+            continue
+        st = r["review_status"]
+        by_status[st] = by_status.get(st, 0) + 1
+        if st == "rejected":
+            counts["rejected"] += 1
+            continue
+        counts["plots"] += 1
+        if st == "needs_review":
+            counts["needs_review"] += 1
+        pts = np.round(np.array(clip_ring(r["pixel_polygon"], box))).astype(np.int32)
+        cv2.polylines(mask, [pts], True, 255, width)
+    counts["by_status"] = by_status
+    return mask, counts
+
+
+def plot_overlay(img_rgb: np.ndarray, mask: np.ndarray, title: str) -> Image.Image:
+    arr = img_rgb.copy()
+    arr[mask > 0] = (255, 0, 255)
+    im = Image.fromarray(arr)
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 330, 16], fill=(255, 255, 255))
+    d.text((3, 2), title + "  magenta = plot-boundary mask (5 px)", fill=(0, 0, 0))
+    return im
 
 
 def ocr_rect(row: dict, label_h_guess: float = 45.0, rot_sign: float = -1.0) -> np.ndarray:
@@ -297,8 +362,8 @@ def locator(cfg, wins, tiles, out: Path, scale: int = 8) -> None:
     d = ImageDraw.Draw(pil)
     for t in tiles:
         x, y, bw, bh = t["box"]
-        d.rectangle([x / scale, y / scale, (x + bw) / scale, (y + bh) / scale], outline=(255, 0, 255) if not t["relaxed"] else (255, 140, 0), width=3)
-        d.text((x / scale + 4, y / scale + 4), t["id"], fill=(255, 0, 255))
+        d.rectangle([x / scale, y / scale, (x + bw) / scale, (y + bh) / scale], outline=(0, 160, 0) if t["split"] == "val" else (255, 0, 255), width=3)
+        d.text((x / scale + 4, y / scale + 4), t["id"] + (" val" if t["split"] == "val" else ""), fill=(255, 0, 255))
     for r in cfg["reserved_test"]:
         x, y, bw, bh = r["box"]
         d.rectangle([x / scale, y / scale, (x + bw) / scale, (y + bh) / scale], outline=(0, 0, 0), width=2)
@@ -310,17 +375,18 @@ def locator(cfg, wins, tiles, out: Path, scale: int = 8) -> None:
 def run(args) -> int:
     cfg = json.loads(TILES_JSON.read_text())
     wins = load_windows()
-    tiles = [t for t in cfg["tiles"] if args.include_relaxed or not t["relaxed"]]
+    tiles = cfg["tiles"]
     if args.only:
         tiles = [t for t in tiles if t["id"] in args.only]
-    # rules: never a held-out, reference or furniture window; calibrate only when marked relaxed
+    targets = ["plot-boundary", "building"] if args.target == "both" else [args.target]
+    # rules: never a held-out, reference or furniture window; calibrate windows are allowed
     for t in tiles:
         hit = check_tile(t["box"], wins)
-        bad = hit["heldout"] + hit["other"] + ([] if t["relaxed"] else hit["calibrate"])
+        bad = hit["heldout"] + hit["other"]
         if bad:
             raise SystemExit(f"{t['id']} {t['box']} overlaps a window it must not touch: {bad}")
-        if t["relaxed"] != bool(hit["calibrate"]):
-            raise SystemExit(f"{t['id']}: relaxed={t['relaxed']} but calibrate overlaps={hit['calibrate']}")
+        if t["calibrate_overlap"] != bool(hit["calibrate"]):
+            raise SystemExit(f"{t['id']}: calibrate_overlap={t['calibrate_overlap']} but it overlaps {hit['calibrate']}")
     for r in cfg["reserved_test"]:
         hit = check_tile(r["box"], wins)
         if any(hit.values()):
@@ -328,7 +394,7 @@ def run(args) -> int:
         for t in tiles:
             if boxes_hit(r["box"], t["box"]):
                 raise SystemExit(f"reserved {r['id']} overlaps tile {t['id']}")
-    out = Path(args.out) if args.out else (HERE / "out_with_relaxed" if args.include_relaxed else DEFAULT_OUT)
+    out = Path(args.out) if args.out else DEFAULT_OUT
     rows = fetch_footprints(cfg["map_id"])
     ocr_rows = fetch_ocr(cfg["map_id"], cfg["ocr_run"])
     print(f"{len(rows)} footprint rows, {len(ocr_rows)} OCR rows ({cfg['ocr_run']})")
@@ -338,47 +404,46 @@ def run(args) -> int:
     for r in cfg["reserved_test"]:
         b = r["box"]
         vol = [f["id"] for f in rows if f["source"] == "volunteer" and Polygon(f["pixel_polygon"]).intersects(sbox(b[0], b[1], b[0] + b[2], b[1] + b[3]))]
-        r["volunteer_traces"] = len(vol)
         print(f"reserved {r['id']}: volunteer traces inside = {len(vol)}")
-    stats = {}
-    todo = 0
+    for sub in ("ocr", "review"):
+        (out / sub).mkdir(parents=True, exist_ok=True)
+    stats: dict = {}
+    todo = {tg: 0 for tg in targets}
     for t in tiles:
         box = t["box"]
         img = fetch_tile_image(cfg["map_id"], box)
-        mask, c = building_mask(rows, box)
         om, on = ocr_mask(ocr_rows, box)
         clean = inpaint(img, om)
-        for variant, im in (("raw", img), ("inpainted", clean)):
-            write_tile(out / variant, t["split"], t["id"], im, mask)
-        for sub in ("ocr", "review"):
-            (out / sub).mkdir(parents=True, exist_ok=True)
         Image.fromarray(om).save(out / "ocr" / f"{t['id']}.png")
-        overlay(img, rows, ocr_rows, box, t["id"]).save(out / "review" / f"{t['id']}_overlay.png")
-        names = sorted(
+        s = stats[t["id"]] = {"box": box, "split": t["split"], "calibrate_overlap": t["calibrate_overlap"],
+                              "ocr_boxes": on["all"], "ocr_group_boxes_skipped": on["skipped_group"], "ocr_boxes_kept": on["kept"], "ocr_boxes_rejected": on["rejected"]}
+        s["ocr_names"] = sorted(
             {r["text"] for r in ocr_rows if r.get("review_status") != "rejected" and r["category"] in ("street", "institution", "place")
              and box[0] <= r["global_x"] + r["global_w"] / 2 < box[0] + box[2] and box[1] <= r["global_y"] + r["global_h"] / 2 < box[1] + box[3]}
-        )
-        stats[t["id"]] = {
-            "box": box, "split": t["split"], "relaxed": t["relaxed"],
-            "buildings": c["building"], "needs_review": c["needs_review"], "rejected": c["rejected"],
-            "by_status": c["by_status"],
-            "pct_building": round(100 * float((mask > 0).mean()), 2),
-            "ocr_boxes": on["all"], "ocr_group_boxes_skipped": on["skipped_group"], "ocr_boxes_kept": on["kept"], "ocr_boxes_rejected": on["rejected"],
-            "ocr_names": names[:6],
-        }
-        todo += c["needs_review"]
-        print(t["id"], box, t["split"], {k: stats[t["id"]][k] for k in ("buildings", "needs_review", "rejected", "pct_building", "ocr_boxes")})
+        )[:6]
+        for tg in targets:
+            mask, c = building_mask(rows, box) if tg == "building" else plot_boundary_mask(rows, box)
+            for variant, im in (("raw", img), ("inpainted", clean)):
+                write_tile(out / tg / variant, t["split"], t["id"], im, mask)
+            s[tg] = {"rows": c["building"] if tg == "building" else c["plots"], "needs_review": c["needs_review"], "rejected": c["rejected"],
+                     "by_status": c["by_status"], "pct_foreground": round(100 * float((mask > 0).mean()), 2)}
+            todo[tg] += c["needs_review"]
+            if tg == "building":
+                overlay(img, rows, ocr_rows, box, t["id"]).save(out / "review" / f"{t['id']}_overlay.png")
+            else:
+                plot_overlay(img, mask, t["id"]).save(out / "review" / f"{t['id']}_plot_overlay.png")
+        print(t["id"], box, t["split"], {tg: (s[tg]["rows"], s[tg]["needs_review"], s[tg]["pct_foreground"]) for tg in targets}, "ocr", on["all"])
     locator(cfg, wins, tiles, out)
     (out / "stats.json").write_text(json.dumps({"reserved_test": cfg["reserved_test"], "tiles": stats}, indent=1))
     if args.update_tiles_json:
         for t in cfg["tiles"]:
             if t["id"] in stats:
-                s = stats[t["id"]]
-                t["stats"] = {k: s[k] for k in ("buildings", "needs_review", "rejected", "pct_building", "ocr_boxes")}
+                t["stats"] = {**t.get("stats", {}), **{tg: {k: stats[t["id"]][tg][k] for k in ("rows", "needs_review", "rejected", "pct_foreground")} for tg in targets}}
         TILES_JSON.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n")
-    print(f"needs_review buildings still touching these tiles: {todo}")
-    if args.require_reviewed and todo:
-        print("NOT READY: approve or reject every needs_review building first")
+    for tg in targets:
+        print(f"needs_review {'land_plot' if tg == 'plot-boundary' else 'building'} rows still touching these tiles: {todo[tg]}")
+    if args.require_reviewed and any(todo.values()):
+        print("NOT READY: approve or reject every needs_review row of the target first")
         return 1
     return 0
 
@@ -405,6 +470,29 @@ def self_check() -> None:
     assert (mask[300:360, 300:360] == 0).all()                        # rejected row leaves no pixels
     assert (mask[900:960, 0:40] == 255).all() and (mask[900:960, 42:60] == 0).all()  # clipped at the edge (fillPoly includes the boundary pixel)
     assert abs(int((mask > 0).sum()) - (51 * 51 + 41 * 61)) <= 2, int((mask > 0).sum())  # union, land_plot excluded; boundary pixel included
+    # plot-boundary target
+    pbox = (1000, 2000, 1024, 1024)
+    P = lambda st, ring: {"feature_type": "land_plot", "review_status": st, "pixel_polygon": ring}
+    plots = [
+        P("approved", sq(1100, 2100, 200)),               # inside the tile
+        P("needs_review", sq(1100, 2100, 200)),           # same plot twice: draws once
+        P("rejected", sq(1500, 2500, 100)),               # rejected: absent
+        P("needs_review", sq(950, 2400, 150)),            # runs off the left edge by 50 px
+        {"feature_type": "building", "review_status": "approved", "pixel_polygon": sq(1600, 2100, 80)},  # wrong class
+        P("approved", sq(4000, 4000, 50)),                # outside
+        P("approved", sq(1300, 2300, 800)),               # a whole domain (640,000 px2): skipped
+    ]
+    pm, pc = plot_boundary_mask(plots, pbox)
+    assert pc["plots"] == 3 and pc["needs_review"] == 2 and pc["rejected"] == 1 and pc["skipped_domain"] == 1, pc
+    one, _ = plot_boundary_mask(plots[:1] + plots[3:4], pbox)
+    assert (pm == one).all()                                           # duplicate and rejected row change nothing
+    assert pm[200, 200] == 0 and pm[250, 150] == 0                    # interior is background
+    assert pm[100:300, 98:103].min() == 255                            # left edge of plot 1 is 5 px wide...
+    assert pm[200, 95] == 0 and pm[200, 105] == 0                      # ...and no wider
+    assert (pm[410:540, 0:3] == 0).all()                            # the plot that runs off the tile leaves no line on the tile border
+    assert pm[400, 5:100].min() == 255                                 # but its top edge is drawn inside the tile
+    fg = float((pm > 0).mean())
+    assert 0.003 < fg < 0.02, fg                                       # a few thin lines, not a fill
     # oriented text box: a 400 x 40 label at 45 deg must stay thin, not become its 296 x 296 bounding box
     L, T, th = 400.0, 40.0, 45.0
     cs = math.cos(math.radians(th))
@@ -455,9 +543,9 @@ def self_check() -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--out", default=None, help="default: out/, or out_with_relaxed/ with --include-relaxed")
+    ap.add_argument("--out", default=None, help="default: out/")
     ap.add_argument("--only", nargs="*")
-    ap.add_argument("--include-relaxed", action="store_true", help="also export tiles marked relaxed (they overlap calibrate windows)")
+    ap.add_argument("--target", choices=("plot-boundary", "building", "both"), default="plot-boundary")
     ap.add_argument("--require-reviewed", action="store_true")
     ap.add_argument("--update-tiles-json", action="store_true")
     ap.add_argument("--self-check", action="store_true")
