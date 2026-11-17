@@ -6,7 +6,9 @@ Bet 1c in `docs/NOW.md`; plan `docs/plans/series-admin-saigon-plan.md`. Started 
 before and after?
 
 **Answer so far.** 46 of 60 changes have a sheet on both sides (`map_match.csv`). None is checked
-yet: `shows_change` is blank on every row.
+yet: `shows_change` is blank on every row. `names.csv` now has 62 rows: E04d (15 Mar 1871) and E04e
+(11 Mar 1876) were added 2026-11-10 from the 50 Dấu Ấn catalogue and have no map pairs yet, and E16
+is probably the same act as E16b, so the distinct changes are 61 at most.
 
 **So what.** A map that shows a change is a source outside the text family, so it can raise a step
 in the plan's N of M. Most of the text here comes from one wiki page, which counts once.

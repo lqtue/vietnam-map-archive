@@ -108,6 +108,33 @@ come first, because a directory address needs the street's name at that date (fo
 Hồng Thập Tự → Xô Viết Nghệ Tĩnh → Nguyễn Thị Minh Khai; the 1955 act is blog-only). *Kill:* fewer than half
 the addresses resolve → find street-name pairs first.
 
+**4. Later: the built edge, planned against built.** Starts only after phase 0's deadline. A street on a plan
+is not a street on the ground, and a sheet can copy a planned street as if it were built (the "built" row
+of the edges table). Status per street segment: built as drawn · built moved · built late · never built.
+- *Specimen:* the Coffyn plan (1862, "pour une ville de 500 000 habitants"), in VMA and georeferenced: a city
+  drawn far larger than was built.
+- *Sheet marks:* the 1878 plan's legend has "Cathédrale projetée" and empty blocks inside the city limit; the
+  1898 cadastral plan colours unsold state land ("propriétés domaniales non affectées"), and draws buildings
+  as darker footprints. A street with buildings along it counts; a street alone does not.
+- *Witnesses that are not maps:* TTLTQG II aerials, 1929 to about 1950, including Khánh Hội port in the
+  1930s (printed without shelf marks in Trần Hữu Phúc Tiến, *Kiến trúc Pháp – Đông Dương*, 2025);
+  Dieulefils's photographs (public domain; album undated, about 1909, so date each photo on its own);
+  directories (phase 3); CORONA, 1959–72.
+- *Test:* the Khánh Hội streets on the 1898 sheet, checked on the 1912 and 1923 sheets. One number: the
+  share built as drawn (within about 20 m, with buildings along it) by 1923. *Kill:* the 1912 and 1923
+  sheets copy 1898 (same lines, same errors) → not independent; use the aerials and directories only.
+
+**Output, when phase 0 is done.**
+- *A strip:* five or six panels of the area cut to one frame (1882, 1898, 1923, 1968, 2025), each with its
+  sheet, holder and date; each arrow names its relation and act, and marks whether its source is
+  independent. *Kill:* more than an afternoon of hand work per strip → one figure, no generator.
+- *A coverage map for each year:* which part of the area a georeferenced sheet covers, so a gap reads as
+  "no sheet", not "nothing there".
+- *A Zenodo release before any API:* flat JSON and CSV with shared ids, a data dictionary, a bibliography
+  file and a links file (Wikidata, OSM, OHM), CC BY 4.0; possibly a data paper (as the western Anatolia
+  Bronze Age catalogue, *Scientific Data*, doi:10.1038/s41597-025-06241-9). Pushing units to OHM means
+  CC0 there: Tuệ's decision.
+
 ## Sources and licences
 
 - Public repo: acts, dates, source names and page numbers only. No Library file, no OCR text, no excerpt of
@@ -120,7 +147,7 @@ the addresses resolve → find street-name pairs first.
 
 ## Open conflicts
 
-- 110-NV: 27/3/1959 (NAC2, archive guide) or 27/2/1959 (the 1959 book alone).
+- 110-NV: 27/3/1959 (NAC2, archive guide) or 27/2/1959 (the 1959 book alone); an unsourced web summary says 1958 (lead only, not a witness: it retells the decree).
 - The 1907 annexation: 16/8 (NAC2) or 31/12 (Saigoneer, digest).
 - 1888 merger of Tam Hội into Khánh Hội, while the 1895 and 1907 texts still name Tam Hội.
 - Phường 4's lineage, 1976–1988 (vi.wiki says both dissolved in 1981 and new in 1988); the 1982 act (en.wiki

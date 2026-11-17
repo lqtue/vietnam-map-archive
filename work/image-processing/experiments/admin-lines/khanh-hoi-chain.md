@@ -68,4 +68,10 @@ source with the 1882 plate: not counted as independent until that is checked.
 2. Add control points near Khánh Hội and re-measure the overlap.
 3. Step 3: find primary text of 301/UB, 147-HĐBT, 258-HĐBT. The vbpl.vn scan of 258 now returns 404.
 4. The 1895/1907 and 1888 conflicts: read the footnoted decrees in the NAC2 captions.
-5. The 1959 phường list for Quận Tư (NAC2 #38 lists wards by quận; not yet extracted).
+5. The 1959 phường list for Quận Tư (NAC2 #38 lists wards by quận; not yet extracted). Lead to check against it, from an unsourced web summary: Xóm Chiếu, Lý Nhơn, Vĩnh Hội, Bến Xà Lan.
+   A printed witness for the same four: the *Tiếng Chuông* newspaper map "Đô thành Saigon", 1:20 000, ward
+   table "Quận Tư, 4 Phường", with "Khánh Hội" printed as an area name across the quận. Date unknown: Virtual
+   Saigon record 1054 gives 1950–1960 without a reason, so treat it as undated until it is checked against
+   the 1959 limits. Holder: Vietnam Archive Map Collection, Texas Tech (not Virtual Saigon). Read in Wayback
+   2026-11-08; see `work/research/admin-saigon/sources.csv` row M21. Not independent of the 1959 list if the
+   newspaper copied the official table. Better dated maps in the same database: 855 (1959, 1:10 000), 836 (1965).

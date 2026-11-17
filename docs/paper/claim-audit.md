@@ -67,6 +67,36 @@ of check scope, already-committed inputs, detectable faults, and blind spots. It
 use of lattices, seams, independent checkpoints, or external validation, nor evidence that the
 observed magnitude or frequency applies generally.
 
+### Data papers: do they measure their checks? (screen, 2026-10-30)
+
+Tests the line "other archives have records and pages, few measure their checks" (`CONCEPT.md`
+§Evidence), which application texts also lean on. **Not a random sample, so no prevalence claim**
+(see the rule in `docs/paper/CLAUDE.md`, "Cases, not rates").
+
+- **Frame.** Crossref titles, two journals, 2022–2026: *Journal of Open Humanities Data* (all 399 works,
+  filtered on map, gazetteer, spatial, place, cadastre, settlement and similar title words; 11 kept as data
+  papers from historical sources) and *Scientific Data* (six keyword searches; 9 kept from historical
+  sources). One could not be read (s41597-026-08017-1, full text not served): **n = 19**.
+- **Rule.** *Measured* = a number for the error or accuracy of the data's own content (positions,
+  transcriptions, classes, links) against a stated sample or reference. A georeferencing residual
+  alone, a graded confidence scale, or a borrowed benchmark score is *partial* or *none*.
+- **Prediction, stated before reading.** Few report a measured number; kill the line if most do.
+- **Result [C].** Measured **6 of 19** (johd.56 newspaper toponyms, johd.602 London footprints; Scientific
+  Data: Kenya roads 05442-6, Canada mining 03116-3, Spain population grid 04533-8, Danish plant maps 07064-y). Partial **3** (johd.616 Algiers parcel
+  areas; johd.633 cartulary numbering, which says itself it is not an error rate; Sydney roads, GCP residual
+  only). None **10** (johd.146 MAPA, .158 PERAIA, .172 Seine 54, .288 Ireland OS, .371 Venice 1808, .459
+  Glottography, .544 Wuhan diary; Scientific Data CFTI landslides 03692-4, eastern Africa dates 05138-x,
+  western Anatolia 06241-9).
+- **The pattern.** Where a machine made the data, the paper measures the machine against people (5 of the
+  6). Where people compiled it, "manually verified" or "cross-checked" stands as the check, with no number.
+  **Only 1 of 19 measures the people:** johd.56, inter-annotator agreement (Krippendorff's α 0.87 and 0.89
+  on 740 pairs). In the others the human pass is the ground truth.
+- **Consequence for the draft and for `CONCEPT.md`.** "Few measure their checks" is too broad: a third
+  measured something. The narrower line holds in this screen: **few measure the human check itself**,
+  which is what bet 2 (`review-events`) measures. Use it, with the frame and n, or not at all.
+- **Who ran it.** Read and classified by Claude, one reader, from the extracted validation sections
+  (2026-10-30). A second reader should re-classify 5 of the 19 before any of this is quoted.
+
 ## Reference metadata verification, 2026-09-20
 
 All thirteen DOI-bearing entries in the draft's reference list were resolved against stored
