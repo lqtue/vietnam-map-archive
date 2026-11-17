@@ -18,10 +18,11 @@ const unwrap = (u) => u.replace(/^https?:\/\/web\.archive\.org\/web\/\d+[a-z_]*\
 const text = (h) =>
   h
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
+    // Last, or `&amp;quot;` would decode twice into `"` (CodeQL js/double-escaping).
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
 
