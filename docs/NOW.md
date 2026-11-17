@@ -59,6 +59,7 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | PhD applications | Tue + Claude | `docs/private/applications/` (private; its own `CLAUDE.md` and claims ledger) | Every factual claim checked against a page image before anything is sent |
 | Virtual Saigon scout (bet 3, feeds 1c) | Claude | PR #116 (`virtual-saigon-scout`) | Review and merge; 378 records exist only at the site's owners |
 | Corpus: every map of Vietnam we know of (bet 3, feeds 1c) | Claude | PR #108 (`corpus-sources`, worktree `.claude/worktrees/corpus-sources`); Rumsey 52 → 243 in the queue 2026-10-21 | Step 2 of `plans/corpus-plan.md`: check each scout reads all its pages |
+| MapSAM2 the upstream way (bet 1b, Later) | Tue + an outside infrastructure helper | `mapsam2-upstream-findings`; `work/MapSAM2/TECHNICAL.md` §7 | Ask sent? If yes, the helper builds the harness only (prompt-free, memory on, fp16, logged runs); Tue traces ~10 full tiles after 1a sittings |
 | Two map books as series (bet 3, feeds 1c) | Claude | `cochinchina-1889-atlas` (PR #99); 27 draft rows live 2026-10-19/20 (12 Cochinchina 1881–89, 15 Tonkin 1950), plus the 2 public 1882 sheets in the Cochinchina series | Georeference by chaining from the placed 1882 plans (idea gate first); only Tan An prints a graticule; Tan An year 1887 |
 
 ## Parked

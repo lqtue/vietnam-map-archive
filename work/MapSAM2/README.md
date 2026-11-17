@@ -82,8 +82,11 @@ The MapSAM2 paper's unifying insight: treat a set of static tiles from one map a
 SAM2's memory attention shares context across tiles instead of segmenting each in isolation. The
 paper measures memory attention alone at **+14.3% IoU on vineyards, +16.1% on railways**.
 
-**Status: shipped in shape, not in mechanism.** `inference_tiles_as_video.py` is the VMA entry point
-and tiles the region sequentially, but still runs SAM2's default FIFO memory. The paper's
+**Status: shipped in name only.** `inference_tiles_as_video.py` is the VMA entry point and tiles
+the region sequentially, but it calls `SAM2ImagePredictor`, which has **no memory at all** (corrected
+2026-11-16; this line used to say "SAM2's default FIFO memory"). Upstream's "video" is also a
+different idea: the same place in different years. How far our use is from upstream, and the test
+that would close the gap: `TECHNICAL.md` §7. The paper's
 **self-sorting memory bank** (MedSAM-2, Zhu et al. 2024) is the open change:
 
 - admit candidate embedding `E_t` if IoU confidence `c_t` > threshold;

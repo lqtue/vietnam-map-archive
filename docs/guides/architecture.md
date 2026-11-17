@@ -331,8 +331,8 @@ to see it whole.
 **IIIF canvas coords:** OL uses `ol_y = -image_y` (y-flip). Tool components store bboxes image-space
 (y-down) and flip when creating OL geometries. `src/lib/core/geo/rectUtils.ts` owns the flip helpers
 (in `core` because `ImageShell` needs them too); `bboxHandles.ts` builds the shared handle features
-and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. Polygon/line tools (`TraceTool`,
-`ReviewTool`) flip inline.
+and `createRectEditor` used by both `OcrBboxTool` and `TriageTool`. The polygon/line tool (`ShapeTool`)
+flips inline.
 
 ### Map stores (`src/lib/map/stores/`)
 
@@ -426,9 +426,9 @@ there are no `overlayload*` events to wire.
 
 **Current default (2026-10-04): OpenStreetMap raster tiles**, using OpenLayers `OSM` with browser caching and visible attribution. The saved `g-streets` key now selects this global base, so existing readers also receive the coverage fix. The self-hosted regional extracts below remain available as `g-archive` (Archive). Series folders expose their individual sheets; info and legend can inspect any chosen sheet independently of stack order. Right-click coverage candidates use sheet bounds, rather than claiming an exact neatline hit. Layer-card Zoom to fits the viewport with a small margin and marks the selected boundary for three seconds; loaded Allmaps masks supply sheet edges, with bounds as the fallback.
 
-**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~348 MB PMTiles archive spanning
-Hanoi to the Mekong (Protomaps' daily OpenStreetMap build, bbox `105.0,8.5,108.5,22.0`, z0–15) in
-the `vma-tiles` R2 bucket at key `basemap/vietnam-20260913.pmtiles`, served straight off the bucket
+**The optional Archive basemap is self-hosted.** `/explore`'s street basemap is one ~510 MB PMTiles archive spanning
+the whole collection (Protomaps' daily OpenStreetMap build, bbox `101.4,7.4,109.7,23.6`, z0–14) in
+the `vma-tiles` R2 bucket at key `basemap/vietnam-z14-20261028.pmtiles`, served straight off the bucket
 at `tiles.maparchive.vn/basemap/*` — an R2 custom domain, so byte-range reads are Cloudflare's to
 cache and no longer invoke the worker (PMTiles is nothing but byte-range reads, and the worker could
 not cache them: `cache.put()` rejects a 206). **The key carries the Protomaps build date on
@@ -443,8 +443,11 @@ CARTO's keyless raster endpoint began stamping "API KEY REQUIRED" over every til
 Foundation's own tiles have a usage policy that does not cover a busy site. `PUBLIC_PROTOMAPS_KEY`
 is gone from `.env.example` too — nothing read it and nothing needs it. The Saigon-only extract it
 replaced (37 MB, bbox `106.3,10.3,107.1,11.2`) left 21 of 40 georeferenced maps — every Huế and
-Hanoi sheet — on bare `earth` fill; `basemap/saigon.pmtiles` is still in the bucket, unreferenced.
-Rebuild with `scripts/pmtiles_extract.sh vietnam 105.0,8.5,108.5,22.0 15 --upload`. **Two archives,
+Hanoi sheet — on bare `earth` fill (deleted 2026-10-29). Its successor, `105.0,8.5,108.5,22.0`, left
+368 of 1,246 placed maps off it by 2026-10-29. **Keep the archive under 512 MB**: Cloudflare will
+not edge-cache a larger object (`cf-cache-status: BYPASS`), which is why it is z14, and why
+`basemapStyle.ts` says what to do when a rebuild outgrows it.
+Rebuild with `scripts/pmtiles_extract.sh vietnam-z14 101.4,7.4,109.7,23.6 14 --upload`. **Two archives,
 one style, one handoff at z8.** That extract stops at its own bbox, so zoomed out the neighbours
 were simply missing and the tile edge around Vietnam read as a hole punched in the page.
 `basemap/seasia-20260912.pmtiles` (28 MB, bbox `90,-13,132,32`, **z0–8**) is the same Protomaps
@@ -914,23 +917,29 @@ exported) is polled via `GET /api/admin/maps/[id]/pipeline`. Four of those stage
 from the map's latest `ocr`/`seg` job; PATCH accepts only `reviewed`, `seg_reviewed`, `exported` and
 `idle` — anything else is a 400.
 
-**Shapes (`/scan?mode=shapes`)** — everything that is a shape rather than a word, three tabs over
-one sheet and one `ImageShell`, chosen by `?tab=`. `trace/ShapesPage.svelte` is the shell; the tabs
-are **links on the same route**, so a tab change keeps the instance, the canvas and the open sheet.
+**Shapes (`/scan?mode=shapes`)** — everything that is a shape rather than a word, two tabs over
+one sheet and one `ImageShell`. `trace/ShapesPage.svelte` is the shell; the tabs are **links on the
+same route**, so a tab change keeps the instance, the canvas and the open sheet. `?tab=` names the
+tab and the Shapes view: `draw` (Mine), `validate` (To check), `segment`.
 
-- **Draw** — `TraceTool.svelte` (OL Draw + Select + Modify) + `TraceSidebar.svelte`. Polygon for
-  closed footprints, line for roads/waterways. Writes live in `trace/traceData.ts` (`createTrace`),
-  through `POST /api/contribute/footprints` (rate-limited, author stamped server-side).
+- **Shapes** — one canvas tool, `ShapeTool.svelte` (OL Draw + Snap + Modify on ImageShell's
+  `footprintLayer`), and `ShapeToolbar.svelte` (Polygon · Line · Edit; keys `p` `l` `e`). The canvas
+  draws every shape on the sheet but the rejected, coloured by state; the view picks the sidebar list
+  and which shapes a click can select. Both views can draw and edit, so a block the machine missed
+  is drawn without leaving the check list (Draw and Validate were separate tabs with separate tools
+  until Nov 2026).
+  - **Mine** — `TraceSidebar.svelte`. Writes live in `trace/traceData.ts` (`createTrace`), through
+    `POST /api/contribute/footprints` (rate-limited, author stamped server-side). A new shape is
+    `submitted`, so it also joins the check list.
 - **Segment** — `SegSidebar.svelte` + `segCommand.ts` (which also owns the `digitalize-seg-<mapId>`
   localStorage, moved off `triagePrefs`): pipeline stage, the gate to the next one, and the MapSAM2
   command to run in Colab. It never starts anything — the GPU is elsewhere.
-- **Validate** — HITL for SAM2 `submitted` / `needs_review` polygons: `ReviewTool.svelte` +
-  `ReviewSidebar.svelte` (approve/reject, "Mark seg reviewed"), state in `review/reviewQueue.ts`
+  - **To check** — HITL for `submitted` / `needs_review` polygons: `ReviewSidebar.svelte` (approve/reject, "Mark seg reviewed"), state in `review/reviewQueue.ts`
   (`createReviewQueue`). Geometry and type edits are **held until the verdict** and sent with it — a
-  reviewer nudging a corner has not decided yet. The rail shows the queue here rather than the
-  archive: `fetchMapsWithSubmittedFootprints()`, one row per sheet badged with its pending count.
-  API `GET/PATCH /api/admin/footprints`; "Mark seg reviewed" PATCHes `/api/admin/maps/[id]/pipeline`
-  → `seg_reviewed`.
+      reviewer nudging a corner has not decided yet (your own shape saves at once). The rail shows the
+    queue here rather than the archive: `fetchMapsWithSubmittedFootprints()`, one row per sheet
+    badged with its pending count. API `GET/PATCH /api/admin/footprints`; "Mark seg reviewed"
+    PATCHes `/api/admin/maps/[id]/pipeline` → `seg_reviewed`.
 
 They were three places — `?mode=trace`, the Segmentation phase of `?mode=triage`, and `?mode=review`
 — which is one sheet opened three times and the same canvas built three times. It is one loop: draw

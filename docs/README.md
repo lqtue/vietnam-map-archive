@@ -41,6 +41,7 @@ Scripts, datasets and local experiments: the [work directory guide](../work/READ
 | [Database](guides/db-guidelines.md) | Schema decisions; also read [Supabase instructions](../supabase/CLAUDE.md) |
 | [Testing](guides/testing.md) | What each check protects; read before changing tests |
 | [Pipelines](guides/pipelines.md) | Index: where each tool's commands and design now live |
+| [Check register](guides/check-register.md) | Each check in the series pipeline: what it reads, whether it could have caught a known error, and what it has done |
 | [Lessons](guides/lessons.md) | Rules learned from failures; read before database writes, unattended runs or measurements |
 | [Ponytail debt](ponytail-debt.md) | Deliberate shortcuts and when to revisit them |
 

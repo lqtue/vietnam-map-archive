@@ -805,6 +805,16 @@ Measured in `docs/guides/pipelines.md` §"Reading a sheet's margins". Cheapest f
       `worker/src/index.ts`. Exit: all of them run on every PR.
 - [ ] **`history-rewrite`** — drop committed build output, `node_modules` and `.vercel` output from
       git history (the repo is 250 MB). Details in `docs/private/`.
+- [ ] **`r2-catalog-mismatches`** — found by checksumming every object in `vma-tiles`, 2026-10-29.
+      (1) Done: `my-tho-e` showed the west half because IGN's Nakala deposit for 229 E
+      (`nkl.710d1rim`) holds `229W_27.jpg`; no east scan is on Nakala. Archived by
+      `scripts/oneoff/archive_25k_composites.mjs`; its address opens cell 229. (2) Hue 6541: the fix
+      in `scripts/oneoff/fix_hue_6541_duplicate.mjs` kept `830551ec`, but no `maps` row has it now;
+      only the demoted `cdef2d04` (`hue-l7014-6541-4-2`) remains, and `tiles/830551ec/` (94 objects)
+      is orphaned. (3) `tiles/ce796ae2/` (461 objects, 6 MB): no row, no reference anywhere;
+      identify from its `full/` thumbnail. Also left in place: the old unversioned tiles of the 16
+      `v2` maps (0.41 GB), until no Allmaps annotation names the old image ids. Exit: each one
+      fixed or deleted.
 
 ## Infrastructure
 
