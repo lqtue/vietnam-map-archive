@@ -38,6 +38,7 @@
   import EmptyPanel from '$lib/features/contribute/shared/EmptyPanel.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
   import ShapeTool from './ShapeTool.svelte';
+  import WorkAreasLayer from './WorkAreasLayer.svelte';
   import ShapeToolbar from './ShapeToolbar.svelte';
   import TraceSidebar from './TraceSidebar.svelte';
   import SegSidebar from './SegSidebar.svelte';
@@ -404,6 +405,7 @@
     <!-- Image stage -->
     {#if currentMap && iiifInfoUrl}
       <ImageShell {iiifInfoUrl} footprints={canvasFootprints} {imageOpacity}>
+        <WorkAreasLayer mapId={currentMap.id} focus={$page.url.searchParams.get('area')} />
         {#if tab === 'shapes'}
           <ShapeTool
             footprints={canvasFootprints}
