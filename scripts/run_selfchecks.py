@@ -21,6 +21,8 @@ RUN = {
     "scripts/check_workspace_layout.py": SC,
     "scripts/lib/georef_annotation.py": [],
     "scripts/tonkin/tonkin_georef.py": ["selfcheck"],
+    "work/MapSAM2/semap_zero_shot/compare.py": SC,
+    "work/MapSAM2/semap_zero_shot/postprocess.py": SC,
     "work/MapSAM2/to_sam2_seeds.py": SC,
     "work/MapSAM2/tiles_1882/export_tiles.py": SC,
     "work/analysis/district4/georef_error.py": SC,

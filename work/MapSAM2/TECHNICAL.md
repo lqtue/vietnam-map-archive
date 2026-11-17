@@ -407,3 +407,41 @@ path, so this is probably harmless, but it is a mismatch.
 
 One model per class. For plots, which fill the sheet, a "plot" mask is one blob; the target
 there is probably the boundary ink, polygonised afterwards.
+
+## 8. The literature on few or no labels — read 2026-11-17
+
+Why: a friend's clean 1959 result (a neural network, no hand labels) raised the question
+of which method suits our sheets. Each paper below was read at the passage cited.
+
+- **With few labels, SAM wins on lines, not on areas.** MapSAM (Xia et al. 2024,
+  arXiv 2411.06971), Table I, IoU:
+  - 10-shot railway: U-Net 61.4, MapSAM 78.5.
+  - 10-shot vineyard: U-Net 60.2, MapSAM 60.0.
+  - Full data: U-Net 91.9 railway and 77.0 vineyard; MapSAM 89.5 and 74.3.
+
+  The authors: "when sufficient training data are available, domain-specific models like
+  U-Net continue to demonstrate superior performance." Blocks and buildings are areas,
+  so the 1882 test needs a U-Net on the same tiles beside MapSAM2.
+- **With many labels, a U-Net group is very good.** Heitzler & Hurni 2020
+  (doi 10.1111/tgis.12610): 88.2% IoU for buildings on the Siegfried map, trained on 26
+  hand-traced sheets. Correction was put at about 45 minutes a sheet.
+- **A model trained on many maps.** Petitpierre 2026 (arXiv 2603.05037): Mask2Former
+  Swin-L on Semap (1,439 patches, 78 of them cadastres) plus synthetic maps. It beats a
+  UNet-ResNet101 by 22 points mIoU on HCMSSD-Paris. Weights are public (CC BY 4.0).
+  Tried zero-shot on 1882 and 1959: `semap_zero_shot/README.md`.
+- **Machine-made labels carry a model through a series.** Yuan et al. 2025
+  (arXiv 2501.01845), age-tracing:
+  1. Train on one labelled anchor map.
+  2. Label maps from nearby years, keeping confident pixels.
+  3. Retrain, and repeat outwards.
+
+  This beat training on the anchor alone. It fits 1882 → 1898 → later Saigon sheets, with
+  the owner approving in Shapes in place of a confidence cut.
+- **Weak labels won the Paris building-block task.** ICDAR 2021 MapSeg Task 1
+  (arXiv 2105.13265): a DenseNet-121 trained in a weakly supervised way. Uhl et al. made
+  weak labels from modern data, or from colour clustering limited to known built-up
+  areas. Our modern block prior is that kind of source.
+
+Order this sets for bet 1b: score the Semap output and MapSAM2 and a U-Net on the same
+1882 validation tiles once the owner's edits are approved, then carry the winner through
+the series with machine-made labels.
