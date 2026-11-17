@@ -281,21 +281,24 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     return null;
   }
 
-  /** Drop decided rows from the list, the selection and the rail's count. */
+  /**
+   * Drop decided rows from the list, the selection and the rail's count. A
+   * decided row's selection is cleared, not handed to the next row: the next
+   * row may sit anywhere on the sheet, and flying there after every verdict
+   * moved the reviewer off the area they were working on.
+   */
   function forget(mapId: string, ids: string[]) {
     const gone = new Set(ids);
     update((s) => {
-      const idx = s.footprints.findIndex((f) => gone.has(f.id));
       const footprints = s.footprints.filter((f) => !gone.has(f.id));
+      const selectedIds = s.selectedIds.filter((id) => !gone.has(id));
       const selectedId =
-        s.footprints[idx] && gone.has(s.footprints[idx].id)
-          ? (footprints[idx]?.id ?? footprints[idx - 1]?.id ?? null)
-          : s.selectedId;
+        s.selectedId && !gone.has(s.selectedId) ? s.selectedId : (selectedIds[0] ?? null);
       return {
         ...s,
         footprints,
         selectedId,
-        selectedIds: selectedId ? [selectedId] : [],
+        selectedIds,
         feedback: pendingFeedback[selectedId ?? ''] ?? { tags: [], note: '' },
         // Keep the rail's count honest without re-querying the whole queue.
         queue: s.queue.map((m) =>
