@@ -22,6 +22,7 @@ RUN = {
     "scripts/lib/georef_annotation.py": [],
     "scripts/tonkin/tonkin_georef.py": ["selfcheck"],
     "work/MapSAM2/to_sam2_seeds.py": SC,
+    "work/MapSAM2/tiles_1882/export_tiles.py": SC,
     "work/analysis/district4/georef_error.py": SC,
     "work/analysis/district4/metrics.py": SC,
     "work/analysis/district4/river_full_map.py": SC,

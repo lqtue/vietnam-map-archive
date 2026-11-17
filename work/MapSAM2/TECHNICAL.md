@@ -75,7 +75,13 @@ Cross-attends prompt embeddings against image features to produce:
 
 ## 2. MapSAM2 — What It Adds
 
-MapSAM2 wraps SAM2 with two modifications: LoRA adaptation of the image encoder, and a training script that generates automatic bbox prompts from GT masks.
+MapSAM2 wraps SAM2 with two modifications: LoRA adaptation of the image encoder, and a 2D training loop that runs **without prompts** and keeps a memory bank across images.
+
+> **Corrected 2026-11-16 against upstream commit `30110f0`.** This section used to say the 2D
+> loop prompts with a box drawn from the ground-truth mask, and that memory attention is frozen.
+> Neither is in the code: `func_2d/function.py` calls the prompt encoder with
+> `points=None, boxes=None`, and only the prompt encoder is frozen. What follows from that for VMA
+> is §7.
 
 ### 2a. LoRA Fine-Tuning (`sam_lora_image_encoder.py`)
 
@@ -105,34 +111,32 @@ class _LoRA_qkv(nn.Module):
 
 **Initialization:** A matrices use Kaiming uniform (small random values), B matrices are zero → at init, LoRA output is exactly zero, so training starts from the pretrained model. Learning rate needs to be reasonable (1e-4) so LoRA adapts gradually.
 
-**What stays frozen:**
+**What stays frozen** (2D mode, `train_2d.py`):
+- The image encoder's original weights (`LoRA_Sam` freezes them; only the LoRA matrices train)
 - Prompt encoder (entirely)
-- Memory attention module
-- Key projections in image encoder
-- Position encodings
 
-**What's trainable:**
-- LoRA A,B matrices in image encoder (~2% of total params)
+**What's trainable** (2D mode):
+- LoRA A,B matrices on Q and V in every image-encoder block
 - Mask decoder (all weights)
-- `obj_ptr_proj` (object pointer projection for memory bank)
+- Memory attention and memory encoder (they are never frozen in `train_2d.py`)
 
-### 2b. Automatic Prompt Generation
+`train_3d.py` (time series) freezes more; that mode is not the one VMA trains.
 
-MapSAM2 doesn't require manually drawn bboxes — it derives them from the GT mask:
+### 2b. No prompt in 2D mode
+
+The 2D loop asks the decoder for the class mask with an empty prompt:
 
 ```python
-# In func_2d/function.py (train_sam):
-def get_bbox(mask):
-    rows = torch.any(mask, dim=1); cols = torch.any(mask, dim=0)
-    y1, y2 = rows.nonzero()[[0,-1]].squeeze()
-    x1, x2 = cols.nonzero()[[0,-1]].squeeze()
-    return torch.tensor([[x1, y1, x2, y2]])
-
-bbox = get_bbox(gt_mask)  # tight box around ground truth polygon
-sparse_emb, dense_emb = model.prompt_encoder(points=None, boxes=bbox, masks=None)
+# func_2d/function.py, train_sam and validation_sam alike:
+se, de = net.sam_prompt_encoder(points=None, boxes=None, masks=None, batch_size=B)
+... net.sam_mask_decoder(..., multimask_output=False, ...)
 ```
 
-This means during training, the model always receives a perfect bbox hint. At inference, you provide the bbox manually (or derive it from another detector like YOLO — which is why `yolo.py` exists in the repo).
+So a 2D model is a **semantic segmenter for one class** (the paper's railway, vineyard): give it a
+tile, it returns every pixel of that class. There is no box, no point and no instance. Boxes appear
+only in 3D mode (`func_3d/function.py`, `train_add_new_bbox` every `prompt_freq` frames, boxes from
+a fine-tuned YOLO via `yolo.py`), where the frames are **the same place in different years** and
+the task is following one building through the editions.
 
 ### 2c. Training Loop (2D mode)
 
@@ -140,13 +144,19 @@ This means during training, the model always receives a perfect bbox hint. At in
 For each batch (image, gt_mask):
   1. Image → HieraDet encoder → 3-level feature maps
   2. Features → Memory Attention (conditioned on memory bank) → conditioned features
-  3. GT mask → get_bbox → Prompt Encoder → sparse + dense embeddings
+  3. Empty prompt → Prompt Encoder → sparse + dense embeddings (no box, no point)
   4. Conditioned features + embeddings → Mask Decoder → low_res_pred (256×256)
   5. low_res_pred → bilinear upsample → pred (1024×1024)
   6. loss = BCEWithLogitsLoss(pred, gt_mask, pos_weight=2.0)
   7. loss.backward(); optimizer.step()
   8. Update memory bank with current image features + predicted mask
+     (6 slots; a new entry replaces the most redundant one if its predicted IoU is within 0.1;
+      each image recalls 2 entries, sampled by similarity)
 ```
+
+Upstream runs this under bf16 autocast (`func_2d/function.py`). A T4 is a Turing card with no
+fast bf16 path, so on Colab's free GPU this is a likely slowdown; fp16 is the T4's fast mode.
+Not measured.
 
 The `pos_weight=2.0` on BCE loss means false negatives (missing polygon area) are penalized twice as much as false positives (spurious predictions). This biases the model to over-segment slightly rather than miss buildings — correct for historical maps where every parcel boundary matters.
 
@@ -254,6 +264,9 @@ eIoU = mean([IoU(pred > t, gt) for t in [0.1, 0.3, 0.5, 0.7, 0.9]])
 **Effort:** Medium — requires modifying `func_2d/function.py` loss computation and the mask decoder output head.
 
 ### 5b. Prompt at inference time
+> **2026-11-16:** the premise below is wrong — 2D training uses no prompt (§2b), so a box at
+> inference is outside what the checkpoint learned. Kept as written; §7 has what it means.
+
 **Current:** Training uses GT-derived bboxes. At inference, you need to supply a bbox somehow — either manually, via YOLO detection, or via SAM2's automatic mask generator.
 
 **Improvement:** The `yolo.py` in MapSAM2 integrates YOLO for automatic bbox proposal. For historical maps, candidate bboxes can come from a tile-based scan or, as VMA now does, from the OCR pass — `inference_tiles_as_video.py --mode prompted --ocr-run-id <run>` seeds SAM2 from `ocr_extractions` bboxes. SAM2 then refines them into precise polygon boundaries. (The older `scripts/vectorize.py` colour-profile scan has been deleted.)
@@ -273,6 +286,9 @@ eIoU = mean([IoU(pred > t, gt) for t in [0.1, 0.3, 0.5, 0.7, 0.9]])
 **Improvement:** Tile adjacent map regions into a "video sequence" so the memory bank builds up spatial context across the scan. Related to `train_3d.py` in MapSAM2 which handles temporal sequences.
 
 **Effort:** High — requires redesigning the data loader to produce spatial sequences.
+
+> **2026-11-16:** the bank *is* used in 2D — trained, and consulted at test time
+> (`validation_sam`). VMA's inference never reaches it: `SAM2ImagePredictor` has no memory. §7.
 
 ### 5e. Data quality vs quantity tradeoff
 **Current:** `STATUS=submitted` gives the most data but includes unreviewed traces. `STATUS=verified` is highest quality but smallest set.
@@ -334,3 +350,60 @@ VMA Supabase
 ```
 
 This loop is the core of VMA's crowdsourcing + AI pipeline: humans review AI output, reviewed data retrains the model, which produces better output for the next round.
+
+---
+
+## 7. VMA against upstream — audit of 2026-11-16
+
+Read from upstream commit `30110f0` (27 Feb 2026), not from the paper. Nothing was run.
+
+**The headline: we train one way and infer another.** The training notebook runs upstream's
+`train_2d.py`, so `epoch_010.pth` learned prompt-free, one-class segmentation with memory (§2b).
+`inference_tiles_as_video.py` loads those weights into `SAM2ImagePredictor` and asks it with a box
+or a point per OCR or prior seed, three outputs, no memory. The decoder never saw a prompt in
+training, and the trained memory weights are never called. The paper's verified gains
+(+14.3 IoU vineyard, +16.1 railway, Table 2) come from the path we skip. So the scores in
+`work/ocr/EVAL-BASELINE.md` (land_plot 0.249, building 0.160) measure this mismatched setup, not
+MapSAM2. `COMPARISON.md` on branch `1882-extraction` already notes its memory adapter "keeps
+instance prompts; it is not the paper's complete prompt-free semantic training pipeline".
+
+**The training data teaches the wrong thing.** Notebook cell 13 crops each footprint's box plus
+`PAD = 64` px and its mask holds only that one footprint. A neighbouring building in the same crop
+is labelled background, so the model is taught to leave buildings out. Upstream's few-shot tiles
+are fully labelled: every pixel of the class is foreground.
+
+**Scale differs between training and inference.** Training crops are rendered at
+`SIZE = 1024` wide whatever their source size, so a small building is enlarged several times.
+Inference renders 1024 source px at 1024.
+
+**The checkpoint's training run is not recorded.**
+- Upstream's `cfg.py` uses strict `parse_args()` and has no `-epoch` flag, so the notebook's training
+  command (`-epoch {EPOCHS}`) would fail on today's upstream. The loop length is
+  `conf/global_settings.py` `EPOCH = 200`; the notebook's regex patch targets `train_2d.py`, which
+  has no epoch argument to patch.
+- Notebook cell 21 parses `Dice:` / `eIoU:`, but upstream logs `IOU: … DICE: …`, so the
+  validation scores were never captured.
+- Which class `epoch_010.pth` was trained on and with which crops is not written anywhere.
+
+**"Tiles as video" borrows the word only.** Upstream's video is the same place in different years
+(3D mode). Neighbouring tiles of one sheet are a different idea; the 2D memory bank is the
+nearest upstream mechanism.
+
+**The config is SAM2.0 vs 2.1.** The notebook trains from `sam2_hiera_small` (SAM2.0) with
+upstream's `sam2_hiera_s.yaml`; inference builds `sam2.1/sam2.1_hiera_s.yaml`. The three keys
+`VIDEO_ONLY` tolerates as missing are exactly the 2.1 additions. They sit outside the image
+path, so this is probably harmless, but it is a mismatch.
+
+### What a faithful test looks like
+
+- **Bet:** 1b (`docs/NOW.md`, still *Later*).
+- **Data:** about 10 tiles of 1024 source px on the 1882 sheet, **every** building traced in each.
+  Training tiles never overlap the held-out windows in `river-reference/windows.json` or the
+  parcel reference windows.
+- **Run:** upstream `train_2d.py` unchanged except fp16 for the T4; inference the upstream way
+  (no prompt, memory on, `validation_sam`'s path), then masks → polygons.
+- **Score:** `seg_eval.py` on a held-out window.
+- **Kill:** below the colour pass's building IoU of 0.355.
+
+One model per class. For plots, which fill the sheet, a "plot" mask is one blob; the target
+there is probably the boundary ink, polygonised afterwards.

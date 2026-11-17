@@ -61,7 +61,10 @@ jobs:
           cache: npm
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned, not `latest`: a newer CLI dropped `[inbucket]` from config.toml and
+          # failed this job before any test ran (2026-11-16). Same version as local dev;
+          # bump both together, and rename `[inbucket]` if the new one asks for it.
+          version: 2.84.2
           # Release discovery otherwise uses GitHub's small anonymous quota.
           github-token: ${{ github.token }}
       - run: npm ci

@@ -3,7 +3,7 @@
  *
  * Pattern: ImageShell calls createImageShellContext() synchronously during
  * component init, which sets a writable store into Svelte context. Child tool
- * components (TraceTool, bbox tools) call getImageShellStore() during their own
+ * components (ShapeTool, bbox tools) call getImageShellStore() during their own
  * init to get the same store. The store starts null; ImageShell populates it
  * in onMount once OL objects exist. Tools react reactively to the store.
  */
