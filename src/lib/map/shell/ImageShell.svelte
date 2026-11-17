@@ -8,7 +8,7 @@
   - loadIIIFImage() called whenever iiifInfoUrl changes
   - Context exposed via setImageShellContext() for child tools
 
-  Tools (TraceTool, bbox tools) are composed as children via slot and access
+  Tools (ShapeTool, bbox tools) are composed as children via slot and access
   map/sources through getImageShellContext().
 
   Props:
@@ -244,7 +244,7 @@
     </div>
   {/if}
 
-  <!-- Tool overlays (PinTool, TraceTool, etc.) compose here -->
+  <!-- Tool overlays (PinTool, ShapeTool, etc.) compose here -->
   <slot />
 </div>
 
