@@ -53,6 +53,61 @@ Colours: red built, beige non-built, grey road, blue water, black contours.
   parks all come out separately. The stadium is labelled built. At full resolution,
   buildings and courtyards still separate, and parks lean non-built.
 
+## Cleaner input, clean-up and checks (same day)
+
+Three scripts, each with a `--self-check` in `scripts/run_selfchecks.py`:
+
+- **`infer_tiled.py`** runs 1024 px windows at stride 512, blended toward window
+  centres, optionally averages two scales, and optionally erases OCR text (run
+  `post0910`) before inference. mmseg's `seg_logits` for this head are already class
+  scores between 0 and 1, so they are normalised, not put through softmax.
+- **`postprocess.py`** turns a class map or probability map into polygons:
+  - **Blocks:** not road and not water, closed at 11 px, opened at 5 px, pieces under
+    4,000 px² dropped, simplified at 1.5 px.
+  - **Lots:** split along the model's contours plus thin ink found in the source image
+    (a blur first, so the hatching does not count as lines). Each lot takes the
+    majority of built vs non-built pixels.
+  - Output is GeoJSON in full-sheet pixels, `feature_type` `land_plot`.
+  - `scripts/import-seg-geojson.mjs` does not yet map `land_plot`; it needs a one-line
+    `COLOUR_CLASSES` entry before any import.
+- **`compare.py`:**
+  - `--agree`: agreement with the colour pass (run `colour-20260919`), with
+    disagreement maps and a review queue of agreed shapes first.
+  - `--score`: scores any prediction against owner-approved rows with the same
+    best-match IoU as the 0.355 bar (`seg_eval.score`).
+  - `--ref-count`: counts the approved rows in each tile.
+
+Agreement with the colour pass (IoU; agreement is not accuracy, since the colour pass
+has its own errors):
+
+| Input | Blocks t01 | Blocks t06 | Built lots t01 | Built lots t06 | Lots t06 built / non-built |
+|---|---|---|---|---|---|
+| Single pass, full resolution | 0.888 | 0.885 | 0.629 | 0.474 | 28 / 30 |
+| Windows, scale 1 only, no text erasure | 0.893 | 0.880 | 0.628 | 0.350 | 46 / 6 |
+
+**What helped and what didn't:**
+- The windows give cleaner regions with less speckle.
+- Averaging in the half scale turns empty 1882 lots into built.
+- Erasing text brings some empty lots back, but also wipes street edges under street
+  names.
+- **The plain single pass at full resolution stays the best input for 1882 lots.**
+  Blocks come out the same either way. On 1959 the two-scale map gives the boldest
+  blocks and a solid river.
+
+**Clean-up by eye:**
+- Block outlines follow the street edges.
+- Regular lots split correctly.
+- Faint or dashed lot lines are missed, so lots merge.
+- In dense blocks, building outlines are taken for lot lines.
+- The stream leaves one sliver.
+
+**References now:**
+- t01 has 7 approved rows, all `land_plot`. Six are colour-pass rows approved
+  unchanged, so `--score` reports independent rows separately.
+- t06 has none usable.
+- Scores on these tiles are not like-for-like with 0.355, which was measured on the
+  17 volunteer building traces across the sheet.
+
 ## Not done
 
 - No score. The 1882 references are the owner's square edits, still in progress; score
