@@ -105,6 +105,20 @@
     return { x: minX, y: minY, w: Math.max(...xs) - minX, h: Math.max(...ys) - minY };
   }
 
+  /**
+   * Bring the anchor row into view when it becomes the anchor, so a shape
+   * clicked on the map, or reached with j/k, shows up here ready for v or x.
+   * `start`, not `nearest`: the anchor row opens its editor, which is taller
+   * than the gap `nearest` leaves, so the row's name scrolled out of sight.
+   */
+  function revealWhen(node: HTMLElement, on: boolean) {
+    const reveal = (now: boolean) => {
+      if (now) node.scrollIntoView({ block: 'start' });
+    };
+    reveal(on);
+    return { update: reveal };
+  }
+
   /** j/k/v/x, same as the OCR side (ocrReviewController.ts's `step`/`setStatus`),
       ignored while focus is in the panel's own text input/textarea. */
   function isTyping(el: EventTarget | null) {
@@ -224,6 +238,7 @@
           class="fp-item"
           class:selected={selected.has(fp.id)}
           class:anchor={fp.id === selectedId}
+          use:revealWhen={fp.id === selectedId}
         >
           <!-- The row itself is the select control, so it is a real button. -->
           <button
