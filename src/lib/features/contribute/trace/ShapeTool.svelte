@@ -17,7 +17,8 @@
   Selection is the parent's (`selectedId`); this reports clicks and zooms to it.
 
   Keys: Enter finishes a shape, Ctrl/Cmd+Z drops its last point, Esc cancels it,
-  Delete removes the selected shape if it is yours.
+  Delete removes the selected shape if it is yours. On the selected shape, its
+  corners show as dots: drag one to move it, right-click (or Alt+click) to delete it.
 
   Dispatches:
     draw   { pixelPolygon, geometry }
@@ -39,6 +40,7 @@
   import Stroke from 'ol/style/Stroke';
   import CircleStyle from 'ol/style/Circle';
   import Polygon from 'ol/geom/Polygon';
+  import MultiPoint from 'ol/geom/MultiPoint';
   import LineString from 'ol/geom/LineString';
   import { unByKey } from 'ol/Observable';
   import type { EventsKey } from 'ol/events';
@@ -68,6 +70,7 @@
   let modify: Modify | null = null;
   const modifyTargets = new Collection<Feature>();
   let keys: EventsKey[] = [];
+  let removeContextMenu: (() => void) | null = null;
   let previousStyle: ReturnType<ImageShellContext['footprintLayer']['getStyle']> | undefined;
   let initialized = false;
   let isDrawing = false;
@@ -99,14 +102,30 @@
     }),
   });
 
-  function shapeStyle(feature: any): Style {
+  /** The selected shape's corners, drawn as dots so you can see what to drag or delete. */
+  const CORNER_STYLE = new Style({
+    image: new CircleStyle({
+      radius: 4,
+      fill: new Fill({ color: INK.paper }),
+      stroke: new Stroke({ color: INK.ink, width: 1.5 }),
+    }),
+    geometry: (feature) => {
+      const shape = feature.getGeometry();
+      if (shape instanceof Polygon) return new MultiPoint(shape.getCoordinates()[0]);
+      if (shape instanceof LineString) return new MultiPoint(shape.getCoordinates());
+      return undefined;
+    },
+  });
+
+  function shapeStyle(feature: any): Style | Style[] {
     const id = String(feature.getId());
     const isLine = feature.getGeometry()?.getType() === 'LineString';
     if (id === selectedId) {
-      return new Style({
+      const outline = new Style({
         stroke: new Stroke({ color: INK.yellow, width: isLine ? 3.5 : 2.5 }),
         fill: isLine ? undefined : new Fill({ color: inkAlpha(INK.yellow, 0.22) }),
       });
+      return activeIds.has(id) ? [outline, CORNER_STYLE] : outline;
     }
     const ink = stateInk(byId.get(id)?.status ?? '');
     if (!activeIds.has(id)) {
@@ -202,6 +221,30 @@
     ctx.map.addInteraction(snap);
   }
 
+  /**
+   * Right-click a corner of the selected shape to delete it (Alt+click, OL's
+   * default, still works). Not a Modify `deleteCondition`: Modify learns which
+   * corner it is on only from a left-button press, so on a right-click it had
+   * nothing to remove. `removePoint(coordinate)` finds the corner itself.
+   * Only on a real corner: on an edge Modify's pointer marks where a corner
+   * would be inserted, and the browser menu is left alone there.
+   */
+  function onContextMenu(ctx: ImageShellContext, e: MouseEvent) {
+    if (tool !== 'edit' || !modify || !modifyTargets.getLength()) return;
+    const at = modify.getPoint();
+    const shape = modifyTargets.item(0).getGeometry();
+    if (!at || !shape) return;
+    const corners =
+      shape instanceof Polygon
+        ? shape.getCoordinates()[0]
+        : shape instanceof LineString
+          ? shape.getCoordinates()
+          : [];
+    if (!corners.some(([x, y]) => x === at[0] && y === at[1])) return;
+    e.preventDefault();
+    modify.removePoint(ctx.map.getEventCoordinate(e));
+  }
+
   // ── Setup ──────────────────────────────────────────────────────────────────
   function setup(ctx: ImageShellContext | null) {
     if (!ctx || initialized) return;
@@ -210,7 +253,10 @@
     previousStyle = ctx.footprintLayer.getStyle();
     ctx.footprintLayer.setStyle(shapeStyle);
 
-    modify = new Modify({ features: modifyTargets, style: VERTEX_STYLE });
+    modify = new Modify({
+      features: modifyTargets,
+      style: VERTEX_STYLE,
+    });
     modify.on('modifyend', (event) => {
       event.features.forEach((f) => {
         const shape = f.getGeometry();
@@ -227,6 +273,11 @@
       });
     });
     ctx.map.addInteraction(modify);
+
+    const viewport = ctx.map.getViewport();
+    const contextMenu = (e: MouseEvent) => onContextMenu(ctx, e);
+    viewport.addEventListener('contextmenu', contextMenu);
+    removeContextMenu = () => viewport.removeEventListener('contextmenu', contextMenu);
 
     keys = [
       ctx.map.on('click', (e) => {
@@ -308,6 +359,7 @@
   onDestroy(() => {
     const ctx = get(shellStore);
     keys.forEach((k) => unByKey(k));
+    removeContextMenu?.();
     if (!ctx) return;
     clearDraw(ctx);
     if (modify) ctx.map.removeInteraction(modify);
@@ -334,7 +386,7 @@
   <div class="legend">
     <span class="legend-dot orange"></span> Waiting
     <span class="legend-dot green"></span> Approved
-    <span class="legend-dot yellow"></span> Selected · drag corners to edit
+    <span class="legend-dot yellow"></span> Selected · drag a corner to move, right-click to delete
   </div>
 {/if}
 
