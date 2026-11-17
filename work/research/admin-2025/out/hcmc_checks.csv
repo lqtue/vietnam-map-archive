@@ -1,0 +1,442 @@
+code,old,district,province,verdict,listed,geometry
+25741,Hiệp Thành,Thủ Dầu Một,Bình Dương,agree,Phú Lợi + Thủ Dầu Một,Phú Lợi 0.73 + Thủ Dầu Một 0.27
+25744,Phú Lợi,Thủ Dầu Một,Bình Dương,agree,Phú Lợi,Phú Lợi 1.00
+25747,Phú Cường,Thủ Dầu Một,Bình Dương,agree,Thủ Dầu Một,Thủ Dầu Một 1.00
+25750,Phú Hoà,Thủ Dầu Một,Bình Dương,agree,Phú Lợi,Phú Lợi 1.00
+25753,Phú Thọ,Thủ Dầu Một,Bình Dương,agree,Thủ Dầu Một,Thủ Dầu Một 1.00
+25756,Chánh Nghĩa,Thủ Dầu Một,Bình Dương,agree,Thủ Dầu Một,Thủ Dầu Một 1.00
+25759,Định Hoà,Thủ Dầu Một,Bình Dương,agree,Chánh Hiệp,Chánh Hiệp 1.00
+25760,Hoà Phú,Thủ Dầu Một,Bình Dương,agree,Bình Dương,Bình Dương 1.00
+25762,Phú Mỹ,Thủ Dầu Một,Bình Dương,agree,Bình Dương,Bình Dương 1.00
+25763,Phú Tân,Thủ Dầu Một,Bình Dương,agree,Bình Dương,Bình Dương 1.00
+25765,Tân An,Thủ Dầu Một,Bình Dương,agree,Phú An,Phú An 1.00
+25768,Hiệp An,Thủ Dầu Một,Bình Dương,agree,Chánh Hiệp + Phú An,Phú An 0.75 + Chánh Hiệp 0.25
+25771,Tương Bình Hiệp,Thủ Dầu Một,Bình Dương,agree,Chánh Hiệp,Chánh Hiệp 1.00
+25774,Chánh Mỹ,Thủ Dầu Một,Bình Dương,agree,Chánh Hiệp + Thủ Dầu Một,Chánh Hiệp 0.73 + Thủ Dầu Một 0.27
+25777,Dầu Tiếng,Dầu Tiếng,Bình Dương,agree,Dầu Tiếng,Dầu Tiếng 1.00
+25780,Minh Hoà,Dầu Tiếng,Bình Dương,agree,Minh Thạnh,Minh Thạnh 1.00
+25783,Minh Thạnh,Dầu Tiếng,Bình Dương,agree,Long Hoà + Minh Thạnh,Minh Thạnh 0.81 + Long Hoà 0.19
+25786,Minh Tân,Dầu Tiếng,Bình Dương,agree,Long Hoà + Minh Thạnh,Long Hoà 0.61 + Minh Thạnh 0.39
+25789,Định An,Dầu Tiếng,Bình Dương,agree,Dầu Tiếng,Dầu Tiếng 1.00
+25792,Long Hoà,Dầu Tiếng,Bình Dương,agree,Long Hoà,Long Hoà 1.00
+25795,Định Thành,Dầu Tiếng,Bình Dương,agree,Dầu Tiếng,Dầu Tiếng 1.00
+25798,Định Hiệp,Dầu Tiếng,Bình Dương,agree,Dầu Tiếng + Thanh An,Dầu Tiếng 0.51 + Thanh An 0.49
+25801,An Lập,Dầu Tiếng,Bình Dương,agree,Thanh An + Tây Nam,Thanh An 0.61 + Tây Nam 0.39
+25804,Long Tân,Dầu Tiếng,Bình Dương,agree,Long Hoà,Long Hoà 1.00
+25807,Thanh An,Dầu Tiếng,Bình Dương,agree,Thanh An,Thanh An 1.00
+25810,Thanh Tuyền,Dầu Tiếng,Bình Dương,agree,Thanh An + Tây Nam,Tây Nam 0.76 + Thanh An 0.24
+25813,Mỹ Phước,Bến Cát,Bình Dương,agree,Bến Cát + Long Nguyên,Bến Cát 0.94 + Long Nguyên 0.06
+25816,Trừ Văn Thố,Bàu Bàng,Bình Dương,agree,Trừ Văn Thố,Trừ Văn Thố 1.00
+25819,Cây Trường II,Bàu Bàng,Bình Dương,agree,Trừ Văn Thố,Trừ Văn Thố 1.00
+25822,Lai Uyên,Bàu Bàng,Bình Dương,list adds,Bàu Bàng + Trừ Văn Thố,Bàu Bàng 0.95
+25825,Tân Hưng,Bàu Bàng,Bình Dương,agree,Bến Cát,Bến Cát 1.00
+25828,Long Nguyên,Bàu Bàng,Bình Dương,agree,Long Nguyên,Long Nguyên 1.00
+25831,Hưng Hoà,Bàu Bàng,Bình Dương,agree,Chánh Phú Hoà,Chánh Phú Hoà 1.00
+25834,Lai Hưng,Bàu Bàng,Bình Dương,agree,Bến Cát,Bến Cát 1.00
+25837,Chánh Phú Hoà,Bến Cát,Bình Dương,agree,Chánh Phú Hoà,Chánh Phú Hoà 1.00
+25840,An Điền,Bến Cát,Bình Dương,agree,Long Nguyên,Long Nguyên 1.00
+25843,An Tây,Bến Cát,Bình Dương,agree,Tây Nam,Tây Nam 1.00
+25846,Thới Hoà,Bến Cát,Bình Dương,agree,Thới Hoà,Thới Hoà 1.00
+25849,Hoà Lợi,Bến Cát,Bình Dương,agree,Hoà Lợi,Hoà Lợi 1.00
+25852,Tân Định,Bến Cát,Bình Dương,agree,Hoà Lợi,Hoà Lợi 1.00
+25855,Phú An,Bến Cát,Bình Dương,agree,Phú An,Phú An 1.00
+25858,Phước Vĩnh,Phú Giáo,Bình Dương,agree,Phú Giáo,Phú Giáo 1.00
+25861,An Linh,Phú Giáo,Bình Dương,agree,An Long,An Long 1.00
+25864,Phước Sang,Phú Giáo,Bình Dương,agree,Phước Thành,Phước Thành 1.00
+25865,An Thái,Phú Giáo,Bình Dương,agree,Phước Thành,Phước Thành 1.00
+25867,An Long,Phú Giáo,Bình Dương,agree,An Long,An Long 1.00
+25870,An Bình,Phú Giáo,Bình Dương,agree,Phú Giáo,Phú Giáo 1.00
+25873,Tân Hiệp,Phú Giáo,Bình Dương,agree,Phước Thành,Phước Thành 1.00
+25876,Tam Lập,Phú Giáo,Bình Dương,agree,Phú Giáo + Phước Hoà,Phú Giáo 0.85 + Phước Hoà 0.15
+25879,Tân Long,Phú Giáo,Bình Dương,agree,An Long,An Long 1.00
+25882,Vĩnh Hoà,Phú Giáo,Bình Dương,agree,Phước Hoà,Phước Hoà 1.00
+25885,Phước Hoà,Phú Giáo,Bình Dương,agree,Phước Hoà,Phước Hoà 1.00
+25888,Uyên Hưng,Tân Uyên,Bình Dương,agree,Tân Uyên,Tân Uyên 1.00
+25891,Tân Phước Khánh,Tân Uyên,Bình Dương,agree,Tân Khánh,Tân Khánh 1.00
+25894,Tân Định,Bắc Tân Uyên,Bình Dương,agree,Bắc Tân Uyên,Bắc Tân Uyên 1.00
+25897,Bình Mỹ,Bắc Tân Uyên,Bình Dương,agree,Bình Cơ,Bình Cơ 1.00
+25900,Tân Bình,Bắc Tân Uyên,Bình Dương,agree,Vĩnh Tân,Vĩnh Tân 1.00
+25903,Tân Lập,Bắc Tân Uyên,Bình Dương,agree,Tân Uyên,Tân Uyên 1.00
+25906,Tân Thành,Bắc Tân Uyên,Bình Dương,agree,Bắc Tân Uyên,Bắc Tân Uyên 1.00
+25907,Đất Cuốc,Bắc Tân Uyên,Bình Dương,agree,Bắc Tân Uyên,Bắc Tân Uyên 1.00
+25908,Hiếu Liêm,Bắc Tân Uyên,Bình Dương,agree,Thường Tân,Thường Tân 1.00
+25909,Lạc An,Bắc Tân Uyên,Bình Dương,agree,Thường Tân,Thường Tân 1.00
+25912,Vĩnh Tân,Tân Uyên,Bình Dương,agree,Vĩnh Tân,Vĩnh Tân 1.00
+25915,Hội Nghĩa,Tân Uyên,Bình Dương,agree,Bình Cơ,Bình Cơ 1.00
+25918,Tân Mỹ,Bắc Tân Uyên,Bình Dương,agree,Thường Tân + Tân Uyên,Tân Uyên 0.52 + Thường Tân 0.48
+25920,Tân Hiệp,Tân Uyên,Bình Dương,agree,Tân Hiệp,Tân Hiệp 1.00
+25921,Khánh Bình,Tân Uyên,Bình Dương,agree,Tân Hiệp,Tân Hiệp 0.99
+25924,Phú Chánh,Tân Uyên,Bình Dương,agree,Bình Dương,Bình Dương 1.00
+25927,Thường Tân,Bắc Tân Uyên,Bình Dương,agree,Thường Tân,Thường Tân 1.00
+25930,Bạch Đằng,Tân Uyên,Bình Dương,agree,Tân Uyên,Tân Uyên 1.00
+25933,Tân Vĩnh Hiệp,Tân Uyên,Bình Dương,agree,Tân Khánh,Tân Khánh 1.00
+25936,Thạnh Phước,Tân Uyên,Bình Dương,agree,Tân Khánh,Tân Khánh 1.00
+25937,Thạnh Hội,Tân Uyên,Bình Dương,agree,Tân Khánh,Tân Khánh 1.00
+25939,Thái Hoà,Tân Uyên,Bình Dương,agree,Tân Khánh + Tân Đông Hiệp,Tân Khánh 0.59 + Tân Đông Hiệp 0.41
+25942,Dĩ An,Dĩ An,Bình Dương,agree,Dĩ An,Dĩ An 1.00
+25945,Tân Bình,Dĩ An,Bình Dương,agree,Tân Đông Hiệp,Tân Đông Hiệp 1.00
+25948,Tân Đông Hiệp,Dĩ An,Bình Dương,agree,Dĩ An + Tân Đông Hiệp,Dĩ An 0.54 + Tân Đông Hiệp 0.46
+25951,Bình An,Dĩ An,Bình Dương,agree,Đông Hoà,Đông Hoà 1.00
+25954,Bình Thắng,Dĩ An,Bình Dương,agree,Đông Hoà,Đông Hoà 1.00
+25957,Đông Hoà,Dĩ An,Bình Dương,agree,Đông Hoà,Đông Hoà 1.00
+25960,An Bình,Dĩ An,Bình Dương,agree,Dĩ An,Dĩ An 1.00
+25963,An Thạnh,Thuận An,Bình Dương,agree,Thuận An,Thuận An 0.98
+25966,Lái Thiêu,Thuận An,Bình Dương,agree,Lái Thiêu,Lái Thiêu 1.00
+25969,Bình Chuẩn,Thuận An,Bình Dương,agree,An Phú + Thuận Giao,An Phú 0.52 + Thuận Giao 0.48
+25972,Thuận Giao,Thuận An,Bình Dương,agree,Thuận Giao,Thuận Giao 1.00
+25975,An Phú,Thuận An,Bình Dương,agree,An Phú,An Phú 1.00
+25978,Hưng Định,Thuận An,Bình Dương,agree,Thuận An,Thuận An 1.00
+25981,An Sơn,Thuận An,Bình Dương,agree,Thuận An,Thuận An 1.00
+25984,Bình Nhâm,Thuận An,Bình Dương,agree,Lái Thiêu,Lái Thiêu 1.00
+25987,Bình Hoà,Thuận An,Bình Dương,agree,Bình Hoà,Bình Hoà 1.00
+25990,Vĩnh Phú,Thuận An,Bình Dương,agree,Bình Hoà + Lái Thiêu,Bình Hoà 0.68 + Lái Thiêu 0.32
+26506,1,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Bàn Cờ + Bình Tiên + Chợ Quán + Cầu Kiệu + Gia Định + Hạnh Thông + Minh Phụng + Tân Sơn Hoà + Vĩnh Hội + Vũng Tàu + Vườn Lài,Vũng Tàu 1.00
+26508,Thắng Tam,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Vũng Tàu,Vũng Tàu 1.00
+26509,2,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Bàn Cờ + Bình Tây + Chợ Quán + Cầu Kiệu + Gia Định + Khánh Hội + Tân Sơn Hoà + Vĩnh Hội + Vũng Tàu + Vườn Lài,Vũng Tàu 0.99
+26512,3,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Bàn Cờ + Bình Thới + Vũng Tàu,Vũng Tàu 1.00
+26515,4,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Tân Sơn Nhất + Vũng Tàu + Vườn Lài + Đức Nhuận,Vũng Tàu 1.00
+26518,5,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,An Nhơn + An Đông + Bàn Cờ + Bình Lợi Trung + Hoà Bình + Tân Sơn Nhất + Vũng Tàu + Đức Nhuận,Vũng Tàu 1.00
+26521,Thắng Nhì,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Vũng Tàu,Vũng Tàu 0.97
+26524,7,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,An Đông + Bình Tiên + Gia Định + Minh Phụng + Tam Thắng,Tam Thắng 0.99
+26526,Nguyễn An Ninh,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Tam Thắng,Tam Thắng 1.00
+26527,8,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Khánh Hội + Phú Nhuận + Tam Thắng + Thông Tây Hội + Tân Hoà,Tam Thắng 1.00
+26530,9,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Nhiêu Lộc + Tam Thắng + Vườn Lài,Tam Thắng 1.00
+26533,Thắng Nhất,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Rạch Dừa,Rạch Dừa 1.00
+26535,Rạch Dừa,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Rạch Dừa,Rạch Dừa 1.00
+26536,10,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Bình Phú + Bảy Hiền + Gò Vấp + Phú Nhuận + Rạch Dừa,Rạch Dừa 1.00
+26539,11,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,Bình Lợi Trung + Bảy Hiền + Chợ Lớn + Nhiêu Lộc + Phú Nhuận + Phú Thọ + Phước Thắng,Phước Thắng 0.99
+26542,12,Vũng Tàu,Bà Rịa - Vũng Tàu,list adds,An Hội Tây + Bình Thạnh + Chợ Lớn + Hòa Hưng + Nhiêu Lộc + Phú Lâm + Phước Thắng,Phước Thắng 1.00
+26545,Long Sơn,Vũng Tàu,Bà Rịa - Vũng Tàu,agree,Long Sơn,Long Sơn 0.99
+26548,Phước Hưng,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Bà Rịa,Bà Rịa 1.00
+26554,Phước Nguyên,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Bà Rịa,Bà Rịa 1.00
+26557,Long Toàn,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Bà Rịa,Bà Rịa 1.00
+26558,Long Tâm,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Tam Long,Tam Long 1.00
+26560,Phước Trung,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Bà Rịa,Bà Rịa 1.00
+26563,Long Hương,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Long Hương,Long Hương 1.00
+26566,Kim Dinh,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Long Hương,Long Hương 1.00
+26567,Tân Hưng,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Long Hương,Long Hương 1.00
+26569,Long Phước,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Tam Long,Tam Long 1.00
+26572,Hoà Long,Bà Rịa,Bà Rịa - Vũng Tàu,agree,Tam Long,Tam Long 1.00
+26574,Bàu Chinh,Châu Đức,Bà Rịa - Vũng Tàu,agree,Kim Long,Kim Long 1.00
+26575,Ngãi Giao,Châu Đức,Bà Rịa - Vũng Tàu,agree,Ngãi Giao,Ngãi Giao 1.00
+26578,Bình Ba,Châu Đức,Bà Rịa - Vũng Tàu,agree,Ngãi Giao,Ngãi Giao 1.00
+26581,Suối Nghệ,Châu Đức,Bà Rịa - Vũng Tàu,agree,Ngãi Giao,Ngãi Giao 1.00
+26584,Xuân Sơn,Châu Đức,Bà Rịa - Vũng Tàu,agree,Xuân Sơn,Xuân Sơn 1.00
+26587,Sơn Bình,Châu Đức,Bà Rịa - Vũng Tàu,agree,Xuân Sơn,Xuân Sơn 1.00
+26590,Bình Giã,Châu Đức,Bà Rịa - Vũng Tàu,agree,Bình Giã,Bình Giã 1.00
+26593,Bình Trung,Châu Đức,Bà Rịa - Vũng Tàu,agree,Bình Giã,Bình Giã 1.00
+26596,Xà Bang,Châu Đức,Bà Rịa - Vũng Tàu,agree,Châu Đức,Châu Đức 1.00
+26599,Cù Bị,Châu Đức,Bà Rịa - Vũng Tàu,agree,Châu Đức,Châu Đức 1.00
+26602,Láng Lớn,Châu Đức,Bà Rịa - Vũng Tàu,agree,Kim Long,Kim Long 1.00
+26605,Quảng Thành,Châu Đức,Bà Rịa - Vũng Tàu,agree,Bình Giã,Bình Giã 1.00
+26608,Kim Long,Châu Đức,Bà Rịa - Vũng Tàu,agree,Kim Long,Kim Long 1.00
+26611,Suối Rao,Châu Đức,Bà Rịa - Vũng Tàu,agree,Xuân Sơn,Xuân Sơn 1.00
+26614,Đá Bạc,Châu Đức,Bà Rịa - Vũng Tàu,agree,Nghĩa Thành,Nghĩa Thành 1.00
+26617,Nghĩa Thành,Châu Đức,Bà Rịa - Vũng Tàu,agree,Nghĩa Thành,Nghĩa Thành 1.00
+26620,Phước Bửu,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hồ Tràm,Hồ Tràm 1.00
+26623,Phước Thuận,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hồ Tràm,Hồ Tràm 1.00
+26626,Phước Tân,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hồ Tràm,Hồ Tràm 1.00
+26629,Xuyên Mộc,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Xuyên Mộc,Xuyên Mộc 1.00
+26632,Bông Trang,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Xuyên Mộc,Xuyên Mộc 1.00
+26635,Tân Lâm,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Bàu Lâm,Bàu Lâm 1.00
+26638,Bàu Lâm,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Bàu Lâm,Bàu Lâm 1.00
+26641,Hoà Bình,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hoà Hội,Hoà Hội 1.00
+26644,Hoà Hưng,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hoà Hội,Hoà Hội 1.00
+26647,Hoà Hiệp,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hoà Hiệp,Hoà Hiệp 1.00
+26650,Hoà Hội,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Hoà Hội,Hoà Hội 1.00
+26653,Bưng Riềng,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Xuyên Mộc,Xuyên Mộc 1.00
+26656,Bình Châu,Xuyên Mộc,Bà Rịa - Vũng Tàu,agree,Bình Châu,Bình Châu 1.00
+26659,Long Điền,Long Đất,Bà Rịa - Vũng Tàu,agree,Long Điền,Long Điền 1.00
+26662,Long Hải,Long Đất,Bà Rịa - Vũng Tàu,agree,Long Hải,Long Hải 1.00
+26668,Tam An,Long Đất,Bà Rịa - Vũng Tàu,agree,Long Điền,Long Điền 1.00
+26674,Phước Tỉnh,Long Đất,Bà Rịa - Vũng Tàu,agree,Long Hải,Long Hải 1.00
+26677,Phước Hưng,Long Đất,Bà Rịa - Vũng Tàu,agree,Long Hải,Long Hải 1.00
+26680,Đất Đỏ,Long Đất,Bà Rịa - Vũng Tàu,agree,Đất Đỏ,Đất Đỏ 1.00
+26683,Phước Long Thọ,Long Đất,Bà Rịa - Vũng Tàu,agree,Đất Đỏ,Đất Đỏ 1.00
+26686,Phước Hội,Long Đất,Bà Rịa - Vũng Tàu,agree,Phước Hải,Phước Hải 1.00
+26689,Phước Hải,Long Đất,Bà Rịa - Vũng Tàu,agree,Phước Hải,Phước Hải 1.00
+26695,Long Tân,Long Đất,Bà Rịa - Vũng Tàu,agree,Đất Đỏ,Đất Đỏ 1.00
+26698,Láng Dài,Long Đất,Bà Rịa - Vũng Tàu,agree,Đất Đỏ,Đất Đỏ 1.00
+26704,Phú Mỹ,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Phú Mỹ,Phú Mỹ 1.00
+26707,Tân Hoà,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Hải,Tân Hải 1.00
+26710,Tân Hải,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Hải,Tân Hải 1.00
+26713,Phước Hoà,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Phước,Tân Phước 0.98
+26716,Tân Phước,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Phước,Tân Phước 1.00
+26719,Mỹ Xuân,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Phú Mỹ,Phú Mỹ 1.00
+26722,Sông Xoài,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Thành,Tân Thành 1.00
+26725,Hắc Dịch,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Tân Thành,Tân Thành 1.00
+26728,Châu Pha,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Châu Pha,Châu Pha 1.00
+26731,Tóc Tiên,Phú Mỹ,Bà Rịa - Vũng Tàu,agree,Châu Pha,Châu Pha 1.00
+26734,Tân Định,1,TP HCM,agree,Tân Định,Tân Định 1.00
+26737,Đa Kao,1,TP HCM,agree,Sài Gòn + Tân Định,Tân Định 0.61 + Sài Gòn 0.39
+26740,Bến Nghé,1,TP HCM,agree,Sài Gòn,Sài Gòn 1.00
+26743,Bến Thành,1,TP HCM,agree,Bến Thành,Bến Thành 1.00
+26746,Nguyễn Thái Bình,1,TP HCM,agree,Bến Thành + Sài Gòn,Bến Thành 0.66 + Sài Gòn 0.33
+26749,Phạm Ngũ Lão,1,TP HCM,agree,Bến Thành,Bến Thành 1.00
+26752,Cầu Ông Lãnh,1,TP HCM,agree,Bến Thành + Cầu Ông Lãnh,Cầu Ông Lãnh 0.56 + Bến Thành 0.44
+26755,Cô Giang,1,TP HCM,agree,Cầu Ông Lãnh,Cầu Ông Lãnh 1.00
+26758,Nguyễn Cư Trinh,1,TP HCM,agree,Cầu Ông Lãnh,Cầu Ông Lãnh 0.99
+26761,Cầu Kho,1,TP HCM,agree,Cầu Ông Lãnh,Cầu Ông Lãnh 0.99
+26764,Thạnh Xuân,12,TP HCM,agree,Thới An,Thới An 1.00
+26767,Thạnh Lộc,12,TP HCM,agree,An Phú Đông,An Phú Đông 0.99
+26770,Hiệp Thành,12,TP HCM,agree,Tân Thới Hiệp,Tân Thới Hiệp 1.00
+26773,Thới An,12,TP HCM,agree,Thới An,Thới An 1.00
+26776,Tân Chánh Hiệp,12,TP HCM,agree,Trung Mỹ Tây,Trung Mỹ Tây 1.00
+26779,An Phú Đông,12,TP HCM,agree,An Phú Đông,An Phú Đông 1.00
+26782,Tân Thới Hiệp,12,TP HCM,agree,Tân Thới Hiệp,Tân Thới Hiệp 0.99
+26785,Trung Mỹ Tây,12,TP HCM,agree,Trung Mỹ Tây,Trung Mỹ Tây 1.00
+26787,Tân Hưng Thuận,12,TP HCM,agree,Đông Hưng Thuận,Đông Hưng Thuận 1.00
+26788,Đông Hưng Thuận,12,TP HCM,agree,Đông Hưng Thuận,Đông Hưng Thuận 1.00
+26791,Tân Thới Nhất,12,TP HCM,agree,Đông Hưng Thuận,Đông Hưng Thuận 1.00
+26794,Linh Xuân,Thủ Đức,TP HCM,agree,Linh Xuân,Linh Xuân 1.00
+26797,Bình Chiểu,Thủ Đức,TP HCM,agree,Tam Bình,Tam Bình 1.00
+26800,Linh Trung,Thủ Đức,TP HCM,agree,Linh Xuân,Linh Xuân 1.00
+26803,Tam Bình,Thủ Đức,TP HCM,agree,Tam Bình,Tam Bình 1.00
+26806,Tam Phú,Thủ Đức,TP HCM,agree,Tam Bình,Tam Bình 1.00
+26809,Hiệp Bình Phước,Thủ Đức,TP HCM,agree,Hiệp Bình,Hiệp Bình 1.00
+26812,Hiệp Bình Chánh,Thủ Đức,TP HCM,agree,Hiệp Bình,Hiệp Bình 1.00
+26815,Linh Chiểu,Thủ Đức,TP HCM,agree,Thủ Đức,Thủ Đức 1.00
+26818,Linh Tây,Thủ Đức,TP HCM,list adds,Linh Xuân + Thủ Đức,Linh Xuân 0.99
+26821,Linh Đông,Thủ Đức,TP HCM,agree,Hiệp Bình + Thủ Đức,Hiệp Bình 0.62 + Thủ Đức 0.37
+26824,Bình Thọ,Thủ Đức,TP HCM,agree,Thủ Đức,Thủ Đức 1.00
+26827,Trường Thọ,Thủ Đức,TP HCM,agree,Thủ Đức,Thủ Đức 1.00
+26830,Long Bình,Thủ Đức,TP HCM,agree,Long Bình,Long Bình 1.00
+26833,Long Thạnh Mỹ,Thủ Đức,TP HCM,agree,Long Bình + Tăng Nhơn Phú,Long Bình 0.72 + Tăng Nhơn Phú 0.28
+26836,Tân Phú,Thủ Đức,TP HCM,agree,Tăng Nhơn Phú,Tăng Nhơn Phú 1.00
+26839,Hiệp Phú,Thủ Đức,TP HCM,agree,Tăng Nhơn Phú,Tăng Nhơn Phú 1.00
+26842,Tăng Nhơn Phú A,Thủ Đức,TP HCM,agree,Tăng Nhơn Phú,Tăng Nhơn Phú 1.00
+26845,Tăng Nhơn Phú B,Thủ Đức,TP HCM,agree,Tăng Nhơn Phú,Tăng Nhơn Phú 1.00
+26848,Phước Long B,Thủ Đức,TP HCM,agree,Phước Long,Phước Long 0.99
+26851,Phước Long A,Thủ Đức,TP HCM,agree,Phước Long,Phước Long 1.00
+26854,Trường Thạnh,Thủ Đức,TP HCM,agree,Long Phước,Long Phước 1.00
+26857,Long Phước,Thủ Đức,TP HCM,agree,Long Phước,Long Phước 1.00
+26860,Long Trường,Thủ Đức,TP HCM,geometry adds,Long Trường,Long Trường 0.94 + Long Phước 0.06
+26863,Phước Bình,Thủ Đức,TP HCM,agree,Phước Long,Phước Long 0.99
+26866,Phú Hữu,Thủ Đức,TP HCM,agree,Long Trường,Long Trường 1.00
+26872,15,Gò Vấp,TP HCM,agree,An Hội Đông,An Hội Đông 1.00
+26875,17,Gò Vấp,TP HCM,agree,Gò Vấp,Gò Vấp 1.00
+26876,6,Gò Vấp,TP HCM,list adds,An Nhơn + Diên Hồng + Tân Hoà,An Nhơn 0.99
+26878,16,Gò Vấp,TP HCM,list adds,An Hội Đông + Xóm Chiếu,An Hội Đông 1.00
+26881,12,Gò Vấp,TP HCM,"unassigned, settled",,An Hội Tây 1.00
+26882,14,Gò Vấp,TP HCM,list adds,An Hội Tây + Phú Định,An Hội Tây 1.00
+26884,10,Gò Vấp,TP HCM,"unassigned, settled",,Gò Vấp 1.00
+26887,5,Gò Vấp,TP HCM,"unassigned, settled",,An Nhơn 0.99
+26890,1,Gò Vấp,TP HCM,"unassigned, settled",,Hạnh Thông 1.00
+26898,8,Gò Vấp,TP HCM,"unassigned, settled",,Thông Tây Hội 1.00
+26899,11,Gò Vấp,TP HCM,agree,Thông Tây Hội,Thông Tây Hội 0.99
+26902,3,Gò Vấp,TP HCM,agree,Hạnh Thông,Hạnh Thông 0.99
+26905,13,Bình Thạnh,TP HCM,list adds,Bình Lợi Trung + Chợ Lớn + Hòa Hưng + Phú Lâm + Tân Bình + Xóm Chiếu,Bình Lợi Trung 0.99
+26908,11,Bình Thạnh,TP HCM,"unassigned, settled",,Bình Lợi Trung 1.00
+26911,27,Bình Thạnh,TP HCM,agree,Bình Quới,Bình Quới 1.00
+26914,26,Bình Thạnh,TP HCM,agree,Bình Thạnh,Bình Thạnh 1.00
+26917,12,Bình Thạnh,TP HCM,"unassigned, settled",,Bình Thạnh 1.00
+26920,25,Bình Thạnh,TP HCM,agree,Thạnh Mỹ Tây,Thạnh Mỹ Tây 1.00
+26923,5,Bình Thạnh,TP HCM,"unassigned, settled",,Bình Lợi Trung 1.00
+26926,7,Bình Thạnh,TP HCM,"unassigned, settled",,Gia Định 1.00
+26929,14,Bình Thạnh,TP HCM,agree,Bình Thạnh,Bình Thạnh 1.00
+26941,2,Bình Thạnh,TP HCM,"unassigned, settled",,Gia Định 1.00
+26944,1,Bình Thạnh,TP HCM,"unassigned, settled",,Gia Định 1.00
+26950,17,Bình Thạnh,TP HCM,agree,Gia Định,Gia Định 1.00
+26953,19,Bình Thạnh,TP HCM,agree,Thạnh Mỹ Tây,Thạnh Mỹ Tây 1.00
+26956,22,Bình Thạnh,TP HCM,agree,Thạnh Mỹ Tây,Thạnh Mỹ Tây 1.00
+26962,28,Bình Thạnh,TP HCM,agree,Bình Quới,Bình Quới 1.00
+26965,2,Tân Bình,TP HCM,"unassigned, settled",,Tân Sơn Hoà 0.99
+26968,4,Tân Bình,TP HCM,"unassigned, settled",,Tân Sơn Nhất 0.99
+26971,12,Tân Bình,TP HCM,agree,Bảy Hiền,Bảy Hiền 1.00
+26974,13,Tân Bình,TP HCM,"unassigned, settled",,Tân Bình 0.99
+26977,1,Tân Bình,TP HCM,"unassigned, settled",,Tân Sơn Hoà 1.00
+26980,3,Tân Bình,TP HCM,agree,Tân Sơn Hoà,Tân Sơn Hoà 0.99
+26983,11,Tân Bình,TP HCM,"unassigned, settled",,Bảy Hiền 1.00
+26986,7,Tân Bình,TP HCM,agree,Tân Sơn Nhất,Tân Sơn Nhất 1.00
+26989,5,Tân Bình,TP HCM,"unassigned, settled",,Tân Sơn Nhất 0.99
+26992,10,Tân Bình,TP HCM,"unassigned, settled",,Bảy Hiền 1.00
+26995,6,Tân Bình,TP HCM,"unassigned, settled",,Tân Hoà 1.00
+26998,8,Tân Bình,TP HCM,"unassigned, settled",,Tân Hoà 1.00
+27001,9,Tân Bình,TP HCM,agree,Tân Hoà,Tân Hoà 1.00
+27004,14,Tân Bình,TP HCM,agree,Tân Bình,Tân Bình 0.99
+27007,15,Tân Bình,TP HCM,list adds,Tân Bình + Tân Sơn,Tân Sơn 0.99
+27010,Tân Sơn Nhì,Tân Phú,TP HCM,agree,Tân Sơn Nhì,Tân Sơn Nhì 1.00
+27013,Tây Thạnh,Tân Phú,TP HCM,agree,Tây Thạnh,Tây Thạnh 0.99
+27016,Sơn Kỳ,Tân Phú,TP HCM,list adds,Bình Hưng Hoà + Tân Sơn Nhì + Tây Thạnh,Tân Sơn Nhì 0.78 + Tây Thạnh 0.20
+27019,Tân Quý,Tân Phú,TP HCM,list adds,Phú Thọ Hoà + Tân Hưng + Tân Sơn Nhì,Phú Thọ Hoà 0.66 + Tân Sơn Nhì 0.34
+27022,Tân Thành,Tân Phú,TP HCM,agree,Phú Thọ Hoà + Tân Phú + Tân Sơn Nhì,Phú Thọ Hoà 0.68 + Tân Phú 0.24 + Tân Sơn Nhì 0.09
+27025,Phú Thọ Hoà,Tân Phú,TP HCM,agree,Phú Thọ Hoà,Phú Thọ Hoà 1.00
+27028,Phú Thạnh,Tân Phú,TP HCM,agree,Phú Thạnh,Phú Thạnh 1.00
+27031,Phú Trung,Tân Phú,TP HCM,agree,Tân Phú,Tân Phú 1.00
+27034,Hoà Thạnh,Tân Phú,TP HCM,agree,Tân Phú,Tân Phú 1.00
+27037,Hiệp Tân,Tân Phú,TP HCM,agree,Phú Thạnh,Phú Thạnh 1.00
+27040,Tân Thới Hoà,Tân Phú,TP HCM,agree,Phú Thạnh + Tân Phú,Phú Thạnh 0.64 + Tân Phú 0.36
+27043,4,Phú Nhuận,TP HCM,"unassigned, settled",,Đức Nhuận 1.00
+27046,5,Phú Nhuận,TP HCM,"unassigned, settled",,Đức Nhuận 0.99
+27049,9,Phú Nhuận,TP HCM,agree,Đức Nhuận,Đức Nhuận 0.98
+27052,7,Phú Nhuận,TP HCM,agree,Cầu Kiệu,Cầu Kiệu 1.00
+27058,1,Phú Nhuận,TP HCM,"unassigned, settled",,Cầu Kiệu 1.00
+27061,2,Phú Nhuận,TP HCM,"unassigned, settled",,Cầu Kiệu 1.00
+27064,8,Phú Nhuận,TP HCM,"unassigned, settled",,Phú Nhuận 1.00
+27070,10,Phú Nhuận,TP HCM,"unassigned, settled",,Phú Nhuận 1.00
+27073,11,Phú Nhuận,TP HCM,"unassigned, settled",,Phú Nhuận 1.00
+27076,15,Phú Nhuận,TP HCM,agree,Cầu Kiệu + Phú Nhuận,Cầu Kiệu 0.62 + Phú Nhuận 0.38
+27085,13,Phú Nhuận,TP HCM,agree,Phú Nhuận,Phú Nhuận 1.00
+27088,Thảo Điền,Thủ Đức,TP HCM,agree,An Khánh,An Khánh 1.00
+27091,An Phú,Thủ Đức,TP HCM,agree,An Khánh + Bình Trưng,Bình Trưng 0.92 + An Khánh 0.08
+27094,An Khánh,Thủ Đức,TP HCM,agree,An Khánh,An Khánh 1.00
+27097,Bình Trưng Đông,Thủ Đức,TP HCM,agree,Bình Trưng,Bình Trưng 0.99
+27100,Bình Trưng Tây,Thủ Đức,TP HCM,agree,Bình Trưng,Bình Trưng 1.00
+27109,Cát Lái,Thủ Đức,TP HCM,agree,Cát Lái,Cát Lái 1.00
+27112,Thạnh Mỹ Lợi,Thủ Đức,TP HCM,agree,Cát Lái,Cát Lái 1.00
+27115,An Lợi Đông,Thủ Đức,TP HCM,agree,An Khánh,An Khánh 1.00
+27118,Thủ Thiêm,Thủ Đức,TP HCM,agree,An Khánh,An Khánh 1.00
+27127,14,3,TP HCM,agree,Nhiêu Lộc,Nhiêu Lộc 0.99
+27130,12,3,TP HCM,"unassigned, settled",,Nhiêu Lộc 1.00
+27133,11,3,TP HCM,"unassigned, settled",,Nhiêu Lộc 0.99
+27139,Võ Thị Sáu,3,TP HCM,agree,Xuân Hoà,Xuân Hoà 1.00
+27142,9,3,TP HCM,"unassigned, settled",,Nhiêu Lộc 0.99
+27148,4,3,TP HCM,agree,Bàn Cờ + Xuân Hoà,Bàn Cờ 0.94 + Xuân Hoà 0.05
+27151,5,3,TP HCM,"unassigned, settled",,Bàn Cờ 1.00
+27154,3,3,TP HCM,"unassigned, settled",,Bàn Cờ 0.99
+27157,2,3,TP HCM,"unassigned, settled",,Bàn Cờ 1.00
+27160,1,3,TP HCM,"unassigned, settled",,Bàn Cờ 0.99
+27163,15,10,TP HCM,agree,Hòa Hưng,Hòa Hưng 1.00
+27166,13,10,TP HCM,"unassigned, settled",,Hòa Hưng 1.00
+27169,14,10,TP HCM,list adds,Diên Hồng + Hòa Hưng,Diên Hồng 0.97
+27172,12,10,TP HCM,"unassigned, settled",,Hòa Hưng 1.00
+27178,10,10,TP HCM,agree,Vườn Lài,Vườn Lài 0.99
+27181,9,10,TP HCM,"unassigned, settled",,Vườn Lài 1.00
+27184,1,10,TP HCM,"unassigned, settled",,Vườn Lài 1.00
+27187,8,10,TP HCM,agree,Diên Hồng,Diên Hồng 1.00
+27190,2,10,TP HCM,"unassigned, settled",,Vườn Lài 1.00
+27193,4,10,TP HCM,"unassigned, settled",,Vườn Lài 0.99
+27202,6,10,TP HCM,"unassigned, settled",,Diên Hồng 1.00
+27208,15,11,TP HCM,agree,Phú Thọ,Phú Thọ 1.00
+27211,5,11,TP HCM,"unassigned, settled",,Hoà Bình 0.99
+27214,14,11,TP HCM,agree,Hoà Bình,Hoà Bình 1.00
+27220,3,11,TP HCM,"unassigned, settled",,Bình Thới 1.00
+27226,11,11,TP HCM,"unassigned, settled",,Phú Thọ 1.00
+27229,8,11,TP HCM,agree,Bình Thới + Phú Thọ,Bình Thới 0.71 + Phú Thọ 0.28
+27232,10,11,TP HCM,agree,Bình Thới,Bình Thới 1.00
+27238,7,11,TP HCM,"unassigned, settled",,Minh Phụng 0.99
+27247,1,11,TP HCM,"unassigned, settled",,Minh Phụng 1.00
+27253,16,11,TP HCM,agree,Minh Phụng,Minh Phụng 1.00
+27259,13,4,TP HCM,"unassigned, settled",,Xóm Chiếu 1.00
+27265,9,4,TP HCM,agree,Khánh Hội,Khánh Hội 0.98
+27271,8,4,TP HCM,"unassigned, settled",,Khánh Hội 1.00
+27277,18,4,TP HCM,agree,Xóm Chiếu,Xóm Chiếu 1.00
+27283,4,4,TP HCM,agree,Khánh Hội + Vĩnh Hội,Vĩnh Hội 0.55 + Khánh Hội 0.45
+27286,3,4,TP HCM,agree,Vĩnh Hội,Vĩnh Hội 1.00
+27289,16,4,TP HCM,"unassigned, settled",,Xóm Chiếu 1.00
+27292,2,4,TP HCM,"unassigned, settled",,Vĩnh Hội 0.94
+27295,15,4,TP HCM,agree,Khánh Hội + Xóm Chiếu,Khánh Hội 0.83 + Xóm Chiếu 0.16
+27298,1,4,TP HCM,"unassigned, settled",,Vĩnh Hội 1.00
+27301,4,5,TP HCM,agree,Chợ Quán,Chợ Quán 1.00
+27304,9,5,TP HCM,agree,An Đông,An Đông 1.00
+27307,2,5,TP HCM,"unassigned, settled",,Chợ Quán 1.00
+27310,12,5,TP HCM,"unassigned, settled",,Chợ Lớn 1.00
+27316,7,5,TP HCM,"unassigned, settled",,An Đông 1.00
+27325,1,5,TP HCM,"unassigned, settled",,Chợ Quán 0.99
+27328,11,5,TP HCM,"unassigned, settled",,Chợ Lớn 1.00
+27331,14,5,TP HCM,agree,Chợ Lớn,Chợ Lớn 1.00
+27334,5,5,TP HCM,"unassigned, settled",,An Đông 0.99
+27343,13,5,TP HCM,"unassigned, settled",,Chợ Lớn 0.99
+27346,14,6,TP HCM,agree,Phú Lâm,Phú Lâm 1.00
+27349,13,6,TP HCM,"unassigned, settled",,Phú Lâm 1.00
+27352,9,6,TP HCM,agree,Bình Tây,Bình Tây 0.99
+27358,12,6,TP HCM,"unassigned, settled",,Phú Lâm 1.00
+27364,11,6,TP HCM,agree,Bình Phú,Bình Phú 1.00
+27367,2,6,TP HCM,"unassigned, settled",,Bình Tây 1.00
+27373,1,6,TP HCM,"unassigned, settled",,Bình Tiên 1.00
+27376,8,6,TP HCM,agree,Bình Tiên,Bình Tiên 0.99
+27382,7,6,TP HCM,"unassigned, settled",,Bình Tiên 0.98
+27385,10,6,TP HCM,"unassigned, settled",,Bình Phú 1.00
+27397,Rạch Ông,8,TP HCM,agree,Chánh Hưng,Chánh Hưng 1.00
+27403,Hưng Phú,8,TP HCM,agree,Chánh Hưng,Chánh Hưng 0.99
+27409,4,8,TP HCM,agree,Chánh Hưng,Chánh Hưng 1.00
+27415,Xóm Củi,8,TP HCM,agree,Phú Định,Phú Định 0.98
+27418,5,8,TP HCM,agree,Bình Đông + Chánh Hưng,Bình Đông 0.56 + Chánh Hưng 0.44
+27421,14,8,TP HCM,"unassigned, settled",,Phú Định 1.00
+27424,6,8,TP HCM,agree,Bình Đông,Bình Đông 0.99
+27427,15,8,TP HCM,agree,Phú Định,Phú Định 1.00
+27430,16,8,TP HCM,agree,Bình Phú + Phú Định + Tân Nhựt,Phú Định 0.82 + Bình Phú 0.11 + Tân Nhựt 0.06
+27433,7,8,TP HCM,list adds,Bình Hưng + Bình Đông,Bình Đông 0.96
+27436,Bình Hưng Hoà,Bình Tân,TP HCM,agree,Bình Hưng Hoà,Bình Hưng Hoà 1.00
+27439,Bình Hưng Hoà A,Bình Tân,TP HCM,agree,Bình Hưng Hoà + Bình Trị Đông,Bình Hưng Hoà 0.84 + Bình Trị Đông 0.16
+27442,Bình Hưng Hoà B,Bình Tân,TP HCM,agree,Bình Tân,Bình Tân 1.00
+27445,Bình Trị Đông,Bình Tân,TP HCM,agree,Bình Trị Đông,Bình Trị Đông 1.00
+27448,Bình Trị Đông A,Bình Tân,TP HCM,agree,Bình Trị Đông + Bình Tân,Bình Trị Đông 0.76 + Bình Tân 0.24
+27451,Bình Trị Đông B,Bình Tân,TP HCM,agree,An Lạc,An Lạc 1.00
+27454,Tân Tạo,Bình Tân,TP HCM,list adds,Bình Tân + Tân Tạo + Tân Vĩnh Lộc,Bình Tân 0.49 + Tân Tạo 0.48
+27457,Tân Tạo A,Bình Tân,TP HCM,list adds,Tân Nhựt + Tân Tạo,Tân Tạo 0.99
+27460,An Lạc,Bình Tân,TP HCM,agree,An Lạc,An Lạc 1.00
+27463,An Lạc A,Bình Tân,TP HCM,agree,An Lạc,An Lạc 1.00
+27466,Tân Thuận Đông,7,TP HCM,agree,Tân Thuận,Tân Thuận 1.00
+27469,Tân Thuận Tây,7,TP HCM,agree,Tân Thuận,Tân Thuận 1.00
+27472,Tân Kiểng,7,TP HCM,agree,Tân Hưng,Tân Hưng 1.00
+27475,Tân Hưng,7,TP HCM,agree,Tân Hưng,Tân Hưng 0.99
+27478,Bình Thuận,7,TP HCM,agree,Tân Thuận,Tân Thuận 1.00
+27481,Tân Quy,7,TP HCM,"unassigned, settled",,Tân Hưng 1.00
+27484,Phú Thuận,7,TP HCM,agree,Phú Thuận,Phú Thuận 1.00
+27487,Tân Phú,7,TP HCM,agree,Tân Mỹ,Tân Mỹ 0.99
+27490,Tân Phong,7,TP HCM,agree,Tân Hưng,Tân Hưng 0.99
+27493,Phú Mỹ,7,TP HCM,agree,Phú Thuận + Tân Mỹ,Tân Mỹ 0.56 + Phú Thuận 0.42
+27496,Củ Chi,Củ Chi,TP HCM,agree,Tân An Hội,Tân An Hội 0.99
+27499,Phú Mỹ Hưng,Củ Chi,TP HCM,agree,An Nhơn Tây,An Nhơn Tây 1.00
+27502,An Phú,Củ Chi,TP HCM,agree,An Nhơn Tây,An Nhơn Tây 1.00
+27505,Trung Lập Thượng,Củ Chi,TP HCM,agree,Thái Mỹ,Thái Mỹ 1.00
+27508,An Nhơn Tây,Củ Chi,TP HCM,agree,An Nhơn Tây,An Nhơn Tây 1.00
+27511,Nhuận Đức,Củ Chi,TP HCM,agree,Nhuận Đức,Nhuận Đức 0.99
+27514,Phạm Văn Cội,Củ Chi,TP HCM,agree,Nhuận Đức,Nhuận Đức 1.00
+27517,Phú Hoà Đông,Củ Chi,TP HCM,agree,Phú Hoà Đông,Phú Hoà Đông 1.00
+27520,Trung Lập Hạ,Củ Chi,TP HCM,agree,Nhuận Đức,Nhuận Đức 0.99
+27523,Trung An,Củ Chi,TP HCM,agree,Bình Mỹ,Bình Mỹ 1.00
+27526,Phước Thạnh,Củ Chi,TP HCM,agree,Thái Mỹ,Thái Mỹ 0.99
+27529,Phước Hiệp,Củ Chi,TP HCM,agree,Tân An Hội,Tân An Hội 0.96
+27532,Tân An Hội,Củ Chi,TP HCM,agree,Tân An Hội,Tân An Hội 0.99
+27535,Phước Vĩnh An,Củ Chi,TP HCM,agree,Củ Chi,Củ Chi 1.00
+27538,Thái Mỹ,Củ Chi,TP HCM,agree,Thái Mỹ,Thái Mỹ 1.00
+27541,Tân Thạnh Tây,Củ Chi,TP HCM,agree,Phú Hoà Đông,Phú Hoà Đông 1.00
+27544,Hoà Phú,Củ Chi,TP HCM,agree,Bình Mỹ,Bình Mỹ 1.00
+27547,Tân Thạnh Đông,Củ Chi,TP HCM,agree,Phú Hoà Đông,Phú Hoà Đông 1.00
+27550,Bình Mỹ,Củ Chi,TP HCM,agree,Bình Mỹ,Bình Mỹ 1.00
+27553,Tân Phú Trung,Củ Chi,TP HCM,agree,Củ Chi,Củ Chi 0.99
+27556,Tân Thông Hội,Củ Chi,TP HCM,agree,Củ Chi,Củ Chi 1.00
+27559,Hóc Môn,Hóc Môn,TP HCM,agree,Hóc Môn,Hóc Môn 1.00
+27562,Tân Hiệp,Hóc Môn,TP HCM,agree,Hóc Môn,Hóc Môn 1.00
+27565,Nhị Bình,Hóc Môn,TP HCM,agree,Đông Thạnh,Đông Thạnh 0.99
+27568,Đông Thạnh,Hóc Môn,TP HCM,agree,Đông Thạnh,Đông Thạnh 1.00
+27571,Tân Thới Nhì,Hóc Môn,TP HCM,agree,Xuân Thới Sơn,Xuân Thới Sơn 0.99
+27574,Thới Tam Thôn,Hóc Môn,TP HCM,agree,Đông Thạnh,Đông Thạnh 1.00
+27577,Xuân Thới Sơn,Hóc Môn,TP HCM,agree,Xuân Thới Sơn,Xuân Thới Sơn 1.00
+27580,Tân Xuân,Hóc Môn,TP HCM,agree,Hóc Môn,Hóc Môn 1.00
+27583,Xuân Thới Đông,Hóc Môn,TP HCM,agree,Xuân Thới Sơn,Xuân Thới Sơn 1.00
+27586,Trung Chánh,Hóc Môn,TP HCM,agree,Bà Điểm,Bà Điểm 1.00
+27589,Xuân Thới Thượng,Hóc Môn,TP HCM,agree,Bà Điểm,Bà Điểm 0.99
+27592,Bà Điểm,Hóc Môn,TP HCM,agree,Bà Điểm,Bà Điểm 1.00
+27595,Tân Túc,Bình Chánh,TP HCM,agree,Tân Nhựt,Tân Nhựt 1.00
+27598,Phạm Văn Hai,Bình Chánh,TP HCM,agree,Tân Vĩnh Lộc + Vĩnh Lộc,Tân Vĩnh Lộc 0.60 + Vĩnh Lộc 0.40
+27601,Vĩnh Lộc A,Bình Chánh,TP HCM,agree,Vĩnh Lộc,Vĩnh Lộc 1.00
+27604,Vĩnh Lộc B,Bình Chánh,TP HCM,agree,Tân Vĩnh Lộc,Tân Vĩnh Lộc 1.00
+27607,Bình Lợi,Bình Chánh,TP HCM,agree,Bình Lợi,Bình Lợi 1.00
+27610,Lê Minh Xuân,Bình Chánh,TP HCM,agree,Bình Lợi,Bình Lợi 1.00
+27613,Tân Nhựt,Bình Chánh,TP HCM,agree,Tân Nhựt,Tân Nhựt 1.00
+27616,Tân Kiên,Bình Chánh,TP HCM,list adds,Tân Nhựt + Tân Tạo,Tân Nhựt 0.99
+27619,Bình Hưng,Bình Chánh,TP HCM,agree,Bình Hưng,Bình Hưng 1.00
+27622,Phong Phú,Bình Chánh,TP HCM,agree,Bình Hưng,Bình Hưng 1.00
+27625,An Phú Tây,Bình Chánh,TP HCM,agree,Bình Chánh + Bình Đông,Bình Chánh 0.82 + Bình Đông 0.18
+27628,Hưng Long,Bình Chánh,TP HCM,agree,Hưng Long,Hưng Long 1.00
+27631,Đa Phước,Bình Chánh,TP HCM,agree,Hưng Long,Hưng Long 1.00
+27634,Tân Quý Tây,Bình Chánh,TP HCM,agree,Bình Chánh,Bình Chánh 1.00
+27637,Bình Chánh,Bình Chánh,TP HCM,agree,Bình Chánh,Bình Chánh 1.00
+27640,Quy Đức,Bình Chánh,TP HCM,agree,Hưng Long,Hưng Long 1.00
+27643,Nhà Bè,Nhà Bè,TP HCM,agree,Nhà Bè,Nhà Bè 1.00
+27646,Phước Kiển,Nhà Bè,TP HCM,agree,Nhà Bè,Nhà Bè 1.00
+27649,Phước Lộc,Nhà Bè,TP HCM,agree,Nhà Bè,Nhà Bè 0.96
+27652,Nhơn Đức,Nhà Bè,TP HCM,agree,Hiệp Phước,Hiệp Phước 0.99
+27655,Phú Xuân,Nhà Bè,TP HCM,agree,Nhà Bè,Nhà Bè 0.99
+27658,Long Thới,Nhà Bè,TP HCM,agree,Hiệp Phước,Hiệp Phước 0.99
+27661,Hiệp Phước,Nhà Bè,TP HCM,agree,Hiệp Phước,Hiệp Phước 0.99
+27664,Cần Thạnh,Cần Giờ,TP HCM,agree,Cần Giờ,Cần Giờ 1.00
+27667,Bình Khánh,Cần Giờ,TP HCM,agree,Bình Khánh,Bình Khánh 0.98
+27670,Tam Thôn Hiệp,Cần Giờ,TP HCM,agree,Bình Khánh,Bình Khánh 1.00
+27673,An Thới Đông,Cần Giờ,TP HCM,agree,An Thới Đông + Bình Khánh,An Thới Đông 0.94 + Bình Khánh 0.05
+27676,Thạnh An,Cần Giờ,TP HCM,agree,Thạnh An,Thạnh An 0.99
+27679,Long Hoà,Cần Giờ,TP HCM,agree,Cần Giờ,Cần Giờ 1.00
+27682,Lý Nhơn,Cần Giờ,TP HCM,agree,An Thới Đông,An Thới Đông 0.99

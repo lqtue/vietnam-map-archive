@@ -17,7 +17,7 @@ for (const [total, mobile] of [
     await page.addInitScript(() => {
       localStorage.clear();
       localStorage.setItem('vma-explore-tour-ack-v1', 'true');
-      localStorage.setItem('vma-explore-welcome-ack-v1', 'all');
+      localStorage.setItem('vma-explore-welcome-ack-v2', 'all');
     });
     await page.route('**/rest/v1/**', async (route) => {
       const url = new URL(route.request().url());

@@ -11,7 +11,8 @@
 #
 # Examples — the two extracts that exist today, and the two the roadmap wants:
 #
-#   scripts/pmtiles_extract.sh vietnam 105.5,8.5,108.5,21.6 15         # ~348 MB, z<=15
+#   scripts/pmtiles_extract.sh vietnam-z14 101.4,7.4,109.7,23.6 14    # ~510 MB; stay under
+#     512 MB or Cloudflare will not edge-cache it (see basemapStyle.ts)
 #   scripts/pmtiles_extract.sh seasia  90,-13,132,32 8                 # ~28 MB, the
 #     surroundings at low zoom only — wide and shallow costs nothing, and without
 #     it the detailed extract's own bbox is a visible edge when you zoom out.

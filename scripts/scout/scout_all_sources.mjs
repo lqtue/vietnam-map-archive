@@ -208,11 +208,13 @@ async function scoutRumsey(keywords) {
   const all = new Map();
   for (const kw of keywords) {
     process.stdout.write(`  rumsey/${kw.padEnd(13)} `);
+    // Luna pages with os (offset) and bs (batch size). `so`/`dh` are ignored, so the old
+    // loop read the first 10 hits of every keyword and nothing else (52 rows of ~230).
     let start = 0;
-    const page = 50;
+    const page = 100;
     let total = 0;
-    while (start < 1000) {
-      const url = `https://www.davidrumsey.com/luna/servlet/as/search?q=${encodeURIComponent(kw)}&dh=${page}&os=json&so=${start}`;
+    for (;;) {
+      const url = `https://www.davidrumsey.com/luna/servlet/as/search?q=${encodeURIComponent(kw)}&os=${start}&bs=${page}`;
       const data = await fetchJson(url);
       if (data.__error) {
         console.log(`ERR ${data.__error}`);
@@ -222,11 +224,14 @@ async function scoutRumsey(keywords) {
       const results = data.results || [];
       for (const r of results) {
         // Filter: must include Vietnam-related country or city
-        const fields = Object.fromEntries(
+        const all_fields = Object.fromEntries(
           (r.fieldValues || []).map((fv) => {
             const k = Object.keys(fv)[0];
-            return [k, Array.isArray(fv[k]) ? fv[k][0] : fv[k]];
+            return [k, Array.isArray(fv[k]) ? fv[k] : [fv[k]]];
           })
+        );
+        const fields = Object.fromEntries(
+          Object.entries(all_fields).map(([k, v]) => [k, v.join('; ')])
         );
         const country = String(fields['Country'] || '');
         const city = String(fields['City'] || '');
@@ -234,7 +239,7 @@ async function scoutRumsey(keywords) {
         const region = String(fields['Region'] || '');
         const combined = (country + ' ' + city + ' ' + region + ' ' + r.displayName).toLowerCase();
         if (
-          !/vietnam|saigon|hanoi|hue|tonkin|annam|cochinchin|indochin|cambodia|laos|indochine/i.test(
+          !/vietnam|saigon|hanoi|\bhu[eé]\b|tonkin|annam|cochinchin|indochin|cambodia|laos|indochine/i.test(
             combined
           )
         )
@@ -257,13 +262,23 @@ async function scoutRumsey(keywords) {
             thumbnail: r.urlSize2 || r.urlSize1 || '',
             foundVia: [kw],
             dedupKey: key,
-            raw: { type: fields['Type'], country, city, region, note: note.slice(0, 200) },
+            // Every Luna field, so the catalogue's first metadata (scale, full title, the
+            // publication a plate belongs to) comes from the source, not from a later re-fetch.
+            raw: {
+              type: fields['Type'],
+              country,
+              city,
+              region,
+              note: note.slice(0, 200),
+              collection: fields['Pub Title'] || '', // the atlas or set a plate belongs to
+              fields: all_fields,
+            },
           });
         else all.get(key).foundVia.push(kw);
       }
-      if (results.length < page) break;
       start += page;
-      await sleep(500);
+      if (!results.length || start >= total) break;
+      await sleep(1200);
     }
     console.log(`(${total} total raw, ${all.size} unique vn-filtered)`);
     await sleep(300);
@@ -444,7 +459,8 @@ if (SOURCES.includes('gallica')) {
 }
 if (SOURCES.includes('rumsey')) {
   console.log('\n=== David Rumsey ===');
-  const recs = await scoutRumsey(KEYWORDS);
+  // Rumsey indexes English forms the French list misses (Cochinchina: 554 hits).
+  const recs = await scoutRumsey([...KEYWORDS, 'Indochina', 'Cochinchina', 'Viet Nam']);
   counts.rumsey = recs.length;
   for (const r of recs) merged.set(r.dedupKey, r);
 }

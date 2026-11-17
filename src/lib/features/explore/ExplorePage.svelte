@@ -116,7 +116,10 @@
   let appliedUrl = '';
   let mounted = false;
 
-  const { addMapOverlay, setViewFromBounds, zoomToMap } = createExploreZoom(mapStore);
+  const { addMapOverlay, setViewFromBounds, reveal, zoomToMap } = createExploreZoom(
+    mapStore,
+    () => shellMap
+  );
   const { syncMapParam, syncAtParam, tallyMapOpen } = createExploreUrl({
     supabase,
     role: () => role,
@@ -281,8 +284,11 @@
   function handleGpsPosition(e: CustomEvent<{ lon: number; lat: number }>) {
     const pos: [number, number] = [e.detail.lon, e.detail.lat];
     // Snap the camera on the first fix only — the user may have panned away by
-    // the time later updates land.
-    if (!userPosition) mapStore.setView({ lng: pos[0], lat: pos[1], zoom: 15 });
+    // the time later updates land. A fix far from the archive (a visitor abroad)
+    // would open the map on an empty basemap every visit: stay on Saigon.
+    // ponytail: rough box round Vietnam, Cambodia and Laos; tighten if the archive grows past it.
+    const nearArchive = pos[0] >= 99 && pos[0] <= 112 && pos[1] >= 7 && pos[1] <= 24;
+    if (!userPosition && nearArchive) mapStore.setView({ lng: pos[0], lat: pos[1], zoom: 15 });
     userPosition = pos;
   }
   function handleGpsError(e: CustomEvent<{ message: string }>) {
@@ -321,8 +327,10 @@
     e: CustomEvent<{ lat: number; lng: number; bbox?: Bbox; zoom?: number }>
   ) {
     const { lat, lng, bbox, zoom } = e.detail;
-    if (bbox) setViewFromBounds(bbox);
-    else mapStore.setView({ lng, lat, zoom: zoom ?? 15 });
+    if (!reveal(bbox ?? [lng, lat, lng, lat])) {
+      if (bbox) setViewFromBounds(bbox);
+      else mapStore.setView({ lng, lat, zoom: zoom ?? 15 });
+    }
     // The camera alone leaves the reader guessing which of the hundred things
     // under the crosshair they searched for — the same reason a label hit
     // pulses. A bbox pick pulses at its centre, which is where it centred.
@@ -351,7 +359,9 @@
     tallyMapOpen(map.id);
     trackMeasurement('map_open', { surface: 'explore', map_id: map.id, action: 'open' });
     if (h.lng != null && h.lat != null) {
-      mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
+      if (!reveal([h.lng, h.lat, h.lng, h.lat])) {
+        mapStore.setView({ lng: h.lng, lat: h.lat, zoom: LABEL_ZOOM });
+      }
       focusPoint = { lng: h.lng, lat: h.lat };
       syncAtParam(focusPoint);
       // The label names the place, the sheet it came from dates it.

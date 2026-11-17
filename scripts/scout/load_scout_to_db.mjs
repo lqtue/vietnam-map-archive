@@ -227,7 +227,8 @@ const rows = candidates
       category: sc.category,
       reasons: sc.reasons,
       found_via: (rec.foundVia || []).join(';'),
-      review_status: 'pending',
+      // No review_status: new rows take the column default ('pending'), and a re-scout
+      // upsert must not reset a row someone already approved or rejected.
       // A source with no reachable Presentation manifest can still have an
       // Image API endpoint (LoC). Ingest reads it from here — see /api/admin/scout.
       raw: (() => {

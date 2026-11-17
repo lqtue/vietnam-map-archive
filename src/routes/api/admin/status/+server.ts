@@ -63,6 +63,14 @@ export const GET: RequestHandler = async ({ locals }) => {
       .select('*', head)
       .not('triage->>neatline', 'is', null)
       .is('triage_reviewed_at', null),
+    // The check side (docs/plans/review-page-plan.md). `review_events` is insert-only and an undo
+    // is a second event, so a live verdict count is the events that are not undos, minus the undos.
+    /* 19 */ db.from('review_tasks').select('*', head).eq('status', 'open'),
+    /* 20 */ db.from('review_items').select('*', head).eq('active', true),
+    /* 21 */ db.from('review_events').select('*', head).is('verdicts->>undone', null),
+    /* 22 */ db.from('review_events').select('*', head).not('verdicts->>undone', 'is', null),
+    // ponytail: counts a blind verdict that was later undone; exact needs the rows, not a head count.
+    /* 23 */ db.from('review_events').select('*', head).eq('verdicts->>arm', 'blind'),
   ]);
 
   const broken = results.find((r) => r.error);
@@ -88,6 +96,11 @@ export const GET: RequestHandler = async ({ locals }) => {
     mapsTriaged,
     mapsWithLayout,
     mapsProposed,
+    tasksOpen,
+    itemsActive,
+    eventsNotUndo,
+    eventsUndo,
+    eventsBlind,
   ] = results.map((r) => r.count ?? 0);
 
   // Only fetched when there is something to show, so the normal case is free.
@@ -123,6 +136,12 @@ export const GET: RequestHandler = async ({ locals }) => {
       byMachine: fpByMachine,
       approved: fpApproved,
       awaitingReview: fpAwaitingReview,
+    },
+    reviews: {
+      tasksOpen,
+      items: itemsActive,
+      verdicts: Math.max(eventsNotUndo - eventsUndo, 0),
+      blind: eventsBlind,
     },
     jobs: { queued: jobsQueued, running: jobsRunning, failed: jobsFailed, failures },
   });

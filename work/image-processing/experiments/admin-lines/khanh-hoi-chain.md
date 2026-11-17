@@ -25,6 +25,13 @@ guide come from one archive, so they count as one family; Baudrit (1943) and the
 | 5b | Tam Hội, Vĩnh Hội → Khánh Hội | `merged_into` | 2/5/1888 | NAC2 #18, #24 | **Conflict.** The 1895 and 1907 texts still name Tam Hội as a village |
 | 6 | Khánh Hội, Tạm Hội, Vĩnh Hội in tổng Dương Minh, hạt 20 | `part_of` | 13/12/1880 (hạt 20); 1880–81 (tổng) | the plate (read: names, village limits, canton name); NAC2 #15; guide A | **Yes**, plate and text are independent |
 
+**An earlier map, found 2026-10-21.** Bigrel's *Carte générale de la Cochinchine française* (Navy,
+c. 1873, 1:127,000; Rumsey, in the scout queue) prints Khánh hội, Xóm chiếu, Tam hội and Vĩnh hội as
+separate places, and Tân qui đông to the south. Read by Tue on a screenshot of the composite; one reader.
+That puts the three villages before the 1880 decree (row 6), and Xóm Chiếu from 1873 to the 2025 ward.
+It prints *Tam*, not *Tạm*. Bigrel is compiled "from the most recent documents", so it may share a
+source with the 1882 plate: not counted as independent until that is checked.
+
 ## Map link (draft)
 
 - Plate placement: 3 control points, none near Quận 4, so Quận 4 is extrapolated. By eye the fit is within

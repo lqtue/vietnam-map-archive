@@ -67,10 +67,14 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
     return `Shape ${rows.filter((f) => f.userId === userId).length + 1}`;
   }
 
-  async function draw(pixelPolygon: PixelCoord[], geometry: 'Polygon' | 'LineString') {
+  /** Saves at once; returns the new row, or null when nothing was saved. */
+  async function draw(
+    pixelPolygon: PixelCoord[],
+    geometry: 'Polygon' | 'LineString'
+  ): Promise<FootprintSubmission | null> {
     const mapId = getMapId();
-    if (!mapId || !userId) return;
-    if (pixelPolygon.length < (geometry === 'Polygon' ? 3 : 2)) return;
+    if (!mapId || !userId) return null;
+    if (pixelPolygon.length < (geometry === 'Polygon' ? 3 : 2)) return null;
     if (!draftPending) {
       draftPending = true;
       trackMeasurement('draft_started', {
@@ -90,7 +94,7 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
       category: null,
       featureType,
     });
-    if (!id) return;
+    if (!id) return null;
     draftPending = false;
     trackMeasurement('save_success', {
       surface: 'scan',
@@ -110,6 +114,16 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
     };
     update((s) => ({ ...s, footprints: [...s.footprints, row], newId: id }));
     setTimeout(() => update((s) => (s.newId === id ? { ...s, newId: null } : s)), 150);
+    return row;
+  }
+
+  /** Rows a verdict has just settled: take their new state and final shape. */
+  function settle(rows: FootprintSubmission[]) {
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    update((s) => ({
+      ...s,
+      footprints: s.footprints.map((f) => byId.get(f.id) ?? f),
+    }));
   }
 
   async function modify(footprintId: string, pixelPolygon: PixelCoord[]) {
@@ -141,5 +155,5 @@ export function createTrace({ supabase, userId, getMapId }: TraceHooks) {
     }));
   }
 
-  return { subscribe, reset, load, draw, modify, remove, retitle };
+  return { subscribe, reset, load, draw, modify, remove, retitle, settle };
 }
