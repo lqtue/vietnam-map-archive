@@ -77,6 +77,8 @@
   let pointCount = 0;
   /** A selection made before its feature was on the canvas; fitted when it lands. */
   let pendingFocus: string | null = null;
+  /** A shape picked on the canvas is already in view: selecting it leaves the view alone. */
+  let pickedOnCanvas: string | null = null;
 
   $: byId = new Map(footprints.map((f) => [f.id, f]));
   $: geometry = (tool === 'line' ? 'LineString' : 'Polygon') as 'Polygon' | 'LineString';
@@ -147,6 +149,9 @@
 
   function focus(ctx: ImageShellContext | null, id: string | null) {
     if (!ctx || !id) return;
+    const fromCanvas = id === pickedOnCanvas;
+    pickedOnCanvas = null;
+    if (fromCanvas) return;
     const geom = ctx.footprintSource.getFeatureById(id)?.getGeometry();
     if (!geom) {
       pendingFocus = id;
@@ -287,7 +292,9 @@
           (f) => (activeIds.has(String(f.getId())) ? f : undefined),
           { layerFilter: (l) => l === ctx.footprintLayer }
         );
-        if (hit) dispatch('select', { id: String(hit.getId()) });
+        if (!hit) return;
+        pickedOnCanvas = String(hit.getId());
+        dispatch('select', { id: pickedOnCanvas });
       }) as EventsKey,
       // ImageShell rebuilds every feature when the list changes, so the selected
       // one is a new object: point Modify at it, and fit a selection that was
