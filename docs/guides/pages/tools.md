@@ -202,15 +202,15 @@ Files: same `DigitalizePage.svelte` (668); `ocr/OcrSidebar.svelte` (658), `OcrRo
   - Client sets `validated_at` itself (`ocrApi.ts:205`, `new Date()`), while the server stamps the real `reviewed_at`; the on-screen time may differ from the stored one until reload.
   - Header comment in `DigitalizePage` and `docs/guides/digitalize-guide.md` describe the old "four jobs in the panel footer" layout; the guide's later text says "All text" plus a preset menu. The two disagree.
 
-### `/scan?mode=shapes` — Draw · Segment · Validate (`?tab=draw|segment|validate`)
-Files: `src/lib/features/contribute/trace/ShapesPage.svelte` (450); `TraceTool` (359), `TraceSidebar` (359), `SegSidebar` (239), `traceData.ts` (145), `segCommand.ts` (89); `review/ReviewSidebar` (541), `ReviewTool` (209), `reviewQueue.ts` (342); shared `pipelineApi.ts` (62), `CliCommandBlock` (59)
-- **For / job:** Draw: volunteer traces buildings and roads by hand. Segment: operator gets the MapSAM2 Colab command and moves the pipeline stage. Validate: reviewer approves or rejects the machine's polygons.
+### `/scan?mode=shapes` — Shapes (Mine · To check) · Segment (`?tab=draw|validate|segment`)
+Files: `src/lib/features/contribute/trace/ShapesPage.svelte` (460); `ShapeTool` (440), `ShapeToolbar` (84), `TraceSidebar` (359), `SegSidebar` (239), `traceData.ts`, `segCommand.ts` (89); `review/ReviewSidebar` (541), `reviewQueue.ts`; shared `pipelineApi.ts` (62), `CliCommandBlock` (59). `TraceTool` and `ReviewTool` merged into `ShapeTool` (Nov 2026).
+- **For / job:** Mine (`tab=draw`): volunteer traces buildings and roads by hand. To check (`tab=validate`): reviewer approves or rejects the waiting polygons, and draws the ones the machine missed. Both views share one canvas tool and show every shape on the sheet. Segment: operator gets the MapSAM2 Colab command and moves the pipeline stage.
 - **Access:** page open; writes need a session. Draw inserts via the browser Supabase client (RLS); Validate and pipeline calls use `/api/admin/footprints` and `/api/admin/maps/[id]/pipeline` (`requireRole`).
 - **Data:** `footprint_submissions` rows (insert, update geometry, delete; status `submitted`); `GET /api/admin/footprints?map_id=&status=needs_review,submitted` (queue); `PATCH /api/admin/footprints` (`set_footprint_status` RPC; body `id, status approved|rejected, pixel_polygon, feature_type, review_tags, review_note`); `GET/PATCH .../pipeline` (`reviewed`, `seg_reviewed`, `exported`, `idle`); localStorage seg config; `trackMeasurement('contribution_open'|'save_success')`. Segment enqueues nothing; a person runs the command on a GPU.
 - **Requirements:**
-  - Draw: polygon, line, edit tools; draw, drag vertices, delete own shapes only; rename and retype in a table.
+  - Both Shapes views: polygon, line, edit tools (`p` `l` `e`); draw (snaps to existing corners), drag vertices, delete own shapes only. Mine: rename and retype in a table.
   - Segment: show stage badge, gate buttons to advance, build the Colab command from a config.
-  - Validate: left rail is a queue of sheets with pending counts; right panel lists polygons with progress "n / total done"; approve or reject one or many; retype; tag a diagnosis and a note; mark sheet "seg reviewed".
+  - To check: left rail is a queue of sheets with pending counts; right panel lists polygons with progress "n / total done"; approve or reject one or many; retype; tag a diagnosis and a note; mark sheet "seg reviewed".
   - Tab change keeps the open sheet (`?map=` carried in the tab links).
   - `?map=` deep link from `/admin?tab=status` resolves against whichever list the rail holds.
 - **Layout:** `ToolLayout` + `ScanLeftRail` (mode `shapes`, layer toggle "Shapes" or "Machine shapes") + `ImageShell` with `TraceTool` or `ReviewTool` + right `ToolSidebarShell` "Shapes" (panel per tab, `Tabs` strip in the footer) + draw bottom bar (Polygon / Line / Edit).

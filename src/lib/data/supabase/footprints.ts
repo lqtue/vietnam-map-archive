@@ -118,17 +118,25 @@ async function footprintColumns(supabase: SupabaseClient<Database>): Promise<str
 	return session ? `${base}, user_id` : base;
 }
 
+/**
+ * Every shape on a sheet, whatever its state. Paged, because the Shapes canvas
+ * now draws them all and the 1882 colour run alone is 1,443 rows; throws on a
+ * failed read rather than returning [], which looked like an empty sheet.
+ */
 export async function fetchMapFootprints(
 	supabase: SupabaseClient<Database>,
 	mapId: string
 ): Promise<FootprintSubmission[]> {
-	const { data, error } = await supabase
-		.from('footprints')
-		.select(await footprintColumns(supabase))
-		.eq('map_id', mapId)
-		.order('created_at', { ascending: true });
-
-	if (error) { console.error('fetchMapFootprints:', error); return []; }
+	const columns = await footprintColumns(supabase);
+	const data = await readAllPages((from, to) =>
+		supabase
+			.from('footprints')
+			.select(columns)
+			.eq('map_id', mapId)
+			.order('created_at', { ascending: true })
+			.order('id')
+			.range(from, to)
+	);
 	return (data as unknown as DbFootprint[]).map(toFootprint);
 }
 
@@ -228,7 +236,7 @@ interface MapJoinRow {
 // machine's. Kept here so the list and the count cannot drift apart.
 export const REVIEW_QUEUE_STATUSES = ['submitted', 'needs_review'] as const;
 
-// SamFootprint = FootprintSubmission; kept for backward compat with ReviewTool/ReviewSidebar
+// SamFootprint = FootprintSubmission; kept for backward compat with ReviewSidebar
 export type SamFootprint = FootprintSubmission;
 
 /**
