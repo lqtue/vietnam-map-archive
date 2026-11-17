@@ -1,11 +1,20 @@
 <!--
   /scan?mode=shapes — everything that is a shape rather than a word.
 
-  Three tabs over one sheet and one ImageShell, chosen by `?tab=`:
+  Two tabs over one sheet and one ImageShell:
 
-    Draw      — trace polygons and lines by hand (TraceTool + TraceSidebar)
-    Segment   — the MapSAM2 launcher and its pipeline stage (SegSidebar)
-    Validate  — approve or reject what SAM2 drew (ReviewTool + ReviewSidebar)
+    Shapes   — one canvas tool (ShapeTool) for drawing and checking, with two
+               views of the sheet's shapes:
+                 To check — what waits on a verdict (ReviewSidebar), `?tab=validate`
+                 Mine     — what this person drew (TraceSidebar), `?tab=draw`
+    Segment  — the MapSAM2 launcher and its pipeline stage (SegSidebar)
+
+  Draw and Validate were separate tabs until Nov 2026, each with its own canvas
+  tool doing select-and-drag twice. Checking could not add the block the machine
+  missed, and drawing could not see the machine's shapes. Both views now draw,
+  edit and show every shape on the sheet; the view picks the list in the sidebar
+  and which shapes a click can select. The old `tab=` values stay as the view
+  names, so every link to `tab=validate` still opens the check list.
 
   They were three places — /scan?mode=trace, the Segmentation phase of
   ?mode=triage, and /scan?mode=review — which is one sheet opened three times
@@ -28,10 +37,10 @@
   import ToolSidebarShell from '$lib/features/contribute/shared/ToolSidebarShell.svelte';
   import EmptyPanel from '$lib/features/contribute/shared/EmptyPanel.svelte';
   import Tabs from '$lib/ui/Tabs.svelte';
-  import TraceTool from './TraceTool.svelte';
+  import ShapeTool from './ShapeTool.svelte';
+  import ShapeToolbar from './ShapeToolbar.svelte';
   import TraceSidebar from './TraceSidebar.svelte';
   import SegSidebar from './SegSidebar.svelte';
-  import ReviewTool from '$lib/features/contribute/review/ReviewTool.svelte';
   import ReviewSidebar from '$lib/features/contribute/review/ReviewSidebar.svelte';
   import '$styles/layouts/tool-page.css';
   import { getSupabaseContext } from '$lib/data/supabase/context';
@@ -47,24 +56,27 @@
     type HumanStage,
   } from '$lib/features/contribute/pipelineApi';
   import type { LabelMapInfo } from '$lib/data/supabase/footprints';
-  import type { FeatureType } from '$lib/data/maps/footprintTypes';
+  import type { FeatureType, FootprintSubmission } from '$lib/data/maps/footprintTypes';
 
   const { supabase, session } = getSupabaseContext();
   const userId = session?.user?.id ?? null;
 
-  const TABS = [
-    { key: 'draw', label: 'Draw' },
-    { key: 'segment', label: 'Segment' },
-    { key: 'validate', label: 'Validate' },
+  type View = 'check' | 'mine';
+  /** `?tab=` carries both the tab and the Shapes view: validate · draw · segment. */
+  $: rawTab = $page.url.searchParams.get('tab');
+  $: tab = (rawTab === 'segment' ? 'segment' : 'shapes') as 'shapes' | 'segment';
+  $: view = (rawTab === 'validate' ? 'check' : 'mine') as View;
+  /** Keep the open sheet across a change — the tabs and views are links on this route. */
+  const hrefFor = (key: string, mapId: string | undefined) =>
+    `/scan?mode=shapes&tab=${key}${mapId ? `&map=${mapId}` : ''}`;
+  $: tabLinks = [
+    {
+      key: 'shapes',
+      label: 'Shapes',
+      href: hrefFor(view === 'check' ? 'validate' : 'draw', currentMap?.id),
+    },
+    { key: 'segment', label: 'Segment', href: hrefFor('segment', currentMap?.id) },
   ];
-  $: tab = TABS.some((t) => t.key === $page.url.searchParams.get('tab'))
-    ? ($page.url.searchParams.get('tab') as 'draw' | 'segment' | 'validate')
-    : 'draw';
-  /** Keep the open sheet across a tab change — the tabs are links on this route. */
-  $: tabLinks = TABS.map((t) => ({
-    ...t,
-    href: `/scan?mode=shapes&tab=${t.key}${currentMap ? `&map=${currentMap.id}` : ''}`,
-  }));
 
   // ── The sheet ──────────────────────────────────────────────────────────────
   let currentMap: LabelMapInfo | null = null;
@@ -84,10 +96,13 @@
   let markingReviewed = false;
   let markReviewedError = '';
 
-  // ── Drawing mode ───────────────────────────────────────────────────────────
-  let traceTool: 'polygon' | 'line' | 'edit' = 'polygon';
-  $: drawMode = (traceTool === 'edit' ? 'select' : 'trace') as 'trace' | 'select';
-  $: geometryMode = (traceTool === 'line' ? 'LineString' : 'Polygon') as 'Polygon' | 'LineString';
+  // ── Canvas tool ────────────────────────────────────────────────────────────
+  type Tool = 'polygon' | 'line' | 'edit';
+  /** Checking starts on Edit (click to select), drawing on Polygon; each view keeps its own. */
+  let toolFor: Record<View, Tool> = { check: 'edit', mine: 'polygon' };
+  $: tool = toolFor[view];
+  /** Mine's selection; the check list's lives in the queue. */
+  let mineSelectedId: string | null = null;
 
   // ── Layout ─────────────────────────────────────────────────────────────────
   let sidebarCollapsed = false;
@@ -95,17 +110,15 @@
   let isMobile = false;
   let imageOpacity = 1;
   let showShapes = true;
-  $: railLayers = [
-    { id: 'shapes', label: tab === 'validate' ? 'Machine shapes' : 'Shapes', on: showShapes },
-  ];
+  $: railLayers = [{ id: 'shapes', label: 'Shapes', on: showShapes }];
 
   // ── Derived ────────────────────────────────────────────────────────────────
   $: myFootprints = userId ? $trace.footprints.filter((f) => f.userId === userId) : [];
   $: traceCategories = currentMap?.categories?.length ? currentMap.categories : [];
   $: reviewed = $queue.total - $queue.footprints.length;
-  /** Validate is a queue, the other tabs are the archive. */
+  /** The check view is a queue; the others are the archive. */
   $: railMaps =
-    tab === 'validate'
+    tab === 'shapes' && view === 'check'
       ? $queue.queue.map((m): LabelMapInfo => ({
           id: m.id,
           name: m.name,
@@ -117,12 +130,29 @@
           badge: `${m.pendingCount} pending`,
         }))
       : null;
-  /** One canvas, two sources: what a person drew, or what the machine proposes. */
-  $: canvasFootprints = !showShapes
-    ? []
-    : tab === 'validate'
-      ? $queue.footprints
-      : $trace.footprints;
+  /**
+   * Every shape on the sheet but the rejected, with the check list's local
+   * copies (corners dragged, type changed, not yet decided) laid over the saved
+   * ones. The queue's rows are added if the sheet-wide read missed them.
+   */
+  $: waitingById = new Map($queue.footprints.map((f) => [f.id, f]));
+  $: sheetRows = mergeRows($trace.footprints, $queue.footprints, waitingById);
+  $: canvasFootprints = showShapes ? sheetRows : [];
+  $: listRows = view === 'check' ? $queue.footprints : myFootprints;
+  $: activeIds = new Set(listRows.map((f) => f.id));
+  $: selectedId = view === 'check' ? $queue.selectedId : mineSelectedId;
+
+  function mergeRows(
+    saved: FootprintSubmission[],
+    waiting: FootprintSubmission[],
+    byId: Map<string, FootprintSubmission>
+  ): FootprintSubmission[] {
+    const seen = new Set(saved.map((f) => f.id));
+    return [
+      ...saved.filter((f) => f.status !== 'rejected').map((f) => byId.get(f.id) ?? f),
+      ...waiting.filter((f) => !seen.has(f.id)),
+    ];
+  }
 
   async function selectMap(m: LabelMapInfo) {
     if (currentMap?.id === m.id) return;
@@ -135,6 +165,7 @@
       action: 'open',
     });
     iiifInfoUrl = null;
+    mineSelectedId = null;
     trace.reset();
     queue.reset();
     segConfig = loadSegConfig(m.id, segConfig);
@@ -144,7 +175,8 @@
     iiifInfoUrl = url;
   }
 
-  /** Each tab wants a different thing about the same sheet; load it once, on arrival. */
+  /** Each tab wants a different thing about the same sheet; load it once, on arrival.
+      Both Shapes views draw the whole sheet, so a view change loads nothing. */
   let loadedFor = '';
   async function loadForTab() {
     const id = currentMap?.id;
@@ -152,9 +184,8 @@
     const key = `${id}:${tab}`;
     if (loadedFor === key) return;
     loadedFor = key;
-    if (tab === 'validate') await queue.open(id);
-    else if (tab === 'segment') await loadPipeline();
-    else await trace.load();
+    if (tab === 'segment') await loadPipeline();
+    else await Promise.all([trace.load(), queue.open(id)]);
   }
   $: if (currentMap && tab) loadForTab();
   // The queue rail's list is ours, not the picker's, so `loaded` never fires there.
@@ -181,12 +212,40 @@
       .catch((e) => (pipeline.error = e.message));
   }
 
-  function decideFootprint(id: string, status: Verdict) {
-    if (currentMap) queue.decide(currentMap.id, id, status);
+  async function decideFootprint(id: string, status: Verdict) {
+    if (currentMap) trace.settle(await queue.decide(currentMap.id, id, status));
   }
 
-  function decideSelected(status: Verdict) {
-    if (currentMap) queue.decideMany(currentMap.id, $queue.selectedIds, status);
+  async function decideSelected(status: Verdict) {
+    if (currentMap) trace.settle(await queue.decideMany(currentMap.id, $queue.selectedIds, status));
+  }
+
+  // ── Canvas events ──────────────────────────────────────────────────────────
+  async function drawShape(
+    pixelPolygon: FootprintSubmission['pixelPolygon'],
+    geometry: 'Polygon' | 'LineString'
+  ) {
+    const row = await trace.draw(pixelPolygon, geometry);
+    // New shapes are `submitted`: they wait on a verdict like the machine's.
+    if (row) queue.add(row);
+  }
+
+  function selectShape(id: string | null) {
+    if (view === 'check') queue.select(id);
+    else mineSelectedId = id;
+  }
+
+  /** Your own shape saves at once; anyone else's is held for the verdict. */
+  function modifyShape(id: string, pixelPolygon: FootprintSubmission['pixelPolygon']) {
+    const mine = userId !== null && sheetRows.some((f) => f.id === id && f.userId === userId);
+    if (mine) trace.modify(id, pixelPolygon);
+    if (waitingById.has(id)) queue.edit(id, pixelPolygon);
+  }
+
+  function removeShape(id: string) {
+    trace.remove(id);
+    if (currentMap) queue.drop(currentMap.id, id);
+    if (mineSelectedId === id) mineSelectedId = null;
   }
 
   async function markReviewed() {
@@ -259,7 +318,7 @@
       <ToolSidebarShell title="Shapes" onCollapse={() => (rightSidebarCollapsed = true)}>
         {#if !currentMap}
           <EmptyPanel
-            message={tab === 'validate'
+            message={view === 'check'
               ? 'Pick a sheet from the queue to start checking.'
               : 'Select a map to start tracing.'}
           />
@@ -273,8 +332,36 @@
             on:advance={(e) => advanceSeg(e.detail.stage)}
             on:refresh={loadPipeline}
           />
-        {:else if tab === 'validate'}
-          {#if $queue.loading}
+        {:else}
+          <nav class="view-chips" aria-label="Which shapes">
+            <a
+              class="chip"
+              class:is-on={view === 'check'}
+              aria-current={view === 'check' ? 'page' : undefined}
+              href={hrefFor('validate', currentMap.id)}>To check · {$queue.footprints.length}</a
+            >
+            <a
+              class="chip"
+              class:is-on={view === 'mine'}
+              aria-current={view === 'mine' ? 'page' : undefined}
+              href={hrefFor('draw', currentMap.id)}>Mine · {myFootprints.length}</a
+            >
+          </nav>
+          {#if view === 'mine'}
+            <TraceSidebar
+              {traceCategories}
+              placedFootprints={myFootprints}
+              drawMode={tool === 'edit' ? 'select' : 'trace'}
+              newFootprintId={$trace.newId}
+              on:removeFootprint={(e) => removeShape(e.detail.footprintId)}
+              on:updateFootprintMeta={(e) =>
+                trace.retitle(e.detail.footprintId, {
+                  name: e.detail.name,
+                  featureType: e.detail.featureType as FeatureType | undefined,
+                  category: e.detail.category,
+                })}
+            />
+          {:else if $queue.loading}
             <EmptyPanel message="Loading footprints…" />
           {:else if $queue.error}
             <EmptyPanel message={$queue.error} />
@@ -306,20 +393,6 @@
               on:markReviewed={markReviewed}
             />
           {/if}
-        {:else}
-          <TraceSidebar
-            {traceCategories}
-            placedFootprints={myFootprints}
-            {drawMode}
-            newFootprintId={$trace.newId}
-            on:removeFootprint={(e) => trace.remove(e.detail.footprintId)}
-            on:updateFootprintMeta={(e) =>
-              trace.retitle(e.detail.footprintId, {
-                name: e.detail.name,
-                featureType: e.detail.featureType as FeatureType | undefined,
-                category: e.detail.category,
-              })}
-          />
         {/if}
 
         <svelte:fragment slot="footer">
@@ -331,22 +404,17 @@
     <!-- Image stage -->
     {#if currentMap && iiifInfoUrl}
       <ImageShell {iiifInfoUrl} footprints={canvasFootprints} {imageOpacity}>
-        {#if tab === 'validate'}
-          <ReviewTool
+        {#if tab === 'shapes'}
+          <ShapeTool
             footprints={canvasFootprints}
-            selectedId={$queue.selectedId}
-            on:select={(e) => queue.select(e.detail.id)}
-            on:edit={(e) => queue.edit(e.detail.id, e.detail.pixelPolygon)}
-          />
-        {:else if tab === 'draw'}
-          <TraceTool
-            {drawMode}
-            {geometryMode}
-            placingEnabled={drawMode === 'trace'}
+            {activeIds}
+            {selectedId}
+            {tool}
             myUserId={userId}
-            on:drawPolygon={(e) => trace.draw(e.detail.pixelPolygon, geometryMode)}
-            on:modifyFootprint={(e) => trace.modify(e.detail.footprintId, e.detail.pixelPolygon)}
-            on:removeFootprint={(e) => trace.remove(e.detail.footprintId)}
+            on:draw={(e) => drawShape(e.detail.pixelPolygon, e.detail.geometry)}
+            on:select={(e) => selectShape(e.detail.id)}
+            on:modify={(e) => modifyShape(e.detail.id, e.detail.pixelPolygon)}
+            on:remove={(e) => removeShape(e.detail.id)}
           />
         {/if}
       </ImageShell>
@@ -377,74 +445,16 @@
     {/if}
   </ToolLayout>
 
-  <!-- Drawing is the only tab with tools of its own under the canvas. -->
-  {#if currentMap && tab === 'draw'}
-    <footer class="bottom-bar">
-      <button
-        type="button"
-        class="sb-btn is-sm"
-        class:is-on={traceTool === 'polygon'}
-        on:click={() => (traceTool = 'polygon')}
-        title="Polygon — for buildings and closed shapes"
-      >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" />
-        </svg>
-        <span>Polygon</span>
-      </button>
-
-      <button
-        type="button"
-        class="sb-btn is-sm"
-        class:is-on={traceTool === 'line'}
-        on:click={() => (traceTool = 'line')}
-        title="Line — for roads and waterways"
-      >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="4 19 8 10 14 14 20 5" />
-        </svg>
-        <span>Line</span>
-      </button>
-
-      <button
-        type="button"
-        class="sb-btn is-sm"
-        class:is-on={traceTool === 'edit'}
-        on:click={() => (traceTool = 'edit')}
-        title="Select and edit a shape"
-      >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-        </svg>
-        <span>Edit</span>
-      </button>
-    </footer>
+  <!-- The canvas tools: both Shapes views draw and edit. -->
+  {#if currentMap && tab === 'shapes'}
+    <ShapeToolbar {tool} on:change={(e) => (toolFor = { ...toolFor, [view]: e.detail.tool })} />
   {/if}
 </div>
+
+<style>
+  .view-chips {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+  }
+</style>

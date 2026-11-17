@@ -9,7 +9,7 @@
       archive (VMA covers Saigon AND other regions).
 
   Includes the privacy explainer for the location path. Ack persists in
-  localStorage under `vma-explore-welcome-ack-v1` so returning users skip
+  localStorage under `vma-explore-welcome-ack-v2` so returning users skip
   straight to their previously chosen mode.
 -->
 <script lang="ts">
@@ -18,7 +18,7 @@
   import { browser } from '$app/environment';
   import { readText, writeText } from '$lib/core/utils/persistence/storage';
 
-  const STORAGE_KEY = 'vma-explore-welcome-ack-v1';
+  const STORAGE_KEY = 'vma-explore-welcome-ack-v2';
   type Choice = 'location' | 'all';
   const dispatch = createEventDispatcher<{ allow: void; skip: void }>();
 

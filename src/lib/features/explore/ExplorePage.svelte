@@ -281,8 +281,11 @@
   function handleGpsPosition(e: CustomEvent<{ lon: number; lat: number }>) {
     const pos: [number, number] = [e.detail.lon, e.detail.lat];
     // Snap the camera on the first fix only — the user may have panned away by
-    // the time later updates land.
-    if (!userPosition) mapStore.setView({ lng: pos[0], lat: pos[1], zoom: 15 });
+    // the time later updates land. A fix far from the archive (a visitor abroad)
+    // would open the map on an empty basemap every visit: stay on Saigon.
+    // ponytail: rough box round Vietnam, Cambodia and Laos; tighten if the archive grows past it.
+    const nearArchive = pos[0] >= 99 && pos[0] <= 112 && pos[1] >= 7 && pos[1] <= 24;
+    if (!userPosition && nearArchive) mapStore.setView({ lng: pos[0], lat: pos[1], zoom: 15 });
     userPosition = pos;
   }
   function handleGpsError(e: CustomEvent<{ message: string }>) {

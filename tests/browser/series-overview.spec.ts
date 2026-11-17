@@ -90,7 +90,7 @@ for (const [seriesCount, mobile] of [
       ({ key, count }) => {
         localStorage.clear();
         localStorage.setItem('vma-explore-tour-ack-v1', 'true');
-        localStorage.setItem('vma-explore-welcome-ack-v1', 'all');
+        localStorage.setItem('vma-explore-welcome-ack-v2', 'all');
         localStorage.setItem(
           'vma-layers-v1',
           JSON.stringify({
