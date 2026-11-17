@@ -113,4 +113,5 @@ has its own errors):
 - No score. The 1882 references are the owner's square edits, still in progress; score
   t01 and t06 when they are approved, against the 0.355 bar in
   `tiles_1882/README.md`.
-- No multiscale inference (the paper's second gain) and no fine-tuning on our tiles.
+- No fine-tuning on our tiles. Two-scale averaging was tried with equal weights and
+  hurt 1882 lots (above); lower weights for the half scale are untested.
