@@ -234,6 +234,12 @@
           "read": "work/research/admin-2025/README.md"
         },
         {
+          "path": "work/research/admin-saigon",
+          "purpose": "Saigon admin units through time (bet 1c): source and map-lead tables, attested names, dated acts",
+          "availability": "repository",
+          "read": "work/research/admin-saigon/README.md"
+        },
+        {
           "path": "work/image-processing/experiments/place-links",
           "purpose": "Machine-proposed 1882 label-to-today place links, confirmed by a person",
           "availability": "repository"
