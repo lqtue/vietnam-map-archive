@@ -214,8 +214,36 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     update((s) => ({ ...s, selectedIds: s.selectedId ? [s.selectedId] : [] }));
   }
 
+  /** Held for the verdict, and kept locally too: the canvas rebuilds its
+      features from this list, and would otherwise snap the corner back. */
   function edit(id: string, pixelPolygon: [number, number][]) {
     pendingEdits[id] = { ...pendingEdits[id], pixelPolygon };
+    update((s) => ({
+      ...s,
+      footprints: s.footprints.map((f) => (f.id === id ? { ...f, pixelPolygon } : f)),
+    }));
+  }
+
+  /** A shape just drawn on this page. It is `submitted`, so it waits here like
+      any other. Not selected: selecting moves the map, and the person is drawing. */
+  function add(row: SamFootprint) {
+    update((s) => ({
+      ...s,
+      footprints: [...s.footprints, row],
+      total: s.total + 1,
+      queue: s.queue.map((m) =>
+        m.id === row.mapId ? { ...m, pendingCount: m.pendingCount + 1 } : m
+      ),
+    }));
+  }
+
+  /** A row deleted elsewhere on the page leaves the list without a verdict. */
+  function drop(mapId: string, id: string) {
+    if (!get(store).footprints.some((f) => f.id === id)) return;
+    delete pendingEdits[id];
+    delete pendingFeedback[id];
+    update((s) => ({ ...s, total: Math.max(0, s.total - 1) }));
+    forget(mapId, [id]);
   }
 
   function retype(id: string, featureType: string) {
@@ -277,7 +305,15 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     });
   }
 
-  async function decide(mapId: string, id: string, status: Verdict) {
+  /** The rows a verdict settled, with their state and final shape, for the canvas. */
+  function settled(ids: string[], status: Verdict): SamFootprint[] {
+    const done = new Set(ids);
+    return get(store)
+      .footprints.filter((f) => done.has(f.id))
+      .map((f) => ({ ...f, status }));
+  }
+
+  async function decide(mapId: string, id: string, status: Verdict): Promise<SamFootprint[]> {
     update((s) => ({ ...s, deciding: id, error: '' }));
     try {
       const message = await writeVerdict(id, status);
@@ -286,9 +322,11 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
           ...s,
           error: `Could not ${status === 'rejected' ? 'reject' : 'approve'}: ${message}`,
         }));
-        return;
+        return [];
       }
+      const rows = settled([id], status);
       forget(mapId, [id]);
+      return rows;
     } finally {
       update((s) => ({ ...s, deciding: null }));
     }
@@ -302,8 +340,12 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
    * ponytail: serial writes, batch the ids into one endpoint if a sheet ever
    * arrives with thousands of polygons.
    */
-  async function decideMany(mapId: string, ids: string[], status: Verdict) {
-    if (!ids.length) return;
+  async function decideMany(
+    mapId: string,
+    ids: string[],
+    status: Verdict
+  ): Promise<SamFootprint[]> {
+    if (!ids.length) return [];
     const done: string[] = [];
     const failures: string[] = [];
     update((s) => ({ ...s, error: '' }));
@@ -315,6 +357,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     }
     // Whatever succeeded leaves the queue even when a later row failed, so a
     // retry is over the remainder rather than over everything again.
+    const rows = settled(done, status);
     if (done.length) forget(mapId, done);
     update((s) => ({
       ...s,
@@ -323,6 +366,7 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
         ? `${done.length} of ${ids.length} saved; ${failures.length} failed: ${failures[0]}`
         : '',
     }));
+    return rows;
   }
 
   return {
@@ -334,6 +378,8 @@ export function createReviewQueue(supabase: SupabaseClient<Database>) {
     selectAll,
     clearSelection,
     edit,
+    add,
+    drop,
     retype,
     setFeedback,
     decide,
