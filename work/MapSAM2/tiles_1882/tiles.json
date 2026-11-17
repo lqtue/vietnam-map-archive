@@ -1,0 +1,488 @@
+{
+  "map_id": "0e02b9d9-9d40-4cca-8e41-8c8373d54d3b",
+  "image": [
+    12102,
+    8982
+  ],
+  "coordinate_system": "source image pixels, origin upper left; box = [x, y, width, height]",
+  "ocr_run": "post0910",
+  "exposure": "R2 was seen on a 1/3 scale crop with colour-pass building outlines drawn; R1 only on 1/6 and 1/8 whole-sheet overviews, also with outlines; neither at native size. No held-out unseen window was drawn (view.blank on every preview).",
+  "hand_labels_2026_11_16": {
+    "rows": "47 volunteer rows (24 land_plot, 18 building, 3 road, 2 waterway); no sam-corrected row, no edited import row (all 1310 colour-20260919 rows are still needs_review, none has reviewed_at)",
+    "exhaustive_tile": "none. The densest cluster is one block of about 5 plots plus one coarse outline of the Magasins des Travaux Publics; the blocks beside it are unlabelled. Median hand plot 30,714 px2 is institutional blocks, one is 2.9 million px2 (the military domain)",
+    "outside_all_windows": 7,
+    "parcel_type": "not live: no row has feature_type parcel (migration 120 is only on 1882-extraction)",
+    "footprint_submissions": "a view of the same 1357 rows, not a second table"
+  },
+  "plot_tiles_proposed": [
+    {
+      "id": "P1",
+      "box": [
+        8024,
+        1264,
+        1024,
+        1024
+      ],
+      "note": "empty gridded blocks at left (Xuan Hoa / An Hoa) and the first cemetery blocks; clear of every window; 33 colour-pass plot rows, some residue along the city-limit dashes",
+      "status": "not used: the ten tiles are the set"
+    },
+    {
+      "id": "P2",
+      "box": [
+        9240,
+        1456,
+        1024,
+        1024
+      ],
+      "note": "Cimetiere Europeen and Cimetiere Indigene blocks, regular rectangles, about 35 plots; clear of every window; 22 colour-pass plot rows",
+      "status": "not used: the ten tiles are the set"
+    }
+  ],
+  "building_rule": "building target: union of building rows with review_status != rejected, clipped to the tile",
+  "exclusion_sources": [
+    "river-reference/windows.json: every 1882 window, heldout and calibrate, both layers",
+    "river-1882/river-windows.json binary_controls (all inside windows.json boxes)",
+    "docs/ROADMAP.md shape-precision window 4420,3800,650,550 (the only parcel reference window recorded; plan phase 2 shapes_ref_1/_2 were never written to windows.json, on any branch)",
+    "windows.json furniture boxes (title, scale, legend)"
+  ],
+  "reserved_test": [
+    {
+      "id": "R1",
+      "box": [
+        4760,
+        4790,
+        600,
+        600
+      ],
+      "note": "dense shophouse blocks near Rue Pellerin; 21 colour-pass building rows; clear of every window; no volunteer trace",
+      "volunteer_traces": 0
+    },
+    {
+      "id": "R2",
+      "box": [
+        8500,
+        2590,
+        600,
+        600
+      ],
+      "note": "pink blocks round the Poste de Police, Rue Larclauze; clear of every window and of every volunteer trace (moved up from y 2680, which a large volunteer land_plot reached)",
+      "volunteer_traces": 0
+    }
+  ],
+  "tiles": [
+    {
+      "id": "t01",
+      "box": [
+        6300,
+        2610,
+        1024,
+        1024
+      ],
+      "split": "val",
+      "note": "Eveche and Camp des Lettres: pink blocks with small buildings beside blue military compounds",
+      "calibrate_overlap": false,
+      "stats": {
+        "plot-boundary": {
+          "rows": 23,
+          "needs_review": 22,
+          "rejected": 0,
+          "pct_foreground": 7.31
+        },
+        "building": {
+          "rows": 11,
+          "needs_review": 11,
+          "rejected": 0,
+          "pct_foreground": 9.06
+        },
+        "block-boundary": {
+          "rows": 23,
+          "needs_review": 22,
+          "rejected": 0,
+          "pct_foreground": 4.95,
+          "blocks": 13
+        }
+      },
+      "block_work_estimate": {
+        "rows": 22,
+        "approve_as_is": 21,
+        "fix": 1,
+        "reject": 0,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t02",
+      "box": [
+        6420,
+        3776,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Hopital Maritime north, Imprimerie Nationale: large blue compounds and pink plots",
+      "calibrate_overlap": false,
+      "stats": {
+        "plot-boundary": {
+          "rows": 8,
+          "needs_review": 8,
+          "rejected": 0,
+          "pct_foreground": 4.02
+        },
+        "building": {
+          "rows": 1,
+          "needs_review": 1,
+          "rejected": 0,
+          "pct_foreground": 0.06
+        },
+        "block-boundary": {
+          "rows": 8,
+          "needs_review": 8,
+          "rejected": 0,
+          "pct_foreground": 4.02,
+          "blocks": 8
+        }
+      },
+      "block_work_estimate": {
+        "rows": 8,
+        "approve_as_is": 7,
+        "fix": 1,
+        "reject": 0,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t03",
+      "box": [
+        8728,
+        4720,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Magasins de la Marine, Rue Tay Ninh: long blue sheds",
+      "calibrate_overlap": false,
+      "stats": {
+        "plot-boundary": {
+          "rows": 20,
+          "needs_review": 20,
+          "rejected": 0,
+          "pct_foreground": 7.19
+        },
+        "building": {
+          "rows": 5,
+          "needs_review": 5,
+          "rejected": 0,
+          "pct_foreground": 0.5
+        },
+        "block-boundary": {
+          "rows": 20,
+          "needs_review": 20,
+          "rejected": 0,
+          "pct_foreground": 4.67,
+          "blocks": 7
+        }
+      },
+      "block_work_estimate": {
+        "rows": 20,
+        "approve_as_is": 12,
+        "fix": 2,
+        "reject": 6,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t04",
+      "box": [
+        7512,
+        3312,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Camp des Indigenes and Hotel du General: mixed",
+      "calibrate_overlap": false,
+      "stats": {
+        "plot-boundary": {
+          "rows": 10,
+          "needs_review": 10,
+          "rejected": 0,
+          "pct_foreground": 5.87
+        },
+        "building": {
+          "rows": 15,
+          "needs_review": 15,
+          "rejected": 0,
+          "pct_foreground": 1.12
+        },
+        "block-boundary": {
+          "rows": 10,
+          "needs_review": 10,
+          "rejected": 0,
+          "pct_foreground": 4.57,
+          "blocks": 6
+        }
+      },
+      "block_work_estimate": {
+        "rows": 10,
+        "approve_as_is": 6,
+        "fix": 2,
+        "reject": 2,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t05",
+      "box": [
+        5000,
+        2000,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Palais du Gouverneur in the Jardin: sparse, 1 to 3 buildings, hard negative (tree hatching)",
+      "calibrate_overlap": false,
+      "stats": {
+        "plot-boundary": {
+          "rows": 28,
+          "needs_review": 28,
+          "rejected": 0,
+          "pct_foreground": 9.19
+        },
+        "building": {
+          "rows": 1,
+          "needs_review": 0,
+          "rejected": 0,
+          "pct_foreground": 2.57
+        },
+        "block-boundary": {
+          "rows": 28,
+          "needs_review": 28,
+          "rejected": 0,
+          "pct_foreground": 8.66,
+          "blocks": 19
+        }
+      },
+      "block_work_estimate": {
+        "rows": 28,
+        "approve_as_is": 0,
+        "fix": 0,
+        "reject": 28,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t06",
+      "box": [
+        2520,
+        3760,
+        1024,
+        1024
+      ],
+      "split": "val",
+      "note": "Rue Lefebvre, Dayot: shophouse rows; overlaps calibrate window west_dense (road layer) only",
+      "calibrate_overlap": true,
+      "stats": {
+        "plot-boundary": {
+          "rows": 60,
+          "needs_review": 60,
+          "rejected": 0,
+          "pct_foreground": 13.52
+        },
+        "building": {
+          "rows": 29,
+          "needs_review": 29,
+          "rejected": 0,
+          "pct_foreground": 8.46
+        },
+        "block-boundary": {
+          "rows": 60,
+          "needs_review": 60,
+          "rejected": 0,
+          "pct_foreground": 5.57,
+          "blocks": 11
+        }
+      },
+      "block_work_estimate": {
+        "rows": 60,
+        "approve_as_is": 52,
+        "fix": 7,
+        "reject": 1,
+        "blocks_to_draw": 2
+      }
+    },
+    {
+      "id": "t07",
+      "box": [
+        1176,
+        2864,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Marche de Cau Ong Lanh, Poste de Police: small shophouse blocks on the arroyo; overlaps calibrate windows western_creek and abattoir_creeks (water layer) only",
+      "calibrate_overlap": true,
+      "stats": {
+        "plot-boundary": {
+          "rows": 25,
+          "needs_review": 25,
+          "rejected": 0,
+          "pct_foreground": 6.39
+        },
+        "building": {
+          "rows": 22,
+          "needs_review": 22,
+          "rejected": 0,
+          "pct_foreground": 12.01
+        },
+        "block-boundary": {
+          "rows": 25,
+          "needs_review": 25,
+          "rejected": 0,
+          "pct_foreground": 4.86,
+          "blocks": 9
+        }
+      },
+      "block_work_estimate": {
+        "rows": 25,
+        "approve_as_is": 15,
+        "fix": 2,
+        "reject": 8,
+        "blocks_to_draw": 2
+      }
+    },
+    {
+      "id": "t08",
+      "box": [
+        3864,
+        1520,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Jardin edge, Rue de la Grandiere: loose house rows; overlaps calibrate window creek_crossing (road layer) only",
+      "calibrate_overlap": true,
+      "stats": {
+        "plot-boundary": {
+          "rows": 32,
+          "needs_review": 32,
+          "rejected": 0,
+          "pct_foreground": 9.99
+        },
+        "building": {
+          "rows": 22,
+          "needs_review": 22,
+          "rejected": 0,
+          "pct_foreground": 2.4
+        },
+        "block-boundary": {
+          "rows": 32,
+          "needs_review": 32,
+          "rejected": 0,
+          "pct_foreground": 7.99,
+          "blocks": 16
+        }
+      },
+      "block_work_estimate": {
+        "rows": 32,
+        "approve_as_is": 13,
+        "fix": 3,
+        "reject": 16,
+        "blocks_to_draw": 2
+      }
+    },
+    {
+      "id": "t09",
+      "box": [
+        7448,
+        5552,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Sainte-Enfance: one large compound; overlaps calibrate windows dry_blue_parcels, arsenal_quay, garden_pond (water layer) only",
+      "calibrate_overlap": true,
+      "stats": {
+        "plot-boundary": {
+          "rows": 15,
+          "needs_review": 14,
+          "rejected": 0,
+          "pct_foreground": 5.13
+        },
+        "building": {
+          "rows": 15,
+          "needs_review": 14,
+          "rejected": 0,
+          "pct_foreground": 6.88
+        },
+        "block-boundary": {
+          "rows": 15,
+          "needs_review": 14,
+          "rejected": 0,
+          "pct_foreground": 4.49,
+          "blocks": 12
+        }
+      },
+      "block_work_estimate": {
+        "rows": 14,
+        "approve_as_is": 4,
+        "fix": 2,
+        "reject": 8,
+        "blocks_to_draw": 1
+      }
+    },
+    {
+      "id": "t10",
+      "box": [
+        6424,
+        5168,
+        1024,
+        1024
+      ],
+      "split": "train",
+      "note": "Artillerie and Cite Ouvriere: blue sheds; overlaps calibrate windows dry_blue_parcels, arsenal_quay, quay_primauguet (water layer) only",
+      "calibrate_overlap": true,
+      "stats": {
+        "plot-boundary": {
+          "rows": 14,
+          "needs_review": 13,
+          "rejected": 0,
+          "pct_foreground": 5.26
+        },
+        "building": {
+          "rows": 7,
+          "needs_review": 7,
+          "rejected": 0,
+          "pct_foreground": 4.27
+        },
+        "block-boundary": {
+          "rows": 14,
+          "needs_review": 13,
+          "rejected": 0,
+          "pct_foreground": 3.92,
+          "blocks": 10
+        }
+      },
+      "block_work_estimate": {
+        "rows": 13,
+        "approve_as_is": 11,
+        "fix": 2,
+        "reject": 0,
+        "blocks_to_draw": 2
+      }
+    }
+  ],
+  "target": "block-boundary (owner decision 2026-11-17: whole blocks first, lots later); plot-boundary and building stay available",
+  "calibrate_rule": "Calibrate windows may be touched, held-out windows never. The calibrate windows were tuned on for the water and road layers; a plot or building model scores nothing in them, and no number in the plan is read from them. Held-out and reference windows (and the legend, title and scale) are still refused by export_tiles.py.",
+  "splits": "8 train, 2 val. Val are t01 (pink blocks beside blue compounds) and t06 (shophouse rows), the two most typical land; t05 (park) stays in train.",
+  "plot_rule": "plot-boundary target: outline of every land_plot row with review_status != rejected, drawn 5 px wide in tile coordinates (cv2 cuts it at the tile edge, no line along the tile border)",
+  "block_rule": "block-boundary target: land_plot rows with review_status != rejected are dissolved into street blocks (a closing: grow 5 px, union, shrink 5 px, mitred), the outer ring of each block is drawn 5 px wide, nothing inside. Gap 10 px: lots inside blocks are 2 to 9 px apart, the narrowest lane seen (Rue de Tay, t03) is 12 px across, lettered streets are wider.",
+  "block_work_total": {
+    "rows": 232,
+    "distinct_rows": 221,
+    "approve_as_is": 141,
+    "fix": 22,
+    "reject": 69,
+    "blocks_to_draw": 14,
+    "blocks_today": 111
+  }
+}
