@@ -113,7 +113,7 @@ VECTOR_PARQUET = mp.HCMC_DIR / "hcmc_vector.parquet"
 TOPO_LAYERS = ("label_congtrinhs", "region_trusos")
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-USER_AGENT = "vma-landmarks-1882/1.0 (lequangtuevn@gmail.com)"
+USER_AGENT = "vma-landmarks-1882/1.0 (+https://maparchive.vn)"
 OVERPASS_QL = """[out:json][timeout:180];
 (
   nwr["wikidata"]({bbox});
