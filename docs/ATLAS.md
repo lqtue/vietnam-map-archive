@@ -59,6 +59,7 @@ Layer `placement`. Georeferences, GCPs, transformations, masks and fit.
 | [work/vn1971](../work/vn1971/) | 1971 provincial maps: grid georeferences and Allmaps annotations | [docs/guides/pipelines.md](guides/pipelines.md) |
 | [work/l909](../work/l909/) | L909 city index, ingested scans and annotations | [README.md](../work/l909/README.md) |
 | [work/cochinchina-1889](../work/cochinchina-1889/) | Cochinchina arrondissement plans: Tan An graticule georeference and river check | [README.md](../work/cochinchina-1889/README.md) |
+| [work/tonkin-1950](../work/tonkin-1950/) | Tonkin 1950 atlas: georeference from the printed graticule, held-out checks | [README.md](../work/tonkin-1950/README.md) |
 
 ## 3. Readings
 
@@ -90,6 +91,7 @@ Layer `entities`. Place-name groups, attested names and classification terms.
 | --- | --- | --- |
 | [work/research/doling](../work/research/doling/) | Source-derived street-name pairs and provenance | [SOURCE.md](../work/research/doling/SOURCE.md) |
 | [work/research/admin-2025](../work/research/admin-2025/) | Where each 2025 commune name came from: two witnesses, a review queue, logged decisions | [README.md](../work/research/admin-2025/README.md) |
+| [work/research/admin-saigon](../work/research/admin-saigon/) | Saigon admin units through time (bet 1c): source and map-lead tables, attested names, dated acts | [README.md](../work/research/admin-saigon/README.md) |
 | [work/image-processing/experiments/place-links](../work/image-processing/experiments/place-links/) | Machine-proposed 1882 label-to-today place links, confirmed by a person | [README.md](../work/image-processing/experiments/place-links/README.md) |
 | [work/image-processing/experiments/then-now](../work/image-processing/experiments/then-now/) | Review page where the owner judges 1882 then-now block differences | [docs/plans/digest-pipeline-plan.md](plans/digest-pipeline-plan.md) |
 

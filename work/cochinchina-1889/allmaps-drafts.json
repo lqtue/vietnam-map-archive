@@ -1,0 +1,74 @@
+[
+ {
+  "plate": "baria",
+  "map_id": "d3ddd9b3-9276-4212-b51e-3f09606ec387",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "bentre",
+  "map_id": "e9fc1c66-a004-414e-8e17-4599445662fd",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "bien-hoa",
+  "map_id": "48525b89-857b-4f66-96cb-7c94d98c473a",
+  "mask": "neatline box (outline not separable)",
+  "gcps": 0
+ },
+ {
+  "plate": "cholon",
+  "map_id": "2202a5ba-44d9-4fe2-ac0a-d1885b909c97",
+  "mask": "neatline box (outline not separable)",
+  "gcps": 0
+ },
+ {
+  "plate": "gocong",
+  "map_id": "62a29997-a0d3-433d-aeab-a40552d3f2b3",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "longxuyen",
+  "map_id": "2594e8c4-279f-4492-910d-be93f3bdbbf7",
+  "mask": "neatline box (outline not separable)",
+  "gcps": 0
+ },
+ {
+  "plate": "mytho",
+  "map_id": "ff6489cd-b5fe-4dea-9513-5468f5972eb3",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "sa-dec",
+  "map_id": "c110cf97-f0ba-4e55-97fa-f2241f8696b7",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "saigon",
+  "map_id": "f680349a-9970-48cb-ad0b-420bf7ff3365",
+  "mask": "neatline box (outline not separable)",
+  "gcps": 0
+ },
+ {
+  "plate": "tan-an",
+  "map_id": "bfc043c5-9023-4182-aa4e-807f4bffe762",
+  "mask": "neatline (README)",
+  "gcps": 24
+ },
+ {
+  "plate": "tra-vinh",
+  "map_id": "2f1e6b96-249f-422c-82cf-151e6c2e9cbc",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ },
+ {
+  "plate": "vinh-long",
+  "map_id": "8653da35-0366-49d3-b8e5-3f2512dcc84b",
+  "mask": "arrondissement outline (ink density)",
+  "gcps": 0
+ }
+]

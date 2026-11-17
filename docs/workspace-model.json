@@ -129,6 +129,12 @@
           "purpose": "Cochinchina arrondissement plans: Tan An graticule georeference and river check",
           "availability": "repository",
           "read": "work/cochinchina-1889/README.md"
+        },
+        {
+          "path": "work/tonkin-1950",
+          "purpose": "Tonkin 1950 atlas: georeference from the printed graticule, held-out checks",
+          "availability": "repository",
+          "read": "work/tonkin-1950/README.md"
         }
       ]
     },
@@ -232,6 +238,12 @@
           "purpose": "Where each 2025 commune name came from: two witnesses, a review queue, logged decisions",
           "availability": "repository",
           "read": "work/research/admin-2025/README.md"
+        },
+        {
+          "path": "work/research/admin-saigon",
+          "purpose": "Saigon admin units through time (bet 1c): source and map-lead tables, attested names, dated acts",
+          "availability": "repository",
+          "read": "work/research/admin-saigon/README.md"
         },
         {
           "path": "work/image-processing/experiments/place-links",
