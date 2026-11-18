@@ -1,6 +1,7 @@
 <!--
-  AerialLabelOverlay.svelte — what the page draws over a plain aerial crop: a ring at the point
-  (the crop is centred on it) and a faint 100 m scale bar. The crop itself carries nothing.
+  AerialLabelOverlay.svelte — what the page draws over a plain aerial crop: short ticks on the four
+  edges that line up with the point (the crop is centred on it), so nothing covers the ground at the
+  point, and a faint 100 m scale bar. The crop itself carries nothing.
   Units are the image's own pixels (`viewBox="0 0 out out"`).
 -->
 <script lang="ts">
@@ -10,13 +11,16 @@
   export let payload: PlaceLinkPayload | AerialLabelPayload;
 
   $: mPerPx = 'm_per_px' in payload ? payload.m_per_px : 1;
+  const TICK = 16;
   $: centre = view.out / 2;
   $: barLen = (view.bar_m / mPerPx) * (view.out / view.side);
 </script>
 
 <svg viewBox="0 0 {view.out} {view.out}" aria-hidden="true" focusable="false">
-  <circle class="ring-halo" cx={centre} cy={centre} r="11" />
-  <circle class="ring" cx={centre} cy={centre} r="11" />
+  {#each [[centre, 0, centre, TICK], [centre, view.out - TICK, centre, view.out], [0, centre, TICK, centre], [view.out - TICK, centre, view.out, centre]] as [x1, y1, x2, y2], i (i)}
+    <line class="tick-halo" {x1} {y1} {x2} {y2} />
+    <line class="tick" {x1} {y1} {x2} {y2} />
+  {/each}
   <g class="bar">
     <line class="halo" x1="18" y1={view.out - 22} x2={18 + barLen} y2={view.out - 22} />
     <line class="stroke" x1="18" y1={view.out - 22} x2={18 + barLen} y2={view.out - 22} />
@@ -32,15 +36,11 @@
     height: 100%;
     pointer-events: none;
   }
-  .ring,
-  .ring-halo {
-    fill: none;
-  }
-  .ring-halo {
+  .tick-halo {
     stroke: var(--light-ink);
     stroke-width: 5;
   }
-  .ring {
+  .tick {
     stroke: var(--color-yellow);
     stroke-width: 2;
   }

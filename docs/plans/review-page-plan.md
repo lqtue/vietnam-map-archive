@@ -282,8 +282,8 @@ and the exported file scores identically when fed through `confirm.py`'s scoring
 Label points on a 1950 aerial as built, open or unsure, one key per item. It feeds issue #127 (about 100
 points per frame, a second labeller blind, stop if agreement is under 80%) and bets 2 and 1c.
 
-- **What the reviewer sees:** the question "In March 1950, what is at the dot: a building, or open land?",
-  a close crop (128 px square, shown at 512) and a context crop (384 px, shown at 512), a ring at the
+- **What the reviewer sees:** the question "In March 1950, what is at the centre mark (between the edge ticks): a building, or open land?",
+  a close crop (128 px square, shown at 512) and a context crop (384 px, shown at 512), edge ticks at the
   point and a faint 100 m bar drawn as SVG. Keys `b` built, `o` open, `.` unsure (`u` stays undo, so
   unsure cannot be `u`). Verdicts store `verdicts.relation` = built / open / unsure, arm `nocand`.
 - **No proposal arm.** The items carry no machine proposal and no map class, so there is nothing to hide

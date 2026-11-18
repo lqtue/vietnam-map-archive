@@ -16,7 +16,9 @@ Rights: the photos' holder is unknown, so the crops must not be public. They are
 base64 JPEG inside `payload.views[*].url`, which only the staff-gated /api/review/<task>/next sends. --out must be outside
 the git repo. Keep it that way.
 
-Method label_v0: close = 128 px square centred on (x, y) shown at 512 px (4x, bicubic); context = 384 px square shown at 512.
+Method label_v1: close = 128 px square centred on (x, y) shown at 512 px (4x, Lanczos); context = 384 px square shown at 512.
+The frame gets one contrast stretch (0.5% clipped each end) and each crop a mild unsharp mask, the same for every crop, so grey 1950 prints are
+easier to read; nothing machine-made is drawn into the pixels. label_v0 (no enhancement) is `--plain`.
 Parts of a crop outside the frame, and the printed data strip (bottom STRIP px of the frame), are filled mid-grey.
 """
 from __future__ import annotations
@@ -36,14 +38,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from review_record import bound as bound_hash  # noqa: E402
 
 TASK_KEY = "aerial-label-1950"
-METHOD = "label_v0"
+METHOD = "label_v1"
 M_PER_PX = 1.085          # ground metres per frame pixel
 CLOSE_SIDE, CONTEXT_SIDE, OUT = 128, 384, 512
 STRIP = 48                # printed data strip along the bottom of the frame
 GREY = (128, 128, 128)
+ENHANCE = True            # label_v1; set False by --plain (label_v0)
 MAX_VIEW_B64 = 110_000    # two views must fit the endpoint's 262,144-byte item limit with room
-QUESTION = "In March 1950, what is at the dot: a building, or open land?"
-QUESTION_VI = "Tháng 3 năm 1950, tại chấm đó là gì: nhà (công trình) hay đất trống?"
+QUESTION = "In March 1950, what is at the centre mark (between the edge ticks): a building, or open land?"
+QUESTION_VI = "Tháng 3 năm 1950, tại điểm giữa (giữa các vạch ở mép ảnh) là gì: nhà (công trình) hay đất trống?"
 
 
 def item_id(point_id: str) -> str:
@@ -64,6 +67,16 @@ def judged(frame_name: str, x: int, y: int) -> list:
     return [frame_name, x, y, CLOSE_SIDE, CONTEXT_SIDE, OUT]
 
 
+def enhance_frame(im):
+    """One contrast stretch for the whole frame (0.5% clipped each end, data strip left out), so every crop is treated alike."""
+    from PIL import ImageOps
+    g = im.convert("L")
+    w, h = g.size
+    body = ImageOps.autocontrast(g.crop((0, 0, w, h - STRIP)), cutoff=0.5)
+    g.paste(body, (0, 0))
+    return g.convert("RGB")
+
+
 def crop(im, x: int, y: int, side: int):
     from PIL import Image
     w, h = im.size
@@ -74,7 +87,11 @@ def crop(im, x: int, y: int, side: int):
     sx0, sy0, sx1, sy1 = max(x0, 0), max(y0, 0), min(x0 + side, w), min(y0 + side, h)
     if sx1 > sx0 and sy1 > sy0:
         canvas.paste(base.crop((sx0, sy0, sx1, sy1)), (sx0 - x0, sy0 - y0))
-    return canvas.resize((OUT, OUT), Image.BICUBIC), x0, y0
+    big = canvas.resize((OUT, OUT), Image.LANCZOS)
+    if ENHANCE:
+        from PIL import ImageFilter, ImageOps
+        big = big.filter(ImageFilter.UnsharpMask(radius=1.5, percent=40, threshold=2))
+    return big, x0, y0
 
 
 def jpeg_b64(img) -> tuple[bytes, str]:
@@ -90,6 +107,8 @@ def jpeg_b64(img) -> tuple[bytes, str]:
 def build(frame_path, points: list[dict], out) -> tuple[dict, list[dict], list[dict]]:
     from PIL import Image
     im = Image.open(frame_path)
+    if ENHANCE:
+        im = enhance_frame(im)
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     items, key = [], []
@@ -126,7 +145,10 @@ def main() -> int:
     ap.add_argument("--points", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--push", action="store_true", help="send the task and items to the app")
+    ap.add_argument("--plain", action="store_true", help="no contrast stretch or sharpening (method label_v0)")
     a = ap.parse_args()
+    if a.plain:
+        globals().update(ENHANCE=False, METHOD="label_v0")
     out = Path(a.out).expanduser().resolve()
     root = repo_root()
     if out == root or root in out.parents:
