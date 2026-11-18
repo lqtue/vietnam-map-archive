@@ -71,7 +71,10 @@
   }
   figure {
     margin: 0;
-    max-width: 100%;
+    /* Side by side when the column allows, each shrinking to fit; wraps only on a narrow window. */
+    flex: 1 1 0;
+    min-width: 16rem;
+    max-width: calc(var(--out) * 1px);
   }
   figcaption {
     font-size: var(--text-xs);
