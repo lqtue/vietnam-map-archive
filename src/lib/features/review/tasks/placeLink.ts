@@ -8,13 +8,23 @@
  * move to Shift+O V W, because `?` and `v` clash with the house keymap (design-system.md § Keys).
  */
 
+import type { ComponentType, SvelteComponent } from 'svelte';
 import PlaceLinkOverlay from './PlaceLinkOverlay.svelte';
+import { aerialLabel } from './aerialLabel';
 import type { Relation } from '../types';
 
-export const placeLink = {
+/** How a kind of task is drawn. `decision` replaces the place-link column (candidates, search, note). */
+export type ReviewTaskDef = {
+  key: string;
+  overlay: ComponentType<SvelteComponent<any>>;
+  decision?: ComponentType<SvelteComponent<any>>;
+  /** Key, relation, and the words on the button. Every key has a visible button. */
+  relations: { key: string; relation: Relation; label: string }[];
+};
+
+export const placeLink: ReviewTaskDef = {
   key: 'place-link',
   overlay: PlaceLinkOverlay,
-  /** Key, relation, and the words on the button. Every key has a visible button. */
   relations: [
     { key: 's', relation: 'same_building', label: 'same building' },
     { key: 'n', relation: 'same_site_new_building', label: 'same site, new building' },
@@ -22,12 +32,10 @@ export const placeLink = {
     { key: 'g', relation: 'gone', label: 'gone' },
     { key: 'x', relation: 'none', label: 'none' },
     { key: '?', relation: 'unsure', label: 'unsure' },
-  ] as { key: string; relation: Relation; label: string }[],
+  ],
 };
 
-export type ReviewTaskDef = typeof placeLink;
-
-const DEFINITIONS: ReviewTaskDef[] = [placeLink];
+const DEFINITIONS: ReviewTaskDef[] = [placeLink, aerialLabel];
 
 /**
  * The definition that draws a task. A task key is a kind, or a kind and a suffix (`place-link`,

@@ -276,3 +276,30 @@ and the exported file scores identically when fed through `confirm.py`'s scoring
    reviewer sees the same thing, so the measure stays fair.)
 3. Does a contributor's verdict count toward the paper's numbers, or only Tue's? (Proposed: the
    paper reports each reviewer group separately.)
+
+## Task: aerial-label-1950
+
+Label points on a 1950 aerial as built, open or unsure, one key per item. It feeds issue #127 (about 100
+points per frame, a second labeller blind, stop if agreement is under 80%) and bets 2 and 1c.
+
+- **What the reviewer sees:** the question "In March 1950, what is at the dot: a building, or open land?",
+  a close crop (128 px square, shown at 512) and a context crop (384 px, shown at 512), a ring at the
+  point and a faint 100 m bar drawn as SVG. Keys `b` built, `o` open, `.` unsure (`u` stays undo, so
+  unsure cannot be `u`). Verdicts store `verdicts.relation` = built / open / unsure, arm `nocand`.
+- **No proposal arm.** The items carry no machine proposal and no map class, so there is nothing to hide
+  and `blind_frac` is 0. The strata (`built_by_1942_class` and the rest) stay in `key.csv` beside the
+  build output and are used only by scoring. Repeats (10 of 110) get opaque item ids, so the page cannot
+  tell them from first showings.
+- **Build:** `python3 work/review-kit/aerial_label.py --frame FRAME.jpg --points label_points_0028.csv --out DIR`
+  writes the crops (JPEG), `task.json`, `items.json`, `key.csv`. `--out` must be outside the repo.
+  `--push` sends them through `POST /api/pipeline/review-items` when `VMA_API_URL` and `VMA_WORKER_KEY`
+  (or `WORKER_TOKEN`) are in the environment; the task is created as `draft` and `staff`.
+- **Score:** `python3 work/review-kit/aerial_label_score.py verdicts.jsonl label_points_0028.csv [--second other.jsonl]`
+  (verdicts from `review_sync.py pull aerial-label-1950 out.jsonl`): n, % unsure, repeat agreement, built
+  share per stratum, and agreement and Cohen's kappa between two reviewers, unsure excluded.
+- **Rights:** the holder of the photos is unknown. The crops are staff only and never public. They are
+  not put in R2 or any bucket and not in git: each crop is a base64 JPEG inside the item's payload, which
+  only the staff-gated `/api/review/<task>/next` sends (about 160 KB per item, under the 256 KB limit).
+- **Server hook:** verdict words are per task kind (`relationsFor` in `reviewVerdict.ts`): `aerial-label*`
+  accepts built / open / unsure, place links keep theirs. The page frame takes a task's own decision
+  column (`decision` in the task definition).

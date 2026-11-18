@@ -19,8 +19,19 @@ export const RELATIONS = [
   'gone',
   'none',
   'unsure',
+  'built',
+  'open',
 ] as const;
 export type Relation = (typeof RELATIONS)[number];
+/**
+ * What a task may answer. A label task (`aerial-label-1950`: built / open / unsure) shares the verdict
+ * shape and the page frame with place links but not their vocabulary, so each task kind accepts only its own.
+ */
+const LABEL_RELATIONS: readonly Relation[] = ['built', 'open', 'unsure'];
+export const relationsFor = (taskKey: string): readonly Relation[] =>
+  taskKey === 'aerial-label' || taskKey.startsWith('aerial-label-')
+    ? LABEL_RELATIONS
+    : RELATIONS.filter((r) => !LABEL_RELATIONS.includes(r) || r === 'unsure');
 /** These three name a place, so they need a pick; the others do not. */
 const NEEDS_PICK: readonly Relation[] = ['same_building', 'same_site_new_building', 'moved'];
 

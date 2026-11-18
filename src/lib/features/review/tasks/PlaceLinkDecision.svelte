@@ -12,7 +12,7 @@
   import { debounce } from '$lib/core/utils/debounce';
   import type { ReviewSession, SessionState } from '../reviewSession';
   import type { ReviewTaskDef } from './placeLink';
-  import type { SearchHit } from '../types';
+  import type { PlaceLinkPayload, SearchHit } from '../types';
 
   export let task: ReviewTaskDef;
   export let session: ReviewSession;
@@ -83,21 +83,23 @@
     if (e.key === 'Enter' || e.key === 'Escape') noteInput.blur();
   }
 
-  $: lat = item?.payload.lat;
-  $: lon = item?.payload.lon;
+  /** This component only draws place-link items. */
+  $: payload = item?.payload as PlaceLinkPayload | undefined;
+  $: lat = payload?.lat;
+  $: lon = payload?.lon;
 </script>
 
-{#if item}
+{#if item && payload}
   <div class="decision" aria-busy={busy}>
     <p class="question">{state.question}</p>
-    <h2 class="label">« {item.payload.text} »</h2>
+    <h2 class="label">« {payload.text} »</h2>
     <p class="see-today">
       See today:
       <a
         target="_blank"
         rel="noopener"
         aria-keyshortcuts="o"
-        href="/explore?map={item.payload.sheet.map_id}&at={lon},{lat}"
+        href="/explore?map={payload.sheet.map_id}&at={lon},{lat}"
         >1882 over today <kbd>o</kbd></a
       >
       ·
@@ -216,7 +218,7 @@
         disabled={busy}
         on:click={() => session.undo()}>undo last <kbd>u</kbd></button
       >
-      <a href="/catalog/{item.payload.sheet.map_id}" target="_blank" rel="noopener">Open sheet ↗</a>
+      <a href="/catalog/{payload.sheet.map_id}" target="_blank" rel="noopener">Open sheet ↗</a>
     </p>
   </div>
 {/if}

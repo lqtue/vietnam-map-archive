@@ -4,7 +4,7 @@
  */
 
 export type Relation =
-  'same_building' | 'same_site_new_building' | 'moved' | 'gone' | 'none' | 'unsure';
+  'same_building' | 'same_site_new_building' | 'moved' | 'gone' | 'none' | 'unsure' | 'built' | 'open';
 
 /** One of the machine's candidates (shown arm only). `px` is the position on the sheet, in source pixels. */
 export type Candidate = {
@@ -54,10 +54,19 @@ export type PlaceLinkPayload = {
   views: { close: CropView; context: CropView };
 };
 
+/** A point on a 1950 aerial (`aerial-label-1950`): a plain close and context crop, centred on `px`. No proposal, no class. */
+export type AerialLabelPayload = {
+  /** Ground metres per frame pixel. */
+  m_per_px: number;
+  /** The point, in frame pixels. */
+  px: [number, number];
+  views: { close: CropView; context: CropView };
+};
+
 export type ReviewItem = {
   item_id: string;
   bound: string;
-  payload: PlaceLinkPayload;
+  payload: PlaceLinkPayload | AerialLabelPayload;
   /** The candidates on this reviewer's shown arm; empty otherwise. Never says which arm. */
   proposal: Candidate[];
 };
@@ -95,7 +104,7 @@ export type TaskSummary = {
 /** What a task's overlay component takes: the view, the item, and what to draw over it. */
 export type OverlayProps = {
   view: CropView;
-  payload: PlaceLinkPayload;
+  payload: PlaceLinkPayload | AerialLabelPayload;
   candidates?: Candidate[];
   picked?: number | null;
 };
