@@ -20,7 +20,10 @@
 
   $: payload = item.payload;
   $: mPerPx = 'sheet' in payload ? payload.sheet.m_per_px : payload.m_per_px;
-  $: what = 'text' in payload ? `the label “${payload.text}” on the 1882 sheet` : 'a point on the 1950 aerial';
+  $: what =
+    'text' in payload
+      ? `the label “${payload.text}” on the 1882 sheet`
+      : 'a point on the 1950 aerial';
 
   /** The ground the view covers, to the nearest 10 m. */
   const across = (side: number, mPerPx: number) => Math.round((side * mPerPx) / 10) * 10;

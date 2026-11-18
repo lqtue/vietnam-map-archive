@@ -43,7 +43,15 @@
    * before the palette sees it. Typing in a field is left alone (the layout skips it too).
    */
   function onSlash(e: KeyboardEvent) {
-    if (!decision || e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return;
+    if (
+      !decision ||
+      e.key !== '/' ||
+      e.ctrlKey ||
+      e.metaKey ||
+      e.altKey ||
+      isTypingTarget(e.target)
+    )
+      return;
     e.preventDefault();
     e.stopPropagation();
     decision?.focusSearch();

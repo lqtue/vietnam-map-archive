@@ -99,8 +99,7 @@
         target="_blank"
         rel="noopener"
         aria-keyshortcuts="o"
-        href="/explore?map={payload.sheet.map_id}&at={lon},{lat}"
-        >1882 over today <kbd>o</kbd></a
+        href="/explore?map={payload.sheet.map_id}&at={lon},{lat}">1882 over today <kbd>o</kbd></a
       >
       ·
       <a

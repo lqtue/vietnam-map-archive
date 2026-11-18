@@ -4,7 +4,14 @@
  */
 
 export type Relation =
-  'same_building' | 'same_site_new_building' | 'moved' | 'gone' | 'none' | 'unsure' | 'built' | 'open';
+  | 'same_building'
+  | 'same_site_new_building'
+  | 'moved'
+  | 'gone'
+  | 'none'
+  | 'unsure'
+  | 'built'
+  | 'open';
 
 /** One of the machine's candidates (shown arm only). `px` is the position on the sheet, in source pixels. */
 export type Candidate = {

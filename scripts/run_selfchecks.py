@@ -68,6 +68,7 @@ RUN = {
     "work/ocr/scripts/test_review_figs.py": [],
     "work/ocr/scripts/test_tile_cache.py": [],
     "work/review-kit/review_page.py": SC,
+    "work/review-kit/test_aerial_label.py": [],
     "work/review-kit/review_record.py": [],
     "work/review-kit/review_sync.py": SC,
     "work/worker/vma_worker.py": SC,
