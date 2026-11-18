@@ -1,7 +1,7 @@
 <!--
   AerialLabelOverlay.svelte — what the page draws over a plain aerial crop: short ticks on the four
-  edges that line up with the point (the crop is centred on it), so nothing covers the ground at the
-  point, and a faint 100 m scale bar. The crop itself carries nothing.
+  edges that line up with the point (the crop is centred on it) and an open crosshair at the centre with
+  the middle left clear, so nothing covers the ground at the point, and a faint 100 m scale bar. The crop itself carries nothing.
   Units are the image's own pixels (`viewBox="0 0 out out"`).
 -->
 <script lang="ts">
@@ -12,12 +12,19 @@
 
   $: mPerPx = 'm_per_px' in payload ? payload.m_per_px : 1;
   const TICK = 16;
+  // Open crosshair at the centre: four short arms with the middle left clear, so the ground at the point stays visible.
+  const GAP = 9;
+  const ARM = 22;
   $: centre = view.out / 2;
   $: barLen = (view.bar_m / mPerPx) * (view.out / view.side);
 </script>
 
 <svg viewBox="0 0 {view.out} {view.out}" aria-hidden="true" focusable="false">
   {#each [[centre, 0, centre, TICK], [centre, view.out - TICK, centre, view.out], [0, centre, TICK, centre], [view.out - TICK, centre, view.out, centre]] as [x1, y1, x2, y2], i (i)}
+    <line class="tick-halo" {x1} {y1} {x2} {y2} />
+    <line class="tick" {x1} {y1} {x2} {y2} />
+  {/each}
+  {#each [[centre, centre - ARM, centre, centre - GAP], [centre, centre + GAP, centre, centre + ARM], [centre - ARM, centre, centre - GAP, centre], [centre + GAP, centre, centre + ARM, centre]] as [x1, y1, x2, y2], i (i)}
     <line class="tick-halo" {x1} {y1} {x2} {y2} />
     <line class="tick" {x1} {y1} {x2} {y2} />
   {/each}
@@ -38,7 +45,7 @@
   }
   .tick-halo {
     stroke: var(--light-ink);
-    stroke-width: 5;
+    stroke-width: 4;
   }
   .tick {
     stroke: var(--color-yellow);

@@ -17,8 +17,8 @@
 <div class="decision" aria-busy={busy}>
   <p class="question">{state.question}</p>
   <p class="hint">
-    Built = roof or house visible at the centre mark; open = field, marsh, bare ground, water edge
-    without roof. Unsure = cannot tell; do not guess.
+    Built = roof or house visible in the middle of the cross; open = field, marsh, bare ground,
+    water edge without roof. Unsure = cannot tell; do not guess.
   </p>
   <div class="relations">
     {#each task.relations as r (r.key)}

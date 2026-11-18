@@ -45,8 +45,8 @@ STRIP = 48                # printed data strip along the bottom of the frame
 GREY = (128, 128, 128)
 ENHANCE = True            # label_v1; set False by --plain (label_v0)
 MAX_VIEW_B64 = 110_000    # two views must fit the endpoint's 262,144-byte item limit with room
-QUESTION = "In March 1950, what is at the centre mark (between the edge ticks): a building, or open land?"
-QUESTION_VI = "Tháng 3 năm 1950, tại điểm giữa (giữa các vạch ở mép ảnh) là gì: nhà (công trình) hay đất trống?"
+QUESTION = "In March 1950, what is in the middle of the cross: a building, or open land?"
+QUESTION_VI = "Tháng 3 năm 1950, tại giữa dấu thập là gì: nhà (công trình) hay đất trống?"
 
 
 def item_id(point_id: str) -> str:
