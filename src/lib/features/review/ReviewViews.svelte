@@ -18,6 +18,13 @@
   /** The task's overlay component, drawn in each view's own pixel units. */
   export let overlay: ComponentType<SvelteComponent<OverlayProps>>;
 
+  $: payload = item.payload;
+  $: mPerPx = 'sheet' in payload ? payload.sheet.m_per_px : payload.m_per_px;
+  $: what =
+    'text' in payload
+      ? `the label “${payload.text}” on the 1882 sheet`
+      : 'a point on the 1950 aerial';
+
   /** The ground the view covers, to the nearest 10 m. */
   const across = (side: number, mPerPx: number) => Math.round((side * mPerPx) / 10) * 10;
 
@@ -32,14 +39,14 @@
     {@const view = item.payload.views[v.key]}
     <figure style:--out={view.out}>
       <figcaption>
-        {v.label} · about {across(view.side, item.payload.sheet.m_per_px)} m across
+        {v.label} · about {across(view.side, mPerPx)} m across
       </figcaption>
       <div class="frame">
         <img
           src={view.url}
           width={view.out}
           height={view.out}
-          alt="{v.label} view of the label “{item.payload.text}” on the 1882 sheet"
+          alt="{v.label} view of {what}"
           on:load={() => session.viewLoaded(VIEWS.length)}
           on:error={() => session.viewFailed()}
         />
@@ -64,7 +71,10 @@
   }
   figure {
     margin: 0;
-    max-width: 100%;
+    /* Side by side when the column allows, each shrinking to fit; wraps only on a narrow window. */
+    flex: 1 1 0;
+    min-width: 16rem;
+    max-width: calc(var(--out) * 1px);
   }
   figcaption {
     font-size: var(--text-xs);

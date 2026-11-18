@@ -43,7 +43,15 @@
    * before the palette sees it. Typing in a field is left alone (the layout skips it too).
    */
   function onSlash(e: KeyboardEvent) {
-    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return;
+    if (
+      !decision ||
+      e.key !== '/' ||
+      e.ctrlKey ||
+      e.metaKey ||
+      e.altKey ||
+      isTypingTarget(e.target)
+    )
+      return;
     e.preventDefault();
     e.stopPropagation();
     decision?.focusSearch();
@@ -111,7 +119,11 @@
           <LoadError message={s.failure} on:retry={() => session.retry()} />
         {/if}
         {#key s.loadId}
-          <PlaceLinkDecision bind:this={decision} {task} {session} state={s} {search} />
+          {#if task.decision}
+            <svelte:component this={task.decision} {task} {session} state={s} />
+          {:else}
+            <PlaceLinkDecision bind:this={decision} {task} {session} state={s} {search} />
+          {/if}
         {/key}
       </aside>
     </div>

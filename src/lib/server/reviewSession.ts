@@ -17,6 +17,7 @@ import { armFor, orderItems } from './reviewArms';
 import {
   buildVerdict,
   checkClock,
+  relationsFor,
   searchPool,
   type Place,
   type VerdictBody,
@@ -150,6 +151,8 @@ export async function searchItem(sb: Client, task: string, itemId: string, q: st
 /** Store one verdict. 409 when the item changed since the page loaded it; a resend is a no-op. */
 export async function saveVerdict(sb: Client, task: Task, reviewer: string, body: VerdictBody) {
   checkClock(body.shown_at, body.decided_at, Date.now());
+  if (!relationsFor(task.key).includes(body.relation))
+    throw error(400, `${body.relation} is not an answer for this task`);
 
   const { data: item, error: itemErr } = await sb
     .from('review_items')
