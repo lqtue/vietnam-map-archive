@@ -71,6 +71,22 @@ Pipeline:
   from the session, never the body, and `assertUnderRateLimit` caps it at 300/hour.
   `data/supabase/footprints.ts:createFootprint` posts here rather than inserting directly.
 
+Staff review session (admin/mod with MFA; the reviewer is the session, never the body; migration 122
+tables read through `$lib/server/reviewSession.ts`):
+
+- `/api/review/tasks/` — GET the open staff tasks with `done` and `total` for this reviewer.
+- `/api/review/[task]/next/` — GET the next item in this reviewer's order: `{ task, done, total, item }`.
+  `proposal` is the machine's candidates on this reviewer's shown arm and `[]` otherwise, and
+  `payload.pool` is never sent. The reply does not say which arm. 404 unless the task is `open`.
+- `/api/review/[task]/verdict/` — POST one verdict (stamps in epoch ms). The server recomputes the arm
+  from `hash(seed, reviewer, item)` and writes it into `verdicts`; 400 on a bad field, a clock more
+  than 10 s ahead or a pick the reviewer could not see; 409 when `bound` no longer matches the item;
+  a resend with the same `client_id` answers `{ ok, duplicate: true }` and stores nothing.
+- `/api/review/[task]/undo/` — POST: appends `{"undone": true}` for this reviewer's last live verdict.
+  A session write with no body needs an `Origin` header (a browser sends one).
+- `/api/review/[task]/search/` — GET `?item=&q=`: up to 8 places of the item's 300 m pool, nearest
+  first, accent-free, the same on every arm.
+
 Worker-authenticated (`Authorization: Bearer <worker_keys token>`, **not** a user session — see
 `$lib/server/workerAuth.ts`):
 

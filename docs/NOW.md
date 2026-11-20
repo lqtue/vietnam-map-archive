@@ -54,7 +54,7 @@ One row per open stream. Owner is Tue or Claude. Prune when merged.
 | OCR ingest sizing | Claude | merged; next step local | Cap tiles by pixel target — `.claude/handoff-ocr-ingest.md` |
 | Home "How it works" · press image proxy | **Tue** | `home-how-it-works`, `press-image-proxy` | Idea gate, then PR or park |
 | L909 sources (USGS GeoPDFs, other institutions) | Claude | `l909-sources` (pushed, no worktree) | Rebase onto main (#77), then PR: scripts and records only |
-| Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live 2026-10-18); `review-web` pushed | PR 2: the page (`docs/plans/review-page-plan.md` §8) |
+| Review page in the app (bet 2, `review-events`) | Claude | PR 1 merged (#82; mig 122 live); PR 2 on `review-page` (routes, page, tests) | Tue: render and upload crops, push items, then the 20-item sitting (`docs/plans/review-page-plan.md` §8) |
 | Data model: activities (bets 1a, 2) | Claude | plans and dedup 1–2 merged (#85; mig 123–124 live 2026-10-18) | `activities` table, per `plans/data-model-target.md` |
 | PhD applications | Tue + Claude | `docs/private/applications/` (private; its own `CLAUDE.md` and claims ledger) | Every factual claim checked against a page image before anything is sent |
 | Virtual Saigon scout (bet 3, feeds 1c) | Claude | PR #116 (`virtual-saigon-scout`) | Review and merge; 378 records exist only at the site's owners |

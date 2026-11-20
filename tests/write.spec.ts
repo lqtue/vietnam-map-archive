@@ -9,6 +9,7 @@ import { createServerClient } from '@supabase/ssr';
 import { loadSchema, unsupportedKeywords, validate } from './schemaCheck';
 import { placeCoreKey } from '../src/lib/core/utils/placeKey';
 import { createHash, createHmac } from 'node:crypto';
+import { armFor } from '../src/lib/server/reviewArms';
 
 /**
  * Write-path smokes (roadmap-record A5). Unlike smoke.spec.ts these DO write rows, so
@@ -46,6 +47,7 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: 
 let session: Session;
 let mapId: string;
 let staffRequest: APIRequestContext;
+let staffState: Awaited<ReturnType<APIRequestContext['storageState']>>;
 
 function totpCode(secret: string): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -139,6 +141,7 @@ test.beforeAll(async () => {
       origins: [],
     },
   });
+  staffState = await staffRequest.storageState();
 });
 
 test.afterAll(async () => {
@@ -2429,4 +2432,418 @@ test('GET /api/pipeline/review-events pages by id and freezes the task once even
   });
   expect(same.ok(), await same.text()).toBe(true);
   await asWorker.dispose();
+});
+
+// ---------------------------------------------------------------------------------------------
+// The review page's routes (docs/plans/review-page-plan.md §4, PR 2). Same rule as above: events
+// cannot be deleted, so each run has a task key of its own.
+
+type ReviewNext = {
+  done: number;
+  total: number;
+  item: null | {
+    item_id: string;
+    bound: string;
+    payload: Record<string, unknown>;
+    proposal: { name: string }[];
+  };
+};
+
+function placeLinkItems(n: number) {
+  const pool = [
+    {
+      id: 'osm:way/1',
+      name: 'Secret candidate',
+      source: 'osm',
+      osm: 'way/1',
+      lon: 106.7,
+      lat: 10.77,
+      dist_m: 40,
+      names: ['Secret candidate'],
+    },
+    {
+      id: 'osm:way/2',
+      name: 'Chợ Bến Thành',
+      source: 'osm',
+      osm: 'way/2',
+      lon: 106.7,
+      lat: 10.77,
+      dist_m: 80,
+      names: ['Chợ Bến Thành'],
+    },
+  ];
+  return Array.from({ length: n }, (_, i) => ({
+    task: '',
+    item_id: `p${i}`,
+    bound: `h${i}`,
+    payload: { text: `LABEL ${i}`, pool },
+    // Every third item has no candidates, so the page meets all three arms.
+    proposal: i % 3 === 2 ? null : [pool[0], pool[1]],
+    gold: null,
+    active: true,
+  }));
+}
+
+async function reviewNext(key: string): Promise<ReviewNext> {
+  const res = await staffRequest.get(`/api/review/${key}/next`);
+  expect(res.ok(), await res.text()).toBe(true);
+  return res.json();
+}
+
+function stamps(msAgo = 8000) {
+  const now = Date.now();
+  return { shown_at: now - msAgo, decided_at: now - 100 };
+}
+
+test('review routes: the blind arm never gets a proposal; verdict, retry, stale, undo and search work', async () => {
+  const key = `ws-page-${Date.now()}`;
+  const seed = 4242;
+  const blindFrac = 0.5;
+  const staffId = session.user.id;
+  expect(
+    (
+      await admin
+        .from('review_tasks')
+        .insert(reviewTask(key, { seed, blind_frac: blindFrac, status: 'open' }))
+    ).error
+  ).toBeNull();
+  const items = placeLinkItems(12).map((i) => ({ ...i, task: key }));
+  expect((await admin.from('review_items').insert(items)).error).toBeNull();
+
+  // Walk the whole task: each item arrives with a proposal only on this reviewer's shown arm.
+  const seen: Record<string, string> = {};
+  for (let guard = 0; guard < 20; guard++) {
+    const next = await reviewNext(key);
+    expect(next.total).toBe(12);
+    expect(next.done).toBe(guard);
+    if (!next.item) break;
+    const raw = JSON.stringify(next);
+    expect(raw).not.toContain('"pool"');
+    const it = next.item;
+    const arm = armFor(
+      seed,
+      staffId,
+      it.item_id,
+      blindFrac,
+      items.find((x) => x.item_id === it.item_id)!.proposal !== null
+    );
+    seen[it.item_id] = arm;
+    if (arm === 'shown') expect(it.proposal).toHaveLength(2);
+    else {
+      expect(it.proposal).toEqual([]);
+      expect(raw).not.toContain('Secret candidate');
+    }
+    const body = arm === 'shown' ? { relation: 'moved', pick: 1 } : { relation: 'gone' };
+    const res = await staffRequest.post(`/api/review/${key}/verdict`, {
+      data: {
+        ...body,
+        item_id: it.item_id,
+        bound: it.bound,
+        client_id: crypto.randomUUID(),
+        hidden_ms: 120,
+        ...stamps(),
+      },
+    });
+    expect(res.ok(), await res.text()).toBe(true);
+  }
+  expect(
+    Object.values(seen)
+      .sort()
+      .filter((a, i, all) => all.indexOf(a) === i)
+  ).toEqual(['blind', 'nocand', 'shown']);
+  expect((await reviewNext(key)).item).toBeNull();
+
+  const { data: events } = await admin
+    .from('review_events')
+    .select('*')
+    .eq('task', key)
+    .order('id');
+  expect(events).toHaveLength(12);
+  for (const [idx, e] of events!.entries()) {
+    expect(e.reviewer).toBe(staffId);
+    expect(e.order_idx).toBe(idx);
+    expect((e.verdicts as { arm: string }).arm).toBe(seen[e.item_id]);
+    expect(e.proposal_shown).toBe(seen[e.item_id] === 'shown');
+    expect(e.readings).toEqual({ hidden_ms: 120 });
+  }
+
+  const blindId = Object.keys(seen).find((id) => seen[id] === 'blind')!;
+  const blindItem = items.find((i) => i.item_id === blindId)!;
+  const shownId = Object.keys(seen).find((id) => seen[id] === 'shown')!;
+  const shownItem = items.find((i) => i.item_id === shownId)!;
+
+  // A blind reviewer cannot pick a candidate they never saw, but can search the pool.
+  const noPick = await staffRequest.post(`/api/review/${key}/verdict`, {
+    data: {
+      relation: 'moved',
+      pick: 1,
+      item_id: blindId,
+      bound: blindItem.bound,
+      client_id: crypto.randomUUID(),
+      ...stamps(),
+    },
+  });
+  expect(noPick.status()).toBe(400);
+  const search = await (
+    await staffRequest.get(`/api/review/${key}/search?item=${blindId}&q=cho%20ben%20thanh`)
+  ).json();
+  expect(search.hits.map((h: { id: string }) => h.id)).toEqual(['osm:way/2']);
+
+  // A resend with the same client id stores nothing twice.
+  const clientId = crypto.randomUUID();
+  const send = () =>
+    staffRequest.post(`/api/review/${key}/verdict`, {
+      data: {
+        relation: 'moved',
+        search_id: 'osm:way/2',
+        item_id: blindId,
+        bound: blindItem.bound,
+        client_id: clientId,
+        ...stamps(),
+      },
+    });
+  const first = await send();
+  expect(first.ok(), await first.text()).toBe(true);
+  const again = await send();
+  expect(await again.json()).toEqual({ ok: true, duplicate: true });
+  expect(
+    (await admin.from('review_events').select('id', { count: 'exact', head: true }).eq('task', key))
+      .count
+  ).toBe(13);
+
+  // Stale: the item changed after it was loaded.
+  await admin
+    .from('review_items')
+    .update({ bound: 'changed' })
+    .eq('task', key)
+    .eq('item_id', shownId);
+  const stale = await staffRequest.post(`/api/review/${key}/verdict`, {
+    data: {
+      relation: 'gone',
+      item_id: shownId,
+      bound: shownItem.bound,
+      client_id: crypto.randomUUID(),
+      ...stamps(),
+    },
+  });
+  expect(stale.status()).toBe(409);
+
+  // A clock far in the future is refused; a small skew is not.
+  const future = Date.now() + 3600_000;
+  const skewed = await staffRequest.post(`/api/review/${key}/verdict`, {
+    data: {
+      relation: 'gone',
+      item_id: blindId,
+      bound: blindItem.bound,
+      client_id: crypto.randomUUID(),
+      shown_at: future - 5000,
+      decided_at: future,
+    },
+  });
+  expect(skewed.status()).toBe(400);
+
+  // Undo appends an event, nothing is rewritten, and the item comes back.
+  // A session write with no body needs an Origin header (hooks.server.ts); a browser sends one.
+  const undo = await (
+    await staffRequest.post(`/api/review/${key}/undo`, {
+      headers: { origin: 'http://localhost:5199' },
+    })
+  ).json();
+  expect(undo).toEqual({ ok: true, undone: blindId });
+  const { data: last } = await admin
+    .from('review_events')
+    .select('item_id, verdicts')
+    .eq('task', key)
+    .order('id', { ascending: false })
+    .limit(1);
+  expect(last![0]).toMatchObject({ item_id: blindId, verdicts: { undone: true } });
+  const back = await reviewNext(key);
+  expect(back.item?.item_id).toBe(blindId);
+  expect(back.done).toBe(11);
+});
+
+test('review routes: closed tasks, anonymous callers and unknown items are refused', async () => {
+  const key = `ws-gate-${Date.now()}`;
+  await admin.from('review_tasks').insert(reviewTask(key, { status: 'draft' }));
+  await admin.from('review_items').insert(placeLinkItems(2).map((i) => ({ ...i, task: key })));
+
+  expect((await staffRequest.get(`/api/review/${key}/next`)).status()).toBe(404);
+  await admin.from('review_tasks').update({ status: 'open' }).eq('key', key);
+  expect((await staffRequest.get(`/api/review/${key}/next`)).status()).toBe(200);
+  expect((await staffRequest.get(`/api/review/${key}/search?item=nope&q=a`)).status()).toBe(404);
+  await admin.from('review_tasks').update({ audience: 'signed_in' }).eq('key', key);
+  expect((await staffRequest.get(`/api/review/${key}/next`)).status()).toBe(403);
+
+  const anon = await playwrightRequest.newContext({ baseURL: 'http://localhost:5199' });
+  expect((await anon.get(`/api/review/${key}/next`)).status()).toBe(401);
+  expect((await anon.post(`/api/review/${key}/verdict`, { data: {} })).status()).toBe(401);
+  expect((await anon.post(`/api/review/${key}/undo`)).status()).toBe(401);
+  expect((await anon.get(`/api/review/${key}/search?item=p0&q=a`)).status()).toBe(401);
+  expect((await anon.get('/api/review/tasks')).status()).toBe(401);
+  await anon.dispose();
+
+  const list = await (await staffRequest.get('/api/review/tasks')).json();
+  expect(list.tasks.map((t: { key: string }) => t.key)).not.toContain(key);
+});
+
+// A real browser on the page: the keys, the overlay, the progress and the undo. The crops are
+// answered by the test (a 1x1 PNG), so it needs no R2.
+const PNG_1X1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64'
+);
+
+test('review page: keys pick and send, the overlay is drawn, undo brings the item back', async ({
+  browser,
+}) => {
+  const key = `place-link-ws-${Date.now()}`;
+  await admin.from('review_tasks').insert(reviewTask(key, { blind_frac: 0, status: 'open' }));
+  const view = (id: string, name: string, out: number, side: number, bar: number) => ({
+    url: `https://crops.test/${id}/${name}.png`,
+    x0: 1000,
+    y0: 1000,
+    side,
+    out,
+    bar_m: bar,
+  });
+  const items = ['u0', 'u1', 'u2'].map((id, i) => ({
+    task: key,
+    item_id: id,
+    bound: `b-${id}`,
+    payload: {
+      text: `LABEL ${i}`,
+      px: [1500, 1500],
+      box: [1450, 1480, 100, 30],
+      pos_from: 'box',
+      lon: 106.7,
+      lat: 10.77,
+      sheet: { map_id: mapId, m_per_px: 0.341, north_px: [1, 0] },
+      views: {
+        close: view(id, 'close', 800, 1040, 50),
+        context: view(id, 'context', 900, 3600, 200),
+      },
+      pool: [
+        { id: 'osm:way/1', name: 'Chợ', source: 'osm', osm: 'way/1', lon: 1, lat: 1, dist_m: 5 },
+        { id: 'osm:way/2', name: 'Ga', source: 'osm', osm: 'way/2', lon: 1, lat: 1, dist_m: 9 },
+      ],
+    },
+    proposal: [
+      {
+        id: 'osm:way/1',
+        name: 'Chợ',
+        source: 'osm',
+        osm: 'way/1',
+        lon: 1,
+        lat: 1,
+        dist_m: 5,
+        px: [1500, 1500],
+        outline_px: [
+          [1450, 1450],
+          [1550, 1450],
+          [1550, 1550],
+        ],
+      },
+      {
+        id: 'osm:way/2',
+        name: 'Ga',
+        source: 'osm',
+        osm: 'way/2',
+        lon: 1,
+        lat: 1,
+        dist_m: 9,
+        px: [1600, 1400],
+      },
+    ],
+  }));
+  expect((await admin.from('review_items').insert(items)).error).toBeNull();
+
+  // bypassCSP: the page reads the role from the local stack over http, which the production
+  // policy (connect-src 'self' https:) refuses; production talks to an https Supabase.
+  const ctx = await browser.newContext({
+    storageState: staffState,
+    baseURL: 'http://localhost:5199',
+    bypassCSP: true,
+  });
+  await ctx.route('https://crops.test/**', (route) =>
+    route.fulfill({ contentType: 'image/png', body: PNG_1X1 })
+  );
+  const page = await ctx.newPage();
+  const loaded = () =>
+    page.waitForFunction(() => {
+      const imgs = [...document.querySelectorAll<HTMLImageElement>('.frame img')];
+      return imgs.length === 2 && imgs.every((i) => i.complete && i.naturalWidth > 0);
+    });
+
+  await page.goto(`/review/${key}`);
+  // The first visit makes Vite compile the page, so it gets a longer wait than the rest.
+  await expect(page.locator('.review-page h1')).toHaveText('Write smoke', { timeout: 25_000 });
+  await expect(page.locator('.count')).toHaveText('0 / 3');
+  await loaded();
+  // Both views carry the label box and the two candidates; each candidate is a button.
+  await expect(page.locator('.frame .label-box')).toHaveCount(2);
+  await expect(page.locator('.frame .marker')).toHaveCount(4);
+  await expect(page.locator('.cand')).toHaveCount(2);
+  const first = await page.locator('.label').innerText();
+  await page.screenshot({ path: 'test-results/review-page.png' });
+
+  // `m` needs a place: refused with a message until a candidate is picked.
+  await page.keyboard.press('m');
+  await expect(page.locator('.message')).toContainText('Pick a place first');
+  await page.keyboard.press('1');
+  await expect(page.locator('.cand.selected')).toHaveCount(1);
+  await page.keyboard.press('m');
+  await expect(page.locator('.count')).toHaveText('1 / 3');
+
+  const { data: ev } = await admin.from('review_events').select('*').eq('task', key);
+  expect(ev).toHaveLength(1);
+  expect(ev![0].verdicts).toMatchObject({ arm: 'shown', pick: 1, relation: 'moved' });
+  expect(ev![0].proposal_shown).toBe(true);
+
+  // Undo puts the same item back at its place in the order.
+  await loaded();
+  await page.keyboard.press('u');
+  await expect(page.locator('.count')).toHaveText('0 / 3');
+  await expect(page.locator('.label')).toHaveText(first);
+
+  // `/` is search here, not the command palette; Enter picks what was typed, even when it is
+  // pressed before the debounced search has answered (the empty query would give the nearest place).
+  await loaded();
+  await page.keyboard.press('/');
+  await expect(page.locator('input[type=search]').first()).toBeFocused();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.keyboard.type('Ga');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.picked b')).toHaveText('Ga');
+  await page.keyboard.press('s');
+  await expect(page.locator('.count')).toHaveText('1 / 3');
+  const { data: found } = await admin
+    .from('review_events')
+    .select('verdicts')
+    .eq('task', key)
+    .order('id', { ascending: false })
+    .limit(1);
+  expect(found![0].verdicts).toMatchObject({
+    pick_via: 'search',
+    relation: 'same_building',
+    target: { name: 'Ga' },
+  });
+
+  // `?` is "unsure" here and needs no place.
+  await loaded();
+  await page.keyboard.press('?');
+  await expect(page.locator('.count')).toHaveText('2 / 3');
+
+  // A stale item: the same item comes back with a new bound, and the page must start its clock again.
+  await loaded();
+  const id = `u${(await page.locator('.label').innerText()).slice(-3, -2)}`;
+  await admin.from('review_items').update({ bound: 'changed' }).eq('task', key).eq('item_id', id);
+  await page.keyboard.press('g');
+  await expect(page.locator('.message')).toContainText('changed');
+  await expect(page.locator('.count')).toHaveText('2 / 3');
+  await loaded();
+  await page.keyboard.press('g');
+  await expect(page.locator('.count')).toHaveText('3 / 3');
+  await expect(page.locator('.done h2')).toHaveText('All 3 done');
+  await expect(page.locator('.done')).toContainText('seconds per item');
+  await ctx.close();
 });

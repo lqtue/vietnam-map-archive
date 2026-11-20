@@ -56,6 +56,8 @@ The group in parentheses is the SvelteKit layout group, not part of the URL. Bot
 | `/scan?mode=text` | Check what came back: Names · Index · Numbers · Other | `src/lib/features/contribute/ocr/` |
 | `/scan?mode=shapes` | Draw · Segment · Validate, `?tab=` | `src/lib/features/contribute/{trace,review}/` |
 | `/scan?mode=legend` | Staff: place the numbered legend on the scan in image pixels — select, click to place, accept a numeral, batch save | `src/lib/features/contribute/legend/` |
+| `/review` | Staff: the open review tasks, with the items left for you | `src/lib/features/review/ReviewTaskList.svelte` |
+| `/review/[task]` | Staff: one review task, one item at a time — keys, a blind arm, seconds per item measured. A key `place-link-…` draws the place-link task | `src/lib/features/review/` |
 | `/trip/[id]` | Story playback | `src/lib/features/stories/play/` |
 | `/catalog` | Faceted catalog + series band + inline admin | `src/lib/features/catalog/`, `src/routes/(editorial)/catalog/` |
 | `/catalog/[id]` | One sheet: the record **and** its tiled scan (`SheetZoom`, full-screen). `[id]` is the **slug** (mig 088); a uuid or a retired slug 301s to it | `src/routes/(editorial)/catalog/[id]/` |

@@ -1,6 +1,6 @@
 # Review page — requirements, design and interaction
 
-Status: proposal, 2026-10-14. PR 1 (Store) built on branch `review-store`: migration 122, the two pipeline endpoints, `review_sync.py`, the place-link adapter. Nothing else. Serves bet 2 (`review-events`) and bet 1a (`place-links`).
+Status: 2026-10-20. PR 1 (Store) merged (#82; migration 122 live). PR 2 (Page) built on branch `review-page`: the five `/api/review/*` routes, `/review` and `/review/[task]`, the place-link task, `review_items.py --crops`. Not yet run on real items: the crops have to be rendered and uploaded to R2, and the items pushed (Tue; §8 step 3). Serves bet 2 (`review-events`) and bet 1a (`place-links`).
 
 **Question.** Can the offline review pages (`work/review-kit/`) move into the VMA web app, so that
 anyone we invite can judge items, without changing what a verdict means or how its time is measured?
@@ -101,6 +101,7 @@ IIIF worker serves only its stored tiles, and other regions fall back to slow or
 |---|---|---|
 | `/review` | staff (v1) | The open tasks, each with items left for you and your last sitting |
 | `/review/[task]` | staff (v1) | The review page |
+| `GET /api/review/tasks` | session | The open staff tasks with items left for you (added in PR 2, for `/review`) |
 | `GET /api/review/[task]/next` | session | The next item for this reviewer, proposal stripped on the blind arm |
 | `POST /api/review/[task]/verdict` | session | Validate and insert one event |
 | `POST /api/review/[task]/undo` | session | Append the undo event for your last live verdict |
@@ -110,6 +111,17 @@ IIIF worker serves only its stored tiles, and other regions fall back to slow or
 
 The page uses the tool register (full-bleed under the nav). A row goes in the `Tools ▾` staff group,
 `paletteDestinations.ts` and `/directory`.
+
+- As built (PR 2): the arm is `hash(seed, reviewer, item) < blind_frac` over items that have a proposal
+  (FNV-1a, `$lib/server/reviewArms.ts`), so a reviewer's blind share is about 20%, not exactly 20% as
+  `confirm.py` draws it. The paper reports the share each reviewer met, counted from `proposal_shown`.
+  The server recomputes the arm and writes it into `verdicts.arm`; the client never sends or sees it.
+  `payload.pool` is never sent to the page; search reads it on the server. A task key is a kind or a
+  kind and a suffix: `place-link`, `place-link-2` use the place-link definition (`taskFor`).
+  `decided_at` may be up to 10 s ahead of the server clock (a browser's clock is not the server's).
+- Crops: `review_items.py --crops` writes plain close and context PNGs (no overlay) and `payload.views`
+  says where each one sits (`x0`, `y0`, `side` in source px; `out` in image px). They go to
+  `r2:vma-tiles/review/place-link/` (`tiles.maparchive.vn`), a production write that Tue runs.
 
 ## 5. Page design
 
@@ -259,7 +271,7 @@ and the exported file scores identically when fed through `confirm.py`'s scoring
 
 ## 9. Open questions
 
-1. Route: `/review` (proposed) or under `/contribute/`?
+1. Route: `/review` (proposed) or under `/contribute/`? Decided in PR 2: `/review`, as proposed.
 2. Should contributors see the "See today" links to Google? (They make the task easier, and every
    reviewer sees the same thing, so the measure stays fair.)
 3. Does a contributor's verdict count toward the paper's numbers, or only Tue's? (Proposed: the
