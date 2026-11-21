@@ -37,7 +37,7 @@ export interface HomeFavorites {
  * from, which stops being true the moment someone georeferences that sheet.
  * One tab's lifetime is the right memory for a fact with that shelf life.
  */
-const THUMB_CACHE_KEY = 'vma-thumb-cache-v1';
+const THUMB_CACHE_KEY = 'vma-thumb-cache-v2';
 
 function readCache(): Record<string, string | null> {
   try {
@@ -55,7 +55,11 @@ function writeCache(source: string, value: string | null): void {
   }
 }
 
-/** The IIIF image a map's Allmaps annotation points at, 400px wide. */
+/**
+ * The IIIF image a map's Allmaps annotation points at, 800px wide. Not `,400`: VMA's
+ * IIIF service holds only the sizes it was tiled with, so a height-only size is a 404
+ * on 973 of 1,000 maps (2026-11-21). `800,` is the width every sheet has (1,000 of 1,000).
+ */
 async function fetchThumbnailUrl(source: string): Promise<string | null> {
   const cache = readCache();
   if (Object.prototype.hasOwnProperty.call(cache, source)) return cache[source];
@@ -65,7 +69,7 @@ async function fetchThumbnailUrl(source: string): Promise<string | null> {
     const response = await fetch(annotationUrlForSource(source));
     if (response.ok) {
       const id = (await response.json())?.items?.[0]?.target?.source?.id;
-      if (id) url = `${id}/full/,400/0/default.jpg`;
+      if (id) url = `${id}/full/800,/0/default.jpg`;
     }
   } catch {
     /* offline or CORS — falls through as a miss, same as a 404 */
