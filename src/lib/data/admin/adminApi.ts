@@ -125,7 +125,9 @@ export interface MirrorR2Result {
 export async function mirrorToR2(mapId: string): Promise<MirrorR2Result> {
   return apiFetch<MirrorR2Result>(
     `/api/admin/maps/${mapId}/mirror-r2`,
-    { method: 'POST' },
+    // Empty JSON body: hooks.server.ts refuses a write whose body is not JSON, and on
+    // Cloudflare a body-less POST still arrives with a (zero-length) body stream.
+    jsonInit('POST', {}),
     'Failed to mirror to R2'
   );
 }
@@ -137,7 +139,9 @@ export async function mirrorToR2(mapId: string): Promise<MirrorR2Result> {
 export async function syncAllmaps(mapId: string): Promise<MirrorR2Result> {
   return apiFetch<MirrorR2Result>(
     `/api/admin/maps/${mapId}/sync-allmaps`,
-    { method: 'POST' },
+    // Empty JSON body: hooks.server.ts refuses a write whose body is not JSON, and on
+    // Cloudflare a body-less POST still arrives with a (zero-length) body stream.
+    jsonInit('POST', {}),
     'Failed to fetch the latest annotation from Allmaps'
   );
 }
