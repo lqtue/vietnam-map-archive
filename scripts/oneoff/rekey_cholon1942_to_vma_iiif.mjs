@@ -17,25 +17,45 @@ const db = createClient(process.env.PUBLIC_SUPABASE_URL, process.env.SUPABASE_SE
 });
 
 const newId = await generateId(VMA_IMAGE);
-const { data: map, error } = await db.from('maps').select('id, slug, allmaps_id, annotation_url').eq('id', MAP_ID).single();
+const { data: map, error } = await db
+  .from('maps')
+  .select('id, slug, allmaps_id, annotation_url')
+  .eq('id', MAP_ID)
+  .single();
 if (error) throw error;
 const { data: imgs, error: e2 } = await db.from('map_images').select('*').eq('map_id', MAP_ID);
 if (e2) throw e2;
-console.log('map', { slug: map.slug, allmaps_id: map.allmaps_id, annotation_url: map.annotation_url });
+console.log('map', {
+  slug: map.slug,
+  allmaps_id: map.allmaps_id,
+  annotation_url: map.annotation_url,
+});
 console.log('new allmaps_id', newId);
 for (const s of imgs) {
   const h = s.iiif_image ? await generateId(s.iiif_image.replace(/\/info\.json$/, '')) : null;
-  console.log('source', { source_type: s.source_type, label: s.label, iiif_image: s.iiif_image, hash: h, matches_new: h === newId });
+  console.log('source', {
+    source_type: s.source_type,
+    label: s.label,
+    iiif_image: s.iiif_image,
+    hash: h,
+    matches_new: h === newId,
+  });
 }
 const live = await fetch(`https://annotations.allmaps.org/images/${newId}`);
 console.log('annotation on Allmaps', live.status);
 if (!imgs.some((s) => s.iiif_image && s.iiif_image.replace(/\/info\.json$/, '') === VMA_IMAGE))
-  console.log('WARNING: no map_images row has the VMA image URL; verifiedEditorSourceId() would not find it');
+  console.log(
+    'WARNING: no map_images row has the VMA image URL; verifiedEditorSourceId() would not find it'
+  );
 if (live.status !== 200) throw new Error('annotation not found on Allmaps; not applying');
 
 if (apply) {
   const patch = { allmaps_id: newId };
-  if (map.annotation_url) console.log('NOTE: annotation_url is set and takes precedence in mapBounds; left unchanged:', map.annotation_url);
+  if (map.annotation_url)
+    console.log(
+      'NOTE: annotation_url is set and takes precedence in mapBounds; left unchanged:',
+      map.annotation_url
+    );
   const { error: e3 } = await db.from('maps').update(patch).eq('id', MAP_ID);
   if (e3) throw e3;
   console.log('applied', patch, 'previous allmaps_id', map.allmaps_id);
