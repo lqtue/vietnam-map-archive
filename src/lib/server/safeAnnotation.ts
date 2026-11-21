@@ -40,12 +40,15 @@ export async function fetchAnnotationJson(value: string): Promise<unknown> {
     if (data.size > MAX_ANNOTATION_BYTES) throw new Error('Annotation is too large');
     return JSON.parse(await data.text());
   }
+  // Cloudflare Workers' fetch rejects redirect: 'error' (only 'follow' / 'manual') and, on older
+  // compatibility dates, any `cache` option, so both threw before any request was made and every
+  // upstream sync failed as a 502. 'manual' + refusing 3xx keeps the no-redirect rule.
   const response = await fetch(value, {
-    redirect: 'error',
-    cache: 'no-store',
+    redirect: 'manual',
     signal: AbortSignal.timeout(10_000),
-    headers: { Accept: 'application/json' },
+    headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
   });
+  if (response.status >= 300 && response.status < 400) throw new Error('Annotation URL redirected');
   if (!response.ok) throw new Error(`Annotation fetch failed (${response.status})`);
   const reader = response.body?.getReader();
   if (!reader) throw new Error('Annotation response has no body');
