@@ -16,11 +16,13 @@ earlier were **not** used, so this is a placement run, not a blind measurement.
 ## Result
 | | Sheets |
 |---|---|
-| Passed gates, stored and pushed | 145 (79 clean border, 66 border-suspect) |
-| Failed gates (holds) | 75: lines not found as equally spaced set 27, lines disagree 16, no frame band 9, one line fit failed ~21, border trace 3, crash 1 |
-| Data defect | 1: Cap St. Jacques (E), image is another sheet |
+| Passed gates, stored and pushed | 159: 145 from the lines-first run (79 clean border, 66 border-suspect), plus 14 recovered from the holds with `--method old` (11 clean, 3 suspect), eye-checked at zoom |
+| Holds | 61 failed gates (list in `325-holds.md`). A refit that drops one failed line was tried on 16 sheets and recovered 0 (half sheets have only 2 interior lon lines); it was not kept |
+| Data defect | Cap St. Jacques (E), image is another sheet (public, not placed); My - Tho (E) is archived with no IIIF source |
 
 Drift check after the push: 144 maps checked, 0 differ; Vinh (E) failed once on a network error and was re-pushed.
+
+Pak-Hin-Boun (W): the printed longitude label reads like 115°60′ while the fit (and the catalogue, Thakhek and Kam-Kout in the margins) say 113.6 grades. Kept as placed; likely a misread digit, not confirmed.
 
 ## Caveats
 - All 221 rows were already public, so storing a georef made it live at once (no draft step). Tue chose that: fix later in Allmaps.
@@ -30,4 +32,4 @@ Drift check after the push: 144 maps checked, 0 differ; Vinh (E) failed once on 
 - Allmaps is push-only: re-running the writer or `allmaps_push.mjs` overwrites edits made in the Allmaps editor.
 
 ## Next
-Place the 75 holds by hand (Allmaps editor). Look at the 66 border-suspect sheets first in `/explore`.
+Place the holds by hand (Allmaps editor). Look at the 66 border-suspect sheets first in `/explore`.
