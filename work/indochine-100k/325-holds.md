@@ -1,6 +1,6 @@
 # Series 325: sheets not placed (2026-11-27)
 
-62 of 221 sheets (61 below plus My - Tho (E)). Place by hand in the Allmaps editor, or skip. 159 sheets are placed.
+62 of 221 sheets (61 below plus My - Tho (E)). Place by hand in the Allmaps editor, or skip. Every sheet listed failed both methods; headings use the border-first run's failure message, so they are not separate causes from the lines-first ones. 60 failed the gates, plus Cap St. Jacques (E) and My - Tho (E) below. 159 sheets are placed.
 
 
 ## Border-first method: expected grade line not found near its placed near its predicted positi (34)

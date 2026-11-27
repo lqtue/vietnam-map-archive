@@ -17,12 +17,14 @@ earlier were **not** used, so this is a placement run, not a blind measurement.
 | | Sheets |
 |---|---|
 | Passed gates, stored and pushed | 159: 145 from the lines-first run (79 clean border, 66 border-suspect), plus 14 recovered from the holds with `--method old` (11 clean, 3 suspect), eye-checked at zoom |
-| Holds | 61 failed gates (list in `325-holds.md`). A refit that drops one failed line was tried on 16 sheets and recovered 0 (half sheets have only 2 interior lon lines); it was not kept |
+| Holds | 60 failed the gates on both methods (list in `325-holds.md`). A refit that drops one failed line was tried on 16 sheets and recovered 0 (half sheets have only 2 interior lon lines); it was not kept |
 | Data defect | Cap St. Jacques (E), image is another sheet (public, not placed); My - Tho (E) is archived with no IIIF source |
 
 Drift check after the push: 144 maps checked, 0 differ; Vinh (E) failed once on a network error and was re-pushed.
 
 Pak-Hin-Boun (W): the printed longitude label reads like 115°60′ while the fit (and the catalogue, Thakhek and Kam-Kout in the margins) say 113.6 grades. Kept as placed; likely a misread digit, not confirmed.
+
+Cross-sheet check (read-only, stored `bbox` of the 159): no two sheets overlap by more than 40% of the smaller one, and no half-sheet pair overlaps beyond its shared edge. It would catch a wrong-image record like Cap St. Jacques (E).
 
 ## Caveats
 - All 221 rows were already public, so storing a georef made it live at once (no draft step). Tue chose that: fix later in Allmaps.
